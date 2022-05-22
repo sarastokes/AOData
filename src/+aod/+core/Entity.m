@@ -1,4 +1,19 @@
-classdef Entity < handle 
+classdef (Abstract) Entity < handle 
+% ENTITY
+%
+% Constructor:
+%   obj = aod.core.Entity()
+%
+% Properties:
+%   Parent                      aod.core.Entity
+%   parameters                  containers.Map()
+%   notes                       cell
+%   allowableParentTypes        cellstr
+%   allowableChildTypes         cellstr
+%
+% Dependent properties:
+%   displayName                 string
+%   shortName                   string
 %
 % Methods:
 %   addParameter(obj, name, value)
@@ -8,8 +23,13 @@ classdef Entity < handle
 %   clearNotes(obj)
 %
 % Protected Methods:
-%   getShortName
-%   getDisplayName
+%   addParent(obj, parent)
+%   x = getShortName(obj)
+%   x = getDisplayName(obj)
+%   addParserToParams(obj, S)
+%
+% Private methods:
+%   tf = isValidParent(obj, parent)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -45,10 +65,20 @@ classdef Entity < handle
 
     methods 
         function addParameter(obj, paramName, paramValue)
+            % ADDPARAMETER
+            %
+            % Syntax:
+            %   obj.addParameter(paramName, paramValue)
+            % -------------------------------------------------------------
             obj.parameters(paramName) = paramValue;
         end
 
         function value = getParameter(obj, paramName)
+            % GETPARAMETER
+            %
+            % Syntax:
+            %   value = obj.getParameter(paramName)
+            % -------------------------------------------------------------
             if ~isKey(obj.parameters, paramName)
                 error('Parameter %s not found!', paramName);
             end
@@ -66,6 +96,9 @@ classdef Entity < handle
 
         function removeNote(obj, noteID)
             % REMOVENOTE
+            %
+            % Syntax:
+            %   obj.removeNote(noteID)
             % -------------------------------------------------------------
             if noteID > numel(obj.notes)
                 error('Note %u is invalid. %u notes exist',... 
@@ -89,6 +122,8 @@ classdef Entity < handle
         function displayName = getDisplayName(obj)  
             % GETDISPLAYNAME
             %      
+            % Syntax:
+            %   displayName = obj.getDisplayName()
             % -------------------------------------------------------------
             displayName = ao.util.class2char(obj);
         end
@@ -107,16 +142,45 @@ classdef Entity < handle
 
     methods (Access = protected)
         function setParent(obj, parent)
+            % SETPARENT
+            %   
+            % Syntax:
+            %   obj.setParent(parent)
+            % -------------------------------------------------------------
             if obj.isValidParent(parent)
                 obj.Parent = parent;
             else
                 error('%s is not a valid parent', class(parent));
             end
         end
+
+        function addParserToParams(obj, S)
+            % ADDPARSERTOPARAMS
+            %
+            % Syntax:
+            %   obj.addParserToParams(S)
+            %
+            % Input:
+            %   S       struct
+            %       The "Results" structure from inputParser
+            %
+            % See also:
+            %   inputParser
+            % -------------------------------------------------------------
+            f = fieldnames(S);
+            for i = 1:numel(f)
+                obj.parameters(f{i}) = S.(f{i});
+            end
+        end
     end
 
     methods (Access = private)
         function tf = isValidParent(obj, parent)
+            % ISVALIDPARENT
+            %
+            % Syntax:
+            %   tf = isValidParent(parent)
+            % -------------------------------------------------------------
             if isempty(obj.allowableParentTypes)
                 tf = true;
             elseif ismember(class(parent), obj.allowableParentTypes)
