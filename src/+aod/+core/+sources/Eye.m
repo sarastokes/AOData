@@ -13,6 +13,7 @@ classdef Eye < aod.core.Source
     methods
         function obj = Eye(parent, whichEye, varargin)
             obj@aod.core.Source(parent);
+            obj.whichEye = whichEye;
 
             ip = inputParser();
             ip.CaseSensitive = false;

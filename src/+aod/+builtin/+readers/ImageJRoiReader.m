@@ -24,13 +24,13 @@ classdef ImageJRoiReader < aod.core.FileReader
 %   19May2022 - SSP - Redesigned as FileReader
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
-        imSize
+        Size(1,2) {mustBeInteger}
     end
 
     methods
         function obj = ImageJRoiReader(fullFilePath, imSize)
             obj@aod.core.FileReader(fullFilePath);
-            obj.imSize = imSize;
+            obj.Size = imSize;
         end
 
         function getFileName(~, varargin)

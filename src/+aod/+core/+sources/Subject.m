@@ -2,13 +2,19 @@ classdef Subject < aod.core.Source
 
     properties
         ID
-        Eyes
+        Eyes        % Keep?
     end
     
     methods 
         function obj = Subject(ID, parent, varargin)
+            if nargin < 2
+                parent = [];
+            end
+
             obj@aod.core.Source(parent);
-            obj.ID = ID;
+            if nargin > 0
+                obj.ID = ID;
+            end
 
             ip = inputParser();
             ip.CaseSensitive = false;

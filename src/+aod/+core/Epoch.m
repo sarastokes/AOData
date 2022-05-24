@@ -1,15 +1,25 @@
 classdef (Abstract) Epoch < ao.core.Entity 
 %
+% Abstract methods:
+%   populateEpoch(obj, varargin)
+%   videoName = getCoreVideoName(obj)
+% 
 % Public methods:
-%   addTransform
-%   clearTransform
-%   clearVideoCache
-%   getStack
-%   makeStackSnapshots
+%   addTransform(obj, tform)
+%   clearTransform(obj)
+%   clearVideoCache(obj)
+%   getStack(obj, varargin)
+%   makeStackSnapshots(obj)
+%
+% Protected methods:
+%   imStack = readStack(obj, videoName)
+%   imStack = applyTransform(obj, imStack)
+%   fName = getFilePath(obj, whichFile)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         ID(1,1) double
+        startTime(1,1)  datetime
 
         files = struct.empty()
         transform(1,1) affine2d
@@ -27,6 +37,9 @@ classdef (Abstract) Epoch < ao.core.Entity
 
     % Methods for subclasses to overwrite
     methods (Abstract, Access = protected)
+        % Load epoch-specific data
+        populateEpoch(obj, varargin);
+        % Main analysis video name, accessed with 'getStack'
         videoName = getCoreVideoName(obj);
     end
 

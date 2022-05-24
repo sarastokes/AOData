@@ -7,6 +7,7 @@ classdef (Abstract) Entity < handle
 % Properties:
 %   Parent                      aod.core.Entity
 %   parameters                  containers.Map()
+%   description                 string
 %   notes                       cell
 %   allowableParentTypes        cellstr
 %   allowableChildTypes         cellstr
@@ -35,6 +36,7 @@ classdef (Abstract) Entity < handle
     properties (SetAccess = private)
         Parent
         parameters
+        description string = string.empty() 
         notes = cell.empty();
     end
 
@@ -64,6 +66,30 @@ classdef (Abstract) Entity < handle
     end
 
     methods 
+        function setDescription(obj, txt, overwrite)
+            % SETDESCRIPTION
+            %
+            % Syntax:
+            %   setDescription(obj, txt, overwrite)
+            %
+            % Inputs:
+            %   txt         string
+            %       Description
+            % Optional inputs:
+            %   overwrite   logical (default = false)
+            %       Whether to overwrite existing description 
+            % -------------------------------------------------------------
+            if nargin < 3
+                overwrite = false;
+            end
+
+            if ~isempty(obj.description) && ~overwrite 
+                warning('Set overwrite=true to change existing description');
+                return
+            end
+            obj.description = txt;
+        end
+
         function addParameter(obj, paramName, paramValue)
             % ADDPARAMETER
             %
@@ -128,7 +154,6 @@ classdef (Abstract) Entity < handle
             displayName = ao.util.class2char(obj);
         end
 
-
         function shortName = getShortName(obj)
             % GETSHORTNAME
             % 
@@ -147,6 +172,10 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.setParent(parent)
             % -------------------------------------------------------------
+            if isempty(parent)
+                return
+            end
+            
             if obj.isValidParent(parent)
                 obj.Parent = parent;
             else

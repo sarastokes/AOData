@@ -12,7 +12,7 @@ classdef RigidTransformReader < aod.core.FileReader
 % -------------------------------------------------------------------------
     
     properties
-        Count
+        Count(1,1) {mustBeInteger} = 0
     end
 
     methods

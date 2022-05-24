@@ -1,45 +1,35 @@
 classdef Regions < aod.core.Entity
 
-    properties (SetAccess = private)
-        Map
-        Count
-        Metadata
+    properties (SetAccess = protected)
+        Map double
+        Count(1,1) {mustBeInteger} = 0
+        Metadata table = table.empty()
     end
 
-    properties (Access = private)
+    properties (Access = protected)
         Reader
     end
 
+    methods (Abstract)
+        load(obj, varargin)
+    end
+
     methods
-        function obj = Regions(parent, rois)
-            if ~ischar(rois) || ~isstring(rois)
-                obj.Map = rois;
-            end
+        function obj = Regions(parent, rois, varargin)
 
             obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Epoch'};
 
             if ~isempty(parent)
                 obj.addParent(parent);
             end
-        end
 
-        function loadRois(obj, rois, imSize)
-            if isnumeric(obj.rois)
-                if ~isdouble(obj.rois)
-                    obj.rois = double(obj.rois);
+            if ~isempty(rois)
+                if ~ischar(rois) || ~isstring(rois)
+                    obj.Map = rois;
+                else
+                    obj.load(rois, varargin{:});
                 end
-                obj.setMap(rois);
-                obj.Reader = [];
-            else
-                roiFileName = char(rois);
-                if endsWith(roiFileName, 'zip')
-                    obj.Reader = ao.builtin.readers.ImageJRoiReader(roiFileName, imSize);
-                elseif endsWith(roiFileName, 'csv')
-                    obj.Reader = ao.builtin.readers.CsvReader(roiFileName);
-                end
-                obj.setMap(obj.Reader.read());
             end
-
         end
 
         function reload(obj)
@@ -49,34 +39,6 @@ classdef Regions < aod.core.Entity
             newMap = obj.Reader.reload();
             obj.setMap(newMap);
         end
-
-    end
-
-    methods
-        function xy = getRoiCenters(obj, ID)
-            % GETROICENTERS
-            %
-            % Description:
-            %   Get the centroids of all rois (default) or specific roi(s)
-            %
-            % Syntax:
-            %   xy = obj.getRoiCentroids(ID)
-            %
-            % Optional inputs:
-            %   ID          numeric
-            %       Specific roi ID(s), otherwise returns all rois
-            % -------------------------------------------------------------
-            if isempty(obj.rois)
-                error('AO.CORE.DATSET: No rois found!');
-            end
-
-            S = regionprops("table", obj.Map, "Centroid");
-            xy = S.Centroid;
-            if nargin == 2
-                xy = xy(ID,:);
-            end
-        end
-           
     end
 
     % Metadata-related methods
@@ -155,8 +117,7 @@ classdef Regions < aod.core.Entity
         end
     end
 
-    methods (Access = private)
-
+    methods (Access = protected)
         function setMap(obj, roiMap)
             obj.Map = roiMap;
             obj.Count = nnz(unique(obj.Map));

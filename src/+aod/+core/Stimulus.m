@@ -1,4 +1,13 @@
-classdef Stimulus < ao.core.Entity
+classdef Stimulus < aod.core.Entity
+
+    properties (SetAccess = protected)
+        presentation timetable
+        stimParameters
+    end
+
+    methods (Abstract)
+        loadPresentation(obj, varargin)
+    end
 
     methods
         function obj = Stimulus(parent)
@@ -6,6 +15,7 @@ classdef Stimulus < ao.core.Entity
             if nargin == 1
                 obj.setParent(parent);
             end
+            obj.stimParameters = containers.Map();
         end
     end
 end
