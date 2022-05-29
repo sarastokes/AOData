@@ -1,4 +1,5 @@
-classdef (Abstract) Epoch < ao.core.Entity 
+classdef (Abstract) Epoch < aod.core.Entity 
+% EPOCH
 %
 % Abstract methods:
 %   populateEpoch(obj, varargin)
@@ -18,13 +19,18 @@ classdef (Abstract) Epoch < ao.core.Entity
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        ID(1,1) double
-        startTime(1,1)  datetime
+        ID(1,1)                     double     = 0
+        Responses                   %aod.core.Response
+        epochParameters
+    end
 
-        files = struct.empty()
-        transform(1,1) affine2d
-        registration 
-        droppedFrames
+    properties (SetAccess = ?aod.core.Creator)
+        startTime(1,1)              datetime
+        stopTime(1,1)               datetime
+
+        files                       
+        transform                   affine2d
+        Registration                aod.core.Registration 
     end
 
     properties (Dependent, Hidden)
@@ -38,19 +44,23 @@ classdef (Abstract) Epoch < ao.core.Entity
     % Methods for subclasses to overwrite
     methods (Abstract, Access = protected)
         % Load epoch-specific data
-        populateEpoch(obj, varargin);
+        % populateEpoch(obj, varargin);
         % Main analysis video name, accessed with 'getStack'
         videoName = getCoreVideoName(obj);
     end
 
     methods 
         function obj = Epoch(ID, parent)
-            obj.ID = ID;
+            if nargin > 0
+                obj.ID = ID;
+            end
 
             obj.allowableParentTypes = {'aod.core.Dataset'};
             if nargin == 2
                 obj.setParent(parent);
             end
+            obj.epochParameters = containers.Map();
+            obj.files = containers.Map();
         end
 
         function value = get.homeDirectory(obj)
@@ -194,6 +204,25 @@ classdef (Abstract) Epoch < ao.core.Entity
             %   shortName = obj.getShortName()
             % -------------------------------------------------------------
             shortName = sprintf('Epoch%u', obj.ID);
+        end
+    end
+
+    methods % (Access = ?aod.core.Creator)
+        function addParameter(obj, paramName, paramValue)
+            obj.epochParameters(paramName) = paramValue;
+        end
+
+        function addFile(obj, fileName, filePath)
+            % ADDFILE
+            %
+            % Description:
+            %   Adds to files prop, stripping out homeDirectory if needed
+            %
+            % Syntax:
+            %   obj.addFile(fileName, filePath)
+            % -------------------------------------------------------------
+            filePath = erase(filePath, obj.Parent.homeDirectory);
+            obj.files(fileName) = filePath;
         end
     end
 end 

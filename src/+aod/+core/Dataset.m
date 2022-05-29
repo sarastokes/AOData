@@ -1,4 +1,4 @@
-classdef Dataset < aod.core.Entity
+classdef (Abstract) Dataset < aod.core.Entity
 % DATASET
 %
 % Constructor:
@@ -12,25 +12,35 @@ classdef Dataset < aod.core.Entity
 %   data = getRegionResponses(obj, epochIDs)
 % -------------------------------------------------------------------------
 
-    properties
-        homeDirectory {mustBeFolder}
-        experimentDate(1,1) datetime
+    properties (SetAccess = private)
+        homeDirectory           %{mustBeFolder}
+        experimentDate(1,1)     datetime
+        datasetParameters
 
-        Epochs
-        Source 
-        Regions
+        Epochs                  %aod.core.Epoch
+        Source                  %aod.core.Source
+        Regions                 %aod.core.Regions
 
-        epochIDs
+        epochIDs                double
     end
 
     properties (Hidden, SetAccess = private)
         baseDirectory       % File path used to initialize Dataset
     end
+
+    methods (Abstract)
+        value = getFileHeader(obj)
+    end
     
     methods 
-        function obj = Dataset(expDate, source)
-            obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
-            obj.Source = source;
+        function obj = Dataset(homeDirectory, expDate)
+            obj.datasetParameters = containers.Map();
+            if nargin > 0
+                obj.setHomeDirectory(homeDirectory);
+            end
+            if nargin > 1
+                obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
+            end
         end
 
         function setHomeDirectory(obj, filePath)
@@ -55,6 +65,29 @@ classdef Dataset < aod.core.Entity
 
         function idx = id2idx(obj, IDs)
             idx = find(obj.epochIDs == IDs);
+        end
+
+        function value = getParameter(obj, paramName)
+            if ~isKey(obj.datasetParameters, paramName)
+                error('Parameter %s not found!', paramName);
+            end
+            value = obj.datasetParameters(paramName);
+        end
+    end
+
+    methods
+        function addRegions(obj, regions, overwrite)
+            if nargin < 3
+                overwrite = false;
+            end
+            assert(isa(regions, 'aod.core.Regions'), 'Input must be Regions object');
+            if ~isempty(obj.Regions)
+                if overwrite
+                    obj.Regions = regions;
+                else
+                    error('Set overwrite=true to overwrite existing regions');
+                end
+            end
         end
     end
 
@@ -91,6 +124,26 @@ classdef Dataset < aod.core.Entity
             if avgFlag && ndims(data) == 3
                 data = mean(data, 3);
             end
+        end
+    end
+
+    methods % (Access = ?aod.core.Creator)
+        function addSource(obj, source)
+            obj.Source = source;
+        end
+
+        function addParameter(obj, paramName, paramValue)
+            % ADDPARAMETER
+            %
+            % Syntax:
+            %   obj.addParameter(paramName, paramValue)
+            % -------------------------------------------------------------
+            obj.datasetParameters(paramName) = paramValue;
+        end
+
+        function addEpoch(obj)
+            assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
+            obj.Epochs = cat(1, obj.Epochs, epoch);
         end
     end
 end

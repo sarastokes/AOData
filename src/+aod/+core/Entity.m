@@ -34,16 +34,16 @@ classdef (Abstract) Entity < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent
-        parameters
-        description string = string.empty() 
-        notes = cell.empty();
+        Parent(1,1)                 %aod.core.Entity 
+        % parameters
+        description                 string = string.empty() 
+        notes                       cell = cell.empty();
     end
 
     
     properties (Hidden, SetAccess = protected)
-        allowableParentTypes = cell.empty();
-        allowableChildTypes = cell.empty();
+        allowableParentTypes        cell    = cell.empty();
+        allowableChildTypes         cell    = cell.empty();
     end
 
     properties (Dependent = true)
@@ -53,7 +53,7 @@ classdef (Abstract) Entity < handle
 
     methods
         function obj = Entity()
-            obj.parameters = containers.Map();
+            % obj.parameters = containers.Map();
         end
 
         function value = get.displayName(obj)
@@ -88,27 +88,6 @@ classdef (Abstract) Entity < handle
                 return
             end
             obj.description = txt;
-        end
-
-        function addParameter(obj, paramName, paramValue)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, paramValue)
-            % -------------------------------------------------------------
-            obj.parameters(paramName) = paramValue;
-        end
-
-        function value = getParameter(obj, paramName)
-            % GETPARAMETER
-            %
-            % Syntax:
-            %   value = obj.getParameter(paramName)
-            % -------------------------------------------------------------
-            if ~isKey(obj.parameters, paramName)
-                error('Parameter %s not found!', paramName);
-            end
-            value = obj.parameter(paramName);
         end
         
         function addNote(obj, txt)
@@ -162,7 +141,6 @@ classdef (Abstract) Entity < handle
             % -------------------------------------------------------------
             shortName = obj.getDisplayName();
         end
-
     end
 
     methods (Access = protected)
@@ -183,11 +161,11 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function addParserToParams(obj, S)
+        function addParserToParams(obj, paramObj, S) %#ok<INUSL> 
             % ADDPARSERTOPARAMS
             %
             % Syntax:
-            %   obj.addParserToParams(S)
+            %   obj.addParserToParams(paramObj, S)
             %
             % Input:
             %   S       struct
@@ -198,7 +176,7 @@ classdef (Abstract) Entity < handle
             % -------------------------------------------------------------
             f = fieldnames(S);
             for i = 1:numel(f)
-                obj.parameters(f{i}) = S.(f{i});
+                paramObj(f{i}) = S.(f{i});
             end
         end
     end
@@ -210,13 +188,23 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = isValidParent(parent)
             % -------------------------------------------------------------
+            tf = false;
             if isempty(obj.allowableParentTypes)
                 tf = true;
-            elseif ismember(class(parent), obj.allowableParentTypes)
-                tf = true;
-            else
-                tf = false;
+                return;
             end
+
+            for i = 1:numel(obj.allowableParentTypes)
+                if ~tf
+                    if isa(parent, obj.allowableParentTypes{i}) ...
+                            || ismember(obj.allowableParentTypes{i}, superclasses(class(parent)))
+                        tf = true;
+                    else
+                        tf = false;
+                    end
+                end
+            end
+            disp('hi');
         end
     end
 end 

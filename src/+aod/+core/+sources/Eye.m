@@ -7,6 +7,7 @@ classdef Eye < aod.core.Source
     end
 
     properties (Dependent)
+        ID
         micronsPerDegree
     end
 
@@ -20,6 +21,17 @@ classdef Eye < aod.core.Source
             addParameter(ip, 'AxialLength', [], @isnumeric);
             addParameter(ip, 'PupilSize', [], @isnumeric);
             parse(ip, varargin{:});
+
+            obj.axialLength = ip.Results.AxialLength;
+            obj.pupilSize = ip.Results.PupilSize;
+        end
+
+        function value = get.ID(obj)
+            try
+                value = obj.Parent.ID;
+            catch
+                value = [];
+            end
         end
         
         function value = get.micronsPerDegree(obj)
@@ -82,6 +94,30 @@ classdef Eye < aod.core.Source
 
             u0 = (obj.pupilSize() * pi * 10e5) / (wavelength * 180);
             otf = 2/pi * (acos(sf ./ u0) - (sf ./ u0) .* sqrt(1 - (sf./u0).^2));
+        end
+    end
+
+    methods (Access = protected)
+        function displayName = getDisplayName(obj)  
+            % GETDISPLAYNAME
+            %      
+            % Syntax:
+            %   displayName = obj.getDisplayName()
+            % -------------------------------------------------------------
+            try
+                displayName = [num2str(obj.Parent.ID), '_', obj.whichEye];
+            catch
+                displayName = obj.whichEye;
+            end
+        end
+
+        function shortName = getShortName(obj)
+            % GETSHORTNAME
+            % 
+            % Syntax:
+            %   shortName = obj.getShortName()
+            % -------------------------------------------------------------
+            shortName = obj.whichEye;
         end
     end
 end

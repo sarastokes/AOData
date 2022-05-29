@@ -1,12 +1,12 @@
 classdef Regions < aod.core.Entity
 
     properties (SetAccess = protected)
-        Map double
-        Count(1,1) {mustBeInteger} = 0
-        Metadata table = table.empty()
+        Map         double
+        Count(1,1) {mustBeInteger}  = 0
+        Metadata    table           = table.empty()
     end
 
-    properties (Access = protected)
+    properties %(Access = protected)
         Reader
     end
 
@@ -19,15 +19,13 @@ classdef Regions < aod.core.Entity
 
             obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Epoch'};
 
-            if ~isempty(parent)
-                obj.addParent(parent);
+            if nargin > 0 && ~isempty(parent)
+                obj.setParent(parent);
             end
 
-            if ~isempty(rois)
+            if nargin > 1 && ~isempty(rois)
                 if ~ischar(rois) || ~isstring(rois)
                     obj.Map = rois;
-                else
-                    obj.load(rois, varargin{:});
                 end
             end
         end
