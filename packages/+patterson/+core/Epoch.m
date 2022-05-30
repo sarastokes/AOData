@@ -31,5 +31,11 @@ classdef Epoch < aod.core.Epoch
             obj.cachedVideo = imStack;
         end
     end
+
+    methods (Access = protected)
+        function value = getDisplayName(obj)
+            value = [obj.Parent.displayName, '#', int2fixedwidthstr(obj.ID, 4)];
+        end
+    end
 end
 

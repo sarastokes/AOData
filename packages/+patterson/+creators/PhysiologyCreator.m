@@ -16,13 +16,16 @@ classdef PhysiologyCreator < aod.core.Creator
         end
 
         function addEpochs(obj, epochIDs)
+            fprintf('Adding epochs... ');
             for i = 1:numel(epochIDs)
                 %try
                     obj.makeEpoch(epochIDs(i));
                 % catch
                 %    warning('Unable to add epoch %u, skipping', epochIDs(i));
                 %end
+                fprintf('%u ', epochIDs(i));
             end
+            fprintf('\nDone.\n')
         end
     
         function addRegions(obj, regions)
@@ -34,7 +37,11 @@ classdef PhysiologyCreator < aod.core.Creator
         function makeEpoch(obj, epochID)
             ep = patterson.core.Epoch(epochID, obj.Dataset);
             obj.extractEpochAttributes(ep);
-            obj.populateVideoNames(ep);
+            obj.populateFileNames(ep);
+            if ~isempty(ep.getFilePath('RegistrationReport'))
+                reg = aod.builtin.registrations.StripRegistration(ep);
+                ep.addRegistration(reg);
+            end
             obj.Dataset.addEpoch(ep);
         end
     end
@@ -69,7 +76,7 @@ classdef PhysiologyCreator < aod.core.Creator
             ep.addStimulus(stim);
         end
 
-        function populateVideoNames(obj, ep)
+        function populateFileNames(obj, ep)
             epochID = ep.ID;
             % Ref channel search parameters
             refFiles = ls([obj.Dataset.homeDirectory, 'Ref']);
@@ -86,7 +93,7 @@ classdef PhysiologyCreator < aod.core.Creator
                 obj.Dataset.getEpochHeader(), '_', visStr, '.avi']);
 
             % Processed video for analysis
-            ep.addFile('AnalysisVideo', ['Analysis', filesep, visStr, '.tif']);
+            ep.addFile('AnalysisVideo', string(['Analysis', filesep, visStr, '.tif']));
 
             % Find registration report
             regFiles = refFiles(multicontains(refFiles, {'motion', 'csv'}));
@@ -98,7 +105,7 @@ classdef PhysiologyCreator < aod.core.Creator
                         numel(ind), epochID);
                 end
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('RegistrationReport', refFiles(ind));
+                ep.addFile('RegistrationReport', ["Ref" + filesep + regFiles(ind)]);
                 % aod.builtin.readers.RegistrationReportReader(refFiles(ind));
             else
                 warning('Registration report for epoch %u not found', epochID);
@@ -109,7 +116,7 @@ classdef PhysiologyCreator < aod.core.Creator
             ind = find(contains(regFiles, [refStr, '_']));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('RegistrationParameters', refFiles(ind));
+                ep.addFile('RegistrationParameters', ["Ref" + filesep + regFiles(ind)]);
             else
                 warning('Registration parameters for epoch %u not found', epochID);
             end
@@ -118,7 +125,7 @@ classdef PhysiologyCreator < aod.core.Creator
             ind = find(contains(refFiles, [refStr, '_linear']));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('ReferenceImage', refFiles(ind));
+                ep.addFile('ReferenceImage', ["Ref" + filesep + refFiles(ind)]);
             else
                 warning('Registration parameters for epoch %u not found', epochID);
             end
@@ -127,7 +134,7 @@ classdef PhysiologyCreator < aod.core.Creator
             ind = find(multicontains(refFiles, {refStr, 'frame', '.avi'}));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('RefVideoFrameReg', refFiles(ind));
+                ep.addFile('RefVideoFrameReg', ["Ref" + filesep + refFiles(ind)]);
             else
                 warning('Frame registered ref video for epoch %u not found', epochID);
             end
@@ -135,7 +142,7 @@ classdef PhysiologyCreator < aod.core.Creator
             ind = find(multicontains(visFiles, {visStr, 'frame', '.avi'}));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('VisVideoFrameReg', visFiles(ind));
+                ep.addFile('VisVideoFrameReg', ["Vis" + filesep + visFiles(ind)]);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
@@ -144,7 +151,7 @@ classdef PhysiologyCreator < aod.core.Creator
             ind = find(multicontains(refFiles, {refStr, 'strip', '.avi'}));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('RefVideoStripReg', refFiles(ind));
+                ep.addFile('RefVideoStripReg', ["Ref" + filesep + refFiles(ind)]);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
@@ -152,7 +159,7 @@ classdef PhysiologyCreator < aod.core.Creator
             ind = find(multicontains(visFiles, {visStr, 'strip', '.avi'}));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('VisVideoStripReg', visFiles(ind));
+                ep.addFile('VisVideoStripReg', ["Vis" + filesep + visFiles(ind)]);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end

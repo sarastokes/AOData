@@ -31,7 +31,7 @@ classdef (Abstract) Epoch < aod.core.Entity
 
     properties (SetAccess = ?aod.core.Creator)
         startTime(1,1)              datetime
-        Registration                aod.core.Registration
+        Registrations               %aod.core.Registration
         Stimuli                     
     end
 
@@ -77,8 +77,24 @@ classdef (Abstract) Epoch < aod.core.Entity
             % Syntax:
             %   fName = obj.getFilePath(whichFile)
             % -------------------------------------------------------------
-            assert(isKey(obj.files, whichFiles), sprintf('File named %s not found', whichFile));
+            assert(isKey(obj.files, whichFile), sprintf('File named %s not found', whichFile));
             fName = obj.Parent.homeDirectory + obj.files(whichFile);
+        end
+
+        function listParameters(obj)
+            dispMapContents(obj.epochParameters);
+        end
+
+        function listFiles(obj)
+            % LISTFILES
+            %
+            % Syntax:
+            %    obj.listFiles()
+            % -------------------------------------------------------------
+            k = obj.files.keys;
+            for i = 1:numel(k)
+                fprintf('%s =\n\t%s\n', k{i}, obj.files(k{i}));
+            end
         end
     end
 
@@ -239,6 +255,10 @@ classdef (Abstract) Epoch < aod.core.Entity
             %   obj.addStimulus(stim)
             % -------------------------------------------------------------
             obj.Stimuli = cat(1, obj.Stimuli, stim);
+        end
+
+        function addRegistration(obj, reg)
+            obj.Registrations = cat(1, obj.Registrations, reg);
         end
     end
 end 

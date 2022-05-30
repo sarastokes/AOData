@@ -13,5 +13,9 @@ classdef Stimulus < aod.core.Entity
             end
             obj.stimParameters = containers.Map();
         end
+
+        function addParameter(obj, paramName, paramValue)
+            obj.stimulusParameters(paramName) = paramValue;
+        end
     end
 end

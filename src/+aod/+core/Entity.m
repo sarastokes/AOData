@@ -204,7 +204,6 @@ classdef (Abstract) Entity < handle
                     end
                 end
             end
-            disp('hi');
         end
     end
 end 

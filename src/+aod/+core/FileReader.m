@@ -1,7 +1,7 @@
 classdef (Abstract) FileReader < handle
 
     properties (SetAccess = protected)
-        Path {mustBeFolder}
+        Path 
         Name
         Extension
     end
@@ -26,7 +26,7 @@ classdef (Abstract) FileReader < handle
     methods
         function obj = FileReader(varargin)
             if nargin == 1
-                assert(isfile(varargin{1}), 'Single input must be file name!');
+                % assert(isfile(varargin{1}), 'Single input must be file name!');
                 [obj.Path, obj.Name, obj.Extension] = fileparts(varargin{1});
             elseif nargin > 1
                 obj.getFileName(varargin{:});
@@ -34,7 +34,11 @@ classdef (Abstract) FileReader < handle
         end
 
         function value = get.fullFile(obj)
-            value = [obj.Path, filesep, obj.Name];
+            if ischar(obj.Path)
+                value = [obj.Path, filesep, obj.Name, obj.Extension];
+            else 
+                value = obj.Path + filesep + obj.Name + obj.Extension;
+            end
         end
 
         function out = reload(obj)
