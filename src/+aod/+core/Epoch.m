@@ -6,6 +6,7 @@ classdef (Abstract) Epoch < aod.core.Entity
 %   videoName = getCoreVideoName(obj)
 % 
 % Public methods:
+%   fName = getFilePath(obj, whichFile)
 %   addTransform(obj, tform)
 %   clearTransform(obj)
 %   clearVideoCache(obj)
@@ -15,22 +16,23 @@ classdef (Abstract) Epoch < aod.core.Entity
 % Protected methods:
 %   imStack = readStack(obj, videoName)
 %   imStack = applyTransform(obj, imStack)
-%   fName = getFilePath(obj, whichFile)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         ID(1,1)                     double     = 0
-        Responses                   %aod.core.Response
+        Responses                   aod.core.Response
         epochParameters
+    end
+
+    properties (SetAccess = protected)
+        files                       
+        transform                   affine2d
     end
 
     properties (SetAccess = ?aod.core.Creator)
         startTime(1,1)              datetime
-        stopTime(1,1)               datetime
-
-        files                       
-        transform                   affine2d
-        Registration                aod.core.Registration 
+        Registration                aod.core.Registration
+        Stimuli                     
     end
 
     properties (Dependent, Hidden)
@@ -43,8 +45,6 @@ classdef (Abstract) Epoch < aod.core.Entity
 
     % Methods for subclasses to overwrite
     methods (Abstract, Access = protected)
-        % Load epoch-specific data
-        % populateEpoch(obj, varargin);
         % Main analysis video name, accessed with 'getStack'
         videoName = getCoreVideoName(obj);
     end
@@ -69,6 +69,16 @@ classdef (Abstract) Epoch < aod.core.Entity
             else
                 value = [];
             end
+        end
+        
+        function fName = getFilePath(obj, whichFile)
+            % GETFILEPATH
+            %
+            % Syntax:
+            %   fName = obj.getFilePath(whichFile)
+            % -------------------------------------------------------------
+            assert(isKey(obj.files, whichFiles), sprintf('File named %s not found', whichFile));
+            fName = obj.Parent.homeDirectory + obj.files(whichFile);
         end
     end
 
@@ -179,13 +189,6 @@ classdef (Abstract) Epoch < aod.core.Entity
             end
         end
 
-        function fName = getFilePath(obj, whichFile)
-            % GETFILEPATH
-            % -------------------------------------------------------------
-            assert(ismember(whichFile, obj.files.fields), 'File name not found!');
-            fName = [obj.Parent.homeDirectory, obj.files(whichFile)];
-        end
-
         function displayName = getDisplayName(obj)  
             % GETDISPLAYNAME
             % May be overwritten by subclasses          
@@ -207,7 +210,11 @@ classdef (Abstract) Epoch < aod.core.Entity
         end
     end
 
-    methods % (Access = ?aod.core.Creator)
+    methods (Access = ?aod.core.Creator)
+        function setStartTime(obj, value)
+            obj.startTime = value;
+        end
+        
         function addParameter(obj, paramName, paramValue)
             obj.epochParameters(paramName) = paramValue;
         end
@@ -223,6 +230,15 @@ classdef (Abstract) Epoch < aod.core.Entity
             % -------------------------------------------------------------
             filePath = erase(filePath, obj.Parent.homeDirectory);
             obj.files(fileName) = filePath;
+        end
+
+        function addStimulus(obj, stim)
+            % ADDSTIMULUS
+            %
+            % Syntax:
+            %   obj.addStimulus(stim)
+            % -------------------------------------------------------------
+            obj.Stimuli = cat(1, obj.Stimuli, stim);
         end
     end
 end 

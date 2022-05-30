@@ -7,7 +7,7 @@ classdef Registration < aod.core.Entity
 
     methods
         function obj = Registration(parent, data)
-            obj.allowableParentTypes = {'aod.core.Dataset'};
+            obj.allowableParentTypes = {'aod.core.Epoch'};
             if nargin > 0
                 obj.addParent(parent);
             end

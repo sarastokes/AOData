@@ -9,8 +9,8 @@ classdef PhysiologyCreator < aod.core.Creator
             obj@aod.core.Creator(homeDirectory);
         end
 
-        function createDataset(obj, expDate, source, varargin)
-            obj.Dataset = patterson.datasets.Physiology(obj.homeDirectory, expDate);
+        function createDataset(obj, expDate, source, location, varargin)
+            obj.Dataset = patterson.datasets.Physiology(obj.homeDirectory, expDate, location);
             obj.Dataset.addSource(source);
             obj.Dataset.initParameters(varargin{:});
         end
@@ -24,11 +24,18 @@ classdef PhysiologyCreator < aod.core.Creator
                 %end
             end
         end
+    
+        function addRegions(obj, regions)
+            obj.Dataset.addRegions(regions);
+        end
+    end
 
+    methods (Access = private)
         function makeEpoch(obj, epochID)
             ep = patterson.core.Epoch(epochID, obj.Dataset);
             obj.extractEpochAttributes(ep);
-            obj.populateVideoNames(ep)
+            obj.populateVideoNames(ep);
+            obj.Dataset.addEpoch(ep);
         end
     end
 
@@ -44,14 +51,22 @@ classdef PhysiologyCreator < aod.core.Creator
             epochID = ep.ID;
             fName = obj.getAttributeFile(epochID);
 
+            txt = readProperty(fName, 'Date/Time = ');
+            txt = erase(txt, ' (yyyy-mm-dd:hh:mm:ss)');
+            ep.setStartTime(datetime(txt, 'InputFormat', 'yyyy-MM-dd HH:mm:ss'));
+
             ep.addFile('TrialFile', readProperty(fName, 'Trial file name = '));
             txt = strsplit(ep.files('TrialFile'), filesep);
             ep.addParameter('StimulusName', txt{end});
 
             ep.addParameter('RefPMT',...
-                readProperty(fName, 'Reflectance PMT gain  = '));
+                str2double(readProperty(fName, 'Reflectance PMT gain  = ')));
             ep.addParameter('VisPMT',...
-                readProperty(fName, 'Fluorescence PMT gain  = '));
+                str2double(readProperty(fName, 'Fluorescence PMT gain  = ')));
+            
+            mustangValue = str2double(readProperty(fName, 'AOM_VALUE1 = '));
+            stim = patterson.stimuli.Mustang(ep, mustangValue);
+            ep.addStimulus(stim);
         end
 
         function populateVideoNames(obj, ep)

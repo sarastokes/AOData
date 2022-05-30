@@ -1,4 +1,4 @@
-classdef (Abstract) Response < aod.core.Entity
+classdef Response < aod.core.Entity
 
     properties (SetAccess = private)
         Data 
@@ -7,7 +7,7 @@ classdef (Abstract) Response < aod.core.Entity
 
     methods
         function obj = Response(parent)
-            obj.allowableParentTypes = {'aod.core.Epoch'};
+            obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
             if nargin > 0
                 obj.addParent(parent);
             end

@@ -87,6 +87,8 @@ classdef (Abstract) Dataset < aod.core.Entity
                 else
                     error('Set overwrite=true to overwrite existing regions');
                 end
+            else
+                obj.Regions = regions;
             end
         end
     end
@@ -127,6 +129,13 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
     end
 
+    methods (Access = protected)
+        function value = getDisplayName(obj)
+            value = ['MC00', num2str(obj.Source.ID), '_', obj.Source.whichEye,...
+                '_', char(obj.experimentDate)];
+        end
+    end
+
     methods % (Access = ?aod.core.Creator)
         function addSource(obj, source)
             obj.Source = source;
@@ -141,9 +150,15 @@ classdef (Abstract) Dataset < aod.core.Entity
             obj.datasetParameters(paramName) = paramValue;
         end
 
-        function addEpoch(obj)
+        function addEpoch(obj, epoch)
+            % ADDEPOCH
+            %
+            % Syntax:
+            %   obj.addEpoch(obj, epoch)
+            % -------------------------------------------------------------
             assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
             obj.Epochs = cat(1, obj.Epochs, epoch);
+            obj.epochIDs = cat(2, obj.epochIDs, epoch.ID);
         end
     end
 end

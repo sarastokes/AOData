@@ -4,11 +4,7 @@ classdef Stimulus < aod.core.Entity
         presentation timetable
         stimParameters
     end
-
-    methods (Abstract)
-        loadPresentation(obj, varargin)
-    end
-
+    
     methods
         function obj = Stimulus(parent)
             obj.allowableParentTypes = {'aod.core.Epoch'};
