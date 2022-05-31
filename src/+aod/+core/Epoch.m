@@ -2,7 +2,6 @@ classdef (Abstract) Epoch < aod.core.Entity
 % EPOCH
 %
 % Abstract methods:
-%   populateEpoch(obj, varargin)
 %   videoName = getCoreVideoName(obj)
 % 
 % Public methods:
@@ -15,24 +14,26 @@ classdef (Abstract) Epoch < aod.core.Entity
 %
 % Protected methods:
 %   imStack = readStack(obj, videoName)
-%   imStack = applyTransform(obj, imStack)
+%
+% aod.core.Creator methods:
+%   addRegistration(obj, reg, overwrite)
+%   addStimulus(obj, stim)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         ID(1,1)                     double     = 0
-        Responses                   aod.core.Response
-        epochParameters
     end
 
     properties (SetAccess = protected)
-        files                       
-        transform                   affine2d
+        Responses                   aod.core.Response
+        epochParameters             % aod.core.Parameters
+        files                       % aod.core.Parameters             
     end
 
     properties (SetAccess = ?aod.core.Creator)
         startTime(1,1)              datetime
-        Registrations               %aod.core.Registration
-        Stimuli                     
+        Registrations               % aod.core.Registration
+        Stimuli                     % aod.core.Stimulus
     end
 
     properties (Dependent, Hidden)
@@ -59,8 +60,9 @@ classdef (Abstract) Epoch < aod.core.Entity
             if nargin == 2
                 obj.setParent(parent);
             end
-            obj.epochParameters = containers.Map();
-            obj.files = containers.Map();
+            
+            obj.epochParameters = aod.core.Parameters();
+            obj.files = aod.core.Parameters();
         end
 
         function value = get.homeDirectory(obj)
@@ -81,20 +83,8 @@ classdef (Abstract) Epoch < aod.core.Entity
             fName = obj.Parent.homeDirectory + obj.files(whichFile);
         end
 
-        function listParameters(obj)
-            dispMapContents(obj.epochParameters);
-        end
-
-        function listFiles(obj)
-            % LISTFILES
-            %
-            % Syntax:
-            %    obj.listFiles()
-            % -------------------------------------------------------------
-            k = obj.files.keys;
-            for i = 1:numel(k)
-                fprintf('%s =\n\t%s\n', k{i}, obj.files(k{i}));
-            end
+        function clearVideoCache(obj)
+            obj.cachedVideo = [];
         end
     end
 
@@ -102,6 +92,10 @@ classdef (Abstract) Epoch < aod.core.Entity
     methods 
         function imStack = getStack(obj)
             % GETSTACK
+            %
+            % Syntax:
+            %   imStack = obj.getStack()
+            % -------------------------------------------------------------
             if ~isempty(obj.cachedVideo)
                 imStack = obj.cachedVideo;
                 return;
@@ -113,60 +107,6 @@ classdef (Abstract) Epoch < aod.core.Entity
             obj.applyTransform(imStack);
 
             obj.cachedVideo = imStack;
-        end
-    end
-
-    % Misc access methods (see also Entity)
-    methods 
-        function clearVideoCache(obj)
-            obj.cachedVideo = [];
-        end
-
-        function addTransform(obj, tform)
-            obj.transform = tform;
-        end
-
-        function clearTransform(obj)
-            obj.transform = [];
-        end
-    end
-
-    methods
-        function makeStackSnapshots(obj, IDs, fPath)
-            % MAKESTACKSNAPSHOTS
-            %
-            % Description:
-            %   Mimics the Z-projections created by ImageJ and saves an
-            %   AVG, MAX, SUM and STD projection to 'Analysis/Snapshots/'
-            %
-            % Syntax:
-            %   obj.makeStackSnapshots(fPath);
-            %
-            % Optional Inputs:
-            %   IDs         array
-            %       Epoch IDs to create snapshots (default = obj.epochIDs)
-            % -------------------------------------------------------------
-            if nargin < 3
-                fPath = [obj.homeDirectory, 'Analysis', filesep, 'Snapshots', filesep];
-            end
-            
-            if nargin < 2 || isempty(obj.IDs)
-                IDs = 1:numel(obj.Epochs);
-            end
-
-            baseName = ['_', obj.getShortName(), '.png'];
-            imStack = obj.Epochs(IDs).getStack();
-            
-            % TODO: Omit dropped frames
-            imSum = sum(im2double(imStack), 3);
-            imwrite(uint8(255 * imSum/max(imSum(:))),...
-                [fPath, 'SUM', baseName], 'png');
-            imwrite(uint8(mean(imStack, 3)),...
-                [fPath, 'AVG', baseName], 'png');
-            imwrite(uint8(max(imStack, [], 3)),... 
-                [fPath, 'MAX', baseName], 'png');
-            imwrite(im2uint8(imadjust(std(im2double(imStack), [], 3))),... 
-                [fPath, 'STD', baseName], 'png');
         end
     end
 
@@ -182,27 +122,6 @@ classdef (Abstract) Epoch < aod.core.Entity
             end
             imStack = reader.read();
             fprintf('Loaded %s\n', videoName);
-        end
-
-        function imStack = applyTransform(obj, imStack)
-            if isempty(obj.transform)
-                return
-            end
-
-            disp('Applying transform');
-            try
-                tform = affine2d_to_3d(obj.transform);
-                viewObj = affineOutputView(size(imStack), tform,... 
-                    'BoundsStyle','SameAsInput');
-                imStack = imwarp(imStack, tform, 'OutputView', viewObj);
-            catch
-                [x, y, t] = size(imStack);
-                refObj = imref2d([x y]);
-                for i = 1:t
-                    imStack(:,:,i) = imwarp(imStack(:,:,i), refObj,...
-                        obj.transform, 'OutputView', refObj);
-                end
-            end
         end
 
         function displayName = getDisplayName(obj)  
@@ -227,11 +146,12 @@ classdef (Abstract) Epoch < aod.core.Entity
     end
 
     methods (Access = ?aod.core.Creator)
-        function setStartTime(obj, value)
-            obj.startTime = value;
-        end
-        
         function addParameter(obj, paramName, paramValue)
+            % ADDPARAMETER
+            %
+            % Syntax:
+            %   addParameter(obj, paramName, paramValue)
+            % -------------------------------------------------------------
             obj.epochParameters(paramName) = paramValue;
         end
 
@@ -257,7 +177,24 @@ classdef (Abstract) Epoch < aod.core.Entity
             obj.Stimuli = cat(1, obj.Stimuli, stim);
         end
 
-        function addRegistration(obj, reg)
+        function addRegistration(obj, reg, overwrite)
+            % ADDREGISTRATION
+            %
+            % Syntax:
+            %   obj.addRegistration(reg, overwrite)
+            % -------------------------------------------------------------
+            if nargin < 3
+                overwrite = false;
+            end
+
+            if ~isempty(obj.Registrations)
+                idx = find(findByClass(obj.Registrations, reg));
+                if ~isempty(idx) && ~overwrite
+                    warning('Set overwrite=true to replace existing registration');
+                    return
+                end
+                obj.Registrations{idx} = reg;
+            end
             obj.Registrations = cat(1, obj.Registrations, reg);
         end
     end

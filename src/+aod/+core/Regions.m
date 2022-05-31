@@ -1,18 +1,24 @@
 classdef Regions < aod.core.Entity
+% REGIONS
+%
+% Constructor:
+%   obj = Regions(parent, rois, varargin)
+%
+% -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Map         double
-        Count(1,1) {mustBeInteger}  = 0
-        Metadata    table           = table.empty()
+        Map                 double
+        Count(1,1)          {mustBeInteger}  = 0
+        Metadata            table            = table.empty()
     end
 
-    properties %(Access = protected)
+    properties (Access = protected)
         Reader
     end
 
-    methods (Abstract)
-        load(obj, varargin)
-    end
+    % methods (Abstract)
+    %     load(obj, varargin)
+    % end
 
     methods
         function obj = Regions(parent, rois, varargin)
@@ -28,6 +34,10 @@ classdef Regions < aod.core.Entity
                     obj.Map = rois;
                 end
             end
+        end
+
+        function load(obj, varargin) %#ok<INUSD> 
+            % Implement in subclasses
         end
 
         function reload(obj)

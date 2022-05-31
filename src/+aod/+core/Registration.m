@@ -2,7 +2,7 @@ classdef Registration < aod.core.Entity
 
     properties (SetAccess = protected)
         Data
-        registrationParameters
+        registrationParameters              % containers.Map()
     end
 
     methods
@@ -14,14 +14,14 @@ classdef Registration < aod.core.Entity
             if nargin > 1
                 obj.Data = data;
             end
+            obj.registrationParameters = containers.Map();
         end
-
         
-        function setParameter(obj, paramName, paramValue)
-            obj.registrationParameters(paramName) = paramValue;
-        end
+        % function setParameter(obj, paramName, paramValue)
+        %     obj.registrationParameters(paramName) = paramValue;
+        % end
 
-        function setParameters(obj, varargin)
+        function setParameter(obj, varargin)
             for i = 1:(nargin - 1)
                 obj.setParameter(varargin{(2*i)-1}) = varargin{2*i};
             end

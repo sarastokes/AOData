@@ -6,7 +6,6 @@ classdef (Abstract) Entity < handle
 %
 % Properties:
 %   Parent                      aod.core.Entity
-%   parameters                  containers.Map()
 %   description                 string
 %   notes                       cell
 %   allowableParentTypes        cellstr
@@ -23,11 +22,10 @@ classdef (Abstract) Entity < handle
 %   removeNote(obj, ID)
 %   clearNotes(obj)
 %
-% Protected Methods:
+% Protected methods:
 %   addParent(obj, parent)
 %   x = getShortName(obj)
 %   x = getDisplayName(obj)
-%   addParserToParams(obj, S)
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
@@ -35,7 +33,6 @@ classdef (Abstract) Entity < handle
 
     properties (SetAccess = private)
         Parent(1,1)                 %aod.core.Entity 
-        % parameters
         description                 string = string.empty() 
         notes                       cell = cell.empty();
     end
@@ -53,7 +50,6 @@ classdef (Abstract) Entity < handle
 
     methods
         function obj = Entity()
-            % obj.parameters = containers.Map();
         end
 
         function value = get.displayName(obj)
@@ -158,25 +154,6 @@ classdef (Abstract) Entity < handle
                 obj.Parent = parent;
             else
                 error('%s is not a valid parent', class(parent));
-            end
-        end
-
-        function addParserToParams(obj, paramObj, S) %#ok<INUSL> 
-            % ADDPARSERTOPARAMS
-            %
-            % Syntax:
-            %   obj.addParserToParams(paramObj, S)
-            %
-            % Input:
-            %   S       struct
-            %       The "Results" structure from inputParser
-            %
-            % See also:
-            %   inputParser
-            % -------------------------------------------------------------
-            f = fieldnames(S);
-            for i = 1:numel(f)
-                paramObj(f{i}) = S.(f{i});
             end
         end
     end

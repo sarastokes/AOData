@@ -60,7 +60,7 @@ classdef PhysiologyCreator < aod.core.Creator
 
             txt = readProperty(fName, 'Date/Time = ');
             txt = erase(txt, ' (yyyy-mm-dd:hh:mm:ss)');
-            ep.setStartTime(datetime(txt, 'InputFormat', 'yyyy-MM-dd HH:mm:ss'));
+            ep.startTime(datetime(txt, 'InputFormat', 'yyyy-MM-dd HH:mm:ss'));
 
             ep.addFile('TrialFile', readProperty(fName, 'Trial file name = '));
             txt = strsplit(ep.files('TrialFile'), filesep);

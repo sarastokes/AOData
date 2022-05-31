@@ -1,7 +1,6 @@
 classdef Physiology < patterson.core.Dataset
 
     properties (SetAccess = protected)
-        % allStimuli 
         location
     end
 

@@ -15,13 +15,13 @@ classdef (Abstract) Dataset < aod.core.Entity
     properties (SetAccess = private)
         homeDirectory           %{mustBeFolder}
         experimentDate(1,1)     datetime
-        datasetParameters
+        datasetParameters       %aod.core.Parameters
 
         Epochs                  %aod.core.Epoch
         Source                  %aod.core.Source
         Regions                 %aod.core.Regions
 
-        epochIDs                double
+        epochIDs(1,:)           double
     end
 
     properties (Hidden, SetAccess = private)
@@ -41,6 +41,7 @@ classdef (Abstract) Dataset < aod.core.Entity
             if nargin > 1
                 obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
             end
+            obj.datasetParameters = aod.core.Parameters();
         end
 
         function setHomeDirectory(obj, filePath)

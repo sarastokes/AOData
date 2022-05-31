@@ -17,6 +17,13 @@ classdef RegistrationReportReader < aod.core.FileReader
             obj@aod.core.FileReader(varargin{:});
         end
 
+        function out = read(obj)
+            warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
+            obj.Data = readtable(obj.fullFile);
+            warning('on', 'MATLAB:table:ModifiedAndSavedVarnames');
+            out = obj.Data;
+        end
+
         function getFileName(obj, experimentDir, epochID)
             obj.Path = [experimentDir, filesep, 'Ref'];
             refFiles = ls(obj.Path);
@@ -34,11 +41,5 @@ classdef RegistrationReportReader < aod.core.FileReader
             end
         end
 
-        function out = read(obj)
-            warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
-            obj.Data = readtable(obj.fullFile);
-            warning('on', 'MATLAB:table:ModifiedAndSavedVarnames');
-            out = obj.Data;
-        end
     end
 end

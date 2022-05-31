@@ -1,8 +1,21 @@
 classdef Response < aod.core.Entity
+% RESPONSE
+%
+% Description:
+%   A response measured over time
+%
+% Properties:
+%   Data 
+%   responseParameters
+%
+% Methods:
+%   addParameter(obj, paramValue, paramName)
+%   setData(obj, data)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Data 
-        responseParameters
+        Data                            timetable
+        responseParameters              % aod.core.parameters
     end
 
     methods
@@ -11,24 +24,18 @@ classdef Response < aod.core.Entity
             if nargin > 0
                 obj.addParent(parent);
             end
-            obj.responseParameters = containers.Map();
+            obj.responseParameters = aod.core.Parameters();
         end
 
-
-        function value = getParameter(obj, paramName)
-            % GETPARAMETER
+        function setData(obj, data)
+            % SETDATA
             %
             % Syntax:
-            %   value = obj.getParameter(paramName)
+            %   setData(obj, data)
             % -------------------------------------------------------------
-            if ~isKey(obj.parameters, paramName)
-                error('Parameter %s not found!', paramName);
-            end
-            value = obj.parameter(paramName);
+            obj.Data = data;
         end
-    end
 
-    methods (Access = protected)
         function addParameter(obj, paramName, paramValue)
             % ADDPARAMETER
             %

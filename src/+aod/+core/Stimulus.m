@@ -1,8 +1,13 @@
 classdef Stimulus < aod.core.Entity
+% STIMULUS
+% 
+% Constructor:
+%   obj = aod.core.Stimulus(parent)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        presentation timetable
-        stimParameters
+        presentation                        timetable
+        stimParameters                      % containers.Map 
     end
     
     methods
@@ -12,10 +17,6 @@ classdef Stimulus < aod.core.Entity
                 obj.setParent(parent);
             end
             obj.stimParameters = containers.Map();
-        end
-
-        function addParameter(obj, paramName, paramValue)
-            obj.stimulusParameters(paramName) = paramValue;
         end
     end
 end

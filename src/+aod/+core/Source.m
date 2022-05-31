@@ -1,7 +1,7 @@
 classdef (Abstract) Source < aod.core.Entity 
 
     properties
-        sourceParameters
+        sourceParameters            % aod.core.Parameters
     end
 
     methods
@@ -11,7 +11,7 @@ classdef (Abstract) Source < aod.core.Entity
             if nargin > 0 && ~isempty(parent)
                 obj.setParent(parent);
             end
-            obj.sourceParameters = containers.Map();
+            obj.sourceParameters = aod.core.Parameters();
         end
     end
 end

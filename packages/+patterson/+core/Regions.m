@@ -1,7 +1,7 @@
 classdef Regions < aod.core.Regions
 
     properties (SetAccess = private)
-        Size(1,2) {mustBeInteger} = [0 0]
+        Size(1,2)           {mustBeInteger}         = [0 0]
     end
 
     methods
