@@ -7,7 +7,6 @@ classdef (Abstract) Epoch < aod.core.Entity
 % Public methods:
 %   fName = getFilePath(obj, whichFile)
 %   addTransform(obj, tform)
-%   clearTransform(obj)
 %   clearVideoCache(obj)
 %   getStack(obj, varargin)
 %   makeStackSnapshots(obj)
@@ -84,6 +83,11 @@ classdef (Abstract) Epoch < aod.core.Entity
         end
 
         function clearVideoCache(obj)
+            % CLEARVIDEOCACHE
+            %
+            % Syntax:
+            %   obj.clearVideoCache()
+            % -------------------------------------------------------------
             obj.cachedVideo = [];
         end
     end
@@ -112,6 +116,11 @@ classdef (Abstract) Epoch < aod.core.Entity
 
     methods (Access = protected)
         function imStack = readStack(~, videoName)
+            % READSTACK
+            %
+            % Syntax:
+            %   imStack = readStack(obj, videoName)
+            % -------------------------------------------------------------
             switch videoName(end-2:end)
                 case 'tif'
                     reader = ao.builtin.readers.TiffReader(videoName);

@@ -7,7 +7,7 @@ classdef Stimulus < aod.core.Entity
 
     properties (SetAccess = protected)
         presentation                        timetable
-        stimParameters                      % containers.Map 
+        stimParameters                      % aod.core.Parameters
     end
     
     methods
@@ -16,7 +16,7 @@ classdef Stimulus < aod.core.Entity
             if nargin == 1
                 obj.setParent(parent);
             end
-            obj.stimParameters = containers.Map();
+            obj.stimParameters = aod.core.Parameters();
         end
     end
 end

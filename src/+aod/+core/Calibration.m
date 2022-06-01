@@ -2,39 +2,31 @@ classdef (Abstract) Calibration < aod.core.Entity
 % CALIBRATION
 %
 % Constructor:
-%   obj = aod.core.Calibration(parent, varargin)
-%   obj = aod.core.Calibration(varargin)
+%   obj = aod.core.Calibration(calibrationDate, parent)
 %
-% Abstract methods:
-%   addCalibration(obj, varargin)
-%   loadCalibration(obj, varargin)
+% Properties:
+%   calibrationDate         date when the calibration was performed
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         calibrationDate(1,1) datetime
     end
 
-    methods (Abstract)
-        addCalibration(obj, varargin)
-        loadCalibration(obj, varargin)
-    end
-
     methods
-        function obj = Calibration(varargin)
-            obj.allowableParentTypes = {'aod.core.Dataset'};
-
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
-            addOptional(ip, 'Parent', [], @(x) isa(x, 'aod.core.Entity'));
-            addParameter(ip, 'CalibrationDate', [], @ischar);
-            parse(ip, varargin{:});
+        function obj = Calibration(calibrationDate, parent)
+            obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.System', 'aod.core.Empty'};
             
-            parent = ip.Results.Parent;
-            calDate = ip.Results.CalibrationDate;
+            if nargin > 0 && ~isempty(calibrationDate)
+                if ~isa(calibrationDate, 'datetime')
+                    obj.calibrationDate = datetime(calDate, 'Format', 'yyyyMMdd');
+                else
+                    obj.calibrationDate = calibrationDate;
+                end
+            end
 
-            obj.addParent(parent);
-            obj.calibrationDate = datetime(calDate, 'Format', 'yyyyMMdd');
+            if nargin > 1 && ~isempty(parent)
+                obj.setParent(parent);
+            end
         end
     end
 end
