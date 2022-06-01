@@ -119,7 +119,7 @@ classdef (Abstract) Dataset < aod.core.Entity
             avgFlag = ip.Results.Average;
 
             data = [];
-            for i = 1:numel(epochsIDs)
+            for i = 1:numel(epochIDs)
                 epoch = obj.id2epoch(epochIDs(i));
                 data = cat(3, data, epoch.getRegionResponses(ip.Unmatched));
             end

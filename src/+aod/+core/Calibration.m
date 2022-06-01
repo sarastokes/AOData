@@ -18,7 +18,7 @@ classdef (Abstract) Calibration < aod.core.Entity
             
             if nargin > 0 && ~isempty(calibrationDate)
                 if ~isa(calibrationDate, 'datetime')
-                    obj.calibrationDate = datetime(calDate, 'Format', 'yyyyMMdd');
+                    obj.calibrationDate = datetime(calibrationDate, 'Format', 'yyyyMMdd');
                 else
                     obj.calibrationDate = calibrationDate;
                 end

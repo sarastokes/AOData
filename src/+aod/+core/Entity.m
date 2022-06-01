@@ -162,6 +162,9 @@ classdef (Abstract) Entity < handle
         function tf = isValidParent(obj, parent)
             % ISVALIDPARENT
             %
+            % Description:
+            %   Determine if parent is in or subclass of allowable parents
+            %
             % Syntax:
             %   tf = isValidParent(parent)
             % -------------------------------------------------------------
