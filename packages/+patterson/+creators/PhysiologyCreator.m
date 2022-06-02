@@ -27,10 +27,11 @@ classdef PhysiologyCreator < aod.core.Creator
 
             fprintf('Adding epochs... ');
             for i = 1:numel(epochIDs)
-                ep = obj.makeEpoch(epochIDs(i));          
+                ep = obj.makeEpoch(epochIDs(i), epochType);          
                 obj.Dataset.addEpoch(ep);
                 fprintf('%u ', epochIDs(i));
             end
+            obj.Dataset.sortEpochs();
             fprintf('\nDone.\n')
         end
     
@@ -42,10 +43,32 @@ classdef PhysiologyCreator < aod.core.Creator
             % -------------------------------------------------------------
             obj.Dataset.addRegions(regions);
         end
+
+        function addTransforms(obj, fName, epochIDs, varargin)
+            % ADDTRANSFORMS
+            %
+            % Syntax:
+            %   obj.addTransforms(fName, epochIDs, varargin)
+            % -------------------------------------------------------------
+            if ~isfile(fName)
+                fName = [obj.Dataset.getAnalysisFolder(), filesep, fName];
+            end
+            reader = aod.builtin.readers.RigidTransformReader(fName);
+            tforms = reader.read();
+
+            for i = 1:numel(epochIDs)
+                ep = obj.Dataset.id2epoch(epochIDs(i));
+                reg = aod.builtin.registrations.SiftRegistration(...
+                    ep, squeeze(tforms(:,:,i)), varargin{:});
+                ep.addRegistration(reg);
+                ep.addFile('SiftTransform', erase(fName, obj.homeDirectory));
+            end
+        end
     end
 
     methods (Access = protected)
         function ep = makeEpoch(obj, epochID, epochType)
+            % MAKEEPOCH
             ep = patterson.Epoch(epochID, obj.Dataset, epochType);
             if epochType.isPhysiology
                 obj.extractEpochAttributes(ep);
@@ -53,8 +76,9 @@ classdef PhysiologyCreator < aod.core.Creator
             obj.populateFileNames(ep);
             if ~isempty(ep.getFilePath('RegistrationReport'))
                 reg = aod.builtin.registrations.StripRegistration(ep);
+                reader = aod.builtin.readers.RegistrationParameterReader(ep.getFilePath('RegistrationParameters'));
+                reg.addParameter(reader.read());
                 ep.addRegistration(reg);
-                % TODO: Read registration parameters
             end
         end
     end
@@ -68,20 +92,57 @@ classdef PhysiologyCreator < aod.core.Creator
         end
 
         function extractEpochAttributes(obj, ep)
+            % TODO: make this a FileReader class
             epochID = ep.ID;
             fName = obj.getAttributeFile(epochID);
 
             txt = readProperty(fName, 'Date/Time = ');
             txt = erase(txt, ' (yyyy-mm-dd:hh:mm:ss)');
-            ep.startTime(datetime(txt, 'InputFormat', 'yyyy-MM-dd HH:mm:ss'));
+            ep.startTime = datetime(txt, 'InputFormat', 'yyyy-MM-dd HH:mm:ss');
 
+            % Additional file names
             ep.addFile('TrialFile', readProperty(fName, 'Trial file name = '));
             txt = strsplit(ep.files('TrialFile'), filesep);
             ep.addParameter('StimulusName', txt{end});
 
-            ep.addParameter('RefPMT',...
+            ep.addFile('StimVideoName',...
+                readProperty(fName, 'Stimulus video = '));
+            ep.addFile('BackgroundVideoName',...
+                readProperty(fName, 'Background video = '));
+
+            txt = readProperty(fName, 'Stimulus location in linear stabilized space = ');
+            txt = erase(txt, '('); txt = erase(txt, ')');
+            txt = strsplit(txt, ', ');
+            ep.addParameter('StimulusLocation', [str2double(txt{1}), str2double(txt{2})]);
+
+            txt = readProperty(fName, 'Scanner FOV = ');
+            txt = erase(txt, ' (496 lines) degrees');
+            txt = strsplit(txt, ' x ');
+            ep.addParameter('FieldOfView', [str2double(txt{1}), str2double(txt{2})]);
+
+            % Imaging window
+            x = str2double(readProperty(fName, 'ImagingWindowX = '));
+            y = str2double(readProperty(fName, 'ImagingWindowY = '));
+            dx = str2double(readProperty(fName, 'ImagingWindowDX = '));
+            dy = str2double(readProperty(fName, 'ImagingWindowDY = '));
+            ep.addParameter('ImagingWindow', [x y dx dy]);
+
+            % Power modulation 
+            ep.addParameter('PowerModulation',... 
+                convertYesNo(readProperty(fName, 'Stimulus power modulation = ')));
+
+            % Channel parameters
+            ep.addParameter('RefGain',... 
+                str2double(readProperty(fName, 'ADC channel 1, gain = ')));
+            ep.addParameter('VisGain',... 
+                str2double(readProperty(fName, 'ADC channel 2, gain = ')));
+            ep.addParameter('RefOffset',... 
+                str2double(readProperty(fName, 'ADC channel 1, offset = ')));
+            ep.addParameter('VisOffset',... 
+                str2double(readProperty(fName, 'ADC channel 2, offset = ')));
+            ep.addParameter('RefPmtGain',...
                 str2double(readProperty(fName, 'Reflectance PMT gain  = ')));
-            ep.addParameter('VisPMT',...
+            ep.addParameter('VisPmtGain',...
                 str2double(readProperty(fName, 'Fluorescence PMT gain  = ')));
             
             mustangValue = str2double(readProperty(fName, 'AOM_VALUE1 = '));
@@ -135,11 +196,11 @@ classdef PhysiologyCreator < aod.core.Creator
             end
 
             % Find stimulus reference images
-            if epochType.isPhysiology
+            if ep.epochType.isPhysiology
                 ind = find(contains(refFiles, [refStr, '_linear']));
                 if ~isempty(ind)
                     ind = obj.checkFilesFound(ind);
-                    ep.addFile('ReferenceImage', ["Ref" + filesep + refFiles(ind)]);
+                    ep.addFile('ReferenceImage', "Ref" + filesep + refFiles(ind));
                 else
                     warning('Reference image for epoch %u not found', epochID);
                 end

@@ -37,9 +37,11 @@ classdef Epoch < aod.core.Epoch
 
     methods 
         function clearTransform(obj)
-            idx = cellfun(@(x) isa(x, 'aod.builtin.registrations.SiftRegistration'),... 
-                obj.Registrations);
-            obj.Registrations = obj.Registrations{~idx};
+            idx = findByClass(obj.Registrations, 'aod.builtin.registrations.SiftRegistration');
+            if ~isempty(idx)
+                obj.Registrations = obj.Registrations{~idx};
+            end
+            % TODO: Clear cached video as well
         end
 
         function makeStackSnapshots(obj, IDs, fPath)
@@ -57,7 +59,7 @@ classdef Epoch < aod.core.Epoch
             %       Epoch IDs to create snapshots (default = obj.epochIDs)
             % -------------------------------------------------------------
             if nargin < 3
-                fPath = [obj.homeDirectory, 'Analysis', filesep, 'Snapshots', filesep];
+                fPath = [obj.Parent.getAnalysisFolder(), 'Snapshots', filesep];
             end
             
             if nargin < 2 || isempty(obj.IDs)

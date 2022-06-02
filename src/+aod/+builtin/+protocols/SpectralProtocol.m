@@ -30,9 +30,14 @@ classdef (Abstract) SpectralProtocol < aod.core.Protocol
 
     methods
         function obj = SpectralProtocol(stimTime, ledMeans, varargin)
-            obj = obj@aod.core.Protocol(stimTime, 500, varargin{:});
+            obj = obj@aod.core.Protocol(stimTime, varargin{:});
             obj.ledMeans = ledMeans;
 
+            % Shared by all spectral stimuli
+            obj.sampleRate = 25;
+            obj.stimRate = 500;
+
+            % Input parsing
             ip = inputParser();
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;

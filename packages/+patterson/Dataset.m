@@ -24,9 +24,9 @@ classdef Dataset < aod.core.Dataset
             addParameter(ip, 'Purpose', '', @ischar);
             parse(ip, varargin{:});
 
-            obj.addProperty('Administrator', ip.Results.Administrator);
-            obj.addProperty('System', ip.Results.System);
-            obj.addProperty('Purpose', ip.Results.Purpose);
+            obj.addParameter('Administrator', ip.Results.Administrator);
+            obj.addParameter('System', ip.Results.System);
+            obj.addParameter('Purpose', ip.Results.Purpose);
         end
 
         function value = getFileHeader(obj)
@@ -39,6 +39,10 @@ classdef Dataset < aod.core.Dataset
             %   value = obj.getFileHeader()
             % -------------------------------------------------------------
             value = [num2str(obj.Source.Parent.ID), '_', char(obj.experimentDate)];
+        end
+        
+        function fPath = getAnalysisFolder(obj)
+            fPath = [obj.homeDirectory, filesep, 'Analysis', filesep];
         end
     end
 

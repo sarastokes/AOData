@@ -161,5 +161,18 @@ classdef (Abstract) Dataset < aod.core.Entity
             obj.Epochs = cat(1, obj.Epochs, epoch);
             obj.epochIDs = cat(2, obj.epochIDs, epoch.ID);
         end
+
+        function sortEpochs(obj)
+            % SORTEPOCHS
+            %
+            % Description:
+            %   Sorts epochIDs and epochs by increasing numerical order
+            % 
+            % Syntax:
+            %   obj.sortEpochs();
+            % -------------------------------------------------------------
+            [obj.epochIDs, idx] = sort(obj.epochIDs);
+            obj.Epochs = obj.Epochs(idx);
+        end
     end
 end

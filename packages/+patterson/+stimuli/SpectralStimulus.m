@@ -12,6 +12,7 @@ classdef SpectralStimulus < aod.core.Stimulus
 
     properties (SetAccess = ?aod.core.Creator)
         stimFileName
+        protocolName
     end
 
     properties (Hidden, Constant)

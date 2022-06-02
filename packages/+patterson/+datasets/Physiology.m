@@ -1,4 +1,4 @@
-classdef Physiology < patterson.core.Dataset
+classdef Physiology < patterson.Dataset
 
     properties (SetAccess = protected)
         location

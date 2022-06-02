@@ -29,9 +29,9 @@ classdef (Abstract) Epoch < aod.core.Entity
         files                       % aod.core.Parameters             
     end
 
-    properties (SetAccess = ?aod.core.Creator)
+    properties (SetAccess = {?aod.core.Creator, ?aod.core.Epoch})
         startTime(1,1)              datetime
-        Registrations               % aod.core.Registration
+        Registrations               = cell.empty()
         Stimuli                     % aod.core.Stimulus
     end
 
@@ -89,6 +89,27 @@ classdef (Abstract) Epoch < aod.core.Entity
             %   obj.clearVideoCache()
             % -------------------------------------------------------------
             obj.cachedVideo = [];
+        end
+    end
+
+    % Access parameters
+    methods
+        function listFiles(obj)
+            % LISTFILES
+            % 
+            % Syntax:
+            %   list(obj)
+            % -------------------------------------------------------------
+            if isempty(obj.files)
+                fprintf('\tParameters is empty\n');
+                return
+            end
+
+            k = obj.files.keys;
+            for i = 1:numel(k)
+                fprintf('\t%s = ', k{i});
+                disp(obj.files(k{i}));
+            end
         end
     end
 
@@ -177,13 +198,31 @@ classdef (Abstract) Epoch < aod.core.Entity
             obj.files(fileName) = filePath;
         end
 
-        function addStimulus(obj, stim)
+        function addStimulus(obj, stim, overwrite)
             % ADDSTIMULUS
             %
             % Syntax:
-            %   obj.addStimulus(stim)
+            %   obj.addStimulus(stim, overwrite)
             % -------------------------------------------------------------
-            obj.Stimuli = cat(1, obj.Stimuli, stim);
+            if nargin < 3
+                overwrite = false;
+            end
+
+            if ~isempty(obj.Stimuli)
+                idx = find(findByClass(obj.Stimuli, stim));
+                if ~isempty(idx) 
+                    if ~overwrite
+                        warning('Set overwrite=true to replace existing registration');
+                        return
+                    else
+                        obj.Stimuli(idx) = stim;
+                        return
+                    end
+                end
+                obj.Stimuli = {obj.Stimuli; stim};
+            else
+                obj.Stimuli = stim;
+            end
         end
 
         function addRegistration(obj, reg, overwrite)
@@ -198,13 +237,19 @@ classdef (Abstract) Epoch < aod.core.Entity
 
             if ~isempty(obj.Registrations)
                 idx = find(findByClass(obj.Registrations, reg));
-                if ~isempty(idx) && ~overwrite
-                    warning('Set overwrite=true to replace existing registration');
-                    return
+                if ~isempty(idx) 
+                    if ~overwrite
+                        warning('Set overwrite=true to replace existing registration');
+                        return
+                    else
+                        obj.Registrations(idx) = reg;
+                        return
+                    end
                 end
-                obj.Registrations{idx} = reg;
+                obj.Registrations = {obj.Registrations; reg};
+            else
+                obj.Registrations = reg;
             end
-            obj.Registrations = cat(1, obj.Registrations, reg);
         end
     end
 end 

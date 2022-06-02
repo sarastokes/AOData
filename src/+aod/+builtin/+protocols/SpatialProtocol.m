@@ -32,8 +32,13 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
 
     methods
         function obj = SpatialProtocol(stimTime, varargin)
-            obj = obj@aod.core.Protocol(stimTime, 25, varargin{:});
+            obj = obj@aod.core.Protocol(stimTime, varargin{:});
 
+            % Shared by all SpatialProtocols
+            obj.sampleRate = 25;
+            obj.stimRate = 25;
+
+            % Input parsing
             ip = inputParser();
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;

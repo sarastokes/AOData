@@ -1,4 +1,6 @@
 *.asv
 *.m~
+*.mldatx
+
 *.DS_Store
 *.vscode

@@ -25,7 +25,10 @@ classdef Subject < aod.core.Source
             addParameter(ip, 'Demographics', [], @ischar);
             parse(ip, varargin{:});
 
-            obj.sourceParameters.addParser(ip);
+            obj.sourceParameters('Species') = ip.Results.Species;
+            obj.sourceParameters('Sex') =  ip.Results.Sex;
+            obj.sourceParameters('Age') = ip.Results.Age;
+            obj.sourceParameters('Demographics') = ip.Results.Demographics;
         end
 
         function addEye(obj, Eye)

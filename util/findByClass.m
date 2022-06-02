@@ -7,4 +7,13 @@ function idx = findByClass(x, className)
     % History:
     %   30May2022 - SSP
     % ---------------------------------------------------------------------
-    idx = cellfun(@(x) isa(x, className), x);
+
+    if ~ischar(className)
+        className = class(className);
+    end
+    
+    if iscell(x)
+        idx = cellfun(@(x) isa(x, className), x);
+    else
+        idx = arrayfun(@(x) isa(x, className), x);
+    end

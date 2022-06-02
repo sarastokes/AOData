@@ -1,4 +1,12 @@
 classdef RegistrationParameterReader < aod.core.FileReader 
+% REGISTRATIONPARAMETERREADER
+%
+% Description:
+%   Creates a struct containing all strip registration parameters
+%
+% See also:
+%   aod.builtin.registrations.StripRegistration
+% -------------------------------------------------------------------------
 
     methods
         function obj = RegistrationParameterReader(fName)
@@ -6,59 +14,49 @@ classdef RegistrationParameterReader < aod.core.FileReader
         end
 
         function out = read(obj)
-            out = cell.empty();
-            out = cat(2, out, 'FilteringOption',...
-                removeTabs(readProperty(obj.fullFile, 'Filtering Option:')));
-            out = cat(2, out, 'System',...
-                removeTabs(readProperty(obj.fullFile, 'Algorithm runs on:')));
-            out = cat(2, out, 'NccLinesToIgnore', obj.readNumber('NCC lines to ignore:'));
-            out = cat(2, out, 'FrameMaxMotion',obj.readNumber('Frame-level maximum motion:'));
-            frameRegOnly = convertYesNo(removeTabs(readProperty(obj.fullFile, 'Frame-level registration only:')));
-            out = cat(2, out, 'FrameRegOnly', frameRegOnly);
+            out = struct();
+            out.FilteringOption = obj.readText('Filtering option:');
+            out.System = obj.readText('Algorithm runs on:');
+            out.NccLinesToIgnore = obj.readNumber('NCC lines to ignore:');
+            out.FrameMaxMotion = obj.readNumber('Frame-level maximum motion:');
+            out.FrameRegOnly = obj.readYesNo('Frame-level registration only:');
 
-            out = cat(2, out, 'NccRowsToIgnore', obj.readNumber('NCC rows to ignore:'));
-            out = cat(2, out, 'NccColumnsToIgnore', obj.readNumber('NCC columns to ignore:'));
-            out = cat(2, out, 'StripNumber',...
-                str2double(removeTabs(readProperty(obj.fullFile, 'Number of strips for registration:'))));
-            out = cat(2, out, 'StripHeight',...
-                str2double(removeTabs(readProperty(obj.fullFile, 'Strip height for registration:'))));
+            out.NccRowsToIgnore = obj.readNumber('NCC rows to ignore:');
+            out.NccColumnsToIgnore = obj.readNumber('NCC columns to ignore:');
+            out.StripNumber = obj.readNumber('Number of strips for registration:');
+            out.StripHeight = obj.readNumber('Strip height for registration:');
             
-            out = cat(2, out, 'StripMaxMotion',...
-                str2double(removeTabs(readProperty(obj.fullFile, 'Strip-level maximum motion:'))));
-            out = cat(2, out, 'StripSaveVideo',...
-                convertYesNo(removeTabs(readProperty(obj.fullFile, 'Strip-level save video:'))));
-            out = cat(2, out, 'StripSaveFullVideo',...
-                convertYesNo(removeTabs(readProperty(obj.fullFile, 'Frame-level save video:'))));
+            out.StripMaxMotion = obj.readNumber('Strip-level maximum motion:');
+            out.StripSaveVideo = obj.readYesNo('Strip-level save video:');
+            out.StripSaveFullVideo = obj.readYesNo('Frame-level save video:');
 
-            out = cat(2, out, 'MinCroppingFlag',...
-                removeTabs(readProperty(obj.fullFile, 'Minimum cropping flag:')));
-            out = cat(2, out, 'MinCroppingValue',...
-                obj.readNumber('Minimum cropping value:'));
-            out = cat(2, out, 'NccCorrelationThreshold', obj.readNumber('NCC correlation threshold:'));
+            out.MinCroppingFlag = obj.readText('Minimum cropping flag:');
+            out.MinCroppingValue = obj.readNumber('Minimum cropping value:');
+            out.NccCorrelationThreshold = obj.readNumber('NCC correlation threshold:');
 
-            out = cat(2, out, 'VideoFrameStart',...
-                obj.readNumber('Run video frames from #:'));
-            out = cat(2, out, 'VideoFrameStop',...
-                str2double(removeTabs(readProperty(obj.fullFile, 'Run video frames to #'))));
-            out = cat(2, out, 'RefFrameNumber',...
-                obj.readNumber('Run video frames with reference #:'));
-            out = cat(2, out, 'AutoRef',...
-                convertYesNo(removeTabs(readProperty(obj.fullFile, 'Run video with automatic reference:'))));
-            out = cat(2, out, 'RefImage',...
-                convertYesNo(removeTabs(readProperty(obj.fullFile, 'Run video with a reference image:'))));
-            out = cat(2, out, 'RefImageName',...
-                removeTabs(readProperty(obj.fullFile, 'Run video with reference image name:')));
-            out = cat(2, out, 'Rotate90Degrees',...
-                convertYesNo(removeTabs(readProperty(obj.fullFile, 'Run video rotating 90 degrees:'))));
-            out = cat(2, out, 'Desinusoid',...
-                convertYesNo(removeTabs(readProperty(obj.fullFile, 'Run video with desinusoiding:'))));
-
+            out.VideoFrameStart = obj.readNumber('Run video frames from #:');
+            out.VideoFrameStop = obj.readNumber('Run video frames to #');
+            out.RefFrameNumber = obj.readNumber('Run video frames with reference #:');
+            out.AutoRef = obj.readYesNo('Run video with automatic reference:');
+            out.RefImage = obj.readYesNo('Run video with a reference image:');
+            out.RefImageName = obj.readText('Run video with reference image name:');
+            out.Rotate90Degrees = obj.readYesNo('Run video rotating 90 degrees:');
+            out.Desinusoid = obj.readYesNo('Run video with desinusoiding:');
+            obj.Data = out;
         end
     end
 
     methods (Access = private)
+        function out = readText(obj, header)
+            out = removeTabs(readProperty(obj.fullFile, header));
+        end
+
         function out = readNumber(obj, header)
             out = str2double(removeTabs(readProperty(obj.fullFile, header)));
+        end
+
+        function out = readYesNo(obj, header)
+            out = convertYesNo(removeTabs(readProperty(obj.fullFile, header)));
         end
     end
 end

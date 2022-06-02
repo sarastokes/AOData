@@ -20,7 +20,6 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
             addParameter(ip, 'Sinewave', true, @islogical);
             parse(ip, varargin{:});
 
-
             obj.temporalFrequency = ip.Results.TemporalFrequency;
             obj.sinewave = ip.Results.Sinewave;
         end
@@ -41,7 +40,7 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
             % Syntax:
             %   stim = generate(obj)
             % -------------------------------------------------------------
-            dt = 1 / obj.sampleRate;
+            dt = 1 / obj.stimRate;
             t = 0:dt:obj.stimTime-dt;
             stim = sin(2*pi*obj.temporalFrequency*t);
             stim = obj.amplitude * stim;

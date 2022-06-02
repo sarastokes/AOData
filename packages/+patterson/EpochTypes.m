@@ -9,8 +9,7 @@ classdef EpochTypes
 
     methods
         function tf = isPhysiology(obj)
-            import patterson.EpochTypes.*;
-            if obj == EpochTypes.Spectral || obj == EpochTypes.Spatial
+            if obj == patterson.EpochTypes.Spectral || obj == patterson.EpochTypes.Spatial
                 tf = true;
             else
                 tf = false;
