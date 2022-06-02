@@ -6,17 +6,27 @@ classdef Stimulus < aod.core.Entity
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        presentation                        timetable
         stimParameters                      % aod.core.Parameters
     end
     
     methods
         function obj = Stimulus(parent)
-            obj.allowableParentTypes = {'aod.core.Epoch'};
-            if nargin == 1
+            obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
+            if nargin == 1 && ~isempty(parent)
                 obj.setParent(parent);
             end
             obj.stimParameters = aod.core.Parameters();
+        end
+    end
+
+    methods (Access = ?aod.core.Creator)
+        function addParameter(obj, paramName, paramValue)
+            % ADDPARAMETER
+            %
+            % Syntax:
+            %   addParameter(obj, paramName, paramValue)
+            % -------------------------------------------------------------
+            obj.stimParameters(paramName) = paramValue;
         end
     end
 end

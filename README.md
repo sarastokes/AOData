@@ -4,7 +4,7 @@ Framework for organizing and analyzing imaging experiments. Designed for adaptiv
 
 ### Organization 
 
-For storing data and metadata associated with an experiment.
+For storing data and metadata associated with an experiment:
 
 - **Dataset**
   - Subject
@@ -31,7 +31,14 @@ Each class is generic and meant to be subclassed and tailored to specific imagin
 - MATLAB (developed in 2022a, compatible with 2021a and 2021b)
 - The core classes do not require additional toolboxes. Some of the examples in `\packages` require the Signal Processing Toolbox and Image Processing Toolbox.
 
-### Included dependencies:
+### Included 3rd party toolboxes:
+(Currently, these may only be necessary for packages)
 - [JSONLab 2.0](https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab-a-toolbox-to-encode-decode-json-files?s_tid=ta_fx_results)
 - [ReadImageJROI](https://github.com/DylanMuir/ReadImageJROI)
 - Other misc 3rd party functions are found in `\lib`
+
+### Optional toolboxes:
+The examples in packages also rely on several toolboxes which are not included. Where necessary, each is mentioned in the class/function documentation.
+- [Psychtoolbox](https://github.com/Psychtoolbox-3/Psychtoolbox-3)
+- [Silent Substitution Toolbox](https://github.com/spitschan/SilentSubstitutionToolbox)
+- [Stage-VSS](https://github.com/Stage-VSS/stage)

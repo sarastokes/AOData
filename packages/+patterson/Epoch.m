@@ -6,12 +6,21 @@ classdef Epoch < aod.core.Epoch
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        epochType       patterson.EpochTypes
+    end
+
+    properties (Dependent)
         transform
     end
 
     methods
-        function obj = Epoch(ID, parent)
+        function obj = Epoch(ID, parent, epochType)
             obj@aod.core.Epoch(ID, parent);
+            if nargin > 2
+                obj.epochType = epochType;
+            else
+                obj.epochType = patterson.EpochTypes.Unknown;
+            end
         end
 
         function value = get.transform(obj)
@@ -27,7 +36,7 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods 
-        function clearSiftTransform(obj)
+        function clearTransform(obj)
             idx = cellfun(@(x) isa(x, 'aod.builtin.registrations.SiftRegistration'),... 
                 obj.Registrations);
             obj.Registrations = obj.Registrations{~idx};

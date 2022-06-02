@@ -15,34 +15,47 @@ classdef PhysiologyCreator < aod.core.Creator
             obj.Dataset.initParameters(varargin{:});
         end
 
-        function addEpochs(obj, epochIDs)
+        function addEpochs(obj, epochIDs, epochType)
+            % ADDEPOCHS
+            %
+            % Syntax:
+            %   obj.addEpochs(epochIDs, epochType)
+            % -------------------------------------------------------------
+            if nargin < 3
+                epochType = patterson.EpochTypes.Unknown;
+            end
+
             fprintf('Adding epochs... ');
             for i = 1:numel(epochIDs)
-                %try
-                    obj.makeEpoch(epochIDs(i));
-                % catch
-                %    warning('Unable to add epoch %u, skipping', epochIDs(i));
-                %end
+                ep = obj.makeEpoch(epochIDs(i));          
+                obj.Dataset.addEpoch(ep);
                 fprintf('%u ', epochIDs(i));
             end
             fprintf('\nDone.\n')
         end
     
         function addRegions(obj, regions)
+            % ADDREGIONS
+            %
+            % Syntax:
+            %   obj.addRegions(regions)
+            % -------------------------------------------------------------
             obj.Dataset.addRegions(regions);
         end
     end
 
-    methods (Access = private)
-        function makeEpoch(obj, epochID)
-            ep = patterson.core.Epoch(epochID, obj.Dataset);
-            obj.extractEpochAttributes(ep);
+    methods (Access = protected)
+        function ep = makeEpoch(obj, epochID, epochType)
+            ep = patterson.Epoch(epochID, obj.Dataset, epochType);
+            if epochType.isPhysiology
+                obj.extractEpochAttributes(ep);
+            end
             obj.populateFileNames(ep);
             if ~isempty(ep.getFilePath('RegistrationReport'))
                 reg = aod.builtin.registrations.StripRegistration(ep);
                 ep.addRegistration(reg);
+                % TODO: Read registration parameters
             end
-            obj.Dataset.addEpoch(ep);
         end
     end
 
@@ -88,9 +101,9 @@ classdef PhysiologyCreator < aod.core.Creator
             visStr = ['vis_', int2fixedwidthstr(epochID, 4)];
 
             ep.addFile('RefVideo', ['Ref', filesep,...
-                obj.Dataset.getEpochHeader(), '_', refStr, '.avi']);
+                obj.Dataset.getFileHeader(), '_', refStr, '.avi']);
             ep.addFile('VisVideo', ['Vis', filesep,...
-                obj.Dataset.getEpochHeader(), '_', visStr, '.avi']);
+                obj.Dataset.getFileHeader(), '_', visStr, '.avi']);
 
             % Processed video for analysis
             ep.addFile('AnalysisVideo', string(['Analysis', filesep, visStr, '.tif']));
@@ -122,12 +135,14 @@ classdef PhysiologyCreator < aod.core.Creator
             end
 
             % Find stimulus reference images
-            ind = find(contains(refFiles, [refStr, '_linear']));
-            if ~isempty(ind)
-                ind = obj.checkFilesFound(ind);
-                ep.addFile('ReferenceImage', ["Ref" + filesep + refFiles(ind)]);
-            else
-                warning('Registration parameters for epoch %u not found', epochID);
+            if epochType.isPhysiology
+                ind = find(contains(refFiles, [refStr, '_linear']));
+                if ~isempty(ind)
+                    ind = obj.checkFilesFound(ind);
+                    ep.addFile('ReferenceImage', ["Ref" + filesep + refFiles(ind)]);
+                else
+                    warning('Reference image for epoch %u not found', epochID);
+                end
             end
 
             % Find frame registered videos 

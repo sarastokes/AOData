@@ -6,7 +6,7 @@ classdef Physiology < patterson.core.Dataset
 
     methods
         function obj = Physiology(homeDirectory, expDate, location)
-            obj = obj@patterson.core.Dataset(homeDirectory, expDate);
+            obj = obj@patterson.Dataset(homeDirectory, expDate);
             if nargin < 3
                 obj.location = 'Unknown';
             else
