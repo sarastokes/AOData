@@ -1,15 +1,12 @@
-classdef Parameters < containers.Map & handle 
+classdef Parameters < containers.Map & matlab.mixin.CustomDisplay 
 % PARAMETERS
 %
 % Description:
-%   Wrapper for containers.Map with extra functions
+%   Wrapper for containers.Map with detailed contents display
 %
 % Constructor:
 %   obj = aod.core.Parameters(keySet, valueSet)
 %   obj = aod.core.Parameters('KeyType', kType, 'ValueType', vType)
-% 
-% Methods:
-%   list(obj)
 %
 % See also:
 %   containers.Map
@@ -18,22 +15,30 @@ classdef Parameters < containers.Map & handle
         function obj = Parameters(varargin)
             obj = obj@containers.Map(varargin{:});
         end
+    end
 
-        function list(obj)
-            % LIST
-            % 
-            % Syntax:
-            %   list(obj)
-            % -------------------------------------------------------------
+    methods (Access = protected)
+        function header = getHeader(obj)
             if isempty(obj)
-                fprintf('\tParameters is empty\n');
-                return
+                header = getHeader@matlab.mixin.CustomDisplay(obj);
+            else
+                headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
+                headerStr = [headerStr, ' with ', num2str(numel(obj.keys)), ' members:'];
+                header = sprintf('\t%s',headerStr);
             end
+        end
 
-            k = obj.keys;
-            for i = 1:numel(k)
-                fprintf('\t%s = ', k{i});
-                disp(obj(k{i}));
+        function propgrp = getPropertyGroups(obj)
+            if isempty(obj)
+                propgrp = getPropertyGroups@matlab.mixin.CustomDisplay(obj);
+            else
+                keys = obj.keys;
+                values = obj.values;
+                propList = struct();
+                for i = 1:numel(keys)
+                    propList.(keys{i}) = values{i};
+                end
+                propgrp = matlab.mixin.util.PropertyGroup(propList);
             end
         end
     end

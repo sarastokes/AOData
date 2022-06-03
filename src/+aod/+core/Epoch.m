@@ -92,27 +92,6 @@ classdef (Abstract) Epoch < aod.core.Entity
         end
     end
 
-    % Access parameters
-    methods
-        function listFiles(obj)
-            % LISTFILES
-            % 
-            % Syntax:
-            %   list(obj)
-            % -------------------------------------------------------------
-            if isempty(obj.files)
-                fprintf('\tParameters is empty\n');
-                return
-            end
-
-            k = obj.files.keys;
-            for i = 1:numel(k)
-                fprintf('\t%s = ', k{i});
-                disp(obj.files(k{i}));
-            end
-        end
-    end
-
     % Core methods
     methods 
         function imStack = getStack(obj)
@@ -130,7 +109,6 @@ classdef (Abstract) Epoch < aod.core.Entity
             imStack = obj.readStack(videoName);
 
             obj.applyTransform(imStack);
-
             obj.cachedVideo = imStack;
         end
     end
@@ -175,7 +153,7 @@ classdef (Abstract) Epoch < aod.core.Entity
         end
     end
 
-    methods (Access = ?aod.core.Creator)
+    methods (Access = {?aod.core.Creator, ?aod.core.Epoch})
         function addParameter(obj, paramName, paramValue)
             % ADDPARAMETER
             %
@@ -189,12 +167,14 @@ classdef (Abstract) Epoch < aod.core.Entity
             % ADDFILE
             %
             % Description:
-            %   Adds to files prop, stripping out homeDirectory if needed
+            %   Adds to files prop, stripping out homeDirectory and
+            %   trailing/leading whitespace, if needed
             %
             % Syntax:
             %   obj.addFile(fileName, filePath)
             % -------------------------------------------------------------
             filePath = erase(filePath, obj.Parent.homeDirectory);
+            filePath = strtrim(filePath);
             obj.files(fileName) = filePath;
         end
 

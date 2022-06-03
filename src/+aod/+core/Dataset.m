@@ -67,13 +67,6 @@ classdef (Abstract) Dataset < aod.core.Entity
         function idx = id2idx(obj, IDs)
             idx = find(obj.epochIDs == IDs);
         end
-
-        function value = getParameter(obj, paramName)
-            if ~isKey(obj.datasetParameters, paramName)
-                error('Parameter %s not found!', paramName);
-            end
-            value = obj.datasetParameters(paramName);
-        end
     end
 
     methods
@@ -137,8 +130,19 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
     end
 
-    methods % (Access = ?aod.core.Creator)
-        function addSource(obj, source)
+    methods(Access = {?aod.core.Dataset, ?aod.core.Creator})
+        function setSource(obj, source)
+            % SETSOURCE
+            %
+            % Description:
+            %   Assign a source to the dataset
+            %
+            % Syntax:
+            %   obj.setSource(source)
+            %
+            % See also:
+            %   aod.core.Source
+            % -------------------------------------------------------------
             obj.Source = source;
         end
 

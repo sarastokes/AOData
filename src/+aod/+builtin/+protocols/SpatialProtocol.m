@@ -15,15 +15,26 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
 %   2. MAPTOLEDS: Uses calibrations to convert to uint8
 %   3. WRITESTIM: Outputs the file used by imaging software
 % Each method will call the prior steps
+%
+% Abstract methods (from aod.core.Protocol, implement in subclasses):
+%   stim = obj.generate()
+%
+% Methods:
+%   fName = getFileName(obj)
+%   stim = mapToLaser(obj)
+%   writeStim(obj, fName)
 % -------------------------------------------------------------------------
     properties
         baseIntensity
         contrast
+
+        % Shared by all Spatial Protocols
+        sampleRate = 25;
+        stimRate = 25;
     end
 
-    properties (Dependent, Access = protected)
+    properties (Dependent)
         amplitude           % Intensity/contrast depending on baseIntensity
-        totalFrames         % Total frames in stimulus presentation
     end
 
     properties (Hidden, Access = protected)
@@ -50,10 +61,6 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
             obj.contrast = ip.Results.Contrast;
         end
 
-        function value = get.totalFrames(obj)
-            value = obj.preFrames + obj.stimFrames + obj.tailFrames;
-        end
-
         function value = get.amplitude(obj)
             if obj.baseIntensity == 0
                 value = obj.contrast;
@@ -72,6 +79,25 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
             %   fName = getFileName(obj)
             % -------------------------------------------------------------
             fName = 'SpatialStimulus';
+        end
+
+        function trace = temporalTrace(obj)
+            % TEMPORALTRACE
+            %
+            % Description:
+            %   Vector representation of stimulus over time. Default shows
+            %   base intensity and a step to contrast value during stim
+            %   time. Subclass to tailor for other stimuli.
+            %
+            % Syntax:
+            %   trace = temporalTrace(obj);
+            % -------------------------------------------------------------
+            trace = obj.baseIntensity + zeros(1, obj.totalTime);
+            if obj.stimTime > 0
+                prePts = obj.sec2pts(obj.preTime);
+                stimPts = obj.sec2pts(obj.stimTime);
+                trace(prePts+1:prePts+stimPts) = obj.amplitude;
+            end
         end
 
         function stim = mapToLaser(obj)

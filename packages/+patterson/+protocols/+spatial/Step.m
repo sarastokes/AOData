@@ -1,11 +1,25 @@
-classdef ContrastStep < aod.builtin.protocols.SpatialProtocol
+classdef Step < aod.builtin.protocols.SpatialProtocol
 % CONTRASTSTEP
 %
 % Description:
 %   A spatially-uniform change in intenstiy
+%
+% Constructor:
+%   obj = patterson.protocols.spatial.step(stimTime, varargin)
+%
+% Inherited properties:
+%   preTime
+%   stimTime
+%   tailTime
+%   baseIntensity
+%   contrast
+%
+% Inherited methods:
+%   trace = temporalTrace(obj)
+%   ...
 % -------------------------------------------------------------------------
     methods
-        function obj = ContrastStep(stimTime, varargin)
+        function obj = Step(stimTime, varargin)
             obj = obj@aod.builtin.protocols.SpatialProtocol(stimTime, varargin{:});
         end
 
@@ -16,11 +30,11 @@ classdef ContrastStep < aod.builtin.protocols.SpatialProtocol
 
         function fName = getFileName(obj)
             if obj.baseIntensity == 0
-                fName = 'intensity_inc_';
+                fName = 'intensity_increment_';
             elseif obj.contrast > 0
-                fName = 'contrast_inc_';
+                fName = 'contrast_increment_';
             elseif obj.contrast < 0
-                fName = 'contrast_dec_';
+                fName = 'contrast_decrement_';
             end
             fName = [fName, fprintf('%up_%us_%ut.avi', 100*obj.contrast, obj.stimTime, obj.totalTime)];
         end

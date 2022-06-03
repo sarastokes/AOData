@@ -19,7 +19,7 @@ classdef Stimulus < aod.core.Entity
         end
     end
 
-    methods (Access = ?aod.core.Creator)
+    methods (Access = {?aod.core.Stimulus, ?aod.core.Creator})
         function addParameter(obj, paramName, paramValue)
             % ADDPARAMETER
             %

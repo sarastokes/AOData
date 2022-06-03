@@ -26,14 +26,14 @@ classdef (Abstract) Protocol < handle
 % -------------------------------------------------------------------------
 
     properties 
-        stimTime             %{mustBePositive}                        = 1
+        stimTime   
         calibration
 
-        preTime              % {mustBeNonnegative, mustBeInteger}      = 0
-        tailTime             % {mustBeNonnegative, mustBeInteger}      = 0
+        preTime   
+        tailTime 
     end
 
-    properties (Dependent, Access = protected)
+    properties (Dependent)
         totalTime
         totalSamples
     end
