@@ -8,8 +8,18 @@ classdef Dataset < aod.core.Dataset
 %   getFileHeader(obj)
 %   initParameters(obj, varargin)
 %   loadTransforms(obj, fName)
+%
+% Inherited public methods:
+%   setHomeDirectory(obj, filePath)
+%   id = id2epoch(obj, epochID)
+%   idx = id2idx(obj, epochID)
+%   imStack = getStacks(obj, epochIDs)
+%   data = getRegionResponses(obj, epochIDs)  
 % -------------------------------------------------------------------------
-    
+    properties (SetAccess = private)
+        sampleRate = 25  % Hz
+    end
+
     methods
         function obj = Dataset(homeDirectory, expDate)
             obj = obj@aod.core.Dataset(homeDirectory, expDate);
@@ -54,6 +64,7 @@ classdef Dataset < aod.core.Dataset
         end
 
         function clearAllTransforms(obj)
+            % CLEARALLTRANSFORMS
             for i = 1:numel(obj.Epochs)
                 obj.Epochs(i).clearTransform();
             end

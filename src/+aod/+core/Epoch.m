@@ -5,17 +5,19 @@ classdef (Abstract) Epoch < aod.core.Entity
 %   videoName = getCoreVideoName(obj)
 % 
 % Public methods:
-%   fName = getFilePath(obj, whichFile)
-%   addTransform(obj, tform)
-%   clearVideoCache(obj)
 %   getStack(obj, varargin)
-%   makeStackSnapshots(obj)
+%   fName = getFilePath(obj, whichFile)
+%   clearResponses(obj)
+%   clearVideoCache(obj)
 %
 % Protected methods:
 %   imStack = readStack(obj, videoName)
 %
 % aod.core.Creator methods:
+%   addFile(obj, fileName, filePath)
+%   addParameter(obj, paramName, paramValue)
 %   addRegistration(obj, reg, overwrite)
+%   addResponse(obj, resp)
 %   addStimulus(obj, stim)
 % -------------------------------------------------------------------------
 
@@ -24,7 +26,7 @@ classdef (Abstract) Epoch < aod.core.Entity
     end
 
     properties (SetAccess = protected)
-        Responses                   aod.core.Response
+        Responses                   % aod.core.Response
         epochParameters             % aod.core.Parameters
         files                       % aod.core.Parameters             
     end
@@ -108,8 +110,16 @@ classdef (Abstract) Epoch < aod.core.Entity
             videoName = obj.getCoreVideoName();
             imStack = obj.readStack(videoName);
 
-            obj.applyTransform(imStack);
             obj.cachedVideo = imStack;
+        end
+
+        function clearResponses(obj)
+            % CLEARRESPONSES
+            %
+            % Syntax:
+            %   obj.clearResponses()
+            % -------------------------------------------------------------
+            obj.Responses = [];
         end
     end
 
@@ -120,11 +130,12 @@ classdef (Abstract) Epoch < aod.core.Entity
             % Syntax:
             %   imStack = readStack(obj, videoName)
             % -------------------------------------------------------------
-            switch videoName(end-2:end)
-                case 'tif'
-                    reader = ao.builtin.readers.TiffReader(videoName);
-                case 'avi'
-                    reader = ao.builtin.readers.AviReader(videoName);
+            [~, ~, extension] = fileparts(videoName);
+            switch extension
+                case {'.tif', '.tiff'}
+                    reader = aod.core.readers.TiffReader(videoName);
+                case '.avi'
+                    reader = aod.core.readers.AviReader(videoName);
                 otherwise
                     error('Unrecognized file extension!');
             end
@@ -216,19 +227,54 @@ classdef (Abstract) Epoch < aod.core.Entity
             end
 
             if ~isempty(obj.Registrations)
-                idx = find(findByClass(obj.Registrations, reg));
+                idx = find(findByClass(obj.Registrations, class(reg)));
                 if ~isempty(idx) 
                     if ~overwrite
                         warning('Set overwrite=true to replace existing registration');
                         return
-                    else
-                        obj.Registrations(idx) = reg;
+                    else % overwrite existing
+                        if numel(obj.Registrations) == 1
+                            obj.Registrations = reg;
+                        else
+                            obj.Registrations{idx} = reg;
+                        end
                         return
                     end
                 end
                 obj.Registrations = {obj.Registrations; reg};
             else
                 obj.Registrations = reg;
+            end
+        end
+
+        function addResponse(obj, resp, overwrite)
+            % ADDRESPONSE
+            %
+            % Syntax:
+            %   obj.addResponse(reg, overwrite)
+            % -------------------------------------------------------------
+            if nargin < 3
+                overwrite = false;
+            end
+
+            if ~isempty(obj.Responses)
+                idx = find(findByClass(obj.Responses, class(resp)));
+                if ~isempty(idx)
+                    if ~overwrite
+                        warning('Set overwrite=true to replace existing %s', class(resp));
+                        return
+                    else  % Overwrite existing
+                        if numel(obj.Responses) == 1
+                            obj.Responses = resp;
+                        else
+                            obj.Responses{idx} = resp;
+                        end
+                        return
+                    end
+                end
+                obj.Responses = {obj.Responses; resp};
+            else
+                obj.Responses = resp;
             end
         end
     end

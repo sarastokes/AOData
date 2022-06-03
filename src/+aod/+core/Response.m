@@ -7,24 +7,40 @@ classdef Response < aod.core.Entity
 % Properties:
 %   Data 
 %   responseParameters
+%   dateModified
 %
 % Methods:
 %   addParameter(obj, paramValue, paramName)
 %   setData(obj, data)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         Data                            timetable
         responseParameters              % aod.core.parameters
+        dateModified                    % date and time last modified
+    end
+
+    properties (Hidden, Dependent)
+        Dataset
+        Regions
     end
 
     methods
         function obj = Response(parent)
-            obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
+            obj.allowableParentTypes = {'aod.core.Epoch'};
             if nargin > 0
-                obj.addParent(parent);
+                obj.setParent(parent);
             end
             obj.responseParameters = aod.core.Parameters();
+            obj.dateModified = datestr(now);
+        end
+
+        function value = get.Dataset(obj)
+            value = obj.ancestor('aod.core.Dataset');
+        end
+
+        function value = get.Regions(obj)
+            value = obj.Dataset.Regions;
         end
 
         function setData(obj, data)

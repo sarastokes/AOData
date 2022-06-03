@@ -2,7 +2,7 @@ classdef AviReader < aod.core.FileReader
 
     methods
         function obj = AviReader(varargin)
-            obj@aod.core.FileReader(varargin{:});
+            obj = obj@aod.core.FileReader(varargin{:});
             obj.validExtensions = '*.avi';
         end
 

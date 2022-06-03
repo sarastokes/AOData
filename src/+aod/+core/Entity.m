@@ -9,7 +9,6 @@ classdef (Abstract) Entity < handle
 %   description                 string
 %   notes                       cell
 %   allowableParentTypes        cellstr
-%   allowableChildTypes         cellstr
 %
 % Dependent properties:
 %   displayName                 string
@@ -32,7 +31,7 @@ classdef (Abstract) Entity < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent(1,1)                 %aod.core.Entity 
+        Parent                      %aod.core.Entity 
         description                 string = string.empty() 
         notes                       cell = cell.empty();
     end
@@ -40,7 +39,6 @@ classdef (Abstract) Entity < handle
     
     properties (Hidden, SetAccess = protected)
         allowableParentTypes        cell    = cell.empty();
-        allowableChildTypes         cell    = cell.empty();
     end
 
     properties (Dependent = true)
@@ -58,6 +56,25 @@ classdef (Abstract) Entity < handle
 
         function value = get.shortName(obj)
             value = obj.getShortName();
+        end
+
+        function h = ancestor(obj, className)
+            % ANCESTOR
+            %
+            % Description:
+            %   Recursively search 'Parent' property for className & return
+            %
+            % Syntax:
+            %   h = obj.ancestor(className)
+            % -------------------------------------------------------------
+            h = obj;
+            while ~isSubclass(h, className)
+                h = h.Parent;
+                if isempty(h)
+                    warning('Ancestor of class %s not found!', className);
+                    break
+                end
+            end
         end
     end
 

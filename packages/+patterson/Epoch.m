@@ -1,8 +1,43 @@
 classdef Epoch < aod.core.Epoch
 % EPOCH
 %
+% Constructor:
+%   obj = Epoch(ID, parent, epochType)
+%
+%
+% Properties:
+%   epochType           patterson.EpochTypes
+% Inherited properties:
+%   ID                  epoch ID
+%   startTime           datetime
+%   Registrations       aod.core.Registration
+%   Responses           aod.core.Response
+%   Stimuli             aod.core.Stimuli
+%   epochParameters     aod.core.Parameters
+%   files               aod.core.Parameters
+% Dependent properties:
+%   transform           aod.builtin.registrations.SiftRegistration
+%   homeDirectory
+%
+%
+% Public methods:
+%   makeStackSnapshots(obj, fPath)
+%   clearTransform(obj)
+% Overwritten public methods:
+%   imStack = getStack(obj)
+% Inherited public methods:
+%   clearVideoCache(obj)
+%   fPath = getFilePath(obj, whichFile)
 % Protected methods:
-%   imStack = applyTransform(obj, imStack)    
+%   imStack = applyTransform(obj, imStack)   
+%   videoName = getCoreVideoName(obj)
+% Inherited protected methods:
+%   imStack = readStack(obj, videoName)
+%   displayName = getDisplayName(obj)
+%   shortName = getShortName(obj)
+% aod.core.Creator methods:
+%   addRegistration(obj, reg, overwrite)
+%   addStimulus(obj, stim)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -25,17 +60,29 @@ classdef Epoch < aod.core.Epoch
 
         function value = get.transform(obj)
             value = [];
-            if isempty(obj.Registration)
+            if isempty(obj.Registrations)
                return  
             end
-            idx = find(isa(obj.Registration, 'aod.builtin.registrations.SiftRegistration'));
+            idx = find(findByClass(obj.Registrations,... 
+                'aod.builtin.registrations.SiftRegistration'));
             if ~isempty(idx)
-                value = obj.Registration(idx).Data;
+                value = obj.Registrations{idx}.Data;
             end
         end
     end
 
     methods 
+        function signals = getRegionResponses(obj)
+            if isempty(obj.Parent.Regions)
+                error('Dataset must contain Regions object!');
+            end
+            signals = getByClass(obj.Responses, 'aod.core.responses.RegionResponse');
+            if isempty(signals)
+                signals = aod.core.responses.RegionResponse(obj);
+                obj.addResponse(signals);
+            end
+        end
+
         function clearTransform(obj)
             idx = findByClass(obj.Registrations, 'aod.builtin.registrations.SiftRegistration');
             if ~isempty(idx)
@@ -44,7 +91,7 @@ classdef Epoch < aod.core.Epoch
             % TODO: Clear cached video as well
         end
 
-        function makeStackSnapshots(obj, IDs, fPath)
+        function makeStackSnapshots(obj, fPath)
             % MAKESTACKSNAPSHOTS
             %
             % Description:
@@ -55,21 +102,16 @@ classdef Epoch < aod.core.Epoch
             %   obj.makeStackSnapshots(fPath);
             %
             % Optional Inputs:
-            %   IDs         array
-            %       Epoch IDs to create snapshots (default = obj.epochIDs)
+            %   fPath       char
+            %       Where to save (default = 'Analysis/Snapshots/')
             % -------------------------------------------------------------
-            if nargin < 3
+            if nargin < 2
                 fPath = [obj.Parent.getAnalysisFolder(), 'Snapshots', filesep];
             end
             
-            if nargin < 2 || isempty(obj.IDs)
-                IDs = 1:numel(obj.Epochs);
-            end
-
             baseName = ['_', obj.getShortName(), '.png'];
-            imStack = obj.Epochs(IDs).getStack();
+            imStack = obj.getStack();
             
-            % TODO: Omit dropped frames
             imSum = sum(im2double(imStack), 3);
             imwrite(uint8(255 * imSum/max(imSum(:))),...
                 [fPath, 'SUM', baseName], 'png');
@@ -92,7 +134,7 @@ classdef Epoch < aod.core.Epoch
                 return
             end
 
-            disp('Applying transform...');
+            fprintf('Applying transform... ');
             try
                 tform = affine2d_to_3d(obj.transform);
                 viewObj = affineOutputView(size(imStack), tform,... 
@@ -109,22 +151,30 @@ classdef Epoch < aod.core.Epoch
         end
     end
 
-
     % Overwritten methods
     methods 
         function imStack = getStack(obj)
             % GETSTACK
+            %
+            % Syntax:
+            %   imStack = obj.getStack()
+            % -------------------------------------------------------------
+            [~, fileName, ~] = fileparts(obj.getCoreVideoName);
             if ~isempty(obj.cachedVideo)
                 imStack = obj.cachedVideo;
+                fprintf('Loaded %s from cache\n', fileName);
                 return;
             end
+
+            fprintf('Loading %s... ', fileName);
 
             videoName = obj.getCoreVideoName();
             imStack = obj.readStack(videoName);
 
-            imStack(:,:,1) = [];
-
+            obj.applyTransform(imStack);
             obj.cachedVideo = imStack;
+
+            fprintf('Done\n');
         end
     end
 

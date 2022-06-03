@@ -41,6 +41,7 @@ classdef (Abstract) Dataset < aod.core.Entity
             if nargin > 1
                 obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
             end
+            obj.setParent([]);
             obj.datasetParameters = aod.core.Parameters();
         end
 
@@ -69,7 +70,7 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
     end
 
-    methods
+    methods 
         function addRegions(obj, regions, overwrite)
             if nargin < 3
                 overwrite = false;

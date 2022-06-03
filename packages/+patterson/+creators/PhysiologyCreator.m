@@ -11,7 +11,7 @@ classdef PhysiologyCreator < aod.core.Creator
 
         function createDataset(obj, expDate, source, location, varargin)
             obj.Dataset = patterson.datasets.Physiology(obj.homeDirectory, expDate, location);
-            obj.Dataset.addSource(source);
+            obj.Dataset.setSource(source);
             obj.Dataset.initParameters(varargin{:});
         end
 
@@ -167,7 +167,7 @@ classdef PhysiologyCreator < aod.core.Creator
                 obj.Dataset.getFileHeader(), '_', visStr, '.avi']);
 
             % Processed video for analysis
-            ep.addFile('AnalysisVideo', string(['Analysis', filesep, visStr, '.tif']));
+            ep.addFile('AnalysisVideo', string(['Analysis', filesep, 'Videos', filesep, visStr, '.tif']));
 
             % Find registration report
             regFiles = refFiles(multicontains(refFiles, {'motion', 'csv'}));

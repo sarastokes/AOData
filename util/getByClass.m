@@ -4,13 +4,22 @@ function value = getByClass(x, className)
     % Syntax:
     %   idx = findByClass(x, className)
     %
+    % See also:
+    %   findByClass
+    %
     % History:
     %   30May2022 - SSP
+    %   03Jun2022 - SSP - Added call to findByClass
     % ---------------------------------------------------------------------
-    idx = cellfun(@(x) isa(x, className), x);
+    idx = findByClass(x, className);
+    idx = find(idx);
 
     if ~isempty(idx)
-        value = x{idx};
+        if iscell(x)
+            value = x{idx};
+        else
+            value = x(idx);
+        end
     else
         value = [];
     end

@@ -17,3 +17,5 @@ function idx = findByClass(x, className)
     else
         idx = arrayfun(@(x) isa(x, className), x);
     end
+
+    

@@ -2,12 +2,12 @@ classdef TiffReader < aod.core.FileReader
 
     methods
         function obj = TiffReader(varargin)
-            obj = aod.core.FileReader(varargin{:});
+            obj = obj@aod.core.FileReader(varargin{:});
             obj.validExtensions = {'*.tif', '*.tiff'};
         end
 
         function out = read(obj)
-            obj.Data = loadTiff(obj.fullFile);
+            obj.Data = obj.loadTiff(obj.fullFile);
             out = obj.Data;
         end
     end
