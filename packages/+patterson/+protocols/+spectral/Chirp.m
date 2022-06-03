@@ -4,6 +4,15 @@ classdef Chirp < aod.builtin.protocols.SpectralProtocol
 % Description:
 %   A sinusoidal modulation linearly increasing in temporal frequency
 %
+% Properties:
+%   preTime
+%   stimTime
+%   tailTime
+%   baseIntensity
+%   contrast
+%   startFreq
+%   stopFreq
+%
 % Reference:
 %   Baden et al (2016) Nature
 % -------------------------------------------------------------------------
@@ -14,8 +23,8 @@ classdef Chirp < aod.builtin.protocols.SpectralProtocol
     end
 
     methods
-        function obj = Chirp(stimTime, ledMeans, varargin)
-            obj = obj@aod.builtin.protocols.SpectralProtocol(stimTime, ledMeans, varargin{:});
+        function obj = Chirp(ledMeans, varargin)
+            obj = obj@aod.builtin.protocols.SpectralProtocol(ledMeans, varargin{:});
 
             ip = inputParser();
             addParameter(ip, 'StartFreq', 0.5, @isnumeric);

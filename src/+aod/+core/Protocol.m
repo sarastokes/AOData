@@ -50,19 +50,20 @@ classdef (Abstract) Protocol < handle
     end
 
     methods
-        function obj = Protocol(stimTime, varargin)
-            obj.stimTime = stimTime;
+        function obj = Protocol(varargin)
         
             ip = inputParser();
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;
             addParameter(ip, 'Calibration', []);
             addParameter(ip, 'PreTime', 0, @isnumeric);
+            addParameter(ip, 'StimTime', 0, @isnumeric);
             addParameter(ip, 'TailTime', 0, @isnumeric);
             parse(ip, varargin{:});
             
             obj.calibration = ip.Results.Calibration;
             obj.preTime = ip.Results.PreTime;
+            obj.stimTime = ip.Results.StimTime;
             obj.tailTime = ip.Results.TailTime;
         end
 

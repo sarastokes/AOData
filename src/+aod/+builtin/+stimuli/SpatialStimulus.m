@@ -12,7 +12,7 @@ classdef SpatialStimulus < aod.core.Stimulus
     end
 
     properties (SetAccess = private)
-        defaultProtocolFile
+        defaultProtocolFile     % Used for display name
     end
 
     methods
@@ -27,10 +27,31 @@ classdef SpatialStimulus < aod.core.Stimulus
                 obj.defaultProtocolFile = protocol.getFileName();
             end
         end
+
+        function protocol = getProtocol(obj)
+            % GETPROTOCOL
+            %
+            % Description:
+            %   Use properties to regenerate the Protocol object
+            %
+            % Syntax:
+            %   protocol = getProtocol(obj)
+            % ----------------------------------------------------------
+            protocolFcn = str2func(obj.protocolName);
+            protocol = protocolFcn(map2struct(obj.stimulusParameters));
+            if isempty(obj.Protocol)
+                obj.Protocol = protocol;
+            end
+        end
     end
 
     methods (Access = private)
         function getProtocolParameters(obj, protocol)
+            % GETPROTOCOLPARAMETERS
+            %
+            % Description:
+            %   Move protocol properties to stimulusProperties
+            % -------------------------------------------------------------
             mc = metaclass(protocol);
             for i = 1:numel(mc.PropertyList)
                 if strcmp(mc.PropertyList(i).GetAccess, 'public')

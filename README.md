@@ -18,9 +18,9 @@ For storing data and metadata associated with an experiment:
     - Stimulus
    - Analysis
 
-Although there are multiple approaches for converting an experiment into a `Dataset` object, 
+Although there are multiple approaches for converting an experiment into a `Dataset` object, the `Creator` class has access to all the building functions within `Dataset` and can provide a standardized way of building customized `Dataset` objects.
 
-For creating stimulus protocols, there is also the `Protocol` class. The advantage of using this class is standardizing stimulus creation. The `Stimulus` class stores the `Protocol` name and parameters, making it possible to recreate the exact stimulus used.
+For creating stimulus protocols, there is also the `Protocol` class. The advantage of using this class is standardizing stimulus creation. The `Stimulus` class stores the `Protocol` name and parameters, making it possible to recreate the `Protocol` object later on and restore the exact stimulus used.
 
 
 ### Examples

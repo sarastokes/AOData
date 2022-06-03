@@ -15,13 +15,12 @@ classdef DecrementIncrement < aod.builtin.protocols.SpatialProtocol
     end
 
     methods 
-        function obj = DecrementIncrement(stimTime, varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(stimTime, varargin{:});
+        function obj = DecrementIncrement(varargin)
+            obj = obj@aod.builtin.protocols.SpatialProtocol(varargin{:});
 
             % Derived properties
             obj.stepTime = obj.stimTime/2;
-
-        end
+       end
 
         function trace = temporalTrace(obj)
             prePts = obj.sec2pts(obj.preTime);

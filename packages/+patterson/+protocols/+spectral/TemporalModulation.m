@@ -1,8 +1,21 @@
 classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
-
+% TEMPORALMODULATION
+%
+% Description:
+%   A periodic temporal modulation
+%
+% Properties:
+%   preTime
+%   stimTime
+%   tailTime
+%   baseIntensity
+%   contrast
+%   temporalFrequency
+%   sinewave           
+% -------------------------------------------------------------------------
     properties
-        temporalFrequency(1,1)      {mustBePositive}        = 5
-        sinewave(1,1)               logical                 = true
+        temporalFrequency       % temporal frequency of modulation in Hz
+        sinewave                % sinewave or squarewave, logical (true)
     end
 
     properties (Dependent)
@@ -10,8 +23,8 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
     end
 
     methods
-        function obj = TemporalModulation(stimTime, ledMeans, varargin)
-            obj = obj@aod.builtin.protocols.SpectralProtocol(stimTime, ledMeans, varargin{:});
+        function obj = TemporalModulation(ledMeans, varargin)
+            obj = obj@aod.builtin.protocols.SpectralProtocol(ledMeans, varargin{:});
 
             ip = inputParser();
             ip.CaseSensitive = false;

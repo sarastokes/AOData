@@ -19,8 +19,8 @@ classdef (Abstract) SpectralProtocol < aod.core.Protocol
 
     properties
         ledMeans
-        baseIntensity%(1,1)  {mustBeNonnegative}                     = 0
-        contrast     %       {mustBeInRange(contrast, -1, 1)}        = 1
+        baseIntensity
+        contrast    
     end
 
     properties (Dependent, Access = protected)
@@ -29,8 +29,8 @@ classdef (Abstract) SpectralProtocol < aod.core.Protocol
     end
 
     methods
-        function obj = SpectralProtocol(stimTime, ledMeans, varargin)
-            obj = obj@aod.core.Protocol(stimTime, varargin{:});
+        function obj = SpectralProtocol(ledMeans, varargin)
+            obj = obj@aod.core.Protocol(varargin{:});
             obj.ledMeans = ledMeans;
 
             % Shared by all spectral stimuli

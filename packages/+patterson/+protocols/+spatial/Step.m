@@ -19,8 +19,8 @@ classdef Step < aod.builtin.protocols.SpatialProtocol
 %   ...
 % -------------------------------------------------------------------------
     methods
-        function obj = Step(stimTime, varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(stimTime, varargin{:});
+        function obj = Step(varargin)
+            obj = obj@aod.builtin.protocols.SpatialProtocol(varargin{:});
         end
 
         function stim = generate(obj)

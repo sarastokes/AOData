@@ -42,8 +42,8 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
     end
 
     methods
-        function obj = SpatialProtocol(stimTime, varargin)
-            obj = obj@aod.core.Protocol(stimTime, varargin{:});
+        function obj = SpatialProtocol(varargin)
+            obj = obj@aod.core.Protocol(varargin{:});
 
             % Shared by all SpatialProtocols
             obj.sampleRate = 25;
