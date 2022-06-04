@@ -163,15 +163,6 @@ classdef (Abstract) Dataset < aod.core.Entity
             obj.Source = source;
         end
 
-        function addParameter(obj, paramName, paramValue)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, paramValue)
-            % -------------------------------------------------------------
-            obj.datasetParameters(paramName) = paramValue;
-        end
-
         function addEpoch(obj, epoch)
             % ADDEPOCH
             %
@@ -224,6 +215,32 @@ classdef (Abstract) Dataset < aod.core.Entity
             % -------------------------------------------------------------
             [obj.epochIDs, idx] = sort(obj.epochIDs);
             obj.Epochs = obj.Epochs(idx);
+        end
+    end
+
+        methods
+        function addParameter(obj, varargin)
+            % ADDPARAMETER
+            %
+            % Syntax:
+            %   obj.addParameter(paramName, value)
+            %   obj.addParameter(paramName, value, paramName, value)
+            %   obj.addParameter(struct)
+            % -------------------------------------------------------------
+            if nargin == 1
+                return
+            end
+            if nargin == 2 && isstruct(varargin{1})
+                S = varargin{1};
+                k = fieldnames(S);
+                for i = 1:numel(k)
+                    obj.datasetParameters(k{i}) = S.(k{i});
+                end
+            else
+                for i = 1:(nargin - 1)/2
+                    obj.datasetParameters(varargin{(2*i)-1}) = varargin{2*i};
+                end
+            end
         end
     end
 end

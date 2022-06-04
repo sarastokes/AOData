@@ -1,4 +1,4 @@
-classdef Fluorescence < aod.core.responses.RegionResponses
+classdef Fluorescence < aod.core.responses.RegionResponse
 %
 % Description:
 %   Wrapper for aod.core.responses.RegionResponses
@@ -8,7 +8,7 @@ classdef Fluorescence < aod.core.responses.RegionResponses
 % -------------------------------------------------------------------------
     methods
         function obj = Fluorescence(parent)
-            obj = obj@aod.core.responses.RegionResponses(parent);
+            obj = obj@aod.core.responses.RegionResponse(parent);
         end
     end
 

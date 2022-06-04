@@ -113,6 +113,24 @@ classdef (Abstract) Epoch < aod.core.Entity
             obj.cachedVideo = imStack;
         end
 
+        
+        function resp = getResponse(obj, responseClassName, varargin)
+            % SETRESPONSE
+            %
+            % Syntax:
+            %   resp = getResponse(obj, responseClassName, varargin)
+            % -------------------------------------------------------------
+            if isempty(obj.Parent.Regions)
+                error('Dataset must contain Regions');
+            end
+            resp = getByClass(obj.Responses, responseClassName);
+            if isempty(resp)
+                constructor = str2func(responseClassName);
+                resp = constructor(obj, varargin{:});
+                obj.addResponse(resp);
+            end
+        end
+
         function clearResponses(obj)
             % CLEARRESPONSES
             %
@@ -165,15 +183,6 @@ classdef (Abstract) Epoch < aod.core.Entity
     end
 
     methods (Access = {?aod.core.Creator, ?aod.core.Epoch})
-        function addParameter(obj, paramName, paramValue)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   addParameter(obj, paramName, paramValue)
-            % -------------------------------------------------------------
-            obj.epochParameters(paramName) = paramValue;
-        end
-
         function addFile(obj, fileName, filePath)
             % ADDFILE
             %
@@ -275,6 +284,32 @@ classdef (Abstract) Epoch < aod.core.Entity
                 obj.Responses = {obj.Responses; resp};
             else
                 obj.Responses = resp;
+            end
+        end
+    end
+
+    methods
+        function addParameter(obj, varargin)
+            % ADDPARAMETER
+            %
+            % Syntax:
+            %   obj.addParameter(paramName, value)
+            %   obj.addParameter(paramName, value, paramName, value)
+            %   obj.addParameter(struct)
+            % -------------------------------------------------------------
+            if nargin == 1
+                return
+            end
+            if nargin == 2 && isstruct(varargin{1})
+                S = varargin{1};
+                k = fieldnames(S);
+                for i = 1:numel(k)
+                    obj.epochParameters(k{i}) = S.(k{i});
+                end
+            else
+                for i = 1:(nargin - 1)/2
+                    obj.epochParameters(varargin{(2*i)-1}) = varargin{2*i};
+                end
             end
         end
     end

@@ -72,15 +72,8 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods 
-        function signals = getRegionResponses(obj)
-            if isempty(obj.Parent.Regions)
-                error('Dataset must contain Regions object!');
-            end
-            signals = getByClass(obj.Responses, 'aod.core.responses.RegionResponse');
-            if isempty(signals)
-                signals = aod.core.responses.RegionResponse(obj);
-                obj.addResponse(signals);
-            end
+        function signals = getFluorescence(obj)
+            signals = obj.getResponse('patterson.responses.Fluorescence');
         end
 
         function clearTransform(obj)
