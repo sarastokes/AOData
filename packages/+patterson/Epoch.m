@@ -130,6 +130,11 @@ classdef Epoch < aod.core.Epoch
         end
 
         function imStack = applyTransform(obj, imStack)
+            % APPLYTRANSFORM
+            %
+            % Syntax:
+            %   imStack = applyTransform(obj, imStack)
+            % -------------------------------------------------------------
             if isempty(obj.transform)
                 return
             end
@@ -170,6 +175,7 @@ classdef Epoch < aod.core.Epoch
 
             videoName = obj.getCoreVideoName();
             imStack = obj.readStack(videoName);
+            imStack(:,:,1) = [];
 
             obj.applyTransform(imStack);
             obj.cachedVideo = imStack;

@@ -8,6 +8,8 @@ classdef Response < aod.core.Entity
 %   Data 
 %   responseParameters
 %   dateModified
+% Dependent properties:
+%   Dataset 
 %
 % Methods:
 %   addParameter(obj, paramValue, paramName)
@@ -22,7 +24,6 @@ classdef Response < aod.core.Entity
 
     properties (Hidden, Dependent)
         Dataset
-        Regions
     end
 
     methods
@@ -39,17 +40,13 @@ classdef Response < aod.core.Entity
             value = obj.ancestor('aod.core.Dataset');
         end
 
-        function value = get.Regions(obj)
-            value = obj.Dataset.Regions;
-        end
-
         function setData(obj, data)
             % SETDATA
             %
             % Syntax:
             %   setData(obj, data)
             % -------------------------------------------------------------
-            obj.Data = data;
+            obj.Data_ = data;
         end
 
         function addParameter(obj, paramName, paramValue)
