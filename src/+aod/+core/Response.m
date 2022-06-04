@@ -46,7 +46,7 @@ classdef Response < aod.core.Entity
             % Syntax:
             %   setData(obj, data)
             % -------------------------------------------------------------
-            obj.Data_ = data;
+            obj.Data = data;
         end
 
         function addParameter(obj, varargin)

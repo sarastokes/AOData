@@ -38,12 +38,63 @@ classdef RegionResponse < aod.core.Response
     end
 
     methods
+        function signals = getData(obj, IDs) 
+            % GETDATA
+            %
+            % Description:
+            %   Convenience method for easy access of data
+            %
+            % Syntax:
+            %   Returns just the signals in the timetable
+            % 
+            % Optional input:
+            %   IDs         integers
+            %       Specific columns (ROIs) to return (default returns all)
+            % Output:
+            %   signals     double [time x rois]
+            % -------------------------------------------------------------
+            if isempty(obj.Data)
+                error('Data has not been set!');
+            end
+            signals = obj.Data.Signals;
+            if nargin == 2
+                signals = signals(:, IDs);
+            end
+        end
+
         function setData(obj)
-            [signals, xpts] = roiResponses(obj.Parent.getStack(),... 
-                obj.Regions.Map(), [], 'FrameRate', obj.Dataset.sampleRate);
-            obj.Data = timetable(seconds(xpts'), signals',... 
+            % SETDATA
+            %
+            % Description:
+            %   Get the average response over all pixels in ROI
+            % -------------------------------------------------------------
+            roiMask = double(obj.Regions.Map);
+            sampleRate = obj.Dataset.sampleRate;
+            imStack = obj.Parent.getStack();
+            roiList = obj.Regions.roiIDs;
+        
+            A = [];
+            for i = 1:obj.Regions.Count
+                [a, b] = find(roiMask == roiList(i));
+                % Look for ROIs exceeding image size
+                a(b > size(imStack,2)) = [];
+                b(b > size(imStack,2)) = [];
+                b(a > size(imStack,1)) = [];
+                a(a > size(imStack,1)) = [];
+                % Time course for each pixel in the ROI
+                signal = zeros(numel(a), size(imStack, 3));
+                for j = 1:numel(a)
+                    signal(j, :) = squeeze(imStack(a(j), b(j), :));
+                end
+                % Average timecourse over all pixels in the ROI
+                signal = mean(signal);
+                % Append to the matrix
+                A = cat(1, A, signal);
+            end
+
+            xpts = 1/sampleRate : 1/sampleRate : (size(imStack,3))/sampleRate;
+            obj.Data = timetable(seconds(xpts'), A',...
                 'VariableNames', {'Signals'});
-            obj.dateModified = datestr(now);
         end
 
         function [signals, xpts] = getRoiResponse(obj, ID)

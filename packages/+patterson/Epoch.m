@@ -170,7 +170,7 @@ classdef Epoch < aod.core.Epoch
             imStack = obj.readStack(videoName);
             imStack(:,:,1) = [];
 
-            obj.applyTransform(imStack);
+            imStack = obj.applyTransform(imStack);
             obj.cachedVideo = imStack;
 
             fprintf('Done\n');

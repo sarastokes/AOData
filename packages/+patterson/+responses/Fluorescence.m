@@ -10,6 +10,12 @@ classdef Fluorescence < aod.core.responses.RegionResponse
         function obj = Fluorescence(parent)
             obj = obj@aod.core.responses.RegionResponse(parent);
         end
+
+        function setData(obj)
+            setData@aod.core.responses.RegionResponse(obj);
+            % Account for the first frame being deleted
+            obj.Data.Time = obj.Data.Time + obj.Data.Time(1);
+        end
     end
 
     methods (Access = protected)

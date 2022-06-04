@@ -4,11 +4,18 @@ classdef (Abstract) Regions < aod.core.Entity
 % Constructor:
 %   obj = Regions(parent, rois, varargin)
 %
+% 
+% Properties:
+%   Map                     labeled map of region locations
+%   Count                   number of regions in map
+%   roiIDs                  IDs of all regions in map
+%   regionParameters        aod.core.Parameters
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         Map                 double
         Count(1,1)          {mustBeInteger}  = 0
+        roiIDs(1,:)         {mustBeInteger}  = 0 
         regionParameters    % aod.core.Parameters
     end
 
@@ -37,7 +44,17 @@ classdef (Abstract) Regions < aod.core.Entity
 
     methods (Access = protected)
         function setMap(obj, roiMap)
+            % SETMAP
+            %
+            % Description:
+            %   Assigns Map property and all derived properties
+            %
+            % Syntax:
+            %   obj.setMap(roiMap);
+            % -------------------------------------------------------------
             obj.Map = roiMap;
+            obj.roiIDs = unique(obj.Map);
+            obj.roiIDs(obj.roiIDs == 0) = [];
             obj.Count = nnz(unique(obj.Map));
         end
     end
