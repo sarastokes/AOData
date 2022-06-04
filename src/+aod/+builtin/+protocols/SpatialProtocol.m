@@ -1,4 +1,4 @@
-classdef (Abstract) SpatialProtocol < aod.core.Protocol
+classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
 % SPATIALPROTOCOL
 %
 % Description:
@@ -12,9 +12,10 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
 %
 % A stimulus is written by the following logic:
 %   1. GENERATE: Calculates normalized stimulus values (0-1)
-%   2. MAPTOLEDS: Uses calibrations to convert to uint8
+%   2. MAPTOSTIMULATOR: Uses calibrations to convert to uint8
 %   3. WRITESTIM: Outputs the file used by imaging software
 % Each method will call the prior steps
+% You can either provide a file name to writeStim or overwrite getFileName
 %
 % Abstract methods (from aod.core.Protocol, implement in subclasses):
 %   stim = obj.generate()
@@ -24,49 +25,19 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
 %   stim = mapToLaser(obj)
 %   writeStim(obj, fName)
 % -------------------------------------------------------------------------
-    properties
-        baseIntensity
-        contrast
-
+    properties (SetAccess = protected)
         % Shared by all Spatial Protocols
         sampleRate = 25;
         stimRate = 25;
     end
 
-    properties (Dependent)
-        amplitude           % Intensity/contrast depending on baseIntensity
-    end
-
-    properties (Hidden, Access = protected)
+    properties (Hidden, SetAccess = private)
         canvasSize = [256, 256];       % pixels
     end
 
     methods
         function obj = SpatialProtocol(varargin)
-            obj = obj@aod.core.Protocol(varargin{:});
-
-            % Shared by all SpatialProtocols
-            obj.sampleRate = 25;
-            obj.stimRate = 25;
-
-            % Input parsing
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
-            addParameter(ip, 'BaseIntensity', 0, @isnumeric);
-            addParameter(ip, 'Contrast', 1, @isnumeric);
-            parse(ip, varargin{:});
-
-            obj.baseIntensity = ip.Results.BaseIntensity;
-            obj.contrast = ip.Results.Contrast;
-        end
-
-        function value = get.amplitude(obj)
-            if obj.baseIntensity == 0
-                value = obj.contrast;
-            else
-                value = obj.contrast * obj.baseIntensity;
-            end
+            obj = obj@aod.builtin.protocols.StimulusProtocol(varargin{:});
         end
 
         function fName = getFileName(obj) %#ok<MANU> 
@@ -100,8 +71,8 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
             end
         end
 
-        function stim = mapToLaser(obj)
-            % MAPTOLASER
+        function stim = mapToStimulator(obj)
+            % MAPTOSTIMULATOR
             %
             % Description:
             %   Apply nonlinearity and change to uint8
@@ -124,7 +95,7 @@ classdef (Abstract) SpatialProtocol < aod.core.Protocol
             else
                 assert(endsWith(fName, '.avi'), 'Filename must end with .avi');
             end
-            stim = obj.mapToLaser();
+            stim = obj.mapToStimulator();
             v = VideoWriter(fName, 'Grayscale AVI');
             v.FrameRate = 25;
             open(v)

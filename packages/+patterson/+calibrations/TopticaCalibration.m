@@ -1,5 +1,5 @@
-classdef TopticaNonlinearity < aod.core.Calibration
-% TOPTICANONLINEARITY
+classdef TopticaCalibration < aod.core.Calibration
+% TOPTICACALIBRATION
 %
 % Description:
 %   Nonlinearity in visual stimuli presented with Toptica.
@@ -13,21 +13,24 @@ classdef TopticaNonlinearity < aod.core.Calibration
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         Data 
+    end
+
+    properties (Access = private)
         fitFcn
     end
 
     methods
-        function obj = TopticaNonlinearity(parent)
+        function obj = TopticaCalibration(parent)
             if nargin < 0
                 parent = [];
             end
-            obj = obj@aod.core.Calibration(parent, '20211101');
+            obj = obj@aod.core.Calibration('20210801', parent);
         
             obj.loadCalibration();
         end
 
         function loadCalibration(obj)
-            dataDir = [fileparts(fileparts(mfilename("fullpath"))), filesep];
+            dataDir = [fileparts(fileparts(mfilename("fullpath"))), filesep, '+resources', filesep];
             data = dlmread([dataDir, 'TopticaNonlinearity2pctPWR.txt']); %#ok<DLMRD> 
 
             obj.Data = table(data(:,1), data(:,2),...

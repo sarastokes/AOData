@@ -20,6 +20,7 @@ classdef (Abstract) Dataset < aod.core.Entity
         Epochs                  %aod.core.Epoch
         Source                  %aod.core.Source
         Regions                 %aod.core.Regions
+        Calibrations            %aod.core.Calibration
 
         epochIDs(1,:)           double
     end
@@ -90,6 +91,12 @@ classdef (Abstract) Dataset < aod.core.Entity
 
     methods 
         function imStack = getStacks(obj, epochIDs, varargin)
+            % GETSTACKS
+            %
+            % Syntax:
+            %   imStack = getStack(obj, epochIDs, varargin)
+            %
+            % -------------------------------------------------------------
             ip = inputParser();
             addParameter(ip, 'Average', false, @islogical);
             parse(ip, varargin{:});
@@ -107,6 +114,14 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
 
         function data = getRegionResponses(obj, epochIDs, varargin)
+            % GETREGIONRESPONSES
+            %
+            % Description:
+            %   Get Region responses from specified epoch(s)
+            %
+            % Syntax:
+            %   data = getRegionResponses(obj, epochIDs, varargin)
+            % -------------------------------------------------------------
             ip = inputParser();
             addParameter(ip, 'Average', false, @islogical);
             parse(ip, varargin{:});
@@ -144,6 +159,7 @@ classdef (Abstract) Dataset < aod.core.Entity
             % See also:
             %   aod.core.Source
             % -------------------------------------------------------------
+            assert(isSubclass(source, 'aod.core.Source'), 'Must be a subclass of aod.core.Source');
             obj.Source = source;
         end
 
@@ -165,6 +181,36 @@ classdef (Abstract) Dataset < aod.core.Entity
             assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
             obj.Epochs = cat(1, obj.Epochs, epoch);
             obj.epochIDs = cat(2, obj.epochIDs, epoch.ID);
+        end
+
+        function addCalibration(obj, calibration)
+            % ADDEPOCH
+            %
+            % Syntax:
+            %   obj.addCalibration(obj, calibration, overwrite)
+            % -------------------------------------------------------------
+            if nargin < 3
+                overwrite = false;
+            end
+
+            if ~isempty(obj.Calibrations)
+                idx = find(findByClass(obj.Calibrations, class(calibration)));
+                if ~isempty(idx)
+                    if ~overwrite
+                        warning('Set overwrite=true to replace existing %s', class(calibration));
+                    else % Overwrite existing
+                        if numel(obj.Calibrations) == 1
+                            obj.Calibrations = calibration;
+                        else
+                            obj.Calibrations{idx} = calibration;
+                        end
+                        return
+                    end
+                end
+                obj.Calibrations = {obj.Calibrations; calibration};
+            else
+                obj.Calibrations = calibration;
+            end
         end
 
         function sortEpochs(obj)

@@ -38,7 +38,7 @@ classdef (Abstract) Protocol < handle
         totalSamples
     end
 
-    properties (Abstract)
+    properties (Abstract, SetAccess = protected)
         sampleRate
         stimRate
     end
@@ -76,6 +76,15 @@ classdef (Abstract) Protocol < handle
         end
     end
 
+    methods
+        function stim = mapToStimulator(obj)
+            % MAPTOSTIMULATOR
+            % Can be overwritten by subclasses if needed
+            % -------------------------------------------------------------
+            stim = obj.generate();
+        end
+    end
+
     methods (Access = protected)
         function value = calculateTotalTime(obj)
             % CALCULATETOTALTIME
@@ -87,7 +96,6 @@ classdef (Abstract) Protocol < handle
 
     % Convenience methods
     methods (Access = protected)
-
         function value = sec2pts(obj, t)
             % SEC2PTS
             %

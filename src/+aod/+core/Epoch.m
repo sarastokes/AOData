@@ -25,16 +25,13 @@ classdef (Abstract) Epoch < aod.core.Entity
         ID(1,1)                     double     = 0
     end
 
-    properties (SetAccess = protected)
-        Responses                   % aod.core.Response
-        epochParameters             % aod.core.Parameters
-        files                       % aod.core.Parameters             
-    end
-
     properties (SetAccess = {?aod.core.Creator, ?aod.core.Epoch})
         startTime(1,1)              datetime
-        Registrations               = cell.empty()
+        Registrations               % aod.core.Registration
+        Responses                   % aod.core.Response  
         Stimuli                     % aod.core.Stimulus
+        epochParameters             % aod.core.Parameters
+        files                       % aod.core.Parameters  
     end
 
     properties (Dependent, Hidden)
@@ -81,7 +78,10 @@ classdef (Abstract) Epoch < aod.core.Entity
             %   fName = obj.getFilePath(whichFile)
             % -------------------------------------------------------------
             assert(isKey(obj.files, whichFile), sprintf('File named %s not found', whichFile));
-            fName = obj.Parent.homeDirectory + obj.files(whichFile);
+            fName = obj.files(whichFile);
+            if ~contains(fName, ':\')
+                fName = obj.Parent.homeDirectory + fName;
+            end
         end
 
         function clearVideoCache(obj)

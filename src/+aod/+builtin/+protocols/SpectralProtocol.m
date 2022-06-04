@@ -1,4 +1,4 @@
-classdef (Abstract) SpectralProtocol < aod.core.Protocol
+classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
 % SPECTRALPROTOCOL
 %
 % Description:
@@ -12,56 +12,36 @@ classdef (Abstract) SpectralProtocol < aod.core.Protocol
 %
 % A stimulus is written by the following logic:
 %   1. GENERATE: Calculates normalized stimulus values (0-1)
-%   2. MAPTOLEDS: Uses calibrations to convert to power
+%   2. MAPTOSTIMULATOR: Uses calibrations to convert to power
 %   3. WRITESTIM: Outputs the file used by imaging software
 % Each method will call the prior steps
 % -------------------------------------------------------------------------
 
     properties
         ledMeans
-        baseIntensity
-        contrast    
     end
 
     properties (Dependent, Access = protected)
-        amplitude
         ledRange
     end
 
+    properties (SetAccess = protected)
+        sampleRate = 25
+        stimRate = 500
+    end
+    
+
     methods
         function obj = SpectralProtocol(ledMeans, varargin)
-            obj = obj@aod.core.Protocol(varargin{:});
+            obj = obj@aod.builtin.protocols.StimulusProtocol(varargin{:});
             obj.ledMeans = ledMeans;
-
-            % Shared by all spectral stimuli
-            obj.sampleRate = 25;
-            obj.stimRate = 500;
-
-            % Input parsing
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
-            addParameter(ip, 'BaseIntensity', 0, @isnumeric);
-            addParameter(ip, 'Contrast', 1, @isnumeric);
-            parse(ip, varargin{:});
-
-            obj.baseIntensity = ip.Results.BaseIntensity;
-            obj.contrast = ip.Results.Contrast;
-        end
-
-        function value = get.amplitude(obj)
-            if obj.baseIntensity == 0
-                value = obj.contrast;
-            else
-                value = obj.contrast * obj.baseIntensity;
-            end
         end
 
         function value = get.ledRange(obj)
             value = 2 * obj.ledMeans;
         end
 
-        function ledValues = mapToLeds(obj)
+        function ledValues = mapToStimulator(obj)
             % MAPTOLEDS
             %
             % Syntax:
@@ -77,7 +57,7 @@ classdef (Abstract) SpectralProtocol < aod.core.Protocol
             % Syntax:
             %   writeStim(obj, fName)
             % -------------------------------------------------------------
-            ledValues = obj.mapToLeds();
+            ledValues = obj.mapToStimulator();
             makeLEDStimulusFile(fName, ledValues);
         end
 

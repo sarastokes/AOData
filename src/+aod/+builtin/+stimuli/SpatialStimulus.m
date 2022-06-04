@@ -24,7 +24,7 @@ classdef SpatialStimulus < aod.core.Stimulus
             if nargin > 1
                 obj.protocolName = class(protocol);
                 obj.getProtocolParameters(protocol);
-                obj.defaultProtocolFile = protocol.getFileName();
+                [~, obj.defaultProtocolFile, ~] = fileparts(protocol.getFileName());
             end
         end
 

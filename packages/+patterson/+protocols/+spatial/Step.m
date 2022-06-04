@@ -16,7 +16,6 @@ classdef Step < aod.builtin.protocols.SpatialProtocol
 %
 % Inherited methods:
 %   trace = temporalTrace(obj)
-%   ...
 % -------------------------------------------------------------------------
     methods
         function obj = Step(varargin)
@@ -36,7 +35,7 @@ classdef Step < aod.builtin.protocols.SpatialProtocol
             elseif obj.contrast < 0
                 fName = 'contrast_decrement_';
             end
-            fName = [fName, fprintf('%up_%us_%ut.avi', 100*obj.contrast, obj.stimTime, obj.totalTime)];
+            fName = [fName, sprintf('%up_%us_%ut.avi', abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
         end
     end
 end

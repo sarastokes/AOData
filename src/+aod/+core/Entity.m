@@ -203,4 +203,10 @@ classdef (Abstract) Entity < handle
             end
         end
     end
+
+    methods (Static)
+        function tf = isEntity(x)
+            tf = isSubclass(x, 'aod.core.Entity');
+        end
+    end
 end 
