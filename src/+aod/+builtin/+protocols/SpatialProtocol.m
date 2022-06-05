@@ -81,7 +81,31 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             %   stim = mapToLaser(obj)
             % -------------------------------------------------------------
             stim = obj.generate();
-            stim = applySystemNonlinearity3d(stim);
+            lookupFit = fit(obj.Calibration.Data.Value, obj.Calibration.Data.Power,...
+                'cubicinterp');
+            lookupTable = lookupFit(0:255);
+
+            powerRange = max(obj.Calibration.Data.Power) - min(obj.Calibration.Data.Power);
+            powerStim = powerRange * stim + min(obj.Calibration.Data.Power);
+
+            [x, y, t] = size(powerStim);
+            powerStim = powerStim(:);
+            stim = zeros(size(powerStim));
+
+            values = unique(powerStim);
+            if numel(values) < 10
+                % If theres just a few unique values, don't run point by point
+                for i = 1:numel(values)
+                    stim(powerStim == values(i)) = findclosest(lookupTable, values(i));
+                end
+            else
+                for i = 1:numel(powerStim)
+                    stim(i) = findclosest(lookupTable, powerStim(i));
+                end
+
+                stim = uint8(stim - 1);
+                stim = reshape(stim, [x y t]);
+            end
         end
 
         function writeStim(obj, fName)
