@@ -55,6 +55,9 @@ classdef SpatialStimulus < aod.core.Stimulus
             mc = metaclass(protocol);
             for i = 1:numel(mc.PropertyList)
                 if strcmp(mc.PropertyList(i).GetAccess, 'public')
+                    if isnumeric(mc.PropertyList(i).Name) && isnan(mc.PropertyList(i).Name)
+                        continue
+                    end
                     obj.addParameter(mc.PropertyList(i).Name,...
                         protocol.(mc.PropertyList(i).Name));
                 end

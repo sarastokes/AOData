@@ -23,10 +23,13 @@ classdef Chirp < aod.builtin.protocols.SpectralProtocol
     end
 
     methods
-        function obj = Chirp(ledMeans, varargin)
-            obj = obj@aod.builtin.protocols.SpectralProtocol(ledMeans, varargin{:});
+        function obj = Chirp(calibration, varargin)
+            obj = obj@aod.builtin.protocols.SpectralProtocol(...
+                calibration, varargin{:});
 
             ip = inputParser();
+            ip.CaseSensitive = false;
+            ip.KeepUnmatched = true;
             addParameter(ip, 'StartFreq', 0.5, @isnumeric);
             addParameter(ip, 'StopFreq', 30, @isnumeric);
             parse(ip, varargin{:});
@@ -37,8 +40,8 @@ classdef Chirp < aod.builtin.protocols.SpectralProtocol
         
         function stim = generate(obj)
             ledResolution = 1/obj.stimRate;  % ms
-            chirpPts = obj.freqTime / ledResolution;
-            hzPerSec = obj.stopFreq / obj.freqTime;
+            chirpPts = obj.stimTime / ledResolution;
+            hzPerSec = obj.stopFreq / obj.stimTime;
 
             stim = zeros(1, chirpPts);
             for i = 1:chirpPts

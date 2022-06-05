@@ -153,7 +153,7 @@ classdef Rois < aod.core.Regions
             else
                 error('Invalid input!');
             end
-            obj.roiUIDs = sortrows(obj.Metadata, 'ID');
+            obj.Metadata = sortrows(obj.Metadata, 'ID');
         end
     end
 

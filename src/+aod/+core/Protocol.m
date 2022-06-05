@@ -5,8 +5,7 @@ classdef (Abstract) Protocol < handle
 %   obj = aod.core.Protocol(stimTime, calibration, varargin)
 %
 % Properties:
-%   preTime         time before stimulus in seconds
-%   tailTime        time after stimulus in seconds
+%   calibration     aod.core.Calibration (optional)
 %
 % Abstract properties (must be set by subclasses):
 %   sampleRate      the rate data is sampled (hz)
@@ -15,27 +14,23 @@ classdef (Abstract) Protocol < handle
 % Dependent properties:
 %   totalTime       total stimulus time (from calculateTotalTime)
 %   totalSamples    total number of samples in stimulus
+%   calibrationDate date calibration was performed
 %
 % Abstract methods:
 %   stim = generate(obj)
 %   fName = getFileName(obj)
 %   writeStim(obj, fileName)
-%
-% Protected methods:
-%   value = calculateTotalTime(obj)
+% Methods (to be subclassed):
+%   stim = mapToStimulator(obj)
 % -------------------------------------------------------------------------
 
-    properties 
-        stimTime   
+    properties  
         calibration
 
-        preTime   
-        tailTime 
     end
 
     properties (Dependent)
-        totalTime
-        totalSamples
+        calibrationDate
     end
 
     properties (Abstract, SetAccess = protected)
@@ -50,29 +45,20 @@ classdef (Abstract) Protocol < handle
     end
 
     methods
-        function obj = Protocol(varargin)
-        
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
-            addParameter(ip, 'Calibration', []);
-            addParameter(ip, 'PreTime', 0, @isnumeric);
-            addParameter(ip, 'StimTime', 0, @isnumeric);
-            addParameter(ip, 'TailTime', 0, @isnumeric);
-            parse(ip, varargin{:});
-            
-            obj.calibration = ip.Results.Calibration;
-            obj.preTime = ip.Results.PreTime;
-            obj.stimTime = ip.Results.StimTime;
-            obj.tailTime = ip.Results.TailTime;
+        function obj = Protocol(calibration)
+            if nargin > 0
+                assert(isSubclass(calibration, 'aod.core.Calibration'),...
+                    'Input must be of class aod.core.Calibration');
+                obj.calibration = calibration;
+            end
         end
 
-        function value = get.totalTime(obj)
-            value = obj.calculateTotalTime();
-        end
-
-        function value = get.totalSamples(obj)
-            value = obj.sec2samples(obj.totalTime);
+        function value = get.calibrationDate(obj)
+            if isempty(obj.calibration)
+                value = '';
+            else
+                value = obj.calibration.calibrationDate;
+            end
         end
     end
 
@@ -130,28 +116,6 @@ classdef (Abstract) Protocol < handle
             %   value = samples2sec(obj, pts)
             % -------------------------------------------------------------
             value = floor(pts/obj.sampleRate);
-        end
-
-        function stim = appendPreTime(obj, stim)
-            % APPENDPRETIME
-            %
-            % Syntax:
-            %   stim = obj.appendPreTime(stim)
-            % -------------------------------------------------------------
-            if obj.preTime > 0
-                stim = [obj.baseIntensity+zeros(1, obj.sec2pts(obj.preTime)), stim];
-            end
-        end
-
-        function stim = appendTailTime(obj, stim)
-            % APPENDTAILTIME
-            %
-            % Syntax:
-            %   stim = obj.appendTailTime(stim)
-            % -------------------------------------------------------------
-            if obj.tailTime > 0
-                stim = [stim, obj.baseIntensity+zeros(1, obj.sec2pts(obj.tailTime))];
-            end
         end
     end
 end 

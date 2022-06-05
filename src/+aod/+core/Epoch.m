@@ -112,14 +112,28 @@ classdef (Abstract) Epoch < aod.core.Entity
 
             obj.cachedVideo = imStack;
         end
-
-        
+      
         function resp = getResponse(obj, responseClassName, varargin)
             % SETRESPONSE
             %
             % Syntax:
             %   resp = getResponse(obj, responseClassName, varargin)
+            %   resp = getResponse(obj, responseClassName, Keep, varargin)
+            %
+            % Inputs:
+            %   responseClassName    response name to compute
+            % Optional inputs:
+            %   keep                 Add to Epoch (default = false)
+            % Additional key/value inputs are sent to response constructor
             % -------------------------------------------------------------
+
+            ip = inputParser();
+            ip.KeepUnmatched = true;
+            addOptional(ip, 'Keep', false, @islogical);
+            parse(ip, varargin{:});
+            keepResponse = ip.Results.Keep;
+
+
             if isempty(obj.Parent.Regions)
                 error('Dataset must contain Regions');
             end
@@ -127,7 +141,9 @@ classdef (Abstract) Epoch < aod.core.Entity
             if isempty(resp)
                 constructor = str2func(responseClassName);
                 resp = constructor(obj, varargin{:});
-                obj.addResponse(resp);
+                if keepResponse
+                    obj.addResponse(resp);
+                end
             end
         end
 
@@ -138,6 +154,23 @@ classdef (Abstract) Epoch < aod.core.Entity
             %   obj.clearResponses()
             % -------------------------------------------------------------
             obj.Responses = [];
+        end
+
+        function clearRegionResponses(obj)
+            % CLEARREGIONRESPONSES
+            %
+            % Syntax:
+            %   obj.clearRegionResponses()
+            % -------------------------------------------------------------
+            if isempty(obj.Responses)
+                return
+            end
+            idx = findByClass(obj.Responses, 'aod.core.responses.RegionResponse');
+            if numel(obj.Responses) > 1
+                obj.Responses{idx} = [];
+            else
+                obj.Responses(idx) = [];
+            end
         end
     end
 

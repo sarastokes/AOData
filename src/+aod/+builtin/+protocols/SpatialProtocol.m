@@ -36,8 +36,8 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
     end
 
     methods
-        function obj = SpatialProtocol(varargin)
-            obj = obj@aod.builtin.protocols.StimulusProtocol(varargin{:});
+        function obj = SpatialProtocol(calibration, varargin)
+            obj = obj@aod.builtin.protocols.StimulusProtocol(calibration, varargin{:});
         end
 
         function fName = getFileName(obj) %#ok<MANU> 

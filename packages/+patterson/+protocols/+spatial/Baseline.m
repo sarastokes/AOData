@@ -7,8 +7,8 @@ classdef Baseline < aod.builtin.stimuli.SpatialProtocol
 % ------------------------------------------------------------------------- 
 
     methods
-        function obj = Baseline(varargin)
-            obj = obj@aod.builtin.stimuli.SpatialProtocol(varargin{:});
+        function obj = Baseline(calibration, varargin)
+            obj = obj@aod.builtin.stimuli.SpatialProtocol(calibration, varargin{:});
 
             obj.contrast = 0;
         end

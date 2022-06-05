@@ -71,8 +71,23 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
     end
 
+    % Property access methods
     methods 
+        function cal = getCalibration(obj, className)
+            % GETCALIBRATION
+            %
+            % Syntax:
+            %   cal = obj.getCalibration(className)
+            % -------------------------------------------------------------
+            cal = getByClass(obj.Calibrations, className);
+        end
+    
         function addRegions(obj, regions, overwrite)
+            % ADDREGIONS
+            %
+            % Syntax:
+            %   imStack = addRegions(obj, regions, overwrite)
+            % -------------------------------------------------------------
             if nargin < 3
                 overwrite = false;
             end
@@ -80,6 +95,11 @@ classdef (Abstract) Dataset < aod.core.Entity
             if ~isempty(obj.Regions)
                 if overwrite
                     obj.Regions = regions;
+                    % Cancel out any existing region responses as their
+                    % relationship to Regions is no longer valid
+                    for i = 1:numel(obj.Epochs)
+                        obj.Epochs(i).clearRegionResponses();
+                    end
                 else
                     error('Set overwrite=true to overwrite existing regions');
                 end
@@ -113,14 +133,14 @@ classdef (Abstract) Dataset < aod.core.Entity
             end
         end
 
-        function data = getRegionResponses(obj, epochIDs, varargin)
+        function data = getResponses(obj, epochIDs, responseClassName, varargin)
             % GETREGIONRESPONSES
             %
             % Description:
             %   Get Region responses from specified epoch(s)
             %
             % Syntax:
-            %   data = getRegionResponses(obj, epochIDs, varargin)
+            %   data = getResponses(obj, epochIDs, className, varargin)
             % -------------------------------------------------------------
             ip = inputParser();
             addParameter(ip, 'Average', false, @islogical);
@@ -130,7 +150,8 @@ classdef (Abstract) Dataset < aod.core.Entity
             data = [];
             for i = 1:numel(epochIDs)
                 epoch = obj.id2epoch(epochIDs(i));
-                data = cat(3, data, epoch.getRegionResponses(ip.Unmatched));
+                resp = epoch.getResponse(className, ip.Unmatched);
+                data = cat(3, data, resp.get);
             end
 
             if avgFlag && ndims(data) == 3

@@ -5,6 +5,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
 %   Spatially-uniform stimuli with multiple LEDs
 %
 % Properties:
+%   spectralClass           patterson.
 %   baseIntensity (0-1)     baseline intensity of stimulus
 %   contrast (0-1)          scaling applied during stimTime
 %                           - computed as contrast if baseIntensity > 0
@@ -18,11 +19,11 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
 % -------------------------------------------------------------------------
 
     properties
-        ledMeans
+        spectralClass           aod.builtin.SpectralTypes
     end
 
     properties (Dependent, Access = protected)
-        ledRange
+        ledMeans
     end
 
     properties (SetAccess = protected)
@@ -32,13 +33,25 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
     
 
     methods
-        function obj = SpectralProtocol(ledMeans, varargin)
-            obj = obj@aod.builtin.protocols.StimulusProtocol(varargin{:});
-            obj.ledMeans = ledMeans;
+        function obj = SpectralProtocol(calibration, varargin)
+            obj = obj@aod.builtin.protocols.StimulusProtocol(calibration, varargin{:});
+
+            ip = inputParser();
+            ip.CaseSensitive = false;
+            ip.KeepUnmatched = true;
+            addParameter(ip, 'SpectralClass', aod.builtin.SpectralTypes.Luminance,...
+                @(x) isa(x, 'aod.builtin.SpectralTypes'));
+            parse(ip, varargin{:});
+
+            obj.spectralClass = ip.Results.SpectralClass;
         end
 
-        function value = get.ledRange(obj)
-            value = 2 * obj.ledMeans;
+        function value = get.ledMeans(obj)
+            if isempty(obj.calibration)
+                value = [];
+            else
+                value = obj.calibration.stimPowers.Background;
+            end
         end
 
         function ledValues = mapToStimulator(obj)
@@ -48,7 +61,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             %   ledValues = mapToLeds(obj)
             % -------------------------------------------------------------
             data = obj.generate();
-            ledValues = data .* obj.ledRange';
+            ledValues = data .* (2*obj.ledMeans)';
         end
 
         function writeStim(obj, fName)
@@ -69,11 +82,14 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
         function ledPlot(obj)
             % LEDPLOT
             %
+            % Description:
+            %   Plots the powers of each LED
+            %
             % Syntax:
             %   ledPlot(obj)
             % -------------------------------------------------------------
             ledValues = obj.mapToLeds();
-            ledPlot(ledValues, obj.led2sec(1:size(ledValues, 2)));
+            ledPlot(ledValues, obj.stim2sec(1:size(ledValues, 2)));
             title(obj.getFileName(), 'Interpreter','none');
             figPos(gcf, 1.5, 1);
             tightfig(gcf);

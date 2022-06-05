@@ -41,7 +41,6 @@ classdef PhysiologyCreator < aod.core.Creator
             % Syntax:
             %   obj.addCalibration(calibration)
             % -------------------------------------------------------------
-            
             obj.Dataset.addCalibration(calibration);
         end
     
@@ -92,7 +91,7 @@ classdef PhysiologyCreator < aod.core.Creator
             end
             if epochType == patterson.EpochTypes.Spatial
                 protocol = patterson.factories.SpatialProtocolFactory(...
-                    ep.getFilePath('TrialFile'));
+                    ep.getFilePath('TrialFile'), obj.Dataset.getCalibration('patterson.calibrations.TopticaCalibration'));
                 stimulus = aod.builtin.stimuli.SpatialStimulus(ep, protocol);
                 ep.addStimulus(stimulus);
             end
