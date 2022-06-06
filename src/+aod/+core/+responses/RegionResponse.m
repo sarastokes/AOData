@@ -26,10 +26,11 @@ classdef RegionResponse < aod.core.Response
     methods
         function obj = RegionResponse(parent)
             obj = obj@aod.core.Response(parent);
-            obj.setData();
-
-            % Listen for changes to ROIs and flag for update
-            obj.listeners = addlistener(obj.Regions, 'UpdatedRois', @obj.onUpdatedRois);
+            if isSubclass(obj.Parent, 'aod.core.Epoch')
+                obj.setData();
+                % Listen for changes to ROIs and flag for update
+                obj.listeners = addlistener(obj.Regions, 'UpdatedRois', @obj.onUpdatedRois);
+            end
         end
 
         function value = get.Regions(obj)

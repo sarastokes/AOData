@@ -112,6 +112,20 @@ classdef (Abstract) Epoch < aod.core.Entity
 
             obj.cachedVideo = imStack;
         end
+
+        function stim = getStimulus(obj, stimClassName)
+            % GETSTIMULUS
+            %
+            % Syntax:
+            %   stim = obj.getStimulus(stimClassName)
+            %
+            % Inputs:
+            %   stimClassName       char, class of stimulus to retrieve
+            % Ouputs:
+            %   stim                aod.core.Stimulus or subclass
+            % ----------------------------------------------------------
+            stim = getByClass(obj.Stimuli, char(stimClassName));
+        end
       
         function resp = getResponse(obj, responseClassName, varargin)
             % SETRESPONSE

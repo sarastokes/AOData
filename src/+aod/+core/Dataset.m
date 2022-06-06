@@ -25,6 +25,10 @@ classdef (Abstract) Dataset < aod.core.Entity
         epochIDs(1,:)           double
     end
 
+    properties (Dependent)
+        numEpochs
+    end
+
     properties (Hidden, SetAccess = private)
         baseDirectory       % File path used to initialize Dataset
     end
@@ -44,6 +48,10 @@ classdef (Abstract) Dataset < aod.core.Entity
             end
             obj.setParent([]);
             obj.datasetParameters = aod.core.Parameters();
+        end
+
+        function value = get.numEpochs(obj)
+            value = numel(obj.Epochs);
         end
 
         function setHomeDirectory(obj, filePath)

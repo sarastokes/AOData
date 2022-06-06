@@ -9,8 +9,7 @@ For storing data and metadata associated with an experiment:
 - **Dataset**
   - Subject
     - Eye 
-  - System
-    - Calibration
+  - Calibration
   - Regions
   - Epoch
     - Registration
