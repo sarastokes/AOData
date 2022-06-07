@@ -5,28 +5,31 @@ classdef (Abstract) Protocol < handle
 %   obj = aod.core.Protocol(stimTime, calibration, varargin)
 %
 % Properties:
-%   calibration     aod.core.Calibration (optional)
-%
-% Abstract properties (must be set by subclasses):
-%   sampleRate      the rate data is sampled (hz)
-%   stimRate        the rate stimuli are presented (hz)
-%
+%   calibration         aod.core.Calibration (optional)
+% Protected properties:
+%   groupBy             optional hierarchy of parameters for grouping 
 % Dependent properties:
-%   totalTime       total stimulus time (from calculateTotalTime)
-%   totalSamples    total number of samples in stimulus
-%   calibrationDate date calibration was performed
+%   totalTime           total stimulus time (from calculateTotalTime)
+%   totalSamples        total number of samples in stimulus
+%   calibrationDate     date calibration was performed
+% Abstract properties (must be set by subclasses):
+%   sampleRate          the rate data is sampled (hz)
+%   stimRate            the rate stimuli are presented (hz)
 %
 % Abstract methods:
 %   stim = generate(obj)
 %   fName = getFileName(obj)
 %   writeStim(obj, fileName)
-% Methods (to be subclassed):
+% Methods (to be redefined by subclasses if needed):
 %   stim = mapToStimulator(obj)
 % -------------------------------------------------------------------------
 
     properties  
         calibration
-
+    end
+    
+    properties (SetAccess = protected)
+        groupBy             = cell.empty()
     end
 
     properties (Dependent)
@@ -116,6 +119,13 @@ classdef (Abstract) Protocol < handle
             %   value = samples2sec(obj, pts)
             % -------------------------------------------------------------
             value = floor(pts/obj.sampleRate);
+        end
+
+        function appendGroupingProperties(obj, varargin)
+            numProps = nargin - 1;
+            for i = 1:numProps
+                obj.groupBy = cat(2, obj.groupBy, varargin{:});
+            end
         end
     end
 end 

@@ -28,6 +28,10 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
         contrast
     end
 
+    properties (SetAccess = protected)
+        groupBy = {'baseIntensity', 'contrast'};
+    end
+
     properties (Dependent)
         totalTime
         totalSamples

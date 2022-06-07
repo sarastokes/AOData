@@ -22,6 +22,10 @@ classdef DecrementIncrementBar < patterson.protocols.spatial.DecrementIncrement
         barSize             % pixels
     end
 
+    properties (SetAccess = protected)
+        groupBy = {'BaseIntensity', 'Contrast', 'NumBars', 'BarID'};
+    end
+
     methods
         function obj = DecrementIncrementBar(calibration, varargin)
             obj = obj@patterson.protocols.spatial.DecrementIncrement(calibration, varargin{:});
