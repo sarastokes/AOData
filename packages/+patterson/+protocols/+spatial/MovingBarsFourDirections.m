@@ -79,7 +79,7 @@ classdef MovingBarsFourDirections < aod.builtin.protocols.SpatialProtocol
                 apertureFlag = '_';
             end
             fName = sprintf('moving_bar%s%udeg_%upix_%uv_%ut.txt',...
-                apertureFlag, obj.direction, obj.barSize, obj.barSpeed, obj.totalTime);
+                apertureFlag, obj.directions, obj.barWidth, obj.barSpeed, obj.totalTime);
         end
     end
 

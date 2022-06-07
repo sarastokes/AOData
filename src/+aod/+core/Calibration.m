@@ -30,7 +30,7 @@ classdef (Abstract) Calibration < aod.core.Entity
                 obj.setParent(parent);
             end
 
-            obj.calibrationParameters = aod.core.Parameters
+            obj.calibrationParameters = aod.core.Parameters;
         end
     end
 

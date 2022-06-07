@@ -1,4 +1,4 @@
-classdef Baseline < aod.builtin.stimuli.SpatialProtocol 
+classdef Baseline < aod.builtin.protocols.SpatialProtocol 
 % BASELINE
 %
 % Description:
@@ -8,7 +8,7 @@ classdef Baseline < aod.builtin.stimuli.SpatialProtocol
 
     methods
         function obj = Baseline(calibration, varargin)
-            obj = obj@aod.builtin.stimuli.SpatialProtocol(calibration, varargin{:});
+            obj = obj@aod.builtin.protocols.SpatialProtocol(calibration, varargin{:});
 
             obj.contrast = 0;
         end

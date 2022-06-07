@@ -14,12 +14,12 @@ classdef Timing < handle
 %   T = getTiming(obj)
 % -------------------------------------------------------------------------
 
-    properties (Dependent)
+    properties (Hidden, Dependent)
         Time
     end
 
     methods (Abstract, Access = protected)
-        T = getTiming(obj)
+        T = getTiming(obj)  % Subclasses define how to return timing
     end
 
     methods
@@ -27,8 +27,8 @@ classdef Timing < handle
             % Do nothing
         end
 
-        function value = get.Time()
-            value = obj.getTiming(obj)
+        function value = get.Time(obj)
+            value = obj.getTiming();
         end
     end
 end 

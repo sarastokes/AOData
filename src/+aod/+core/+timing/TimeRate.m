@@ -13,37 +13,40 @@ classdef TimeRate < aod.core.Timing
 % Optional inputs:
 %   timeStart               start time in seconds, default = 0
 %
+% Properties:
+%   Interval 
+%
 % Note:
 %   Units for time are seconds!
 %--------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        timeInterval(1,1) double = 1
-        timeStart(1,1) double = 0
-        timeCount(1,1)  double
+        Interval(1,1)   double      {mustBePositive}                   = 1
+        Start(1,1)      double                                         = 0
+        Count(1,1)      double      {mustBeInteger, mustBeNonnegative} = 0
     end
 
     methods 
         function obj = TimeRate(timeInterval, timeCount, timeStart)
             if nargin > 0 
-                obj.timeInterval = timeInterval;
-                obj.timeCount = timeCount;
+                obj.Interval = timeInterval;
+                obj.Count = timeCount;
             end
 
             if nargin > 2
-                obj.timeStart = timeStart;
+                obj.Start = timeStart;
             end
         end
     end
 
-    methods (Access = private)
+    methods (Access = protected)
         function value = getTiming(obj)
-            if isempty(obj.timeCount) || obj.timeCount = 0
+            if isempty(obj.Count) || obj.Count == 0
                 value = [];
                 return
             end
-            stopTime = (timeInterval * timeCount) - timeStart;
-            value = timeStart:timeInterval:stopTime;
+            stopTime = (obj.Interval * obj.Count) - obj.Start;
+            value = obj.Start:obj.Interval:stopTime;
         end
     end
 end

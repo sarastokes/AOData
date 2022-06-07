@@ -25,11 +25,15 @@ classdef RegionResponse < aod.core.Response
 
     methods
         function obj = RegionResponse(parent)
+            if nargin < 1
+                parent = [];
+            end
             obj = obj@aod.core.Response(parent);
             if isSubclass(obj.Parent, 'aod.core.Epoch')
                 obj.setData();
                 % Listen for changes to ROIs and flag for update
-                obj.listeners = addlistener(obj.Regions, 'UpdatedRois', @obj.onUpdatedRois);
+                obj.listeners = addlistener(obj.Regions,... 
+                    'UpdatedRois', @obj.onUpdatedRois);
             end
         end
 
@@ -93,12 +97,17 @@ classdef RegionResponse < aod.core.Response
                 A = cat(1, A, signal);
             end
 
-            xpts = 1/sampleRate : 1/sampleRate : (size(imStack,3))/sampleRate;
-            obj.Data = timetable(seconds(xpts'), A',...
-                'VariableNames', {'Signals'});
+            obj.Timing = aod.core.timing.TimeRate(1/sampleRate,... 
+                size(imStack,3), 1/sampleRate);
+            obj.Data = A;
         end
 
         function [signals, xpts] = getRoiResponse(obj, ID)
+            % GETROIRESPONSE
+            %
+            % Syntax:
+            %   [signals, xpts] = obj.getRoiResponse(ID)
+            % -------------------------------------------------------------
             if isempty(obj.Responses)
                 obj.setData();
             end

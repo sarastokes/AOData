@@ -17,8 +17,9 @@ classdef Response < aod.core.Entity
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Data                            timetable
-        responseParameters              % aod.core.parameters
+        Data                             
+        Timing                          % aod.core.Timing
+        responseParameters              % aod.core.Parameters
         dateModified                    % date and time last modified
     end
 
@@ -47,6 +48,15 @@ classdef Response < aod.core.Entity
             %   setData(obj, data)
             % -------------------------------------------------------------
             obj.Data = data;
+        end
+
+        function setTiming(obj, timing)
+            % SETTIMING
+            %
+            % Syntax:
+            %   obj.setTiming(timing)
+            % -------------------------------------------------------------
+            obj.Timing = timing;
         end
 
         function addParameter(obj, varargin)

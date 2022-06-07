@@ -71,7 +71,7 @@ classdef (Abstract) Entity < handle
             while ~isSubclass(h, className)
                 h = h.Parent;
                 if isempty(h)
-                    warning('Ancestor of class %s not found!', className);
+                    %warning('Ancestor of class %s not found!', className);
                     break
                 end
             end
