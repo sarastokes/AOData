@@ -42,33 +42,33 @@ classdef Dff < aod.core.responses.RegionResponse
             F = obj.Parent.getResponse('patterson.responses.Fluorescence');
 
             % Compute the deltaF/F
-            signals = F.Data.Signals;
-            for i = 1:size(signals,2)               
+            signals = F.Data;
+            for i = 1:size(signals,1)               
                 if useMedian
-                    baseline = median(signals(bkgd(1):bkgd(2), i));
+                    baseline = median(signals(i, bkgd(1):bkgd(2)));
                 else
-                    baseline = mean(signals(bkgd(1):bkgd(2), i));
+                    baseline = mean(signals(i, bkgd(1):bkgd(2)));
                 end
-                signals(:,i) = (signals(:,i) - baseline) / baseline;
+                signals(i,:) = (signals(i,:) - baseline) / baseline;
             end
 
             % High pass filter, if necessary            
             if highCut > 0
-                signals = signalHighPassFilter(signals', highCut, obj.Dataset.frameRate);
-                signals = signalBaselineCorrect(signals, bkgd)'; 
+                signals = signalHighPassFilter(signals, highCut, obj.Dataset.frameRate);
+                signals = signalBaselineCorrect(signals, bkgd); 
             end
 
             % Smooth, if necessary
             if smoothFac > 0
-                signals = mysmooth2(signals', smoothFac)';
+                signals = mysmooth2(signals, smoothFac);
             end
-            
-            % Create time table 
-            obj.Data = timetable(F.Data.Time, signals,...
-                'VariableNames', {'Signals'});
-            
-            % Add to response parameters
+                     
+            % Add to Response
+            obj.Data = signals;
             obj.addParameter(ip.Results);
+        end
+
+        function matchProperties(obj, varargin)
         end
     end
 

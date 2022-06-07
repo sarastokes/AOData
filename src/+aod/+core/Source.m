@@ -1,12 +1,21 @@
 classdef (Abstract) Source < aod.core.Entity 
+% SOURCE
+%
+% Description:
+%   A class for the data's source
+%
+% Properties:
+%   sourceParameters                aod.core.Parameters
+% -------------------------------------------------------------------------
 
-    properties
+    properties (SetAccess = private)
         sourceParameters            % aod.core.Parameters
     end
 
     methods
         function obj = Source(parent)
-            obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Source', 'aod.core.Subject', 'aod.core.Empty'};
+            obj.allowableParentTypes = {'aod.core.Dataset',...
+                'aod.core.Source', 'aod.core.Subject', 'aod.core.Empty'};
             % Check if a parent input was supplied
             if nargin > 0 && ~isempty(parent)
                 obj.setParent(parent);

@@ -3,18 +3,34 @@ classdef Primate < aod.core.Subject
     %
     % Description:
     %   Subject class tailored for UR primates
+    %
+    % Inherited properties:
+    %   sourceParameters        aod.core.Parameters
+    % Dependent properties:
+    %   dcmID                   ID formatted to match DCM's style
     % ---------------------------------------------------------------------
     
-    properties
-        fullID
+    properties (Hidden, Dependent)
+        dcmID
     end
 
     methods
         function obj = Primate(ID, parent, varargin)
-            obj = obj@aod.core.Subject(ID, parent, varargin{:});
+            obj = obj@aod.core.Subject(ID, parent);
+
+
+            ip = inputParser();
+            ip.CaseSensitive = false;
+            addParameter(ip, 'Species', [], @ischar);
+            addParameter(ip, 'Sex', [], @ischar);
+            addParameter(ip, 'Age', [], @isnumeric);
+            addParameter(ip, 'Demographics', [], @ischar);
+            parse(ip, varargin{:});
+
+            obj.addParameter(ip.Results);
         end
 
-        function value = get.fullID(obj)
+        function value = get.dcmID(obj)
             value = ['201', num2str(floor(obj.ID/100)), num2str(rem(obj.ID/100))];
         end
     end

@@ -7,7 +7,7 @@ classdef Response < aod.core.Entity
 % Properties:
 %   Data 
 %   responseParameters
-%   dateModified
+%   dateCreated
 % Dependent properties:
 %   Dataset 
 %
@@ -20,7 +20,7 @@ classdef Response < aod.core.Entity
         Data                             
         Timing                          % aod.core.Timing
         responseParameters              % aod.core.Parameters
-        dateModified                    % date and time last modified
+        % dateCreated(1,1)    datestr     % date and time last modified
     end
 
     properties (Hidden, Dependent)
@@ -34,7 +34,7 @@ classdef Response < aod.core.Entity
                 obj.setParent(parent);
             end
             obj.responseParameters = aod.core.Parameters();
-            obj.dateModified = datestr(now);
+            % obj.dateCreated = datestr(now);
         end
 
         function value = get.Dataset(obj)

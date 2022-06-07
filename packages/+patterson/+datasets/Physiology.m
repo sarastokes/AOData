@@ -2,8 +2,11 @@ classdef Physiology < patterson.Dataset
 
     properties (SetAccess = protected)
         location
-
         stimTable
+    end
+
+    properties (Hidden, Dependent)
+        visualStimuli
     end
 
     methods
@@ -15,9 +18,26 @@ classdef Physiology < patterson.Dataset
                 obj.location = capitalize(location);
             end
         end
+
+        function value = get.visualStimuli(obj)
+            if isempty(obj.stimTable)
+                obj.setStimTable();
+            end
+            value = unique(obj.stimTable.Stimulus);
+        end
     end
 
     methods
+        function F = getFluorescence(obj, epochID)
+            ep = obj.id2epoch(epochID);
+            F = ep.getFluorescence();
+        end
+
+        function R = getDff(obj, epochID, varargin)
+            ep = obj.id2epoch(epochID);
+            R = ep.getDff(varargin{:});
+        end
+
         function epochs = stim2epochs(obj, stimName)
             if ischar(stimName)
                 stimName = string(stimName);
@@ -31,6 +51,7 @@ classdef Physiology < patterson.Dataset
             if ~isempty(idx)
                 epochs = obj.Epochs(idx);
             else
+                warning('No epochs found matching %s', stimName);
                 epochs = [];
             end
         end
@@ -56,7 +77,6 @@ classdef Physiology < patterson.Dataset
 
             obj.stimTable = table(obj.epochIDs', stimNames(2:end), protocols(2:end),...
                 'VariableNames', {'ID', 'Stimulus', 'Protocol'});
-
         end
     end
 

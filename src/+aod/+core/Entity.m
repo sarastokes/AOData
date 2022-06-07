@@ -118,20 +118,14 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.removeNote(noteID)
             % -------------------------------------------------------------
+            if nargin < 2
+                obj.notes = cell(0,1);
+            end
             if noteID > numel(obj.notes)
                 error('Note %u is invalid. %u notes exist',... 
                     noteID, numel(obj.notes));
             end
             obj.notes{noteID} = [];
-        end
-
-        function clearNotes(obj)
-            % CLEARNOTES
-            %
-            % Syntax:
-            %   obj.clearNotes();
-            % -------------------------------------------------------------
-            obj.notes = cell(0,1);
         end
     end
 

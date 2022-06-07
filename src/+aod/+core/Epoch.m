@@ -154,7 +154,7 @@ classdef (Abstract) Epoch < aod.core.Entity
             resp = getByClass(obj.Responses, responseClassName);
             if isempty(resp)
                 constructor = str2func(responseClassName);
-                resp = constructor(obj, varargin{:});
+                resp = constructor(obj, ip.Unmatched);
                 if keepResponse
                     obj.addResponse(resp);
                 end

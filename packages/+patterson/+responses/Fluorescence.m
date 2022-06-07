@@ -7,7 +7,7 @@ classdef Fluorescence < aod.core.responses.RegionResponse
 %   aod.core.responses.RegionResponses()
 % -------------------------------------------------------------------------
     methods
-        function obj = Fluorescence(parent)
+        function obj = Fluorescence(parent, varargin)
             obj = obj@aod.core.responses.RegionResponse(parent);
         end
 

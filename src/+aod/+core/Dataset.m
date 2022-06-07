@@ -141,16 +141,18 @@ classdef (Abstract) Dataset < aod.core.Entity
             end
         end
 
-        function data = getResponses(obj, epochIDs, responseClassName, varargin)
-            % GETREGIONRESPONSES
+        function data = getResponse(obj, epochIDs, className, varargin)
+            % GETRESPONSE
             %
             % Description:
-            %   Get Region responses from specified epoch(s)
+            %   Get a response from specified epoch(s)
             %
             % Syntax:
-            %   data = getResponses(obj, epochIDs, className, varargin)
+            %   data = getResponse(obj, epochIDs, className, varargin)
             % -------------------------------------------------------------
             ip = inputParser();
+            ip.CaseSensitive = false;
+            ip.KeepUnmatched = true;
             addParameter(ip, 'Average', false, @islogical);
             parse(ip, varargin{:});
             avgFlag = ip.Results.Average;
@@ -159,7 +161,7 @@ classdef (Abstract) Dataset < aod.core.Entity
             for i = 1:numel(epochIDs)
                 epoch = obj.id2epoch(epochIDs(i));
                 resp = epoch.getResponse(className, ip.Unmatched);
-                data = cat(3, data, resp.get);
+                data = cat(3, data, resp.Data);
             end
 
             if avgFlag && ndims(data) == 3

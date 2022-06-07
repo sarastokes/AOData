@@ -10,6 +10,7 @@ classdef Registration < aod.core.Entity
 
     properties (SetAccess = protected)
         Data
+        dateCreated(1,1)                    datetime
         registrationParameters              % aod.core.Parameters
     end
 

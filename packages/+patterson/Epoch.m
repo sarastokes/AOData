@@ -72,8 +72,13 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods 
-        function signals = getFluorescence(obj)
-            signals = obj.getResponse('patterson.responses.Fluorescence');
+        function F = getFluorescence(obj)
+            % GETFLUORESCENCE
+            F = obj.getResponse('patterson.responses.Fluorescence', true);
+        end
+
+        function R = getDff(obj, varargin)
+            R = obj.getResponse('patterson.responses.Dff', varargin{:});
         end
 
         function clearTransform(obj)

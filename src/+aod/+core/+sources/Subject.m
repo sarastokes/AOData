@@ -1,13 +1,22 @@
 classdef Subject < aod.core.Source 
 % SUBJECT
+%
+% Description:
+%   A mouse, human, monkey, etc
+%
+% Constructor:
+%   obj = aod.core.sources.Subject(ID, parent)
+%
+% Properties:
+%   ID                      Subject's identifier
+% -------------------------------------------------------------------------
 
-    properties
+    properties (SetAccess = private)
         ID
-        Eyes        % Keep?
     end
     
     methods 
-        function obj = Subject(ID, parent, varargin)
+        function obj = Subject(ID, parent)
             if nargin < 2
                 parent = [];
             end
@@ -16,25 +25,6 @@ classdef Subject < aod.core.Source
             if nargin > 0
                 obj.ID = ID;
             end
-
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            addParameter(ip, 'Species', [], @ischar);
-            addParameter(ip, 'Sex', [], @ischar);
-            addParameter(ip, 'Age', [], @isnumeric);
-            addParameter(ip, 'Demographics', [], @ischar);
-            parse(ip, varargin{:});
-
-            obj.sourceParameters('Species') = ip.Results.Species;
-            obj.sourceParameters('Sex') =  ip.Results.Sex;
-            obj.sourceParameters('Age') = ip.Results.Age;
-            obj.sourceParameters('Demographics') = ip.Results.Demographics;
-        end
-
-        function addEye(obj, Eye)
-            assert(isa(Eye, 'aod.builtin.sources.Eye'),...
-                'Must be class aod.builtin.sources.Eye');
-            obj.Eyes = cat(1, obj.Eyes, Eye);
         end
     end
 end
