@@ -184,6 +184,15 @@ classdef PhysiologyCreator < aod.core.Creator
             % Processed video for analysis
             ep.addFile('AnalysisVideo', string(['Analysis', filesep, 'Videos', filesep, visStr, '.tif']));
 
+            % Find csv output file
+            ind = find(refFiles(multicontains(refFiles, {refStr, 'csv'})) && ~contains(refFiles, 'motion'));
+            if ~isempty(ind)
+                ind = obj.checkFilesFound(ind);
+                ep.addFile('FrameReport', "Ref" + filesep + refFiles(ind));
+            else
+                warning('Frame report for epoch %u not found', epochID);
+            end
+
             % Find registration report
             regFiles = refFiles(multicontains(refFiles, {'motion', 'csv'}));
             ind = find(contains(regFiles, refStr));
@@ -252,6 +261,17 @@ classdef PhysiologyCreator < aod.core.Creator
                 ep.addFile('VisVideoStripReg', "Vis" + filesep + visFiles(ind));
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
+            end
+
+            % Find LED stimulus files, if necessary
+            if ep.epochType == patterson.EpochTypes.Spatial
+                ind = find(multicontains(visFiles, {visStr, '.json'}));
+                if ~isempty(ind)
+                    ind = obj.checkFilesFound(ind);
+                    ep.addFile('LedVoltages', "Vis" + filesep + visFiles(ind));
+                else
+                    warning('LED voltage json files for epoch %u not found', epochID);
+                end
             end
         end
     end

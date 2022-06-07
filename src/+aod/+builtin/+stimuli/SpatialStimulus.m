@@ -1,77 +1,45 @@
-classdef SpatialStimulus < aod.core.Stimulus 
+classdef SpatialStimulus < aod.builtin.stimuli.VisualStimulus
+% SPATIALSTIMULUS`
 %
+% Constructor:
+%   obj = SpatialStimulus(parent, protocol, basePower)
+%
+% Properties:
+%   basePower
 % Inherited properties:
 %   stimParameters
 %
+% Methods:
+%   setBasePower(obj, value)
 % Inherited methods:
 %   addParameter(obj, paramName, paramValue)
 % -------------------------------------------------------------------------
-
     properties (SetAccess = private)
-        protocolName
-    end
-
-    properties (SetAccess = private)
-        defaultProtocolFile     % Used for display name
+        basePower
     end
 
     methods
-        function obj = SpatialStimulus(parent, protocol)
+        function obj = SpatialStimulus(parent, protocol, basePower)
             if nargin < 1
                 parent = [];
             end
-            obj = obj@aod.core.Stimulus(parent);
-            if nargin > 1
-                obj.protocolName = class(protocol);
-                obj.getProtocolParameters(protocol);
-                [~, obj.defaultProtocolFile, ~] = fileparts(protocol.getFileName());
+            obj = obj@aod.builtin.stimuli.VisualStimulus(parent, protocol);
+            if nargin > 2
+                obj.setBasePower(basePower);
             end
         end
 
-        function protocol = getProtocol(obj)
-            % GETPROTOCOL
-            %
-            % Description:
-            %   Use properties to regenerate the Protocol object
+        function setBasePower(obj, value)
+            % SETBASEPOWER
             %
             % Syntax:
-            %   protocol = getProtocol(obj)
-            % ----------------------------------------------------------
-            protocolFcn = str2func(obj.protocolName);
-            protocol = protocolFcn(map2struct(obj.stimulusParameters));
-            if isempty(obj.Protocol)
-                obj.Protocol = protocol;
-            end
-        end
-    end
-
-    methods (Access = private)
-        function getProtocolParameters(obj, protocol)
-            % GETPROTOCOLPARAMETERS
-            %
-            % Description:
-            %   Move protocol properties to stimulusProperties
+            %   obj.setBasePower(value)
             % -------------------------------------------------------------
-            mc = metaclass(protocol);
-            for i = 1:numel(mc.PropertyList)
-                if strcmp(mc.PropertyList(i).GetAccess, 'public')
-                    if isnumeric(mc.PropertyList(i).Name) && isnan(mc.PropertyList(i).Name)
-                        continue
-                    end
-                    obj.addParameter(mc.PropertyList(i).Name,...
-                        protocol.(mc.PropertyList(i).Name));
-                end
+            arguments
+                obj
+                value(1,1)       {mustBeInRange(value, 0, 100)}
             end
-        end
-    end
-
-    methods (Access = protected)
-        function value = getDisplayName(obj)
-            value = [];
-            txt = strsplit(obj.defaultProtocolFile, '_');
-            for i = 1:numel(txt)
-                value = [value, capitalize(txt{i})]; %#ok<AGROW> 
-            end
+            obj.basePower = value;
         end
     end
 end
