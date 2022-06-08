@@ -7,8 +7,8 @@ classdef ModelEye < aod.core.Source
     end
 
     methods (Access = protected)
-        function displayName = getDisplayName(obj)
-            displayName = 'ModelEye';
+        function value = getLabel(obj)
+            value = 'ModelEye';
         end
     end
 end 

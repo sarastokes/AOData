@@ -29,7 +29,7 @@ classdef SpectralStimulus < aod.core.Stimulus
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             if ~isempty(obj.stimFileName)
                 txt = strsplit(obj.stimFileName, '_');
                 value = [];

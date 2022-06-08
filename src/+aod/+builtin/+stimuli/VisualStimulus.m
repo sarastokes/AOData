@@ -41,7 +41,7 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = [];
             txt = strsplit(obj.defaultProtocolFile, '_');
             for i = 1:numel(txt)

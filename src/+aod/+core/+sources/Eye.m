@@ -98,16 +98,16 @@ classdef Eye < aod.core.Source
     end
 
     methods (Access = protected)
-        function displayName = getDisplayName(obj)  
-            % GETDISPLAYNAME
+        function value = getLabel(obj)  
+            % LABEL
             %      
             % Syntax:
-            %   displayName = obj.getDisplayName()
+            %   value = obj.getLabel()
             % -------------------------------------------------------------
             try
-                displayName = [num2str(obj.Parent.ID), '_', obj.whichEye];
+                value = [num2str(obj.Parent.ID), '_', obj.whichEye];
             catch
-                displayName = obj.whichEye;
+                value = obj.whichEye;
             end
         end
 

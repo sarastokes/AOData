@@ -119,7 +119,7 @@ classdef RegionResponse < aod.core.Response
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = sprintf('Epoch%u_Responses', obj.Parent.ID);
         end
     end

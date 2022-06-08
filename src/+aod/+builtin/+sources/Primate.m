@@ -36,7 +36,7 @@ classdef Primate < aod.core.Subject
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = ['MC', int2fixedwidthstr(obj.ID, 5)];
         end
     end

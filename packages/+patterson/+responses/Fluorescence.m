@@ -22,7 +22,7 @@ classdef Fluorescence < aod.core.responses.RegionResponse
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = sprintf('Epoch%u_Fluorescence', obj.Parent.ID);
         end
     end

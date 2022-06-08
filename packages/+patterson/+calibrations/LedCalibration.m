@@ -61,7 +61,7 @@ classdef LedCalibration < aod.core.Calibration
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = ['LedCalibration', char(obj.calibrationDate)];
         end
     end

@@ -12,7 +12,7 @@ classdef Mustang < aod.core.stimuli.ImagingLight
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = sprintf('Mustang%u', obj.Value);
         end
     end

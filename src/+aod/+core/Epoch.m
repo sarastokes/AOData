@@ -208,14 +208,14 @@ classdef (Abstract) Epoch < aod.core.Entity
             fprintf('Loaded %s\n', videoName);
         end
 
-        function displayName = getDisplayName(obj)  
-            % GETDISPLAYNAME
+        function value = getLabel(obj)  
+            % GETLABEL
             % May be overwritten by subclasses          
             % -------------------------------------------------------------
             if isempty(obj.Parent)
-                displayName = obj.shortName;
+                value = obj.shortName;
             else
-                displayName = sprintf("Epoch%u_%s", obj.ID, obj.Parent.displayName);
+                value = sprintf("Epoch%u_%s", obj.ID, obj.Parent.label);
             end
         end
 

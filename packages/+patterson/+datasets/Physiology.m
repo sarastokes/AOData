@@ -72,7 +72,7 @@ classdef Physiology < patterson.Dataset
                     stim = ep.getStimulus('aod.builtin.stimuli.SpatialStimulus');
                 end
                 protocols = cat(1, protocols, string(stim.protocolName));
-                stimNames = cat(1, stimNames, string(stim.displayName));
+                stimNames = cat(1, stimNames, string(stim.label));
             end
 
             obj.stimTable = table(obj.epochIDs', stimNames(2:end), protocols(2:end),...

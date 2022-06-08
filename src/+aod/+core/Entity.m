@@ -11,7 +11,7 @@ classdef (Abstract) Entity < handle
 %   allowableParentTypes        cellstr
 %
 % Dependent properties:
-%   displayName                 string
+%   label                       string
 %   shortName                   string
 %
 % Methods:
@@ -24,7 +24,7 @@ classdef (Abstract) Entity < handle
 % Protected methods:
 %   addParent(obj, parent)
 %   x = getShortName(obj)
-%   x = getDisplayName(obj)
+%   x = getLabel(obj)
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
@@ -42,7 +42,7 @@ classdef (Abstract) Entity < handle
     end
 
     properties (Dependent = true)
-        displayName
+        label
         shortName
     end
 
@@ -50,8 +50,8 @@ classdef (Abstract) Entity < handle
         function obj = Entity()
         end
 
-        function value = get.displayName(obj)
-            value = obj.getDisplayName();
+        function value = get.label(obj)
+            value = obj.getLabel();
         end
 
         function value = get.shortName(obj)
@@ -131,13 +131,13 @@ classdef (Abstract) Entity < handle
 
     % Methods likely to be overwritten by subclasses
     methods (Access = protected)
-        function displayName = getDisplayName(obj)  
-            % GETDISPLAYNAME
+        function value = getLabel(obj)  
+            % GETVALUE
             %      
             % Syntax:
-            %   displayName = obj.getDisplayName()
+            %   value = obj.getLabel()
             % -------------------------------------------------------------
-            displayName = ao.util.class2char(obj);
+            value = ao.util.class2char(obj);
         end
 
         function shortName = getShortName(obj)
@@ -146,7 +146,7 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   shortName = obj.getShortName()
             % -------------------------------------------------------------
-            shortName = obj.getDisplayName();
+            shortName = obj.getLabel();
         end
     end
 

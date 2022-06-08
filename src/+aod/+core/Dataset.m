@@ -171,7 +171,7 @@ classdef (Abstract) Dataset < aod.core.Entity
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = ['MC00', num2str(obj.Source.ID), '_', obj.Source.whichEye,...
                 '_', char(obj.experimentDate)];
         end
