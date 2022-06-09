@@ -18,7 +18,6 @@ classdef (Abstract) Entity < handle
 %   addParameter(obj, name, value)
 %   value = getParameter(obj, name)
 %   addNote(obj, txt)
-%   removeNote(obj, ID)
 %   clearNotes(obj)
 %
 % Protected methods:
@@ -33,7 +32,7 @@ classdef (Abstract) Entity < handle
     properties (SetAccess = private)
         Parent                      %aod.core.Entity 
         description                 string = string.empty() 
-        notes                       cell = cell.empty();
+        notes                       string = string.empty()
     end
 
     
@@ -112,23 +111,19 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.addNote(txt)
             % -------------------------------------------------------------
-            obj.notes = cat(1, obj.notes, txt);
+            if ~isempty(obj.notes)
+                obj.notes = obj.notes + '; ';
+            end
+            obj.notes = obj.notes + txt;
         end
 
-        function removeNote(obj, noteID)
-            % REMOVENOTE
+        function clearNotes(obj)
+            % CLEARNOTES
             %
             % Syntax:
-            %   obj.removeNote(noteID)
+            %   obj.clearNotes()
             % -------------------------------------------------------------
-            if nargin < 2
-                obj.notes = cell(0,1);
-            end
-            if noteID > numel(obj.notes)
-                error('Note %u is invalid. %u notes exist',... 
-                    noteID, numel(obj.notes));
-            end
-            obj.notes{noteID} = [];
+            obj.notes = string.empty();
         end
     end
 

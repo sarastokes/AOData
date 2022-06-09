@@ -21,6 +21,7 @@ classdef HDF5 < handle
 % 
 % History:
 %   17Jan2022 - SSP
+%   08Jun2022 - SSP - Additions to ao-data-tools
 % -------------------------------------------------------------------------
 
     properties (Hidden, Constant)
@@ -63,15 +64,15 @@ classdef HDF5 < handle
             %   varargin        New group name(s)
             % -------------------------------------------------------------
             
-            fileID = ao.io.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName);
             for i = 1:numel(varargin)
                 try
-                    groupPath = ao.io.HDF5.buildPath(pathName, varargin{i});
-                    groupID = H5G.create(fileID, groupPath, ao.io.HDF5.NEW_GROUP_PROPS);
+                    groupPath = aod.h5.HDF5.buildPath(pathName, varargin{i});
+                    groupID = H5G.create(fileID, groupPath, aod.h5.HDF5.NEW_GROUP_PROPS);
                     H5G.close(groupID);
                 catch ME
                     if contains(ME.message, 'name already exists')
-                        warning('AO.IO.HDF5:Group %s already exists, skipping', groupPath);
+                        warning('aod.h5.HDF5:Group %s already exists, skipping', groupPath);
                     else
                         rethrow(ME);
                     end
@@ -93,29 +94,16 @@ classdef HDF5 < handle
             %   If no output argument is specified, the group is closed
             %   Continues on if group already exists
             % -------------------------------------------------------------
-            if ~ao.io.HDF5.exists(locID, groupName)   
-                groupID = H5G.create(locID, groupName, ao.io.HDF5.NEW_GROUP_PROPS);
+            if ~aod.h5.HDF5.exists(locID, groupName)   
+                groupID = H5G.create(locID, groupName, aod.h5.HDF5.NEW_GROUP_PROPS);
                 if nargout == 0
                     H5G.close(groupID);
                 end
             end
-
-            % try
-            %     groupID = H5G.create(locID, groupName, ao.io.HDF5.NEW_GROUP_PROPS);
-            %     if nargout == 0
-            %         H5G.close(groupID);
-            %     end
-            % catch ME
-            %     if contains(ME.message, 'name already exists')
-            %         warning('AO.IO.HDF5:Group %s already exists, skipping', groupName);
-            %     else
-            %         rethrow(ME);
-            %     end
-            % end
             % Call again for additional groups
             if nargin > 2
                 for i = 1:numel(varargin)
-                    ao.io.HDF5.createGroup(locID, varargin{i});
+                    aod.h5.HDF5.createGroup(locID, varargin{i});
                 end
             end
         end
@@ -149,7 +137,7 @@ classdef HDF5 < handle
             % Syntax:
             %   dsetID = makeDatasetText(fileName, pathName, dsetName, txt)
             % -------------------------------------------------------------
-            fileID = ao.io.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName);
                 
             typeID = H5T.copy('H5T_C_S1');
             H5T.set_size(typeID, 'H5T_VARIABLE');
@@ -160,7 +148,7 @@ classdef HDF5 < handle
                 groupID = H5G.open(fileID, pathName);
             catch ME
                 if contains(ME.message, 'doesn''t exist')
-                    groupID = H5G.create(fileID, pathName, ao.io.HDF5.NEW_GROUP_PROPS);
+                    groupID = H5G.create(fileID, pathName, aod.h5.HDF5.NEW_GROUP_PROPS);
                 else
                     rethrow(ME);
                 end
@@ -170,7 +158,6 @@ classdef HDF5 < handle
                 dsetID = H5D.create(groupID, dsetName, typeID, dspaceID, 'H5P_DEFAULT');
             catch ME
                 if contains(ME.message, 'name already exists')
-                    % ao.io.HDF5.deleteObject(fileName, pathName, dsetName);
                     dsetID = H5D.open(groupID, dsetName, 'H5P_DEFAULT');
                 else
                     rethrow(ME);
@@ -200,7 +187,7 @@ classdef HDF5 < handle
             %   https://github.com/NeurodataWithoutBorders/matnwb/+io/writeCompound.m
             % -------------------------------------------------------------
         
-            fileID = ao.io.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName);
             nRows = height(data);
             data = table2struct(data);
         
@@ -221,7 +208,7 @@ classdef HDF5 < handle
                     data.(names{i}) = [val{:}];
                     val = val{1};
                 end
-                typeIDs{i} = ao.io.HDF5.getDataType(val);
+                typeIDs{i} = aod.h5.HDF5.getDataType(val);
                 sizes(i) = H5T.get_size(typeIDs{i});
             end
         
@@ -234,9 +221,9 @@ classdef HDF5 < handle
             H5T.pack(typeID);
         
             spaceID = H5S.create_simple(1, nRows, []);
-            if ao.io.HDF5.exists(fileName, pathName)
+            if aod.h5.HDF5.exists(fileName, pathName)
                 warning('found and replaced %s', pathName);
-                ao.io.HDF5.deleteObject(fileName, pathName);
+                aod.h5.HDF5.deleteObject(fileName, pathName);
             end
             dsetID = H5D.create(fileID, pathName, typeID, spaceID, 'H5P_DEFAULT');
             H5D.write(dsetID, typeID, spaceID, spaceID, 'H5P_DEFAULT', data);
@@ -254,13 +241,13 @@ classdef HDF5 < handle
             %   Delete a group or dataset
             %
             % Syntax:
-            %   ao.io.HDF5.deleteObject(fileID, pathName, name);
+            %   aod.h5.HDF5.deleteObject(fileID, pathName, name);
             % -------------------------------------------------------------
             if nargin == 2
-                name = ao.io.HDF5.getPathEnd(pathName);
-                pathName = ao.io.HDF5.getPathParent(pathName);
+                name = aod.h5.HDF5.getPathEnd(pathName);
+                pathName = aod.h5.HDF5.getPathParent(pathName);
             end
-            fileID = ao.io.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName);
             if pathName == '/'
                 parentID = fileID;
             else
@@ -280,7 +267,7 @@ classdef HDF5 < handle
             %   Write one or more attributes at a specific location
             %
             % Syntax:
-            %   ao.io.HDF5.writeatts(fileName, pathName, varargin)
+            %   aod.h5.HDF5.writeatts(fileName, pathName, varargin)
             %
             % varargin may be a containers.Map of attributes or a list of
             % attributes specified as key, value
@@ -305,41 +292,40 @@ classdef HDF5 < handle
             % Syntax:
             %   createLink(fileName, targetPath, linkPath, linkName)
             % -------------------------------------------------------------
-            fileID = ao.io.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName);
             linkID = H5G.open(fileID, linkPath);
             H5L.create_soft(targetPath, linkID, linkName, 'H5P_DEFAULT', 'H5P_DEFAULT');
             H5G.close(linkID);
             H5F.close(fileID);
         end
+    end
 
-        function tf = exists(fileName, pathName)
-            % EXISTS
-            % 
-            % Check if group or dataset exists in file
+    % Data type methods
+    methods
+        function writeDataByType(fileName, pathName, data)
+            % WRITEDATABYTYPE
+            %
+            % Description:
+            %   Call the appropriate "make" function for given data type
             %
             % Syntax:
-            %   tf = exists(fileName, pathName)
-            %
-            % Inputs:
-            %   fileName        char H5 file name OR H5ML.id
+            %   writeDataByType(fileName, pathName, data)
             % -------------------------------------------------------------
-            if isa(fileName, 'H5ML.id')
-                tf = H5L.exists(fileName, pathName, 'H5P_DEFAULT');
-            else
-                fileID = ao.io.HDF5.openFile(fileName);
-                try
-                    tf = H5L.exists(fileID, pathName, 'H5P_DEFAULT');
-                catch ME
-                    if contains(ME.message, 'component not found')
-                        error('Parent group not found: %s', pathName);
-                    else
-                        rethrow(ME);
-                    end
-                end
-                H5F.close(fileID);
+            if istable(data)
+                aod.h5.HDF5.makeTableDataset(fileName, pathName, data);
+                aod.h5.HDF5.writeatts(fileName, pathName, 'EntityType', 'table');
+            elseif isdouble(data)
+                aod.h5.HDF5.makeMatrixDataset(fileName, pathName, data);
+            elseif ischar(data)
+                aod.h5.HDF5.makeTextDataset(fileName, pathName, data);
+            elseif isstring(data)
+                aod.h5.HDF.makeTextDataset(fileName, pathName, char(data));
+            elseif isdatetime(data)
+                aod.h5.HDF5.makeTextDataset(fileName, pathName, datestr(data));
+                aod.h5.HDF5.writeatts(fileName, pathName, 'EntityType', 'date');
             end
-        end
-        
+        end    
+
         function typeID = getDataType(var)
             % GETDATATYPE
             %
@@ -359,11 +345,39 @@ classdef HDF5 < handle
             elseif isa(var, 'uint8')
                 typeID = 'H5T_STD_U8LE';
             end
-
         end
     end
 
+    % Query functions
     methods (Static)
+        function tf = exists(fileName, pathName)
+            % EXISTS
+            % 
+            % Check if group or dataset exists in file
+            %
+            % Syntax:
+            %   tf = exists(fileName, pathName)
+            %
+            % Inputs:
+            %   fileName        char H5 file name OR H5ML.id
+            % -------------------------------------------------------------
+            if isa(fileName, 'H5ML.id')
+                tf = H5L.exists(fileName, pathName, 'H5P_DEFAULT');
+            else
+                fileID = aod.h5.HDF5.openFile(fileName);
+                try
+                    tf = H5L.exists(fileID, pathName, 'H5P_DEFAULT');
+                catch ME
+                    if contains(ME.message, 'component not found')
+                        error('Parent group not found: %s', pathName);
+                    else
+                        rethrow(ME);
+                    end
+                end
+                H5F.close(fileID);
+            end
+        end
+
         function x = getGroupNames(fileName, pathName)
             if nargin == 1
                 pathName = '\';
