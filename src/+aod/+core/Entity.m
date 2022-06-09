@@ -43,6 +43,9 @@ classdef (Abstract) Entity < handle
 
     properties (Dependent = true)
         label
+    end
+
+    properties (Hidden, Dependent)
         shortName
     end
 

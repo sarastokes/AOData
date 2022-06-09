@@ -1,11 +1,11 @@
-classdef LedCalibration < aod.core.Calibration
+classdef MaxwellianView < aod.core.Calibration
 % LEDCALIBRATION
 %
 % Description:
 %   Calibration for the 3 LED Maxwellian View system
 %
 % Constructor:
-%   obj = patterson.calibrations.LedCalibration(calibrationDate, parent)
+%   obj = patterson.calibrations.MaxwellianView(calibrationDate, parent)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -25,7 +25,7 @@ classdef LedCalibration < aod.core.Calibration
     end
 
     methods
-        function obj = LedCalibration(calibrationDate, parent)
+        function obj = MaxwellianView(calibrationDate, parent)
             if nargin < 2
                 parent = [];
             end

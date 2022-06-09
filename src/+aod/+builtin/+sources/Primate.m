@@ -1,4 +1,4 @@
-classdef Primate < aod.core.Subject
+classdef Primate < aod.core.sources.Subject
     % PRIMATE
     %
     % Description:
@@ -16,7 +16,7 @@ classdef Primate < aod.core.Subject
 
     methods
         function obj = Primate(ID, parent, varargin)
-            obj = obj@aod.core.Subject(ID, parent);
+            obj = obj@aod.core.sources.Subject(ID, parent);
 
 
             ip = inputParser();

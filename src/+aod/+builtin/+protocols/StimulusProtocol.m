@@ -28,10 +28,6 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
         contrast
     end
 
-    properties (SetAccess = protected)
-        groupBy = {'baseIntensity', 'contrast'};
-    end
-
     properties (Dependent)
         totalTime
         totalSamples
@@ -41,6 +37,8 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
     methods
         function obj = StimulusProtocol(calibration, varargin)
             obj = obj@aod.core.Protocol(calibration);
+
+            obj.groupBy = {'baseIntensity', 'contrast'};
 
              % Input parsing
             ip = inputParser();

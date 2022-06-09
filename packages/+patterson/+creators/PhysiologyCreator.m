@@ -91,7 +91,7 @@ classdef PhysiologyCreator < aod.core.Creator
             end
             if epochType == patterson.EpochTypes.Spatial
                 protocol = patterson.factories.SpatialProtocolFactory(...
-                    ep.getFilePath('TrialFile'), obj.Dataset.getCalibration('patterson.calibrations.TopticaCalibration'));
+                    ep.getFilePath('TrialFile'), obj.Dataset.getCalibration('patterson.calibrations.Toptica'));
                 stimulus = aod.builtin.stimuli.SpatialStimulus(ep, protocol);
                 ep.addStimulus(stimulus);
             end
@@ -185,7 +185,8 @@ classdef PhysiologyCreator < aod.core.Creator
             ep.addFile('AnalysisVideo', string(['Analysis', filesep, 'Videos', filesep, visStr, '.tif']));
 
             % Find csv output file
-            ind = find(refFiles(multicontains(refFiles, {refStr, 'csv'})) && ~contains(refFiles, 'motion'));
+            csvFiles = refFiles(multicontains(refFiles, {refStr, 'csv'}));
+            ind = find(~contains(csvFiles, 'motion'));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
                 ep.addFile('FrameReport', "Ref" + filesep + refFiles(ind));
@@ -264,7 +265,7 @@ classdef PhysiologyCreator < aod.core.Creator
             end
 
             % Find LED stimulus files, if necessary
-            if ep.epochType == patterson.EpochTypes.Spatial
+            if ep.epochType == patterson.EpochTypes.Spectral
                 ind = find(multicontains(visFiles, {visStr, '.json'}));
                 if ~isempty(ind)
                     ind = obj.checkFilesFound(ind);

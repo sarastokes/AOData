@@ -1,4 +1,4 @@
-classdef TopticaCalibration < aod.core.Calibration
+classdef Toptica < aod.core.Calibration
 % TOPTICACALIBRATION
 %
 % Description:
@@ -20,7 +20,7 @@ classdef TopticaCalibration < aod.core.Calibration
     end
 
     methods
-        function obj = TopticaCalibration(parent)
+        function obj = Toptica(parent)
             if nargin < 0
                 parent = [];
             end
