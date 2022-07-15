@@ -1,4 +1,9 @@
 classdef SpectralTypes
+% SPECTRALTYPES
+%
+% Description:
+%   Enumeration of potential spectral types
+% -------------------------------------------------------------------------
 
     enumeration
         Luminance      
@@ -14,12 +19,23 @@ classdef SpectralTypes
     end
 
     methods 
-        function tf = isLed(obj)
+        function tf = isSpectral(obj)
             import aod.builtin.SpectralTypes;
             if obj == patterson.SpectralTypes.Red ...
                     || obj == SpectralTypes.Green...
                     || obj == SpectralTypes.Blue ...
                     || obj == SpectralTypes.Yellow
+                tf = true;
+            else
+                tf = false;
+            end
+        end
+        
+        function tf = isConeIsolating(obj)
+            import aod.builtin.SpectralTypes;
+            if obj == SpectralTypes.Liso || SpectralTypes.Miso || ...
+                    SpectralTypes.Siso || SpectralTypes.LMiso || ...
+                    SpectralTypes.Isoluminance
                 tf = true;
             else
                 tf = false;
@@ -69,6 +85,14 @@ classdef SpectralTypes
         end
 
         function ledValues = getStimulus(obj, cal, stim)
+            % GETSTIMULUS
+            %
+            % Description:
+            %   Convert normalized stimulus to RGB powers 
+            %
+            % Syntax:
+            %   ledValues = getStimulus(obj, cal, stim)
+            % -------------------------------------------------------------
             import aod.builtin.SpectralTypes;
             if obj.isSpectral
                 % Assumes 1st value is background for all LEDs
@@ -83,12 +107,22 @@ classdef SpectralTypes
                 end
             elseif obj == SpectralTypes.Luminance
                 ledValues = stim .* (2*cal.stimPowers.Background');
+            elseif obj.isConeIsolating
+                ledValues = cal.calcStimulus(obj.getAbbrev(), stim);
             end
         end
     end
 
     methods (Static)
         function obj = init(str)
+            % INIT
+            %
+            % Description:
+            %   Initialize object from spectral type name
+            %
+            % Syntax:
+            %   obj = aod.builtin.SpectralTypes.init(str)
+            % -------------------------------------------------------------
             import aod.builtin.SpectralTypes;
 
             if isa(str, 'aod.builtin.SpectralTypes')
@@ -99,13 +133,13 @@ classdef SpectralTypes
             switch lower(str)
                 case {'w', 'luminance', 'achromatic', 'lum'}
                     obj = SpectralTypes.Luminance; 
-                case {'lcone', 'liso', 'lisolating'}
+                case {'l', 'lcone', 'liso', 'lisolating'}
                     obj = SpectralTypes.Liso;
-                case {'mcone', 'miso', 'misolating'}
+                case {'m', 'mcone', 'miso', 'misolating'}
                     obj = SpectralTypes.Miso;
-                case {'scone', 'siso', 'sisolating'}
+                case {'s', 'scone', 'siso', 'sisolating'}
                     obj = SpectralTypes.Siso;
-                case {'lmcone', 'lmiso', 'lmisolating'}
+                case {'lm', 'lmcone', 'lmiso', 'lmisolating'}
                     obj = SpectralTypes.LMiso;
                 case {'isolum', 'isoluminance'}
                     obj = SpectralTypes.Isoluminance;
@@ -116,6 +150,7 @@ classdef SpectralTypes
                 case {'b', 'blue'}
                     obj = SpectralTypes.Blue;
                 case {'y', 'yellow'}
+                    obj = SpectralTypes.Yellow;
                 otherwise
                     error('Unrecognized SpectralTypes: %s', str);
                     

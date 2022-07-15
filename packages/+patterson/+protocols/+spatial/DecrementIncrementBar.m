@@ -22,10 +22,6 @@ classdef DecrementIncrementBar < patterson.protocols.spatial.DecrementIncrement
         barSize             % pixels
     end
 
-    properties (SetAccess = protected)
-        groupBy = {'BaseIntensity', 'Contrast', 'NumBars', 'BarID'};
-    end
-
     methods
         function obj = DecrementIncrementBar(calibration, varargin)
             obj = obj@patterson.protocols.spatial.DecrementIncrement(calibration, varargin{:});
@@ -49,6 +45,9 @@ classdef DecrementIncrementBar < patterson.protocols.spatial.DecrementIncrement
                 case 'horizontal'
                     obj.barSize = floor(obj.canvasSize(2)/obj.numBars);
             end
+
+            % Stimulus-specific property settings
+            obj.groupBy = {'BaseIntensity', 'Contrast', 'NumBars', 'BarID'};
         end
 
         function stim = generate(obj)

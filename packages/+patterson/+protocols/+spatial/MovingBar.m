@@ -35,11 +35,11 @@ classdef MovingBar < aod.builtin.protocols.SpatialProtocol
             obj = obj@aod.builtin.protocols.SpatialProtocol(calibration, varargin{:});
             
             ip = inputParser();
-            addParameter(ip, 'Direction', 0, @(x) x >= 0 & x <= 360));
+            addParameter(ip, 'Direction', 0, @(x) x >= 0 & x <= 360);
             addParameter(ip, 'BarWidth', 20, @isnumeric);
             addParameter(ip, 'BarSpeed', 1, @isnumeric);
             addParameter(ip, 'UseAperture', true, @islogical);
-            addParameter(ip, 'NumReps', 1, @(x) x > 0));
+            addParameter(ip, 'NumReps', 1, @(x) x > 0);
             parse(ip, varargin{:});
 
             obj.direction = ip.Results.Direction;

@@ -4,6 +4,12 @@ classdef Toptica < aod.core.Calibration
 % Description:
 %   Nonlinearity in visual stimuli presented with Toptica.
 %
+% Syntax:
+%   obj = Toptica(parent)
+%
+% Parent:
+%   aod.core.Calibration
+%
 % Note:
 %   The Toptica's output is linear, the nonlinearity arises through the
 %   modulation performed by the imaging software. Thus, this applies to all

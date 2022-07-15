@@ -1,8 +1,11 @@
 classdef (Abstract) Calibration < aod.core.Entity
-% CALIBRATION
+% CALIBRATION (abstract)
 %
 % Constructor:
 %   obj = aod.core.Calibration(calibrationDate, parent)
+%
+% Parent:
+%   aod.core.Entity
 %
 % Properties:
 %   calibrationDate         date when the calibration was performed
@@ -15,7 +18,8 @@ classdef (Abstract) Calibration < aod.core.Entity
 
     methods
         function obj = Calibration(calibrationDate, parent)
-            obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.System', 'aod.core.Empty'};
+            obj.allowableParentTypes = {'aod.core.Dataset',... 
+                'aod.core.System', 'aod.core.Empty'};
             
             if nargin > 0 && ~isempty(calibrationDate)
                 if ~isa(calibrationDate, 'datetime')

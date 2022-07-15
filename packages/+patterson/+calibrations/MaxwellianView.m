@@ -4,8 +4,11 @@ classdef MaxwellianView < aod.core.Calibration
 % Description:
 %   Calibration for the 3 LED Maxwellian View system
 %
+% Parent:
+%   aod.core.Calibration
+%
 % Constructor:
-%   obj = patterson.calibrations.MaxwellianView(calibrationDate, parent)
+%   obj = MaxwellianView(calibrationDate, parent)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

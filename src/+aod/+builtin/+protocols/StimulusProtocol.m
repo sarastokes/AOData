@@ -1,21 +1,31 @@
 classdef (Abstract) StimulusProtocol < aod.core.Protocol
-% STIMULUSPROTOCOL
+% STIMULUSPROTOCOL (abstract)
 %
 % Description:
-%   A protocol presenting a visual stimulus
+%   A protocol presenting a visual stimulus 
+%
+% Parent:
+%   aod.core.Protocol
+%
+% Constructor:
+%   obj = StimulusProtocol(calibration, varargin)
 %
 % Properties:
-%   preTime         time before stimulus in seconds
-%   stimTIme        tim during stimulus
-%   tailTime        time after stimulus in seconds
+%   preTime                 time before stimulus in seconds
+%   stimTime                time during stimulus
+%   tailTime                time after stimulus in seconds
 %   baseIntensity (0-1)     baseline intensity of stimulus
 %   contrast (0-1)          scaling applied during stimTime
 %                           - computed as contrast if baseIntensity > 0
 %                           - computed as intensity if baseIntensity = 0
+%
 % Dependent properties:
-%   totalTime       total stimulus time (from calculateTotalTime)
-%   totalSamples    total number of samples in stimulus
+%   totalTime               total stimulus time (from calculateTotalTime)
+%   totalSamples            total number of samples in stimulus
 %   amplitude               computed from contrast as described above
+%
+% Protected properties:
+%   groupBy             optional hierarchy of parameters for grouping 
 %
 % Protected methods:
 %   value = calculateTotalTime(obj)
@@ -26,6 +36,10 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
         tailTime 
         baseIntensity
         contrast
+    end
+    
+    properties (SetAccess = protected)
+        groupBy             = cell.empty()
     end
 
     properties (Dependent)
@@ -94,6 +108,13 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
             % Can be overwritten by subclasses if needed
             % -------------------------------------------------------------
             value = obj.preTime + obj.stimTime + obj.tailTime;
+        end
+
+        function appendGroupingProperties(obj, varargin)
+            numProps = nargin - 1;
+            for i = 1:numProps
+                obj.groupBy = cat(2, obj.groupBy, varargin{:});
+            end
         end
     end
 
