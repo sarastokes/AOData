@@ -16,7 +16,7 @@ classdef StepBar < patterson.protocols.spatial.Step
 %   orientation
 %
 % Notes:
-%   - If numBars is not divisible by canvasSize, the barSize will be
+%   - If numBars is not divisible by canvasSize, the barWidth will be
 %       rounded down with floor()
 % -------------------------------------------------------------------------
     properties
@@ -26,7 +26,7 @@ classdef StepBar < patterson.protocols.spatial.Step
     end
 
     properties (SetAccess = private)
-        barSize             % pixels
+        barWidth             % pixels
     end
 
     methods
@@ -53,9 +53,9 @@ classdef StepBar < patterson.protocols.spatial.Step
             % Derived parameters
             switch obj.orientation
                 case 'vertical'
-                    obj.barSize = floor(obj.canvasSize(1)/obj.numBars);
+                    obj.barWidth = floor(obj.canvasSize(1)/obj.numBars);
                 case 'horizontal'
-                    obj.barSize = floor(obj.canvasSize(2)/obj.numBars);
+                    obj.barWidth = floor(obj.canvasSize(2)/obj.numBars);
             end
 
             % Stimulus-specific parameters
@@ -65,7 +65,7 @@ classdef StepBar < patterson.protocols.spatial.Step
         function stim = generate(obj)
             stim = obj.baseIntensity + zeros(obj.canvasSize(1), obj.canvasSize(2), obj.totalSamples);   
             for i = 1:obj.totalSamples
-                stim((obj.barID-1) * obj.barSize+1 : obj.barID*obj.barSize, i) = trace(i);
+                stim((obj.barID-1) * obj.barWidth+1 : obj.barID*obj.barWidth, i) = trace(i);
             end
         end
 

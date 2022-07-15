@@ -71,6 +71,11 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             end
         end
 
+        function stim = generate(obj)
+            stim = obj.baseIntensity + zeros(obj.canvasSize(1), ...
+                obj.canvasSize(2), obj.totalTime);
+        end
+
         function stim = mapToStimulator(obj)
             % MAPTOSTIMULATOR
             %
