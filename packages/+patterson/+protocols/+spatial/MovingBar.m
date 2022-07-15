@@ -1,57 +1,64 @@
-classdef MovingBarsFourDirections < aod.builtin.protocols.SpatialProtocol
-% MOVINGBARFOURDIRECTIONS
+classdef MovingBar < aod.builtin.protocols.SpatialProtocol
+% MOVINGBAR
 %
 % Description:
-%   A series of 4 moving bars in cardinal or diagonal directions
+%   A bar that moves...
+%
+% Syntax:
+%   obj = MovingBar(varargin);
 %
 % Properties:
-%   stimTime    time window for each bar presentation to occur
+%   direction
+%   barWidth
+%   barSpeed
+%   useAperture
+%   repeats
+%
+% Derived properties;
+%   startFrames
 % -------------------------------------------------------------------------
+
     properties
-        directionClass      % 'cardinal' or 'diagonal'
+        direction           % Direction in degrees
         barWidth            % pixels
         barSpeed            % pixels/sec
         useAperture         % logical (default = true)
+        numReps             % number of bar presentations (default = 1)
     end
 
     properties (SetAccess = private)
-        directions 
         startFrames
     end
 
     methods
-        function obj = MovingBarsFourDirections(calibration, varargin)
+        function obj = MovingBar(calibration, varargin)
             obj = obj@aod.builtin.protocols.SpatialProtocol(calibration, varargin{:});
-
+            
             ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
-            addParameter(ip, 'DirectionClass', 'cardinal',... 
-                @(x)ismember(x, {'cardinal', 'diagonal'}));
+            addParameter(ip, 'Direction', 0, @(x) x >= 0 & x <= 360));
             addParameter(ip, 'BarWidth', 20, @isnumeric);
             addParameter(ip, 'BarSpeed', 1, @isnumeric);
             addParameter(ip, 'UseAperture', true, @islogical);
+            addParameter(ip, 'NumReps', 1, @(x) x > 0));
             parse(ip, varargin{:});
 
-            obj.directionClass = ip.Results.DirectionClass;
+            obj.direction = ip.Results.Direction;
             obj.barWidth = ip.Results.BarWidth;
             obj.barSpeed = ip.Results.BarSpeed;
             obj.useAperture = ip.Results.UseAperture;
-
-            % Derived properties
-            if strcmp(obj.directionClass, 'cardinal')
-                obj.directions = [0, 90, 180, 270];
-            else
-                obj.directions = [45, 135, 225, 315];
-            end
+            obj.numReps = ip.Results.NumReps;
 
             prePts = obj.sec2pts(obj.preTime);
             stimPts = obj.sec2pts(obj.stimTime);
-            obj.startFrames = prePts + [1, stimPts+1, (2*stimPts)+1, (3*stimPts)+1];
+            obj.startFrames = [];
+            for i = 1:obj.numReps
+                obj.startFrames = cat(2, obj.startFrames,...
+                    prePts + (i-1)*stimPts+1);
+            end
         end
     end
 
-    methods
+    methods      
         function trace = temporalTrace(obj)
             % TEMPORALTRACE
             %
@@ -68,11 +75,9 @@ classdef MovingBarsFourDirections < aod.builtin.protocols.SpatialProtocol
                 trace(obj.startFrames(i):obj.startFrames(i)+barPts-1) = 1:numel(barPts);
             end
         end
-
+        
         function stim = generate(obj)
             warning('Not yet implemented!');
-            stim = obj.baseIntensity + zeros(obj.totalSamples);
-            stim(prePts+1:(stimPts*4)) = obj.amplitude;
         end
 
         function fName = getFileName(obj)
@@ -81,14 +86,14 @@ classdef MovingBarsFourDirections < aod.builtin.protocols.SpatialProtocol
             else
                 apertureFlag = '_';
             end
-            fName = sprintf('moving_bar%s%udeg_%upix_%uv_%ut.txt',...
-                apertureFlag, obj.directions, obj.barWidth, obj.barSpeed, obj.totalTime);
+            fName = sprintf('moving_bar%s%udeg_%upix_%uv_%ut',...
+                apertureFlag, obj.direction, obj.barWidth, obj.barSpeed, obj.totalTime);
         end
     end
-
+    
     methods (Access = protected)
         function value = calculateTotalTime(obj)
-            value = obj.preTime + (4*obj.stimTime) + obj.tailTime;
+            value = obj.preTime + (obj.numReps*obj.stimTime) + obj.tailTime;
         end
     end
-end 
+end

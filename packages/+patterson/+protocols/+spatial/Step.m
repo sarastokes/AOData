@@ -1,11 +1,11 @@
 classdef Step < aod.builtin.protocols.SpatialProtocol
-% CONTRASTSTEP
+% STEP
 %
 % Description:
 %   A spatially-uniform change in intenstiy
 %
 % Constructor:
-%   obj = patterson.protocols.spatial.step(stimTime, varargin)
+%   obj = patterson.protocols.spatial.Step(varargin)
 %
 % Inherited properties:
 %   preTime
@@ -17,9 +17,10 @@ classdef Step < aod.builtin.protocols.SpatialProtocol
 % Inherited methods:
 %   trace = temporalTrace(obj)
 % -------------------------------------------------------------------------
+
     methods
-        function obj = Step(varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(varargin{:});
+        function obj = Step(calibration, varargin)
+            obj = obj@aod.builtin.protocols.SpatialProtocol(calibration, varargin{:});
         end
 
         function stim = generate(obj)
@@ -28,14 +29,12 @@ classdef Step < aod.builtin.protocols.SpatialProtocol
         end
 
         function fName = getFileName(obj)
-            if obj.baseIntensity == 0
-                fName = 'intensity_increment_';
-            elseif obj.contrast > 0
-                fName = 'contrast_increment_';
-            elseif obj.contrast < 0
-                fName = 'contrast_decrement_';
+            [a, b] = parseModulation(obj.baseIntenity, obj.contrast);
+            fName = [sprintf('%s_%s_%up_%us_%ut', a, b,... 
+                abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
+            if obj.tailTime == 0
+                fName = ['step_', fName];
             end
-            fName = [fName, sprintf('%up_%us_%ut.avi', abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
         end
     end
 end

@@ -282,7 +282,8 @@ classdef HDF5 < handle
             end
             k = attMap.keys;
             for i = 1:numel(k)
-                h5writeatt(fileName, pathName, k{i}, attMap(k{i}));
+                h5writeatt(fileName, pathName, k{i},...
+                    aod.h5.HDF5.data2att(attMap(k{i})));
             end
         end
 
@@ -301,7 +302,15 @@ classdef HDF5 < handle
     end
 
     % Data type methods
-    methods
+    methods (Static)
+        function out = data2att(data)
+            if islogical(data)
+                out = int32(data);
+            else
+                out = data;
+            end
+        end
+
         function writeDataByType(fileName, pathName, data)
             % WRITEDATABYTYPE
             %
