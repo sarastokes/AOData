@@ -27,12 +27,12 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         % Shared by all Spatial Protocols
-        sampleRate = 25;
-        stimRate = 25;
+        sampleRate = 25
+        stimRate = 25
     end
 
     properties (Hidden, SetAccess = private)
-        canvasSize = [256, 256];       % pixels
+        canvasSize = [256, 256]        % pixels
     end
 
     methods
@@ -51,26 +51,7 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             % -------------------------------------------------------------
             fName = 'SpatialStimulus';
         end
-
-        function trace = temporalTrace(obj)
-            % TEMPORALTRACE
-            %
-            % Description:
-            %   Vector representation of stimulus over time. Default shows
-            %   base intensity and a step to contrast value during stim
-            %   time. Subclass to tailor for other stimuli.
-            %
-            % Syntax:
-            %   trace = temporalTrace(obj);
-            % -------------------------------------------------------------
-            trace = obj.baseIntensity + zeros(1, obj.totalTime);
-            if obj.stimTime > 0
-                prePts = obj.sec2pts(obj.preTime);
-                stimPts = obj.sec2pts(obj.stimTime);
-                trace(prePts+1:prePts+stimPts) = obj.amplitude;
-            end
-        end
-
+        
         function stim = generate(obj)
             stim = obj.baseIntensity + zeros(obj.canvasSize(1), ...
                 obj.canvasSize(2), obj.totalTime);

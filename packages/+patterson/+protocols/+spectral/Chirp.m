@@ -1,4 +1,4 @@
-classdef Chirp < aod.builtin.protocols.SpectralProtocol
+classdef Chirp < patterson.protocols.SpectralProtocol
 % CHIRP
 %
 % Description:
@@ -24,7 +24,7 @@ classdef Chirp < aod.builtin.protocols.SpectralProtocol
 
     methods
         function obj = Chirp(calibration, varargin)
-            obj = obj@aod.builtin.protocols.SpectralProtocol(...
+            obj = obj@patterson.protocols.SpectralProtocol(...
                 calibration, varargin{:});
 
             ip = inputParser();
@@ -39,13 +39,14 @@ classdef Chirp < aod.builtin.protocols.SpectralProtocol
         end
         
         function stim = generate(obj)
-            ledResolution = 1/obj.stimRate;  % ms
-            chirpPts = obj.stimTime / ledResolution;
+            sampleTime = 1/obj.stimRate;  % sec
+            chirpPts = obj.sec2pts(obj.stimTime);
             hzPerSec = obj.stopFreq / obj.stimTime;
 
             stim = zeros(1, chirpPts);
             for i = 1:chirpPts
-                stim(i) = sin(pi*hzPerSec*(i*ledResolution)^2)...
+                x = i*sampleTime;
+                stim(i) = sin(pi*hzPerSec*x^2)...
                     * obj.baseIntensity + obj.baseIntensity;
             end
 
@@ -54,14 +55,18 @@ classdef Chirp < aod.builtin.protocols.SpectralProtocol
             stim = obj.appendTailTime(stim);
         end
 
+        function trace = temporalTrace(obj)
+            trace = obj.generate();
+        end
+
         function fName = getFileName(obj)
             % GETFILENAME
             %
             % Syntax:
             %   fName = getFileName(obj)
             % -------------------------------------------------------------
-            fName = sprintf('chirp_%ut_%s', floor(obj.totalTime),...
-                getTodaysDate());
+            fName = sprintf('%s_chirp_%up_%ut_%s', lower(char(obj.spectralClass)),...
+                100*obj.baseIntensity, floor(obj.totalTime), getTodaysDate());
         end
     end
 end

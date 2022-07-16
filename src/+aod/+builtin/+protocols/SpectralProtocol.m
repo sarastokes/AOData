@@ -69,11 +69,13 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             % Syntax:
             %   ledPlot(obj)
             % -------------------------------------------------------------
-            ledValues = obj.mapToLeds();
-            ledPlot(ledValues, obj.stim2sec(1:size(ledValues, 2)));
-            title(obj.getFileName(), 'Interpreter','none');
-            figPos(gcf, 1.5, 1);
-            tightfig(gcf);
+            ledValues = obj.mapToStimulator();
+            ax = ledPlot(ledValues, obj.pts2sec(1:size(ledValues, 2)));
+            title(ax, obj.getFileName(), 'Interpreter','none');
+            xlabel(ax, 'Time (sec)');
+            ylabel(ax, 'Power (uW)');
+            figPos(ax.Parent, 1.5, 1);
+            tightfig(ax.Parent);
         end
     end
 end

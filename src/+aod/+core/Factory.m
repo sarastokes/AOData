@@ -4,20 +4,43 @@ classdef (Abstract) Factory < handle
 % Description:
 %   Generic parent class for factories
 %
+% Constructor:
+%   obj = Factory()
+%
 % Abstract methods:
 %   newObj = create(obj, varargin)
 %
-% Constructor:
-%   obj = Factory()
+% Static methods
+%   newObj = get(varargin)
+%
+% Notes:
+%   Implementation goes into create() and get() is an optional static  
+%   method for calling create() without instantiating the object first
 % -------------------------------------------------------------------------
 
     methods (Abstract)
-        newObj = create(obj, varargin)
+        newObj = get(obj, varargin)
     end
 
     methods
         function obj = Factory()
             % Do nothing
+        end
+    end
+
+    methods (Static)
+        function newObj = create(varargin)
+            % CREATE
+            %
+            % Description:
+            %   Optional static method for calling get() without creating 
+            %   the Factory object first. Subclasses should first create 
+            %   the object, then run get() and return the new object
+            %
+            % Syntax:
+            %   newObj = create(varargin)
+            % ------------------------------------------------------------- 
+            error('Not yet implemented');
         end
     end
 end

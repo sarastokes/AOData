@@ -8,7 +8,7 @@ classdef DecrementIncrement < aod.builtin.protocols.SpatialProtocol
 %   obj = DecrementIncrement(stimTime, varargin)
 %
 % Properties:
-%   stepTime
+%   stepTime                    Individual timing for the two modulations
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         stepTime        % Individual timing for the decrement and increment
@@ -27,8 +27,8 @@ classdef DecrementIncrement < aod.builtin.protocols.SpatialProtocol
             stepPts = obj.sec2pts(obj.stepTime);
 
             trace = obj.baseIntensity + zeros(1, obj.totalSamples);
-            trace(prePts+1:prePts+stepPts) = - obj.amplitude;
-            trace(prePts+stepPts+1:prePts+(2*stepPts)) = obj.amplitude;
+            trace(prePts+1:prePts+stepPts) = obj.baseIntensity - obj.amplitude;
+            trace(prePts+stepPts+1:prePts+(2*stepPts)) = obj.baseIntensity + obj.amplitude;
         end
 
         function stim = generate(obj)

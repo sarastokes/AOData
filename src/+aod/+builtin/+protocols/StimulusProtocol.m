@@ -27,6 +27,10 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
 % Protected properties:
 %   groupBy             optional hierarchy of parameters for grouping 
 %
+% Methods:
+%   trace = temporalTrace(obj) 
+%   plotTemporalTrace(obj)
+%
 % Protected methods:
 %   value = calculateTotalTime(obj)
 % -------------------------------------------------------------------------
@@ -88,7 +92,6 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
             value = obj.sec2samples(obj.totalTime);
         end
 
-
         function fName = getFileName(obj) %#ok<MANU> 
             % GETFILENAME
             %
@@ -99,6 +102,49 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
             %   fName = getFileName(obj)
             % -------------------------------------------------------------
             fName = 'Stimulus';
+        end
+
+        function trace = temporalTrace(obj)
+            % TEMPORALTRACE
+            %
+            % Description:
+            %   Vector representation of stimulus over time. Default shows
+            %   base intensity and a step to contrast value during stim
+            %   time. Subclass to tailor for other stimuli.
+            %
+            % Syntax:
+            %   trace = temporalTrace(obj);
+            % -------------------------------------------------------------
+            trace = obj.baseIntensity + zeros(1, obj.totalTime);
+            if obj.stimTime > 0
+                prePts = obj.sec2pts(obj.preTime);
+                stimPts = obj.sec2pts(obj.stimTime);
+                trace(prePts+1:prePts+stimPts) = obj.amplitude;
+            end
+        end
+        
+        function h = plotTemporalTrace(obj)
+            % PLOTTEMPORALTRACE
+            %   
+            % Description:
+            %   Create a quick plot of the protocol's temporal trace
+            %
+            % Syntax:
+            %   h = plotTemporalTrace(obj)
+            %
+            % Output:
+            %   h               handle to line plotting stimulus trace
+            % -------------------------------------------------------------
+            trace = obj.temporalTrace();
+
+            ax = axes('Parent', figure()); hold on;
+            h = plot(ax, obj.pts2sec(1:numel(trace)), trace, 'LineWidth', 1);
+            title(ax, class(obj));
+            xlabel('Time (sec)');
+            ylabel('Normalized');
+            axis(ax, 'tight');
+            ylim(ax, [0 1]);
+            grid(ax, 'on');
         end
     end
 

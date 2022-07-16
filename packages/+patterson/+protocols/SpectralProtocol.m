@@ -76,30 +76,35 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
             end
         end       
 
+        function stim = generate(obj)
+            stim = obj.temporalTrace();
+        end
+
         function ledValues = mapToStimulator(obj)
             % MAPTOLEDS
             %
             % Syntax:
-            %   ledValues = mapTgoioLeds(obj)
+            %   ledValues = mapToStimulator(obj)
             % -------------------------------------------------------------
-            ledValues = mapToStimulator@aod.builtin.protocols.SpectralProtocol();
+            stim = obj.generate();
+            bkgdPowers = obj.calibration.stimPowers.Background;
 
             import aod.builtin.SpectralTypes;
-            if obj.isSpectral
+            if obj.spectralClass.isSpectral
                 % Assumes 1st value is background for all LEDs
                 ledValues = zeros(3, numel(stim));
-                ledList = obj.whichLEDs();
+                ledList = obj.spectralClass.whichLEDs();
                 for i = 1:3
                     if ledList(i)
-                        ledValues(i, :) = (2*cal.stimPowers.Background(i)) * data;
+                        ledValues(i, :) = (bkgdPowers(i)) * stim;
                     else
-                        ledValues(i, :) = (2*cal.stimPowers.Background(i)) * data(1);
+                        ledValues(i, :) = (bkgdPowers(i)) * stim(1);
                     end
                 end
-            elseif obj == SpectralTypes.Luminance
-                ledValues = data .* (2*cal.stimPowers.Background');
-            elseif obj.isConeIsolating
-                ledValues = cal.calcStimulus(obj.getAbbrev(), data);
+            elseif obj.spectralClass == SpectralTypes.Luminance
+                ledValues = stim .* (bkgdPowers');
+            elseif obj.spectralClass.isConeIsolating
+                ledValues = cal.calcStimulus(obj.getAbbrev(), stim);
             end
         end
 

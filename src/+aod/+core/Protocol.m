@@ -6,6 +6,7 @@ classdef (Abstract) Protocol < handle
 %
 % Properties:
 %   calibration         aod.core.Calibration (optional)
+%   dateCreated         datetime, when the protocol was created (optional)
 %
 % Dependent properties:
 %   totalTime           total stimulus time (from calculateTotalTime)
@@ -27,7 +28,8 @@ classdef (Abstract) Protocol < handle
 % -------------------------------------------------------------------------
 
     properties  
-        calibration
+        calibration                 % aod.core.Calibration
+        dateCreated                 datetime            = datetime.empty()
     end
 
     properties (Dependent)
@@ -35,8 +37,8 @@ classdef (Abstract) Protocol < handle
     end
 
     properties (Abstract, SetAccess = protected)
-        sampleRate
-        stimRate
+        sampleRate(1,1)             double
+        stimRate(1,1)               double
     end
 
     methods (Abstract)
@@ -47,10 +49,12 @@ classdef (Abstract) Protocol < handle
 
     methods
         function obj = Protocol(calibration)
-            if nargin > 0
+            if nargin > 0 && ~isempty(calibration)
                 assert(isSubclass(calibration, 'aod.core.Calibration'),...
                     'Input must be of class aod.core.Calibration');
                 obj.calibration = calibration;
+            else
+                obj.calibration = aod.core.calibrations.Empty();
             end
         end
 
@@ -82,7 +86,7 @@ classdef (Abstract) Protocol < handle
     end
 
     % Convenience methods
-    methods (Access = protected)
+    methods
         function value = sec2pts(obj, t)
             % SEC2PTS
             %
@@ -98,7 +102,7 @@ classdef (Abstract) Protocol < handle
             % Syntax:
             %   value = pts2sec(obj, pts)
             % -------------------------------------------------------------
-            value = floor(pts/obj.stimRate);
+            value = pts/obj.stimRate;
         end
 
         function value = sec2samples(obj, t)
