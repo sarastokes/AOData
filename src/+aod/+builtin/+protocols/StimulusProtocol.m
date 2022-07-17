@@ -22,6 +22,7 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
 % Dependent properties:
 %   totalTime               total stimulus time (from calculateTotalTime)
 %   totalSamples            total number of samples in stimulus
+%   totalPoints             total number of time points in stimulus
 %   amplitude               computed from contrast as described above
 %
 % Protected properties:
@@ -33,6 +34,7 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
 %
 % Protected methods:
 %   value = calculateTotalTime(obj)
+%   value = calculateAmplitude(obj)
 % -------------------------------------------------------------------------
     properties
         preTime  
@@ -49,6 +51,7 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
     properties (Dependent)
         totalTime
         totalSamples
+        totalPoints
         amplitude
     end
 
@@ -77,11 +80,7 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
         end
 
         function value = get.amplitude(obj)
-            if obj.baseIntensity == 0
-                value = obj.contrast;
-            else
-                value = obj.baseIntensity * obj.contrast;
-            end
+            value = obj.calculateAmplitude();
         end
 
         function value = get.totalTime(obj)
@@ -90,6 +89,10 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
 
         function value = get.totalSamples(obj)
             value = obj.sec2samples(obj.totalTime);
+        end
+
+        function value = get.totalPoints(obj)
+            value = obj.sec2pts(obj.totalTime);
         end
 
         function fName = getFileName(obj) %#ok<MANU> 
@@ -115,11 +118,11 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
             % Syntax:
             %   trace = temporalTrace(obj);
             % -------------------------------------------------------------
-            trace = obj.baseIntensity + zeros(1, obj.totalTime);
+            trace = obj.baseIntensity + zeros(1, obj.totalPoints);
             if obj.stimTime > 0
                 prePts = obj.sec2pts(obj.preTime);
                 stimPts = obj.sec2pts(obj.stimTime);
-                trace(prePts+1:prePts+stimPts) = obj.amplitude;
+                trace(prePts+1:prePts+stimPts) = obj.amplitude + obj.baseIntensity;
             end
         end
         
@@ -154,6 +157,17 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
             % Can be overwritten by subclasses if needed
             % -------------------------------------------------------------
             value = obj.preTime + obj.stimTime + obj.tailTime;
+        end
+
+        function value = calculateAmplitude(obj)
+            % CALCULATEAMPLITUDE
+            % Can be overwritten by subclasses if needed
+            % -------------------------------------------------------------
+            if obj.baseIntensity == 0
+                value = obj.contrast;
+            else
+                value = obj.baseIntensity * obj.contrast;
+            end
         end
 
         function appendGroupingProperties(obj, varargin)

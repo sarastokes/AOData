@@ -7,6 +7,9 @@ classdef MovingBar < aod.builtin.protocols.SpatialProtocol
 % Syntax:
 %   obj = MovingBar(varargin);
 %
+% Parent:
+%   aod.builtin.protocols.SpatialProtocol
+%
 % Properties:
 %   direction
 %   barWidth

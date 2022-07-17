@@ -15,7 +15,8 @@ classdef SpectralTypes
         Red          
         Green        
         Blue         
-        Yellow       
+        Yellow 
+        Generic
     end
 
     methods 

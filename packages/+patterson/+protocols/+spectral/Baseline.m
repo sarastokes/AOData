@@ -1,11 +1,11 @@
-classdef Baseline < aod.builtin.protocols.SpatialProtocol 
+classdef Baseline < patterson.protocols.SpectralProtocol
 % BASELINE
 %
 % Description:
-%   A constant display at baseIntensity (contrast set to 0)
+%   A constant display at baseIntensity
 %
 % Parent:
-%   aod.builtin.protocols.SpatialProtocol
+%   patterson.protocols.SpectralProtocol
 %
 % Constructor:
 %   obj = Baseline(calibration, varargin)
@@ -13,13 +13,14 @@ classdef Baseline < aod.builtin.protocols.SpatialProtocol
 % Notes:
 %   Contrast is set to 0, baseIntensity determines value. 
 %   TailTime and PreTime are set to 0, stimTime determines timing
+%   SpectralClass set to Luminance if cone-isolating, which is equivalent
 % ------------------------------------------------------------------------- 
 
     methods
         function obj = Baseline(calibration, varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(...
+            obj = obj@patterson.protocols.SpectralProtocol(...
                 calibration, varargin{:});
-
+            
             % Input checking
             assert(obj.stimTime>0, 'StimTime must be greater than 0');
 
@@ -27,6 +28,9 @@ classdef Baseline < aod.builtin.protocols.SpatialProtocol
             obj.contrast = 0;
             obj.preTime = 0;
             obj.tailTime = 0;
+            if obj.spectralClass.isConeIsolating()
+                obj.spectralClass = aod.builtin.SpectralTypes.Luminance;
+            end
         end
     end
 
@@ -34,9 +38,13 @@ classdef Baseline < aod.builtin.protocols.SpatialProtocol
         function trace = temporalTrace(obj)
             trace = obj.baseIntensity + zeros(1, obj.totalSamples);
         end
-
+        
         function stim = generate(obj)
             stim = obj.temporalTrace();
+        end
+
+        function ledValues = mapToStimulator(obj)
+            ledValues = mapToStimulator@patterson.protocols.SpectralProtocol(obj);
         end
 
         function fName = getFileName(obj)

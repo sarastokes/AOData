@@ -59,6 +59,10 @@ classdef Chirp < patterson.protocols.SpectralProtocol
             trace = obj.generate();
         end
 
+        function ledValues = mapToStimulator(obj)
+            ledValues = mapToStimulator@patterson.protocols.SpectralProtocol(obj);
+        end
+
         function fName = getFileName(obj)
             % GETFILENAME
             %
