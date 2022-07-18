@@ -1,4 +1,4 @@
-classdef DecrementIncrement < aod.builtin.protocols.SpatialProtocol
+classdef DecrementIncrement < patterson.protocols.SpatialProtocol
 % DECREMENTINCREMENT
 %
 % Description:
@@ -16,7 +16,7 @@ classdef DecrementIncrement < aod.builtin.protocols.SpatialProtocol
 
     methods 
         function obj = DecrementIncrement(varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(varargin{:});
+            obj = obj@patterson.protocols.SpatialProtocol(varargin{:});
 
             % Derived properties
             obj.stepTime = obj.stimTime/2;

@@ -80,14 +80,14 @@ classdef Chirp < patterson.protocols.SpectralProtocol
             % Syntax:
             %   fName = getFileName(obj)
             % -------------------------------------------------------------
-            if obj.reverse
+            if obj.reversed
                 stimName = 'chirp';
             else
                 stimName = 'reverse_chirp';
             end
             
             fName = sprintf('%s_%s_%us_%up_%ut',... 
-                lower(char(obj.spectralClass)), stimName, obj.stimTime...
+                lower(char(obj.spectralClass)), stimName, obj.stimTime,...
                 100*obj.baseIntensity, floor(obj.totalTime));
         end
     end

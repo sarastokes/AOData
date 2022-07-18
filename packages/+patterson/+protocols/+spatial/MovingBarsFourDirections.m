@@ -1,4 +1,4 @@
-classdef MovingBarsFourDirections < aod.builtin.protocols.SpatialProtocol
+classdef MovingBarsFourDirections < patterson.protocols.SpatialProtocol
 % MOVINGBARFOURDIRECTIONS
 %
 % Description:
@@ -21,7 +21,7 @@ classdef MovingBarsFourDirections < aod.builtin.protocols.SpatialProtocol
 
     methods
         function obj = MovingBarsFourDirections(calibration, varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(calibration, varargin{:});
+            obj = obj@patterson.protocols.SpatialProtocol(calibration, varargin{:});
 
             ip = inputParser();
             ip.CaseSensitive = false;

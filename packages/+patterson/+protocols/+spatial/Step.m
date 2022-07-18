@@ -1,4 +1,4 @@
-classdef Step < aod.builtin.protocols.SpatialProtocol
+classdef Step < patterson.protocols.SpatialProtocol
 % STEP
 %
 % Description:
@@ -20,7 +20,7 @@ classdef Step < aod.builtin.protocols.SpatialProtocol
 
     methods
         function obj = Step(calibration, varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(calibration, varargin{:});
+            obj = obj@patterson.protocols.SpatialProtocol(calibration, varargin{:});
         end
 
         function stim = generate(obj)

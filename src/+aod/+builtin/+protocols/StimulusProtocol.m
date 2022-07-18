@@ -126,13 +126,6 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
                 value = obj.baseIntensity * obj.contrast;
             end
         end
-
-        function appendGroupingProperties(obj, varargin)
-            numProps = nargin - 1;
-            for i = 1:numProps
-                obj.groupBy = cat(2, obj.groupBy, varargin{:});
-            end
-        end
     end
 
     % Convenience methods

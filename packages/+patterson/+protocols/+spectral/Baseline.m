@@ -29,7 +29,7 @@ classdef Baseline < patterson.protocols.SpectralProtocol
             obj.preTime = 0;
             obj.tailTime = 0;
             if obj.spectralClass.isConeIsolating()
-                obj.spectralClass = aod.builtin.SpectralTypes.Luminance;
+                obj.spectralClass = patterson.SpectralTypes.Luminance;
             end
         end
     end

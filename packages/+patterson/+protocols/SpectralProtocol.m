@@ -1,4 +1,4 @@
-classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
+classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
 % SPECTRALPROTOCOL (abstract)
 %
 % Description:
@@ -8,7 +8,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
 %   obj = SpectralProtocol(calibration, varargin)
 %
 % Parent:
-%   aod.builtin.protocols.SpectralProtocol
+%   aod.builtin.protocols.StimulusProtocol
 %
 % Properties:
 %   spectralClass           ao.builtin.SpectralTypes
@@ -34,13 +34,14 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
 %
 % Inherited methods for subclasses to potentially overwrite:
 %   value = calculateTotalTime(obj)
+%   value = calculateAmplitude(obj)
 %
 % See aod.builtin.protocols.StimulusProtocol and aod.core.Protocol for
 %   additional inherited methods
 % -------------------------------------------------------------------------
 
     properties
-        spectralClass           aod.builtin.SpectralTypes
+        spectralClass           patterson.SpectralTypes
     end
 
     properties (Dependent, Access = protected)
@@ -56,15 +57,15 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
     methods
     
         function obj = SpectralProtocol(calibration, varargin)
-            obj = obj@aod.builtin.protocols.SpectralProtocol(calibration, varargin{:});
+            obj = obj@aod.builtin.protocols.StimulusProtocol(calibration, varargin{:});
 
             ip = inputParser();
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;
-            addParameter(ip, 'SpectralClass', aod.builtin.SpectralTypes.Luminance);
+            addParameter(ip, 'SpectralClass', patterson.SpectralTypes.Luminance);
             parse(ip, varargin{:});
 
-            obj.spectralClass = aod.builtin.SpectralTypes.init(...
+            obj.spectralClass = patterson.SpectralTypes.init(...
                 ip.Results.SpectralClass);
         end
 
@@ -89,7 +90,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
             stim = obj.generate();
             bkgdPowers = obj.calibration.stimPowers.Background;
 
-            import aod.builtin.SpectralTypes;
+            import patterson.SpectralTypes;
             if obj.spectralClass.isSpectral
                 % Assumes 1st value is background for all LEDs
                 ledValues = zeros(3, numel(stim));
@@ -116,6 +117,31 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
             % -------------------------------------------------------------
             ledValues = obj.mapToStimulator();
             makeLEDStimulusFile(fName, ledValues);
+        end     
+
+        function fName = getFileName(obj) %#ok<MANU> 
+            % Overwrite in subclasses if needed
+            fName = 'SpectralStimulus';
+        end
+    end
+
+    methods
+        function ledPlot(obj)
+            % LEDPLOT
+            %
+            % Description:
+            %   Plots the powers of each LED
+            %
+            % Syntax:
+            %   ledPlot(obj)
+            % -------------------------------------------------------------
+            ledValues = obj.mapToStimulator();
+            ax = ledPlot(ledValues, obj.pts2sec(1:size(ledValues, 2)));
+            title(ax, obj.getFileName(), 'Interpreter','none');
+            xlabel(ax, 'Time (sec)');
+            ylabel(ax, 'Power (uW)');
+            figPos(ax.Parent, 1.5, 1);
+            tightfig(ax.Parent);
         end
     end
 end

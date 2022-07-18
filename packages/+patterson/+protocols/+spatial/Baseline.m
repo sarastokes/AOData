@@ -1,11 +1,11 @@
-classdef Baseline < aod.builtin.protocols.SpatialProtocol 
+classdef Baseline < patterson.protocols.SpatialProtocol 
 % BASELINE
 %
 % Description:
 %   A constant display at baseIntensity
 %
 % Parent:
-%   aod.builtin.protocols.SpatialProtocol
+%   patterson.protocols.SpatialProtocol
 %
 % Constructor:
 %   obj = Baseline(calibration, varargin)
@@ -17,7 +17,7 @@ classdef Baseline < aod.builtin.protocols.SpatialProtocol
 
     methods
         function obj = Baseline(calibration, varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(...
+            obj = obj@patterson.protocols.SpatialProtocol(...
                 calibration, varargin{:});
 
             % Input checking

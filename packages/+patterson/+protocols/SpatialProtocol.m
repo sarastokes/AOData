@@ -29,7 +29,7 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
 %   plotTemporalTrace(obj)
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
-        % Shared by all Spatial Protocols
+        % Shared by all Protocols
         sampleRate = 25
         stimRate = 25
     end
@@ -95,6 +95,9 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
                 stim = uint8(stim - 1);
                 stim = reshape(stim, [x y t]);
             end
+
+            % Rotate counter-clockwise (1P system applies clockwise rotation)
+            stim = rot90(stim);
         end
 
         function writeStim(obj, fName)
@@ -105,9 +108,15 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             % -------------------------------------------------------------
             if nargin < 2
                 fName = obj.getFileName();
-            else
-                assert(endsWith(fName, '.avi'), 'Filename must end with .avi');
             end
+
+            [~, ~, ext] = fileparts(fName);
+            if isempty(ext)
+                fName = [fName, '.avi'];
+            else
+                assert(contains(ext, 'avi'), 'File extension must be AVI');
+            end
+
             stim = obj.mapToStimulator();
             v = VideoWriter(fName, 'Grayscale AVI');
             v.FrameRate = 25;

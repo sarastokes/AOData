@@ -1,4 +1,4 @@
-classdef MovingBar < aod.builtin.protocols.SpatialProtocol
+classdef MovingBar < patterson.protocols.SpatialProtocol
 % MOVINGBAR
 %
 % Description:
@@ -8,7 +8,7 @@ classdef MovingBar < aod.builtin.protocols.SpatialProtocol
 %   obj = MovingBar(varargin);
 %
 % Parent:
-%   aod.builtin.protocols.SpatialProtocol
+%   patterson.protocols.SpatialProtocol
 %
 % Properties:
 %   direction
@@ -35,7 +35,7 @@ classdef MovingBar < aod.builtin.protocols.SpatialProtocol
 
     methods
         function obj = MovingBar(calibration, varargin)
-            obj = obj@aod.builtin.protocols.SpatialProtocol(calibration, varargin{:});
+            obj = obj@patterson.protocols.SpatialProtocol(calibration, varargin{:});
             
             ip = inputParser();
             addParameter(ip, 'Direction', 0, @(x) x >= 0 & x <= 360);

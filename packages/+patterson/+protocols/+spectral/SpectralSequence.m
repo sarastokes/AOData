@@ -48,7 +48,7 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
             obj.pulseTime = ip.Results.PulseTime;
 
             % Override default parameters
-            obj.spectralClass = aod.builtin.SpectralTypes.Generic;
+            obj.spectralClass = patterson.SpectralTypes.Generic;
 
             % Derived properties
             obj.numPulses = numel(obj.spectralSequence);
@@ -77,7 +77,7 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
             spectralClasses = [];
             for i = 1:obj.numPulses
                 spectralClasses = cat(1, spectralClasses,...
-                    aod.builtin.SpectralTypes.init(obj.spectralSequence(i)));
+                    patterson.SpectralTypes.init(obj.spectralSequence(i)));
             end
 
             ledValues = obj.baseIntensity * repmat(bkgdPowers', [1 numel(stim)]);

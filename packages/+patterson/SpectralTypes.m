@@ -21,7 +21,7 @@ classdef SpectralTypes
 
     methods 
         function tf = isSpectral(obj)
-            import aod.builtin.SpectralTypes;
+            import patterson.SpectralTypes;
             if obj == SpectralTypes.Red || obj == SpectralTypes.Green...
                     || obj == SpectralTypes.Blue || obj == SpectralTypes.Yellow
                 tf = true;
@@ -31,7 +31,7 @@ classdef SpectralTypes
         end
         
         function tf = isConeIsolating(obj)
-            import aod.builtin.SpectralTypes;
+            import patterson.SpectralTypes;
             if obj == SpectralTypes.Liso || SpectralTypes.Miso || ...
                     SpectralTypes.Siso || SpectralTypes.LMiso || ...
                     SpectralTypes.Isoluminance
@@ -42,7 +42,7 @@ classdef SpectralTypes
         end
 
         function value = getAbbrev(obj)
-            import aod.builtin.SpectralTypes;
+            import patterson.SpectralTypes;
             switch obj
                 case SpectralTypes.Red
                     value = 'R';
@@ -68,7 +68,7 @@ classdef SpectralTypes
         end
 
         function value = whichLEDs(obj)
-            import aod.builtin.SpectralTypes;
+            import patterson.SpectralTypes;
             switch obj
                 case SpectralTypes.Red
                     value = [1 0 0];
@@ -92,7 +92,7 @@ classdef SpectralTypes
             % Syntax:
             %   ledValues = getStimulus(obj, cal, stim)
             % -------------------------------------------------------------
-            import aod.builtin.SpectralTypes;
+            import patterson.SpectralTypes;
             if obj.isSpectral
                 % Assumes 1st value is background for all LEDs
                 ledValues = zeros(3, numel(stim));
@@ -120,11 +120,11 @@ classdef SpectralTypes
             %   Initialize object from spectral type name
             %
             % Syntax:
-            %   obj = aod.builtin.SpectralTypes.init(str)
+            %   obj = patterson.SpectralTypes.init(str)
             % -------------------------------------------------------------
-            import aod.builtin.SpectralTypes;
+            import patterson.SpectralTypes;
 
-            if isa(str, 'aod.builtin.SpectralTypes')
+            if isa(str, 'patterson.SpectralTypes')
                 obj = str;
                 return
             end
