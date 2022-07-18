@@ -4,14 +4,22 @@ classdef Chirp < patterson.protocols.SpectralProtocol
 % Description:
 %   A sinusoidal modulation linearly increasing in temporal frequency
 %
+% Parent:
+%   patterson.protocols.SpectralProtocol
+%
+% Constructor:
+%   obj = Chirp(calibration, varargin)
+%
 % Properties:
+%   startFreq                       First frequency (hz)
+%   stopFreq                        Final frequency (hz)
+%   reversed                        Reverse chirp (high to low freqs)
+% Properties (inherited)
 %   preTime
 %   stimTime
 %   tailTime
 %   baseIntensity
 %   contrast
-%   startFreq
-%   stopFreq
 %
 % Reference:
 %   Baden et al (2016) Nature
@@ -20,6 +28,7 @@ classdef Chirp < patterson.protocols.SpectralProtocol
     properties
         startFreq
         stopFreq
+        reversed
     end
 
     methods
@@ -32,10 +41,12 @@ classdef Chirp < patterson.protocols.SpectralProtocol
             ip.KeepUnmatched = true;
             addParameter(ip, 'StartFreq', 0.5, @isnumeric);
             addParameter(ip, 'StopFreq', 30, @isnumeric);
+            addParameter(ip, 'Reversed', false, @islogical);
             parse(ip, varargin{:});
 
             obj.startFreq = ip.Results.StartFreq;
             obj.stopFreq = ip.Results.StopFreq;
+            obj.reversed = ip.Results.Reversed;
         end
         
         function stim = generate(obj)
@@ -50,13 +61,13 @@ classdef Chirp < patterson.protocols.SpectralProtocol
                     * obj.baseIntensity + obj.baseIntensity;
             end
 
+            if obj.reversed
+                stim = flipud(stim);
+            end
+
             % Add pre time and tail time
             stim = obj.appendPreTime(stim);
             stim = obj.appendTailTime(stim);
-        end
-
-        function trace = temporalTrace(obj)
-            trace = obj.generate();
         end
 
         function ledValues = mapToStimulator(obj)
@@ -69,8 +80,15 @@ classdef Chirp < patterson.protocols.SpectralProtocol
             % Syntax:
             %   fName = getFileName(obj)
             % -------------------------------------------------------------
-            fName = sprintf('%s_chirp_%up_%ut_%s', lower(char(obj.spectralClass)),...
-                100*obj.baseIntensity, floor(obj.totalTime), getTodaysDate());
+            if obj.reverse
+                stimName = 'chirp';
+            else
+                stimName = 'reverse_chirp';
+            end
+            
+            fName = sprintf('%s_%s_%us_%up_%ut',... 
+                lower(char(obj.spectralClass)), stimName, obj.stimTime...
+                100*obj.baseIntensity, floor(obj.totalTime));
         end
     end
 end

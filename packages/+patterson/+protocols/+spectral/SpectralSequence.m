@@ -69,10 +69,6 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
             end
         end
 
-        function trace = temporalTrace(obj)
-            trace = obj.generate();
-        end
-
         function ledValues = mapToStimulator(obj)
             stim = obj.generate();
             ups = getModulationTimes(stim);

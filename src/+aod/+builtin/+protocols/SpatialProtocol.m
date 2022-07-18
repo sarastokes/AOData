@@ -1,5 +1,5 @@
 classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
-% SPATIALPROTOCOL
+% SPATIALPROTOCOL (abstract)
 %
 % Description:
 %   Spatial stimuli presented with a laser through the scanning system
@@ -20,10 +20,13 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
 % Abstract methods (from aod.core.Protocol, implement in subclasses):
 %   stim = obj.generate()
 %
-% Methods:
+% Methods (inherited, implemented by subclasses):
 %   fName = getFileName(obj)
-%   stim = mapToLaser(obj)
+%   stim = mapToStimulator(obj)
 %   writeStim(obj, fName)
+% Methods (optional):
+%   trace = temporalTrace(obj)
+%   plotTemporalTrace(obj)
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         % Shared by all Spatial Protocols
@@ -114,6 +117,53 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             end
             close(v);
             fprintf('Finished writing %s\n', fName);
+        end
+    end
+
+    methods
+        function trace = temporalTrace(obj)
+            % TEMPORALTRACE
+            %
+            % Description:
+            %   Vector representation of stimulus over time. Default shows
+            %   base intensity and a step to contrast value during stim
+            %   time. Subclass to tailor for other stimuli. This is useful
+            %   for getting a 1D temporal representation of a 3D spatial
+            %   stimulus for plotting
+            %
+            % Syntax:
+            %   trace = temporalTrace(obj);
+            % -------------------------------------------------------------
+            trace = obj.baseIntensity + zeros(1, obj.totalPoints);
+            if obj.stimTime > 0
+                prePts = obj.sec2pts(obj.preTime);
+                stimPts = obj.sec2pts(obj.stimTime);
+                trace(prePts+1:prePts+stimPts) = obj.amplitude + obj.baseIntensity;
+            end
+        end
+        
+        function h = plotTemporalTrace(obj)
+            % PLOTTEMPORALTRACE
+            %   
+            % Description:
+            %   Create a quick plot of the protocol's temporal trace
+            %
+            % Syntax:
+            %   h = plotTemporalTrace(obj)
+            %
+            % Output:
+            %   h               handle to line plotting stimulus trace
+            % -------------------------------------------------------------
+            trace = obj.temporalTrace();
+
+            ax = axes('Parent', figure()); hold on;
+            h = plot(ax, obj.pts2sec(1:numel(trace)), trace, 'LineWidth', 1);
+            title(ax, class(obj));
+            xlabel('Time (sec)');
+            ylabel('Normalized');
+            axis(ax, 'tight');
+            ylim(ax, [0 1]);
+            grid(ax, 'on');
         end
     end
 end

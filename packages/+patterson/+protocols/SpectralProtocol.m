@@ -1,5 +1,5 @@
 classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
-% SPECTRALPROTOCOL
+% SPECTRALPROTOCOL (abstract)
 %
 % Description:
 %   SpectralProtocol for LED stimuli presented on 1P system
@@ -77,7 +77,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.SpectralProtocol
         end       
 
         function stim = generate(obj)
-            stim = obj.temporalTrace();
+            error('Must be implemented by subclasses');
         end
 
         function ledValues = mapToStimulator(obj)

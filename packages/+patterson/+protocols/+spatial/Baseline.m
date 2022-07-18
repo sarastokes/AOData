@@ -2,7 +2,7 @@ classdef Baseline < aod.builtin.protocols.SpatialProtocol
 % BASELINE
 %
 % Description:
-%   A constant display at baseIntensity (contrast set to 0)
+%   A constant display at baseIntensity
 %
 % Parent:
 %   aod.builtin.protocols.SpatialProtocol
