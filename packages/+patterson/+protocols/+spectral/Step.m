@@ -34,7 +34,8 @@ classdef Step < patterson.protocols.SpectralProtocol
                     abs(100*obj.contrast), obj.totalTime);
             else
                 [a, b] = parseModulation(obj.baseIntensity, obj.contrast);
-                fName = [sprintf('%s_%s_%up_%us_%ut', a, b,... 
+                fName = [sprintf('%s_%s_%s_%up_%us_%ut',...
+                    lower(char(obj.spectralClass)), a, b,... 
                     abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
             end
         end

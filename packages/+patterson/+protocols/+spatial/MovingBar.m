@@ -4,11 +4,11 @@ classdef MovingBar < patterson.protocols.SpatialProtocol
 % Description:
 %   A bar that moves...
 %
-% Syntax:
-%   obj = MovingBar(varargin);
-%
 % Parent:
 %   patterson.protocols.SpatialProtocol
+%
+% Syntax:
+%   obj = MovingBar(varargin);
 %
 % Properties:
 %   direction
@@ -16,6 +16,9 @@ classdef MovingBar < patterson.protocols.SpatialProtocol
 %   barSpeed
 %   useAperture
 %   repeats
+%
+% Inherited properties:
+%   See aod.builtin.protocols.StimulusProtocol
 %
 % Derived properties;
 %   startFrames
@@ -80,7 +83,7 @@ classdef MovingBar < patterson.protocols.SpatialProtocol
         end
         
         function stim = generate(obj)
-            warning('Not yet implemented!');
+            warning('Not yet implemented within ao-data-tools!');
         end
 
         function fName = getFileName(obj)

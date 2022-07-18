@@ -105,7 +105,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             elseif obj.spectralClass == SpectralTypes.Luminance
                 ledValues = stim .* (bkgdPowers');
             elseif obj.spectralClass.isConeIsolating
-                ledValues = cal.calcStimulus(obj.getAbbrev(), stim);
+                ledValues = obj.calibration.calcStimulus(obj.spectralClass, stim);
             end
         end
 

@@ -32,12 +32,13 @@ classdef SpectralTypes
         
         function tf = isConeIsolating(obj)
             import patterson.SpectralTypes;
-            if obj == SpectralTypes.Liso || SpectralTypes.Miso || ...
-                    SpectralTypes.Siso || SpectralTypes.LMiso || ...
-                    SpectralTypes.Isoluminance
-                tf = true;
-            else
-                tf = false;
+            switch obj
+                case {SpectralTypes.Liso, SpectralTypes.Miso,...
+                        SpectralTypes.Siso, SpectralTypes.LMiso,...
+                        SpectralTypes.Isoluminance}
+                    tf = true;
+                otherwise
+                    tf = false;
             end
         end
 
@@ -52,7 +53,7 @@ classdef SpectralTypes
                     value = 'B';
                 case SpectralTypes.Yellow
                     value = 'Y';
-                case SpectralTypes.Isouminance
+                case SpectralTypes.Isoluminance
                     value = 'Isolum';
                 case SpectralTypes.Luminance
                     value = 'Lum';

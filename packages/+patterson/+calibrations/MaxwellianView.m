@@ -36,6 +36,17 @@ classdef MaxwellianView < aod.core.Calibration
 
             obj.loadCalibrationFile()
         end
+
+        function stim = calcStimulus(obj, whichStim, baseStim)
+            if isa(whichStim, 'patterson.SpectralTypes')
+                whichStim = whichStim.getAbbrev();
+            end
+
+            dPower = obj.stimPowers.(whichStim)';
+            bkgdPower = obj.stimPowers.Background';
+
+            stim = (dPower .* ((1/baseStim(1)) * (baseStim-baseStim(1))) + bkgdPower);
+        end
     end
 
     methods (Access = private)

@@ -28,12 +28,17 @@ classdef Step < patterson.protocols.SpatialProtocol
             stim(:, :, obj.preFrames+1:obj.preFrames+obj.stimFrames) = obj.amplitude;
         end
 
-        function fName = getFileName(obj)
-            [a, b] = parseModulation(obj.baseIntenity, obj.contrast);
-            fName = [sprintf('%s_%s_%up_%us_%ut', a, b,... 
-                abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
-            if obj.tailTime == 0
-                fName = ['step_', fName];
+        function fName = getFileName(obj)           
+            if obj.tailTime == 0 && obj.baseIntensity == 0
+                fName = sprintf('lights_on_%u_%u',...
+                    abs(100*obj.contrast), obj.totalTime);
+            elseif obj.tailTime == 0 && obj.contrast == -1
+                fName = sprintf('lights_off_%u_%u',...
+                    abs(100*obj.contrast), obj.totalTime);
+            else
+                [a, b] = parseModulation(obj.baseIntenity, obj.contrast);
+                fName = [sprintf('%s_%s_%up_%us_%ut', a, b,... 
+                    abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
             end
         end
     end

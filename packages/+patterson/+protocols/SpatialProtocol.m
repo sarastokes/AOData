@@ -67,7 +67,7 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             %   Apply nonlinearity and change to uint8
             %
             % Syntax:
-            %   stim = mapToLaser(obj)
+            %   stim = mapToStimulator(obj)
             % -------------------------------------------------------------
             stim = obj.generate();
             lookupFit = fit(obj.Calibration.Data.Value, obj.Calibration.Data.Power,...
@@ -151,19 +151,21 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             end
         end
         
-        function h = plotTemporalTrace(obj)
+        function h = plotTemporalTrace(obj, trace)
             % PLOTTEMPORALTRACE
             %   
             % Description:
             %   Create a quick plot of the protocol's temporal trace
             %
             % Syntax:
-            %   h = plotTemporalTrace(obj)
+            %   h = plotTemporalTrace(obj, trace)
             %
             % Output:
             %   h               handle to line plotting stimulus trace
             % -------------------------------------------------------------
-            trace = obj.temporalTrace();
+            if nargin < 2
+                trace = obj.temporalTrace();
+            end
 
             ax = axes('Parent', figure()); hold on;
             h = plot(ax, obj.pts2sec(1:numel(trace)), trace, 'LineWidth', 1);
