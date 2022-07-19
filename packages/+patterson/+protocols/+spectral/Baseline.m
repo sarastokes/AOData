@@ -10,6 +10,14 @@ classdef Baseline < patterson.protocols.SpectralProtocol
 % Constructor:
 %   obj = Baseline(calibration, varargin)
 %
+% Inherited properties:
+%   spectralClass           patterson.SpectralTypes
+%   preTime                 Fixed to 0
+%   stimTime                
+%   tailTime                Fixed to 0
+%   contrast                Fixed to 0
+%   baseIntensity           
+%
 % Notes:
 %   Contrast is set to 0, baseIntensity determines value. 
 %   TailTime and PreTime are set to 0, stimTime determines timing

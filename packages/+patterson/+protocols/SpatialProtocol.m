@@ -177,4 +177,10 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             grid(ax, 'on');
         end
     end
+
+    methods (Access = protected)
+        function stim = initStimulus(obj)
+            stim = obj.baseIntensity + zeros(obj.canvasSize(1), obj.canvasSize(2), obj.totalPoints);   
+        end
+    end
 end

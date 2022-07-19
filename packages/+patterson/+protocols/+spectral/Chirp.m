@@ -19,7 +19,6 @@ classdef Chirp < patterson.protocols.SpectralProtocol
 %   stimTime
 %   tailTime
 %   baseIntensity
-%   contrast
 %
 % Reference:
 %   Baden et al (2016) Nature
@@ -47,6 +46,9 @@ classdef Chirp < patterson.protocols.SpectralProtocol
             obj.startFreq = ip.Results.StartFreq;
             obj.stopFreq = ip.Results.StopFreq;
             obj.reversed = ip.Results.Reversed;
+
+            % Overwrites
+            obj.contrast = 1;
         end
         
         function stim = generate(obj)
@@ -81,9 +83,9 @@ classdef Chirp < patterson.protocols.SpectralProtocol
             %   fName = getFileName(obj)
             % -------------------------------------------------------------
             if obj.reversed
-                stimName = 'chirp';
-            else
                 stimName = 'reverse_chirp';
+            else
+                stimName = 'chirp';
             end
             
             fName = sprintf('%s_%s_%us_%up_%ut',... 

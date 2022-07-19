@@ -1,6 +1,6 @@
 # ao-data-tools
 
-Framework for organizing and analyzing imaging experiments. Designed for adaptive optics but likely applies well to other imaging datasets.
+Framework for organizing and analyzing imaging experiments. Designed with adaptive optics experiments in mind but applies well to other imaging datasets. Draws on ideas from other open source data frameworks, especially [NeurodataWithoutBorders](https://github.com/NeurodataWithoutBorders) and [Symphony](https://github.com/Symphony-DAS/symphony-matlab). 
 
 ### Organization 
 
@@ -8,18 +8,19 @@ For storing data and metadata associated with an experiment:
 
 - **Dataset**
   - Subject
-    - Eye 
+    - Subject (nestable) 
   - Calibration
   - Regions
   - Epoch
     - Registration
-    - **Response**
+    - Response
+      - Timing
     - Stimulus
    - Analysis
 
 Although there are multiple approaches for converting an experiment into a `Dataset` object, the `Creator` class has access to all the building functions within `Dataset` and can provide a standardized way of building customized `Dataset` objects.
 
-For creating stimulus protocols, there is also the `Protocol` class. The advantage of using this class is standardizing stimulus creation. The `Stimulus` class stores the `Protocol` name and parameters, making it possible to recreate the `Protocol` object later on and restore the exact stimulus used.
+For creating stimulus protocols, there is also the `Protocol` class. The advantage of using this class is standardizing stimulus creation. The `Stimulus` class stores the `Protocol` name and parameters, making it possible to recreate the `Protocol` object later on and regenerate the exact stimulus used.
 
 
 ### Examples

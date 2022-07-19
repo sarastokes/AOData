@@ -48,11 +48,6 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
 
     methods
         function stim = generate(obj)
-            % GENERATE
-            %
-            % Syntax:
-            %   stim = generate(obj)
-            % -------------------------------------------------------------
             dt = 1 / obj.stimRate;
             t = 0:dt:obj.stimTime-dt;
             stim = sin(2*pi*obj.temporalFrequency*t);
@@ -72,15 +67,15 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
         end
         
         function fName = getFileName(obj)
-            % GETFILENAME
-            % 
-            % Syntax:
-            %   fName = getFileName(obj)
-            % -------------------------------------------------------------
-            fName = sprintf('luminance_%s_%uhz_%up_%ut_%s.txt',...
-                obj.temporalClass, obj.temporalFrequency,...
-                100*obj.baseIntensity, obj.totalTime,...
-                datetime(datestr(now), 'Format', 'ddMMMuuuu'));
+            if obj.sinewave
+                modulationType = 'sine';
+            else
+                modulationType = 'square';
+            end
+            fName = sprintf('%s_%s_%s_%uhz_%up_%ut_%s.txt',...
+                lower(char(obj.spectralClass)), obj.temporalClass,... 
+                obj.temporalFrequency, 100*obj.baseIntensity, obj.totalTime);
+                % datetime(datestr(now), 'Format', 'ddMMMuuuu'));
         end
     end
 end

@@ -2,7 +2,17 @@ classdef SpectralTypes
 % SPECTRALTYPES
 %
 % Description:
-%   Enumeration of potential spectral types
+%   Enumeration of spectral stimulus types
+%
+% Methods:
+%   tf = obj.isSpectral()
+%   tf = obj.isConeIsolating()
+%   txt = obj.getAbbrev()
+%   rgb = obj.whichLEDs()
+%   ledValues = obj.getStimulus(calibration)
+%
+% Static methods:
+%   obj = SpectralTypes.init(name)
 % -------------------------------------------------------------------------
 
     enumeration
@@ -16,17 +26,22 @@ classdef SpectralTypes
         Green        
         Blue         
         Yellow 
+        Cyan
+        Magenta
         Generic
     end
 
     methods 
         function tf = isSpectral(obj)
             import patterson.SpectralTypes;
-            if obj == SpectralTypes.Red || obj == SpectralTypes.Green...
-                    || obj == SpectralTypes.Blue || obj == SpectralTypes.Yellow
-                tf = true;
-            else
-                tf = false;
+            
+            switch obj
+                case {SpectralTypes.Red, SpectralTypes.Green,...
+                        SpectralTypes.Blue, SpectralTypes.Yellow,...
+                        SpectralTypes.Cyan, SpectralTypes.Magenta}
+                    tf = true;
+                otherwise
+                    tf = false;
             end
         end
         
@@ -53,6 +68,10 @@ classdef SpectralTypes
                     value = 'B';
                 case SpectralTypes.Yellow
                     value = 'Y';
+                case SpectralTypes.Cyan
+                    value = 'C';
+                case SpectralTypes.Magenta
+                    value = 'M';
                 case SpectralTypes.Isoluminance
                     value = 'Isolum';
                 case SpectralTypes.Luminance
@@ -79,6 +98,10 @@ classdef SpectralTypes
                     value = [0 0 1];
                 case SpectralTypes.Yellow
                     value = [1 1 0];
+                case SpectralTypes.Cyan
+                    value = [0 1 1];
+                case SpectralTypes.Magenta
+                    value = [1 0 1];
                 otherwise
                     value = [1 1 1];
             end
@@ -151,6 +174,10 @@ classdef SpectralTypes
                     obj = SpectralTypes.Blue;
                 case {'y', 'yellow'}
                     obj = SpectralTypes.Yellow;
+                case {'c', 'cyan'}
+                    obj = SpectralTypes.Cyan;
+                case {'p', 'magenta'}
+                    obj = SpectralTypes.Magenta;
                 otherwise
                     error('Unrecognized SpectralTypes: %s', str);
                     

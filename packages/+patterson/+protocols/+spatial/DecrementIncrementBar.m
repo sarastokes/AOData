@@ -51,9 +51,13 @@ classdef DecrementIncrementBar < patterson.protocols.spatial.DecrementIncrement
         end
 
         function stim = generate(obj)
-            stim = obj.baseIntensity + zeros(obj.canvasSize(1), obj.canvasSize(2), obj.totalSamples);   
-            for i = 1:obj.totalSamples
-                stim((obj.barID-1) * obj.barSize+1 : obj.barID*obj.barSize, i) = trace(i);
+            stim = obj.initStimulus();   
+            for i = 1:obj.totalPoints
+                stim(:, (obj.barID-1) * obj.barSize+1 : obj.barID*obj.barSize, i) = trace(i);
+            end
+            
+            if strcmp(obj.orientation, 'horizontal')
+                stim = stim';
             end
         end
 

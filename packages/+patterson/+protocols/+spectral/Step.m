@@ -9,6 +9,14 @@ classdef Step < patterson.protocols.SpectralProtocol
 %
 % Constructor:
 %   obj = Step(calibration, varargin)
+%
+% Inherited properties:
+%   spectralClass           patterson.SpectralTypes
+%   preTime
+%   stimTime                Time of each step + return to baseline (sec)
+%   tailTime
+%   contrast                List of contrasts for each step (positive)
+%   baseIntensity           Fixed to 0
 % -------------------------------------------------------------------------
 
     methods
