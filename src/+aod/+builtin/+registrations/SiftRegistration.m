@@ -14,5 +14,21 @@ classdef SiftRegistration < aod.core.Registration
 
             obj.addParameter(varargin{:});
         end
+
+        function imStack = apply(obj, imStack)
+            try
+                tform = affine2d_to_3d(obj.Data);
+                viewObj = affineOutputView(size(imStack), tform,...
+                    'BoundsStyle', 'SameAsInput');
+                imStack = imwarp(imStack, tform, 'OutputView', viewObj);
+            catch
+                [x, y, t] = size(imStack);
+                refObj = imref2d([x y]);
+                for i = 1:t
+                    imStack(:,:,i) = imwarp(imStack(:,:,i), refObj,...
+                        obj.Data, 'OutputView', refObj);
+                end 
+            end
+        end
     end
 end 

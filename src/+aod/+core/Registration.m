@@ -26,6 +26,10 @@ classdef Registration < aod.core.Entity
             obj.registrationParameters = aod.core.Parameters();
         end
 
+        function varargout = apply(obj, varargin) %#ok<*STOUT,*INUSD> 
+            error('Not yet implemented');
+        end
+
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %
