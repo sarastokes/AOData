@@ -35,6 +35,10 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
 % Protected methods:
 %   value = calculateTotalTime(obj)
 %   value = calculateAmplitude(obj)
+%
+% Notes:
+%   - Contrast can be set by passing 'contrast', value to constructor or 
+%     calculated from absolute intensity by passing 'intensity', value
 % -------------------------------------------------------------------------
     properties
         preTime  
@@ -70,13 +74,18 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
             addParameter(ip, 'TailTime', 0, @isnumeric);
             addParameter(ip, 'BaseIntensity', 0.5, @isnumeric);
             addParameter(ip, 'Contrast', 1, @isnumeric);
+            addParameter(ip, 'Intensity', [], @isnumeric);
             parse(ip, varargin{:});
 
             obj.preTime = ip.Results.PreTime;
             obj.stimTime = ip.Results.StimTime;
             obj.tailTime = ip.Results.TailTime;
             obj.baseIntensity = ip.Results.BaseIntensity;
-            obj.contrast = ip.Results.Contrast;
+            if ~isempty(ip.Results.Intensity)
+                obj.contrast = ip.Results.Intensity / obj.baseIntensity;
+            else
+                obj.contrast = ip.Results.Contrast;
+            end
         end
 
         function value = get.amplitude(obj)

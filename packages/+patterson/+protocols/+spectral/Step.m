@@ -13,10 +13,10 @@ classdef Step < patterson.protocols.SpectralProtocol
 % Inherited properties:
 %   spectralClass           patterson.SpectralTypes
 %   preTime
-%   stimTime                Time of each step + return to baseline (sec)
+%   stimTime                
 %   tailTime
-%   contrast                List of contrasts for each step (positive)
-%   baseIntensity           Fixed to 0
+%   contrast                
+%   baseIntensity           
 % -------------------------------------------------------------------------
 
     methods
@@ -26,7 +26,11 @@ classdef Step < patterson.protocols.SpectralProtocol
         end
 
         function stim = generate(obj)
-            stim = generate@patterson.protocols.SpectralProtocol(obj);
+            stim = obj.baseIntensity + zeros(1, obj.totalPoints);
+
+            prePts = obj.sec2pts(obj.preTime);
+            stimPts = obj.sec2pts(obj.stimTime);
+            stim(prePts+1:stimPts) = obj.amplitude + obj.baseIntensity;
         end
 
         function ledValues = mapToStimulator(obj)
