@@ -1,8 +1,14 @@
 classdef (Abstract) TextReader < aod.core.FileReader
-% TEXTREADER
+% TEXTREADER (abstract)
 %
 % Description:
 %   Superclass for text reader classes, useful methods for robust code
+%
+% Parent:
+%   obj = aod.core.FileReader
+%
+% Constructor:
+%   obj = TextReader(varargin)
 %
 % Protected methods:
 %   txt = readProperty(obj, header, N)

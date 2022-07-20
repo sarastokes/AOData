@@ -45,7 +45,7 @@ classdef Epoch < aod.core.Epoch
     end
 
     properties (Dependent)
-        transform
+        transform           % aod.builtin.registrations.SiftRegistration
     end
 
     methods
@@ -126,32 +126,6 @@ classdef Epoch < aod.core.Epoch
         function videoName = getCoreVideoName(obj)
             videoName = obj.getFilePath('AnalysisVideo');
         end
-
-        function imStack = applyTransform(obj, imStack)
-            % APPLYTRANSFORM
-            %
-            % Syntax:
-            %   imStack = applyTransform(obj, imStack)
-            % -------------------------------------------------------------
-            if isempty(obj.transform)
-                return
-            end
-
-            fprintf('Applying transform... ');
-            try
-                tform = affine2d_to_3d(obj.transform);
-                viewObj = affineOutputView(size(imStack), tform,... 
-                    'BoundsStyle','SameAsInput');
-                imStack = imwarp(imStack, tform, 'OutputView', viewObj);
-            catch
-                [x, y, t] = size(imStack);
-                refObj = imref2d([x y]);
-                for i = 1:t
-                    imStack(:,:,i) = imwarp(imStack(:,:,i), refObj,...
-                        obj.transform, 'OutputView', refObj);
-                end
-            end
-        end
     end
 
     % Overwritten methods
@@ -175,7 +149,9 @@ classdef Epoch < aod.core.Epoch
             imStack = obj.readStack(videoName);
             imStack(:,:,1) = [];
 
-            imStack = obj.applyTransform(imStack);
+            if ~isempty(obj.transform)
+                imStack = obj.transform.apply(imStack);
+            end
             obj.cachedVideo = imStack;
 
             fprintf('Done\n');

@@ -1,5 +1,13 @@
 classdef (Abstract) FileReader < handle
-
+% FILEREADER (abstract)
+%
+% Description:
+%   Standardized interface for reading files
+%
+% Constructor:
+%   obj = FileReader(varargin)
+%
+% -------------------------------------------------------------------------
     properties (SetAccess = protected)
         Path 
         Name
@@ -26,10 +34,16 @@ classdef (Abstract) FileReader < handle
     methods
         function obj = FileReader(varargin)
             if nargin == 1
-                % assert(isfile(varargin{1}), 'Single input must be file name!');
-                [obj.Path, obj.Name, obj.Extension] = fileparts(varargin{1});
+                % Treat as file name, pass to getFileName() if invalid
+                try
+                    [obj.Path, obj.Name, obj.Extension] = fileparts(varargin{1});
+                catch
+                    obj.getFileName(varargin{:});
+                end
             elseif nargin > 1
                 obj.getFileName(varargin{:});
+            elseif nargin == 0
+                return      % Useful for subclasses to own initialization
             end
         end
 

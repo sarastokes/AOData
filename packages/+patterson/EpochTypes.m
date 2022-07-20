@@ -3,16 +3,26 @@ classdef EpochTypes
     enumeration
         Spectral
         Spatial
-        Anatomy
+        AnatomyOneChannel
+        AnatomyTwoChannel
         Unknown
     end
 
     methods
         function tf = isPhysiology(obj)
-            if obj == patterson.EpochTypes.Spectral || obj == patterson.EpochTypes.Spatial
-                tf = true;
+            switch obj
+                case {EpochTypes.Spectral, EpochTypes.Spatial}
+                    tf = true;
+                otherwise
+                    tf = false;
+            end
+        end
+
+        function value = numChannels(obj)
+            if obj == patterson.EpochTypes.AnatomyOneChannel
+                value = 1;
             else
-                tf = false;
+                value = 2;
             end
         end
     end
@@ -29,8 +39,10 @@ classdef EpochTypes
                     obj = patterson.EpochTypes.Spectral;
                 case 'spatial'
                     obj = patterson.EpochTypes.Spatial;
-                case 'anatomy'
-                    obj = patterson.EpochTypes.Anatomy;
+                case 'anatomy1'
+                    obj = patterson.EpochTypes.AnatomyOneChannel;
+                case 'anatomy2'
+                    obj = patterson.EpochTypes.AnatomyTwoChannel;
                 case 'unknown'
                     obj = patterson.EpochTypes.Unknown;
                 otherwise

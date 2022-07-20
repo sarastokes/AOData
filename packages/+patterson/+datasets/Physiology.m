@@ -62,7 +62,7 @@ classdef Physiology < patterson.Dataset
             % Syntax:
             %   obj.setStimTable()
             %
-            % Todo: Revisit to decide who/when calls this fcn
+            % TODO: Revisit to decide who/when calls this fcn
             % -------------------------------------------------------------
             protocols = "";
             stimNames = "";

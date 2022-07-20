@@ -4,6 +4,19 @@ classdef (Abstract) Dataset < aod.core.Entity
 % Constructor:
 %   obj = Dataset(expDate, source)
 %
+% Properties:
+%   Epochs
+%   Source
+%   Regions
+%   Calibrations
+%   homeDirectory
+%   experimentDate              
+%   datasetParameters
+%   epochIDs                    list of epoch IDs in dataset
+%
+% Private properties:
+%   baseDirectory               folder used to initialize Dataset
+%
 % Public methods:
 %   setHomeDirectory(obj, filePath)
 %   id = id2epoch(obj, epochID)

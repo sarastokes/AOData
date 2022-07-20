@@ -106,8 +106,8 @@ classdef PhysiologyCreator < aod.core.Creator
             fName = [obj.Dataset.homeDirectory, filesep, 'Ref', filesep, fName];
         end
 
+
         function extractEpochAttributes(obj, ep)
-            % TODO: make this a FileReader class
             epochID = ep.ID;
             fName = obj.getAttributeFile(epochID);
 
@@ -120,16 +120,6 @@ classdef PhysiologyCreator < aod.core.Creator
             txt = strsplit(ep.files('TrialFile'), filesep);
             ep.addParameter('StimulusName', txt{end});
 
-            ep.addFile('StimVideoName',...
-                readProperty(fName, 'Stimulus video = '));
-            ep.addFile('BackgroundVideoName',...
-                readProperty(fName, 'Background video = '));
-
-            txt = readProperty(fName, 'Stimulus location in linear stabilized space = ');
-            txt = erase(txt, '('); txt = erase(txt, ')');
-            txt = strsplit(txt, ', ');
-            ep.addParameter('StimulusLocation', [str2double(txt{1}), str2double(txt{2})]);
-
             txt = readProperty(fName, 'Scanner FOV = ');
             txt = erase(txt, ' (496 lines) degrees');
             txt = strsplit(txt, ' x ');
@@ -141,10 +131,6 @@ classdef PhysiologyCreator < aod.core.Creator
             dx = str2double(readProperty(fName, 'ImagingWindowDX = '));
             dy = str2double(readProperty(fName, 'ImagingWindowDY = '));
             ep.addParameter('ImagingWindow', [x y dx dy]);
-
-            % Power modulation 
-            ep.addParameter('PowerModulation',... 
-                convertYesNo(readProperty(fName, 'Stimulus power modulation = ')));
 
             % Channel parameters
             ep.addParameter('RefGain',... 
@@ -163,15 +149,65 @@ classdef PhysiologyCreator < aod.core.Creator
             mustangValue = str2double(readProperty(fName, 'AOM_VALUE1 = '));
             stim = patterson.stimuli.Mustang(ep, mustangValue);
             ep.addStimulus(stim);
+
+            switch ep.epochType
+                case patterson.EpochTypes.Spatial
+                    obj.extractSpatialAttributes(ep, fName);
+                case patterson.EpochTypes.Spectral
+                    obj.extractSpectralAttributes(ep, fName);
+            end
+        end
+
+        function extractSpectralAttributes(obj, ep, fName)
+            % EXTRACTSPECTRALATTRIBUTES
+            %
+            % Description:
+            %   Extract attributes specific to spectral stimulus epochs
+            % -------------------------------------------------------------
+            % Reflectance window
+            x = str2double(readProperty(fName, 'ReflectanceWindowX = '));
+            y = str2double(readProperty(fName, 'ReflectanceWindowY = '));
+            dx = str2double(readProperty(fName, 'ReflectanceWindowDX = '));
+            dy = str2double(readProperty(fName, 'ReflectanceWindowDY = '));
+            ep.addParameter('ReflectanceWindow', [x y dx dy]);
+
+            % LED stimulus specifications
+            ep.addParameter('LedInterval',...
+                str2double(readProperty(fName, 'Interval value = ')));
+            ep.addParameter('LedIntervalUnit',...
+                readProperty(fName, 'Interval unit = '));
+            
+            % LUT files (may not be necessary with Calibration class)
+            ep.addFile('LUT1', readProperty(fName, 'LUT1 = '));
+            ep.addFile('LUT2', readProperty(fName, 'LUT2 = '));
+            ep.addFile('LUT3', readProperty(fName, 'LUT3 = '));
+        end
+
+        function extractSpatialAttributes(obj, ep, fName)
+            % Video names
+            ep.addFile('StimVideoName',...
+                readProperty(fName, 'Stimulus video = '));
+            ep.addFile('BackgroundVideoName',...
+                readProperty(fName, 'Background video = '));
+            
+            % Stimulus location
+            txt = readProperty(fName, 'Stimulus location in linear stabilized space = ');
+            txt = erase(txt, '('); txt = erase(txt, ')');
+            txt = strsplit(txt, ', ');
+            ep.addParameter('StimulusLocation', [str2double(txt{1}), str2double(txt{2})]);
+            
+            % Power modulation 
+            ep.addParameter('PowerModulation',... 
+                convertYesNo(readProperty(fName, 'Stimulus power modulation = ')));
         end
 
         function populateFileNames(obj, ep)
             epochID = ep.ID;
-            % Ref channel search parameters
+            % Channel One search parameters
             refFiles = ls([obj.Dataset.homeDirectory, 'Ref']);
             refFiles = string(deblank(refFiles));
             refStr = ['ref_', int2fixedwidthstr(epochID, 4)];
-            % Vis channel search parameters
+            % Channel Two search parameters
             visFiles = ls([obj.Dataset.homeDirectory, 'Vis']);
             visFiles = string(deblank(visFiles));
             visStr = ['vis_', int2fixedwidthstr(epochID, 4)];
