@@ -1,14 +1,14 @@
-classdef StepSpacedBars < patterson.protocols.spatial.Step 
-% STEPSPACEDBARS
+classdef PulseSpacedBars < patterson.protocols.spatial.Pulse 
+% PULSESPACEDBARS
 %
 % Description:
 %   Series of spaced-out bars
 %
 % Parent:
-%   patterson.protocols.spatial.Step
+%   patterson.protocols.spatial.Pulse
 %
 % Syntax:
-%   obj = StepSpacedBars(calibration, varargin)
+%   obj = PulseSpacedBars(calibration, varargin)
 %
 % Properties:
 %   barWidth                    Width of each bar in pixels
@@ -35,8 +35,8 @@ classdef StepSpacedBars < patterson.protocols.spatial.Step
     end
 
     methods
-        function obj = StepSpacedBars(calibration, varargin)
-            obj = obj@patterson.protocols.spatial.Step(calibration, varargin{:});
+        function obj = PulseSpacedBars(calibration, varargin)
+            obj = obj@patterson.protocols.spatial.Pulse(calibration, varargin{:});
 
             ip = inputParser();
             ip.CaseSensitive = false;
@@ -88,7 +88,7 @@ classdef StepSpacedBars < patterson.protocols.spatial.Step
         end
 
         function fName = getFileName(obj)
-            fName = getFileName@patterson.protocols.spatial.Step(obj);
+            fName = getFileName@patterson.protocols.spatial.Pulse(obj);
             fName = [fName, '_', sprintf('spaced_bars_%upix_%uof%u',...
                 obj.barWidth, obj.seriesID, obj.numBars)];
         end

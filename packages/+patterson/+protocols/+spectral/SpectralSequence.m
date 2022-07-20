@@ -5,24 +5,24 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
 %   A series of LED-specific pulses
 %
 % Parent:
-%   patterson.protocols.SpectralSequence
+%   patterson.protocols.SpectralProtocol
 %
 % Constructor:
 %   obj = SpectralProtocol(calibration, varargin)
 % 
 % Properties:
-%   spectralSequence            LED sequence (e.g. 'RGW', 'BYW')
+%   sequence                    LED sequence (e.g. 'RGW', 'BYW')
 %   pulseTime                   Time of each pulse in spectral series
 %   stimTime                    Time for each pulse (pulse + baseline)
 %   contrast                    Percent of LED max values for pulse
 %
 % Derived properties:
 %   interpulseTime              Time b/w pulses (stimTime-pulseTime)
-%   numPulses                   Number of letters in spectralSequence
+%   numPulses                   Number of letters in sequence
 % -------------------------------------------------------------------------
 
     properties
-        spectralSequence
+        sequence
         pulseTime
     end
 
@@ -40,18 +40,18 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;
             addParameter(ip, 'Intensity', 0.75, @isnumeric);
-            addParameter(ip, 'SpectralSequence', 'RGW', @ischar);
+            addParameter(ip, 'Sequence', 'RGW', @ischar);
             addParameter(ip, 'PulseTime', 5, @isnumeric);
             parse(ip, varargin{:});
 
-            obj.spectralSequence = ip.Results.SpectralSequence;
+            obj.sequence = ip.Results.Sequence;
             obj.pulseTime = ip.Results.PulseTime;
 
             % Override default parameters
             obj.spectralClass = patterson.SpectralTypes.Generic;
 
             % Derived properties
-            obj.numPulses = numel(obj.spectralSequence);
+            obj.numPulses = numel(obj.sequence);
             obj.interpulseTime = obj.stimTime - obj.pulseTime;
         end
     end
@@ -77,7 +77,7 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
             spectralClasses = [];
             for i = 1:obj.numPulses
                 spectralClasses = cat(1, spectralClasses,...
-                    patterson.SpectralTypes.init(obj.spectralSequence(i)));
+                    patterson.SpectralTypes.init(obj.sequence(i)));
             end
 
             ledValues = obj.baseIntensity * repmat(bkgdPowers', [1 numel(stim)]);
@@ -92,7 +92,7 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
 
         function fName = getFileName(obj)
             fName = sprintf('%s_seq_%us_%um_%up_%ut',...
-                lower(obj.spectralSequence), obj.pulseTime, 100*obj.contrast,...
+                lower(obj.sequence), obj.pulseTime, 100*obj.contrast,...
                 100*obj.baseIntensity, obj.totalTime);
         end
 

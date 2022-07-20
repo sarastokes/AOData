@@ -1,11 +1,11 @@
-classdef Step < patterson.protocols.SpatialProtocol
-% STEP
+classdef Pulse < patterson.protocols.SpatialProtocol
+% PULSE
 %
 % Description:
 %   A spatially-uniform change in intenstiy
 %
 % Constructor:
-%   obj = patterson.protocols.spatial.Step(varargin)
+%   obj = patterson.protocols.spatial.Pulse(varargin)
 %
 % Inherited properties:
 %   preTime
@@ -19,7 +19,7 @@ classdef Step < patterson.protocols.SpatialProtocol
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Step(calibration, varargin)
+        function obj = Pulse(calibration, varargin)
             obj = obj@patterson.protocols.SpatialProtocol(calibration, varargin{:});
         end
 

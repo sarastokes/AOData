@@ -11,7 +11,7 @@ classdef IsoluminanceBoost < patterson.protocols.spectral.Steps
 
     methods 
         function obj = IsoluminanceBoost(calibration, varargin)
-            obj = obj@patterson.protocols.spectralStep(...
+            obj = obj@patterson.protocols.Steps(...
                 calibration, varargin{:});
 
             ip = inputParser();

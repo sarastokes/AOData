@@ -1,8 +1,13 @@
-classdef ScannerSimulation < patterson.protocols.spectral.Step 
+classdef ScannerSimulation < patterson.protocols.spectral.Pulse 
 % SCANNERSIMULATION
+%
+% Presents stimulus modulated temporally as if through a scanning system
 %
 % Constructor:
 %   obj = ScannerSimulation(calibration, varargin)
+%
+% Parent:
+%   patterson.protocols.spectral.Pulse
 %
 % Properties
 %   pulseTime                           Pulse time (ms)
@@ -25,7 +30,7 @@ classdef ScannerSimulation < patterson.protocols.spectral.Step
 
     methods
         function obj = ScannerSimulation(calibration, varargin)
-            obj = obj@patterson.protocols.spectral.Step(...
+            obj = obj@patterson.protocols.spectral.Pulse(...
                 calibration, varargin{:});
 
             % Input checking

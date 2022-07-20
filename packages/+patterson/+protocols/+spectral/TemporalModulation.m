@@ -15,7 +15,7 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
 % -------------------------------------------------------------------------
     properties
         temporalFrequency       % temporal frequency of modulation in Hz
-        sinewave                % sinewave or squarewave, logical (true)
+        modulationClass         % 'sinewave' or 'squarewave'
     end
 
     properties (Dependent)
@@ -30,11 +30,12 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;
             addParameter(ip, 'TemporalFrequency', 5, @isnumeric);
-            addParameter(ip, 'Sinewave', true, @islogical);
+            addParameter(ip, 'ModulationClass', 'square', ...
+                @(x) ismember(x, {'square', 'sine'}));
             parse(ip, varargin{:});
 
             obj.temporalFrequency = ip.Results.TemporalFrequency;
-            obj.sinewave = ip.Results.Sinewave;
+            obj.modulationClass = ip.Results.ModulationClass;
         end
 
         function value = get.temporalClass(obj)
@@ -51,7 +52,12 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
             dt = 1 / obj.stimRate;
             t = 0:dt:obj.stimTime-dt;
             stim = sin(2*pi*obj.temporalFrequency*t);
+            if strcmp(obj.modulationClass, 'square')
+                stim = sign(stim);
+            end
+            stim = stim * obj.baseIntensity + obj.baseIntensity;
             stim = obj.amplitude * stim;
+
 
 
             if obj.preTime > 0
@@ -67,13 +73,8 @@ classdef TemporalModulation < aod.builtin.protocols.SpectralProtocol
         end
         
         function fName = getFileName(obj)
-            if obj.sinewave
-                modulationType = 'sine';
-            else
-                modulationType = 'square';
-            end
             fName = sprintf('%s_%s_%s_%uhz_%up_%ut_%s.txt',...
-                lower(char(obj.spectralClass)), obj.temporalClass,... 
+                lower(char(obj.spectralClass)), obj.modulationClass,... 
                 obj.temporalFrequency, 100*obj.baseIntensity, obj.totalTime);
                 % datetime(datestr(now), 'Format', 'ddMMMuuuu'));
         end

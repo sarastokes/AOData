@@ -1,14 +1,14 @@
-classdef StepBar < patterson.protocols.spatial.Step
-% STEPBAR
+classdef PulseBar < patterson.protocols.spatial.Pulse
+% PULSEBAR
 %
 % Description:
 %   Individual bar presented as a decrement followed by an increment
 %
 % Constructor:
-%   obj = StepBar(stimTime, varargin)
+%   obj = PulseBar(stimTime, varargin)
 %
 % Parent class:
-%   patterson.protocols.spatial.Step
+%   patterson.protocols.spatial.Pulse
 %
 % Properties (set as optional key/value inputs):
 %   numBars
@@ -30,8 +30,8 @@ classdef StepBar < patterson.protocols.spatial.Step
     end
 
     methods
-        function obj = StepBar(calibration, varargin)
-            obj = obj@patterson.protocols.spatial.Step(calibration, varargin{:});
+        function obj = PulseBar(calibration, varargin)
+            obj = obj@patterson.protocols.spatial.Pulse(calibration, varargin{:});
             
             ip = inputParser();
             ip.CaseSensitive = false;
@@ -74,7 +74,7 @@ classdef StepBar < patterson.protocols.spatial.Step
         end
 
         function fName = getFileName(obj)
-            fName = getFileName@patterson.protocols.spatial.Step(obj);
+            fName = getFileName@patterson.protocols.spatial.Pulse(obj);
             fName = [fName,'_', obj.orientation, ...
                 sprintf('_bar_%uof%u', obj.barID, obj.numBars)];
         end

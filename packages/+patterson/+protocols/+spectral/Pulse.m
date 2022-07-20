@@ -1,5 +1,5 @@
-classdef Step < patterson.protocols.SpectralProtocol
-% STEP
+classdef Pulse < patterson.protocols.SpectralProtocol
+% PULSE
 % 
 % Description:
 %   An change in intensity from a specified background level
@@ -8,7 +8,7 @@ classdef Step < patterson.protocols.SpectralProtocol
 %   patterson.protocols.SpectralProtocol
 %
 % Constructor:
-%   obj = Step(calibration, varargin)
+%   obj = Pulse(calibration, varargin)
 %
 % Inherited properties:
 %   spectralClass           patterson.SpectralTypes
@@ -20,7 +20,7 @@ classdef Step < patterson.protocols.SpectralProtocol
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Step(calibration, varargin)
+        function obj = Pulse(calibration, varargin)
             obj = obj@patterson.protocols.SpectralProtocol(...
                 calibration, varargin{:});
         end
