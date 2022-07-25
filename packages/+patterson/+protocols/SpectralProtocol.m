@@ -87,6 +87,9 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             % Syntax:
             %   ledValues = mapToStimulator(obj)
             % -------------------------------------------------------------
+            assert(isa(obj.calibration, 'patterson.calibrations.MaxwellianView'),...
+                'SpectralProtocol/mapToStimulator: requires MaxwellianView calibration');
+                
             stim = obj.generate();
             bkgdPowers = obj.calibration.stimPowers.Background;
 
@@ -142,6 +145,29 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             ylabel(ax, 'Power (uW)');
             figPos(ax.Parent, 1.5, 1);
             tightfig(ax.Parent);
+        end
+
+        function stimPlot(obj, trace)
+            % STIMPLOT
+            %
+            % Description:
+            %   Plots the normalized stimulus trace from generate()
+            %
+            % Syntax:
+            %   ledPlot(obj)
+            % -------------------------------------------------------------
+            if nargin < 2
+                trace = obj.generate();
+            end
+
+            ax = axes('Parent', figure()); hold on;
+            plot(ax, obj.pts2sec(1:numel(trace)), trace, 'LineWidth', 1);
+            title(ax, class(obj));
+            xlabel('Time (sec)');
+            ylabel('Normalized');
+            axis(ax, 'tight');
+            ylim(ax, [0 1]);
+            grid(ax, 'on');
         end
     end
 end

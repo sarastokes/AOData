@@ -69,13 +69,16 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             % Syntax:
             %   stim = mapToStimulator(obj)
             % -------------------------------------------------------------
+            assert(isSubclass(obj.calibration, 'patterson.calibrations.Toptica'),...
+                'SpatialProtocol/mapToStimulator: requires Toptica calibration');
+
             stim = obj.generate();
-            lookupFit = fit(obj.Calibration.Data.Value, obj.Calibration.Data.Power,...
+            lookupFit = fit(obj.calibration.Data.Value, obj.calibration.Data.Power,...
                 'cubicinterp');
             lookupTable = lookupFit(0:255);
 
-            powerRange = max(obj.Calibration.Data.Power) - min(obj.Calibration.Data.Power);
-            powerStim = powerRange * stim + min(obj.Calibration.Data.Power);
+            powerRange = max(obj.calibration.Data.Power) - min(obj.calibration.Data.Power);
+            powerStim = powerRange * stim + min(obj.calibration.Data.Power);
 
             [x, y, t] = size(powerStim);
             powerStim = powerStim(:);
