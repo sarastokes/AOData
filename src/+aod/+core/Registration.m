@@ -16,6 +16,7 @@ classdef Registration < aod.core.Entity
 
     methods
         function obj = Registration(parent, data)
+            obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
             if nargin > 0 && ~isempty(parent)
                 obj.setParent(parent);

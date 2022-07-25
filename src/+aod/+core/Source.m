@@ -14,6 +14,7 @@ classdef (Abstract) Source < aod.core.Entity
 
     methods
         function obj = Source(parent)
+            obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Dataset',...
                 'aod.core.Source', 'aod.core.Subject', 'aod.core.Empty'};
             % Check if a parent input was supplied

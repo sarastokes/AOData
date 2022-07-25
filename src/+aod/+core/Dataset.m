@@ -52,6 +52,8 @@ classdef (Abstract) Dataset < aod.core.Entity
     
     methods 
         function obj = Dataset(homeDirectory, expDate)
+            obj = obj@aod.core.Entity();
+            
             obj.datasetParameters = containers.Map();
             if nargin > 0
                 obj.setHomeDirectory(homeDirectory);

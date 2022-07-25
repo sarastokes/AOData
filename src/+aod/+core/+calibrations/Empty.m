@@ -13,6 +13,7 @@ classdef Empty < aod.core.Calibration
 % -------------------------------------------------------------------------
     methods
         function obj = Empty(parent)
+            obj = obj@aod.core.Calibration(parent);
             calibrationDate = datestr(now);
             if nargin < 1
                 parent = [];

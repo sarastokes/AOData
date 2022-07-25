@@ -18,6 +18,7 @@ classdef (Abstract) Calibration < aod.core.Entity
 
     methods
         function obj = Calibration(calibrationDate, parent)
+            obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Dataset',... 
                 'aod.core.System', 'aod.core.Empty'};
             

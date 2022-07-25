@@ -31,6 +31,7 @@ classdef (Abstract) Entity < handle
 
     properties (SetAccess = private)
         Parent                      %aod.core.Entity 
+        UUID                        string = string.empty()
         description                 string = string.empty() 
         notes                       string = string.empty()
     end
@@ -50,6 +51,7 @@ classdef (Abstract) Entity < handle
 
     methods
         function obj = Entity()
+            obj.UUID = generateUUID();
         end
 
         function value = get.label(obj)

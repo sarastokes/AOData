@@ -25,7 +25,7 @@ classdef (Abstract) Regions < aod.core.Entity
 
     methods
         function obj = Regions(parent, rois, varargin)
-
+            obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Epoch'};
 
             if nargin > 0 && ~isempty(parent)

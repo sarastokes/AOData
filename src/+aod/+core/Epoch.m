@@ -50,6 +50,7 @@ classdef (Abstract) Epoch < aod.core.Entity
 
     methods 
         function obj = Epoch(ID, parent)
+            obj = obj@aod.core.Entity();
             if nargin > 0
                 obj.ID = ID;
             end

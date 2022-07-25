@@ -29,6 +29,7 @@ classdef Response < aod.core.Entity
 
     methods
         function obj = Response(parent)
+            obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
             if nargin > 0
                 obj.setParent(parent);

@@ -18,7 +18,6 @@ classdef Primate < aod.core.sources.Subject
         function obj = Primate(ID, parent, varargin)
             obj = obj@aod.core.sources.Subject(ID, parent);
 
-
             ip = inputParser();
             ip.CaseSensitive = false;
             addParameter(ip, 'Species', [], @ischar);
