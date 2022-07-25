@@ -4,6 +4,9 @@ classdef Analysis < aod.core.Entity
 % Description:
 %   Implements data analysis. Meant to be expanded by subclasses
 %
+% Parent:
+%   aod.core.Entity
+%
 % -------------------------------------------------------------------------
     properties
         analysisParameters

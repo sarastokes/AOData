@@ -2,7 +2,7 @@ classdef SpatialStimulus < aod.builtin.stimuli.VisualStimulus
 % SPATIALSTIMULUS`
 %
 % Constructor:
-%   obj = SpatialStimulus(parent, protocol, basePower)
+%   obj = SpatialStimulus(parent, protocol, varargin)
 %
 % Properties:
 %   basePower
@@ -19,13 +19,20 @@ classdef SpatialStimulus < aod.builtin.stimuli.VisualStimulus
     end
 
     methods
-        function obj = SpatialStimulus(parent, protocol, basePower)
+        function obj = SpatialStimulus(parent, protocol, varargin)
             if nargin < 1
                 parent = [];
             end
             obj = obj@aod.builtin.stimuli.VisualStimulus(parent, protocol);
-            if nargin > 2
-                obj.setBasePower(basePower);
+            
+            ip = inputParser();
+            ip.KeepUnmatched = true;
+            ip.CaseSensitive = false;
+            addParameter(ip, 'BasePower', [], @isnumeric);
+            parse(ip, varargin{:});
+            
+            if ~isempty(ip.Results.BasePower)
+                obj.setBasePower(ip.Results.BasePower);
             end
         end
 

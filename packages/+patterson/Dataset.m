@@ -48,7 +48,7 @@ classdef Dataset < aod.core.Dataset
             % Syntax:
             %   value = obj.getFileHeader()
             % -------------------------------------------------------------
-            value = [num2str(obj.Source.Parent.ID), '_', char(obj.experimentDate)];
+            value = [num2str(obj.Source.ID), '_', char(obj.experimentDate)];
         end
         
         function fPath = getAnalysisFolder(obj)

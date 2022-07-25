@@ -1,33 +1,34 @@
-classdef PhysiologyCreator < aod.core.Creator
+classdef Creator < aod.core.Creator
 
     properties (SetAccess = private)
         Dataset
     end
 
     methods
-        function obj = PhysiologyCreator(homeDirectory)
+        function obj = Creator(homeDirectory)
             obj@aod.core.Creator(homeDirectory);
         end
 
         function createDataset(obj, expDate, source, location, varargin)
-            obj.Dataset = patterson.datasets.Physiology(obj.homeDirectory, expDate, location);
+            obj.Dataset = patterson.datasets.Physiology(...
+                obj.homeDirectory, expDate, location);
             obj.Dataset.setSource(source);
             obj.Dataset.initParameters(varargin{:});
         end
 
-        function addEpochs(obj, epochIDs, epochType)
+        function addEpochs(obj, epochIDs, epochType, varargin)
             % ADDEPOCHS
             %
             % Syntax:
             %   obj.addEpochs(epochIDs, epochType)
             % -------------------------------------------------------------
-            if nargin < 3
+            if isempty(epochType)
                 epochType = patterson.EpochTypes.Unknown;
             end
 
             fprintf('Adding epochs... ');
             for i = 1:numel(epochIDs)
-                ep = obj.makeEpoch(epochIDs(i), epochType);          
+                ep = obj.makeEpoch(epochIDs(i), epochType, varargin{:});          
                 obj.Dataset.addEpoch(ep);
                 fprintf('%u ', epochIDs(i));
             end
@@ -76,7 +77,7 @@ classdef PhysiologyCreator < aod.core.Creator
     end
 
     methods (Access = protected)
-        function ep = makeEpoch(obj, epochID, epochType)
+        function ep = makeEpoch(obj, epochID, epochType, varargin)
             % MAKEEPOCH
             ep = patterson.Epoch(epochID, obj.Dataset, epochType);
             if epochType.isPhysiology
@@ -90,9 +91,10 @@ classdef PhysiologyCreator < aod.core.Creator
                 ep.addRegistration(reg);
             end
             if epochType == patterson.EpochTypes.Spatial
-                protocol = patterson.factories.SpatialProtocolFactory(...
-                    ep.getFilePath('TrialFile'), obj.Dataset.getCalibration('patterson.calibrations.Toptica'));
-                stimulus = aod.builtin.stimuli.SpatialStimulus(ep, protocol);
+                protocol = patterson.factories.SpatialProtocolFactory.create(...
+                    obj.Dataset.getCalibration('patterson.calibrations.Toptica'),...
+                    ep.getFilePath('TrialFile'));
+                stimulus = aod.builtin.stimuli.SpatialStimulus(ep, protocol, varargin{:});
                 ep.addStimulus(stimulus);
             end
         end
@@ -205,11 +207,11 @@ classdef PhysiologyCreator < aod.core.Creator
             epochID = ep.ID;
             % Channel One search parameters
             refFiles = ls([obj.Dataset.homeDirectory, 'Ref']);
-            refFiles = string(deblank(refFiles));
+            refFiles = deblank(string(refFiles));
             refStr = ['ref_', int2fixedwidthstr(epochID, 4)];
             % Channel Two search parameters
             visFiles = ls([obj.Dataset.homeDirectory, 'Vis']);
-            visFiles = string(deblank(visFiles));
+            visFiles = deblank(string(visFiles));
             visStr = ['vis_', int2fixedwidthstr(epochID, 4)];
 
             ep.addFile('RefVideo', ['Ref', filesep,...
@@ -221,32 +223,32 @@ classdef PhysiologyCreator < aod.core.Creator
             ep.addFile('AnalysisVideo', string(['Analysis', filesep, 'Videos', filesep, visStr, '.tif']));
 
             % Find csv output file
-            csvFiles = refFiles(multicontains(refFiles, {refStr, 'csv'}));
-            ind = find(~contains(csvFiles, 'motion'));
-            if ~isempty(ind)
-                ind = obj.checkFilesFound(ind);
-                ep.addFile('FrameReport', "Ref" + filesep + refFiles(ind));
+            csvFiles = multicontains(refFiles, {refStr, 'csv'});
+            match = find(~contains(csvFiles, 'motion'));
+            if ~isempty(match)
+                match = obj.checkFilesFound(match);
+                ep.addFile('FrameReport', "Ref" + filesep + refFiles(match));
             else
                 warning('Frame report for epoch %u not found', epochID);
             end
 
             % Find registration report
-            regFiles = refFiles(multicontains(refFiles, {'motion', 'csv'}));
-            ind = find(contains(regFiles, refStr));
-            if ~isempty(ind)
+            regFiles = multicontains(refFiles, {'motion', 'csv'});
+            match = find(contains(regFiles, refStr));
+            if ~isempty(match)
                 % Return warning if > 1 registration files found
-                if numel(ind) > 1
+                if numel(match) > 1
                     warning('%u registrations found for epoch %u, using first\n', ...
-                        numel(ind), epochID);
+                        numel(match), epochID);
                 end
-                ind = obj.checkFilesFound(ind);
-                ep.addFile('RegistrationReport', "Ref" + filesep + regFiles(ind));
+                match = obj.checkFilesFound(match);
+                ep.addFile('RegistrationReport', "Ref" + filesep + regFiles(match));
             else
                 warning('Registration report for epoch %u not found', epochID);
             end
 
             % Find registration parameters
-            regFiles = refFiles(multicontains(refFiles, {'params', 'txt'}));
+            regFiles = multicontains(refFiles, {'params', 'txt'});
             ind = find(contains(regFiles, [refStr, '_']));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
@@ -257,55 +259,55 @@ classdef PhysiologyCreator < aod.core.Creator
 
             % Find stimulus reference images
             if ep.epochType.isPhysiology
-                ind = find(contains(refFiles, [refStr, '_linear']));
-                if ~isempty(ind)
-                    ind = obj.checkFilesFound(ind);
-                    ep.addFile('ReferenceImage', "Ref" + filesep + refFiles(ind));
+                match = find(contains(refFiles, [refStr, '_linear']));
+                if ~isempty(match)
+                    match = obj.checkFilesFound(match);
+                    ep.addFile('ReferenceImage', "Ref" + filesep + match);
                 else
                     warning('Reference image for epoch %u not found', epochID);
                 end
             end
 
             % Find frame registered videos 
-            ind = find(multicontains(refFiles, {refStr, 'frame', '.avi'}));
-            if ~isempty(ind)
-                ind = obj.checkFilesFound(ind);
-                ep.addFile('RefVideoFrameReg', "Ref" + filesep + refFiles(ind));
+            match = multicontains(refFiles, {refStr, 'frame', '.avi'});
+            if ~isempty(match)
+                match = obj.checkFilesFound(match);
+                ep.addFile('RefVideoFrameReg', "Ref" + filesep + match);
             else
                 warning('Frame registered ref video for epoch %u not found', epochID);
             end
 
-            ind = find(multicontains(visFiles, {visStr, 'frame', '.avi'}));
-            if ~isempty(ind)
-                ind = obj.checkFilesFound(ind);
-                ep.addFile('VisVideoFrameReg', "Vis" + filesep + visFiles(ind));
+            match = multicontains(visFiles, {visStr, 'frame', '.avi'});
+            if ~isempty(match)
+                match = obj.checkFilesFound(match);
+                ep.addFile('VisVideoFrameReg', "Vis" + filesep + match);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
 
             % Find strip registered videos
-            ind = find(multicontains(refFiles, {refStr, 'strip', '.avi'}));
-            if ~isempty(ind)
-                ind = obj.checkFilesFound(ind);
-                ep.addFile('RefVideoStripReg', "Ref" + filesep + refFiles(ind));
+            match = multicontains(refFiles, {refStr, 'strip', '.avi'});
+            if ~isempty(match)
+                match = obj.checkFilesFound(match);
+                ep.addFile('RefVideoStripReg', "Ref" + filesep + match);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
 
-            ind = find(multicontains(visFiles, {visStr, 'strip', '.avi'}));
-            if ~isempty(ind)
-                ind = obj.checkFilesFound(ind);
-                ep.addFile('VisVideoStripReg', "Vis" + filesep + visFiles(ind));
+            match = multicontains(visFiles, {visStr, 'strip', '.avi'});
+            if ~isempty(match)
+                match = obj.checkFilesFound(match);
+                ep.addFile('VisVideoStripReg', "Vis" + filesep + match);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
 
             % Find LED stimulus files, if necessary
             if ep.epochType == patterson.EpochTypes.Spectral
-                ind = find(multicontains(visFiles, {visStr, '.json'}));
-                if ~isempty(ind)
-                    ind = obj.checkFilesFound(ind);
-                    ep.addFile('LedVoltages', "Vis" + filesep + visFiles(ind));
+                match = multicontains(visFiles, {visStr, '.json'});
+                if ~isempty(match)
+                    match = obj.checkFilesFound(match);
+                    ep.addFile('LedVoltages', "Vis" + filesep + match);
                 else
                     warning('LED voltage json files for epoch %u not found', epochID);
                 end
@@ -314,14 +316,14 @@ classdef PhysiologyCreator < aod.core.Creator
     end
 
     methods (Static)
-        function ind = checkFilesFound(ind)
+        function matches = checkFilesFound(matches)
             % CHECKFILESFOUND
             %
             % Syntax:
             %   ind = obj.checkFilesFound(ind)
             % -------------------------------------------------------------
-            if numel(ind) > 1
-                ind = ind(1);
+            if numel(matches) > 1
+                matches = matches(1);
             end
         end
     end

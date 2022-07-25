@@ -23,7 +23,7 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
             end
         end
 
-        function protocol = getProtocol(obj)
+        function protocol = getProtocol(obj, calibration)
             % GETPROTOCOL
             %
             % Description:
@@ -31,12 +31,11 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
             %
             % Syntax:
             %   protocol = getProtocol(obj)
+            %
+            % TODO: Automate calibration identification
             % ----------------------------------------------------------
             protocolFcn = str2func(obj.protocolName);
-            protocol = protocolFcn(map2struct(obj.stimulusParameters));
-            if isempty(obj.Protocol)
-                obj.Protocol = protocol;
-            end
+            protocol = protocolFcn(calibration, map2struct(obj.stimParameters));
         end
     end
 

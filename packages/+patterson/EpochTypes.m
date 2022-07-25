@@ -10,6 +10,7 @@ classdef EpochTypes
 
     methods
         function tf = isPhysiology(obj)
+            import patterson.EpochTypes;
             switch obj
                 case {EpochTypes.Spectral, EpochTypes.Spatial}
                     tf = true;
