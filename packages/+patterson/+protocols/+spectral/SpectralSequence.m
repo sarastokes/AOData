@@ -13,8 +13,12 @@ classdef SpectralSequence < patterson.protocols.SpectralProtocol
 % Properties:
 %   sequence                    LED sequence (e.g. 'RGW', 'BYW')
 %   pulseTime                   Time of each pulse in spectral series
+% Inherited properties:
+%   preTime
 %   stimTime                    Time for each pulse (pulse + baseline)
-%   contrast                    Percent of LED max values for pulse
+%   tailTime        
+%   baseIntensity
+%   contrast
 %
 % Derived properties:
 %   interpulseTime              Time b/w pulses (stimTime-pulseTime)

@@ -1,8 +1,9 @@
 ## TODO
 
 ##### Major
-- [ ] Add UIDs to all Entitys
+- [x] Add UIDs to all Entitys
 - [ ] Implement search by UID
+- [ ] Replace duplicated epoch from Creator
 
 ##### Package
 - [ ] Add rotation to 1P-specific SpatialProtocol

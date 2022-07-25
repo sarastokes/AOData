@@ -137,6 +137,48 @@ classdef SpectralTypes
     end
 
     methods (Static)
+        function obj = match(str)
+            % MATCH
+            %
+            % Description:
+            %   Search input text for spectral type, then initialize
+            %
+            % Syntax:
+            %   obj = patterson.SpectralTypes.match(str)
+            % -------------------------------------------------------------
+            import patterson.SpectralTypes;
+            
+            str = lower(str);
+
+            if contains(str, {'isoluminance', 'isolum'})
+                obj = SpectralTypes.Isoluminance;
+            elseif contains(str, {'luminance', 'achromatic', 'lmsx'})
+                obj = SpectralTypes.Luminance;
+            elseif contains(str, {'red'})
+                obj = SpectralTypes.Red;
+            elseif contains(str, {'green'})
+                obj = SpectralTypes.Green;
+            elseif contains(str, {'blue'})
+                obj = SpectralTypes.Blue;
+            elseif contains(str, {'yellow'})
+                obj = SpectralTypes.Yellow;
+            elseif contains(str, {'magenta'})
+                obj = SpectralTypes.Magenta;
+            elseif contains(str, {'cyan'})
+                obj = SpectralTypes.Cyan;
+            elseif contains(str, {'lmcone', 'lmiso'})
+                obj = SpectralTypes.LMiso;
+            elseif contains(str, {'scone', 'siso'})
+                obj = SpectralTypes.Siso;
+            elseif contains(str, {'mcone', 'miso'})
+                obj = SpectralTypes.Miso;
+            elseif contains(str, {'lcone', 'liso'})
+                obj = SpectralTypes.Liso;
+            else
+                obj = [];
+            end
+        end
+
         function obj = init(str)
             % INIT
             %

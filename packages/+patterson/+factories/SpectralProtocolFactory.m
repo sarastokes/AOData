@@ -27,7 +27,7 @@ classdef SpectralProtocolFactory < aod.core.Factory
             dateStr = extract(fileName, searchPattern);
             if ~isempty(dateStr)
                 dateStr = char(dateStr);
-                protocol.dateCreated = datetime(dateStr(2:end), 'Format', 'yyyyMMdd');
+                protocol.dateCreated = datetime(dateStr(2:end), 'Format', 'ddMMMuuuu');
             end
 
         end
@@ -37,29 +37,101 @@ classdef SpectralProtocolFactory < aod.core.Factory
         function protocol = parseProtocol(obj, fileName)
             import patterson.protocols.spectral.*;
 
+            % Determine totalTime
             totalTime = extractFlaggedNumber(fileName, 't');
 
             % Determine baseIntensity
-            baseIntensity = extractFlaggedNumber(fileName, 'p');
+            baseIntensity = extractFlaggedNumber(fileName, 'p_');
             if isempty(baseIntensity)
-                baseIntensity = extractFlaggedNumber(fileName, 'p', false);
+                baseIntensity = extractFlaggedNumber(fileName, '_p', true);
             end
             if isempty(baseIntensity)
                 baseIntensity = 0.5;
             end
 
+            % Baseline
+            if contains(fileName, 'background')
+                protocol = Baseline(obj.calibration,...
+                    'StimTime', totalTime, 'BaseIntensity', baseIntensity);
+                return
+            end
+
+            % Lights Off
             if contains(fileName, 'lights_off')
                 protocol = Step(obj.calibration,...
-                    'PreTime', 20, 'StimTime', totalTime-preTime, 'TailTime', 0,...
+                    'PreTime', 20, 'StimTime', totalTime-20, 'TailTime', 0,...
                     'BaseIntensity', baseIntensity, 'Contrast', -1);
                 return
             end
+
+            % Lights On
             if contains(fileName, 'lights_on')
                 protocol = Step(obj.calibration,...
-                    'PreTime', 20, 'StimTime', totalTime-preTime, 'TailTime', 0,...
+                    'PreTime', 20, 'StimTime', totalTime-20, 'TailTime', 0,...
                     'BaseIntensity', 0, 'Contrast', baseIntensity);
                 return
             end
+
+            % Temporal frequency tuning curves
+            if contains(fileName, {'hz', 'square'})
+                hz = extractFlaggedNumber(fileName, 'hz');
+                protocol = TemporalModulation(obj.calibration,...
+                    'PreTime', 20, 'StimTime', 60, 'TailTime', 40,...
+                    'BaseIntensity', baseIntensity, 'TemporalFrequency', hz);
+                return
+            end
+
+            % Chirps
+            if contains(fileName, 'chirp')
+                if totalTime == 190
+                    error('SpectralProtocolFactory: StepChirp not yet implemented');
+                end
+                protocol = Chirp(obj.calibration,...
+                    'PreTime', 20, 'StimTime', 100, 'TailTime', 40,...
+                    'BaseIntensity', baseIntensity);
+                return
+            end
+
+            % Sequences
+            if contains(fileName, 'seq')
+                intensity = extractFlaggedNumber(fileName, 'm');
+                sequenceType = extractCrop(fileName, lettersPattern(), '_seq');
+
+                if contains(sequenceType, 'intensity')
+                    error('SpectralProtocolFactory: IntensitySeries not yet implemented!');
+                end
+                protocol = SpectralSequence(obj.calibration,...
+                    'PreTime', 20, 'StimTime', 60, 'PulseTime', 5,...
+                    'BaseIntensity', baseIntensity, 'Intensity', intensity,...
+                    'Sequence', sequenceType);
+                return
+            end
+
+            % Increment
+            if contains(fileName, {'inc_', 'increment_'})
+                intensity = extractFlaggedNumber(fileName, 'm');
+                if isempty(intensity)
+                    intensity = extractFlaggedNumber(fileName, 'pm', true);
+                end
+
+                spectralClass = patterson.SpectralTypes.match(fileName);
+                if isempty(spectralClass)
+                    spectralClass = patterson.SpectralTypes.Luminance;
+                end
+
+                stimTime = extractFlaggedNumber(fileName, 's_');
+                if isempty(stimTime)
+                    stimTime = 20;
+                end
+
+                protocol = Pulse(obj.calibration,...
+                    'PreTime', 20, 'StimTime', stimTime, 'TailTime', totalTime-(20+stimTime),...
+                    'BaseIntensity', baseIntensity, 'Intensity', intensity,...
+                    'SpectralClass', spectralClass);
+                return
+            end
+
+            error('SpectralProtocolFactory: Did not recognize %s!', fileName);
         end
     end
             

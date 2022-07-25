@@ -1,26 +1,27 @@
-function [value, tf] = extractFlaggedNumber(txt, flagStr, trailingFlag)
+function [value, tf] = extractFlaggedNumber(txt, flagStr, leadingFlag)
 % EXTRACTFLAGGEDNUMBER
 %
 % Description:
 %   Extract numbers from text with a trailing flag (e.g. '80t', '3pix')
 %
 % Syntax:
-%   [value, tf] = extractFlaggedNumber(txt, flagStr, trailingFlag)
+%   [value, tf] = extractFlaggedNumber(txt, flagStr, leadingFlag)
 %
 % Input:
 %   txt                     text to search
 %       
-%   trailingFlag            logical (default = true)
-%       Whether the flag is after the number or not
+%   leadingFlag             logical (default = false)
+%       Whether the flag before the number
 %
 % History:
 %   16Jul2022 - SSP
+%   25Jul2022 - SSP - switched trailingFlag to leadingFlag
 % -------------------------------------------------------------------------
     if nargin < 3
-        trailingFlag = true;
+        leadingFlag = false;
     end
 
-    if trailingFlag 
+    if ~leadingFlag 
         searchPattern = digitsPattern + flagStr;
     else
         searchPattern = flagStr + digitsPattern;
@@ -33,5 +34,9 @@ function [value, tf] = extractFlaggedNumber(txt, flagStr, trailingFlag)
     else
         tf = true;
         out = char(out);
-        value = str2double(out(1:end-numel(flagStr)));
+        if leadingFlag
+            value = str2double(out(numel(flagStr)+1:end));
+        else
+            value = str2double(out(1:end-numel(flagStr)));
+        end
     end

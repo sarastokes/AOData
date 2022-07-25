@@ -31,13 +31,12 @@ classdef LedFrameTableReader < aod.core.FileReader
             % Remove extra frames and also the blank frames
             T = T(2:numFrames, :);
 
-            TT = timeseries(seconds(T.Timing), T.TimeInterval, T.TimeStamp, T.R, T.G, T.B,...
+            TT = timetable(seconds(T.Timing), T.TimeInterval, T.TimeStamp, T.R, T.G, T.B,...
                 'VariableNames', {'TimeInterval', 'TimeStamp', 'R', 'G', 'B'});
             obj.Data = TT;
             out = TT;
 
             obj.frameRate = 1000/mean(T.TimeInterval);
-            fprintf('Frame rate for %u was %.3f\n', epochID, obj.frameRate);
         end
     end
 end

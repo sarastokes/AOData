@@ -10,10 +10,21 @@ classdef Creator < aod.core.Creator
         end
 
         function createDataset(obj, expDate, source, location, varargin)
+            
+            ip = inputParser();
+            ip.KeepUnmatched = true;
+            ip.CaseSensitive = false;
+            addParameter(ip, 'Purpose', [], @istext);
+            parse(ip, varargin{:});
+            
+
             obj.Dataset = patterson.datasets.Physiology(...
                 obj.homeDirectory, expDate, location);
             obj.Dataset.setSource(source);
-            obj.Dataset.initParameters(varargin{:});
+            if ~isempty(ip.Results.Purpose)
+                obj.Dataset.setDescription(ip.Results.Purpose);
+            end
+            obj.Dataset.initParameters(ip.Unmatched);
         end
 
         function addEpochs(obj, epochIDs, epochType, varargin)
@@ -45,23 +56,32 @@ classdef Creator < aod.core.Creator
             obj.Dataset.addCalibration(calibration);
         end
     
-        function addRegions(obj, regions)
+        function addRegions(obj, fileName, imSize, UIDs)
             % ADDREGIONS
             %
             % Syntax:
-            %   obj.addRegions(regions)
+            %   obj.addRegions(fileName, imSize, UIDs)
             % -------------------------------------------------------------
+
+            [filePath, ~, ~] = fileparts(fileName);
+            if isempty(filePath)
+                fileName = fullfile(obj.Dataset.getAnalysisFolder(), fileName);
+            end
+            regions = aod.core.regions.Rois(obj.Dataset, fileName, imSize);
+            if nargin > 3 && ~isempty(UIDs)
+                regions.setRoiUIDs(UIDs);
+            end
             obj.Dataset.addRegions(regions);
         end
 
-        function addTransforms(obj, fName, epochIDs, varargin)
-            % ADDTRANSFORMS
+        function addSiftTransforms(obj, fName, epochIDs, varargin)
+            % ADDSIFTTRANSFORMS
             %
             % Syntax:
-            %   obj.addTransforms(fName, epochIDs, varargin)
+            %   obj.addSiftTransforms(fName, epochIDs, varargin)
             % -------------------------------------------------------------
             if ~isfile(fName)
-                fName = [obj.Dataset.getAnalysisFolder(), filesep, fName];
+                fName = fullfile(obj.Dataset.getAnalysisFolder(), fName);
             end
             reader = aod.builtin.readers.RigidTransformReader(fName);
             tforms = reader.read();
@@ -83,24 +103,32 @@ classdef Creator < aod.core.Creator
             if epochType.isPhysiology
                 obj.extractEpochAttributes(ep);
             end
+            % Extract filenames from experiment file
             obj.populateFileNames(ep);
+            % If a registration report was found, add StripRegistration
             if ~isempty(ep.getFilePath('RegistrationReport'))
-                reg = aod.builtin.registrations.StripRegistration(ep);
-                reader = aod.builtin.readers.RegistrationParameterReader(ep.getFilePath('RegistrationParameters'));
-                reg.addParameter(reader.read());
-                ep.addRegistration(reg);
+                obj.addStripRegistration(ep);
             end
+            % Processing specific to spatial epochs
             if epochType == patterson.EpochTypes.Spatial
                 protocol = patterson.factories.SpatialProtocolFactory.create(...
                     obj.Dataset.getCalibration('patterson.calibrations.Toptica'),...
                     ep.getFilePath('TrialFile'));
-                stimulus = aod.builtin.stimuli.SpatialStimulus(ep, protocol, varargin{:});
+                stimulus = patterson.stimuli.SpatialStimulus(ep, protocol, varargin{:});
+                ep.addStimulus(stimulus);
+            end
+            % Processing specific to spectral epochs
+            if epochType == patterson.EpochTypes.Spectral
+                protocol = patterson.factories.SpectralProtocolFactory.create(...
+                    obj.Dataset.getCalibration('patterson.calibrations.MaxwellianView'),...
+                    ep.getFilePath('TrialFile'));
+                stimulus = patterson.stimuli.SpectralStimulus(ep, protocol, varargin{:});
                 ep.addStimulus(stimulus);
             end
         end
     end
 
-    methods %(Access = protected)
+    methods (Access = protected)
         function fName = getAttributeFile(obj, epochID)
             fName = sprintf('%u_%s_ref_%s.txt',...
                 obj.Dataset.Source.ID, obj.Dataset.experimentDate,...
@@ -160,7 +188,7 @@ classdef Creator < aod.core.Creator
             end
         end
 
-        function extractSpectralAttributes(obj, ep, fName)
+        function extractSpectralAttributes(obj, ep, fName) %#ok<INUSL> 
             % EXTRACTSPECTRALATTRIBUTES
             %
             % Description:
@@ -185,7 +213,7 @@ classdef Creator < aod.core.Creator
             ep.addFile('LUT3', readProperty(fName, 'LUT3 = '));
         end
 
-        function extractSpatialAttributes(obj, ep, fName)
+        function extractSpatialAttributes(obj, ep, fName) %#ok<INUSL> 
             % Video names
             ep.addFile('StimVideoName',...
                 readProperty(fName, 'Stimulus video = '));
@@ -224,10 +252,10 @@ classdef Creator < aod.core.Creator
 
             % Find csv output file
             csvFiles = multicontains(refFiles, {refStr, 'csv'});
-            match = find(~contains(csvFiles, 'motion'));
+            match = csvFiles(~contains(csvFiles, 'motion'));
             if ~isempty(match)
                 match = obj.checkFilesFound(match);
-                ep.addFile('FrameReport', "Ref" + filesep + refFiles(match));
+                ep.addFile('FrameReport', "Ref" + filesep + match);
             else
                 warning('Frame report for epoch %u not found', epochID);
             end
@@ -312,6 +340,19 @@ classdef Creator < aod.core.Creator
                     warning('LED voltage json files for epoch %u not found', epochID);
                 end
             end
+        end
+
+        function addStripRegistration(obj, ep) %#ok<INUSL> 
+            % ADDSTRIPREGISTRATION
+            %
+            % Syntax:
+            %   addStripRegistration(obj, epoch)
+            % -------------------------------------------------------------
+            reg = aod.builtin.registrations.StripRegistration(ep);
+            reader = aod.builtin.readers.RegistrationParameterReader(...
+                ep.getFilePath('RegistrationParameters'));
+            reg.addParameter(reader.read());
+            ep.addRegistration(reg);
         end
     end
 

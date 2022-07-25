@@ -74,11 +74,17 @@ classdef Dataset < aod.core.Dataset
             ip = inputParser();
             addParameter(ip, 'TransformType', 'rigid', @ischar);
             addParameter(ip, 'ReferenceEpoch', [], @isnumeric);
+            addParameter(ip, 'WhichTforms', [], @isnumeric);
             parse(ip, varargin{:});
+
+            whichTforms = ip.Results.whichTforms;
 
             if ischar(tforms)
                 TR = ao.builtin.RigidTransformReader(tforms);
                 tforms = tformReader.read();
+                if ~isempty(whichTforms)
+                    tforms = tforms(:, :, whichTforms);
+                end
                 assert(TR.Count == numel(epochIDs), ...
                     'Epoch IDs does not match number of transforms');
             end
@@ -88,6 +94,11 @@ classdef Dataset < aod.core.Dataset
                     squeeze(tforms(:,:,i)));
                 reg.addParameter('TransformType', ip.Results.TransformType);
                 reg.addParameter('ReferenceEpoch', ip.Results.ReferenceEpoch);
+                if ~isempty(whichTforms)
+                    reg.addParameter('WhichTforms', whichTforms);
+                else
+                    reg.addParameter('WhichTforms', 1:numel(epochIDs));
+                end
                 obj.Epochs(obj.idx2epoch(epochIDs(i))).addRegistration(reg);
             end
         end

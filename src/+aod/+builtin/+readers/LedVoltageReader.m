@@ -34,8 +34,10 @@ classdef LedVoltageReader < aod.core.FileReader
                 voltage3 = cat(1, voltage3, str2double(entries{6}));
                 timestamp = cat(1, timestamp, str2double(entries{7}));
             end
+
+            timestamp = timestamp - timestamp(1) + mean(diff(timestamp));
         
-            TT = timetable(seconds(milliseconds(timestamp - timestamp(1))),... 
+            TT = timetable(milliseconds(timestamp - timestamp(1)),... 
                 frameNumber, ID, voltage1, voltage2, voltage3,...
                 'VariableNames', {'Frame', 'ID', 'R', 'G', 'B'});
             TT{end, 'Frame'} = TT{end-1, 'Frame'};

@@ -23,11 +23,6 @@ classdef TemporalModulation < patterson.protocols.SpectralProtocol
         temporalFrequency       % temporal frequency of modulation in Hz
         modulationClass         % 'sinewave' or 'squarewave'
     end
-
-    properties (Dependent)
-        temporalClass
-    end
-
     methods
         function obj = TemporalModulation(calibration, varargin)
             obj = obj@patterson.protocols.SpectralProtocol(...
@@ -43,14 +38,6 @@ classdef TemporalModulation < patterson.protocols.SpectralProtocol
 
             obj.temporalFrequency = ip.Results.TemporalFrequency;
             obj.modulationClass = ip.Results.ModulationClass;
-        end
-
-        function value = get.temporalClass(obj)
-            if obj.sinewave
-                value = 'sine';
-            else
-                value = 'square';
-            end
         end
     end
 

@@ -1,60 +1,57 @@
-classdef SpectralStimulus < aod.core.Stimulus 
-% SPECTRALSTIMULUS
-%
-% Description:
-%   A spectral stimulus produced by 3 LEDs modulated in time
-% -------------------------------------------------------------------------
+classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
+    % SPECTRALSTIMULUS
+    %
+    % Constructor:
+    %   obj = SpectralStimulus(parent, protocol, presentation)
+    %
+    % Properties:
+    %   presentation
+    %   voltages
+    % Inherited properties:
+    %   stimParameters
+    %
+    % Methods:
+    %   setPresentation(obj, presentation)
+    % Inherited methods:
+    %   addParameter(obj, varargin)
+    % ---------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        presentation        timetable
-        ledVoltages         timetable
+    properties (SetAccess = private)
+        presentation
+        frameRate
+        voltages
     end
 
-    properties (SetAccess = ?aod.core.Creator)
-        stimFileName
-        protocolName
-    end
-
-    properties (Hidden, Constant)
-        calibrationType = 'ConeIsolation';
-    end
-
-    methods 
-        function obj = SpectralStimulus(parent)
+    methods
+        function obj = SpectralStimulus(parent, protocol)
             if nargin < 1
                 parent = [];
             end
-            obj = obj@aod.core.Stimulus(parent);
-        end
-    end
-
-    methods (Access = protected)
-        function value = getLabel(obj)
-            if ~isempty(obj.stimFileName)
-                txt = strsplit(obj.stimFileName, '_');
-                value = [];
-                for i = 1:numel(txt)
-                    phrase = txt{i};
-                    if isletter(phrase(1))
-                        phrase(1) = upper(phrase(1));
-                    end
-                    value = [value, phrase]; %#ok<AGROW> 
-                end
-            else
-                value = 'Unknown';
+            obj = obj@aod.builtin.stimuli.VisualStimulus(parent, protocol);
+            if isSubclass(obj.Parent, 'aod.core.Epoch')
+                obj.importStimulusFiles();
             end
         end
     end
 
-    methods (Access = ?aod.core.Creator)
-        function addLedVoltages(obj, data)
-            % TODO: Different import strategy
-            obj.ledVoltages = data;
-        end
+    methods (Access = private)
+        function importStimulusFiles(obj)
+            % IMPORTLEDFILES
+            %
+            % Syntax:
+            %   obj.setPresentation(presentation)
+            % -------------------------------------------------------------
+            
+            % Get the LED values during each sample
+            reader = aod.builtin.readers.LedFrameTableReader(...
+                obj.Parent.getFilePath('FrameReport'));
+            obj.presentation = reader.read();
+            obj.frameRate = reader.frameRate;
 
-        function addPresentation(obj, data)
-            % TODO: Different import strategy
-            obj.ledVoltages = data;
+            % Get the command voltages in LED timing
+            reader = aod.builtin.readers.LedVoltageReader(...
+                obj.Parent.getFilePath('LedVoltages'));
+            obj.voltages = reader.read();
         end
     end
-end 
+end
