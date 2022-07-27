@@ -167,6 +167,24 @@ classdef (Abstract) Entity < handle
                 error('%s is not a valid parent', class(parent));
             end
         end
+
+        function setUUID(obj, UUID)
+            % SETUUID
+            %   
+            % Description:
+            %   Allows subclasses to set UUID to a standardized value. 
+            %   Useful in ensuring sources match across experiments
+            %
+            % Syntax:
+            %   obj.setUUID(UUID)
+            %
+            % See also:
+            %   generateUUID
+            % -------------------------------------------------------------
+            assert(isstring(UUID) & strlength(UUID) == 36,...
+                'ENTITY: UUID is not properly formatted, use generateUUID');
+            obj.UUID = UUID;
+        end
     end
 
     methods (Access = private)
@@ -200,6 +218,14 @@ classdef (Abstract) Entity < handle
 
     methods (Static)
         function tf = isEntity(x)
+            % ISENTITY
+            %
+            % Description:
+            %   Determines whether input is a subclass of Entity
+            %
+            % Syntax:
+            %   tf = aod.core.Entity.isEntity(x)
+            % -------------------------------------------------------------
             tf = isSubclass(x, 'aod.core.Entity');
         end
     end

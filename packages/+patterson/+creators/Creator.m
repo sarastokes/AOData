@@ -44,6 +44,9 @@ classdef Creator < aod.core.Creator
                 fprintf('%u ', epochIDs(i));
             end
             obj.Dataset.sortEpochs();
+            if epochType.isPhysiology()
+                obj.Dataset.populateStimSummaries();
+            end
             fprintf('\nDone.\n')
         end
 
@@ -131,7 +134,7 @@ classdef Creator < aod.core.Creator
     methods (Access = protected)
         function fName = getAttributeFile(obj, epochID)
             fName = sprintf('%u_%s_ref_%s.txt',...
-                obj.Dataset.Source.ID, obj.Dataset.experimentDate,...
+                obj.Dataset.Source.getParentID(), obj.Dataset.experimentDate,...
                 int2fixedwidthstr(epochID, 4));
             fName = [obj.Dataset.homeDirectory, filesep, 'Ref', filesep, fName];
         end

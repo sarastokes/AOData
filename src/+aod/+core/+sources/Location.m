@@ -21,14 +21,4 @@ classdef Location < aod.core.Source
             obj.identifier = identifier;
         end
     end
-
-    methods 
-        function value = getLabel(obj)
-            if isnumeric(obj.identifier)
-                value = num2str(obj.identifier);
-            else
-                value = identifier;
-            end
-        end
-    end
 end

@@ -39,9 +39,14 @@ classdef Pulse < patterson.protocols.SpectralProtocol
         
         function fName = getFileName(obj)
             [a, b] = parseModulation(obj.baseIntensity, obj.contrast);
+            if obj.baseIntensity == 0
+                magVal = obj.amplitude;
+            else
+                magVal = obj.contrast;
+            end
             fName = [sprintf('%s_%s_%s_%up_%us_%ut',...
                 lower(char(obj.spectralClass)), a, b,... 
-                abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
+                abs(100*magVal), obj.stimTime, obj.totalTime)];
         end
     end
 end
