@@ -77,7 +77,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             end
         end       
 
-        function stim = generate(obj)
+        function stim = generate(obj) %#ok<STOUT,MANU>
             error('Must be implemented by subclasses');
         end
 
@@ -91,7 +91,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
                 'SpectralProtocol/mapToStimulator: requires MaxwellianView calibration');
                 
             stim = obj.generate();
-            bkgdPowers = obj.calibration.stimPowers.Background;
+            bkgdPowers = 2 * obj.calibration.stimPowers.Background;
 
             import patterson.SpectralTypes;
             if obj.spectralClass.isSpectral
@@ -118,6 +118,12 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             % Syntax:
             %   writeStim(obj, fName)
             % -------------------------------------------------------------
+            if nargin < 2
+                fName = obj.getFileName();
+            end
+            if ~endsWith(fName, '.txt')
+                fName = [fName, '.txt'];
+            end
             ledValues = obj.mapToStimulator();
             makeLEDStimulusFile(fName, ledValues);
         end     
@@ -129,7 +135,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
     end
 
     methods
-        function ledPlot(obj)
+        function ledPlot(obj, ledValues)
             % LEDPLOT
             %
             % Description:
@@ -138,7 +144,9 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             % Syntax:
             %   ledPlot(obj)
             % -------------------------------------------------------------
-            ledValues = obj.mapToStimulator();
+            if nargin < 2
+                ledValues = obj.mapToStimulator();
+            end
             ax = ledPlot(ledValues, obj.pts2sec(1:size(ledValues, 2)));
             title(ax, obj.getFileName(), 'Interpreter','none');
             xlabel(ax, 'Time (sec)');

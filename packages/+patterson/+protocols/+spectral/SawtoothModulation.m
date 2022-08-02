@@ -70,9 +70,9 @@ classdef SawtoothModulation < patterson.protocols.SpectralProtocol
                 contrastTxt = '';
             end
             if strcmp(obj.polarityClass, 'positive')
-                polarityTxt = 'On';
+                polarityTxt = 'on';
             else
-                polarityTxt = 'Off';
+                polarityTxt = 'off';
             end
             fName = sprintf('%s_%s_sawtooth_%uhz_%s%up_%ut_%s',...
                 lower(char(obj.spectralClass)), polarityTxt,... 

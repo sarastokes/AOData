@@ -23,6 +23,7 @@ classdef TemporalModulation < patterson.protocols.SpectralProtocol
         temporalFrequency       % temporal frequency of modulation in Hz
         modulationClass         % 'sinewave' or 'squarewave'
     end
+    
     methods
         function obj = TemporalModulation(calibration, varargin)
             obj = obj@patterson.protocols.SpectralProtocol(...
@@ -49,7 +50,7 @@ classdef TemporalModulation < patterson.protocols.SpectralProtocol
             if strcmp(obj.modulationClass, 'square')
                 stim = sign(stim);
             end
-            stim = obj.amplitude * stim + obj.baseIntensity;
+            stim = (obj.amplitude * stim) + obj.baseIntensity;
 
             stim = obj.appendPreTime(stim);
             stim = obj.appendTailTime(stim);
@@ -69,6 +70,10 @@ classdef TemporalModulation < patterson.protocols.SpectralProtocol
                 lower(char(obj.spectralClass)), obj.modulationClass,... 
                 obj.temporalFrequency, contrastTxt,... 
                 100*obj.baseIntensity, obj.totalTime);
+        end
+        
+        function ledPlot(obj)
+            ledPlot@patterson.protocols.SpectralProtocol(obj);
         end
     end
 end

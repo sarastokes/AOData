@@ -82,7 +82,11 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
             obj.tailTime = ip.Results.TailTime;
             obj.baseIntensity = ip.Results.BaseIntensity;
             if ~isempty(ip.Results.Intensity)
-                obj.contrast = ip.Results.Intensity / obj.baseIntensity;
+                if obj.baseIntensity > 0
+                    obj.contrast = ip.Results.Intensity / obj.baseIntensity;
+                else
+                    obj.contrast = ip.Results.Intensity;
+                end
             else
                 obj.contrast = ip.Results.Contrast;
             end

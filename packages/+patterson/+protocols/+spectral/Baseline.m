@@ -44,7 +44,7 @@ classdef Baseline < patterson.protocols.SpectralProtocol
 
     methods
         function trace = temporalTrace(obj)
-            trace = obj.baseIntensity + zeros(1, obj.totalSamples);
+            trace = obj.baseIntensity + zeros(1, obj.totalPoints);
         end
         
         function stim = generate(obj)
@@ -56,7 +56,7 @@ classdef Baseline < patterson.protocols.SpectralProtocol
         end
 
         function fName = getFileName(obj)
-            fName = sprintf('baseline_%up_%ut', obj.baseIntensity, obj.totalTime);
+            fName = sprintf('baseline_%up_%ut', 100*obj.baseIntensity, obj.totalTime);
         end
     end
 

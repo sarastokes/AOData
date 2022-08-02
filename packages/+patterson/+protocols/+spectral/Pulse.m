@@ -48,5 +48,10 @@ classdef Pulse < patterson.protocols.SpectralProtocol
                 lower(char(obj.spectralClass)), a, b,... 
                 abs(100*magVal), obj.stimTime, obj.totalTime)];
         end
+        
+        function ledPlot(obj)
+            ledPlot@patterson.protocols.SpectralProtocol(obj,...
+                obj.mapToStimulator());
+        end
     end
 end

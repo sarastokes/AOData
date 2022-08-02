@@ -73,12 +73,33 @@ classdef SpectralProtocolFactory < aod.core.Factory
             end
 
             % Temporal frequency tuning curves
-            if contains(fileName, {'hz', 'square'})
+            if contains(fileName, 'hz')
                 hz = extractFlaggedNumber(fileName, 'hz');
-                protocol = TemporalModulation(obj.calibration,...
-                    'PreTime', 20, 'StimTime', 60, 'TailTime', 40,...
-                    'BaseIntensity', baseIntensity, 'TemporalFrequency', hz);
-                return
+                if contains(fileName, 'sawtooth')
+                    if contains(fileName, '_on_')
+                        polarityClass = 'positive';
+                    else
+                        polarityClass = 'negative';
+                    end
+                    protocol = SawtoothModulation(obj.calibration,...
+                        'PreTime', 20, 'StimTime', 60, 'TailTime', 40,...
+                        'BaseIntensity', baseIntensity,...
+                        'TemporalFrequency', temporalFrequency,...
+                        'PolarityClass', 'positive');
+                    return
+                else
+                    if contains(fileName, 'sine')
+                        modulationClass = 'sine';
+                    else
+                        modulationClass = 'square';
+                    end
+                    protocol = TemporalModulation(obj.calibration,...
+                        'PreTime', 20, 'StimTime', 60, 'TailTime', 40,...
+                        'BaseIntensity', baseIntensity,...
+                        'TemporalFrequency', hz,...
+                        'ModulationClass', modulationClass);
+                    return
+                end
             end
 
             % Chirps

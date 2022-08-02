@@ -36,20 +36,39 @@ classdef Step < patterson.protocols.spectral.Pulse
             end
             
             % Overwrites
-            if obj.tailTime > 0
-                warning('Step protocol sets tailTime = 0');
-                obj.tailTime = 0;
-            end
+            obj.tailTime = 0;
+        end
+        
+        function stim = generate(obj)
+            stim = obj.baseIntensity + zeros(1, obj.totalPoints);
+
+            prePts = obj.sec2pts(obj.preTime);
+            stim(prePts+1:end) = obj.amplitude + obj.baseIntensity;
+        end
+        
+        function ledValues = mapToStimulator(obj)
+            ledValues = mapToStimulator@patterson.protocols.spectral.Pulse(obj);
         end
 
         function fName = getFileName(obj)
             if obj.baseIntensity == 0
                 fName = sprintf('%s_lights_on_%up_%ut',...
-                    lower(obj.spectralClass), 100*obj.contrast, obj.totalTime);
+                    char(obj.spectralClass), 100*obj.contrast, obj.totalTime);
             else
                 fName = sprintf('%s_lights_off_%up_%ut',...
-                    lower(obj.spectralClass), 100*obj.baseIntensity, obj.totalTime);
+                    char(obj.spectralClass), 100*obj.baseIntensity, obj.totalTime);
             end
+            fName = lower(fName);
+        end
+        
+        function ledPlot(obj)
+            ledPlot@patterson.protocols.spectral.Pulse(obj);
+        end
+    end
+    
+    methods (Access = protected)
+        function value = calculateTotalTime(obj)
+            value = obj.preTime + obj.stimTime;
         end
     end
 end
