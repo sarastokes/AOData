@@ -24,9 +24,19 @@ classdef LedFrameTableReader < aod.core.FileReader
             
             % The final frames in the stimulus log weren't actually saved
             % Use the video size to determine which frames are relevant
-            videoPath = strrep(obj.fullFile, '.csv', '.avi');
-            v = VideoReader(videoPath);
-            numFrames = v.NumFrames;
+            try
+                fName = char(obj.fullFile);
+                videoPath = fileparts(fileparts(fName));
+                videoPath = fullfile(videoPath, 'Analysis');
+
+                videoPath = fullfile(videoPath, fName(end-11:end-4));
+                imStack = readTiffStack(videoPath);
+                numFrames = size(imStack, 3) + 1;
+            catch
+                videoPath = strrep(obj.fullFile, '.csv', '.avi');
+                v = VideoReader(videoPath);
+                numFrames = v.NumFrames;
+            end
         
             % Remove extra frames and also the blank frames
             T = T(2:numFrames, :);

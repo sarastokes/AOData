@@ -33,7 +33,7 @@ classdef Epoch < aod.core.Epoch
 %   videoName = getCoreVideoName(obj)
 % Inherited protected methods:
 %   imStack = readStack(obj, videoName)
-%   displayName = getDisplayName(obj)
+%   displayName = getLabel(obj)
 %   shortName = getShortName(obj)
 % aod.core.Creator methods:
 %   addRegistration(obj, reg, overwrite)
@@ -41,7 +41,7 @@ classdef Epoch < aod.core.Epoch
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        epochType       patterson.EpochTypes
+        epochType           patterson.EpochTypes
     end
 
     properties (Dependent)
@@ -66,7 +66,7 @@ classdef Epoch < aod.core.Epoch
             idx = find(findByClass(obj.Registrations,... 
                 'aod.builtin.registrations.SiftRegistration'));
             if ~isempty(idx)
-                value = obj.Registrations{idx}.Data;
+                value = obj.Registrations{idx};
             end
         end
     end
@@ -107,7 +107,7 @@ classdef Epoch < aod.core.Epoch
                 fPath = [obj.Parent.getAnalysisFolder(), 'Snapshots', filesep];
             end
             
-            baseName = ['_', obj.getShortName(), '.png'];
+            baseName = ['_', 'vis_', int2fixedwidthstr(obj.ID, 4), '.png'];
             imStack = obj.getStack();
             
             imSum = sum(im2double(imStack), 3);
@@ -159,7 +159,7 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = [obj.Parent.displayName, '#', int2fixedwidthstr(obj.ID, 4)];
         end
     end

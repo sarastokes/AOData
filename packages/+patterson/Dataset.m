@@ -53,12 +53,22 @@ classdef Dataset < aod.core.Dataset
         end
         
         function fPath = getAnalysisFolder(obj)
+            % GETANALYSISFOLDER
+            % 
+            % Syntax:
+            %   fPath = getAnalysisFolder(obj)
+            % -------------------------------------------------------------
             fPath = [obj.homeDirectory, filesep, 'Analysis', filesep];
         end
     end
 
     methods 
         function clearAllCachedVideos(obj)
+            % CLEARALLCACHEDVIDEOS
+            %
+            % Syntax:
+            %   clearAllCachedVideos(obj)
+            % -------------------------------------------------------------
             for i = 1:numel(obj.Epochs)
                 obj.Epochs(i).clearVideoCache();
             end
@@ -66,12 +76,21 @@ classdef Dataset < aod.core.Dataset
 
         function clearAllTransforms(obj)
             % CLEARALLTRANSFORMS
+            %
+            % Syntax:
+            %   clearAllTransforms(obj)
+            % -------------------------------------------------------------
             for i = 1:numel(obj.Epochs)
                 obj.Epochs(i).clearTransform();
             end
         end
 
         function loadTransforms(obj, tforms, epochIDs, varargin)
+            % LOADTRANSFORMS
+            %
+            % Syntax:
+            %   loadTransforms(obj, tforms, epochIDs, varargin)
+            % -------------------------------------------------------------
             ip = inputParser();
             addParameter(ip, 'TransformType', 'rigid', @ischar);
             addParameter(ip, 'ReferenceEpoch', [], @isnumeric);
@@ -101,6 +120,21 @@ classdef Dataset < aod.core.Dataset
                     reg.addParameter('WhichTforms', 1:numel(epochIDs));
                 end
                 obj.Epochs(obj.idx2epoch(epochIDs(i))).addRegistration(reg);
+            end
+        end
+
+        function makeStackSnapshots(obj, epochIDs)
+            % MAKESTACKSNAPSHOTS
+            %
+            % Syntax:
+            %   makeStackSnapshots(obj, epochIDs)
+            % -------------------------------------------------------------
+            if nargin < 2
+                epochIDs = obj.epochIDs;
+            end
+            for i = 1:numel(epochIDs)
+                epoch = obj.id2epoch(epochIDs(i));
+                epoch.makeStackSnapshots();
             end
         end
     end

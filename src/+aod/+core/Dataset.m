@@ -20,7 +20,7 @@ classdef (Abstract) Dataset < aod.core.Entity
 % Public methods:
 %   setHomeDirectory(obj, filePath)
 %   id = id2epoch(obj, epochID)
-%   idx = id2idx(obj, epochID)
+%   idx = id2index(obj, epochID)
 %   imStack = getStacks(obj, epochIDs)
 %   data = getRegionResponses(obj, epochIDs)
 % -------------------------------------------------------------------------
@@ -86,10 +86,26 @@ classdef (Abstract) Dataset < aod.core.Entity
 
     methods
         function epoch = id2epoch(obj, IDs)
+            % ID2EPOCH
+            %
+            % Description:
+            %   Input epoch ID(s), get Epoch(s)
+            %
+            % Syntax:
+            %   epoch = id2epoch(obj, IDs)
+            % -------------------------------------------------------------
             epoch = obj.Epochs(find(obj.epochIDs == IDs));
         end
 
-        function idx = id2idx(obj, IDs)
+        function idx = id2index(obj, IDs)
+            % ID2INDEX
+            %
+            % Description:
+            %   Returns index of in Epochs for a given epoch ID
+            %
+            % Syntax:
+            %   idx = id2index(obj, IDs)
+            % -------------------------------------------------------------
             idx = find(obj.epochIDs == IDs);
         end
     end
@@ -192,7 +208,7 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
     end
 
-    methods(Access = {?aod.core.Dataset, ?aod.core.Creator})
+    methods (Access = {?aod.core.Dataset, ?aod.core.Creator})
         function setSource(obj, source)
             % SETSOURCE
             %
@@ -221,7 +237,7 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
 
         function addCalibration(obj, calibration)
-            % ADDEPOCH
+            % ADDCALIBRATION
             %
             % Syntax:
             %   obj.addCalibration(obj, calibration, overwrite)
@@ -244,7 +260,7 @@ classdef (Abstract) Dataset < aod.core.Entity
                         return
                     end
                 end
-                obj.Calibrations = {obj.Calibrations; calibration};
+                obj.Calibrations = cat(1, obj.Calibrations, calibration);
             else
                 obj.Calibrations = calibration;
             end

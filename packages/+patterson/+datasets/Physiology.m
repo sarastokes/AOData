@@ -137,7 +137,7 @@ classdef Physiology < patterson.Dataset
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = ['MC', int2fixedwidthstr(num2str(obj.Source.ID), 5),...
                 '_', obj.Source.whichEye,...
                 obj.location(1), '_', char(obj.experimentDate)];
