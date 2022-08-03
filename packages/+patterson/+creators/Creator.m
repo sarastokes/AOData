@@ -51,11 +51,14 @@ classdef Creator < aod.core.Creator
         end
 
         function addCalibration(obj, calibration)
-            % ADDLEDCALIBRATION
+            % ADDCALIBRATION
             %
             % Syntax:
             %   obj.addCalibration(calibration)
             % -------------------------------------------------------------
+            if isempty(calibration.Parent) || isa(calibration.Parent, 'aod.calibrations.Empty')
+                calibration.setParent(obj.Dataset);
+            end
             obj.Dataset.addCalibration(calibration);
         end
     

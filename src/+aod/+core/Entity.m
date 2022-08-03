@@ -1,5 +1,8 @@
 classdef (Abstract) Entity < handle 
-% ENTITY
+% ENTITY (Abstract)
+%
+% Description:
+%   Base class for information related to an experiment
 %
 % Constructor:
 %   obj = aod.core.Entity()
@@ -21,9 +24,11 @@ classdef (Abstract) Entity < handle
 %   clearNotes(obj)
 %
 % Protected methods:
-%   addParent(obj, parent)
 %   x = getShortName(obj)
 %   x = getLabel(obj)
+%
+% Protected methods (w/ Creator access):
+%   addParent(obj, parent)
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
@@ -150,7 +155,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods (Access = protected)
+    methods (Access = {?aod.core.Entity, ?aod.core.Creator})
         function setParent(obj, parent)
             % SETPARENT
             %   

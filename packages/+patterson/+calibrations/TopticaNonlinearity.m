@@ -1,14 +1,18 @@
-classdef Toptica < aod.core.Calibration
-% TOPTICACALIBRATION
+classdef TopticaNonlinearity < aod.core.Calibration
+% TOPTICANONLINEARITY
 %
 % Description:
 %   Nonlinearity in visual stimuli presented with Toptica.
 %
 % Syntax:
-%   obj = Toptica(parent)
+%   obj = TopticaNonlinearity(parent)
 %
 % Parent:
 %   aod.core.Calibration
+%
+% Methods:
+%   loadCalibration(obj)
+%   stim = applyNonlinearity(obj, stim)
 %
 % Note:
 %   The Toptica's output is linear, the nonlinearity arises through the
@@ -26,7 +30,7 @@ classdef Toptica < aod.core.Calibration
     end
 
     methods
-        function obj = Toptica(parent)
+        function obj = TopticaNonlinearity(parent)
             if nargin < 0
                 parent = [];
             end
