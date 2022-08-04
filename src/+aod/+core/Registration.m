@@ -1,4 +1,4 @@
-classdef Registration < aod.core.Entity
+classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 % REGISTRATION
 %
 % Description:
@@ -6,11 +6,15 @@ classdef Registration < aod.core.Entity
 %
 % Constructor:
 %   obj = Registration(parent, data)
+%
+% Sealed methods:
+%   setRegistrationDate(obj, regDate)
+%   addParameter(obj, varargin)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         Data
-        dateCreated(1,1)                    datetime
+        registrationDate(1,1)               datetime
         registrationParameters              % aod.core.Parameters
     end
 
@@ -29,6 +33,23 @@ classdef Registration < aod.core.Entity
 
         function varargout = apply(obj, varargin) %#ok<*STOUT,*INUSD> 
             error('Not yet implemented');
+        end
+    end
+
+    methods (Sealed)
+        function setRegistrationDate(obj, regDate)
+            % SETREGISTRATIONDATE
+            %
+            % Description:
+            %   Set the date where the registration was performed
+            % 
+            % Syntax:
+            %   obj.setRegistrationDate(regDate)
+            % -------------------------------------------------------------
+            if ~isdatetime(regDate)
+                regDate = datetime(regDate, 'Format', 'YYYYMMDD');
+            end
+            obj.registrationDate = regDate;
         end
 
         function addParameter(obj, varargin)

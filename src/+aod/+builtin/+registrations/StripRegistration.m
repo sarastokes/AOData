@@ -38,7 +38,6 @@ classdef StripRegistration < aod.core.Registration
             end
             reader = aod.builtin.readers.RegistrationParameterReader(fName);
         end
-
     end
 
     methods (Access = private)

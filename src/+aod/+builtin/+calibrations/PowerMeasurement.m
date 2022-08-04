@@ -72,7 +72,7 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
                 value = value';
             end
             for i = 1:size(setting, 1)
-                obj.Setting = cat(1, obj.Setting, setting)
+                obj.Setting = cat(1, obj.Setting, setting);
                 obj.Value = cat(1, obj.Value, value);
             end
         end
@@ -91,7 +91,7 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
     end
 
     methods (Access = protected)
-        function value = getDisplayName(obj)
+        function value = getLabel(obj)
             value = [class(obj), num2str(obj.wavelength), 'nm'];
         end
     end

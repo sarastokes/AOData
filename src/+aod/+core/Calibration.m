@@ -1,14 +1,27 @@
-classdef (Abstract) Calibration < aod.core.Entity
-% CALIBRATION (abstract)
+classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
+% CALIBRATION
+%
+% Description:
+%   A calibration associated with the system or experiment
 %
 % Constructor:
 %   obj = aod.core.Calibration(calibrationDate, parent)
 %
 % Parent:
 %   aod.core.Entity
+%   matlab.mixin.Heterogeneous
 %
 % Properties:
 %   calibrationDate         date when the calibration was performed
+%   calibrationParameters   aod.core.Parameters
+%
+% Sealed methods:
+%   addParameter(obj, varargin)
+%   setCalibrationDate(obj, calibrationDate)
+%
+% Note:
+%   Inheriting matlab.mixin.Heterogeneous allows creation of arrays
+%   containing different subclasses of aod.core.Calibration
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -39,7 +52,22 @@ classdef (Abstract) Calibration < aod.core.Entity
         end
     end
 
-    methods
+    methods (Sealed)
+        function setCalibrationDate(obj, calDate)
+            % SETCALIBRATIONDATE
+            %
+            % Description:
+            %   Set the date where the calibration was performed
+            % 
+            % Syntax:
+            %   obj.setCalibrationDate(calDate)
+            % -------------------------------------------------------------
+            if ~isdatetime(calDate)
+                calDate = datetime(calDate, 'Format', 'yyyyMMdd');
+            end
+            obj.calibrationDate = calDate;
+        end
+
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %

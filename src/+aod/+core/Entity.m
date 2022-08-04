@@ -27,8 +27,9 @@ classdef (Abstract) Entity < handle
 %   x = getShortName(obj)
 %   x = getLabel(obj)
 %
-% Protected methods (w/ Creator access):
+% Sealed, protected methods (w/ Creator access):
 %   addParent(obj, parent)
+%   setUUID(obj, uuid)
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
@@ -137,12 +138,12 @@ classdef (Abstract) Entity < handle
     % Methods likely to be overwritten by subclasses
     methods (Access = protected)
         function value = getLabel(obj)  
-            % GETVALUE
+            % GETLABEL
             %      
             % Syntax:
             %   value = obj.getLabel()
             % -------------------------------------------------------------
-            value = ao.util.class2char(obj);
+            value = getClassWithoutPackages(obj);
         end
 
         function shortName = getShortName(obj)
@@ -155,7 +156,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods (Access = {?aod.core.Entity, ?aod.core.Creator})
+    methods (Sealed, Access = {?aod.core.Entity, ?aod.core.Creator})
         function setParent(obj, parent)
             % SETPARENT
             %   

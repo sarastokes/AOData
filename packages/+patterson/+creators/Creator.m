@@ -80,11 +80,11 @@ classdef Creator < aod.core.Creator
             obj.Dataset.addRegions(regions);
         end
 
-        function addSiftTransforms(obj, fName, epochIDs, varargin)
-            % ADDSIFTTRANSFORMS
+        function addAffineTransform(obj, fName, epochIDs, varargin)
+            % ADDAFFINETRANSFORM
             %
             % Syntax:
-            %   obj.addSiftTransforms(fName, epochIDs, varargin)
+            %   obj.addAffineTransform(fName, epochIDs, varargin)
             % -------------------------------------------------------------
             if ~isfile(fName)
                 fName = fullfile(obj.Dataset.getAnalysisFolder(), fName);
@@ -94,7 +94,7 @@ classdef Creator < aod.core.Creator
 
             for i = 1:numel(epochIDs)
                 ep = obj.Dataset.id2epoch(epochIDs(i));
-                reg = aod.builtin.registrations.SiftRegistration(...
+                reg = aod.builtin.registrations.AffineRegistration(...
                     ep, squeeze(tforms(:,:,i)), varargin{:});
                 ep.addRegistration(reg);
                 ep.addFile('SiftTransform', erase(fName, obj.homeDirectory));

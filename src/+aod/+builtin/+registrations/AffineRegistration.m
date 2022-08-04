@@ -1,17 +1,24 @@
-classdef SiftRegistration < aod.core.Registration 
-% SIFTREGISTRATION
+classdef AffineRegistration < aod.core.Registration 
+% AffineRegistration
 %
 % Description:
-%   Transformation obtained from ImageJ SIFT Registration plugin
+%   Any registration that outputs a standard transformation matrix
+%
+% Parent:
+%   aod.core.Registration
+%
+% Constructor:
+%   obj = AffineRegistration(parent, data, varargin)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = SiftRegistration(parent, data, varargin)
+        function obj = AffineRegistration(parent, data, varargin)
             if ~isa(data, 'affine2d')
                 data = affine2d(data);
             end
             obj@aod.core.Registration(parent, data);
 
+            % Additional inputs are added to registrationParameters
             obj.addParameter(varargin{:});
         end
 
