@@ -1,8 +1,12 @@
-classdef (Abstract) Source < aod.core.Entity 
+classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 % SOURCE
 %
 % Description:
 %   A class for the data's source
+%
+% Parent:
+%   aod.core.Entity
+%   matlab.mixin.Heterogeneous
 %
 % Properties:
 %   sourceParameters                aod.core.Parameters
@@ -18,14 +22,14 @@ classdef (Abstract) Source < aod.core.Entity
             obj.allowableParentTypes = {'aod.core.Dataset',...
                 'aod.core.Source', 'aod.core.Subject', 'aod.core.Empty'};
             % Check if a parent input was supplied
-            if nargin > 0 && ~isempty(parent)
+            if nargin > 0
                 obj.setParent(parent);
             end
             obj.sourceParameters = aod.core.Parameters();
         end
     end
 
-    methods
+    methods (Sealed)
         function ID = getParentID(obj)
             % GETPARENTID
             %

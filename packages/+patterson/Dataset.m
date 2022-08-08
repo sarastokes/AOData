@@ -110,7 +110,7 @@ classdef Dataset < aod.core.Dataset
             end
 
             for i = 1:numel(epochIDs)
-                reg = aod.builtin.registrations.SiftRegistration(...
+                reg = aod.builtin.registrations.AffineRegistration(...
                     squeeze(tforms(:,:,i)));
                 reg.addParameter('TransformType', ip.Results.TransformType);
                 reg.addParameter('ReferenceEpoch', ip.Results.ReferenceEpoch);

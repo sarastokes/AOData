@@ -8,6 +8,7 @@ classdef Response < aod.core.Entity
 %   Data 
 %   responseParameters
 %   dateCreated
+%
 % Dependent properties:
 %   Dataset 
 %
@@ -18,9 +19,8 @@ classdef Response < aod.core.Entity
 
     properties (SetAccess = protected)
         Data                             
-        Timing                          % aod.core.Timing
-        responseParameters              % aod.core.Parameters
-        % dateCreated(1,1)    datestr     % date and time last modified
+        Timing                              % aod.core.Timing
+        responseParameters                  % aod.core.Parameters
     end
 
     properties (Hidden, Dependent)
@@ -29,13 +29,11 @@ classdef Response < aod.core.Entity
 
     methods
         function obj = Response(parent)
-            obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
             if nargin > 0
                 obj.setParent(parent);
             end
             obj.responseParameters = aod.core.Parameters();
-            % obj.dateCreated = datestr(now);
         end
 
         function value = get.Dataset(obj)
@@ -59,7 +57,9 @@ classdef Response < aod.core.Entity
             % -------------------------------------------------------------
             obj.Timing = timing;
         end
+    end
 
+    methods (Sealed)
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %

@@ -16,7 +16,7 @@ classdef Epoch < aod.core.Epoch
 %   epochParameters     aod.core.Parameters
 %   files               aod.core.Parameters
 % Dependent properties:
-%   transform           aod.builtin.registrations.SiftRegistration
+%   transform           aod.builtin.registrations.AffineRegistration
 %   homeDirectory
 %
 %
@@ -45,7 +45,7 @@ classdef Epoch < aod.core.Epoch
     end
 
     properties (Dependent)
-        transform           % aod.builtin.registrations.SiftRegistration
+        transform           % aod.builtin.registrations.AffineRegistration
     end
 
     methods
@@ -64,7 +64,7 @@ classdef Epoch < aod.core.Epoch
                return  
             end
             idx = find(findByClass(obj.Registrations,... 
-                'aod.builtin.registrations.SiftRegistration'));
+                'aod.builtin.registrations.AffineRegistration'));
             if ~isempty(idx)
                 value = obj.Registrations{idx};
             end
@@ -72,6 +72,33 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods 
+        function imStack = getStack(obj)
+            % GETSTACK
+            %
+            % Syntax:
+            %   imStack = obj.getStack()
+            % -------------------------------------------------------------
+            [~, fileName, ~] = fileparts(obj.getCoreVideoName);
+            if ~isempty(obj.cachedVideo)
+                imStack = obj.cachedVideo;
+                fprintf('Loaded %s from cache\n', fileName);
+                return;
+            end
+
+            fprintf('Loading %s... ', fileName);
+
+            videoName = obj.getCoreVideoName();
+            imStack = readStack(videoName);
+            imStack(:,:,1) = [];
+
+            if ~isempty(obj.transform)
+                imStack = obj.transform.apply(imStack);
+            end
+            obj.cachedVideo = imStack;
+
+            fprintf('Done\n');
+        end
+
         function F = getFluorescence(obj)
             % GETFLUORESCENCE
             F = obj.getResponse('patterson.responses.Fluorescence', true);
@@ -82,7 +109,7 @@ classdef Epoch < aod.core.Epoch
         end
 
         function clearTransform(obj)
-            idx = findByClass(obj.Registrations, 'aod.builtin.registrations.SiftRegistration');
+            idx = findByClass(obj.Registrations, 'aod.builtin.registrations.AffineRegistration');
             if ~isempty(idx)
                 obj.Registrations = obj.Registrations{~idx};
             end
@@ -126,39 +153,7 @@ classdef Epoch < aod.core.Epoch
         function videoName = getCoreVideoName(obj)
             videoName = obj.getFilePath('AnalysisVideo');
         end
-    end
 
-    % Overwritten methods
-    methods 
-        function imStack = getStack(obj)
-            % GETSTACK
-            %
-            % Syntax:
-            %   imStack = obj.getStack()
-            % -------------------------------------------------------------
-            [~, fileName, ~] = fileparts(obj.getCoreVideoName);
-            if ~isempty(obj.cachedVideo)
-                imStack = obj.cachedVideo;
-                fprintf('Loaded %s from cache\n', fileName);
-                return;
-            end
-
-            fprintf('Loading %s... ', fileName);
-
-            videoName = obj.getCoreVideoName();
-            imStack = obj.readStack(videoName);
-            imStack(:,:,1) = [];
-
-            if ~isempty(obj.transform)
-                imStack = obj.transform.apply(imStack);
-            end
-            obj.cachedVideo = imStack;
-
-            fprintf('Done\n');
-        end
-    end
-
-    methods (Access = protected)
         function value = getLabel(obj)
             value = [obj.Parent.displayName, '#', int2fixedwidthstr(obj.ID, 4)];
         end

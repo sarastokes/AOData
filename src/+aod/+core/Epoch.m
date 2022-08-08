@@ -1,5 +1,8 @@
-classdef (Abstract) Epoch < aod.core.Entity 
+classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
 % EPOCH
+%
+% Description:
+%   A continuous period of data acquisition within an experiment
 %
 % Abstract methods:
 %   videoName = getCoreVideoName(obj)
@@ -10,24 +13,25 @@ classdef (Abstract) Epoch < aod.core.Entity
 %   clearResponses(obj)
 %   clearVideoCache(obj)
 %
-% Protected methods:
-%   imStack = readStack(obj, videoName)
-%
 % aod.core.Creator methods:
 %   addFile(obj, fileName, filePath)
 %   addParameter(obj, paramName, paramValue)
 %   addRegistration(obj, reg, overwrite)
 %   addResponse(obj, resp)
 %   addStimulus(obj, stim)
+%
+% Notes:
+%   Inheritance from matlab.mixin.Heterogeneous allows forming arrays of 
+%   multiple Epoch subclasses
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         ID(1,1)                     double     = 0
     end
 
-    properties (SetAccess = {?aod.core.Creator, ?aod.core.Epoch})
+    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Creator})
         startTime(1,1)              datetime
-        Registrations               % aod.core.Registration
+        Registrations               aod.core.Registration
         Responses                   % aod.core.Response  
         Stimuli                     % aod.core.Stimulus
         epochParameters             % aod.core.Parameters
@@ -44,7 +48,7 @@ classdef (Abstract) Epoch < aod.core.Entity
 
     % Methods for subclasses to overwrite
     methods (Abstract, Access = protected)
-        % Main analysis video name, accessed with 'getStack'
+        % Main analysis video name
         videoName = getCoreVideoName(obj);
     end
 
@@ -71,7 +75,9 @@ classdef (Abstract) Epoch < aod.core.Entity
                 value = [];
             end
         end
-        
+    end
+
+    methods (Sealed)
         function fName = getFilePath(obj, whichFile)
             % GETFILEPATH
             %
@@ -80,6 +86,7 @@ classdef (Abstract) Epoch < aod.core.Entity
             % -------------------------------------------------------------
             assert(isKey(obj.files, whichFile), sprintf('File named %s not found', whichFile));
             fName = obj.files(whichFile);
+            % TODO: This might be an issue for Mac
             if ~contains(fName, ':\')
                 fName = obj.Parent.homeDirectory + fName;
             end
@@ -95,25 +102,8 @@ classdef (Abstract) Epoch < aod.core.Entity
         end
     end
 
-    % Core methods
-    methods 
-        function imStack = getStack(obj)
-            % GETSTACK
-            %
-            % Syntax:
-            %   imStack = obj.getStack()
-            % -------------------------------------------------------------
-            if ~isempty(obj.cachedVideo)
-                imStack = obj.cachedVideo;
-                return;
-            end
-
-            videoName = obj.getCoreVideoName();
-            imStack = obj.readStack(videoName);
-
-            obj.cachedVideo = imStack;
-        end
-
+    % Access methods
+    methods (Sealed)
         function stim = getStimulus(obj, stimClassName)
             % GETSTIMULUS
             %
@@ -189,48 +179,7 @@ classdef (Abstract) Epoch < aod.core.Entity
         end
     end
 
-    methods (Access = protected)
-        function imStack = readStack(~, videoName)
-            % READSTACK
-            %
-            % Syntax:
-            %   imStack = readStack(obj, videoName)
-            % -------------------------------------------------------------
-            [~, ~, extension] = fileparts(videoName);
-            switch extension
-                case {'.tif', '.tiff'}
-                    reader = aod.core.readers.TiffReader(videoName);
-                case '.avi'
-                    reader = aod.core.readers.AviReader(videoName);
-                otherwise
-                    error('Unrecognized file extension!');
-            end
-            imStack = reader.read();
-            fprintf('Loaded %s\n', videoName);
-        end
-
-        function value = getLabel(obj)  
-            % GETLABEL
-            % May be overwritten by subclasses          
-            % -------------------------------------------------------------
-            if isempty(obj.Parent)
-                value = obj.shortName;
-            else
-                value = sprintf("Epoch%u_%s", obj.ID, obj.Parent.label);
-            end
-        end
-
-        function shortName = getShortName(obj)
-            % GETSHORTNAME
-            % 
-            % Syntax:
-            %   shortName = obj.getShortName()
-            % -------------------------------------------------------------
-            shortName = sprintf('Epoch%u', obj.ID);
-        end
-    end
-
-    methods (Access = {?aod.core.Creator, ?aod.core.Epoch})
+    methods (Sealed, Access = {?aod.core.Epoch, ?aod.core.Creator})
         function addFile(obj, fileName, filePath)
             % ADDFILE
             %
@@ -298,10 +247,8 @@ classdef (Abstract) Epoch < aod.core.Entity
                         return
                     end
                 end
-                obj.Registrations = {obj.Registrations; reg};
-            else
-                obj.Registrations = reg;
             end
+            obj.Registrations = cat(1, obj.Registrations, reg);
         end
 
         function addResponse(obj, resp, overwrite)
@@ -334,9 +281,7 @@ classdef (Abstract) Epoch < aod.core.Entity
                 obj.Responses = resp;
             end
         end
-    end
 
-    methods
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %
@@ -359,6 +304,29 @@ classdef (Abstract) Epoch < aod.core.Entity
                     obj.epochParameters(varargin{(2*i)-1}) = varargin{2*i};
                 end
             end
+        end
+    end
+
+    % Overwritten methods from Entity
+    methods (Access = protected)
+        function value = getLabel(obj)  
+            % GETLABEL
+            % May be overwritten by subclasses          
+            % -------------------------------------------------------------
+            if isempty(obj.Parent)
+                value = obj.shortName;
+            else
+                value = sprintf("Epoch%u_%s", obj.ID, obj.Parent.label);
+            end
+        end
+
+        function shortName = getShortName(obj)
+            % GETSHORTNAME
+            % 
+            % Syntax:
+            %   shortName = obj.getShortName()
+            % -------------------------------------------------------------
+            shortName = sprintf('Epoch%u', obj.ID);
         end
     end
 end 

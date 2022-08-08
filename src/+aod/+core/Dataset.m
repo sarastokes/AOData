@@ -33,7 +33,7 @@ classdef (Abstract) Dataset < aod.core.Entity
         Epochs                  %aod.core.Epoch
         Source                  %aod.core.Source
         Regions                 %aod.core.Regions
-        Calibrations            %aod.core.Calibration
+        Calibrations            = aod.core.Calibration.empty();
 
         epochIDs(1,:)           double
     end
@@ -246,6 +246,7 @@ classdef (Abstract) Dataset < aod.core.Entity
                 overwrite = false;
             end
 
+            % Determine if calibration exists and should be overwritten
             if ~isempty(obj.Calibrations)
                 idx = find(findByClass(obj.Calibrations, class(calibration)));
                 if ~isempty(idx)
@@ -260,10 +261,8 @@ classdef (Abstract) Dataset < aod.core.Entity
                         return
                     end
                 end
-                obj.Calibrations = cat(1, obj.Calibrations, calibration);
-            else
-                obj.Calibrations = calibration;
             end
+            obj.Calibrations = cat(1, obj.Calibrations, calibration);
         end
 
         function sortEpochs(obj)
@@ -280,7 +279,7 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
     end
 
-        methods
+    methods (Sealed)
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %

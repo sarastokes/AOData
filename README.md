@@ -9,6 +9,9 @@ For storing data and metadata associated with an experiment:
 - **Dataset**
   - Subject
     - Subject (nestable) 
+  - System
+    - Channel
+      - Device
   - Calibration
   - Regions
   - Epoch
@@ -22,10 +25,8 @@ Although there are multiple approaches for converting an experiment into a `Data
 
 For creating stimulus protocols, there is also the `Protocol` class. The advantage of using this class is standardizing stimulus creation. The `Stimulus` class stores the `Protocol` name and parameters, making it possible to recreate the `Protocol` object later on and regenerate the exact stimulus used.
 
-
 ### Examples
 Each class is generic and meant to be subclassed and tailored to specific imaging experiments. Examples can be found in the `\packages` folder.
-
 
 ### Dependencies
 - MATLAB (developed in 2022a, compatible with 2021a and 2021b)

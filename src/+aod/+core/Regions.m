@@ -24,7 +24,7 @@ classdef (Abstract) Regions < aod.core.Entity
     end
 
     methods
-        function obj = Regions(parent, rois, varargin)
+        function obj = Regions(parent, rois)
             obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Epoch'};
 
