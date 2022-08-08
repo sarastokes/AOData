@@ -2,7 +2,7 @@ function y = class2char(obj)
     % CLASS2CHAR
     %
     % Description:
-    %   Returns class name as char
+    %   Returns class name as char, omitting packages
     %
     % Syntax:
     %   y = class2char(obj)
@@ -16,6 +16,6 @@ function y = class2char(obj)
     % ---------------------------------------------------------------------
     
     mc = metaclass(obj);
-    y = class2display(mc.Name, true);
+    y = class2display(mc.Name, false);
     y = y{:};
     y(isstrprop(y, 'wspace')) = [];

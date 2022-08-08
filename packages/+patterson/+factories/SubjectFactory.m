@@ -7,12 +7,15 @@ classdef SubjectFactory < aod.core.Factory
 % Parent:
 %   aod.core.Factory
 %
-% Syntax:
+% Constructor:
 %   obj = SubjectFactory()
 %
 % Methods:
-%   protocol = get(obj, ID, whichEye, parent)
-%   protocol = create(ID, whichEye, parent)
+%   subject = get(obj, ID, whichEye, parent)
+%   subject = create(ID, whichEye, location, parent)
+%
+% Quick initialization:
+%   subject = SubjectFactory(ID, whichEye, location, parent)
 %
 % Notes:
 %   - Standardized UUIDs are provided for each animal, eye and, for 
@@ -22,7 +25,7 @@ classdef SubjectFactory < aod.core.Factory
 
     properties (Hidden, Constant)
         DEFAULT_PUPIL_SIZE = 6.7;       % mm
-        PHYSIOLOGY_LOCATIONS = ["right", "bottom", "left", "top"];
+        PHYSIOLOGY_LOCATIONS = ["Right", "Bottom", "Left", "Top"];
     end
 
     methods

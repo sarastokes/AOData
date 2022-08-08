@@ -47,6 +47,8 @@ classdef SpectralProtocolFactory < aod.core.Factory
             end
             if isempty(baseIntensity)
                 baseIntensity = 0.5;
+            else
+                baseIntensity = baseIntensity / 100;
             end
 
             % Baseline
@@ -85,7 +87,7 @@ classdef SpectralProtocolFactory < aod.core.Factory
                         'PreTime', 20, 'StimTime', 60, 'TailTime', 40,...
                         'BaseIntensity', baseIntensity,...
                         'TemporalFrequency', hz,...
-                        'PolarityClass', 'positive');
+                        'PolarityClass', polarityClass);
                     return
                 else
                     if contains(fileName, 'sine')
