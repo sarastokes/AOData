@@ -1,5 +1,5 @@
-classdef AffineRegistration < aod.core.Registration 
-% AffineRegistration
+classdef RigidRegistration < aod.core.Registration 
+% RIGIDREGISTRATION
 %
 % Description:
 %   Any registration that outputs a standard transformation matrix
@@ -8,11 +8,11 @@ classdef AffineRegistration < aod.core.Registration
 %   aod.core.Registration
 %
 % Constructor:
-%   obj = AffineRegistration(parent, data, varargin)
+%   obj = RigidRegistration(parent, data, varargin)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = AffineRegistration(parent, data, varargin)
+        function obj = RigidRegistration(parent, data, varargin)
             if ~isa(data, 'affine2d')
                 data = affine2d(data);
             end

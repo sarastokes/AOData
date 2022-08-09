@@ -94,7 +94,7 @@ classdef Creator < aod.core.Creator
 
             for i = 1:numel(epochIDs)
                 ep = obj.Dataset.id2epoch(epochIDs(i));
-                reg = aod.builtin.registrations.AffineRegistration(...
+                reg = aod.builtin.registrations.RigidRegistration(...
                     ep, squeeze(tforms(:,:,i)), varargin{:});
                 ep.addRegistration(reg);
                 ep.addFile('SiftTransform', erase(fName, obj.homeDirectory));

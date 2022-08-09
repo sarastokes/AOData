@@ -16,7 +16,7 @@ classdef Epoch < aod.core.Epoch
 %   epochParameters     aod.core.Parameters
 %   files               aod.core.Parameters
 % Dependent properties:
-%   transform           aod.builtin.registrations.AffineRegistration
+%   transform           aod.builtin.registrations.RigidRegistration
 %   homeDirectory
 %
 %
@@ -45,7 +45,7 @@ classdef Epoch < aod.core.Epoch
     end
 
     properties (Dependent)
-        transform           % aod.builtin.registrations.AffineRegistration
+        transform           % aod.builtin.registrations.RigidRegistration
     end
 
     methods
@@ -64,7 +64,7 @@ classdef Epoch < aod.core.Epoch
                return  
             end
             idx = find(findByClass(obj.Registrations,... 
-                'aod.builtin.registrations.AffineRegistration'));
+                'aod.builtin.registrations.RigidRegistration'));
             if ~isempty(idx)
                 value = obj.Registrations{idx};
             end
@@ -109,7 +109,7 @@ classdef Epoch < aod.core.Epoch
         end
 
         function clearTransform(obj)
-            idx = findByClass(obj.Registrations, 'aod.builtin.registrations.AffineRegistration');
+            idx = findByClass(obj.Registrations, 'aod.builtin.registrations.RigidRegistration');
             if ~isempty(idx)
                 obj.Registrations = obj.Registrations{~idx};
             end
