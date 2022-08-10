@@ -1,11 +1,14 @@
 classdef LedVoltageReader < aod.core.FileReader
 % LEDVOLTAGEREADER
 %
-% Constructor:
-%   obj = patterson.readers.LedVoltageReader(fName)
+% Description:
+%   Reads LED voltage json file generated for arbitrary LED presentations
 %
-% See also:
-%   READJSONLED
+% Parent:
+%   aod.core.FileReader
+%
+% Constructor:
+%   obj = LedVoltageReader(fName)
 % -------------------------------------------------------------------------
 
     methods

@@ -10,14 +10,14 @@ classdef PhysiologyExperimentTest < matlab.unittest.TestCase
             S = load('MC00851_OSR_20220125A');
             obj.OldExperiment = S.MC00851_OSR_20220125A;
             expDir = 'C:\Users\sarap\Dropbox\Postdoc\Data\AO\MC00851_20220125\';
-            source = patterson.factories.SourceFactory(851, 'OS');
-            x = patterson.creators.PhysiologyCreator(expDir);
+            source = sara.factories.SourceFactory(851, 'OS');
+            x = sara.creators.PhysiologyCreator(expDir);
             x.createExperiment('20220125', source, 'Right',... 
                 'Administrator', 'Sara Patterson',...
                 'System', '1P primate',...
                 'Purpose', 'RF mapping with vertical bars');
 
-            x.addEpochs(6:39, patterson.EpochTypes.Spatial);
+            x.addEpochs(6:39, sara.EpochTypes.Spatial);
             regions = aod.builtin.regions.Rois(x.Experiment, '851_OSR_20220125_RoiSet.zip', [248, 360]);
             x.addRegions(regions);
 
@@ -39,7 +39,7 @@ classdef PhysiologyExperimentTest < matlab.unittest.TestCase
         function testFluorescence(testCase)
             ep = testCase.Experiment.id2epoch(6);
             signals = testCase.OldExperiment.getEpochResponses(6, []);
-            TT = ep.getResponse('patterson.responses.Fluorescence');
+            TT = ep.getResponse('sara.responses.Fluorescence');
             testCase.verifyEqual(...
                 signals1(1, :), TT.Data.Signals(:,1),...
                 'Flourescence does not match')

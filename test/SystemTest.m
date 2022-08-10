@@ -1,5 +1,5 @@
 
-resourceDir = '/Users/sarap/Dropbox/Postdoc/Code/ao-data-tools/packages/+patterson/+resources';
+resourceDir = '/Users/sarap/Dropbox/Postdoc/Code/ao-data-tools/packages/+sara/+resources';
 
 
 system = aod.core.System([], 'SpectralPhysiology');

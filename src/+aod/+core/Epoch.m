@@ -199,7 +199,7 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
             if isempty(obj.Responses)
                 return
             end
-            idx = findByClass(obj.Responses, 'aod.core.responses.RegionResponse');
+            idx = findByClass(obj.Responses, 'aod.builtin.responses.RegionResponse');
             if numel(obj.Responses) > 1
                 obj.Responses{idx} = [];
             else
