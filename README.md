@@ -6,7 +6,7 @@ Framework for organizing and analyzing imaging experiments. Designed with adapti
 
 For storing data and metadata associated with an experiment:
 
-- **Dataset**
+- **Experiment**
   - Subject
     - Subject (nestable) 
   - System
@@ -21,7 +21,7 @@ For storing data and metadata associated with an experiment:
     - Stimulus
    - Analysis
 
-Although there are multiple approaches for converting an experiment into a `Dataset` object, the `Creator` class has access to all the building functions within `Dataset` and can provide a standardized way of building customized `Dataset` objects.
+Although there are multiple approaches for converting an experiment into a `Experiment` object, the `Creator` class has access to all the building functions within `Experiment` and can provide a standardized way of building customized `Experiment` objects.
 
 For creating stimulus protocols, there is also the `Protocol` class. The advantage of using this class is standardizing stimulus creation. The `Stimulus` class stores the `Protocol` name and parameters, making it possible to recreate the `Protocol` object later on and regenerate the exact stimulus used.
 

@@ -1,4 +1,4 @@
-classdef Physiology < patterson.Dataset
+classdef PhysiologyExperiment < patterson.Experiment
 
     properties (SetAccess = protected)
         location
@@ -17,8 +17,8 @@ classdef Physiology < patterson.Dataset
     end
 
     methods
-        function obj = Physiology(homeDirectory, expDate, location)
-            obj = obj@patterson.Dataset(homeDirectory, expDate);
+        function obj = PhysiologyExperiment(homeDirectory, expDate, location)
+            obj = obj@patterson.Experiment(homeDirectory, expDate);
             if nargin < 3
                 obj.location = 'Unknown';
             else

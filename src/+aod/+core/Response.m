@@ -13,7 +13,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   dateCreated
 %
 % Dependent properties:
-%   Dataset 
+%   Experiment 
 %
 % Methods:
 %   addParameter(obj, paramValue, paramName)
@@ -27,7 +27,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     properties (Hidden, Dependent)
-        Dataset
+        Experiment
     end
 
     methods
@@ -39,8 +39,8 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.responseParameters = aod.core.Parameters();
         end
 
-        function value = get.Dataset(obj)
-            value = obj.ancestor('aod.core.Dataset');
+        function value = get.Experiment(obj)
+            value = obj.ancestor('aod.core.Experiment');
         end
     end
 

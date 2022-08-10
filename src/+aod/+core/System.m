@@ -28,7 +28,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     
     methods
         function obj = System(parent, name)
-            obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Empty'};
+            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Empty'};
             if nargin > 0
                 obj.setParent(parent)
             end

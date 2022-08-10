@@ -15,7 +15,7 @@ classdef Analysis < aod.core.Entity
     methods
         function obj = Analysis(parent)
             obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Epoch', 'aod.core.Empty'};
+            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Epoch', 'aod.core.Empty'};
 
             if nargin > 0
                 obj.setParent(parent);

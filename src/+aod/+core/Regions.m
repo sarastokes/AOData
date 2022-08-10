@@ -26,7 +26,7 @@ classdef Regions < aod.core.Entity
     methods
         function obj = Regions(parent, rois)
             obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Epoch'};
+            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Epoch'};
 
             if nargin > 0
                 obj.setParent(parent);
@@ -75,11 +75,11 @@ classdef Regions < aod.core.Entity
                 S = varargin{1};
                 k = fieldnames(S);
                 for i = 1:numel(k)
-                    obj.datasetParameters(k{i}) = S.(k{i});
+                    obj.regionParameters(k{i}) = S.(k{i});
                 end
             else
                 for i = 1:(nargin - 1)/2
-                    obj.datasetParameters(varargin{(2*i)-1}) = varargin{2*i};
+                    obj.regionParameters(varargin{(2*i)-1}) = varargin{2*i};
                 end
             end
         end

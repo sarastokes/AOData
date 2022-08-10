@@ -1,8 +1,8 @@
-classdef Dataset < aod.core.Dataset
-% DATASET
+classdef Experiment < aod.core.Experiment
+% EXPERIMENT
 %
 % Description:
-%   Dataset subclass tailored to Primate 1P system experiments
+%   Experiment subclass tailored to Primate 1P system experiments
 %
 % Methods:
 %   getFileHeader(obj)
@@ -22,8 +22,8 @@ classdef Dataset < aod.core.Dataset
     end
 
     methods
-        function obj = Dataset(homeDirectory, expDate)
-            obj = obj@aod.core.Dataset(homeDirectory, expDate);
+        function obj = Experiment(homeDirectory, expDate)
+            obj = obj@aod.core.Experiment(homeDirectory, expDate);
         end
 
         function initParameters(obj, varargin)

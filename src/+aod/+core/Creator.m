@@ -3,7 +3,7 @@ classdef (Abstract) Creator < handle
 %
 % Description:
 %   Class with SetAccess to aod.core.Entity objects containing custom code
-%   to populate Dataset, Epoch, etc 
+%   to populate Experiment, Epoch, etc 
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

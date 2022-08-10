@@ -32,7 +32,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
     methods
         function obj = Calibration(calibrationDate, parent)
             obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Dataset',... 
+            obj.allowableParentTypes = {'aod.core.Experiment',... 
                 'aod.core.System', 'aod.core.Empty'};
             
             if nargin > 0 && ~isempty(calibrationDate)

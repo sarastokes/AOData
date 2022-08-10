@@ -19,7 +19,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
     methods
         function obj = Source(parent)
             obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Dataset',...
+            obj.allowableParentTypes = {'aod.core.Experiment',...
                 'aod.core.Source', 'aod.core.Subject', 'aod.core.Empty'};
             % Check if a parent input was supplied
             if nargin > 0

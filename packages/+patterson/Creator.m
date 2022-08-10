@@ -1,7 +1,7 @@
 classdef Creator < aod.core.Creator
 
     properties (SetAccess = private)
-        Dataset
+        Experiment
     end
 
     methods
@@ -9,7 +9,7 @@ classdef Creator < aod.core.Creator
             obj@aod.core.Creator(homeDirectory);
         end
 
-        function createDataset(obj, expDate, source, location, varargin)
+        function createExperiment(obj, expDate, source, location, varargin)
             
             ip = inputParser();
             ip.KeepUnmatched = true;
@@ -18,13 +18,13 @@ classdef Creator < aod.core.Creator
             parse(ip, varargin{:});
             
 
-            obj.Dataset = patterson.datasets.Physiology(...
+            obj.Experiment = patterson.experiments.PhysiologyExperiment(...
                 obj.homeDirectory, expDate, location);
-            obj.Dataset.addSource(source);
+            obj.Experiment.addSource(source);
             if ~isempty(ip.Results.Purpose)
-                obj.Dataset.setDescription(ip.Results.Purpose);
+                obj.Experiment.setDescription(ip.Results.Purpose);
             end
-            obj.Dataset.initParameters(ip.Unmatched);
+            obj.Experiment.initParameters(ip.Unmatched);
         end
 
         function addEpochs(obj, epochIDs, epochType, source, varargin)
@@ -40,12 +40,12 @@ classdef Creator < aod.core.Creator
             fprintf('Adding epochs... ');
             for i = 1:numel(epochIDs)
                 ep = obj.makeEpoch(epochIDs(i), epochType, source, varargin{:});          
-                obj.Dataset.addEpoch(ep);
+                obj.Experiment.addEpoch(ep);
                 fprintf('%u ', epochIDs(i));
             end
-            obj.Dataset.sortEpochs();
+            obj.Experiment.sortEpochs();
             if epochType.isPhysiology()
-                obj.Dataset.populateStimSummaries();
+                obj.Experiment.populateStimSummaries();
             end
             fprintf('\nDone.\n')
         end
@@ -57,9 +57,9 @@ classdef Creator < aod.core.Creator
             %   obj.addCalibration(calibration)
             % -------------------------------------------------------------
             if isempty(calibration.Parent) || isa(calibration.Parent, 'aod.calibrations.Empty')
-                calibration.setParent(obj.Dataset);
+                calibration.setParent(obj.Experiment);
             end
-            obj.Dataset.addCalibration(calibration);
+            obj.Experiment.addCalibration(calibration);
         end
     
         function addRegions(obj, fileName, imSize, UIDs)
@@ -71,13 +71,13 @@ classdef Creator < aod.core.Creator
 
             [filePath, ~, ~] = fileparts(fileName);
             if isempty(filePath)
-                fileName = fullfile(obj.Dataset.getAnalysisFolder(), fileName);
+                fileName = fullfile(obj.Experiment.getAnalysisFolder(), fileName);
             end
-            regions = aod.core.regions.Rois(obj.Dataset, fileName, imSize);
+            regions = aod.core.regions.Rois(obj.Experiment, fileName, imSize);
             if nargin > 3 && ~isempty(UIDs)
                 regions.setRoiUIDs(UIDs);
             end
-            obj.Dataset.addRegions(regions);
+            obj.Experiment.addRegions(regions);
         end
 
         function addRigidTransform(obj, fName, epochIDs, varargin)
@@ -87,13 +87,13 @@ classdef Creator < aod.core.Creator
             %   obj.addRigidTransform(fName, epochIDs, varargin)
             % -------------------------------------------------------------
             if ~isfile(fName)
-                fName = fullfile(obj.Dataset.getAnalysisFolder(), fName);
+                fName = fullfile(obj.Experiment.getAnalysisFolder(), fName);
             end
             reader = aod.builtin.readers.RigidTransformReader(fName);
             tforms = reader.read();
 
             for i = 1:numel(epochIDs)
-                ep = obj.Dataset.id2epoch(epochIDs(i));
+                ep = obj.Experiment.id2epoch(epochIDs(i));
                 reg = aod.builtin.registrations.RigidRegistration(...
                     ep, squeeze(tforms(:,:,i)), varargin{:});
                 ep.addRegistration(reg);
@@ -105,7 +105,7 @@ classdef Creator < aod.core.Creator
     methods (Access = protected)
         function ep = makeEpoch(obj, epochID, epochType, source, varargin)
             % MAKEEPOCH
-            ep = patterson.Epoch(epochID, obj.Dataset, epochType);
+            ep = patterson.Epoch(epochID, obj.Experiment, epochType);
             % Assign source for the epoch
             ep.setSource(source);
             % Extract epoch imaging parameters
@@ -121,7 +121,7 @@ classdef Creator < aod.core.Creator
             % Processing specific to spatial epochs
             if epochType == patterson.EpochTypes.Spatial
                 protocol = patterson.factories.SpatialProtocolFactory.create(...
-                    obj.Dataset.getCalibration('patterson.calibrations.Toptica'),...
+                    obj.Experiment.getCalibration('patterson.calibrations.Toptica'),...
                     ep.getFilePath('TrialFile'));
                 stimulus = patterson.stimuli.SpatialStimulus(ep, protocol, varargin{:});
                 ep.addStimulus(stimulus);
@@ -129,7 +129,7 @@ classdef Creator < aod.core.Creator
             % Processing specific to spectral epochs
             if epochType == patterson.EpochTypes.Spectral
                 protocol = patterson.factories.SpectralProtocolFactory.create(...
-                    obj.Dataset.getCalibration('patterson.calibrations.MaxwellianView'),...
+                    obj.Experiment.getCalibration('patterson.calibrations.MaxwellianView'),...
                     ep.getFilePath('TrialFile'));
                 stimulus = patterson.stimuli.SpectralStimulus(ep, protocol, varargin{:});
                 ep.addStimulus(stimulus);
@@ -140,9 +140,9 @@ classdef Creator < aod.core.Creator
     methods (Access = protected)
         function fName = getAttributeFile(obj, epochID)
             fName = sprintf('%u_%s_ref_%s.txt',...
-                obj.Dataset.Sources(1).getParentID(), obj.Dataset.experimentDate,...
+                obj.Experiment.Sources(1).getParentID(), obj.Experiment.experimentDate,...
                 int2fixedwidthstr(epochID, 4));
-            fName = [obj.Dataset.homeDirectory, filesep, 'Ref', filesep, fName];
+            fName = [obj.Experiment.homeDirectory, filesep, 'Ref', filesep, fName];
         end
 
 
@@ -243,18 +243,18 @@ classdef Creator < aod.core.Creator
         function populateFileNames(obj, ep)
             epochID = ep.ID;
             % Channel One search parameters
-            refFiles = ls([obj.Dataset.homeDirectory, 'Ref']);
+            refFiles = ls([obj.Experiment.homeDirectory, 'Ref']);
             refFiles = deblank(string(refFiles));
             refStr = ['ref_', int2fixedwidthstr(epochID, 4)];
             % Channel Two search parameters
-            visFiles = ls([obj.Dataset.homeDirectory, 'Vis']);
+            visFiles = ls([obj.Experiment.homeDirectory, 'Vis']);
             visFiles = deblank(string(visFiles));
             visStr = ['vis_', int2fixedwidthstr(epochID, 4)];
 
             ep.addFile('RefVideo', ['Ref', filesep,...
-                obj.Dataset.getFileHeader(), '_', refStr, '.avi']);
+                obj.Experiment.getFileHeader(), '_', refStr, '.avi']);
             ep.addFile('VisVideo', ['Vis', filesep,...
-                obj.Dataset.getFileHeader(), '_', visStr, '.avi']);
+                obj.Experiment.getFileHeader(), '_', visStr, '.avi']);
 
             % Processed video for analysis
             ep.addFile('AnalysisVideo', string(['Analysis', filesep, 'Videos', filesep, visStr, '.tif']));

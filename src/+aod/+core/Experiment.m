@@ -1,8 +1,8 @@
-classdef (Abstract) Dataset < aod.core.Entity
-% DATASET
+classdef (Abstract) Experiment < aod.core.Entity
+% EXPERIMENT
 %
 % Constructor:
-%   obj = Dataset(expDate, source)
+%   obj = Experiment(expDate, source)
 %
 % Properties:
 %   Epochs
@@ -11,11 +11,11 @@ classdef (Abstract) Dataset < aod.core.Entity
 %   Calibrations
 %   homeDirectory
 %   experimentDate              
-%   datasetParameters
-%   epochIDs                    list of epoch IDs in dataset
+%   experimentParameters
+%   epochIDs                    list of epoch IDs in experiment
 %
 % Private properties:
-%   baseDirectory               folder used to initialize Dataset
+%   baseDirectory               folder used to initialize Experiment
 %
 % Public methods:
 %   setHomeDirectory(obj, filePath)
@@ -28,7 +28,7 @@ classdef (Abstract) Dataset < aod.core.Entity
     properties (SetAccess = private)
         homeDirectory           char
         experimentDate(1,1)     datetime
-        datasetParameters       %aod.core.Parameters
+        experimentParameters    %aod.core.Parameters
 
         Epochs                  %aod.core.Epoch
         Sources                 aod.core.Source
@@ -43,7 +43,7 @@ classdef (Abstract) Dataset < aod.core.Entity
     end
 
     properties (Hidden, SetAccess = private)
-        baseDirectory       % File path used to initialize Dataset
+        baseDirectory       % File path used to initialize Experiment
     end
 
     methods (Abstract)
@@ -51,10 +51,10 @@ classdef (Abstract) Dataset < aod.core.Entity
     end
     
     methods 
-        function obj = Dataset(homeDirectory, expDate)
+        function obj = Experiment(homeDirectory, expDate)
             obj = obj@aod.core.Entity();
             
-            obj.datasetParameters = containers.Map();
+            obj.experimentParameters = containers.Map();
             if nargin > 0
                 obj.setHomeDirectory(homeDirectory);
             end
@@ -62,7 +62,7 @@ classdef (Abstract) Dataset < aod.core.Entity
                 obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
             end
             obj.setParent([]);
-            obj.datasetParameters = aod.core.Parameters();
+            obj.experimentParameters = aod.core.Parameters();
         end
 
         function value = get.numEpochs(obj)
@@ -208,12 +208,12 @@ classdef (Abstract) Dataset < aod.core.Entity
         end
     end
 
-    methods (Access = {?aod.core.Dataset, ?aod.core.Creator})
+    methods (Access = {?aod.core.Experiment, ?aod.core.Creator})
         function addSource(obj, source)
             % ADDSOURCE
             %
             % Description:
-            %   Assign source(s) to the dataset
+            %   Assign source(s) to the experiment
             %
             % Syntax:
             %   obj.addSource(source, overwrite)
@@ -302,11 +302,11 @@ classdef (Abstract) Dataset < aod.core.Entity
                 S = varargin{1};
                 k = fieldnames(S);
                 for i = 1:numel(k)
-                    obj.datasetParameters(k{i}) = S.(k{i});
+                    obj.experimentParameters(k{i}) = S.(k{i});
                 end
             else
                 for i = 1:(nargin - 1)/2
-                    obj.datasetParameters(varargin{(2*i)-1}) = varargin{2*i};
+                    obj.experimentParameters(varargin{(2*i)-1}) = varargin{2*i};
                 end
             end
         end

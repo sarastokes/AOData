@@ -58,7 +58,7 @@ classdef Dff < aod.core.responses.RegionResponse
 
             % High pass filter, if necessary            
             if highCut > 0
-                signals = signalHighPassFilter(signals, highCut, obj.Dataset.frameRate);
+                signals = signalHighPassFilter(signals, highCut, obj.Experiment.frameRate);
                 signals = signalBaselineCorrect(signals, bkgd); 
             end
 
@@ -84,7 +84,7 @@ classdef Dff < aod.core.responses.RegionResponse
                 error('Dff/guess did not find stimulus');
             end
 
-            prePts = floor(stim.stimParameters('preTime') * obj.Dataset.sampleRate);
+            prePts = floor(stim.stimParameters('preTime') * obj.Experiment.sampleRate);
             bkgd = [floor(prePts/4) prePts-10];
         end
     end

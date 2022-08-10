@@ -67,7 +67,7 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
                 obj.ID = ID;
             end
 
-            obj.allowableParentTypes = {'aod.core.Dataset'};
+            obj.allowableParentTypes = {'aod.core.Experiment'};
             if nargin == 2
                 obj.setParent(parent);
             end
@@ -169,7 +169,7 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
             keepResponse = false;
 
             if isempty(obj.Parent.Regions)
-                error('Dataset must contain Regions');
+                error('Experiment must contain Regions');
             end
             resp = getByClass(obj.Responses, responseClassName);
             if isempty(resp)
