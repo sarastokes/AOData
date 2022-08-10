@@ -1,4 +1,4 @@
-classdef (Abstract) Regions < aod.core.Entity
+classdef Regions < aod.core.Entity 
 % REGIONS
 %
 % Constructor:
@@ -28,7 +28,7 @@ classdef (Abstract) Regions < aod.core.Entity
             obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Dataset', 'aod.core.Epoch'};
 
-            if nargin > 0 && ~isempty(parent)
+            if nargin > 0
                 obj.setParent(parent);
             end
 
@@ -42,7 +42,7 @@ classdef (Abstract) Regions < aod.core.Entity
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function setMap(obj, roiMap)
             % SETMAP
             %
@@ -59,7 +59,7 @@ classdef (Abstract) Regions < aod.core.Entity
         end
     end
 
-    methods
+    methods (Sealed)
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %

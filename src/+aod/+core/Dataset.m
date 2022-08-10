@@ -209,20 +209,23 @@ classdef (Abstract) Dataset < aod.core.Entity
     end
 
     methods (Access = {?aod.core.Dataset, ?aod.core.Creator})
-        function setSource(obj, source)
-            % SETSOURCE
+        function addSource(obj, source)
+            % ADDSOURCE
             %
             % Description:
-            %   Assign a source to the dataset
+            %   Assign source(s) to the dataset
             %
             % Syntax:
-            %   obj.setSource(source)
+            %   obj.addSource(source, overwrite)
             %
             % See also:
             %   aod.core.Source
             % -------------------------------------------------------------
-            assert(isSubclass(source, 'aod.core.Source'), 'Must be a subclass of aod.core.Source');
-            obj.Source = source;
+            assert(isSubclass(source, 'aod.core.Source'),...
+                'Must be a subclass of aod.core.Source');
+            for i = 1:numel(sources)
+                obj.Source = cat(1, obj.Source, source);
+            end
         end
 
         function addEpoch(obj, epoch)

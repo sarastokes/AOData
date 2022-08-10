@@ -18,16 +18,16 @@ classdef Dff < aod.core.responses.RegionResponse
 % ----------------------------------------------------------------------
     methods
         function obj = Dff(parent, varargin)
-            obj = obj@aod.core.responses.RegionResponse(parent);
-            obj.setData(varargin{:});
+            obj = obj@aod.core.responses.RegionResponse(parent, varargin{:});
+            obj.load(varargin{:});
         end
 
-        function setData(obj, varargin)
+        function load(obj, varargin)
             % Parse optional inputs
             ip = inputParser();
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;
-            addOptional(ip, 'Bkgd', obj.guessBkgd(), @isnumeric);
+            addOptional(ip, 'Bkgd', [], @isnumeric);
             addParameter(ip, 'UseMedian', false, @islogical);
             addParameter(ip, 'Smooth', 0, @isnumeric);
             addParameter(ip, 'HighPass', 0, @isnumeric);
@@ -38,6 +38,10 @@ classdef Dff < aod.core.responses.RegionResponse
             highCut = ip.Results.HighPass;
             useMedian = ip.Results.UseMedian;
 
+            if isempty(bkgd)
+                bkgd = obj.guessBkgd();
+            end
+            
             % Check for fluorescence 
             F = obj.Parent.getResponse('patterson.responses.Fluorescence');
 
@@ -64,11 +68,8 @@ classdef Dff < aod.core.responses.RegionResponse
             end
                      
             % Add to Response
-            obj.Data = signals;
+            obj.setData(signals);
             obj.addParameter(ip.Results);
-        end
-
-        function matchProperties(obj, varargin)
         end
     end
 

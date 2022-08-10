@@ -19,6 +19,10 @@ classdef StripRegistration < aod.core.Registration
             obj.tryLoad();
         end
 
+        function apply(~)
+            warning('StripRegistration applied offline');
+        end
+
         function loadData(obj, fName)
             % LOADDATA
             % 
@@ -37,17 +41,18 @@ classdef StripRegistration < aod.core.Registration
                 fName = obj.Parent.getFilePath('RegistrationParameters');
             end
             reader = aod.builtin.readers.RegistrationParameterReader(fName);
+            obj.addParameter(reader.read());
         end
     end
 
     methods (Access = private)
         function tryLoad(obj)
-            % try
+            try
                 obj.loadData();
                 obj.loadParameters();
-            % catch
-                % Do nothing
-            % end
+            catch
+                warning('Registration report or parameters not found');
+            end
         end
     end
 end 

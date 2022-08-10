@@ -18,6 +18,10 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
         registrationParameters              % aod.core.Parameters
     end
 
+    methods (Abstract)
+        varargout = apply(obj, varargin)
+    end
+
     methods
         function obj = Registration(parent, data)
             obj = obj@aod.core.Entity();
@@ -29,10 +33,6 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
                 obj.Data = data;
             end
             obj.registrationParameters = aod.core.Parameters();
-        end
-
-        function varargout = apply(obj, varargin) %#ok<*STOUT,*INUSD> 
-            error('Not yet implemented');
         end
     end
 

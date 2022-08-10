@@ -32,12 +32,22 @@ classdef Rois < aod.core.Regions
                 parent = [];
                 rois = [];
                 imSize = [];
+            elseif nargin < 3
+                imSize = [];
             end
             obj@aod.core.Regions(parent, rois);
             obj.load(rois, imSize);
         end
 
         function load(obj, rois, imSize)
+            % LOAD
+            %
+            % Description:
+            %   Obtain data to send to setMap()
+            %
+            % Syntax:
+            %   load(obj, rois, imSize)
+            % -------------------------------------------------------------
             if nargin == 3
                 obj.Size = imSize;
             else
@@ -59,14 +69,24 @@ classdef Rois < aod.core.Regions
                 end
                 obj.setMap(obj.Reader.read());
             end
+            obj.setMetadata();
         end
            
         function reload(obj)
+            % RELOAD
+            %
+            % Description:
+            %   Reload ROIs (if loaded from a specific file)
+            %
+            % Syntax:
+            %   reload(obj)
+            % -------------------------------------------------------------
             if isempty(obj.Reader) 
                 error('No Reader found!');
             end
             newMap = obj.Reader.reload();
             obj.setMap(newMap);
+            obj.setMetadata();
             notify(obj, 'UpdatedRois');
         end
     end
@@ -88,11 +108,15 @@ classdef Rois < aod.core.Regions
             % UID2ROI 
             % 
             % Description:
-            %   Given a UID, return the corresponding ROI ID
+            %   Given a UID, return the ROI ID. Given ROI ID, return as is
             %
             % Syntax:
             %   uid = obj.roi2uid(roiID)
             % -------------------------------------------------------------
+            if isnumeric(uid)
+                roiID = uid;
+                return
+            end
             roiID = find(obj.Metadata.UID == uid);
         end
 
@@ -100,11 +124,15 @@ classdef Rois < aod.core.Regions
             % ROI2UID 
             % 
             % Description:
-            %   Given a roi ID, returns the UID
+            %   Given a roi ID, returns the UID. Given a UID, return as is
             %
             % Syntax:
             %   uid = obj.roi2uid(roiID)
             % -------------------------------------------------------------
+            if isstring && strlength(3)
+                uid = roiID;
+                return
+            end
             if roiID > height(obj.Metadata)
                 error('Roi ID %u not in metadata', roiID);
             end
@@ -156,8 +184,13 @@ classdef Rois < aod.core.Regions
             end
             obj.Metadata = sortrows(obj.Metadata, 'ID');
         end
+    
+        function clearMetadata(obj)
+            obj.createMetadata(true);
+        end
     end
 
+    % Convenience analysis methods
     methods
         function xy = getCentroids(obj, ID)
             % GETCENTROIDS
@@ -181,12 +214,13 @@ classdef Rois < aod.core.Regions
     end
 
     methods (Access = protected)
-        function setMap(obj, roiMap)
-            setMap@aod.core.Regions(obj, roiMap);
-
-            % If there were existing ROIs, make sure to append to Metadata 
-            % rather than erasing existing table
+        function setMetadata(obj)
+            if isempty(obj.Map)
+                return
+            end
             if ~isempty(obj.Metadata)
+                % If there were existing ROIs, make sure to append to  
+                % Metadata rather than erasing existing table
                 newROIs = obj.Count - height(obj.Metadata);
                 newTable = table(height(obj.Metadata) + rangeCol(1, newROIs),...
                     repmat("", [newROIs, 1]), 'VariableNames', {'ID', 'UID'});

@@ -22,7 +22,7 @@ classdef Epoch < aod.core.Epoch
 %
 % Public methods:
 %   makeStackSnapshots(obj, fPath)
-%   clearTransform(obj)
+%   clearRigidTransform(obj)
 % Overwritten public methods:
 %   imStack = getStack(obj)
 % Inherited public methods:
@@ -66,7 +66,7 @@ classdef Epoch < aod.core.Epoch
             idx = find(findByClass(obj.Registrations,... 
                 'aod.builtin.registrations.RigidRegistration'));
             if ~isempty(idx)
-                value = obj.Registrations{idx};
+                value = obj.Registrations(idx);
             end
         end
     end
@@ -93,6 +93,7 @@ classdef Epoch < aod.core.Epoch
 
             if ~isempty(obj.transform)
                 imStack = obj.transform.apply(imStack);
+                fprintf('Applying transform...');
             end
             obj.cachedVideo = imStack;
 
@@ -108,10 +109,10 @@ classdef Epoch < aod.core.Epoch
             R = obj.getResponse('patterson.responses.Dff', varargin{:});
         end
 
-        function clearTransform(obj)
+        function clearRigidTransform(obj)
             idx = findByClass(obj.Registrations, 'aod.builtin.registrations.RigidRegistration');
             if ~isempty(idx)
-                obj.Registrations = obj.Registrations{~idx};
+                obj.Registrations = obj.Registrations(~idx);
             end
             % TODO: Clear cached video as well
         end
@@ -131,7 +132,7 @@ classdef Epoch < aod.core.Epoch
             %       Where to save (default = 'Analysis/Snapshots/')
             % -------------------------------------------------------------
             if nargin < 2
-                fPath = [obj.Parent.getAnalysisFolder(), 'Snapshots', filesep];
+                fPath = fullfile(obj.Parent.getAnalysisFolder(), 'Snapshots');
             end
             
             baseName = ['_', 'vis_', int2fixedwidthstr(obj.ID, 4), '.png'];
@@ -139,13 +140,11 @@ classdef Epoch < aod.core.Epoch
             
             imSum = sum(im2double(imStack), 3);
             imwrite(uint8(255 * imSum/max(imSum(:))),...
-                [fPath, 'SUM', baseName], 'png');
+                fullfile(fPath, ['SUM', baseName]), 'png');
             imwrite(uint8(mean(imStack, 3)),...
-                [fPath, 'AVG', baseName], 'png');
-            imwrite(uint8(max(imStack, [], 3)),... 
-                [fPath, 'MAX', baseName], 'png');
+                fullfile(fPath, ['AVG', baseName]), 'png');
             imwrite(im2uint8(imadjust(std(im2double(imStack), [], 3))),... 
-                [fPath, 'STD', baseName], 'png');
+                fullfile(fPath, ['STD', baseName]), 'png');
         end
     end
 

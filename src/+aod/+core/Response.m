@@ -39,7 +39,9 @@ classdef Response < aod.core.Entity
         function value = get.Dataset(obj)
             value = obj.ancestor('aod.core.Dataset');
         end
+    end
 
+    methods (Sealed)
         function setData(obj, data)
             % SETDATA
             %
@@ -57,9 +59,7 @@ classdef Response < aod.core.Entity
             % -------------------------------------------------------------
             obj.Timing = timing;
         end
-    end
-
-    methods (Sealed)
+        
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %

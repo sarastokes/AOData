@@ -4,14 +4,14 @@ classdef RegionResponse < aod.core.Response
 % Description:
 %   The average response with each ROI in Regions
 %
-% Properties
+% Properties:
 %   Data
 %   responseParameters
 %   dateModified
 % Dependent properties:
 %   Dataset
 %   Regions
-% Private properties
+% Private properties:
 %   listeners
 % -------------------------------------------------------------------------
 
@@ -24,13 +24,13 @@ classdef RegionResponse < aod.core.Response
     end
 
     methods
-        function obj = RegionResponse(parent)
+        function obj = RegionResponse(parent, varargin)
             if nargin < 1
                 parent = [];
             end
             obj = obj@aod.core.Response(parent);
             if isSubclass(obj.Parent, 'aod.core.Epoch')
-                obj.setData();
+                obj.load(varargin{:});
                 % Listen for changes to ROIs and flag for update
                 obj.listeners = addlistener(obj.Regions,... 
                     'UpdatedRois', @obj.onUpdatedRois);
@@ -67,8 +67,8 @@ classdef RegionResponse < aod.core.Response
             end
         end
 
-        function setData(obj)
-            % SETDATA
+        function load(obj)
+            % LOAD
             %
             % Description:
             %   Get the average response over all pixels in ROI
@@ -97,9 +97,9 @@ classdef RegionResponse < aod.core.Response
                 A = cat(1, A, signal);
             end
 
-            obj.Timing = aod.core.timing.TimeRate(1/sampleRate,... 
-                size(imStack,3), 1/sampleRate);
-            obj.Data = A;
+            obj.setData(A);
+            obj.setTiming(aod.core.timing.TimeRate(1/sampleRate,... 
+                size(imStack,3), 1/sampleRate));
         end
 
         function [signals, xpts] = getRoiResponse(obj, ID)
@@ -109,7 +109,7 @@ classdef RegionResponse < aod.core.Response
             %   [signals, xpts] = obj.getRoiResponse(ID)
             % -------------------------------------------------------------
             if isempty(obj.Responses)
-                obj.setData();
+                obj.load();
             end
             ID = obj.Regions.parseRoi(ID);
 
@@ -126,7 +126,7 @@ classdef RegionResponse < aod.core.Response
 
     methods (Access = private)
         function onUpdatedRois(obj, ~, ~)
-            obj.setData();
+            obj.load();
         end
     end
 end

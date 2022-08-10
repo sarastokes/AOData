@@ -86,7 +86,7 @@ classdef SubjectFactory < aod.core.Factory
                                 "e534bdca-fa2b-46ae-a099-4f28efbfd253"];
                             subject = patterson.sources.PhysiologyLocation(...
                                 subject, location);
-                            subject.assignUUID(obj.getStandardUUID(ID));
+                            subject.assignUUID(locationUUIDs(ID));
                         end
                     end
                 case 848
@@ -129,11 +129,12 @@ classdef SubjectFactory < aod.core.Factory
                                 "b2208ed0-7abd-4bda-834e-75b0f1133359"];
                             subject = patterson.sources.PhysiologyLocation(...
                                 subject, location);
-                            subject.assignUUID(obj.getStandardUUID(ID));
+                            subject.assignUUID(locationUUIDs(ID));
                         end
                     else
                         subject = aod.builtin.sources.primate.Eye(subject, 'OS',...
                             'AxialLength', 16.97, nhpProps{:});
+                        subject.addParameter('ContactLens', '12.2mm/5.8mm/plano');
                         subject.assignUUID("5e8118e0-a165-4c4f-a261-47fb31e9059c");
                         
                         % Add location, if standardized
@@ -146,7 +147,7 @@ classdef SubjectFactory < aod.core.Factory
                                 "fc161ba0-25aa-4a3b-b2fc-8d9b42c1e685"];
                             subject = patterson.sources.PhysiologyLocation(...
                                 subject, location);
-                            subject.assignUUID(obj.getStandardUUID(ID));
+                            subject.assignUUID(locationUUIDs(ID));
                         end
                     end
                 otherwise

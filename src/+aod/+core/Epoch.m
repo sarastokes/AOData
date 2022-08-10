@@ -132,12 +132,12 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
             % Additional key/value inputs are sent to response constructor
             % -------------------------------------------------------------
 
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            addOptional(ip, 'Keep', false, @islogical);
-            parse(ip, varargin{:});
-            keepResponse = ip.Results.Keep;
-
+            %ip = inputParser();
+            %ip.KeepUnmatched = true;
+            %addOptional(ip, 'Keep', false, @islogical);
+            %parse(ip, varargin{:});
+            %keepResponse = ip.Results.Keep;
+            keepResponse = false;
 
             if isempty(obj.Parent.Regions)
                 error('Dataset must contain Regions');
@@ -145,7 +145,7 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
             resp = getByClass(obj.Responses, responseClassName);
             if isempty(resp)
                 constructor = str2func(responseClassName);
-                resp = constructor(obj, ip.Unmatched);
+                resp = constructor(obj, varargin{:});
                 if keepResponse
                     obj.addResponse(resp);
                 end

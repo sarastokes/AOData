@@ -8,6 +8,7 @@ classdef Dataset < aod.core.Dataset
 %   getFileHeader(obj)
 %   initParameters(obj, varargin)
 %   loadTransforms(obj, fName)
+%   clearRigidTransforms(obj)
 %
 % Inherited public methods:
 %   setHomeDirectory(obj, filePath)
@@ -74,14 +75,14 @@ classdef Dataset < aod.core.Dataset
             end
         end
 
-        function clearAllTransforms(obj)
-            % CLEARALLTRANSFORMS
+        function clearRigidTransforms(obj)
+            % CLEARRIGIDTRANSFORMS
             %
             % Syntax:
-            %   clearAllTransforms(obj)
+            %   clearRigidTransforms(obj)
             % -------------------------------------------------------------
             for i = 1:numel(obj.Epochs)
-                obj.Epochs(i).clearTransform();
+                obj.Epochs(i).clearRigidTransform();
             end
         end
 

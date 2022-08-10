@@ -63,13 +63,14 @@ classdef Physiology < patterson.Dataset
                 stimName = string(stimName);
             end
             % Check the stimulus name first
-            idx = obj.stimTable.Stimulus == stimName;
+            idx = find(obj.stimTable.Stimulus == stimName);
             % Then try protocol name, if necessary
-            if isempty(idx)
-                idx = obj.stimTable.Protocol == stimName;
-            end
+            % if isempty(idx)
+            %     idx = find(obj.stimTable.Protocol == stimName);
+            % end
             if ~isempty(idx)
-                epochs = obj.Epochs(idx);
+                ID = cell2mat(obj.stimTable.ID(idx));
+                epochs = obj.Epochs(ID);
             else
                 warning('No epochs found matching %s', stimName);
                 epochs = [];

@@ -77,6 +77,16 @@ classdef SpectralProtocolFactory < aod.core.Factory
             % Temporal frequency tuning curves
             if contains(fileName, 'hz')
                 hz = extractFlaggedNumber(fileName, 'hz');
+                switch totalTime
+                    case 110
+                        stimTime = 60; tailTime = 30;
+                    case 120
+                        stimTime = 60; tailTime = 40;
+                    case 160
+                        stimTime = 100; tailTime = 40;
+                    otherwise
+                        error('%s total time unrecognized', fileName);
+                end
                 if contains(fileName, 'sawtooth')
                     if contains(fileName, '_on_')
                         polarityClass = 'positive';
@@ -84,7 +94,7 @@ classdef SpectralProtocolFactory < aod.core.Factory
                         polarityClass = 'negative';
                     end
                     protocol = SawtoothModulation(obj.calibration,...
-                        'PreTime', 20, 'StimTime', 60, 'TailTime', 40,...
+                        'PreTime', 20, 'StimTime', stimTime, 'TailTime', tailTime,...
                         'BaseIntensity', baseIntensity,...
                         'TemporalFrequency', hz,...
                         'PolarityClass', polarityClass);
@@ -96,7 +106,7 @@ classdef SpectralProtocolFactory < aod.core.Factory
                         modulationClass = 'square';
                     end
                     protocol = TemporalModulation(obj.calibration,...
-                        'PreTime', 20, 'StimTime', 60, 'TailTime', 40,...
+                        'PreTime', 20, 'StimTime', stimTime, 'TailTime', tailTime,...
                         'BaseIntensity', baseIntensity,...
                         'TemporalFrequency', hz,...
                         'ModulationClass', modulationClass);

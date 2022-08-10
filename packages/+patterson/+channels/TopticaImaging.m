@@ -29,7 +29,7 @@ classdef TopticaImaging < aod.core.Channel
     methods (Access = private)
         function initialize(obj, pinhole, gain)
             obj.addDevice(aod.core.LightSource(channel, 561,...
-                'Manufacturer', 'Toptica'));
+                'Manufacturer', 'Toptica', 'Model','iChrome MLE'));
             if ~isempty(pinhole)
                 obj.addDevice(aod.core.Pinhole(channel, pinhole,...
                     'Manufacturer', 'ThorLabs', 'Model', sprintf('P%uK', pinhole)));

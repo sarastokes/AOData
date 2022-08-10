@@ -48,8 +48,13 @@ classdef SawtoothModulation < patterson.protocols.SpectralProtocol
             dt = 1/obj.stimRate;
             t = dt:dt:obj.stimTime;
 
-            stim = sawtooth(2 * pi * obj.temporalFrequency * t);
-            stim = obj.amplitude * stim + obj.baseIntensity;
+            W = obj.stimRate/obj.temporalFrequency;
+
+            syms x y;
+            stim = 1/W * (x-fix(x/W));
+
+            %stim = sawtooth(2 * pi * obj.temporalFrequency * t);
+            %stim = obj.amplitude * stim + obj.baseIntensity;
 
             if strcmp(obj.polarityClass, 'positive')
                 stim = fliplr(stim);

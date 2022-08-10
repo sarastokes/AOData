@@ -28,7 +28,7 @@ classdef TopticaStimulation < aod.core.Channel
         function initialize(obj, ndf)
 
             obj.addDevice(aod.builtin.devices.LightSource(obj, 561,...
-                'Manufacturer', 'Toptica'));
+                'Manufacturer', 'Toptica', 'Model', 'iChrome MLE'));
             if ~isempty(ndf)
                 ndf = aod.builtin.NeutralDensityFilter(obj, ndf,...
                     'Model', sprintf('NE%sA-A', int2fixedwidthstr(ndf, 2)));

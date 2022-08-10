@@ -20,7 +20,7 @@ classdef Creator < aod.core.Creator
 
             obj.Dataset = patterson.datasets.Physiology(...
                 obj.homeDirectory, expDate, location);
-            obj.Dataset.setSource(source);
+            obj.Dataset.addSource(source);
             if ~isempty(ip.Results.Purpose)
                 obj.Dataset.setDescription(ip.Results.Purpose);
             end
@@ -80,11 +80,11 @@ classdef Creator < aod.core.Creator
             obj.Dataset.addRegions(regions);
         end
 
-        function addAffineTransform(obj, fName, epochIDs, varargin)
-            % ADDAFFINETRANSFORM
+        function addRigidTransform(obj, fName, epochIDs, varargin)
+            % ADDRIGIDTRANSFORM
             %
             % Syntax:
-            %   obj.addAffineTransform(fName, epochIDs, varargin)
+            %   obj.addRigidTransform(fName, epochIDs, varargin)
             % -------------------------------------------------------------
             if ~isfile(fName)
                 fName = fullfile(obj.Dataset.getAnalysisFolder(), fName);
@@ -283,7 +283,7 @@ classdef Creator < aod.core.Creator
 
             % Find registration parameters
             regFiles = multicontains(refFiles, {'params', 'txt'});
-            ind = find(contains(regFiles, [refStr, '_']));
+            ind = find(contains(regFiles, refStr));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
                 ep.addFile('RegistrationParameters', "Ref" + filesep + regFiles(ind));
