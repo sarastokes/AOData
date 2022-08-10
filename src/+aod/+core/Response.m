@@ -1,8 +1,11 @@
-classdef Response < aod.core.Entity
+classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 % RESPONSE
 %
 % Description:
-%   A response measured over time
+%   A response measured during an Epoch
+%
+% Parent: 
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Properties:
 %   Data 

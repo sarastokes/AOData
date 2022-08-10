@@ -223,7 +223,7 @@ classdef (Abstract) Dataset < aod.core.Entity
             % -------------------------------------------------------------
             assert(isSubclass(source, 'aod.core.Source'),...
                 'Must be a subclass of aod.core.Source');
-            for i = 1:numel(sources)
+            for i = 1:numel(source)
                 obj.Source = cat(1, obj.Source, source);
             end
         end

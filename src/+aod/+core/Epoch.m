@@ -209,17 +209,15 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
                 idx = find(findByClass(obj.Stimuli, stim));
                 if ~isempty(idx) 
                     if ~overwrite
-                        warning('Set overwrite=true to replace existing registration');
+                        warning('Set overwrite=true to replace existing stimuli');
                         return
                     else
                         obj.Stimuli(idx) = stim;
                         return
                     end
                 end
-                obj.Stimuli = {obj.Stimuli; stim};
-            else
-                obj.Stimuli = stim;
             end
+            obj.Stimuli = cat(1, obj.Stimuli, stim);
         end
 
         function addRegistration(obj, reg, overwrite)
@@ -242,7 +240,7 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
                         if numel(obj.Registrations) == 1
                             obj.Registrations = reg;
                         else
-                            obj.Registrations{idx} = reg;
+                            obj.Registrations(idx) = reg;
                         end
                         return
                     end
@@ -271,15 +269,13 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
                         if numel(obj.Responses) == 1
                             obj.Responses = resp;
                         else
-                            obj.Responses{idx} = resp;
+                            obj.Responses(idx) = resp;
                         end
                         return
                     end
                 end
-                obj.Responses = {obj.Responses; resp};
-            else
-                obj.Responses = resp;
             end
+            obj.Responses = cat(1, obj.Responses, resp);
         end
 
         function addParameter(obj, varargin)
