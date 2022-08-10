@@ -27,11 +27,11 @@ classdef Creator < aod.core.Creator
             obj.Dataset.initParameters(ip.Unmatched);
         end
 
-        function addEpochs(obj, epochIDs, epochType, varargin)
+        function addEpochs(obj, epochIDs, epochType, source, varargin)
             % ADDEPOCHS
             %
             % Syntax:
-            %   obj.addEpochs(epochIDs, epochType)
+            %   obj.addEpochs(epochIDs, epochType, source, varargin)
             % -------------------------------------------------------------
             if isempty(epochType)
                 epochType = patterson.EpochTypes.Unknown;
@@ -39,7 +39,7 @@ classdef Creator < aod.core.Creator
 
             fprintf('Adding epochs... ');
             for i = 1:numel(epochIDs)
-                ep = obj.makeEpoch(epochIDs(i), epochType, varargin{:});          
+                ep = obj.makeEpoch(epochIDs(i), epochType, source, varargin{:});          
                 obj.Dataset.addEpoch(ep);
                 fprintf('%u ', epochIDs(i));
             end
@@ -103,9 +103,12 @@ classdef Creator < aod.core.Creator
     end
 
     methods (Access = protected)
-        function ep = makeEpoch(obj, epochID, epochType, varargin)
+        function ep = makeEpoch(obj, epochID, epochType, source, varargin)
             % MAKEEPOCH
             ep = patterson.Epoch(epochID, obj.Dataset, epochType);
+            % Assign source for the epoch
+            ep.setSource(source);
+            % Extract epoch imaging parameters
             if epochType.isPhysiology
                 obj.extractEpochAttributes(ep);
             end
@@ -137,7 +140,7 @@ classdef Creator < aod.core.Creator
     methods (Access = protected)
         function fName = getAttributeFile(obj, epochID)
             fName = sprintf('%u_%s_ref_%s.txt',...
-                obj.Dataset.Source.getParentID(), obj.Dataset.experimentDate,...
+                obj.Dataset.Sources(1).getParentID(), obj.Dataset.experimentDate,...
                 int2fixedwidthstr(epochID, 4));
             fName = [obj.Dataset.homeDirectory, filesep, 'Ref', filesep, fName];
         end

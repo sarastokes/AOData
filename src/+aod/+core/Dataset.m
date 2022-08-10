@@ -26,14 +26,14 @@ classdef (Abstract) Dataset < aod.core.Entity
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        homeDirectory           %{mustBeFolder}
+        homeDirectory           char
         experimentDate(1,1)     datetime
         datasetParameters       %aod.core.Parameters
 
         Epochs                  %aod.core.Epoch
-        Source                  %aod.core.Source
-        Regions                 %aod.core.Regions
-        Calibrations            = aod.core.Calibration.empty();
+        Sources                 aod.core.Source
+        Regions                 aod.core.Regions
+        Calibrations            aod.core.Calibration
 
         epochIDs(1,:)           double
     end
@@ -203,7 +203,7 @@ classdef (Abstract) Dataset < aod.core.Entity
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['MC00', num2str(obj.Source.ID), '_', obj.Source.whichEye,...
+            value = ['MC00', num2str(obj.Sources(1).getParentID()), '_', obj.Sources(1).whichEye,...
                 '_', char(obj.experimentDate)];
         end
     end
@@ -224,7 +224,11 @@ classdef (Abstract) Dataset < aod.core.Entity
             assert(isSubclass(source, 'aod.core.Source'),...
                 'Must be a subclass of aod.core.Source');
             for i = 1:numel(source)
-                obj.Source = cat(1, obj.Source, source);
+                if ~isempty(obj.Sources)
+                    assert(obj.Sources(1).getParentID() == source.getParentID(),...
+                        'Experiment may only contain 1 animal');
+                end
+                obj.Sources = cat(1, obj.Sources, source);
             end
         end
 

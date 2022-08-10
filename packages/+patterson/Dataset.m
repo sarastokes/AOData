@@ -49,7 +49,7 @@ classdef Dataset < aod.core.Dataset
             % Syntax:
             %   value = obj.getFileHeader()
             % -------------------------------------------------------------
-            value = [num2str(obj.Source.getParentID()), '_', ...
+            value = [num2str(obj.Sources(1).getParentID()), '_', ...
                 char(obj.experimentDate)];
         end
         

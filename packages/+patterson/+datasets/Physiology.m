@@ -87,7 +87,7 @@ classdef Physiology < patterson.Dataset
 
     methods (Access = private)
         function populateStimLog(obj)
-            % SETSTIMTABLE
+            % POPULATESTIMLOG
             % 
             % Syntax:
             %   obj.populateStimLog()
@@ -139,13 +139,14 @@ classdef Physiology < patterson.Dataset
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['MC', int2fixedwidthstr(num2str(obj.Source.ID), 5),...
-                '_', obj.Source.whichEye,...
+            value = ['MC', int2fixedwidthstr(num2str(obj.Sources.getParentID()), 5),...
+                '_', obj.Sources(1).whichEye,...
                 obj.location(1), '_', char(obj.experimentDate)];
         end
 
         function value = getShortName(obj)
-            value = [num2str(obj.Source.ID), '_', obj.Source.whichEye,...
+            value = [num2str(obj.Sources(1).getParentID), '_', ...
+                obj.Sources(1).Parent.whichEye,...
                 obj.location(1), '_', char(obj.experimentDate)];
         end
     end

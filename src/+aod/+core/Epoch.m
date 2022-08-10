@@ -32,10 +32,14 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Creator})
         startTime(1,1)              datetime
         Registrations               aod.core.Registration
-        Responses                   % aod.core.Response  
-        Stimuli                     % aod.core.Stimulus
+        Responses                   aod.core.Response  
+        Stimuli                     aod.core.Stimulus
         epochParameters             % aod.core.Parameters
         files                       % aod.core.Parameters  
+    end
+
+    properties (Dependent)
+        Source
     end
 
     properties (Dependent, Hidden)
@@ -44,6 +48,10 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
 
     properties (Hidden, Transient, Access = protected)
         cachedVideo
+    end
+
+    properties (Hidden, SetAccess = private)
+        sourceUUID
     end
 
     % Methods for subclasses to overwrite
@@ -75,6 +83,14 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
                 value = [];
             end
         end
+
+        function value = get.Source(obj)
+            if isempty(obj.sourceUUID)
+                value = [];
+            else
+                value = findByUUID(obj.Parent.Sources, obj.sourceUUID);
+            end
+        end
     end
 
     methods (Sealed)
@@ -104,6 +120,19 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
 
     % Access methods
     methods (Sealed)
+        function setSource(obj, source)
+            % SETSOURCE
+            %
+            % Syntax:
+            %   obj.setSource(source)
+            % -------------------------------------------------------------
+            assert(isSubclass(source, 'aod.core.Source'),...
+                'source must be subclass of aod.core.Source');
+            assert(~isempty(findByUUID(obj.Parent.Sources, source.UUID)),... 
+                'Source be part of the same Experiment');
+            obj.sourceUUID = source.UUID;
+        end
+
         function stim = getStimulus(obj, stimClassName)
             % GETSTIMULUS
             %
