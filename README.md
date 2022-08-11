@@ -7,8 +7,8 @@ Framework for organizing and analyzing imaging experiments. Designed with adapti
 For storing data and metadata associated with an experiment:
 
 - **Experiment**
-  - Subject
-    - Subject (nestable) 
+  - Source
+    - Source (nestable) 
   - System
     - Channel
       - Device
@@ -30,7 +30,7 @@ Each class is generic and meant to be subclassed and tailored to specific imagin
 
 ### Dependencies
 - MATLAB (developed in 2022a, compatible with 2021a and 2021b)
-- The core classes do not require additional toolboxes. Some of the examples in `\packages` require the Signal Processing Toolbox and Image Processing Toolbox.
+- The core classes do not require additional toolboxes. Some of the examples in `\packages` require the following additional MATLAB toolboxes: Signal Processing, Image Processing and Symbolic Math.
 
 ### Included 3rd party toolboxes:
 (Currently, these may only be necessary for packages)
