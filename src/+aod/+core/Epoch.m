@@ -1,4 +1,4 @@
-classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
+classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % EPOCH
 %
 % Description:
@@ -100,7 +100,11 @@ classdef Epoch < aod.core.Entity % & matlab.mixin.Heterogeneous
             % Syntax:
             %   fName = obj.getFilePath(whichFile)
             % -------------------------------------------------------------
-            assert(isKey(obj.files, whichFile), sprintf('File named %s not found', whichFile));
+            if ~isKey(obj.files, whichFile)
+                warning('File named %s not found', whichFile);
+                fName = [];
+                return
+            end
             fName = obj.files(whichFile);
             % TODO: This might be an issue for Mac
             if ~contains(fName, ':\')

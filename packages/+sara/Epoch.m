@@ -90,6 +90,7 @@ classdef Epoch < aod.core.Epoch
 
             videoName = obj.getCoreVideoName();
             imStack = readStack(videoName);
+            imStack = im2double(imStack);
             imStack(:,:,1) = [];
 
             if ~isempty(obj.transform)

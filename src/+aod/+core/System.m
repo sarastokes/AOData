@@ -43,7 +43,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             assert(isSubclass(channel, 'aod.core.Channel'),...
                 'Invalid type: must be a subclass of aod.core.Channel');
             if isempty(channel.Parent)
-                channel.Parent = obj;
+                channel.setParent(obj);
             end
             obj.Channels = cat(1, obj.Channels, channel);
         end

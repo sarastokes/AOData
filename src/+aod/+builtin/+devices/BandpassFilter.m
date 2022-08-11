@@ -7,7 +7,7 @@ classdef BandpassFilter < aod.core.Device
 % Properties:
 %   wavelength
 %   bandwidth
-%   spectra
+%   transmission
 % Inherited properties:
 %   manufacturer
 %   model
@@ -15,12 +15,12 @@ classdef BandpassFilter < aod.core.Device
 % Methods:
 %   setWavelength(obj, wavelength)
 %   setBandwidth(obj, bandwidth)
-%   setSpectra(obj, spectra)
+%   setTransmission(obj, transmission)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
         wavelength
         bandwidth
-        spectra
+        transmission
     end
 
     methods 
@@ -41,8 +41,8 @@ classdef BandpassFilter < aod.core.Device
             obj.bandwidth = bandwidth;
         end
         
-        function setSpectra(obj, spectra)
-            obj.spectra = spectra;
+        function setTransmission(obj, transmission)
+            obj.transmission = transmission;
         end
     end
 

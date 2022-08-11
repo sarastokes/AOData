@@ -5,6 +5,7 @@ classdef EpochTypes
         Spatial
         AnatomyOneChannel
         AnatomyTwoChannel
+        Background
         Unknown
     end
 
@@ -44,6 +45,8 @@ classdef EpochTypes
                     obj = sara.EpochTypes.AnatomyOneChannel;
                 case 'anatomy2'
                     obj = sara.EpochTypes.AnatomyTwoChannel;
+                case 'backgroumd'
+                    obj = sara.EpochTypes.Background;
                 case 'unknown'
                     obj = sara.EpochTypes.Unknown;
                 otherwise

@@ -45,7 +45,7 @@ classdef TimeRate < aod.core.Timing
                 value = [];
                 return
             end
-            stopTime = (obj.Interval * (obj.Count+1));
+            stopTime = (obj.Interval * (obj.Count));
             value = obj.Interval:obj.Interval:stopTime;
             value = value + obj.Start;
         end

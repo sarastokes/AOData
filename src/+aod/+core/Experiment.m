@@ -34,6 +34,7 @@ classdef (Abstract) Experiment < aod.core.Entity
         Sources                 aod.core.Source
         Regions                 aod.core.Regions
         Calibrations            aod.core.Calibration
+        Systems                 aod.core.System
 
         epochIDs(1,:)           double
     end
@@ -229,6 +230,15 @@ classdef (Abstract) Experiment < aod.core.Entity
                         'Experiment may only contain 1 animal');
                 end
                 obj.Sources = cat(1, obj.Sources, source);
+            end
+        end
+
+        function addSystem(obj, system)
+            assert(isSubclass(system, 'aod.core.System'),...
+                'Must be a subclass of aod.core.System');
+            for i = 1:numel(system)
+
+                obj.Systems = cat(1, obj.Systems, system);
             end
         end
 

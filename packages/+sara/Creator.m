@@ -61,6 +61,18 @@ classdef Creator < aod.core.Creator
             end
             obj.Experiment.addCalibration(calibration);
         end
+
+        function addSystem(obj, system)
+            % ADDSYSTEM
+            %
+            % Syntax:
+            %   obj.addSystem(system)
+            % -------------------------------------------------------------
+            if isempty(system.Parent)
+                system.setParent(obj.Experiment);
+            end
+            obj.Experiment.addSystem(system);
+        end
     
         function addRegions(obj, fileName, imSize, UIDs)
             % ADDREGIONS
@@ -105,9 +117,15 @@ classdef Creator < aod.core.Creator
     methods (Access = protected)
         function ep = makeEpoch(obj, epochID, epochType, source, varargin)
             % MAKEEPOCH
-            ep = sara.Epoch(epochID, obj.Experiment, epochType);
+            if epochType == sara.EpochTypes.Background
+                ep = sara.epochs.BackgroundEpoch(epochID, obj.Experiment);
+            else
+                ep = sara.Epoch(epochID, obj.Experiment, epochType);
+            end
             % Assign source for the epoch
-            ep.setSource(source);
+            if ~isempty(source)
+                ep.setSource(source);
+            end
             % Extract epoch imaging parameters
             if epochType.isPhysiology
                 obj.extractEpochAttributes(ep);
@@ -143,12 +161,20 @@ classdef Creator < aod.core.Creator
                 obj.Experiment.Sources(1).getParentID(), obj.Experiment.experimentDate,...
                 int2fixedwidthstr(epochID, 4));
             fName = [obj.Experiment.homeDirectory, filesep, 'Ref', filesep, fName];
+            if exist(fName, 'file')
+                ep.addFile('Attributes', fName);
+            else
+                fName = [];
+            end
         end
 
 
         function extractEpochAttributes(obj, ep)
             epochID = ep.ID;
             fName = obj.getAttributeFile(epochID);
+            if isempty(fName)
+                return
+            end
 
             txt = readProperty(fName, 'Date/Time = ');
             txt = erase(txt, ' (yyyy-mm-dd:hh:mm:ss)');

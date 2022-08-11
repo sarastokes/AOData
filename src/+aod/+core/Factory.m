@@ -29,7 +29,7 @@ classdef (Abstract) Factory < handle
     end
 
     methods (Static)
-        function newObj = create(varargin)
+        function varargout = create(varargin) %#ok<STOUT> 
             % CREATE
             %
             % Description:
@@ -38,7 +38,7 @@ classdef (Abstract) Factory < handle
             %   the object, then run get() and return the new object
             %
             % Syntax:
-            %   newObj = create(varargin)
+            %   varargout = create(varargin)
             % ------------------------------------------------------------- 
             error('Not yet implemented');
         end
