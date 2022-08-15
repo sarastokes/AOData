@@ -14,12 +14,12 @@ classdef (Abstract) Entity < handle
 %   allowableParentTypes        cellstr
 %
 % Dependent properties:
-%   label                       string
-%   shortName                   string
+%   label                       string      (defined by getLabel)
+%   shortName                   string      (defined by shortName)
 %
-% Methods:
-%   addParameter(obj, name, value)
-%   value = getParameter(obj, name)
+% Public:
+%   h = ancestor(obj, className)
+%   setDescription(obj, txt, overwrite)
 %   addNote(obj, txt)
 %   clearNotes(obj)
 %
@@ -27,12 +27,15 @@ classdef (Abstract) Entity < handle
 %   x = getShortName(obj)
 %   x = getLabel(obj)
 %
-% Sealed, protected methods (w/ Creator access):
+% Protected methods (with Creator access):
 %   addParent(obj, parent)
 %   setUUID(obj, uuid)
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
+%
+% Static methods:
+%   tf = isEntity(entity)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -47,7 +50,7 @@ classdef (Abstract) Entity < handle
         allowableParentTypes        cell    = cell.empty();
     end
 
-    properties (Dependent = true)
+    properties (Dependent)
         label
     end
 
@@ -72,7 +75,8 @@ classdef (Abstract) Entity < handle
             % ANCESTOR
             %
             % Description:
-            %   Recursively search 'Parent' property for className & return
+            %   Recursively search 'Parent' property for an entity matching
+            %   or subclassing className
             %
             % Syntax:
             %   h = obj.ancestor(className)
@@ -81,7 +85,6 @@ classdef (Abstract) Entity < handle
             while ~isSubclass(h, className)
                 h = h.Parent;
                 if isempty(h)
-                    %warning('Ancestor of class %s not found!', className);
                     break
                 end
             end

@@ -9,7 +9,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Channel(parent)
+%   obj = Channel(parent, channelName)
 %
 % Methods:
 %   addParameter(obj, varargin)
@@ -19,38 +19,74 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   clearDevices(obj)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
-        dataFolder
+        Name                    char
+        dataFolder              char
         Devices                         = aod.core.Device.empty()
         channelParameters               % aod.core.Parameters
     end
     
     methods
-        function obj = Channel(parent)
+        function obj = Channel(parent, channelName)
             obj.allowableParentTypes = {'aod.core.System', 'aod.core.Empty'};
             if nargin > 0
                 obj.setParent(parent);
+            end
+            if nargin > 1
+                obj.setName(channelName);
             end
             obj.channelParameters = aod.core.Parameters;
         end
     end
     
     methods (Sealed)
+        function setName(obj, channelName)
+            % SETNAME
+            %
+            % Description:
+            %   Assign channel name
+            %
+            % Syntax:
+            %   setName(obj, channelName)
+            % -------------------------------------------------------------
+            obj.Name = channelName;
+        end
+
         function addDevice(obj, device)
+            % ADDDEVICE
+            %
+            % Syntax:
+            %   addDevice(obj, device)
+            % -------------------------------------------------------------
             assert(isSubclass(device, 'aod.core.Device'),...
                 'Must be subclass of aod.core.Device');
             obj.Devices = cat(1, obj.Devices, device);
         end
         
         function removeDevice(obj, deviceID)
+            % REMOVEDEVICES
+            %
+            % Syntax:
+            %   removeDevice(obj, deviceID)
+            % -------------------------------------------------------------
             assert(deviceID <= numel(obj.Devices), 'Invalid Device number');
             obj.Devices(deviceID) = [];
         end
         
         function clearDevices(obj)
+            % CLEARDEVICES
+            %
+            % Syntax:
+            %   clearDevices(obj)
+            % -------------------------------------------------------------
             obj.Devices = [];
         end
 
         function setDataFolder(obj, folderName)
+            % SETDATAFOLDER
+            %
+            % Syntax:
+            %   setDataFolder(obj, folderName)
+            % -------------------------------------------------------------
             assert(istext(folderName), 'Data folder must be string or char');
             obj.dataFolder = folderName;
         end
@@ -95,6 +131,13 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   generateUUID
             % -------------------------------------------------------------
             obj.setUUID(UUID);
+        end
+    end
+
+    % Overwritten methods
+    methods (Access = protected)
+        function value = getLabel(obj)
+            value = [obj.Name, 'Channel'];
         end
     end
 end

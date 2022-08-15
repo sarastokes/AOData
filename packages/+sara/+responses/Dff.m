@@ -72,6 +72,7 @@ classdef Dff < aod.builtin.responses.RegionResponse
                      
             % Add to Response
             obj.setData(signals);
+            obj.setTiming(F.Timing);
             obj.addParameter(ip.Results);
         end
     end

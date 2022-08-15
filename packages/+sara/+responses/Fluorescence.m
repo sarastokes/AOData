@@ -17,11 +17,9 @@ classdef Fluorescence < aod.builtin.responses.RegionResponse
 
         function load(obj)
             load@aod.builtin.responses.RegionResponse(obj);
-            % Account for the first frame being deleted
-            obj.Timing = aod.core.timing.TimeRate(...
+            obj.setTiming(aod.core.timing.TimeRate(...
                 1/obj.Experiment.sampleRate, obj.Timing.Count,... 
-                obj.Timing.Start+obj.Timing.Interval);
-            % obj.Data.Time = obj.Data.Time + obj.Data.Time(1);
+                obj.Timing.Start+obj.Timing.Interval));
         end
     end
 

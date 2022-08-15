@@ -58,6 +58,34 @@ classdef PhysiologyExperiment < sara.Experiment
             R = ep.getDff(varargin{:});
         end
 
+        function [data, t] = getStimulusDff(obj, stimName, varargin)
+            
+            % Search for average input
+            idx = find(cellfun(@(x) strcmp(x, 'Average'), varargin));
+            args = varargin;
+            if isempty(idx)
+                averageFlag = false;
+            else
+                averageFlag = cell2mat(args(idx+1));
+                args([idx,idx+1]) = [];
+            end
+
+            ep = obj.stim2epochs(stimName);
+            if isempty(ep)
+                data = []; t = [];
+                return
+            end
+            data = [];
+            for i = 1:numel(ep)
+                R = ep(i).getDff(args{:});
+                data = cat(3, data, R.Data);
+            end
+            if numel(ep) > 1 && averageFlag
+                data = mean(data, 3);
+            end
+            t = R.Timing.Time;
+        end
+
         function epochs = stim2epochs(obj, stimName)
             if ischar(stimName)
                 stimName = string(stimName);

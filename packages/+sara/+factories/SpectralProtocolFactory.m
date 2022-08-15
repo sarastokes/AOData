@@ -76,6 +76,12 @@ classdef SpectralProtocolFactory < aod.core.Factory
 
             % Temporal frequency tuning curves
             if contains(fileName, 'hz')
+                contrast = extractFlaggedNumber(fileName, 'c_');
+                if isempty(contrast)
+                    contrast = 1;
+                else
+                    contrast = contrast / 100;
+                end
                 hz = extractFlaggedNumber(fileName, 'hz');
                 switch totalTime
                     case 110
@@ -95,7 +101,7 @@ classdef SpectralProtocolFactory < aod.core.Factory
                     end
                     protocol = SawtoothModulation(obj.calibration,...
                         'PreTime', 20, 'StimTime', stimTime, 'TailTime', tailTime,...
-                        'BaseIntensity', baseIntensity,...
+                        'BaseIntensity', baseIntensity, 'Contrast', contrast,...
                         'TemporalFrequency', hz,...
                         'PolarityClass', polarityClass);
                     return
@@ -107,7 +113,7 @@ classdef SpectralProtocolFactory < aod.core.Factory
                     end
                     protocol = TemporalModulation(obj.calibration,...
                         'PreTime', 20, 'StimTime', stimTime, 'TailTime', tailTime,...
-                        'BaseIntensity', baseIntensity,...
+                        'BaseIntensity', baseIntensity, 'Contrast', contrast,...
                         'TemporalFrequency', hz,...
                         'ModulationClass', modulationClass);
                     return
@@ -173,6 +179,7 @@ classdef SpectralProtocolFactory < aod.core.Factory
         function protocol = create(calibration, fileName)
             obj = sara.factories.SpectralProtocolFactory(calibration);
             protocol = obj.get(fileName);
+            fprintf('\t%s --- %s\n', class(protocol), fileName);
         end
     end
 end 

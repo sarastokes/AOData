@@ -156,10 +156,10 @@ classdef Creator < aod.core.Creator
     end
 
     methods (Access = protected)
-        function fName = getAttributeFile(obj, epochID)
+        function fName = getAttributeFile(obj, ep)
             fName = sprintf('%u_%s_ref_%s.txt',...
                 obj.Experiment.Sources(1).getParentID(), obj.Experiment.experimentDate,...
-                int2fixedwidthstr(epochID, 4));
+                int2fixedwidthstr(ep.ID, 4));
             fName = [obj.Experiment.homeDirectory, filesep, 'Ref', filesep, fName];
             if exist(fName, 'file')
                 ep.addFile('Attributes', fName);
@@ -168,10 +168,8 @@ classdef Creator < aod.core.Creator
             end
         end
 
-
         function extractEpochAttributes(obj, ep)
-            epochID = ep.ID;
-            fName = obj.getAttributeFile(epochID);
+            fName = obj.getAttributeFile(ep);
             if isempty(fName)
                 return
             end

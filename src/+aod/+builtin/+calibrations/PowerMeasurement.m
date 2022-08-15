@@ -92,7 +92,7 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = [class(obj), num2str(obj.wavelength), 'nm'];
+            value = [char(getClassWithoutPackages(obj)), num2str(obj.wavelength), 'nm'];
         end
     end
 end

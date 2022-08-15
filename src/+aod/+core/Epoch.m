@@ -4,6 +4,23 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % Description:
 %   A continuous period of data acquisition within an experiment
 %
+% Parent:
+%   aod.core.Entity
+%   matlab.mixin.Heterogeneous
+%
+% Constructor:
+%   obj = Epoch(ID, parent)
+%
+% Properties:
+%   ID                              Epoch identifier (integer)
+%   startTime                       Time when epoch began
+%   Registrations                   Container for epoch's registrations
+%   Responses                       Container for epoch's responses
+%   Stimuli                         Container for epoch's stimuli
+%
+% Dependent properties:
+%   Source
+%
 % Abstract methods:
 %   videoName = getCoreVideoName(obj)
 % 
@@ -191,7 +208,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   obj.clearResponses()
             % -------------------------------------------------------------
-            obj.Responses = [];
+            obj.Responses = aod.core.Response.empty();
         end
 
         function clearRegionResponses(obj)

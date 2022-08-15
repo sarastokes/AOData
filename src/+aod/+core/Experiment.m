@@ -1,28 +1,51 @@
 classdef (Abstract) Experiment < aod.core.Entity
 % EXPERIMENT
 %
+% Description:
+%   Parent class for a single experiment
+%
 % Constructor:
 %   obj = Experiment(expDate, source)
 %
 % Properties:
-%   Epochs
-%   Source
-%   Regions
-%   Calibrations
-%   homeDirectory
-%   experimentDate              
-%   experimentParameters
-%   epochIDs                    list of epoch IDs in experiment
+%   Epochs                      Container for Epochs
+%   Source                      Container experiment's for Sources
+%   Regions                     Container for experiment's Regions
+%   Calibrations                Container for experiment's Calibrations
+%   Systems                     Container for experiment's Systems
+%   homeDirectory               File path for experiment files 
+%   experimentDate              Date the experiment occurred
+%   experimentParameters        Additional parameters related to experiment
+%   epochIDs                    List of epoch IDs in experiment
+%
+% Dependent properties:
+%   numEpochs                   Number of epochs in experiment
 %
 % Private properties:
-%   baseDirectory               folder used to initialize Experiment
+%   baseDirectory               Folder used to initialize Experiment
 %
+% Abstract methods:
+%   value = getFileHeader(obj)
+% 
 % Public methods:
 %   setHomeDirectory(obj, filePath)
 %   id = id2epoch(obj, epochID)
 %   idx = id2index(obj, epochID)
+%
+%   calibration = getCalibration(obj, className)
 %   imStack = getStacks(obj, epochIDs)
+%
+%   data = getResponse(obj, epochIDs, className, varargin)
 %   data = getRegionResponses(obj, epochIDs)
+%   clearAllResponses(obj, epochIDs)
+%   addParameter(obj, varargin)
+%
+% Protected methods with Creator access:
+%   addCalibration(obj, calibration)
+%   addEpoch(obj, epoch)
+%   addSystem(obj, system)
+%   sortEpochs(obj)
+%
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -200,6 +223,25 @@ classdef (Abstract) Experiment < aod.core.Entity
                 data = mean(data, 3);
             end
         end
+
+        function clearAllResponses(obj, epochIDs)
+            % CLEARALLRESPONSES
+            %
+            % Description:
+            %   Clear responses in all or a subset of Epochs
+            %
+            % Syntax:
+            %   clearAllResponses(obj)
+            %   clearAllResponses(obj, epochIDs)
+            % -------------------------------------------------------------
+            if nargin < 2
+                epochIDs = obj.epochIDs;
+            end
+            for i = 1:numel(epochIDs)
+                ep = obj.id2epoch(epochIDs(i));
+                ep.clearResponses();
+            end
+        end
     end
 
     methods (Access = protected)
@@ -234,6 +276,14 @@ classdef (Abstract) Experiment < aod.core.Entity
         end
 
         function addSystem(obj, system)
+            % ADDSYSTEM
+            %
+            % Description:
+            %   Add a System to the expeirment
+            %
+            % Syntax:
+            %   obj.addSystem(system)
+            % -------------------------------------------------------------
             assert(isSubclass(system, 'aod.core.System'),...
                 'Must be a subclass of aod.core.System');
             for i = 1:numel(system)

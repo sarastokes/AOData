@@ -30,8 +30,7 @@ classdef RegionResponses < aod.builtin.responses.RegionResponse ...
     methods (Access = protected)
         function varargout = parenReference(obj, indexOp)
             if isempty(obj.Data)
-                error("RegionResponse:DataNotSet",...
-                    "Data is empty");
+                error("RegionResponse:DataNotSet", "Data is empty");
             end
             if numel(indexOp.Indices) > 2
                 error("RegionResponses:IncorrectDimensions",...

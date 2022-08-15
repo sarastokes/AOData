@@ -7,17 +7,20 @@ classdef ChannelFactory < aod.core.Factory
 
         function channel = get(obj, channelName) %#ok<INUSL> 
             switch channelName 
-                case 'Reflectance'
-                    channel = aod.core.Channel(system);
+                case 'ReflectanceImaging'
+                    channel = aod.core.Channel([]);
                     channel.addDevice(aod.builtin.devices.LightSource([], 796,...
                         'Manufacturer', 'SuperLum'));
+                    channel.addDevice(aod.builtin.devices.Pinhole([], 20,...
+                        'Manufacturer', 'ThorLabs', 'Model', 'P20K'));
                     channel.setDataFolder('Ref');
-                case 'Wavefront'
-                    channel = aod.core.Channel(system);
+                    % TODO: Add PMT
+                case 'WavefrontSensing'
+                    channel = aod.core.Channel([]);
                     channel.addDevice(aod.builtin.devices.LightSource([], 847,...
                         'Manufacturer', 'QPhotonics'));
                 case 'MustangImaging'
-                    channel = aod.core.Channel(system);
+                    channel = aod.core.Channel([]);
                     channel.setDataFolder('Vis');
                     channel.addDevice(aod.builtin.devices.Pinhole([], 25,...
                         'Manufacturer', 'ThorLabs', 'Model', 'P20K'));
@@ -34,11 +37,11 @@ classdef ChannelFactory < aod.core.Factory
                         'Manufacturer', 'ThorLabs', 'Model', 'M660L4'));
                     channel.addDevice(aod.builtin.devices.LightSource([], 530,...
                         'Manufacturer', 'ThorLabs', 'Model', 'M530L4'));
-                    channel.addDevice(aod.builtin.devices.LightSource([], 415,...
-                        'Manufacturer', 'ThorLabs', 'Model', 'M415L4'));
+                    channel.addDevice(aod.builtin.devices.LightSource([], 420,...
+                        'Manufacturer', 'ThorLabs', 'Model', 'M420L4'));
                     % Add the dichroic filters
                     ff470 = aod.builtin.devices.DichroicFilter([], 470,...
-                        'Manufacturer', 'Semrock', 'Model', 'FF47-Di01');
+                        'Manufacturer', 'Semrock', 'Model', 'FF470-Di01');
                     ff470.setSpectrum(sara.resources.getResource('FF470_Di01.txt'));
                     channel.addDevice(ff470);
                     ff562 = aod.builtin.devices.DichroicFilter([], 562,...

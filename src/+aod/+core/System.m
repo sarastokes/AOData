@@ -13,15 +13,17 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   systemParameters
 %
 % Methods:
-%   addChannel(obj, channel)
 %   removeChannel(obj, ID)
 %   clearChannels(obj)
 %   addParameter(obj, varargin)
 %   assignUUID(obj, uuid)
+%
+% Protected methods (with Creator access):
+%   addChannel(obj, channel)
 % -------------------------------------------------------------------------
     
     properties
-        Name
+        Name                char
         Channels            = aod.core.Channel.empty();
         systemParameters    % aod.core.Parameters     
     end
@@ -39,15 +41,6 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
-        function addChannel(obj, channel)
-            assert(isSubclass(channel, 'aod.core.Channel'),...
-                'Invalid type: must be a subclass of aod.core.Channel');
-            if isempty(channel.Parent)
-                channel.setParent(obj);
-            end
-            obj.Channels = cat(1, obj.Channels, channel);
-        end
-        
         function removeChannel(obj, channelID)
             assert(channelID <= numel(obj.Channels), 'Invalid Channel number');
             obj.Channels(channelID) = [];
@@ -99,14 +92,24 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.setUUID(UUID);
         end
     end
+
+    methods (Sealed, Access = {?aod.core.System, ?aod.core.Creator})
+        function addChannel(obj, channel)
+            % ADDCHANNEL
+            %
+            % Syntax:
+            %   addChannel(obj, channel)
+            % -------------------------------------------------------------
+            assert(isSubclass(channel, 'aod.core.Channel'),...
+                'Invalid type: must be a subclass of aod.core.Channel');
+            channel.setParent(obj);
+            obj.Channels = cat(1, obj.Channels, channel);
+        end
+    end
     
     methods (Access = protected)
         function value = getLabel(obj)
-            if ~isempty(obj.name)
-                value = obj.name;
-            else
-                value = 'System';
-            end
+            value = [obj.Name, 'System'];
         end
     end
 end
