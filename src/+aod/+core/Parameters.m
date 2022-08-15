@@ -4,12 +4,15 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 % Description:
 %   Wrapper for containers.Map with detailed contents display
 %
+% Parent:
+%   containers.Map
+%   matlab.mixin.CustomDisplay
+%
 % Constructor:
 %   obj = aod.core.Parameters(keySet, valueSet)
-%   obj = aod.core.Parameters('KeyType', kType, 'ValueType', vType)
 %
-% See also:
-%   containers.Map
+% Notes:
+%   Use is identical to the containers.Map class
 % -------------------------------------------------------------------------
     methods
         function obj = Parameters(varargin)
@@ -24,7 +27,7 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
             else
                 headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
                 headerStr = [headerStr, ' with ', num2str(numel(obj.keys)), ' members:'];
-                header = sprintf('\t%s',headerStr);
+                header = sprintf('  %s',headerStr);
             end
         end
 

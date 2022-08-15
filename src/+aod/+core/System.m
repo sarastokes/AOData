@@ -73,6 +73,18 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
                 end
             end
         end
+ 
+        function addChannel(obj, channel)
+            % ADDCHANNEL
+            %
+            % Syntax:
+            %   addChannel(obj, channel)
+            % -------------------------------------------------------------
+            assert(isSubclass(channel, 'aod.core.Channel'),...
+                'Invalid type: must be a subclass of aod.core.Channel');
+            channel.setParent(obj);
+            obj.Channels = cat(1, obj.Channels, channel);
+        end
 
         function assignUUID(obj, UUID)
             % ASSIGNUUID
@@ -90,20 +102,6 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %   generateUUID
             % -------------------------------------------------------------
             obj.setUUID(UUID);
-        end
-    end
-
-    methods (Sealed, Access = {?aod.core.System, ?aod.core.Creator})
-        function addChannel(obj, channel)
-            % ADDCHANNEL
-            %
-            % Syntax:
-            %   addChannel(obj, channel)
-            % -------------------------------------------------------------
-            assert(isSubclass(channel, 'aod.core.Channel'),...
-                'Invalid type: must be a subclass of aod.core.Channel');
-            channel.setParent(obj);
-            obj.Channels = cat(1, obj.Channels, channel);
         end
     end
     

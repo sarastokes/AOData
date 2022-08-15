@@ -9,72 +9,44 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Device(varargin)
+%   obj = Device(parent, varargin)
 %
 % Properties:
-%   model                               Model of the device
-%   manufacturer                        Manufacturer of the device
 %   deviceParameters                    aod.core.Parameters
 %
+% Parameters:
+%   Model                               Model of the device
+%   Manufacturer                        Manufacturer of the device
+%
 % Public Sealed methods:
-%   setManufacturer(obj, manufacturer)
-%   setModel(obj, model)
 %   addParameter(obj, varargin)
 %   assignUUID(obj, uuid)
 % -------------------------------------------------------------------------
+
     properties (SetAccess = protected)
-        model                           char
-        manufacturer                    char
         deviceParameters                % aod.core.Parameters
     end
     
     methods
         function obj = Device(parent, varargin)
-
             obj.allowableParentTypes = {'aod.core.System',...
                 'aod.core.Channel', 'aod.core.Empty'};
             obj.setParent(parent);
+
+            obj.deviceParameters = aod.core.Parameters;
 
             ip = inputParser();
             ip.KeepUnmatched = true;
             ip.CaseSensitive = false;
             addParameter(ip, 'Model', [], @ischar);
-            addParameter(ip, 'Manufacturer', @ischar);
+            addParameter(ip, 'Manufacturer', [], @ischar);
             parse(ip, varargin{:});
             
-            obj.setModel(ip.Results.Model);
-            obj.setModel(ip.Results.Manufacturer);
-            
-            obj.deviceParameters = aod.core.Parameters;
+            obj.addParameter(ip.Results);
         end
     end
     
     methods (Sealed)
-        function setManufacturer(obj, manufacturer)
-            % SETMANUFACTURER
-            %
-            % Description:
-            %   Sets the manufacturer property
-            %
-            % Syntax:
-            %   setManufacturer(obj, manufacturer)
-            % -------------------------------------------------------------
-
-            obj.manufacturer = manufacturer;
-        end
-        
-        function setModel(obj, model)
-            % SETMODEL
-            %
-            % Description:
-            %   Sets the model property
-            %
-            % Syntax:
-            %   setModel(obj, model)
-            % -------------------------------------------------------------
-            obj.model = model;
-        end
-
         function addParameter(obj, varargin)
             % ADDPARAMETER
             %

@@ -14,6 +14,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Properties:
 %   calibrationDate         date when the calibration was performed
 %   calibrationParameters   aod.core.Parameters
+%   Target                  the channel, system or device calibrated
 %
 % Sealed methods:
 %   addParameter(obj, varargin)
@@ -27,6 +28,10 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = private)
         calibrationDate(1,1)                datetime
         calibrationParameters               % aod.core.Parameters
+    end
+
+    properties (SetAccess = protected)
+        Target
     end
 
     methods
@@ -66,6 +71,20 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                 calDate = datetime(calDate, 'Format', 'yyyyMMdd');
             end
             obj.calibrationDate = calDate;
+        end
+
+        function setCalibrationTarget(obj, device)
+            % SETCALIBRATIONTARGET
+            %
+            % Description:
+            %   Set the calibration target
+            % 
+            % Syntax:
+            %   obj.setCalibrationTarget(dev)
+            % -------------------------------------------------------------
+            assert(isSubclass(device, {'aod.core.Device', 'aod.core.Channel', 'aod.core.System'}),...
+                'setDevice: must be a device, channel or system');
+            obj.Target = device;
         end
 
         function addParameter(obj, varargin)

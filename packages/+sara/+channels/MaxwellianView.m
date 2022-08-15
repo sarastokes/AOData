@@ -46,17 +46,17 @@ classdef MaxwellianView < aod.core.Channel
             ff470 = aod.builtin.devices.DichroicFilter([], 470,...
                 'Manufacturer', 'Semrock', 'Model', 'FF47-Di01');
             ff470.setSpectrum(dlmread(...
-                sara.resources.loadResource('FF470_Di01.txt')));
+                sara.resources.getResource('FF470_Di01.txt')));
             obj.addDevice(ff470);
             ff562 = aod.builtin.devices.DichroicFilter([], 562,...
                 'Manufacturer', 'Semrock', 'Model', 'FF562_Di03');
             ff562.setSpectrum(dlmread(...
-                sara.resources.loadResource('FF562_Di03.txt')));
+                sara.resources.getResource('FF562_Di03.txt')));
             obj.addDevice(ff562);
             ff649 = aod.builtin.devices.DichroicFilter([], 649,...
                 'Manufacturer', 'Semrock', 'Model', 'FF649-Di01');
             ff649.setSpectrum(dlmread(...
-                sara.resources.loadResource('FF649_Di01.txt')));
+                sara.resources.getResource('FF649_Di01.txt')));
             obj.addDevice(ff649);
             
             % Add the NDF 
