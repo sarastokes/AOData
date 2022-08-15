@@ -5,7 +5,7 @@ classdef Epoch < aod.core.Epoch
 %   aod.core.Epoch
 %
 % Constructor:
-%   obj = Epoch(ID, parent, epochType)
+%   obj = Epoch(parent, ID, epochType)
 %
 % Properties:
 %   epochType           sara.EpochTypes
@@ -19,6 +19,7 @@ classdef Epoch < aod.core.Epoch
 %   files               aod.core.Parameters
 % Dependent properties:
 %   transform           aod.builtin.registrations.RigidRegistration
+% Inherited dependent properties:
 %   homeDirectory
 %
 % Public methods:
@@ -50,8 +51,8 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods
-        function obj = Epoch(ID, parent, epochType)
-            obj@aod.core.Epoch(ID, parent);
+        function obj = Epoch(parent, ID, epochType)
+            obj@aod.core.Epoch(parent, ID);
             if nargin > 2
                 obj.epochType = epochType;
             else

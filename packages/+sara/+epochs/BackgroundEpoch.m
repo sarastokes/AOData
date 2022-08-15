@@ -1,4 +1,15 @@
 classdef BackgroundEpoch < sara.Epoch
+% BACKGROUNDEPOCH
+%
+% Description:
+%   An epoch measuring the background noise without stimuli
+%
+% Parent:
+%   sara.Epoch
+%
+% Constructor:
+%   obj = BackgroundEpoch(parent, ID)
+% -------------------------------------------------------------------------
 
     properties (Dependent)
         meanValue
@@ -10,8 +21,8 @@ classdef BackgroundEpoch < sara.Epoch
     end
 
     methods
-        function obj = BackgroundEpoch(ID, parent)
-            obj@sara.Epoch(ID, parent, sara.EpochTypes.Background);
+        function obj = BackgroundEpoch(parent, ID)
+            obj@sara.Epoch(parent, ID, sara.EpochTypes.Background);
         end
 
         function value = get.meanValue(obj)

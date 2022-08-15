@@ -11,16 +11,21 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = Device(varargin)
 %
-% Sealed methods:
+% Properties:
+%   model                               Model of the device
+%   manufacturer                        Manufacturer of the device
+%   deviceParameters                    aod.core.Parameters
+%
+% Public Sealed methods:
 %   setManufacturer(obj, manufacturer)
 %   setModel(obj, model)
 %   addParameter(obj, varargin)
 %   assignUUID(obj, uuid)
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
-        model
-        manufacturer
-        deviceParameters
+        model                           char
+        manufacturer                    char
+        deviceParameters                % aod.core.Parameters
     end
     
     methods
@@ -46,10 +51,27 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
     
     methods (Sealed)
         function setManufacturer(obj, manufacturer)
+            % SETMANUFACTURER
+            %
+            % Description:
+            %   Sets the manufacturer property
+            %
+            % Syntax:
+            %   setManufacturer(obj, manufacturer)
+            % -------------------------------------------------------------
+
             obj.manufacturer = manufacturer;
         end
         
         function setModel(obj, model)
+            % SETMODEL
+            %
+            % Description:
+            %   Sets the model property
+            %
+            % Syntax:
+            %   setModel(obj, model)
+            % -------------------------------------------------------------
             obj.model = model;
         end
 

@@ -19,10 +19,10 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   clearDevices(obj)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
-        Name                    char
-        dataFolder              char
-        Devices                         = aod.core.Device.empty()
-        channelParameters               % aod.core.Parameters
+        Name                        char
+        dataFolder                  char
+        Devices                     aod.core.Device
+        channelParameters           % aod.core.Parameters
     end
     
     methods

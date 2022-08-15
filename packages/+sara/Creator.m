@@ -118,9 +118,9 @@ classdef Creator < aod.core.Creator
         function ep = makeEpoch(obj, epochID, epochType, source, varargin)
             % MAKEEPOCH
             if epochType == sara.EpochTypes.Background
-                ep = sara.epochs.BackgroundEpoch(epochID, obj.Experiment);
+                ep = sara.epochs.BackgroundEpoch(obj.Experiment, epochID);
             else
-                ep = sara.Epoch(epochID, obj.Experiment, epochType);
+                ep = sara.Epoch(obj.Experiment, epochID, epochType);
             end
             % Assign source for the epoch
             if ~isempty(source)

@@ -9,7 +9,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Epoch(ID, parent)
+%   obj = Epoch(parent, ID)
 %
 % Properties:
 %   ID                              Epoch identifier (integer)
@@ -78,16 +78,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods 
-        function obj = Epoch(ID, parent)
-            obj = obj@aod.core.Entity();
-            if nargin > 0
-                obj.ID = ID;
-            end
-
+        function obj = Epoch(parent, ID)
             obj.allowableParentTypes = {'aod.core.Experiment'};
-            if nargin == 2
-                obj.setParent(parent);
-            end
+            obj.setParent(parent);
+            obj.ID = ID;
             
             obj.epochParameters = aod.core.Parameters();
             obj.files = aod.core.Parameters();
