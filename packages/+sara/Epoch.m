@@ -1,11 +1,14 @@
 classdef Epoch < aod.core.Epoch
 % EPOCH
 %
+% Description:
+%   A continuous period of data acquisition within an experiment
+%
 % Parent:
 %   aod.core.Epoch
 %
 % Constructor:
-%   obj = Epoch(parent, ID, epochType)
+%   obj = Epoch(parent, ID, source, epochType)
 %
 % Properties:
 %   epochType           sara.EpochTypes
@@ -51,13 +54,9 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods
-        function obj = Epoch(parent, ID, epochType)
-            obj@aod.core.Epoch(parent, ID);
-            if nargin > 2
-                obj.epochType = epochType;
-            else
-                obj.epochType = sara.EpochTypes.Unknown;
-            end
+        function obj = Epoch(parent, ID, source, epochType)
+            obj@aod.core.Epoch(parent, ID, source);
+            obj.epochType = epochType;
         end
 
         function value = get.transform(obj)
@@ -74,12 +73,17 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods 
-        function imStack = getStack(obj)
+        function imStack = getStack(obj, cacheFlag)
             % GETSTACK
             %
             % Syntax:
-            %   imStack = obj.getStack()
+            %   imStack = obj.getStack(cacheFlag)
             % -------------------------------------------------------------
+            
+            if nargin < 2
+                cacheFlag = false;
+            end
+
             [~, fileName, ~] = fileparts(obj.getCoreVideoName);
             if ~isempty(obj.cachedVideo)
                 imStack = obj.cachedVideo;
@@ -98,7 +102,9 @@ classdef Epoch < aod.core.Epoch
                 imStack = obj.transform.apply(imStack);
                 fprintf('Applying transform...');
             end
-            obj.cachedVideo = imStack;
+            if cacheFlag
+                obj.cachedVideo = imStack;
+            end
 
             fprintf('Done\n');
         end

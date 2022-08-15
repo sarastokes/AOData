@@ -1,13 +1,9 @@
 classdef Eye < aod.core.Source 
 
-    properties (SetAccess = private)
-        whichEye
-    end
-
     methods
-        function obj = Eye(parent, whichEye)
-            obj = obj@aod.core.Source(parent);
-            obj.whichEye = whichEye;
+        function obj = Eye(parent, name)
+            assert(ismember(name, {'OD', 'OS'}), 'Eye: Must be OS or OD');
+            obj = obj@aod.core.Source(parent, name);
         end
     end
 
@@ -18,10 +14,10 @@ classdef Eye < aod.core.Source
             % Syntax:
             %   value = obj.getLabel()
             % -------------------------------------------------------------
-            try
-                value = [num2str(obj.Parent.label), '_', obj.whichEye];
-            catch
-                value = obj.whichEye;
+            if ~isempty(obj.Parent)
+                value = [obj.Parent.name, '_', obj.name];
+            else
+                value = obj.name;
             end
         end
 

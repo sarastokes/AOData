@@ -24,8 +24,7 @@ classdef Toptica < aod.core.LightSource
             obj = obj@aod.core.LightSource(parent, laserLine,...
                 'Manufacturer', 'Toptica', 'Model', 'iChrome MLE',...
                 varargin{:});
-            assert(ismember(laserLine, obj.LASER_LINES),...
-                'Invalid laser line');
+            assert(ismember(laserLine, obj.LASER_LINES), 'Invalid laser line');
         end
         
         function value = get.Calibrations(obj)

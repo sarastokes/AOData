@@ -2,34 +2,59 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 % SOURCE
 %
 % Description:
-%   A class for the data's source
+%   The source of data collected in an experiment
 %
 % Parent:
 %   aod.core.Entity
 %   matlab.mixin.Heterogeneous
 %
+% Constructor:
+%   obj = Source(parent, name);
+%
 % Properties:
+%   name                            char, some identifier for the source 
 %   sourceParameters                aod.core.Parameters
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        name                        char
         sourceParameters            % aod.core.Parameters
     end
 
     methods
-        function obj = Source(parent)
-            obj = obj@aod.core.Entity();
+        function obj = Source(parent, name)
             obj.allowableParentTypes = {'aod.core.Experiment',...
-                'aod.core.Source', 'aod.core.Subject', 'aod.core.Empty'};
-            % Check if a parent input was supplied
+                'aod.core.Source', 'aod.core.Subject'};
             if nargin > 0
                 obj.setParent(parent);
             end
+            obj.name = name;
             obj.sourceParameters = aod.core.Parameters();
         end
     end
 
     methods (Sealed)
+        function sources = getParents(obj)
+            % GETPARENTS
+            %
+            % Description:
+            %   Collect all source parents, with top-level listed first
+            %
+            % Syntax:
+            %   ID = obj.getParents();
+            % -------------------------------------------------------------
+            sources = [];
+            parent = obj.Parent;
+            while ~isempty(parent) && isSubclass(parent, 'aod.core.Source')
+                sources = cat(1, sources, parent);
+                parent = parent.Parent;
+            end
+            % Ensure top-level is first
+            if ~isempty(sources)
+                sources = flipud(sources);
+            end
+        end
+
         function ID = getParentID(obj)
             % GETPARENTID
             %
@@ -96,10 +121,10 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Access = protected)
         function value = getLabel(obj)
-            if isnumeric(obj.identifier)
-                value = num2str(obj.identifier);
+            if isnumeric(obj.name)
+                value = num2str(obj.name);
             else
-                value = identifier;
+                value = name;
             end
         end
     end

@@ -7,36 +7,26 @@ classdef Primate < aod.core.sources.Subject
     % Inherited properties:
     %   sourceParameters        aod.core.Parameters
     % Dependent properties:
-    %   dcmID                   ID formatted to match DCM's style
+    %   ID                      double, ID extracted from name
     % ---------------------------------------------------------------------
     
     properties (Hidden, Dependent)
-        dcmID
+        ID
     end
 
     methods
-        function obj = Primate(ID, parent, varargin)
-            obj = obj@aod.core.sources.Subject(ID, parent);
-
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            addParameter(ip, 'Species', [], @ischar);
-            addParameter(ip, 'Sex', [], @ischar);
-            addParameter(ip, 'Age', [], @isnumeric);
-            addParameter(ip, 'Demographics', [], @ischar);
-            parse(ip, varargin{:});
-
-            obj.addParameter(ip.Results);
+        function obj = Primate(parent, name, varargin)
+            obj = obj@aod.core.sources.Subject(parent, name);
         end
 
-        function value = get.dcmID(obj)
-            value = ['201', num2str(floor(obj.ID/100)), num2str(rem(obj.ID/100))];
+        function value = get.ID(obj)
+            value = str2double(erase(obj.name, 'MC'));
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['MC', int2fixedwidthstr(obj.ID, 5)];
+            value = obj.name;
         end
     end
 end

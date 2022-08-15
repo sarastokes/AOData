@@ -1,12 +1,34 @@
 classdef Eye < aod.core.sources.Eye 
-
-    properties (SetAccess = protected) 
-        axialLength
-        pupilSize
-    end
+% EYE
+%
+% Description:
+%   Primate eye
+%
+% Parent:
+%   aod.core.sources.Eye
+%
+% Constructor:
+%   obj = Eye(parent, whichEye, varargin)
+%
+% Parameters:
+%   AxialLength                 double, axial length in mm
+%   PupilSize                   double, pupil size in mm
+%   ContactLens
+%
+% Dependent properties:
+%   subjectName                 name of parent aod.core.sources.Subject
+%   micronsPerDegree
+%
+% Methods:
+%   value = deg2um(obj, deg)
+%   value = um2deg(obj, um)
+%   value = micronsPerPixel(obj, fovDegrees)
+%   value = degreesPerPixel(obj, fovDegrees)
+%   otf = getOTF(obj, wavelength, sf)
+% -------------------------------------------------------------------------
 
     properties (Dependent)
-        ID
+        subjectName
         micronsPerDegree
     end
 
@@ -15,28 +37,30 @@ classdef Eye < aod.core.sources.Eye
             obj = obj@aod.core.sources.Eye(parent, whichEye);
 
             ip = inputParser();
+            ip.KeepUnmatched = true;
             ip.CaseSensitive = false;
+            addParameter(ip, 'ContactLens', [], @ischar);
             addParameter(ip, 'AxialLength', [], @isnumeric);
             addParameter(ip, 'PupilSize', [], @isnumeric);
             parse(ip, varargin{:});
 
-            obj.axialLength = ip.Results.AxialLength;
-            obj.pupilSize = ip.Results.PupilSize;
+            obj.addParameter(ip.Results);
         end
 
-        function value = get.ID(obj)
-            try
-                value = obj.Parent.ID;
-            catch
+        function value = get.subjectName(obj)
+            h = obj.ancestor('aod.core.sources.Subject');
+            if ~isempty(h)
+                value = h.Name;
+            else
                 value = [];
             end
         end
         
         function value = get.micronsPerDegree(obj)
-            if ~isempty(obj.axialLength)
-                value = 291.2 * (obj.axialLength / 24.2);
+            if isempty(obj.sourceParameters('AxialLength'))
+                value = [];
             else
-                error('Axial length not set!');
+                value = 291.2 * (obj.sourceParameters('AxialLength') / 24.2);
             end
         end
     end
@@ -87,11 +111,11 @@ classdef Eye < aod.core.sources.Eye
             % Syntax:
             %   otf = getOTF(obj, wavelength, sf)
             % -------------------------------------------------------------
-            if isempty(obj.pupilSize)
+            if isempty(obj.sourceParameters('PupilSize'))
                 error('OTF calculation requires pupilSize property!');
             end
 
-            u0 = (obj.pupilSize() * pi * 10e5) / (wavelength * 180);
+            u0 = (obj.sourceParameters('PupilSize') * pi * 10e5) / (wavelength * 180);
             otf = 2/pi * (acos(sf ./ u0) - (sf ./ u0) .* sqrt(1 - (sf./u0).^2));
         end
     end

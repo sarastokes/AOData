@@ -1,28 +1,35 @@
 classdef PhysiologyLocation < aod.core.sources.Location 
+% PHYSIOLOGYLOCATION
+%
+% Constructor:
+%   obj = PhysiologyLocation(parent, name)
+%
+% Note:
+%   Allowed locations: right, bottom, left, top
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         avgImage
     end
 
     methods
-        function obj = PhysiologyLocation(parent, locationName)
+        function obj = PhysiologyLocation(parent, name)
             
-            if ischar(locationName)
-                locationName = string(locationName);
+            if ischar(name)
+                name = string(name);
             end
 
             % Determine whether location is one of the standard locations
             STANDARD_LOCATIONS = ["right", "bottom", "left", "top"];
-            ID = find(STANDARD_LOCATIONS == lower(locationName));
+            ID = find(STANDARD_LOCATIONS == lower(name));
             if ~isempty(ID)
-                locationName = STANDARD_LOCATIONS(ID);
+                name = STANDARD_LOCATIONS(ID);
             else
-                locationName = "unknown";
+                warning('PhysiologyLocation: Unidentified location %s', name);
+                name = "unknown";
             end
 
-            obj = obj@aod.core.sources.Location(...
-                parent, capitalize(locationName));
-
+            obj = obj@aod.core.sources.Location(parent, char(capitalize(name)));
         end
 
         function setAvgImage(obj, avgImage)
@@ -30,6 +37,16 @@ classdef PhysiologyLocation < aod.core.sources.Location
                 obj.avgImage = imread(avgImage);
             else
                 obj.avgImage = avgImage;
+            end
+        end
+    end
+
+    methods (Access = protected)
+        function value = getLabel(obj)
+            if ~isempty(obj.Parent)
+                value = [obj.Parent.label, obj.name(1)];
+            else
+                value = obj.name;
             end
         end
     end

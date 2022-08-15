@@ -2,29 +2,36 @@ classdef Subject < aod.core.Source
 % SUBJECT
 %
 % Description:
-%   A mouse, human, monkey, etc
+%   Top-level source of data in experiment (e.g. mouse, human, model eye)
+%
+% Parent:
+%   aod.core.Source
 %
 % Constructor:
-%   obj = aod.core.sources.Subject(ID, parent)
+%   obj = aod.core.sources.Subject(parent, name, varargin)
 %
-% Properties:
-%   ID                      Subject's identifier
+% Parameters:
+%   Species
+%   Sex
+%   Age
+%   Demographics
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        ID
-    end
-    
     methods 
-        function obj = Subject(ID, parent)
-            if nargin < 2
-                parent = [];
-            end
+        function obj = Subject(parent, name, varargin)
+            obj@aod.core.Source(parent, name);
 
-            obj@aod.core.Source(parent);
-            if nargin > 0
-                obj.ID = ID;
-            end
+            ip = inputParser();
+            ip.KeepUnmatched = true;
+            ip.CaseSensitive = false;
+            addParameter(ip, 'Species', [], @ischar);
+            addParameter(ip, 'Sex', 'unknown',... 
+                @(x) ismember(lower(x), {'male', 'female', 'unknown'}));
+            addParameter(ip, 'Age', [], @isnumeric);
+            addParameter(ip, 'Demographics', [], @ischar);
+            parse(ip, varargin{:});
+
+            obj.addParameter(ip.Results);
         end
     end
 end

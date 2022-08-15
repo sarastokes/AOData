@@ -1,8 +1,12 @@
 classdef ModelEye < aod.core.Source 
 
     methods
-        function obj = ModelEye(varargin)
-            obj@aod.core.Source(varargin{:});
+        function obj = ModelEye(parent, name)
+            if nargin < 2
+                name = 'ModelEye';
+            end
+
+            obj@aod.core.Source(parent, name);
         end
     end
 

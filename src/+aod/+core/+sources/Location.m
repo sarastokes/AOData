@@ -5,20 +5,22 @@ classdef Location < aod.core.Source
 %   An imaging location within an eye
 %
 % Constructor:
-%   obj = Location(parent, identifier)
+%   obj = Location(parent, name)
 %
 % Properties:
-%   identifier              Some way of labeling the location
+%   name             
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        identifier
-    end
-
     methods
-        function obj = Location(parent, identifier)
-            obj = obj@aod.core.Source(parent);
-            obj.identifier = identifier;
+        function obj = Location(parent, name)
+            obj = obj@aod.core.Source(parent, name);
         end
     end
+
+    methods (Access = protected)
+        function value = getLabel(obj)
+            value = [char(obj.name), 'Location'];
+        end
+    end
+
 end

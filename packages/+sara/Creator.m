@@ -120,11 +120,7 @@ classdef Creator < aod.core.Creator
             if epochType == sara.EpochTypes.Background
                 ep = sara.epochs.BackgroundEpoch(obj.Experiment, epochID);
             else
-                ep = sara.Epoch(obj.Experiment, epochID, epochType);
-            end
-            % Assign source for the epoch
-            if ~isempty(source)
-                ep.setSource(source);
+                ep = sara.Epoch(obj.Experiment, epochID, source, epochType);
             end
             % Extract epoch imaging parameters
             if epochType.isPhysiology
