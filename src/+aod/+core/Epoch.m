@@ -78,10 +78,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods 
-        function obj = Epoch(parent, ID)
+        function obj = Epoch(parent, ID, source)
             obj.allowableParentTypes = {'aod.core.Experiment'};
             obj.setParent(parent);
             obj.ID = ID;
+            if nargin > 2
+                obj.setSource(source);
+            end
             
             obj.epochParameters = aod.core.Parameters();
             obj.files = aod.core.Parameters();
@@ -299,8 +302,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   obj.addResponse(reg, overwrite)
             % -------------------------------------------------------------
-            if nargin < 3
-                overwrite = false;
+            arguments 
+                obj
+                resp(1,1)           {mustBeA(resp, 'aod.core.Response')}
+                overwrite(1,1)      logical                             = false 
             end
 
             if ~isempty(obj.Responses)
