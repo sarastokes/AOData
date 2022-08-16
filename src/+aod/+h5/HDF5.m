@@ -6,14 +6,17 @@ classdef HDF5 < handle
 %   low-level HDF5 API and MATLAB's high-level built-in functions
 %
 % Methods:
-%   openFile(fileName, readOnly)
-%   deleteGroup()
+%   fileID = openFile(fileName, readOnly)
+%   deleteObject(fileName, pathName, name)
 %   createGroups(fileName, pathName, varargin)
 %   createGroup(locID, groupName, varargin)
-%   makeTextDataset(fileName, pathName, dsetName, txt)
-%   makeTableDataset(fileName, pathName, dsetName, txt)
+%   makeMatrixDataset(fileName, pathName, dsetName, data)
+%   dsetID = makeTextDataset(fileName, pathName, dsetName, txt)
+%   dsetID = makeDateDataset(fileName, pathName, data)
+%   makeTableDataset(fileName, pathName, dsetName, data)
 %   writeatts(fileName, pathName, varargin)
 %   createLink(fileName, targetPath, linkPath, linkName)
+%
 %   tf = exists(fileName, pathName)
 %   path = buildPath(varargin)
 %   parentPath = getParentPath(pathName)
@@ -89,11 +92,17 @@ classdef HDF5 < handle
             %
             % Syntax:
             %   groupID = createGroup(locID, groupName, varargin)
+            %   groupID = createGroup(fileName, groupName, varargin)
             %
             % Notes:
             %   If no output argument is specified, the group is closed
             %   Continues on if group already exists
             % -------------------------------------------------------------
+
+            if ischar(locID)
+                locID = aod.h5.HDF5.openFile(locID);
+            end
+
             if ~aod.h5.HDF5.exists(locID, groupName)   
                 groupID = H5G.create(locID, groupName, aod.h5.HDF5.NEW_GROUP_PROPS);
                 if nargout == 0
@@ -115,29 +124,35 @@ classdef HDF5 < handle
             %   Chains h5create and h5write for use with simple matrices
             %
             % Syntax:
-            %   h5createwrite(hdfFile, pathName, data)
-            %
+            %   makeMatrixDataset(hdfFile, pathName, data)
             % -------------------------------------------------------------
             try
                 h5create(fileName, pathName, size(data));
             catch ME
                 if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-                    warning('Dataset %s already existed, continuing', targetPath);
+                    warning('Dataset %s already existed', pathName);
                 else
                     rethrow(ME);
                 end
             end
                     
-            h5write(hdfFile, targetPath, data);
+            h5write(fileName, pathName, data);
         end
 
-        function dsetID = makeTextDataset(fileName, pathName, dsetName, txt) 
+        function dsetID = makeTextDataset(hdfIn, pathName, dsetName, txt) 
             % MAKETEXTDATASET
             %
+            % Description:
+            %   Create dataset for char/string data
+            %
             % Syntax:
-            %   dsetID = makeDatasetText(fileName, pathName, dsetName, txt)
+            %   dsetID = makeTextDataset(fileName, pathName, dsetName, txt)
             % -------------------------------------------------------------
-            fileID = aod.h5.HDF5.openFile(fileName);
+            if isa(hdfIn, 'H5ML.id')
+                fileID = hdfIn;
+            else
+                fileID = aod.h5.HDF5.openFile(hdfIn);
+            end
                 
             typeID = H5T.copy('H5T_C_S1');
             H5T.set_size(typeID, 'H5T_VARIABLE');
@@ -173,7 +188,24 @@ classdef HDF5 < handle
             H5F.close(fileID);
         end
 
-        function dsetID = makeTableDataset(fileName, pathName, data)
+        function dsetID = makeDateDataset(fileName, pathName, dsetName, data)
+            % MAKEDATEDATASET
+            % 
+            % Description:
+            %   Saves datetime as text dataset with class and date format
+            %   stored as attribute 
+            %
+            % Syntax:
+            %   dsetID = makeDateDataset(fileName, pathName, data)
+            % -------------------------------------------------------------
+            assert(isdatetime(data), 'makeDateDataset: data must be datetime');
+
+            dsetID = aod.h5.HDF5.makeTextDataset(fileName, pathName, dsetName, datestr(data));
+            aod.h5.HDF5.writeatts(fileName, [pathName, '/', dsetName],...
+                'Class', 'datetime', 'Format', data.Format);
+        end
+
+        function dsetID = makeTableDataset(fileName, pathName, dsetName, data)
             % MAKETABLEDATSET
             %
             % Description:
@@ -187,6 +219,7 @@ classdef HDF5 < handle
             %   https://github.com/NeurodataWithoutBorders/matnwb/+io/writeCompound.m
             % -------------------------------------------------------------
         
+            pathName = [pathName, '/', dsetName];
             fileID = aod.h5.HDF5.openFile(fileName);
             nRows = height(data);
             data = table2struct(data);
@@ -290,9 +323,16 @@ classdef HDF5 < handle
         function createLink(fileName, targetPath, linkPath, linkName)
             % CREATELINK 
             %
+            % Description:
+            %   Creates a soft link within HDF5 file
+            %
             % Syntax:
             %   createLink(fileName, targetPath, linkPath, linkName)
             % -------------------------------------------------------------
+            if aod.h5.HDF5.exists(fileName, [linkPath, '/', linkName])
+                warning('LinkExists: Skipped existing link at %s', linkPath);
+                return
+            end
             fileID = aod.h5.HDF5.openFile(fileName);
             linkID = H5G.open(fileID, linkPath);
             H5L.create_soft(targetPath, linkID, linkName, 'H5P_DEFAULT', 'H5P_DEFAULT');
