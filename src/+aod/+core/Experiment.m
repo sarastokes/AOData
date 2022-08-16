@@ -45,7 +45,6 @@ classdef (Abstract) Experiment < aod.core.Entity
 %   addEpoch(obj, epoch)
 %   addSystem(obj, system)
 %   sortEpochs(obj)
-%
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -75,18 +74,19 @@ classdef (Abstract) Experiment < aod.core.Entity
     end
     
     methods 
-        function obj = Experiment(homeDirectory, expDate)
-            obj = obj@aod.core.Entity();
-            
-            obj.experimentParameters = containers.Map();
-            if nargin > 0
-                obj.setHomeDirectory(homeDirectory);
-            end
-            if nargin > 1
-                obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
-            end
-            obj.setParent([]);
+        function obj = Experiment(homeDirectory, expDate, varargin)
+            obj.setHomeDirectory(homeDirectory);
+            obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
             obj.experimentParameters = aod.core.Parameters();
+
+            ip = inputParser();
+            ip.CaseSensitive = false;
+            ip.KeepUnmatched = true;
+            addParameter(ip, 'Administrator', '', @ischar);
+            addParameter(ip, 'System', '', @ischar);
+            parse(ip, varargin{:});
+
+            obj.addParameter(ip.Results);
         end
 
         function value = get.numEpochs(obj)

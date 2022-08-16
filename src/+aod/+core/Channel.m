@@ -9,7 +9,15 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Channel(parent, channelName)
+%   obj = Channel(parent, channelName, varargin)
+%
+% Parameters:
+%   DataFolder                  char, folder for the channel's data
+%
+% Properties:
+%   Name                        char, channel name
+%   Devices                     container for all devices in channel
+%   channelParameters           aod.core.Parameters
 %
 % Methods:
 %   addParameter(obj, varargin)
@@ -20,21 +28,26 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
         Name                        char
-        dataFolder                  char
         Devices                     aod.core.Device
         channelParameters           % aod.core.Parameters
     end
     
     methods
-        function obj = Channel(parent, channelName)
+        function obj = Channel(parent, channelName, varargin)
             obj.allowableParentTypes = {'aod.core.System', 'aod.core.Empty'};
-            if nargin > 0
-                obj.setParent(parent);
-            end
+            obj.setParent(parent);
             if nargin > 1
                 obj.setName(channelName);
             end
             obj.channelParameters = aod.core.Parameters;
+
+            ip = inputParser();
+            ip.KeepUnmatched = true;
+            ip.CaseSensitive = false;
+            addParameter(ip, 'DataFolder', '', @ischar);
+            parse(ip, varargin{:});
+
+            obj.addParameter(ip.Results);
         end
     end
     
@@ -106,11 +119,11 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
                 S = varargin{1};
                 k = fieldnames(S);
                 for i = 1:numel(k)
-                    obj.sourceParameters(k{i}) = S.(k{i});
+                    obj.channelParameters(k{i}) = S.(k{i});
                 end
             else
                 for i = 1:(nargin - 1)/2
-                    obj.sourceParameters(varargin{(2*i)-1}) = varargin{2*i};
+                    obj.channelParameters(varargin{(2*i)-1}) = varargin{2*i};
                 end
             end
         end

@@ -22,22 +22,8 @@ classdef Experiment < aod.core.Experiment
     end
 
     methods
-        function obj = Experiment(homeDirectory, expDate)
-            obj = obj@aod.core.Experiment(homeDirectory, expDate);
-        end
-
-        function initParameters(obj, varargin)
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
-            addParameter(ip, 'Administrator', '', @ischar);
-            addParameter(ip, 'System', '1P Primate', @ischar);
-            addParameter(ip, 'Purpose', '', @ischar);
-            parse(ip, varargin{:});
-
-            obj.addParameter('Administrator', ip.Results.Administrator);
-            obj.addParameter('System', ip.Results.System);
-            obj.addParameter('Purpose', ip.Results.Purpose);
+        function obj = Experiment(homeDirectory, expDate, varargin)
+            obj = obj@aod.core.Experiment(homeDirectory, expDate, varargin);
         end
 
         function value = getFileHeader(obj)

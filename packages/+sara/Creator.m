@@ -10,21 +10,10 @@ classdef Creator < aod.core.Creator
         end
 
         function createExperiment(obj, expDate, source, location, varargin)
-            
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            ip.CaseSensitive = false;
-            addParameter(ip, 'Purpose', [], @istext);
-            parse(ip, varargin{:});
-            
-
             obj.Experiment = sara.experiments.PhysiologyExperiment(...
                 obj.homeDirectory, expDate, location);
             obj.Experiment.addSource(source);
-            if ~isempty(ip.Results.Purpose)
-                obj.Experiment.setDescription(ip.Results.Purpose);
-            end
-            obj.Experiment.initParameters(ip.Unmatched);
+            obj.Experiment.addParameter(varargin{:});
         end
 
         function addEpochs(obj, epochIDs, epochType, source, varargin)
