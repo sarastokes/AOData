@@ -2,7 +2,7 @@ classdef Empty < aod.core.Calibration
 % EMPTY
 %
 % Description:
-%   An empty calibration object
+%   An empty placeholder calibration object
 %
 % Parent:
 %   aod.core.Calibration
@@ -13,14 +13,13 @@ classdef Empty < aod.core.Calibration
 % -------------------------------------------------------------------------
     methods
         function obj = Empty(parent)
-            obj = obj@aod.core.Calibration(parent);
             calibrationDate = datestr(now);
             if nargin < 1
                 parent = [];
             end
-            obj = obj@aod.core.Calibration(calibrationDate, parent);
+            obj = obj@aod.core.Calibration(parent, calibrationDate);
 
-            obj.setDescription('An empty calibration object');
+            obj.setDescription('A placeholder calibration object');
         end
     end
 end

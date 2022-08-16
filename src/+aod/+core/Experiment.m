@@ -332,6 +332,15 @@ classdef (Abstract) Experiment < aod.core.Entity
             obj.Calibrations = cat(1, obj.Calibrations, calibration);
         end
 
+        function clearCalibrations(obj)
+            % CLEARCALIBRATIONS
+            %
+            % Syntax:
+            %   obj.clearCalibrations()
+            % -------------------------------------------------------------
+            obj.Calibrations = aod.core.Calibration.empty();
+        end
+
         function sortEpochs(obj)
             % SORTEPOCHS
             %

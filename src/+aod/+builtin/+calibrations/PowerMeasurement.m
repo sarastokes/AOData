@@ -5,14 +5,16 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
 %   aod.core.Calibration
 %
 % Constructor:
-%   obj = PowerMeasurement(calibrationDate, parent);
+%   obj = PowerMeasurement(parent, calibrationDate, wavelength, varargin);
+%
+% Parameters:
+%   settingUnit             char, device setting unit (no default)
+%   valueUnit               char, measurement unit (default = 'uW')
 %
 % Methods:
 %   T = table(obj)
 %   addMeasurement(obj, setting, value)
-%   setWavelength(obj, value)
-%   setValueUnit(obj, value)
-%   setSettingUnit(obj, value)
+%   loadTable(obj, measurementTable)
 %
 % Note:
 %   Subclasses should set light source specific parameters (wavelength, 
@@ -21,18 +23,27 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        wavelength 
+        measurements
+    end
 
+    properties (Access = private)
         Setting
         Value
-
-        settingUnit
-        valueUnit = 'uW';
     end
 
     methods 
-        function obj = PowerMeasurement(varargin)
-            obj = obj@aod.core.Calibration(varargin{:});
+        function obj = PowerMeasurement(parent, calibrationDate, wavelength, varargin)
+            obj = obj@aod.core.Calibration(parent, calibrationDate);
+            obj.addParameter('Wavelength', wavelength);
+
+            ip = inputParser();
+            ip.KeepUnmatched = true;
+            ip.CaseSensitive = false;
+            addParameter(ip, 'SettingUnit', '', @ischar);
+            addParameter(ip, 'ValueUnit', 'uW', @ischar);
+            parse(ip, varargin{:});
+
+            obj.addParameter(ip.Results);
         end
 
         function T = table(obj)
@@ -75,24 +86,25 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
                 obj.Setting = cat(1, obj.Setting, setting);
                 obj.Value = cat(1, obj.Value, value);
             end
+            obj.measurements = obj.table();
         end
 
-        function setWavelength(obj, wavelength)
-            obj.wavelength = wavelength;
-        end
-
-        function setValueUnit(obj, newUnit)
-            obj.valueUnit = newUnit;
-        end
-
-        function setSettingUnit(obj, newUnit)
-            obj.settingUnit = newUnit;
+        function loadTable(obj, measurementTable)
+            % LOADTABLE 
+            %
+            % Description:
+            %   loadTable(obj, measurementTable)
+            % -------------------------------------------------------------
+            assert(istable(measurementTable), 'Must be a table!');
+            obj.Setting = measurementTable.Setting;
+            obj.Value = measurementTable.Value;
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = [char(getClassWithoutPackages(obj)), num2str(obj.wavelength), 'nm'];
+            value = [char(getClassWithoutPackages(obj)),... 
+                num2str(obj.calibrationParameters('Wavelength')), 'nm'];
         end
     end
 end

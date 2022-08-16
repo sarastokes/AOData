@@ -5,14 +5,14 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %   A calibration associated with the system or experiment
 %
 % Constructor:
-%   obj = aod.core.Calibration(calibrationDate, parent)
+%   obj = aod.core.Calibration(parent, calibrationDate)
 %
 % Parent:
 %   aod.core.Entity
 %   matlab.mixin.Heterogeneous
 %
 % Properties:
-%   calibrationDate         date when the calibration was performed
+%   calibrationDate         date calibration was performed (yyyyMMdd)
 %   calibrationParameters   aod.core.Parameters
 %   Target                  the channel, system or device calibrated
 %
@@ -30,17 +30,12 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
         calibrationParameters               % aod.core.Parameters
     end
 
-    properties (SetAccess = protected)
-        Target
-    end
-
     methods
-        function obj = Calibration(calibrationDate, parent)
-            obj = obj@aod.core.Entity();
+        function obj = Calibration(parent, calibrationDate)
             obj.allowableParentTypes = {'aod.core.Experiment',... 
                 'aod.core.System', 'aod.core.Empty'};
             
-            if nargin > 0 && ~isempty(calibrationDate)
+            if nargin > 1 && ~isempty(calibrationDate)
                 if ~isa(calibrationDate, 'datetime')
                     obj.calibrationDate = datetime(calibrationDate,... 
                         'Format', 'yyyyMMdd');
@@ -71,20 +66,6 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                 calDate = datetime(calDate, 'Format', 'yyyyMMdd');
             end
             obj.calibrationDate = calDate;
-        end
-
-        function setCalibrationTarget(obj, device)
-            % SETCALIBRATIONTARGET
-            %
-            % Description:
-            %   Set the calibration target
-            % 
-            % Syntax:
-            %   obj.setCalibrationTarget(dev)
-            % -------------------------------------------------------------
-            assert(isSubclass(device, {'aod.core.Device', 'aod.core.Channel', 'aod.core.System'}),...
-                'setDevice: must be a device, channel or system');
-            obj.Target = device;
         end
 
         function addParameter(obj, varargin)

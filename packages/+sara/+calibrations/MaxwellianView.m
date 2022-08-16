@@ -8,7 +8,7 @@ classdef MaxwellianView < aod.core.Calibration
 %   aod.core.Calibration
 %
 % Constructor:
-%   obj = MaxwellianView(calibrationDate, parent)
+%   obj = MaxwellianView(parent, calibrationDate)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -28,11 +28,8 @@ classdef MaxwellianView < aod.core.Calibration
     end
 
     methods
-        function obj = MaxwellianView(calibrationDate, parent)
-            if nargin < 2
-                parent = [];
-            end
-            obj = obj@aod.core.Calibration(calibrationDate, parent);
+        function obj = MaxwellianView(parent, calibrationDate)
+            obj = obj@aod.core.Calibration(parent, calibrationDate);
 
             obj.loadCalibrationFile()
         end

@@ -5,13 +5,14 @@ classdef TopticaNonlinearity < aod.core.Calibration
 %   Nonlinearity in visual stimuli presented with Toptica.
 %
 % Syntax:
-%   obj = TopticaNonlinearity(parent)
+%   obj = TopticaNonlinearity(parent, calibrationDate, laserLine)
 %
 % Parent:
 %   aod.core.Calibration
 %
 % Methods:
 %   loadCalibration(obj)
+%   setFitFunction(obj)
 %   stim = applyNonlinearity(obj, stim)
 %
 % Note:
@@ -20,9 +21,12 @@ classdef TopticaNonlinearity < aod.core.Calibration
 %   wavelengths and baseline Toptica output levels.  The measurement here
 %   was made at 2% on the Toptica and checked in Nov 2021 with other
 %   Toptica output levels.
+%
+% TODO: Support for additional laser lines
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         Data 
+        laserLine
     end
 
     properties (Access = private)
@@ -30,11 +34,18 @@ classdef TopticaNonlinearity < aod.core.Calibration
     end
 
     methods
-        function obj = TopticaNonlinearity(parent)
+        function obj = TopticaNonlinearity(parent, calibrationDate, laserLine)
             if nargin < 0
                 parent = [];
             end
-            obj = obj@aod.core.Calibration('20210801', parent);
+            if nargin < 2
+                calibrationDate = '20210801';
+            end
+            if nargin < 3
+                laserLine = 561;
+            end
+            obj = obj@aod.core.Calibration(parent, calibrationDate);
+            obj.laserLine = laserLine;
         
             obj.loadCalibration();
         end
@@ -45,11 +56,18 @@ classdef TopticaNonlinearity < aod.core.Calibration
 
             obj.Data = table(data(:,1), data(:,2),...
                 'VariableNames', {'Value', 'Power'});
+            obj.setFitFunction();
+        end
+        
+        function setFitFunction(obj)
             obj.fitFcn = fit(obj.Data.Value, obj.Data.Power, 'cubicinterp');
         end
 
         function stim = applyNonlinearity(obj, stim0)
             % APPLYNONLINEARITY
+            if isempty(obj.fitFcn)
+                obj.setFitFunction();
+            end
             lut = obj.fitFcn(0:255);
 
             powerRange = max(obj.Data.Power) - min(obj.Data.Power);

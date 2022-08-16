@@ -62,6 +62,15 @@ classdef Creator < aod.core.Creator
             obj.Experiment.addCalibration(calibration);
         end
 
+        function clearCalibrations(obj)
+            % CLEARCALIBRATIONS
+            %
+            % Syntax:
+            %   obj.clearCalibrations()
+            % -------------------------------------------------------------
+            obj.Experiment.clearCalibrations();
+        end
+        
         function addSystem(obj, system)
             % ADDSYSTEM
             %
@@ -118,7 +127,7 @@ classdef Creator < aod.core.Creator
         function ep = makeEpoch(obj, epochID, epochType, source, varargin)
             % MAKEEPOCH
             if epochType == sara.EpochTypes.Background
-                ep = sara.epochs.BackgroundEpoch(obj.Experiment, epochID);
+                ep = sara.epochs.BackgroundEpoch(obj.Experiment, epochID, source);
             else
                 ep = sara.Epoch(obj.Experiment, epochID, source, epochType);
             end
