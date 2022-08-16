@@ -10,22 +10,17 @@ classdef PMT < aod.core.Device
 % Constructor:
 %   obj = PMT(parent, varargin)
 %
-% Properties:
-%   gain
-%   position
-% Inherited properties:
-%   manufacturer
-%   models
+% Parameters:
+%   Gain
+%   Position
+% Inherited parameters:
+%   Manufacturer
+%   Model
 %
 % Methods:
 %   setGain(obj, gain)
 %   setPosition(obj, position)
 % -------------------------------------------------------------------------
-
-    properties (SetAccess = private)
-        gain
-        position
-    end
 
     methods 
         function obj = PMT(parent, varargin)
@@ -37,16 +32,18 @@ classdef PMT < aod.core.Device
             addParameter(ip, 'Gain', [], @isnumeric);
             addParameter(ip, 'Position', [], @isnumeric);
             parse(ip, varargin{:});
+
+            obj.addParameter(ip.Results);
         end
     end
     
     methods
         function setPosition(obj, position)
-            obj.position = position;
+            obj.deviceParameters('Position') = position;
         end
         
         function setGain(obj, gain)
-            obj.gain = gain;
+            obj.deviceParameters('Gain') = gain;
         end
     end
 end 

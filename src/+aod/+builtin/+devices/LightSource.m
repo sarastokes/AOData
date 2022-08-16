@@ -10,20 +10,18 @@ classdef LightSource < aod.core.Device
 % Constructor:
 %   obj = LightSource(parent, wavelength, varargin)
 %
-% Properties:
-%   wavelength
-%   spectra
+% Parameters:
+%   Wavelength
 % Inherited properties:
-%   manufacturer
-%   model
+%   Manufacturer
+%   Model
 %
 % Methods:
 %   setWavelength(obj, wavelength)
-%   setPosition(obj, spectra)
+%   setSpectra(obj, spectra)
 % -------------------------------------------------------------------------
     
-    properties (SetAccess = private)
-        wavelength
+    properties (SetAccess = protected)
         spectra
     end
 
@@ -37,8 +35,7 @@ classdef LightSource < aod.core.Device
     
     methods
         function obj = LightSource(parent, wavelength, varargin)
-            obj = obj@aod.core.Device(parent, varargin{:});
-            
+            obj = obj@aod.core.Device(parent, varargin{:});            
             obj.setWavelength(wavelength);
         end
 
@@ -57,7 +54,7 @@ classdef LightSource < aod.core.Device
     
     methods 
         function setWavelength(obj, wavelength)
-            obj.wavelength = wavelength;
+            obj.deviceParameters('Wavelength') = wavelength;
         end
         
         function setSpectra(obj, spectra)

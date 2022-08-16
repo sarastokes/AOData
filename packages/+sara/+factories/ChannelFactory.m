@@ -76,17 +76,17 @@ classdef ChannelFactory < aod.core.Factory
                     channel.addDevice(aod.builtin.devices.LightSource([], 420,...
                         'Manufacturer', 'ThorLabs', 'Model', 'M420L4'));
                     % Add the dichroic filters
-                    ff470 = aod.builtin.devices.DichroicFilter([], 470,...
+                    ff470 = aod.builtin.devices.DichroicFilter([], 470, 'high',...
                         'Manufacturer', 'Semrock', 'Model', 'FF470-Di01');
-                    ff470.setSpectrum(sara.resources.getResource('FF470_Di01.txt'));
+                    ff470.setTransmission(sara.resources.getResource('FF470_Di01.txt'));
                     channel.addDevice(ff470);
-                    ff562 = aod.builtin.devices.DichroicFilter([], 562,...
+                    ff562 = aod.builtin.devices.DichroicFilter([], 562, 'high',...
                         'Manufacturer', 'Semrock', 'Model', 'FF562_Di03');
-                    ff562.setSpectrum(sara.resources.getResource('FF562_Di03.txt'));
+                    ff562.setTransmission(sara.resources.getResource('FF562_Di03.txt'));
                     channel.addDevice(ff562);
-                    ff649 = aod.builtin.devices.DichroicFilter([], 649,...
+                    ff649 = aod.builtin.devices.DichroicFilter([], 649, 'high',...
                         'Manufacturer', 'Semrock', 'Model', 'FF649-Di01');
-                    ff649.setSpectrum(sara.resources.getResource('FF649_Di01.txt'));
+                    ff649.setTransmission(sara.resources.getResource('FF649_Di01.txt'));
                     channel.addDevice(ff649);
                 otherwise
                     error('Unrecognized channel: %s', channelName);

@@ -101,7 +101,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   setDataFolder(obj, folderName)
             % -------------------------------------------------------------
             assert(istext(folderName), 'Data folder must be string or char');
-            obj.dataFolder = folderName;
+            obj.addParameter('DataFolder', folderName);
         end
 
         function addParameter(obj, varargin)

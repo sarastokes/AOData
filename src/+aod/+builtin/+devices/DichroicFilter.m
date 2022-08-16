@@ -10,28 +10,31 @@ classdef DichroicFilter < aod.core.Device
 % Constructor:
 %   obj = DichroicFilter(parent, edgeWavelength, varargin)
 %   
-% Properties:
-%   edgeWavelength
-%   spectrum
+% Parameters:
+%   EdgeWavelength
+%   PassType                        char, 'low' or 'high'
 % Inherited properties:
-%   manufacturer
-%   model
+%   Manufacturer
+%   Model
+%
+% Properties:
+%   transmission
 %
 % Methods:
 %   setEdgeWavelength(obj, wavelength)
-%   setSpectrum(obj, spectrum)
+%   setTransmission(obj, spectrum)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        edgeWavelength
-        spectrum
+        transmission
     end
     
     methods
-        function obj = DichroicFilter(parent, edgeWavelength, varargin)
+        function obj = DichroicFilter(parent, edgeWavelength, passType, varargin)
             obj = obj@aod.core.Device(parent, varargin{:});
             
             obj.setEdgeWavelength(edgeWavelength);
+            obj.setPassType(passType);
         end
     end
     
@@ -42,16 +45,27 @@ classdef DichroicFilter < aod.core.Device
             % Syntax:
             %   setEdgeWavelength(obj, wavelength)
             % -------------------------------------------------------------
-            obj.edgeWavelength = wavelength;
+            obj.deviceParameters('EdgeWavelength') = wavelength;
         end
         
-        function setSpectrum(obj, spectrum)
+        function setPassType(obj, passType)
+            % SETPASSTYPE
+            %
+            % Syntax:
+            %   setPassType(obj, passType)
+            % -------------------------------------------------------------
+            assert(ismember(passType, {'low', 'high'}),...
+                'PassType must be either ''low'' or ''high''');
+            obj.deviceParameters('Pass') = passType;
+        end
+
+        function setTransmission(obj, spectra)
             % SETSPECTRUM
             %
             % Syntax:
             %   setSpectrum(obj, spectrum)
             % -------------------------------------------------------------
-            obj.spectrum = spectrum;
+            obj.transmission = spectra;
         end
     end
 end

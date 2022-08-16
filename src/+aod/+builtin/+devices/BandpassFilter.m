@@ -4,22 +4,22 @@ classdef BandpassFilter < aod.core.Device
 % Constructor:
 %   obj = BandpassFilter(parent, wavelength, bandwidth, varargin)
 %
-% Properties:
+% Parameters:
 %   wavelength
 %   bandwidth
-%   transmission
-% Inherited properties:
+% Inherited parameters:
 %   manufacturer
 %   model
+%
+% Properties:
+%   transmission
 %
 % Methods:
 %   setWavelength(obj, wavelength)
 %   setBandwidth(obj, bandwidth)
 %   setTransmission(obj, transmission)
 % -------------------------------------------------------------------------
-    properties (SetAccess = private)
-        wavelength
-        bandwidth
+    properties (SetAccess = protected)
         transmission
     end
 
@@ -34,11 +34,11 @@ classdef BandpassFilter < aod.core.Device
 
     methods 
         function setWavelength(obj, wavelength)
-            obj.wavelength = wavelength;
+            obj.addParameter('Wavelength', wavelength);
         end
         
         function setBandwidth(obj, bandwidth)
-            obj.bandwidth = bandwidth;
+            obj.addParameter('Bandwidth', bandwidth);
         end
         
         function setTransmission(obj, transmission)
@@ -48,7 +48,8 @@ classdef BandpassFilter < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = sprintf('%u_%u', obj.wavelength, obj.bandwidth);
+            value = sprintf('%u_%u', obj.deviceParameters('Wavelength'),... 
+                obj.deviceParameters('Bandwidth'));
         end
     end
 end 

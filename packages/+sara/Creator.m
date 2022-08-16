@@ -71,7 +71,16 @@ classdef Creator < aod.core.Creator
             end
             obj.Experiment.addSystem(system);
         end
-    
+
+        function clearSystems(obj)
+            % CLEARSYSTEMS
+            %
+            % Syntax:
+            %   obj.clearSystems()
+            % -------------------------------------------------------------
+            obj.Experiment.clearSystems();
+        end
+
         function addRegions(obj, fileName, imSize, UIDs)
             % ADDREGIONS
             %

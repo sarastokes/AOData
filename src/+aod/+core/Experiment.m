@@ -292,6 +292,15 @@ classdef (Abstract) Experiment < aod.core.Entity
             end
         end
 
+        function clearSystems(obj)
+            % CLEARSYSTEMS
+            %
+            % Syntax:
+            %   obj.clearSystems()
+            % -------------------------------------------------------------
+            obj.Systems = aod.core.System.empty();
+        end
+
         function addEpoch(obj, epoch)
             % ADDEPOCH
             %

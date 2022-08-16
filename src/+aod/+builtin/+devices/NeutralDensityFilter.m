@@ -10,12 +10,21 @@ classdef NeutralDensityFilter < aod.core.Device
 % Constructor:
 %   obj = NeutralDensityFilter(parent, attenuation, varargin)
 %
+% Parameters:
+%   Attenuation
+% Inherited parameters:
+%   Manufacturer
+%   Model
+%
+% Properties:
+%   transmission
+%
 % Methods:
 %   setAttenuation(obj, attenuation)
+%   setTransmission(obj, spectra)
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
-        attenuation 
         transmission
     end
     
@@ -28,7 +37,7 @@ classdef NeutralDensityFilter < aod.core.Device
     
     methods
         function setAttenuation(obj, attenuation)
-            obj.attenuation = attenuation;
+            obj.addParameter('Attenuation', attenuation);
         end
         
         function setTransmission(obj, spectra)
@@ -38,7 +47,7 @@ classdef NeutralDensityFilter < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = sprintf('%undf', 10*obj.attenuation);
+            value = sprintf('%undf', 10*obj.deviceParameters('Attenuation'));
         end
     end
 end
