@@ -8,14 +8,16 @@ classdef TopticaPower < aod.builtin.calibrations.PowerMeasurement
 %   aod.builtin.calibrations.PowerMeasurement
 %
 % Constructor:
-%   obj = TopticaPower(laserLine, calibrationDate, parent)
+%   obj = TopticaPower(parent, calibrationDate, wavelength)
 % -------------------------------------------------------------------------
-    methods
-        function obj = TopticaPower(laserLine, varargin)
-            obj = obj@aod.builtin.calibrations.PowerMeasurement(varargin{:});
 
-            obj.wavelength = laserLine;
-            obj.settingUnit = 'Normalized';
+    methods
+        function obj = TopticaPower(parent, calibrationDate, wavelength)
+            laserLines = [488, 515, 561, 630];
+            assert(ismember(wavelength, laserLines), 'TopticaPower: Invalid laser line!');
+            
+            obj = obj@aod.builtin.calibrations.PowerMeasurement(parent,...
+                calibrationDate, wavelength, 'SettingUnit', '%');
         end
     end
 end 

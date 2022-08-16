@@ -5,18 +5,16 @@ classdef MustangPower < aod.builtin.calibrations.PowerMeasurement
 %   Power measurements of Mustang laser
 %
 % Parent:
-%   aod.builtin.calibrations.PowerMeasurement(calibrationDate, parent)
+%   aod.builtin.calibrations.PowerMeasurement(parent, calibrationDate)
 %
 % Constructor:
 %   obj = MustangPower(calibrationDate, parent);
 % -------------------------------------------------------------------------
 
     methods
-        function obj = MustangPower(varargin)
-            obj = obj@aod.builtin.calibrations.PowerMeasurement(varargin{:});
-
-            obj.wavelength = 488;
-            obj.settingUnit = 'Normalized';
+        function obj = MustangPower(parent, calibrationDate)
+            obj = obj@aod.builtin.calibrations.PowerMeasurement(parent,...
+                calibrationDate, 488, 'SettingUnit', 'Normalized');
         end
     end
 end 

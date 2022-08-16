@@ -5,17 +5,15 @@ classdef BeaconPower < aod.builtin.calibrations.PowerMeasurement
 %   Power measurements of wavefront-sensing beacon
 %
 % Parent:
-%   aod.builtin.calibration.PowerMeasurement
+%   aod.builtin.calibrations.PowerMeasurement
 %
 % Constructor:
-%   obj = BeaconPower(calibrationDate, parent)
+%   obj = BeaconPower(parent, calibrationDate)
 % -------------------------------------------------------------------------
     methods
-        function obj = BeaconPower(varargin)
-            obj = obj@aod.builtin.calibrations.PowerMeasurement(varargin{:});
-
-            obj.wavelength = 847;
-            obj.settingUnit = 'mA';
+        function obj = BeaconPower(parent, calibrationDate)
+            obj = obj@aod.builtin.calibrations.PowerMeasurement(parent,...
+                calibrationDate, 847, 'SettingUnit', 'mA');
         end
     end
 end 
