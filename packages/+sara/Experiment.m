@@ -17,7 +17,7 @@ classdef Experiment < aod.core.Experiment
 %   imStack = getStacks(obj, epochIDs)
 %   data = getRegionResponses(obj, epochIDs)  
 % -------------------------------------------------------------------------
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         sampleRate = 25  % Hz
     end
 

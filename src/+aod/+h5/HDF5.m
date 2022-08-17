@@ -13,7 +13,7 @@ classdef HDF5 < handle
 %   makeMatrixDataset(fileName, pathName, dsetName, data)
 %   dsetID = makeTextDataset(fileName, pathName, dsetName, txt)
 %   dsetID = makeDateDataset(fileName, pathName, data)
-%   makeTableDataset(fileName, pathName, dsetName, data)
+%   makeCompoundDataset(fileName, pathName, dsetName, data)
 %   writeatts(fileName, pathName, varargin)
 %   createLink(fileName, targetPath, linkPath, linkName)
 %
@@ -99,7 +99,7 @@ classdef HDF5 < handle
             %   Continues on if group already exists
             % -------------------------------------------------------------
 
-            if ischar(locID)
+            if ischar(locID) && endsWith(locID, 'h5')
                 locID = aod.h5.HDF5.openFile(locID);
             end
 
@@ -117,26 +117,47 @@ classdef HDF5 < handle
             end
         end
 
-        function makeMatrixDataset(fileName, pathName, data)
-            % CREATEWRITEMATRIX
+        function makeMatrixDataset(fileName, pathName, dsetName, data)
+            % MAKEMATRIXDATASET
             % 
             % Description:
             %   Chains h5create and h5write for use with simple matrices
             %
             % Syntax:
-            %   makeMatrixDataset(hdfFile, pathName, data)
+            %   makeMatrixDataset(hdfFile, pathName, dsetName, data)
             % -------------------------------------------------------------
+            fullPath = aod.h5.HDF5.buildPath(pathName, dsetName);
+
             try
-                h5create(fileName, pathName, size(data));
+                h5create(fileName, fullPath, size(data), 'Datatype', class(data));
             catch ME
                 if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-                    warning('Dataset %s already existed', pathName);
+                    warning('Dataset %s already existed', fullPath);
                 else
                     rethrow(ME);
                 end
+            end                    
+            h5write(fileName, fullPath, data);
+        end
+
+        function dsetID = writeEnumDataset(hdfName, pathName, dsetName, value)
+            % WRITEENUMDATASET
+            %
+            % Description:
+            %   Create a pseudo enumerated type dataset
+            %
+            % Syntax:
+            %   dsetID = writeEnumDataset(hdfName, pathName, dsetName, val)
+            % -------------------------------------------------------------
+            if isstring(dsetName)
+                dsetName = char(dsetName);
             end
-                    
-            h5write(fileName, pathName, data);
+            dsetID = aod.h5.HDF5.makeTextDataset(hdfName, pathName, dsetName, char(value));
+            aod.h5.HDF5.writeatts(hdfName, [pathName, '/', dsetName],... 
+                'Class', 'enum', 'EnumClass', class(value));
+            if nargout == 0
+                H5D.close(dsetID);
+            end
         end
 
         function dsetID = makeTextDataset(hdfIn, pathName, dsetName, txt) 
@@ -148,6 +169,9 @@ classdef HDF5 < handle
             % Syntax:
             %   dsetID = makeTextDataset(fileName, pathName, dsetName, txt)
             % -------------------------------------------------------------
+            if isstring(dsetName)
+                dsetName = char(dsetName);
+            end
             if isa(hdfIn, 'H5ML.id')
                 fileID = hdfIn;
             else
@@ -178,9 +202,10 @@ classdef HDF5 < handle
                     rethrow(ME);
                 end
             end
+            H5D.write(dsetID, 'H5ML_DEFAULT', 'H5S_ALL', 'H5S_ALL', 'H5P_DEFAULT', txt);
+
             H5T.close(typeID);
             H5S.close(dspaceID);
-            H5D.write(dsetID, 'H5ML_DEFAULT', 'H5S_ALL', 'H5S_ALL', 'H5P_DEFAULT', txt);
             if nargout == 0
                 H5D.close(dsetID);
             end
@@ -193,38 +218,66 @@ classdef HDF5 < handle
             % 
             % Description:
             %   Saves datetime as text dataset with class and date format
-            %   stored as attribute 
+            %   stored as attributes 
             %
             % Syntax:
             %   dsetID = makeDateDataset(fileName, pathName, data)
             % -------------------------------------------------------------
+            import aod.h5.HDF5
             assert(isdatetime(data), 'makeDateDataset: data must be datetime');
 
-            dsetID = aod.h5.HDF5.makeTextDataset(fileName, pathName, dsetName, datestr(data));
-            aod.h5.HDF5.writeatts(fileName, [pathName, '/', dsetName],...
+            dsetID = HDF5.makeTextDataset(fileName, pathName, dsetName, datestr(data));
+            HDF5.writeatts(fileName, HDF5.buildPath(pathName, dsetName),...
                 'Class', 'datetime', 'Format', data.Format);
+            if nargout == 0
+                H5D.close(dsetID);
+            end
         end
 
-        function dsetID = makeTableDataset(fileName, pathName, dsetName, data)
-            % MAKETABLEDATSET
+        function dsetID = makeStructDataset(fileName, pathName, dsetName, data)
+            % MAKESTRUCTDATASET
+            % -------------------------------------------------------------
+            import aod.h5.HDF5
+
+            fullPath = HDF5.buildPath(pathName, dsetName);
+
+            if istable(data)
+                data = table2struct(data);
+            end
+
+            dsetID = HDF5.makeTextDataset(fileName, pathName, dsetName, 'struct');
+            f = fieldnames(data);
+            for i = 1:numel(f)
+                HDF5.writeatts(fileName, fullPath, f{i}, HDF5.data2att(data.(f{i})));
+            end
+            if nargout == 0
+                H5D.close(dsetID);
+            end
+        end
+
+        function dsetID = makeCompoundDataset(fileName, pathName, dsetName, data)
+            % MAKECOMPOUNDDATASET
             %
             % Description:
-            %   Adds table to HDF5 file as compound
+            %   Adds table/struct to HDF5 file as compound
             %
             % Syntax:
-            %   dsetID = makeTableDataset(fileName, pathName, table);
-            %
-            % Notes:
-            %   Appreciative to NWB for showing the way on this one:
-            %   https://github.com/NeurodataWithoutBorders/matnwb/+io/writeCompound.m
+            %   dsetID = makeCompoundDataset(fileName, pathName, table);
             % -------------------------------------------------------------
-        
-            pathName = [pathName, '/', dsetName];
+            import aod.h5.HDF5
+
+            fullPath = HDF5.buildPath(pathName, dsetName);
+
+            % Record original class, then convert to struct
+            dataClass = class(data);
+            if istable(data)
+                data = table2struct(data);
+            end
+
             fileID = aod.h5.HDF5.openFile(fileName);
-            nRows = height(data);
-            data = table2struct(data);
         
             names = fieldnames(data);
+            nDims = numel(names);
         
             S = struct();
             for i = 1:length(names) 
@@ -240,8 +293,10 @@ classdef HDF5 < handle
                 if iscell(val) && ~isstring(val)
                     data.(names{i}) = [val{:}];
                     val = val{1};
+                elseif isstring(val) && numel(val) == 1
+                    val = char(val);
                 end
-                typeIDs{i} = aod.h5.HDF5.getDataType(val);
+                typeIDs{i} = HDF5.getDataType(val);
                 sizes(i) = H5T.get_size(typeIDs{i});
             end
         
@@ -253,18 +308,24 @@ classdef HDF5 < handle
             % Optimizes for type size
             H5T.pack(typeID);
         
-            spaceID = H5S.create_simple(1, nRows, []);
-            if aod.h5.HDF5.exists(fileName, pathName)
-                warning('found and replaced %s', pathName);
-                aod.h5.HDF5.deleteObject(fileName, pathName);
+            spaceID = H5S.create_simple(1, nDims, []);
+            if aod.h5.HDF5.exists(fileName, fullPath)
+                warning('found and replaced %s', fullPath);
+                HDF5.deleteObject(fileName, fullPath);
             end
-            dsetID = H5D.create(fileID, pathName, typeID, spaceID, 'H5P_DEFAULT');
+            dsetID = H5D.create(fileID, fullPath, typeID, spaceID, 'H5P_DEFAULT');
             H5D.write(dsetID, typeID, spaceID, spaceID, 'H5P_DEFAULT', data);
+
+            % Cleanup
+            H5T.close(typeID);
             H5S.close(spaceID);
             if nargout == 0
                 H5D.close(dsetID);
             end
             H5F.close(fileID);
+            
+            % Write original class as an attribute 
+            HDF5.writeatts(fileName, fullPath, 'Class', dataClass);
         end
         
         function deleteObject(fileName, pathName, name)
@@ -346,32 +407,61 @@ classdef HDF5 < handle
         function out = data2att(data)
             if islogical(data)
                 out = int32(data);
+            elseif isdatetime(data)
+                out = datestr(data);
+            elseif isstring(data) && numel(data) == 1
+                out = char(data);
             else
                 out = data;
             end
         end
 
-        function writeDataByType(fileName, pathName, data)
+        function tf = writeDataByType(fileName, pathName, dsetName, data)
             % WRITEDATABYTYPE
             %
             % Description:
-            %   Call the appropriate "make" function for given data type
+            %   Call the appropriate "make" function for given data type 
+            %   and tags with original MATLAB class information
             %
             % Syntax:
-            %   writeDataByType(fileName, pathName, data)
+            %   tf = writeDataByType(fileName, pathName, dsetName, data)
             % -------------------------------------------------------------
-            if istable(data)
-                aod.h5.HDF5.makeTableDataset(fileName, pathName, data);
-                aod.h5.HDF5.writeatts(fileName, pathName, 'EntityType', 'table');
-            elseif isdouble(data)
-                aod.h5.HDF5.makeMatrixDataset(fileName, pathName, data);
+            import aod.h5.HDF5
+
+            if isstring(dsetName)
+                dsetName = char(dsetName);
+            end
+
+            fullPath = HDF5.buildPath(pathName, dsetName);
+
+            tf = true;
+
+            if isenum(data)
+                HDF5.makeEnumDataset(fileName, pathName, dsetName, data);
+            elseif isstruct(data) || istable(data)
+                try
+                    HDF5.makeCompoundDataset(fileName, pathName, dsetName, data);
+                    HDF5.writeatts(fileName, fullPath, 'Class', class(data));
+                catch
+                    % Delete dataset created while attempting compound type
+                    if aod.h5.HDF5.exists(fileName, fullPath)
+                        HDF5.deleteObject(fileName, fullPath);
+                    end
+                    HDF5.makeStructDataset(fileName, pathName, dsetName, data);
+                end
+            elseif isnumeric(data)
+                HDF5.makeMatrixDataset(fileName, pathName, dsetName, data);
+                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
             elseif ischar(data)
-                aod.h5.HDF5.makeTextDataset(fileName, pathName, data);
+                HDF5.makeTextDataset(fileName, pathName, dsetName, data);
+                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
             elseif isstring(data)
-                aod.h5.HDF.makeTextDataset(fileName, pathName, char(data));
+                HDF5.makeTextDataset(fileName, pathName, dsetName, char(data));
+                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
             elseif isdatetime(data)
-                aod.h5.HDF5.makeTextDataset(fileName, pathName, datestr(data));
-                aod.h5.HDF5.writeatts(fileName, pathName, 'EntityType', 'date');
+                HDF5.makeDateDataset(fileName, pathName, dsetName, data);
+            else
+                tf = false;
             end
         end    
 
@@ -387,6 +477,9 @@ classdef HDF5 < handle
             if isa(var, 'double')
                 typeID = 'H5T_IEEE_F64LE';
             elseif ismember(class(var), {'char', 'cell', 'datetime'})
+                typeID = H5T.copy('H5T_C_S1');
+                H5T.set_size(typeID, 'H5T_VARIABLE');
+            elseif isstring(var) && numel(var) == 1
                 typeID = H5T.copy('H5T_C_S1');
                 H5T.set_size(typeID, 'H5T_VARIABLE');
             elseif islogical(var)
@@ -471,7 +564,7 @@ classdef HDF5 < handle
             % -------------------------------------------------------------
             path = [];
             for i = 1:nargin
-                path = [path, '/', varargin{i}];  %#ok
+                path = [path, '/', char(varargin{i})];  %#ok
             end
 
             % Make sure leading / isn't duplicated
@@ -512,3 +605,9 @@ classdef HDF5 < handle
         end
     end
 end 
+
+% if isstring(prop) && numel(prop) > 1
+%    HDF5.makeMatrixDataset(hdfName, hdfPath, persistedProps(i), prop);
+% else
+%     HDF5.makeTextDataset(hdfName, hdfPath, persistedProps(i), prop);
+% end

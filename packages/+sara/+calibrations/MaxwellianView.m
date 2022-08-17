@@ -20,9 +20,7 @@ classdef MaxwellianView < aod.core.Calibration
         meanChromaticity
         LUTs
         spectra
-
-        spectraFiles
-        lutFiles
+        files
 
         calibrationFile
     end
@@ -31,6 +29,7 @@ classdef MaxwellianView < aod.core.Calibration
         function obj = MaxwellianView(parent, calibrationDate)
             obj = obj@aod.core.Calibration(parent, calibrationDate);
 
+            obj.files = aod.core.Parameters;
             obj.loadCalibrationFile()
         end
 
@@ -57,9 +56,14 @@ classdef MaxwellianView < aod.core.Calibration
             obj.ledMaxPowers = S.LedMaxPowers_uW;
             obj.ledBackgroundNorm = S.LedBackground_Norm;
             obj.meanChromaticity = S.MeanChromaticity_xyY;
+
+            for i = 1:numel(S.Files.LUT)
+                obj.files(sprintf('LUT%u',i)) = S.Files.LUT{i};
+            end
+            for i = 1:numel(S.Files.Spectra)
+                obj.files(sprintf('Spectra%u',i)) = S.Files.Spectra{i};
+            end
             
-            obj.spectraFiles = S.Files.Spectra;
-            obj.lutFiles = S.Files.LUT;
             obj.stimContrasts = S.Stimuli.Contrasts;
             obj.stimPowers = S.Stimuli.Powers;
 

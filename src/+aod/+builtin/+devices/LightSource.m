@@ -61,4 +61,10 @@ classdef LightSource < aod.core.Device
             obj.spectra = spectra;
         end
     end
+
+    methods (Access = protected)
+        function value = getLabel(obj)
+            value = [num2str(obj.deviceParameters('Wavelength')), 'nmLightSource'];
+        end
+    end
 end

@@ -29,6 +29,6 @@ function writeExperiment(hdfName, obj)
     HDF5.makeDateDataset(hdfName, '/Experiment', 'experimentDate', obj.experimentDate);
     
     % Write epochIDs
-    HDF5.makeMatrixDataset(hdfName, '/Experiment/epochIDs', obj.epochIDs);
+    HDF5.makeMatrixDataset(hdfName, '/Experiment', 'epochIDs', obj.epochIDs);
 
     %% TODO: Write notes

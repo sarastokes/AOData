@@ -36,7 +36,7 @@ function writeCalibration(hdfName, obj)
     % Write setting/value table
     calibrationTable = table(obj.Setting, obj.Value,...
         'VariableNames', {'Setting', 'Value'});
-    HDF5.makeTableDataset(hdfName, hdfPath, 'Measurements', calibrationTable);
+    HDF5.makeCompoundDataset(hdfName, hdfPath, 'Measurements', calibrationTable);
     HDF5.writeatts(hdfName, [hdfPath, '/Measurements'],...
         'settingUnit', obj.settingUnit, 'valueUnit', obj.valueUnit);
     

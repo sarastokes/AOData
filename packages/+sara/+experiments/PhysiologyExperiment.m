@@ -2,6 +2,9 @@ classdef PhysiologyExperiment < sara.Experiment
 
     properties (SetAccess = protected)
         location
+    end
+
+    properties (Transient, SetAccess = protected)
         stimLog
         stimTable
     end
@@ -168,7 +171,7 @@ classdef PhysiologyExperiment < sara.Experiment
     methods (Access = protected)
         function value = getLabel(obj)
             value = ['MC', int2fixedwidthstr(num2str(obj.Sources.getParentID()), 5),...
-                '_', obj.Sources(1).whichEye,...
+                '_', obj.Sources(1).name,...
                 obj.location(1), '_', char(obj.experimentDate)];
         end
 

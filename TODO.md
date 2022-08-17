@@ -2,15 +2,16 @@
 
 ##### Major
 - [x] Add UIDs to all Entitys
-- [ ] Implement search by UID
-- [ ] Replace duplicated epoch from Creator
+- [x] Implement search by UID
+- [x] Replace duplicated epoch from Creator
+- [ ] Decide where allowableParentTypes go
 
 ##### Package
-- [ ] Add rotation to 1P-specific SpatialProtocol
+- [x] Add rotation to 1P-specific SpatialProtocol
 - [ ] Test SpatialProtocol file writer 
 - [ ] Dates for SpectralProtocol file names
-- [ ] Add Location to SubjectFactory
-- [ ] Ensure eye-specific parameters go to Eye, not subject
+- [x] Add Location to SubjectFactory
+- [x] Ensure eye-specific parameters go to Eye, not subject
 - [ ] Get specific Calibration (at Dataset) from Stimulus in Epoch
 
 ##### Minor

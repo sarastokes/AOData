@@ -47,7 +47,7 @@ classdef (Abstract) Experiment < aod.core.Entity
 %   sortEpochs(obj)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         homeDirectory           char
         experimentDate(1,1)     datetime
         experimentParameters    %aod.core.Parameters
