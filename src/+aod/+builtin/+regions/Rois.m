@@ -104,7 +104,7 @@ classdef Rois < aod.core.Regions
                 ID = obj.uid2roi(ID);
                 return;
             end
-            assert(ID <= obj.Count, 'ROI is not within Count!');
+            assert(ID <= obj.count, 'ROI is not within count!');
         end
         
         function roiID = uid2roi(obj, uid)
@@ -168,13 +168,13 @@ classdef Rois < aod.core.Regions
             % -------------------------------------------------------------
             if isstring(roiUIDs)
                 roiUIDs = roiUIDs(:);
-                assert(numel(roiUIDs) == obj.Count, ...
+                assert(numel(roiUIDs) == obj.count, ...
                     'Number of UIDs must equal number of ROIs');
-                T = table(rangeCol(1, obj.Count), roiUIDs,...
+                T = table(rangeCol(1, obj.count), roiUIDs,...
                     'VariableNames', {'ID', 'UID'});
                 obj.Metadata = T;
             elseif istable(roiUIDs)
-                assert(height(roiUIDs) == obj.Count,...
+                assert(height(roiUIDs) == obj.count,...
                     'Number of UIDs must equal number of ROIs');
                 assert(~isempty(cellfind(roiUIDs.Properties.VariableNames, 'UID')),...
                     'roiUID table must have a column named UID');
@@ -224,7 +224,7 @@ classdef Rois < aod.core.Regions
             if ~isempty(obj.Metadata)
                 % If there were existing ROIs, make sure to append to  
                 % Metadata rather than erasing existing table
-                newROIs = obj.Count - height(obj.Metadata);
+                newROIs = obj.count - height(obj.Metadata);
                 newTable = table(height(obj.Metadata) + rangeCol(1, newROIs),...
                     repmat("", [newROIs, 1]), 'VariableNames', {'ID', 'UID'});
                 newTable = [obj.Metadata; newTable];
@@ -239,8 +239,8 @@ classdef Rois < aod.core.Regions
                 forceOverwrite = false;
             end
             if isempty(obj.Metadata) || forceOverwrite
-                obj.Metadata = table(rangeCol(1, obj.Count), ...
-                    repmat("", [obj.Count, 1]),...
+                obj.Metadata = table(rangeCol(1, obj.count), ...
+                    repmat("", [obj.count, 1]),...
                     'VariableNames', {'ID', 'UID'});
             end
         end

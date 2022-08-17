@@ -48,7 +48,7 @@ classdef BandpassFilter < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = sprintf('%u_%u', obj.deviceParameters('Wavelength'),... 
+            value = sprintf('%u_%unmBandpassFilter', obj.deviceParameters('Wavelength'),... 
                 obj.deviceParameters('Bandwidth'));
         end
     end

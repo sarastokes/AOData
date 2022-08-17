@@ -39,7 +39,7 @@ classdef (Abstract) Entity < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent                      %aod.core.Entity 
+        Parent                      % aod.core.Entity
         UUID                        string = string.empty()
         description                 string = string.empty() 
         notes                       string = string.empty()
@@ -196,7 +196,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods (Access = private)
+    methods %(Access = private)
         function tf = isValidParent(obj, parent)
             % ISVALIDPARENT
             %

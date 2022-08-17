@@ -4,19 +4,27 @@ classdef Regions < aod.core.Entity
 % Constructor:
 %   obj = Regions(parent, rois, varargin)
 %
-% 
+% Private parameters:
+%   Count
+%   RoiIDs
+%
 % Properties:
 %   Map                     labeled map of region locations
-%   Count                   number of regions in map
-%   roiIDs                  IDs of all regions in map
 %   regionParameters        aod.core.Parameters
+% Dependent properties:
+%   count
+%   roiIDs
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         Map                 double
-        Count(1,1)          {mustBeInteger}  = 0
-        roiIDs(1,:)         {mustBeInteger}  = 0 
         regionParameters    % aod.core.Parameters
+    end
+
+    % Enables quick access to commonly-used parameters
+    properties (Dependent)
+        count
+        roiIDs
     end
 
     properties (Access = protected)
@@ -26,7 +34,7 @@ classdef Regions < aod.core.Entity
     methods
         function obj = Regions(parent, rois)
             obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Epoch'};
+            obj.allowableParentTypes = {'aod.core.Experiment'};
 
             if nargin > 0
                 obj.setParent(parent);
@@ -39,6 +47,22 @@ classdef Regions < aod.core.Entity
             end
 
             obj.regionParameters = aod.core.Parameters();
+        end
+
+        function value = get.count(obj)
+            if obj.regionParameters.isKey('Count')
+                value = obj.regionParameters('Count');
+            else 
+                value = 0;
+            end
+        end
+
+        function value = get.roiIDs(obj)
+            if obj.regionParameters.isKey('RoiIDs')
+                value = obj.regionParameters('RoiIDs');
+            else 
+                value = [];
+            end
         end
     end
 
@@ -53,9 +77,12 @@ classdef Regions < aod.core.Entity
             %   obj.setMap(roiMap);
             % -------------------------------------------------------------
             obj.Map = roiMap;
-            obj.roiIDs = unique(obj.Map);
-            obj.roiIDs(obj.roiIDs == 0) = [];
-            obj.Count = nnz(unique(obj.Map));
+            IDs = unique(obj.Map);
+            IDs(obj.roiIDs == 0) = [];
+            roiCount = nnz(unique(obj.Map));
+
+            obj.addParameter('RoiIDs', IDs);
+            obj.addParameter('Count', roiCount);
         end
     end
 
@@ -81,6 +108,14 @@ classdef Regions < aod.core.Entity
                 for i = 1:(nargin - 1)/2
                     obj.regionParameters(varargin{(2*i)-1}) = varargin{2*i};
                 end
+            end
+        end
+
+        function value = getParameter(obj, paramName)
+            if obj.regionParameters.isKey(paramName)
+                value = obj.regionParameters(paramName);
+            else
+                value = [];
             end
         end
     end

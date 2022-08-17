@@ -45,7 +45,7 @@ classdef Epoch < aod.core.Epoch
 %   addStimulus(obj, stim)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         epochType           sara.EpochTypes
     end
 

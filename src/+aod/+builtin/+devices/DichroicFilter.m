@@ -68,4 +68,12 @@ classdef DichroicFilter < aod.core.Device
             obj.transmission = spectra;
         end
     end
+
+    methods (Access = protected)
+        function value = getLabel(obj)
+            value = [num2str(obj.deviceParameters('EdgeWavelength')), 'nm',...
+                capitalize(obj.deviceParameters('Pass')), 'Pass',...
+                'DichroicFilter'];
+        end
+    end
 end

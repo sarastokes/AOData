@@ -47,6 +47,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Creator})
+        Source                      aod.core.Source
         startTime(1,1)              datetime
         Registrations               aod.core.Registration
         Responses                   aod.core.Response  
@@ -55,20 +56,12 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         files                       % aod.core.Parameters  
     end
 
-    properties (Dependent)
-        Source
-    end
-
     properties (Dependent, Hidden)
         homeDirectory
     end
 
     properties (Hidden, Transient, Access = protected)
         cachedVideo
-    end
-
-    properties (Hidden, SetAccess = private)
-        sourceUUID
     end
 
     % Methods for subclasses to overwrite
@@ -95,14 +88,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 value = obj.Parent.homeDirectory;
             else
                 value = [];
-            end
-        end
-
-        function value = get.Source(obj)
-            if isempty(obj.sourceUUID)
-                value = [];
-            else
-                value = findByUUID(obj.Parent.Sources, obj.sourceUUID);
             end
         end
     end
@@ -148,7 +133,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 'source must be subclass of aod.core.Source');
             assert(~isempty(findByUUID(obj.Parent.Sources, source.UUID)),... 
                 'Source be part of the same Experiment');
-            obj.sourceUUID = source.UUID;
+            obj.Source = source;
         end
 
         function stim = getStimulus(obj, stimClassName)

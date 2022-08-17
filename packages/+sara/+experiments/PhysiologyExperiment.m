@@ -1,9 +1,5 @@
 classdef PhysiologyExperiment < sara.Experiment
 
-    properties (SetAccess = protected)
-        location
-    end
-
     properties (Transient, SetAccess = protected)
         stimLog
         stimTable
@@ -20,13 +16,8 @@ classdef PhysiologyExperiment < sara.Experiment
     end
 
     methods
-        function obj = PhysiologyExperiment(homeDirectory, expDate, location)
-            obj = obj@sara.Experiment(homeDirectory, expDate);
-            if nargin < 3
-                obj.location = 'Unknown';
-            else
-                obj.location = capitalize(location);
-            end
+        function obj = PhysiologyExperiment(homeDirectory, expDate, varargin)
+            obj = obj@sara.Experiment(homeDirectory, expDate, varargin{:});
         end
 
         function value = get.visualStimuli(obj)
@@ -170,15 +161,7 @@ classdef PhysiologyExperiment < sara.Experiment
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['MC', int2fixedwidthstr(num2str(obj.Sources.getParentID()), 5),...
-                '_', obj.Sources(1).name,...
-                obj.location(1), '_', char(obj.experimentDate)];
-        end
-
-        function value = getShortName(obj)
-            value = [num2str(obj.Sources(1).getParentID), '_', ...
-                obj.Sources(1).Parent.whichEye,...
-                obj.location(1), '_', char(obj.experimentDate)];
+            value = [obj.Sources.label, '_', char(obj.experimentDate)];
         end
     end
 end

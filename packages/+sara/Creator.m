@@ -9,9 +9,9 @@ classdef Creator < aod.core.Creator
             obj@aod.core.Creator(homeDirectory);
         end
 
-        function createExperiment(obj, expDate, source, location, varargin)
+        function createExperiment(obj, expDate, source, varargin)
             obj.Experiment = sara.experiments.PhysiologyExperiment(...
-                obj.homeDirectory, expDate, location);
+                obj.homeDirectory, expDate, varargin{:});
             obj.Experiment.addSource(source);
             obj.Experiment.addParameter(varargin{:});
         end
