@@ -38,11 +38,11 @@ function writeGeneric(hdfName, obj)
             hdfPath = ['/Experiment/Calibrations/', char(obj.label)];
             parentPath = '/Experiment';
         case EntityTypes.CHANNEL 
-            doesParentExist(GMT, obj.Parent);
+            doesEntityExist(GMT, obj.Parent);
             parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
             hdfPath = [parentPath, '/Channels/', char(obj.Name)];
         case EntityTypes.DEVICE
-            doesParentExist(GMT, obj.Parent);
+            doesEntityExist(GMT, obj.Parent);
             parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
             hdfPath = [parentPath, '/Devices/', char(obj.label)];
         case EntityTypes.EPOCH
@@ -97,6 +97,13 @@ function writeGeneric(hdfName, obj)
             fprintf('Skipping empty property: %s\n', persistedProps(i));
             continue
         end
+        % Write links to other entities
+        if isSubclass(prop, 'aod.core.Entity')
+            isEntityInFile(GMT, prop);
+            entityPath = char(GMT{GMT.UUID == prop.UUID, 'Path'});
+            HDF5.createLink(hdfName, entityPath, hdfPath, persistedProp(i));
+            return
+        end
         success = HDF5.writeDataByType(hdfName, hdfPath, persistedProps(i), prop);
 
         if ~success
@@ -105,11 +112,14 @@ function writeGeneric(hdfName, obj)
     end
 end
 
-function doesParentExist(GMT, parent)
-    if isempty(parent)
-        error('Parent does not exist!');
+function doesEntityExist(GMT, entity)
+    if isempty(entity)
+        error('Entity does not exist!');
     end
-    if isempty(find(GMT.UUID == parent.UUID)) %#ok<EFIND> 
-        error('Parent does not exist in HDF5 file!');
+end
+
+function isEntityInFile(GMT, entity)
+    if isempty(find(GMT.UUID == entity.UUID)) %#ok<EFIND> 
+        error('Entity does not exist in HDF5 file!');
     end
 end

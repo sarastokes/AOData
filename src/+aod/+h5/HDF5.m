@@ -271,13 +271,15 @@ classdef HDF5 < handle
             % Record original class, then convert to struct
             dataClass = class(data);
             if istable(data)
+                nDims = height(data);
                 data = table2struct(data);
+            else
+                nDims = max(@numel, data);
             end
 
             fileID = aod.h5.HDF5.openFile(fileName);
         
             names = fieldnames(data);
-            nDims = numel(names);
         
             S = struct();
             for i = 1:length(names) 
