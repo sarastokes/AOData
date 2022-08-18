@@ -17,24 +17,24 @@ classdef EntityTypes
     end
 
     methods
-        function parentTypes = allowableParentTypes(obj)
+        function parents = parentTypes(obj)
             import aod.core.EntityTypes
 
             switch obj 
                 case EntityTypes.SOURCE
-                    parentTypes = {'aod.core.Experiment', 'aod.core.Source'};
+                    parents = {'aod.core.Experiment', 'aod.core.Source'};
                 case EntityTypes.CHANNEL 
-                    parentTypes = {'aod.core.System'};
+                    parents = {'aod.core.System'};
                 case EntityTypes.DEVICE
-                    parentTypes = {'aod.core.Channel'};
+                    parents = {'aod.core.Channel'};
                 case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE}
-                    parentTypes = {'aod.core.Epoch'};
+                    parents = {'aod.core.Epoch'};
                 case EntityTypes.TIMING
-                    parentTypes = {'aod.core.Response'};
+                    parents = {'aod.core.Response'};
                 case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.REGION, EntityTypes.CALIBRATION}
-                    parentTypes = {'aod.core.Experiment'};
+                    parents = {'aod.core.Experiment'};
                 case EntityTypes.EXPERIMENT
-                    parentTypes = {};
+                    parents = {};
             end
         end
 

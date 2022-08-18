@@ -21,9 +21,6 @@ classdef (Abstract) Experiment < aod.core.Entity
 % Dependent properties:
 %   numEpochs                   Number of epochs in experiment
 %
-% Private properties:
-%   baseDirectory               Folder used to initialize Experiment
-%
 % Abstract methods:
 %   value = getFileHeader(obj)
 % 
@@ -52,7 +49,7 @@ classdef (Abstract) Experiment < aod.core.Entity
         experimentDate(1,1)     datetime
         experimentParameters    %aod.core.Parameters
 
-        Epochs                  %aod.core.Epoch
+        Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
         Regions                 aod.core.Regions
         Calibrations            aod.core.Calibration
@@ -63,10 +60,6 @@ classdef (Abstract) Experiment < aod.core.Entity
 
     properties (Dependent)
         numEpochs
-    end
-
-    properties (Hidden, SetAccess = private)
-        baseDirectory       % File path used to initialize Experiment
     end
 
     methods (Abstract)

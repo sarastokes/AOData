@@ -73,7 +73,7 @@ classdef DichroicFilter < aod.core.Device
         function value = getLabel(obj)
             value = [num2str(obj.deviceParameters('EdgeWavelength')), 'nm',...
                 capitalize(obj.deviceParameters('Pass')), 'Pass',...
-                'DichroicFilter'];
+                'Filter'];
         end
     end
 end

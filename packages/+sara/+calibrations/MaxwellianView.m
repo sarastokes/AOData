@@ -64,14 +64,16 @@ classdef MaxwellianView < aod.core.Calibration
                 obj.files(sprintf('Spectra%u',i)) = S.Files.Spectra{i};
             end
             
-            obj.stimContrasts = S.Stimuli.Contrasts;
-            obj.stimPowers = S.Stimuli.Powers;
+            obj.stimContrasts = rmfield(S.Stimuli.Contrasts, {'Labels', 'Units'});
+            obj.stimContrasts = struct2table(structfun(@(x) x', obj.stimContrasts, 'UniformOutput', false));
+            obj.stimPowers = rmfield(S.Stimuli.Powers, {'Labels', 'Units', 'Description'});
+            obj.stimPowers = struct2table(structfun(@(x) x', obj.stimPowers, 'UniformOutput', false));
 
             obj.LUTs = table(S.LUTs.Voltages', S.LUTs.R', S.LUTs.G', S.LUTs.B',...
                 'VariableNames', {'Voltage', 'R', 'G', 'B'});
             obj.spectra = table(S.Spectra.Wavelengths', S.Spectra.R',...
                 S.Spectra.G', S.Spectra.B',...
-                'VariableNames', {'Wavleength', 'R', 'G', 'B'});
+                'VariableNames', {'Wavelength', 'R', 'G', 'B'});
         end
     end
 

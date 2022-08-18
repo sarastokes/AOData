@@ -56,4 +56,11 @@ classdef Pinhole < aod.core.Device
             end
         end
     end
+
+    methods (Access = protected)
+        function value = getLabel(obj)
+            value = ['Pinhole', num2str(obj.deviceParameters('Diameter')),...
+                obj.deviceParameters('DiameterUnits')];
+        end
+    end
 end
