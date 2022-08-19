@@ -10,13 +10,15 @@ classdef Creator < aod.core.Creator
         end
 
         function createExperiment(obj, expDate, source, varargin)
+            % CREATEEXPERIMENT
+            % -------------------------------------------------------------
             obj.Experiment = sara.experiments.PhysiologyExperiment(...
                 obj.homeDirectory, expDate, varargin{:});
             obj.Experiment.addSource(source);
             obj.Experiment.addParameter(varargin{:});
         end
 
-        function addEpochs(obj, epochIDs, epochType, source, varargin)
+        function addEpochs(obj, epochIDs, epochType, varargin)
             % ADDEPOCHS
             %
             % Syntax:
@@ -28,7 +30,7 @@ classdef Creator < aod.core.Creator
 
             fprintf('Adding epochs... ');
             for i = 1:numel(epochIDs)
-                ep = obj.makeEpoch(epochIDs(i), epochType, source, varargin{:});          
+                ep = obj.makeEpoch(epochIDs(i), epochType, varargin{:});          
                 obj.Experiment.addEpoch(ep);
                 fprintf('%u ', epochIDs(i));
             end

@@ -18,18 +18,16 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = private)
         name                        char
-        sourceParameters            % aod.core.Parameters
+        sourceParameters            = aod.core.Parameters
     end
 
     methods
         function obj = Source(parent, name)
-            obj.allowableParentTypes = {'aod.core.Experiment',...
-                'aod.core.Source', 'aod.core.Subject'};
+            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Source'};
             if nargin > 0
                 obj.setParent(parent);
             end
             obj.name = name;
-            obj.sourceParameters = aod.core.Parameters();
         end
     end
 

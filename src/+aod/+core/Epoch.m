@@ -47,13 +47,18 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Creator})
-        Source                      aod.core.Source
         startTime(1,1)              datetime
         Registrations               aod.core.Registration
         Responses                   aod.core.Response  
         Stimuli                     aod.core.Stimulus
-        epochParameters             % aod.core.Parameters
-        files                       % aod.core.Parameters  
+        epochParameters             = aod.core.Parameters
+        files                       = aod.core.Parameters  
+    end
+
+    % Entity link properties
+    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Source})
+        Source                      = aod.core.Source.empty()
+        System                      = aod.core.System.empty()
     end
 
     properties (Dependent, Hidden)
@@ -71,16 +76,18 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods 
-        function obj = Epoch(parent, ID, source)
+        function obj = Epoch(parent, ID, varargin)
             obj.allowableParentTypes = {'aod.core.Experiment'};
             obj.setParent(parent);
             obj.ID = ID;
-            if nargin > 2
-                obj.setSource(source);
-            end
             
-            obj.epochParameters = aod.core.Parameters();
-            obj.files = aod.core.Parameters();
+            ip = aod.util.InputParser();
+            addParameter(ip, 'Source', [], @(x) isSubclass(x, 'aod.core.Source'));
+            addParameter(ip, 'System', [], @(x) isSubclass(x, 'aod.core.System'));
+            parse(ip, varargin{:});
+
+            obj.setSource(ip.Results.Source);
+            obj.setSystem(ip.Results.System);
         end
 
         function value = get.homeDirectory(obj)
@@ -123,19 +130,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     % Access methods
     methods (Sealed)
-        function setSource(obj, source)
-            % SETSOURCE
-            %
-            % Syntax:
-            %   obj.setSource(source)
-            % -------------------------------------------------------------
-            assert(isSubclass(source, 'aod.core.Source'),...
-                'source must be subclass of aod.core.Source');
-            assert(~isempty(findByUUID(obj.Parent.Sources, source.UUID)),... 
-                'Source be part of the same Experiment');
-            obj.Source = source;
-        end
-
         function stim = getStimulus(obj, stimClassName)
             % GETSTIMULUS
             %
@@ -211,7 +205,45 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Sealed, Access = {?aod.core.Epoch, ?aod.core.Creator})
+    methods (Sealed)%(Sealed, Access = {?aod.core.Epoch, ?aod.core.Creator})       
+        function setSource(obj, source)
+            % SETSOURCE
+            %
+            % Description:
+            %   Set the Source for this epoch
+            %
+            % Syntax:
+            %   obj.setSource(source)
+            % -------------------------------------------------------------
+            if isempty(source)
+                return
+            end
+            assert(isSubclass(source, 'aod.core.Source'),...
+                'source must be subclass of aod.core.Source');
+            assert(~isempty(findByUUID(obj.Parent.Sources, source.UUID)),... 
+                'Source be part of the same Experiment');
+            obj.Source = source;
+        end
+
+        function setSystem(obj, system)
+            % SETSYSTEM
+            % 
+            % Description:
+            %   Set the System used during this epoch
+            %
+            % Syntax:
+            %   obj.setSystem(system)
+            % -------------------------------------------------------------
+            if isempty(system)
+                return
+            end
+            assert(isSubclass(system, 'aod.core.System'),...
+                'System must be a subclass of aod.core.System');
+            assert(~isempty(findByUUID(obj.Parent.Systems, system.UUID)),... 
+                'System be part of the same Experiment');
+            obj.System = system;
+        end
+
         function addFile(obj, fileName, filePath)
             % ADDFILE
             %

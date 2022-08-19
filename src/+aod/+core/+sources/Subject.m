@@ -21,9 +21,7 @@ classdef Subject < aod.core.Source
         function obj = Subject(parent, name, varargin)
             obj@aod.core.Source(parent, name);
 
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            ip.CaseSensitive = false;
+            ip = aod.util.InputParser();
             addParameter(ip, 'Species', [], @ischar);
             addParameter(ip, 'Sex', 'unknown',... 
                 @(x) ismember(lower(x), {'male', 'female', 'unknown'}));

@@ -23,7 +23,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Data                             
         Timing                              % aod.core.Timing
-        responseParameters                  % aod.core.Parameters
+        responseParameters                  = aod.core.Parameters
     end
 
     properties (Hidden, Dependent)
@@ -32,11 +32,10 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods
         function obj = Response(parent)
-            obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
+            obj.allowableParentTypes = {'aod.core.Epoch'};
             if nargin > 0
                 obj.setParent(parent);
             end
-            obj.responseParameters = aod.core.Parameters();
         end
 
         function value = get.Experiment(obj)

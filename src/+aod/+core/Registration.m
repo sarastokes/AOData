@@ -15,7 +15,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Data
         registrationDate(1,1)               datetime
-        registrationParameters              % aod.core.Parameters
+        registrationParameters              = aod.core.Parameters
     end
 
     methods (Abstract)
@@ -26,13 +26,11 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
         function obj = Registration(parent, data)
             obj = obj@aod.core.Entity();
             obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
-            if nargin > 0 && ~isempty(parent)
-                obj.setParent(parent);
-            end
+            obj.setParent(parent);
+
             if nargin > 1
                 obj.Data = data;
             end
-            obj.registrationParameters = aod.core.Parameters();
         end
     end
 

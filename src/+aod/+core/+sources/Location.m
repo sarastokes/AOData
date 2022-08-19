@@ -19,7 +19,7 @@ classdef Location < aod.core.Source
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = [char(obj.name), 'Location'];
+            value = obj.name;
         end
     end
 

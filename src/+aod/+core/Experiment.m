@@ -47,7 +47,7 @@ classdef (Abstract) Experiment < aod.core.Entity
     properties (SetAccess = protected)
         homeDirectory           char
         experimentDate(1,1)     datetime
-        experimentParameters    %aod.core.Parameters
+        experimentParameters    = aod.core.Parameters
 
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
@@ -70,7 +70,6 @@ classdef (Abstract) Experiment < aod.core.Entity
         function obj = Experiment(homeDirectory, expDate, varargin)
             obj.setHomeDirectory(homeDirectory);
             obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
-            obj.experimentParameters = aod.core.Parameters();
 
             ip = inputParser();
             ip.CaseSensitive = false;

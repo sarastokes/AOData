@@ -11,7 +11,6 @@ classdef (Abstract) Protocol < handle
 % Dependent properties:
 %   totalTime           total stimulus time (from calculateTotalTime)
 %   totalSamples        total number of samples in stimulus
-%   calibrationDate     date calibration was performed
 %
 % Abstract properties (must be set by subclasses):
 %   sampleRate          the rate data is sampled (hz)
@@ -28,17 +27,13 @@ classdef (Abstract) Protocol < handle
 % -------------------------------------------------------------------------
 
     properties  
-        calibration                 % aod.core.Calibration
-        dateCreated                 datetime            = datetime.empty()
-    end
-
-    properties (Dependent)
-        calibrationDate
+        calibration     aod.core.Calibration    = aod.core.Calibration.empty()
+        dateCreated     datetime                = datetime.empty()
     end
 
     properties (Abstract, SetAccess = protected)
-        sampleRate(1,1)             double
-        stimRate(1,1)               double
+        sampleRate(1,1)     double
+        stimRate(1,1)       double
     end
 
     methods (Abstract)
@@ -57,31 +52,14 @@ classdef (Abstract) Protocol < handle
                 obj.calibration = aod.core.calibrations.Empty();
             end
         end
-
-        function value = get.calibrationDate(obj)
-            if isempty(obj.calibration)
-                value = '';
-            else
-                value = obj.calibration.calibrationDate;
-            end
-        end
     end
 
     methods
         function stim = mapToStimulator(obj)
             % MAPTOSTIMULATOR
-            % Can be overwritten by subclasses if needed
+            % Should be overwritten by subclasses if needed
             % -------------------------------------------------------------
             stim = obj.generate();
-        end
-    end
-
-    methods (Access = protected)
-        function value = calculateTotalTime(obj)
-            % CALCULATETOTALTIME
-            % Can be overwritten by subclasses if needed
-            % -------------------------------------------------------------
-            value = obj.preTime + obj.stimTime + obj.tailTime;
         end
     end
 
@@ -89,6 +67,9 @@ classdef (Abstract) Protocol < handle
     methods
         function value = sec2pts(obj, t)
             % SEC2PTS
+            %
+            % Description:
+            %   Convert from seconds to stimulus presentations
             %
             % Syntax:
             %   value = sec2pts(obj, t)
@@ -108,6 +89,8 @@ classdef (Abstract) Protocol < handle
         function value = sec2samples(obj, t)
             % SEC2PTS
             %
+            % Description:
+            %   Convert from seconds to samples (data acquisitions)
             % Syntax:
             %   value = sec2samples(obj, t)
             % -------------------------------------------------------------

@@ -18,7 +18,7 @@ classdef Regions < aod.core.Entity
 
     properties (SetAccess = protected)
         Map                 double
-        regionParameters    % aod.core.Parameters
+        regionParameters    = aod.core.Parameters
     end
 
     % Enables quick access to commonly-used parameters
@@ -45,8 +45,6 @@ classdef Regions < aod.core.Entity
                     obj.Map = rois;
                 end
             end
-
-            obj.regionParameters = aod.core.Parameters();
         end
 
         function value = get.count(obj)

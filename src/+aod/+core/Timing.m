@@ -1,9 +1,13 @@
-classdef Timing < handle
+classdef Timing < handle & matlab.mixin.Heterogeneous
 % TIMING
 %
 % Description:
 %   Provides a consistent interface for timing stored in different formats
 % 
+% Parent:
+%   handle
+%   matlab.mixin.Heterogeneous
+%
 % Constructor:
 %   obj = Timing(varargin)
 %

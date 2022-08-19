@@ -54,11 +54,10 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods
-        function obj = Epoch(parent, ID, source, epochType)
-            obj@aod.core.Epoch(parent, ID, source);
+        function obj = Epoch(parent, ID, epochType, varargin)
+            obj@aod.core.Epoch(parent, ID, varargin{:});
             obj.epochType = epochType;
         end
-
         function value = get.transform(obj)
             value = [];
             if isempty(obj.Registrations)

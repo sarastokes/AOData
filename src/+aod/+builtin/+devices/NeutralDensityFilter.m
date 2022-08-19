@@ -47,7 +47,8 @@ classdef NeutralDensityFilter < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = sprintf('%uNeutralDensityFilter', 10*obj.deviceParameters('Attenuation'));
+            value = sprintf('%uNeutralDensityFilter',... 
+                10*obj.deviceParameters('Attenuation'));
         end
     end
 end

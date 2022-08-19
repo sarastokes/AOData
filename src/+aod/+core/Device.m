@@ -24,7 +24,7 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        deviceParameters                % aod.core.Parameters
+        deviceParameters                = aod.core.Parameters
     end
     
     methods
@@ -33,11 +33,7 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
                 'aod.core.Channel', 'aod.core.Empty'};
             obj.setParent(parent);
 
-            obj.deviceParameters = aod.core.Parameters;
-
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            ip.CaseSensitive = false;
+            ip = aod.util.InputParser();
             addParameter(ip, 'Model', [], @ischar);
             addParameter(ip, 'Manufacturer', [], @ischar);
             parse(ip, varargin{:});

@@ -14,7 +14,6 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Properties:
 %   calibrationDate         date calibration was performed (yyyyMMdd)
 %   calibrationParameters   aod.core.Parameters
-%   Target                  the channel, system or device calibrated
 %
 % Sealed methods:
 %   addParameter(obj, varargin)
@@ -27,13 +26,14 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = private)
         calibrationDate(1,1)                datetime
-        calibrationParameters               % aod.core.Parameters
+        calibrationParameters               = aod.core.Parameters
     end
 
     methods
         function obj = Calibration(parent, calibrationDate)
             obj.allowableParentTypes = {'aod.core.Experiment',... 
                 'aod.core.System', 'aod.core.Empty'};
+            obj.setParent(parent);
             
             if nargin > 1 && ~isempty(calibrationDate)
                 if ~isa(calibrationDate, 'datetime')
@@ -43,12 +43,6 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                     obj.calibrationDate = calibrationDate;
                 end
             end
-
-            if nargin > 1 && ~isempty(parent)
-                obj.setParent(parent);
-            end
-
-            obj.calibrationParameters = aod.core.Parameters;
         end
     end
 

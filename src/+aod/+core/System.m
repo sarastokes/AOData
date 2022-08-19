@@ -1,9 +1,11 @@
 classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 % SYSTEM
 %
+% Description:
+%    A configuration of the AO imaging system 
+%
 % Parent:
-%   aod.core.Entity 
-%   matlab.mixin.Heterogeneous
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
 %   obj = System(parent)
@@ -25,15 +27,13 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     properties
         Name                char
         Channels            = aod.core.Channel.empty();
-        systemParameters    % aod.core.Parameters     
+        systemParameters    = aod.core.Parameters     
     end
     
     methods
         function obj = System(parent, name)
-            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Empty'};
-            if nargin > 0
-                obj.setParent(parent)
-            end
+            obj.allowableParentTypes = {'aod.core.Experiment'};
+            obj.setParent(parent)
             if nargin > 1
                 obj.Name = name;
             end

@@ -9,13 +9,12 @@ classdef Analysis < aod.core.Entity
 %
 % -------------------------------------------------------------------------
     properties
-        analysisParameters
+        analysisParameters          = aod.core.Parameters
     end
 
     methods
         function obj = Analysis(parent)
-            obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Epoch', 'aod.core.Empty'};
+            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Epoch'};
 
             if nargin > 0
                 obj.setParent(parent);
