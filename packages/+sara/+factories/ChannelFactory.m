@@ -99,7 +99,7 @@ classdef ChannelFactory < aod.core.Factory
 
             % Add additional inputs to channelParameters
             if ~isempty(ip.Unmatched)
-                channel.addParameter(ip.Unmatched);
+                channel.setParam(ip.Unmatched);
             end
         end
     end

@@ -9,7 +9,11 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Sealed methods:
 %   setRegistrationDate(obj, regDate)
-%   addParameter(obj, varargin)
+%
+% Inherited methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -18,15 +22,19 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
         registrationParameters              = aod.core.Parameters
     end
 
+    properties (Hidden, Access = protected)
+        allowableParentTypes = {'aod.core.Epoch'};
+        parameterPropertyName = 'registrationParameters';
+    end
+
+    % TODO: Add setData method?
     methods (Abstract)
         varargout = apply(obj, varargin)
     end
 
     methods
         function obj = Registration(parent, data)
-            obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Epoch', 'aod.core.Empty'};
-            obj.setParent(parent);
+            obj = obj@aod.core.Entity(parent);
 
             if nargin > 1
                 obj.Data = data;
@@ -43,35 +51,23 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
             % 
             % Syntax:
             %   obj.setRegistrationDate(regDate)
+            %
+            % Inputs:
+            %   regDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
             if ~isdatetime(regDate)
-                regDate = datetime(regDate, 'Format', 'YYYYMMDD');
+                try
+                    regDate = datetime(regDate, 'Format', 'yyyyMMdd');
+                catch ME 
+                    if strcmp(ME.id, 'MATLAB:datestr:ConvertToDateNumber')
+                        error("aod.core.Registration/setRegistrationDate",...
+                            "Failed to convert to datetime, use format yyyyMMdd");
+                    else
+                        rethrow(ME);
+                    end
+                end
             end
             obj.registrationDate = regDate;
-        end
-
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.registrationParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.registrationParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
         end
     end
 end

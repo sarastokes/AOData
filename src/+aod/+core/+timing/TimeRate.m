@@ -4,10 +4,15 @@ classdef TimeRate < aod.core.Timing
 % Description:
 %   Consistent timing that can be descibed by 2-3 numbers
 %
+% Parent:
+%   aod.core.Timing
+%
 % Constructor:
-%   obj = TimeRate(timeInterval, timeCount, timeStart)
+%   obj = TimeRate(parent, timeInterval, timeCount)
+%   obj = TimeRate(parent, timeInterval, timeCount, timeStart)
 %
 % Inputs:
+%   parent                  aod.core.Response or []
 %   timeInterval            time interval in seconds
 %   timeCount               number of points
 % Optional inputs:
@@ -15,6 +20,8 @@ classdef TimeRate < aod.core.Timing
 %
 % Properties:
 %   Interval 
+%   Start
+%   Count
 %
 % Note:
 %   Units for time are seconds!
@@ -27,14 +34,15 @@ classdef TimeRate < aod.core.Timing
     end
 
     methods 
-        function obj = TimeRate(timeInterval, timeCount, timeStart)
-            if nargin > 0 
-                obj.Interval = timeInterval;
-                obj.Count = timeCount;
-            end
+        function obj = TimeRate(parent, timeInterval, timeCount, timeStart)
+            obj = obj@aod.core.Timing(parent);
+            obj.Interval = timeInterval;
+            obj.Count = timeCount;
 
-            if nargin > 2
+            if nargin > 3
                 obj.Start = timeStart;
+            else
+                obj.Start = obj.Interval;
             end
         end
     end

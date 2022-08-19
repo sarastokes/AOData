@@ -19,6 +19,11 @@ classdef Pinhole < aod.core.Device
 %
 % Sealed methods:
 %   setDiameter(obj, diameter, diameterUnits)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     methods
@@ -31,8 +36,8 @@ classdef Pinhole < aod.core.Device
             addParameter(ip, 'DiameterUnits', 'micron', @istext);
             parse(ip, varargin{:});
             
-            obj.addParameter('Diameter', diameter);
-            obj.addParameter(ip.Results);
+            obj.setParam('Diameter', diameter);
+            obj.setParam(ip.Results);
         end
     end
     
@@ -50,17 +55,17 @@ classdef Pinhole < aod.core.Device
             % Notes:
             %   Default diameter units is 'microns'
             % -------------------------------------------------------------
-            obj.addParameter('Diameter', diameter);
+            obj.setParam('Diameter', diameter);
             if nargin > 2
-                obj.addParameter('DiameterUnits', diameterUnits);
+                obj.setParam('DiameterUnits', diameterUnits);
             end
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['Pinhole', num2str(obj.deviceParameters('Diameter')),...
-                obj.deviceParameters('DiameterUnits')];
+            value = ['Pinhole', num2str(obj.getParam('Diameter')),...
+                obj.getParam('DiameterUnits')];
         end
     end
 end

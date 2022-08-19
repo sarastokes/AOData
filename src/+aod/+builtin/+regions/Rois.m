@@ -7,6 +7,9 @@ classdef Rois < aod.core.Regions
 % Parent:
 %   aod.core.Regions
 %
+% Constructor:
+%   obj = Rois(parent, rois, imSize)
+%
 % Methods:
 %   load(obj)
 %   reload(obj)

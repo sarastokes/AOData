@@ -8,7 +8,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = System(parent)
+%   obj = System(parent, name)
 %
 % Properties:
 %   Channels
@@ -17,11 +17,15 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 % Methods:
 %   removeChannel(obj, ID)
 %   clearChannels(obj)
-%   addParameter(obj, varargin)
 %   assignUUID(obj, uuid)
 %
 % Protected methods (with Creator access):
 %   addChannel(obj, channel)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
     
     properties
@@ -29,11 +33,15 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
         Channels            = aod.core.Channel.empty();
         systemParameters    = aod.core.Parameters     
     end
-    
+
+    properties (Hidden, SetAccess = protected)
+        allowableParentTypes = {'aod.core.Experiment'};
+        parameterPropertyName = 'systemParameters';
+    end
+
     methods
         function obj = System(parent, name)
-            obj.allowableParentTypes = {'aod.core.Experiment'};
-            obj.setParent(parent)
+            obj = obj@aod.core.Entity(parent);
             if nargin > 1
                 obj.Name = name;
             end
@@ -48,30 +56,6 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
         
         function clearChannels(obj)
             obj.Channels = [];
-        end
-               
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.deviceParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.deviceParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
         end
  
         function addChannel(obj, channel)

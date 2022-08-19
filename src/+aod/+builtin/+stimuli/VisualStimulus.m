@@ -3,9 +3,6 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
 %
 % Inherited properties:
 %   stimParameters
-%
-% Inherited methods:
-%   addParameter(obj, varargin)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -62,7 +59,7 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
                     if isnumeric(mc.PropertyList(i).Name) && isnan(mc.PropertyList(i).Name)
                         continue
                     end
-                    obj.addParameter(mc.PropertyList(i).Name,...
+                    obj.setParam(mc.PropertyList(i).Name,...
                         protocol.(mc.PropertyList(i).Name));
                 end
             end

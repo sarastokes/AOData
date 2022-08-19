@@ -5,8 +5,7 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 %   Wrapper for containers.Map with detailed contents display
 %
 % Parent:
-%   containers.Map
-%   matlab.mixin.CustomDisplay
+%   containers.Map, matlab.mixin.CustomDisplay
 %
 % Constructor:
 %   obj = aod.core.Parameters(keySet, valueSet)

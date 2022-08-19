@@ -15,7 +15,7 @@ classdef Creator < aod.core.Creator
             obj.Experiment = sara.experiments.PhysiologyExperiment(...
                 obj.homeDirectory, expDate, varargin{:});
             obj.Experiment.addSource(source);
-            obj.Experiment.addParameter(varargin{:});
+            obj.Experiment.setParam(varargin{:});
         end
 
         function addEpochs(obj, epochIDs, epochType, varargin)
@@ -186,32 +186,32 @@ classdef Creator < aod.core.Creator
             % Additional file names
             ep.addFile('TrialFile', readProperty(fName, 'Trial file name = '));
             txt = strsplit(ep.files('TrialFile'), filesep);
-            ep.addParameter('StimulusName', txt{end});
+            ep.setParam('StimulusName', txt{end});
 
             txt = readProperty(fName, 'Scanner FOV = ');
             txt = erase(txt, ' (496 lines) degrees');
             txt = strsplit(txt, ' x ');
-            ep.addParameter('FieldOfView', [str2double(txt{1}), str2double(txt{2})]);
+            ep.setParam('FieldOfView', [str2double(txt{1}), str2double(txt{2})]);
 
             % Imaging window
             x = str2double(readProperty(fName, 'ImagingWindowX = '));
             y = str2double(readProperty(fName, 'ImagingWindowY = '));
             dx = str2double(readProperty(fName, 'ImagingWindowDX = '));
             dy = str2double(readProperty(fName, 'ImagingWindowDY = '));
-            ep.addParameter('ImagingWindow', [x y dx dy]);
+            ep.setParam('ImagingWindow', [x y dx dy]);
 
             % Channel parameters
-            ep.addParameter('RefGain',... 
+            ep.setParam('RefGain',... 
                 str2double(readProperty(fName, 'ADC channel 1, gain = ')));
-            ep.addParameter('VisGain',... 
+            ep.setParam('VisGain',... 
                 str2double(readProperty(fName, 'ADC channel 2, gain = ')));
-            ep.addParameter('RefOffset',... 
+            ep.setParam('RefOffset',... 
                 str2double(readProperty(fName, 'ADC channel 1, offset = ')));
-            ep.addParameter('VisOffset',... 
+            ep.setParam('VisOffset',... 
                 str2double(readProperty(fName, 'ADC channel 2, offset = ')));
-            ep.addParameter('RefPmtGain',...
+            ep.setParam('RefPmtGain',...
                 str2double(readProperty(fName, 'Reflectance PMT gain  = ')));
-            ep.addParameter('VisPmtGain',...
+            ep.setParam('VisPmtGain',...
                 str2double(readProperty(fName, 'Fluorescence PMT gain  = ')));
             
             mustangValue = str2double(readProperty(fName, 'AOM_VALUE1 = '));
@@ -237,12 +237,12 @@ classdef Creator < aod.core.Creator
             y = str2double(readProperty(fName, 'ReflectanceWindowY = '));
             dx = str2double(readProperty(fName, 'ReflectanceWindowDX = '));
             dy = str2double(readProperty(fName, 'ReflectanceWindowDY = '));
-            ep.addParameter('ReflectanceWindow', [x y dx dy]);
+            ep.setParam('ReflectanceWindow', [x y dx dy]);
 
             % LED stimulus specifications
-            ep.addParameter('LedInterval',...
+            ep.setParam('LedInterval',...
                 str2double(readProperty(fName, 'Interval value = ')));
-            ep.addParameter('LedIntervalUnit',...
+            ep.setParam('LedIntervalUnit',...
                 readProperty(fName, 'Interval unit = '));
             
             % LUT files (may not be necessary with Calibration class)
@@ -262,10 +262,10 @@ classdef Creator < aod.core.Creator
             txt = readProperty(fName, 'Stimulus location in linear stabilized space = ');
             txt = erase(txt, '('); txt = erase(txt, ')');
             txt = strsplit(txt, ', ');
-            ep.addParameter('StimulusLocation', [str2double(txt{1}), str2double(txt{2})]);
+            ep.setParam('StimulusLocation', [str2double(txt{1}), str2double(txt{2})]);
             
             % Power modulation 
-            ep.addParameter('PowerModulation',... 
+            ep.setParam('PowerModulation',... 
                 convertYesNo(readProperty(fName, 'Stimulus power modulation = ')));
         end
 
@@ -389,7 +389,7 @@ classdef Creator < aod.core.Creator
             reg = aod.builtin.registrations.StripRegistration(ep);
             reader = aod.builtin.readers.RegistrationParameterReader(...
                 ep.getFilePath('RegistrationParameters'));
-            reg.addParameter(reader.read());
+            reg.setParam(reader.read());
             ep.addRegistration(reg);
         end
     end

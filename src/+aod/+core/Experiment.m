@@ -35,13 +35,17 @@ classdef (Abstract) Experiment < aod.core.Entity
 %   data = getResponse(obj, epochIDs, className, varargin)
 %   data = getRegionResponses(obj, epochIDs)
 %   clearAllResponses(obj, epochIDs)
-%   addParameter(obj, varargin)
 %
 % Protected methods with Creator access:
 %   addCalibration(obj, calibration)
 %   addEpoch(obj, epoch)
 %   addSystem(obj, system)
 %   sortEpochs(obj)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -62,23 +66,27 @@ classdef (Abstract) Experiment < aod.core.Entity
         numEpochs
     end
 
+    properties (Hidden, SetAccess = protected)
+        allowableParentTypes = {'none'};
+        parameterPropertyName = 'experimentParameters'
+    end
+
     methods (Abstract)
         value = getFileHeader(obj)
     end
     
     methods 
         function obj = Experiment(homeDirectory, expDate, varargin)
+            obj = obj@aod.core.Entity();
             obj.setHomeDirectory(homeDirectory);
             obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
 
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
+            ip = aod.util.InputParser();
             addParameter(ip, 'Administrator', '', @ischar);
             addParameter(ip, 'System', '', @ischar);
             parse(ip, varargin{:});
 
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
         end
 
         function value = get.numEpochs(obj)
@@ -238,7 +246,8 @@ classdef (Abstract) Experiment < aod.core.Entity
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['MC00', num2str(obj.Sources(1).getParentID()), '_', obj.Sources(1).whichEye,...
+            value = ['MC00', num2str(obj.Sources(1).getParentID()),...
+                '_', obj.Sources(1).name,...
                 '_', char(obj.experimentDate)];
         end
     end
@@ -279,7 +288,6 @@ classdef (Abstract) Experiment < aod.core.Entity
             assert(isSubclass(system, 'aod.core.System'),...
                 'Must be a subclass of aod.core.System');
             for i = 1:numel(system)
-
                 obj.Systems = cat(1, obj.Systems, system);
             end
         end
@@ -353,32 +361,6 @@ classdef (Abstract) Experiment < aod.core.Entity
             % -------------------------------------------------------------
             [obj.epochIDs, idx] = sort(obj.epochIDs);
             obj.Epochs = obj.Epochs(idx);
-        end
-    end
-
-    methods (Sealed)
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.experimentParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.experimentParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
         end
     end
 end

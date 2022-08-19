@@ -5,11 +5,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   A continuous period of data acquisition within an experiment
 %
 % Parent:
-%   aod.core.Entity
-%   matlab.mixin.Heterogeneous
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Epoch(parent, ID)
+%   obj = Epoch(parent, ID, varargin)
 %
 % Properties:
 %   ID                              Epoch identifier (integer)
@@ -17,6 +16,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Registrations                   Container for epoch's registrations
 %   Responses                       Container for epoch's responses
 %   Stimuli                         Container for epoch's stimuli
+%   epochParameters                 aod.core.Parameters
+%   files                           aod.core.Parameters
 %
 % Dependent properties:
 %   Source
@@ -36,6 +37,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   addRegistration(obj, reg, overwrite)
 %   addResponse(obj, resp)
 %   addStimulus(obj, stim)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 %
 % Notes:
 %   Inheritance from matlab.mixin.Heterogeneous allows forming arrays of 
@@ -69,6 +75,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         cachedVideo
     end
 
+    properties (Hidden, Access = protected)
+        allowableParentTypes = {'aod.core.Experiment'}
+        parameterPropertyName = 'epochParameters'
+    end
+
     % Methods for subclasses to overwrite
     methods (Abstract, Access = protected)
         % Main analysis video name
@@ -77,8 +88,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods 
         function obj = Epoch(parent, ID, varargin)
-            obj.allowableParentTypes = {'aod.core.Experiment'};
-            obj.setParent(parent);
+            obj = obj@aod.core.Entity(parent);
             obj.ID = ID;
             
             ip = aod.util.InputParser();
@@ -342,30 +352,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 end
             end
             obj.Responses = cat(1, obj.Responses, resp);
-        end
-
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.epochParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.epochParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
         end
     end
 

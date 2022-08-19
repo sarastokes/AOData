@@ -5,8 +5,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Represents a single channel within a system configuration
 %
 % Parent:
-%   aod.core.Entity
-%   matlab.mixin.Heterogeneous
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
 %   obj = Channel(parent, channelName, varargin)
@@ -20,11 +19,15 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   channelParameters           aod.core.Parameters
 %
 % Methods:
-%   addParameter(obj, varargin)
 %   assignUUID(obj, uuid)
 %   addDevice(obj, device)
 %   removeDevice(obj, ID)
 %   clearDevices(obj)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
         Name                        char
@@ -32,17 +35,21 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
         channelParameters           = aod.core.Parameters
     end
     
+    properties (Hidden, SetAccess = protected)
+        allowableParentTypes = {'aod.core.System'};
+        parameterPropertyName = 'channelParameters';
+    end
+
     methods
         function obj = Channel(parent, channelName, varargin)
-            obj.allowableParentTypes = {'aod.core.System', 'aod.core.Empty'};
-            obj.setParent(parent);
+            obj = obj@aod.core.Entity(parent);
             obj.setName(channelName);
 
             ip = aod.util.InputParser();
             addParameter(ip, 'DataFolder', '', @ischar);
             parse(ip, varargin{:});
 
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
         end
     end
     
@@ -97,33 +104,9 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   setDataFolder(obj, folderName)
             % -------------------------------------------------------------
             assert(istext(folderName), 'Data folder must be string or char');
-            obj.addParameter('DataFolder', folderName);
+            obj.setParam('DataFolder', folderName);
         end
 
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.channelParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.channelParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
-        end
-        
         function assignUUID(obj, UUID)
             % ASSIGNUUID
             %

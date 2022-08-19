@@ -99,12 +99,12 @@ classdef Experiment < aod.core.Experiment
             for i = 1:numel(epochIDs)
                 reg = aod.builtin.registrations.RigidRegistration(...
                     squeeze(tforms(:,:,i)));
-                reg.addParameter('TransformType', ip.Results.TransformType);
-                reg.addParameter('ReferenceEpoch', ip.Results.ReferenceEpoch);
+                reg.setParam('TransformType', ip.Results.TransformType);
+                reg.setParam('ReferenceEpoch', ip.Results.ReferenceEpoch);
                 if ~isempty(whichTforms)
-                    reg.addParameter('WhichTforms', whichTforms);
+                    reg.setParam('WhichTforms', whichTforms);
                 else
-                    reg.addParameter('WhichTforms', 1:numel(epochIDs));
+                    reg.setParam('WhichTforms', 1:numel(epochIDs));
                 end
                 obj.Epochs(obj.idx2epoch(epochIDs(i))).addRegistration(reg);
             end

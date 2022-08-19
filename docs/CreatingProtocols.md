@@ -2,7 +2,7 @@
 ##### Creating a new protocol
 Subclass `aod.core.Protocol` or one of the subclasses (e.g. `aod.core.StimulusProtocol`)  if those are applicable.
 
-Each `Protocol` subclass must define two properties: `sampleRate`, the rate data is sampled in hz, and `stimRate`, the rate stimuli are presented in hz. 
+Each `Protocol` subclass must define two properties: `sampleRate`, the rate data is sampled in Hz, and `stimRate`, the rate stimuli are presented in Hz. 
 
 The stimulus is created and written with the following methods:
 1. **calculateTotalTime**: determine how the total stimulus time is calculated

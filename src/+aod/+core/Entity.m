@@ -22,6 +22,9 @@ classdef (Abstract) Entity < handle
 %   setDescription(obj, txt, overwrite)
 %   addNote(obj, txt)
 %   clearNotes(obj)
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 %
 % Protected methods:
 %   x = getShortName(obj)
@@ -46,8 +49,9 @@ classdef (Abstract) Entity < handle
     end
 
     
-    properties (Hidden, SetAccess = protected)
-        allowableParentTypes        cell    = cell.empty();
+    properties (Abstract, Hidden, SetAccess = protected)
+        allowableParentTypes        cell
+        parameterPropertyName       char
     end
 
     properties (Dependent)
@@ -59,7 +63,10 @@ classdef (Abstract) Entity < handle
     end
 
     methods
-        function obj = Entity()
+        function obj = Entity(parent)
+            if nargin > 0
+                obj.setParent(parent);
+            end
             obj.UUID = generateUUID();
         end
 
@@ -138,6 +145,87 @@ classdef (Abstract) Entity < handle
         end
     end
 
+    % Parameter methods
+    methods
+        function tf = hasParam(obj, paramName)
+            % HASPARAM
+            %
+            % Description:
+            %   Check whether entity parameters has a specific parameter
+            %
+            % Syntax:
+            %   tf = hasParam(obj, paramName)
+            % -------------------------------------------------------------
+            tf = obj.(obj.parameterPropertyName).isKey(paramName);
+        end
+
+        function paramValue = getParam(obj, paramName, mustReturnParam)
+            % GETPARAM
+            %
+            % Description:
+            %   Return the value of a specific parameter. 
+            %   If the mustReturnParam is true, and the parameter is not
+            %   found, an error will be thrown. If false, [] is returned 
+            %   and a warning is triggered.
+            %
+            % Syntax:
+            %   paramValue = getParam(obj, paramName, mustReturnParam)
+            %
+            % Inputs:
+            %   paramName               char
+            % Optional inputs:
+            %   mustReturnParam         logical (default = false)            
+            % -------------------------------------------------------------
+            if nargin < 3
+                mustReturnParam = false;
+            end
+
+            if ~obj.hasParam(paramName)
+                if mustReturnParam
+                    error('GetParam: Did not find %s in %s',... 
+                        paramName, obj.parameterPropertyName);
+                else
+                    warning('GetParam: Did not find %s in %s',... 
+                        paramName, obj.parameterPropertyName);
+                    paramValue = [];
+                end
+            else
+                paramProp = obj.(obj.parameterPropertyName);
+                paramValue = paramProp(paramName);
+            end
+        end
+
+        function setParam(obj, varargin)
+            % ADDPARAMETER
+            %
+            % Description:
+            %   Add parameter(s) to the parameter property defined by
+            %   parameterPropertyName
+            %
+            % Syntax:
+            %   obj.setParam(paramName, value)
+            %   obj.setParam(paramName1, value1, paramName2, value2)
+            %   obj.setParam(struct)
+            % -------------------------------------------------------------
+            if nargin == 1
+                return
+            end
+            paramProp = obj.(obj.parameterPropertyName);
+
+            if nargin == 2 && isstruct(varargin{1})
+                S = varargin{1};
+                k = fieldnames(S);
+                for i = 1:numel(k)
+                    paramProp(k{i}) = S.(k{i});
+                end
+            else
+                for i = 1:(nargin - 1)/2
+                    paramProp(varargin{(2*i)-1}) = varargin{2*i};
+                end
+            end
+        end
+    end
+
     % Methods likely to be overwritten by subclasses
     methods (Access = protected)
         function value = getLabel(obj)  
@@ -196,7 +284,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods %(Access = private)
+    methods (Access = private)
         function tf = isValidParent(obj, parent)
             % ISVALIDPARENT
             %
@@ -210,6 +298,9 @@ classdef (Abstract) Entity < handle
             if isempty(obj.allowableParentTypes)
                 tf = true;
                 return;
+            elseif strcmp(obj.allowableParentTypes, {'none'})
+                tf = false;
+                return
             end
 
             for i = 1:numel(obj.allowableParentTypes)

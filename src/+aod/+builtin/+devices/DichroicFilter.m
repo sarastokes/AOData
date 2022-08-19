@@ -8,10 +8,10 @@ classdef DichroicFilter < aod.core.Device
 %   aod.core.Device
 %
 % Constructor:
-%   obj = DichroicFilter(parent, edgeWavelength, varargin)
+%   obj = DichroicFilter(parent, wavelength, passType, varargin)
 %   
 % Parameters:
-%   EdgeWavelength
+%   Wavelength                      numeric
 %   PassType                        char, 'low' or 'high'
 % Inherited properties:
 %   Manufacturer
@@ -21,7 +21,7 @@ classdef DichroicFilter < aod.core.Device
 %   transmission
 %
 % Methods:
-%   setEdgeWavelength(obj, wavelength)
+%   setWavelength(obj, wavelength)
 %   setTransmission(obj, spectrum)
 % -------------------------------------------------------------------------
 
@@ -30,22 +30,23 @@ classdef DichroicFilter < aod.core.Device
     end
     
     methods
-        function obj = DichroicFilter(parent, edgeWavelength, passType, varargin)
+        function obj = DichroicFilter(parent, wavelength, passType, varargin)
             obj = obj@aod.core.Device(parent, varargin{:});
             
-            obj.setEdgeWavelength(edgeWavelength);
+            obj.setWavelength(wavelength);
             obj.setPassType(passType);
         end
     end
     
     methods
-        function setEdgeWavelength(obj, wavelength)
-            % SETEDGEWAVELENGTH
+        function setWavelength(obj, wavelength)
+            % SETWAVELENGTH
             %
             % Syntax:
-            %   setEdgeWavelength(obj, wavelength)
+            %   setWavelength(obj, wavelength)
             % -------------------------------------------------------------
-            obj.deviceParameters('EdgeWavelength') = wavelength;
+            assert(isnumeric(wavelength),  'Wavelength must be a number')
+            obj.setParam('Wavelength') = wavelength;
         end
         
         function setPassType(obj, passType)
@@ -56,7 +57,7 @@ classdef DichroicFilter < aod.core.Device
             % -------------------------------------------------------------
             assert(ismember(passType, {'low', 'high'}),...
                 'PassType must be either ''low'' or ''high''');
-            obj.deviceParameters('Pass') = passType;
+            obj.setParam('Pass') = passType;
         end
 
         function setTransmission(obj, spectra)
@@ -71,9 +72,8 @@ classdef DichroicFilter < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = [num2str(obj.deviceParameters('EdgeWavelength')), 'nm',...
-                capitalize(obj.deviceParameters('Pass')), 'Pass',...
-                'Filter'];
+            value = [num2str(obj.getParam('Wavelength')), 'nm',...
+                capitalize(obj.getParam('Pass')), 'Pass', 'Filter'];
         end
     end
 end

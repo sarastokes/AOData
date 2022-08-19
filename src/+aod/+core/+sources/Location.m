@@ -4,11 +4,15 @@ classdef Location < aod.core.Source
 % Description:
 %   An imaging location within an eye
 %
+% Parent:
+%   aod.core.Source
+%
 % Constructor:
 %   obj = Location(parent, name)
 %
-% Properties:
-%   name             
+% Inherited properties:
+%   name   
+%   sourceParameters          
 % -------------------------------------------------------------------------
 
     methods

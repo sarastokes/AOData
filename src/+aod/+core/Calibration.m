@@ -8,16 +8,19 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = aod.core.Calibration(parent, calibrationDate)
 %
 % Parent:
-%   aod.core.Entity
-%   matlab.mixin.Heterogeneous
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Properties:
 %   calibrationDate         date calibration was performed (yyyyMMdd)
 %   calibrationParameters   aod.core.Parameters
 %
 % Sealed methods:
-%   addParameter(obj, varargin)
 %   setCalibrationDate(obj, calibrationDate)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 %
 % Note:
 %   Inheriting matlab.mixin.Heterogeneous allows creation of arrays
@@ -29,19 +32,17 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
         calibrationParameters               = aod.core.Parameters
     end
 
+    properties (Hidden, SetAccess = protected)
+        allowableParentTypes = {'aod.core.Experiment'};
+        parameterPropertyName = 'calibrationParameters';
+    end
+
     methods
         function obj = Calibration(parent, calibrationDate)
-            obj.allowableParentTypes = {'aod.core.Experiment',... 
-                'aod.core.System', 'aod.core.Empty'};
-            obj.setParent(parent);
+            obj = obj@aod.core.Entity(parent);
             
             if nargin > 1 && ~isempty(calibrationDate)
-                if ~isa(calibrationDate, 'datetime')
-                    obj.calibrationDate = datetime(calibrationDate,... 
-                        'Format', 'yyyyMMdd');
-                else
-                    obj.calibrationDate = calibrationDate;
-                end
+                obj.setCalibrationDate(calibrationDate);
             end
         end
     end
@@ -55,35 +56,23 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             % 
             % Syntax:
             %   obj.setCalibrationDate(calDate)
+            %
+            % Inputs:
+            %   calDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
             if ~isdatetime(calDate)
-                calDate = datetime(calDate, 'Format', 'yyyyMMdd');
+                try
+                    calDate = datetime(calDate, 'Format', 'yyyyMMdd');
+                catch ME 
+                    if strcmp(ME.id, 'MATLAB:datestr:ConvertToDateNumber')
+                        error("aod.core.Calibration/setCalibrationDate",...
+                            "Failed to convert to datetime, use format yyyyMMdd");
+                    else
+                        rethrow(ME);
+                    end
+                end
             end
             obj.calibrationDate = calDate;
-        end
-
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.calibrationParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.calibrationParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
         end
     end
 end

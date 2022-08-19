@@ -137,7 +137,7 @@ classdef SubjectFactory < aod.core.Factory
                     else
                         subject = aod.builtin.sources.primate.Eye(subject, 'OS',...
                             'AxialLength', 16.97, nhpProps{:});
-                        subject.addParameter('ContactLens', '12.2mm/5.8mm/plano');
+                        subject.setParam('ContactLens', '12.2mm/5.8mm/plano');
                         subject.assignUUID("5e8118e0-a165-4c4f-a261-47fb31e9059c");
                         
                         % Add location, if standardized

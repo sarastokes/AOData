@@ -34,7 +34,7 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
     methods 
         function obj = PowerMeasurement(parent, calibrationDate, wavelength, varargin)
             obj = obj@aod.core.Calibration(parent, calibrationDate);
-            obj.addParameter('Wavelength', wavelength);
+            obj.setParam('Wavelength', wavelength);
 
             ip = inputParser();
             ip.KeepUnmatched = true;
@@ -43,7 +43,7 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
             addParameter(ip, 'ValueUnit', 'uW', @ischar);
             parse(ip, varargin{:});
 
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
         end
 
         function T = table(obj)

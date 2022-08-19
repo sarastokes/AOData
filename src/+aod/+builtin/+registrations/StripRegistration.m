@@ -2,10 +2,18 @@ classdef StripRegistration < aod.core.Registration
 % STRIPREGISTRATION
 %
 % Description:
-%   Imager software registration
+%   Registration performed with Qiang's registration software
+%
+% Parent:
+%   aod.core.Registration
 %
 % Properties:
 %   usedFrame (logical; whether strip or frame reg was ultimately used)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties
@@ -20,7 +28,7 @@ classdef StripRegistration < aod.core.Registration
         end
 
         function apply(~)
-            warning('StripRegistration applied offline');
+            warning('NotImplemented: StripRegistration is applied offline');
         end
 
         function loadData(obj, fName)
@@ -41,7 +49,7 @@ classdef StripRegistration < aod.core.Registration
                 fName = obj.Parent.getFilePath('RegistrationParameters');
             end
             reader = aod.builtin.readers.RegistrationParameterReader(fName);
-            obj.addParameter(reader.read());
+            obj.setParam(reader.read());
         end
     end
 

@@ -17,9 +17,10 @@ classdef PMT < aod.core.Device
 %   Manufacturer
 %   Model
 %
-% Methods:
-%   setGain(obj, gain)
-%   setPosition(obj, position)
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     methods 
@@ -33,17 +34,7 @@ classdef PMT < aod.core.Device
             addParameter(ip, 'Position', [], @isnumeric);
             parse(ip, varargin{:});
 
-            obj.addParameter(ip.Results);
-        end
-    end
-    
-    methods
-        function setPosition(obj, position)
-            obj.deviceParameters('Position') = position;
-        end
-        
-        function setGain(obj, gain)
-            obj.deviceParameters('Gain') = gain;
+            obj.setParam(ip.Results);
         end
     end
 end 

@@ -13,11 +13,10 @@ classdef Empty < aod.core.Calibration
 % -------------------------------------------------------------------------
     methods
         function obj = Empty(parent)
-            calibrationDate = datestr(now);
             if nargin < 1
                 parent = [];
             end
-            obj = obj@aod.core.Calibration(parent, calibrationDate);
+            obj = obj@aod.core.Calibration(parent, []);
 
             obj.setDescription('A placeholder calibration object');
         end

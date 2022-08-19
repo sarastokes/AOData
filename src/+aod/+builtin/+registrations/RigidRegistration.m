@@ -9,6 +9,19 @@ classdef RigidRegistration < aod.core.Registration
 %
 % Constructor:
 %   obj = RigidRegistration(parent, data, varargin)
+%
+% Inherited properties:
+%   Data
+%   registrationDate
+%
+% Methods:
+%   imStack = apply(obj, imStack)
+%
+% Inherited methods:
+%   setRegistrationDate(obj, regDate)
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     methods
@@ -19,7 +32,7 @@ classdef RigidRegistration < aod.core.Registration
             obj@aod.core.Registration(parent, data);
 
             % Additional inputs are added to registrationParameters
-            obj.addParameter(varargin{:});
+            obj.setParam(varargin{:});
         end
 
         function imStack = apply(obj, imStack)

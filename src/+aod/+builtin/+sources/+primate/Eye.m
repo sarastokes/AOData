@@ -44,7 +44,7 @@ classdef Eye < aod.core.sources.Eye
             addParameter(ip, 'PupilSize', [], @isnumeric);
             parse(ip, varargin{:});
 
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
         end
 
         function value = get.subjectName(obj)

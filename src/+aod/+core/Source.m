@@ -5,8 +5,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 %   The source of data collected in an experiment
 %
 % Parent:
-%   aod.core.Entity
-%   matlab.mixin.Heterogeneous
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
 %   obj = Source(parent, name);
@@ -14,6 +13,11 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 % Properties:
 %   name                            char, some identifier for the source 
 %   sourceParameters                aod.core.Parameters
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -21,12 +25,14 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         sourceParameters            = aod.core.Parameters
     end
 
+    properties (Hidden, SetAccess = protected)
+        allowableParentTypes = {'aod.core.Experiment', 'aod.core.Source'}
+        parameterPropertyName = 'sourceParameters'
+    end
+
     methods
         function obj = Source(parent, name)
-            obj.allowableParentTypes = {'aod.core.Experiment', 'aod.core.Source'};
-            if nargin > 0
-                obj.setParent(parent);
-            end
+            obj = obj@aod.core.Entity(parent);
             obj.name = name;
         end
     end
@@ -72,30 +78,6 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 parent = parent.Parent;
             end
             ID = parent.ID;
-        end
-
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.sourceParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.sourceParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
         end
 
         function assignUUID(obj, UUID)

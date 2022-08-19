@@ -11,9 +11,7 @@ classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
     %   stimParameters
     %
     % Methods:
-    %   setPresentation(obj, presentation)
-    % Inherited methods:
-    %   addParameter(obj, varargin)
+    %   importStimulusFiles(obj)
     % ---------------------------------------------------------------------
 
     properties (SetAccess = private)

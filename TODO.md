@@ -4,7 +4,7 @@
 - [x] Add UIDs to all Entitys
 - [x] Implement search by UID
 - [x] Replace duplicated epoch from Creator
-- [ ] Decide where allowableParentTypes go
+- [x] Decide where allowableParentTypes go
 
 ##### Package
 - [x] Add rotation to 1P-specific SpatialProtocol
@@ -16,7 +16,7 @@
 
 ##### Minor
 - [x] Documentation for `multcontains`
-
+- [ ] Name vs name
 
 ##### Other
 - [ ] Don't forget to register for SFN by early deadline!!!!!

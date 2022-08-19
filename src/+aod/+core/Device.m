@@ -5,8 +5,7 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   A light source, NDF, filter, PMT, etc used in an experiment
 %
 % Parent:
-%   aod.core.Entity
-%   matlab.mixin.Heterogeneous
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
 %   obj = Device(parent, varargin)
@@ -19,18 +18,25 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Manufacturer                        Manufacturer of the device
 %
 % Public Sealed methods:
-%   addParameter(obj, varargin)
 %   assignUUID(obj, uuid)
+%
+% Inherited methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         deviceParameters                = aod.core.Parameters
     end
+
+    properties (Hidden, SetAccess = protected)
+        parameterPropertyName = 'deviceParameters';
+        allowableParentTypes = {'aod.core.Channel'};
+    end
     
     methods
         function obj = Device(parent, varargin)
-            obj.allowableParentTypes = {'aod.core.System',...
-                'aod.core.Channel', 'aod.core.Empty'};
             obj.setParent(parent);
 
             ip = aod.util.InputParser();
@@ -38,35 +44,11 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
             addParameter(ip, 'Manufacturer', [], @ischar);
             parse(ip, varargin{:});
             
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
         end
     end
     
     methods (Sealed)
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.deviceParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.deviceParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
-        end
-
         function assignUUID(obj, UUID)
             % ASSIGNUUID
             %

@@ -1,4 +1,19 @@
 classdef Eye < aod.core.Source 
+% EYE
+%
+% Description:
+%   An eye within a Subject
+%
+% Parent:
+%   aod.core.Source
+%
+% Constructor:
+%   obj = Eye(parent, name)
+%
+% Inherited properties:
+%   name   
+%   sourceParameters          
+% -------------------------------------------------------------------------
 
     methods
         function obj = Eye(parent, name)
@@ -27,7 +42,7 @@ classdef Eye < aod.core.Source
             % Syntax:
             %   shortName = obj.getShortName()
             % -------------------------------------------------------------
-            shortName = obj.whichEye;
+            shortName = obj.name;
         end
     end
 end

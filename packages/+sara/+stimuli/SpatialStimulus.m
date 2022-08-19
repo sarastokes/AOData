@@ -11,8 +11,6 @@ classdef SpatialStimulus < aod.builtin.stimuli.VisualStimulus
 %
 % Methods:
 %   setBasePower(obj, value)
-% Inherited methods:
-%   addParameter(obj, paramName, paramValue)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
         basePower

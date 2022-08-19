@@ -15,6 +15,10 @@ classdef Subject < aod.core.Source
 %   Sex
 %   Age
 %   Demographics
+%
+% Inherited properties:
+%   name
+%   sourceParameters
 % -------------------------------------------------------------------------
 
     methods 
@@ -29,7 +33,7 @@ classdef Subject < aod.core.Source
             addParameter(ip, 'Demographics', [], @ischar);
             parse(ip, varargin{:});
 
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
         end
     end
 end

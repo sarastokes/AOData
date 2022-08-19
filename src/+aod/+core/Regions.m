@@ -14,6 +14,14 @@ classdef Regions < aod.core.Entity
 % Dependent properties:
 %   count
 %   roiIDs
+%
+% Protected methods:
+%   setMap(obj, roiMap)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -31,14 +39,15 @@ classdef Regions < aod.core.Entity
         Reader
     end
 
+    properties (Hidden, Access = protected)
+        allowableParentTypes = {'aod.core.Experiment'};
+        parameterPropertyName = 'regionParameters';
+    end
+
     methods
         function obj = Regions(parent, rois)
             obj = obj@aod.core.Entity();
-            obj.allowableParentTypes = {'aod.core.Experiment'};
-
-            if nargin > 0
-                obj.setParent(parent);
-            end
+            obj.setParent(parent);
 
             if nargin > 1 && ~isempty(rois)
                 if ~ischar(rois) || ~isstring(rois)
@@ -48,19 +57,11 @@ classdef Regions < aod.core.Entity
         end
 
         function value = get.count(obj)
-            if obj.regionParameters.isKey('Count')
-                value = obj.regionParameters('Count');
-            else 
-                value = 0;
-            end
+            value = obj.getParam('Count');
         end
 
         function value = get.roiIDs(obj)
-            if obj.regionParameters.isKey('RoiIDs')
-                value = obj.regionParameters('RoiIDs');
-            else 
-                value = [];
-            end
+            value = obj.getParam('RoiIDs');
         end
     end
 
@@ -79,42 +80,8 @@ classdef Regions < aod.core.Entity
             IDs(obj.roiIDs == 0) = [];
             roiCount = nnz(unique(obj.Map));
 
-            obj.addParameter('RoiIDs', IDs);
-            obj.addParameter('Count', roiCount);
-        end
-    end
-
-    methods (Sealed)
-        function addParameter(obj, varargin)
-            % ADDPARAMETER
-            %
-            % Syntax:
-            %   obj.addParameter(paramName, value)
-            %   obj.addParameter(paramName, value, paramName, value)
-            %   obj.addParameter(struct)
-            % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.regionParameters(k{i}) = S.(k{i});
-                end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.regionParameters(varargin{(2*i)-1}) = varargin{2*i};
-                end
-            end
-        end
-
-        function value = getParameter(obj, paramName)
-            if obj.regionParameters.isKey(paramName)
-                value = obj.regionParameters(paramName);
-            else
-                value = [];
-            end
+            obj.setParam('RoiIDs', IDs);
+            obj.setParam('Count', roiCount);
         end
     end
 end
