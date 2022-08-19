@@ -162,7 +162,7 @@ classdef Epoch < aod.core.Epoch
         end
 
         function value = getLabel(obj)
-            value = [obj.Parent.displayName, '#', int2fixedwidthstr(obj.ID, 4)];
+            value = [obj.Parent.label, '#', int2fixedwidthstr(obj.ID, 4)];
         end
     end
 end

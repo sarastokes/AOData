@@ -378,8 +378,12 @@ classdef HDF5 < handle
             end
             k = attMap.keys;
             for i = 1:numel(k)
+                attValue = attMap(k{i});
+                if isenum(attValue)
+                    attValue = [class(attValue), ',', char(attValue)];
+                end
                 h5writeatt(fileName, pathName, k{i},...
-                    aod.h5.HDF5.data2att(attMap(k{i})));
+                    aod.h5.HDF5.data2att(attValue));
             end
         end
 
@@ -392,11 +396,12 @@ classdef HDF5 < handle
             % Syntax:
             %   createLink(fileName, targetPath, linkPath, linkName)
             % -------------------------------------------------------------
-            if aod.h5.HDF5.exists(fileName, [linkPath, '/', linkName])
+            import aod.h5.HDF5
+            if HDF5.exists(fileName, HDF5.buildPath(linkPath, linkName))
                 warning('LinkExists: Skipped existing link at %s', linkPath);
                 return
             end
-            fileID = aod.h5.HDF5.openFile(fileName);
+            fileID = HDF5.openFile(fileName);
             linkID = H5G.open(fileID, linkPath);
             H5L.create_soft(targetPath, linkID, linkName, 'H5P_DEFAULT', 'H5P_DEFAULT');
             H5G.close(linkID);
@@ -451,8 +456,16 @@ classdef HDF5 < handle
                     end
                     HDF5.makeStructDataset(fileName, pathName, dsetName, data);
                 end
+            elseif istimetable(data)
+                T = timetable2table(data);
+                T.Time = seconds(T.Time);
+                HDF5.makeCompoundDataset(fileName, pathName, dsetName, T);
+                HDF5.writeatts(fileName, pathName, 'Class', class(data));
             elseif isnumeric(data)
                 HDF5.makeMatrixDataset(fileName, pathName, dsetName, data);
+                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
+            elseif islogical(data)
+                HDF5.makeMatrixDataset(fileName, pathName, dsetName, double(data));
                 HDF5.writeatts(fileName, fullPath, 'Class', class(data));
             elseif ischar(data)
                 HDF5.makeTextDataset(fileName, pathName, dsetName, data);
@@ -462,6 +475,9 @@ classdef HDF5 < handle
                 HDF5.writeatts(fileName, fullPath, 'Class', class(data));
             elseif isdatetime(data)
                 HDF5.makeDateDataset(fileName, pathName, dsetName, data);
+            elseif isa(data, 'affine2d')
+                HDF5.makeMatrixDataset(fileName, pathName, dsetName, data.T);
+                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
             else
                 tf = false;
             end

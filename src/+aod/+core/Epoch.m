@@ -62,7 +62,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     % Entity link properties
-    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Source})
+    properties (SetAccess = protected)
         Source                      = aod.core.Source.empty()
         System                      = aod.core.System.empty()
     end

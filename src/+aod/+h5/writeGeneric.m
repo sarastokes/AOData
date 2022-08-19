@@ -31,6 +31,13 @@ function writeGeneric(hdfName, obj)
         case EntityTypes.EXPERIMENT
             hdfPath = '/Experiment';
             parentPath = [];
+        case EntityTypes.SOURCE
+            if isempty(obj.Parent)
+                parentPath = '/Experiment/Sources';
+            else
+                parentPath = [char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'}), '/Sources'];
+            end
+            hdfPath = [parentPath, '/', char(obj.name)];
         case EntityTypes.SYSTEM
             hdfPath = ['/Experiment/Systems/', char(obj.Name)];
             parentPath = '/Experiment';
@@ -38,19 +45,27 @@ function writeGeneric(hdfName, obj)
             hdfPath = ['/Experiment/Calibrations/', char(obj.label)];
             parentPath = '/Experiment';
         case EntityTypes.CHANNEL 
-            doesEntityExist(GMT, obj.Parent);
+            isEntityInFile(GMT, obj.Parent);
             parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
             hdfPath = [parentPath, '/Channels/', char(obj.Name)];
         case EntityTypes.DEVICE
-            doesEntityExist(GMT, obj.Parent);
+            isEntityInFile(GMT, obj.Parent);
             parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
             hdfPath = [parentPath, '/Devices/', char(obj.label)];
         case EntityTypes.EPOCH
-            hdfPath = ['/Experiment/Epochs', char(obj.label)];
+            hdfPath = ['/Experiment/Epochs/', char(obj.shortName)];
             parentPath = '/Experiment';
+        case EntityTypes.REGISTRATION
+            parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
+            hdfPath = [parentPath, '/Registrations/', char(obj.label)];
+        case EntityTypes.STIMULUS
+            parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
+            hdfPath = [parentPath, '/Stimuli/', char(obj.label)];
         otherwise
-            error('Unrecognized entity');
+            error("writeGeneric:UnrecognizedEntity",...
+                "Unknown entity: %s", entityType);
     end
+    fprintf('\tWriting: %s\n', hdfPath);
 
     % Create the new group
     HDF5.createGroup(hdfName, hdfPath);
@@ -59,7 +74,8 @@ function writeGeneric(hdfName, obj)
     if ~isempty(containers)
         HDF5.createGroups(hdfName, hdfPath, containers{:});
         for i = 1:numel(containers)
-            HDF5.writeatts(hdfName, [hdfPath, '/', containers{i}], 'Class', 'Container');
+            HDF5.writeatts(hdfName, [hdfPath, '/', containers{i}],... 
+                'Class', 'Container');
         end
     end
 
@@ -101,7 +117,7 @@ function writeGeneric(hdfName, obj)
         if isSubclass(prop, 'aod.core.Entity')
             isEntityInFile(GMT, prop);
             entityPath = char(GMT{GMT.UUID == prop.UUID, 'Path'});
-            HDF5.createLink(hdfName, entityPath, hdfPath, persistedProp(i));
+            HDF5.createLink(hdfName, entityPath, hdfPath, persistedProps(i));
             return
         end
         success = HDF5.writeDataByType(hdfName, hdfPath, persistedProps(i), prop);
@@ -112,14 +128,26 @@ function writeGeneric(hdfName, obj)
     end
 end
 
-function doesEntityExist(GMT, entity)
+function tf = doesEntityExist(entity)
     if isempty(entity)
-        error('Entity does not exist!');
+        if nargout == 0
+            error('Entity does not exist');
+        else
+            tf = false;
+        end
+    else
+        tf = true;
     end
 end
 
-function isEntityInFile(GMT, entity)
+function tf = isEntityInFile(GMT, entity)
     if isempty(find(GMT.UUID == entity.UUID)) %#ok<EFIND> 
-        error('Entity does not exist in HDF5 file!');
+        if nargout == 0
+            error('Entity does not exist in HDF5 file!');
+        else
+            tf = false;
+        end
+    else
+        tf = true;
     end
 end

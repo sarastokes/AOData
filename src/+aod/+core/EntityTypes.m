@@ -86,7 +86,7 @@ classdef EntityTypes
                 case EntityTypes.REGISTRATION 
                     prop = entity.registrationParameters;
                 case EntityTypes.STIMULUS 
-                    prop = entity.stimulusParameters;
+                    prop = entity.stimParameters;
                 case EntityTypes.RESPONSE 
                     prop = entity.responseParameters;
                 case EntityTypes.REGION 

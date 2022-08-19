@@ -1,11 +1,11 @@
-function [persistedProps, attributeProps, abandonedProps] = displayPersistedProperties(obj, verbose)
+function [persistedProps, attributeProps, abandonedProps] = getPersistedProperties(obj, verbose)
 % DISPLAYPERSISTEDPROPERTIES
 %
 % Description:
 %   Check which properties will be persisted and which will not
 %
 % Syntax:
-%   displayPersistedProperties(obj, verbose)
+%   getPersistedProps(obj, verbose)
 %
 % Input:
 %   obj             aod.core.Entity
@@ -26,7 +26,7 @@ function [persistedProps, attributeProps, abandonedProps] = displayPersistedProp
     
     alwaysPersistedProps = ["notes", "Parent"]';
     alwaysAttributeProps = ["UUID", "description"];
-    alwaysAbandonedProps = ["allowableParentTypes"];
+    alwaysAbandonedProps = ["allowableParentTypes", "parameterPropertyName"];
     persistedProps = [];
     attributeProps = [];
     abandonedProps = [];

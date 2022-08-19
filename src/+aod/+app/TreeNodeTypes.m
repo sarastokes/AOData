@@ -1,8 +1,8 @@
 classdef TreeNodeTypes
 
     properties (Hidden, Constant)
-        ICON_DIR = [fileparts(fileparts(fileparts(fileparts(fileparts(fileparts(mfilename('fullpath'))))))),...
-            filesep, 'resources', filesep];
+        ICON_DIR = [fileparts(mfilename('fullpath')),...
+            filesep, '+icons', filesep];
     end
 
     enumeration 
@@ -11,6 +11,7 @@ classdef TreeNodeTypes
         TEXT
         XYSERIES        % First column is the x-axis
         TIMESERIES      % Contains metadata about timing
+        DATETIME        % Datetime treated like text
 
         TABLE
 
@@ -102,7 +103,7 @@ classdef TreeNodeTypes
                     axis(parentHandle, 'equal', 'tight', 'off');
                 case TreeNodeTypes.SCALAR
                     text(0.5, 0.5, num2str(data), 'FontSize', 10);
-                case {TreeNodeTypes.TEXT, TreeNodeTypes.EXTERNALFILE}
+                case {TreeNodeTypes.TEXT, TreeNodeTypes.EXTERNALFILE, TreeNodeTypes.DATETIME}
                     parentHandle.Value = data;
                 case TreeNodeTypes.TABLE
                     parentHandle.Data = struct2table(data);
@@ -130,7 +131,7 @@ classdef TreeNodeTypes
                     obj = TreeNodeTypes.MASK;
                 case 'timeseries'
                     obj = TreeNodeTypes.TIMESERIES;
-                case 'text'
+                case {'text', 'char', 'string'}
                     obj = TreeNodeTypes.TEXT;
                 case 'scalar'
                     obj = TreeNodeTypes.SCALAR;
@@ -138,8 +139,10 @@ classdef TreeNodeTypes
                     obj = TreeNodeTypes.VIDEO;
                 case 'externalfile'
                     obj = TreeNodeTypes.EXTERNALFILE;
-                case 'table'
+                case {'table', 'timetable'}
                     obj = TreeNodeTypes.TABLE;
+                case 'datetime'
+                    obj = TreeNodeTypes.DATETIME;
                 otherwise
                     warning('TreeNODETYPES:Unknown node type %s', x);
                     obj = TreeNodeTypes.UNKNOWN;

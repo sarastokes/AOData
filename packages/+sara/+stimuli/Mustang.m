@@ -17,13 +17,13 @@ classdef Mustang < aod.builtin.stimuli.ImagingLight
             if nargin < 3
                 units = '%';
             end
-            obj@aod.builtin.stimuli.ImagingLight(parent, value)
+            obj@aod.builtin.stimuli.ImagingLight(parent, value, units)
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = sprintf('Mustang%u', obj.Value);
+            value = sprintf('Mustang%u', obj.value);
         end
     end
 end
