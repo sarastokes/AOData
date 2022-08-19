@@ -39,7 +39,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Sealed)
-        function setAnalysisDate(obj)
+        function setAnalysisDate(obj, analysisDate)
             % SETANALYSISDATE
             %
             % Syntax:
@@ -48,12 +48,12 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   analysisDate            datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
-            if ~isdatetime(analysisDate)
+            if ~isdatetime(analysisDate) %#ok<*PROP> 
                 try
                     analysisDate = datetime(analysisDate, 'Format', 'yyyyMMdd');
                 catch ME 
                     if strcmp(ME.id, 'MATLAB:datestr:ConvertToDateNumber')
-                        error("aod.core.Analysis/setAnalysisDate",...
+                        error("setAnalysisDate:FailedDatetimeConversion",...
                             "Failed to set analysisDate, use format yyyyMMdd");
                     else
                         rethrow(ME);

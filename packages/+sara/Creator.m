@@ -124,12 +124,12 @@ classdef Creator < aod.core.Creator
     end
 
     methods (Access = protected)
-        function ep = makeEpoch(obj, epochID, epochType, source, varargin)
+        function ep = makeEpoch(obj, epochID, epochType, varargin)
             % MAKEEPOCH
             if epochType == sara.EpochTypes.Background
-                ep = sara.epochs.BackgroundEpoch(obj.Experiment, epochID, source);
+                ep = sara.epochs.BackgroundEpoch(obj.Experiment, epochID, varargin{:});
             else
-                ep = sara.Epoch(obj.Experiment, epochID, source, epochType);
+                ep = sara.Epoch(obj.Experiment, epochID, epochType, varargin{:});
             end
             % Extract epoch imaging parameters
             if epochType.isPhysiology
@@ -146,7 +146,7 @@ classdef Creator < aod.core.Creator
                 protocol = sara.factories.SpatialProtocolFactory.create(...
                     obj.Experiment.getCalibration('sara.calibrations.TopticaNonlinearity'),...
                     ep.getFilePath('TrialFile'));
-                stimulus = sara.stimuli.SpatialStimulus(ep, protocol, varargin{:});
+                stimulus = sara.stimuli.SpatialStimulus(ep, protocol);
                 ep.addStimulus(stimulus);
             end
             % Processing specific to spectral epochs
@@ -154,7 +154,7 @@ classdef Creator < aod.core.Creator
                 protocol = sara.factories.SpectralProtocolFactory.create(...
                     obj.Experiment.getCalibration('sara.calibrations.MaxwellianView'),...
                     ep.getFilePath('TrialFile'));
-                stimulus = sara.stimuli.SpectralStimulus(ep, protocol, varargin{:});
+                stimulus = sara.stimuli.SpectralStimulus(ep, protocol);
                 ep.addStimulus(stimulus);
             end
         end

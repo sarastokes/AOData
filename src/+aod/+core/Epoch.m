@@ -26,7 +26,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   videoName = getCoreVideoName(obj)
 % 
 % Public methods:
-%   getStack(obj, varargin)
+%   imStack = getStack(obj, varargin)
 %   fName = getFilePath(obj, whichFile)
 %   clearResponses(obj)
 %   clearVideoCache(obj)
@@ -55,7 +55,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Creator})
         startTime(1,1)              datetime
         Registrations               aod.core.Registration
-        Responses                   aod.core.Response  
+        Responses                   %aod.core.Response  
         Stimuli                     aod.core.Stimulus
         epochParameters             = aod.core.Parameters
         files                       = aod.core.Parameters  
@@ -75,7 +75,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         cachedVideo
     end
 
-    properties (Hidden, Access = protected)
+    properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'}
         parameterPropertyName = 'epochParameters'
     end

@@ -39,7 +39,7 @@ classdef Regions < aod.core.Entity
         Reader
     end
 
-    properties (Hidden, Access = protected)
+    properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'};
         parameterPropertyName = 'regionParameters';
     end
@@ -57,11 +57,11 @@ classdef Regions < aod.core.Entity
         end
 
         function value = get.count(obj)
-            value = obj.getParam('Count');
+            value = obj.getParam('Count', aod.util.MessageTypes.NONE);
         end
 
         function value = get.roiIDs(obj)
-            value = obj.getParam('RoiIDs');
+            value = obj.getParam('RoiIDs', aod.util.MessageTypes.NONE);
         end
     end
 

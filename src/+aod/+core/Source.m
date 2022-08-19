@@ -104,7 +104,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             if isnumeric(obj.name)
                 value = num2str(obj.name);
             else
-                value = name;
+                value = obj.name;
             end
         end
     end

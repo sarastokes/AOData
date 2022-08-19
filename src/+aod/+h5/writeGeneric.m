@@ -22,7 +22,7 @@ function writeGeneric(hdfName, obj)
     end
 
     % Collect UUIDs of entities within the HDF5 file
-    GM = aod.h5.GroupManager(hdfName);
+    GM = aod.h5.EntityManager(hdfName);
     GM.collect();
     GMT = table(GM);
 

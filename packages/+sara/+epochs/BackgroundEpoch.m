@@ -17,8 +17,8 @@ classdef BackgroundEpoch < sara.Epoch
     end
 
     methods
-        function obj = BackgroundEpoch(parent, ID, source)
-            obj@sara.Epoch(parent, ID, source, sara.EpochTypes.Background);
+        function obj = BackgroundEpoch(parent, ID, varargin)
+            obj@sara.Epoch(parent, ID, sara.EpochTypes.Background, varargin{:});
         end
     end
 

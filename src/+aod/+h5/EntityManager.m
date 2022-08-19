@@ -1,4 +1,4 @@
-classdef GroupManager < handle 
+classdef EntityManager < handle 
 
     properties
         hdfName
@@ -7,7 +7,7 @@ classdef GroupManager < handle
     end
 
     methods
-        function obj = GroupManager(hdfName)
+        function obj = EntityManager(hdfName)
             obj.hdfName = hdfName;
             obj.clearMaps();
         end

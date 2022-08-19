@@ -22,7 +22,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
         registrationParameters              = aod.core.Parameters
     end
 
-    properties (Hidden, Access = protected)
+    properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Epoch'};
         parameterPropertyName = 'registrationParameters';
     end
@@ -60,7 +60,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
                     regDate = datetime(regDate, 'Format', 'yyyyMMdd');
                 catch ME 
                     if strcmp(ME.id, 'MATLAB:datestr:ConvertToDateNumber')
-                        error("aod.core.Registration/setRegistrationDate",...
+                        error("setRegistrationDate:FailedDatetimeConversion",...
                             "Failed to convert to datetime, use format yyyyMMdd");
                     else
                         rethrow(ME);

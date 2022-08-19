@@ -159,39 +159,41 @@ classdef (Abstract) Entity < handle
             tf = obj.(obj.parameterPropertyName).isKey(paramName);
         end
 
-        function paramValue = getParam(obj, paramName, mustReturnParam)
+        function paramValue = getParam(obj, paramName, msgType)
             % GETPARAM
             %
             % Description:
             %   Return the value of a specific parameter. 
-            %   If the mustReturnParam is true, and the parameter is not
-            %   found, an error will be thrown. If false, [] is returned 
-            %   and a warning is triggered.
             %
             % Syntax:
-            %   paramValue = getParam(obj, paramName, mustReturnParam)
+            %   paramValue = getParam(obj, paramName, messageType)
             %
             % Inputs:
-            %   paramName               char
+            %   paramName       char
             % Optional inputs:
-            %   mustReturnParam         logical (default = false)            
+            %   msgType         aod.util.MessageTypes (default = ERROR)            
             % -------------------------------------------------------------
             if nargin < 3
-                mustReturnParam = false;
+                msgType = aod.util.MessageTypes.ERROR;
+            else
+                msgType = aod.util.MessageTypes.init(msgType);
             end
 
-            if ~obj.hasParam(paramName)
-                if mustReturnParam
-                    error('GetParam: Did not find %s in %s',... 
-                        paramName, obj.parameterPropertyName);
-                else
-                    warning('GetParam: Did not find %s in %s',... 
-                        paramName, obj.parameterPropertyName);
-                    paramValue = [];
-                end
-            else
+            if obj.hasParam(paramName)
                 paramProp = obj.(obj.parameterPropertyName);
                 paramValue = paramProp(paramName);
+            else
+                switch msgType 
+                    case MessageType.ERROR 
+                        error('GetParam: Did not find %s in %s',... 
+                            paramName, obj.parameterPropertyName);
+                    case MessageType.WARNING 
+                        warning('GetParam: Did not find %s in %s',... 
+                            paramName, obj.parameterPropertyName);
+                        paramValue = [];
+                    case MessageType.NONE
+                        paramValue = [];
+                end
             end
         end
 

@@ -46,7 +46,7 @@ classdef DichroicFilter < aod.core.Device
             %   setWavelength(obj, wavelength)
             % -------------------------------------------------------------
             assert(isnumeric(wavelength),  'Wavelength must be a number')
-            obj.setParam('Wavelength') = wavelength;
+            obj.setParam('Wavelength', wavelength);
         end
         
         function setPassType(obj, passType)
@@ -57,7 +57,7 @@ classdef DichroicFilter < aod.core.Device
             % -------------------------------------------------------------
             assert(ismember(passType, {'low', 'high'}),...
                 'PassType must be either ''low'' or ''high''');
-            obj.setParam('Pass') = passType;
+            obj.setParam('Pass', passType);
         end
 
         function setTransmission(obj, spectra)
