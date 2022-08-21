@@ -1,4 +1,4 @@
-function writeGeneric(hdfName, obj)
+function writeEntity(hdfName, obj)
 
     arguments
         hdfName             {mustBeFile}
@@ -10,7 +10,7 @@ function writeGeneric(hdfName, obj)
 
     entityType = aod.core.EntityTypes.get(obj);
 
-    persistedProps = getPersistedProperties(obj);
+    persistedProps = aod.h5.getPersistedProperties(obj);
     % Extract out independently set properties
     hasFiles = ismember(persistedProps, "files");
     specialProps = ["Parent", "notes", "UUID", "files"];
@@ -22,9 +22,9 @@ function writeGeneric(hdfName, obj)
     end
 
     % Collect UUIDs of entities within the HDF5 file
-    GM = aod.h5.EntityManager(hdfName);
-    GM.collect();
-    GMT = table(GM);
+    EM = aod.h5.EntityManager(hdfName);
+    EM.collect();
+    EMT = table(EM);
 
     % Determine class-specific location
     switch entityType 
@@ -35,9 +35,9 @@ function writeGeneric(hdfName, obj)
             if isempty(obj.Parent)
                 parentPath = '/Experiment/Sources';
             else
-                parentPath = [char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'}), '/Sources'];
+                parentPath = getParentPath(EMT, obj.Parent.UUID);
             end
-            hdfPath = [parentPath, '/', char(obj.name)];
+            hdfPath = [parentPath, '/Sources/', char(obj.name)];
         case EntityTypes.SYSTEM
             hdfPath = ['/Experiment/Systems/', char(obj.Name)];
             parentPath = '/Experiment';
@@ -45,22 +45,23 @@ function writeGeneric(hdfName, obj)
             hdfPath = ['/Experiment/Calibrations/', char(obj.label)];
             parentPath = '/Experiment';
         case EntityTypes.CHANNEL 
-            isEntityInFile(GMT, obj.Parent);
-            parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
+            parentPath = getParentPath(EMT, obj.Parent.UUID);
             hdfPath = [parentPath, '/Channels/', char(obj.Name)];
         case EntityTypes.DEVICE
-            isEntityInFile(GMT, obj.Parent);
-            parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
+            parentPath = getParentPath(EMT, obj.Parent.UUID);
             hdfPath = [parentPath, '/Devices/', char(obj.label)];
         case EntityTypes.EPOCH
             hdfPath = ['/Experiment/Epochs/', char(obj.shortName)];
             parentPath = '/Experiment';
         case EntityTypes.REGISTRATION
-            parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
+            parentPath = getParentPath(EMT, obj.Parent.UUID);
             hdfPath = [parentPath, '/Registrations/', char(obj.label)];
         case EntityTypes.STIMULUS
-            parentPath = char(GMT{GMT.UUID == obj.Parent.UUID, 'Path'});
+            parentPath = getParentPath(EMT, obj.Parent.UUID);
             hdfPath = [parentPath, '/Stimuli/', char(obj.label)];
+        case EntityTypes.RESPONSE
+            parentPath = getParentPath(EMT, obj.Parent.UUID);
+            hdfPath = [parentPath, '/Responses/', char(obj.label)];
         otherwise
             error("writeGeneric:UnrecognizedEntity",...
                 "Unknown entity: %s", entityType);
@@ -115,17 +116,22 @@ function writeGeneric(hdfName, obj)
         end
         % Write links to other entities
         if isSubclass(prop, 'aod.core.Entity')
-            isEntityInFile(GMT, prop);
-            entityPath = char(GMT{GMT.UUID == prop.UUID, 'Path'});
+            isEntityInFile(EMT, prop);
+            entityPath = char(EMT{EMT.UUID == prop.UUID, 'Path'});
             HDF5.createLink(hdfName, entityPath, hdfPath, persistedProps(i));
-            return
+            continue
         end
-        success = HDF5.writeDataByType(hdfName, hdfPath, persistedProps(i), prop);
+        success = aod.h5.writeDataByType(hdfName, hdfPath, persistedProps(i), prop);
 
         if ~success
-            error('Unrecognized property %s of type %s', persistedProps(i), class(persistedProps(i)));
+            error('Unrecognized property %s of type %s', persistedProps(i), class(prop(i)));
         end
     end
+end
+
+function patentPath = getParentPath(EM, parentUUID)
+    isEntityInFile(EMT, parentUUID);
+    parentPath = char(EMT(EMT.UUID == parentUUID, 'Path'));
 end
 
 function tf = doesEntityExist(entity)
@@ -140,8 +146,8 @@ function tf = doesEntityExist(entity)
     end
 end
 
-function tf = isEntityInFile(GMT, entity)
-    if isempty(find(GMT.UUID == entity.UUID)) %#ok<EFIND> 
+function tf = isEntityInFile(EMT, UUID)
+    if isempty(find(EMT.UUID == UUID)) %#ok<EFIND> 
         if nargout == 0
             error('Entity does not exist in HDF5 file!');
         else

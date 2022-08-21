@@ -52,7 +52,7 @@ classdef H5TreeView < handle
         end
         
         function onNodeSelected(obj, src, ~)
-            assignin('base', 'src', src);
+            % assignin('base', 'src', src);
             obj.resetDisplay();
             node = src.SelectedNodes;
             if isempty(node.NodeData)

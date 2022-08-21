@@ -9,7 +9,7 @@ classdef EntityManager < handle
     methods
         function obj = EntityManager(hdfName)
             obj.hdfName = hdfName;
-            obj.clearMaps();
+            obj.collect();
         end
 
         function clearMaps(obj)

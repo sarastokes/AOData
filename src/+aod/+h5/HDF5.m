@@ -213,6 +213,21 @@ classdef HDF5 < handle
             H5F.close(fileID);
         end
 
+        function makeStringDataset(fileName, pathName, dsetName, data)
+            % MAKESTRINGDATASET
+            %
+            % Description:
+            %   Write a string array dataset
+            %
+            % Syntax:
+            %   makeStringDataset(fileName, pathName, dsetName, data)
+            % ------------------------------------------------------------
+            fullPath = aod.h5.buildPath(pathName, dsetName);
+            h5create(fileName, fullPath, size(data),...
+                'DataType', 'string');
+            h5write(fileName, fullPath, data);
+        end
+
         function dsetID = makeDateDataset(fileName, pathName, dsetName, data)
             % MAKEDATEDATASET
             % 
