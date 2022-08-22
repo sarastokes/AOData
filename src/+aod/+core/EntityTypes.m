@@ -112,6 +112,20 @@ classdef EntityTypes
     end
 
     methods (Static)
+        function obj = factory(entityType)
+            entityType = upper(entityType);
+            try
+                obj = aod.core.EntityTypes.(entityType);
+            catch ME 
+                if strcmp(ME.id, 'MATLAB:subscripting:classHasNoPropertyOrMethod')
+                    error("ENTITYTYPES:UnrecognizedEntity",...
+                        "aod.core.EntityTypes has no entity named %s", entityType);
+                else
+                    rethrow(ME);
+                end
+            end
+        end
+
         function value = get(obj)
 
             arguments 

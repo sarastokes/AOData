@@ -11,7 +11,7 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = Timing(varargin)
 %
 % Properties:
-%   timingParameter
+%   timingParameters
 %
 % Dependent properties:
 %   Time                    Time of each sample in seconds

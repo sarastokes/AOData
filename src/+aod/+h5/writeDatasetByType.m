@@ -14,7 +14,7 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
 
     if isnumeric(data)
         HDF5.makeMatrixDataset(fileName, pathName, dsetName, data);
-        HDF5.writeatts(fileName, pathName, dsetName, 'Class', class(data));
+        HDF5.writeatts(fileName, fullPath, 'Class', class(data));
         return
     end
 
@@ -38,6 +38,7 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
                 HDF5.deleteObject(fileName, fullPath);
             end
             HDF5.makeStructDataset(fileName, pathName, dsetName, data);
+            HDF5.writeatts(fileName, fullPath, 'Class', class(data));
         end
     end
 
@@ -60,13 +61,13 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
         T = timetable2table(data);
         T.Time = seconds(T.Time);
         HDF5.makeCompoundDataset(fileName, pathName, dsetName, T);
-        HDF5.writeatts(fileName, pathName, 'Class', class(data));
+        HDF5.writeatts(fileName, fullPath, 'Class', class(data));
         return
     end
 
     if isduration(data)
         HDF5.makeMatrixDataset(fileName, pathName, dsetName, seconds(data));
-        HDF5.writeatts(fileName, pathName, 'Class', class(data),...
+        HDF5.writeatts(fileName, fullPath, 'Class', class(data),...
             'Units', 'seconds');
     end
 

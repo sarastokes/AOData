@@ -1,11 +1,13 @@
-function out = readDatasetByType(hdfName, groupPath, D)
+function out = readDatasetByType(hdfName, groupPath, dsetName)
 
     import aod.h5.HDF5
 
-    fullPath = HDF5.buildPath(groupPath, D.name);
-    data = h5read(hdfFile, fullPath);
+    fullPath = HDF5.buildPath(groupPath, dsetName);
+    disp(fullPath)
 
-    numAtts = numel(D.Attributes);
+    data = h5read(hdfName, fullPath);
+
+    % numAtts = numel(D.Attributes);
     className = h5readatt(hdfName, fullPath, 'Class');
 
     switch className 
@@ -14,9 +16,10 @@ function out = readDatasetByType(hdfName, groupPath, D)
                 h5readatt(hdfName, fullPath, 'Format'));
         case 'table'
             out = struct2table(data);
-        case 'scalarstring'
+        case 'string'
             out = string(data);
         case 'logical'
+            out = logical(data);
         case 'timetable'
             out = struct2table(data);
             out.Time = seconds(out.Time);

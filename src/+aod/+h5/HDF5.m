@@ -222,7 +222,7 @@ classdef HDF5 < handle
             % Syntax:
             %   makeStringDataset(fileName, pathName, dsetName, data)
             % ------------------------------------------------------------
-            fullPath = aod.h5.buildPath(pathName, dsetName);
+            fullPath = aod.h5.HDF5.buildPath(pathName, dsetName);
             h5create(fileName, fullPath, size(data),...
                 'DataType', 'string');
             h5write(fileName, fullPath, data);
@@ -283,12 +283,20 @@ classdef HDF5 < handle
 
             fullPath = HDF5.buildPath(pathName, dsetName);
 
-            % Record original class, then convert to struct
+            % Record original class and column classes
             dataClass = class(data);
+            columnClass = [];
             if istable(data)
+                for i = 1:size(data, 2)
+                    columnClass = [columnClass, ', ', class(data(:,i))]; %#ok<AGROW> 
+                end
                 nDims = height(data);
                 data = table2struct(data);
             else
+                f = fieldnames(data);
+                for i = 1:numel(f)
+                    columnClass = [columnClass, ', ', class(data.(f{i}))]; %#ok<AGROW> 
+                end
                 nDims = max(@numel, data);
             end
 
@@ -341,8 +349,9 @@ classdef HDF5 < handle
             end
             H5F.close(fileID);
             
-            % Write original class as an attribute 
-            HDF5.writeatts(fileName, fullPath, 'Class', dataClass);
+            % Write original class and column classes attributes
+            HDF5.writeatts(fileName, fullPath, 'Class', dataClass,...
+                'ColumnClass', columnClass);
         end
         
         function deleteObject(fileName, pathName, name)
@@ -586,7 +595,8 @@ classdef HDF5 < handle
             % BUILDPATH
             %
             % Description:
-            %   Concatenates names into valid HDF5 path
+            %   Concatenates names into valid HDF5 path. If leading / is
+            %   missing, it will be added
             %
             % Syntax:
             %   path = buildPath(varargin)
@@ -601,7 +611,7 @@ classdef HDF5 < handle
             end
 
             % Make sure leading / isn't duplicated
-            if strcmp(1, '/') && strcmp(2, '/')
+            while strcmp(path(2), '/')
                 path = path(2:end);
             end
         end
