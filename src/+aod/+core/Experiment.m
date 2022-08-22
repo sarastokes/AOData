@@ -55,7 +55,7 @@ classdef Experiment < aod.core.Entity
 
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
-        Regions                 aod.core.Regions
+        Regions                 aod.core.Region
         Calibrations            aod.core.Calibration
         Systems                 aod.core.System
 
@@ -156,31 +156,54 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             cal = getByClass(obj.Calibrations, className);
         end
+
+        function region = getRegion(obj, className)
+            % GETREGION
+            %
+            % Syntax:
+            %   cal = obj.getRegion(className)
+            % -------------------------------------------------------------
+            cal = getByClass(obj.Regions, className);
+        end
+
     
-        function addRegions(obj, regions, overwrite)
+        function addRegion(obj, region, overwrite)
             % ADDREGIONS
             %
             % Syntax:
-            %   imStack = addRegions(obj, regions, overwrite)
+            %   imStack = addRegion(obj, region, overwrite)
             % -------------------------------------------------------------
             if nargin < 3
                 overwrite = false;
             end
-            assert(isa(regions, 'aod.core.Regions'), 'Input must be Regions object');
+            assert(isa(region, 'aod.core.Region'), 'Input must be Region subclass');
+            
+            % Determine if region exists and should be overwritten
             if ~isempty(obj.Regions)
-                if overwrite
-                    obj.Regions = regions;
-                    % Cancel out any existing region responses as their
-                    % relationship to Regions is no longer valid
-                    for i = 1:numel(obj.Epochs)
-                        obj.Epochs(i).clearRegionResponses();
+                idx = find(findByClass(obj.Regions, class(region)));
+                if ~isempty(idx)
+                    if ~overwrite
+                        warning('Set overwrite=true to replace existing %s', class(region));
+                    else % Overwrite existing
+                        if numel(obj.Regions) == 1
+                            obj.Regions = region;
+                        else
+                            obj.Regions{idx} = region;
+                        end
+                        return
                     end
-                else
-                    error('Set overwrite=true to overwrite existing regions');
                 end
-            else
-                obj.Regions = regions;
             end
+            obj.Regions = cat(1, obj.Regions, region);
+        end
+
+        function clearRegions(obj)
+            % CLEARREGIONS
+            %
+            % Syntax:
+            %   obj.clearRegions()
+            % -------------------------------------------------------------
+            obj.Regions = aod.core.Region.empty();
         end
     end
 

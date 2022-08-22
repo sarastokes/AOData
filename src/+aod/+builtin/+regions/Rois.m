@@ -1,14 +1,18 @@
-classdef Rois < aod.core.Regions
+classdef Rois < aod.core.Region
 % ROIS
 % 
 % Description:
-%   Regions subclass meant for Rois in physiology experiment
+%   ROIs in physiology experiment
 % 
 % Parent:
-%   aod.core.Regions
+%   aod.core.Region
 %
 % Constructor:
 %   obj = Rois(parent, rois, imSize)
+%
+% Private parameters (automatically calculated from Data):
+%   Count
+%   RoiIDs
 %
 % Methods:
 %   load(obj)
@@ -18,6 +22,14 @@ classdef Rois < aod.core.Regions
 %   uid = roi2uid(obj, roiID)
 %   addRoiUID(obj, roiID, roiUID)
 %   setRoiUIDs(obj, roiUIDs)
+%
+% Inherited public methods:
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, mustReturnParam)
+%   tf = hasParam(obj, paramName)
+%
+% Protected methods:
+%   setMap(obj, map);
 % -------------------------------------------------------------------------
 
     events 
@@ -32,19 +44,35 @@ classdef Rois < aod.core.Regions
         Size(1,2)           {mustBeInteger}         = [0 0]
     end
 
+    % Enables quick access to commonly-used parameters
+    properties (Dependent)
+        count
+        roiIDs
+    end
+
     methods
-        function obj = Rois(parent, rois, imSize)
-            if nargin == 0
-                parent = [];
-                rois = [];
-                imSize = [];
-            elseif nargin < 3
-                imSize = [];
-            end
-            obj@aod.core.Regions(parent, rois);
-            obj.load(rois, imSize);
+        function obj = Rois(parent, rois, varargin)
+            obj@aod.core.Region(parent, varargin{:});
+
+            ip = aod.util.InputParser();
+            addParameter(ip, 'Size', [], @isnumeric);
+            parse(ip, varargin{:});
+            
+            obj.Size = ip.Results.Size;
+
+            obj.load(rois);
         end
 
+        function value = get.count(obj)
+            value = obj.getParam('Count', aod.util.MessageTypes.NONE);
+        end
+
+        function value = get.roiIDs(obj)
+            value = obj.getParam('RoiIDs', aod.util.MessageTypes.NONE);
+        end
+    end
+
+    methods
         function load(obj, rois, imSize)
             % LOAD
             %
@@ -211,7 +239,7 @@ classdef Rois < aod.core.Regions
             %   ID          numeric
             %       Specific roi ID(s), otherwise returns all rois
             % -------------------------------------------------------------
-            S = regionprops("table", obj.Map, "Centroid");
+            S = regionprops("table", obj.Data, "Centroid");
             xy = S.Centroid;
             if nargin == 2
                 xy = xy(ID,:);
@@ -221,7 +249,7 @@ classdef Rois < aod.core.Regions
 
     methods (Access = protected)
         function setMetadata(obj)
-            if isempty(obj.Map)
+            if isempty(obj.Data)
                 return
             end
             if ~isempty(obj.Metadata)
@@ -246,6 +274,27 @@ classdef Rois < aod.core.Regions
                     repmat("", [obj.count, 1]),...
                     'VariableNames', {'ID', 'UID'});
             end
+        end
+    end
+
+    methods (Access = protected)     
+        function setMap(obj, map)
+            % SETMAP
+            %
+            % Description:
+            %   Assigns ROI map to Data property and gets derived metadata
+            %
+            % Syntax:
+            %   setMap(obj, data);
+            % -------------------------------------------------------------
+            obj.setData(map);
+
+            IDs = unique(obj.Data);
+            IDs(obj.roiIDs == 0) = [];
+            roiCount = nnz(unique(obj.Data));
+
+            obj.setParam('RoiIDs', IDs);
+            obj.setParam('Count', roiCount);
         end
     end
 end

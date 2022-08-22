@@ -83,22 +83,31 @@ classdef Creator < aod.core.Creator
             obj.Experiment.clearSystems();
         end
 
-        function addRegions(obj, fileName, imSize, UIDs)
+        function addROIs(obj, fileName, source, imSize, UIDs)
             % ADDREGIONS
             %
             % Syntax:
-            %   obj.addRegions(fileName, imSize, UIDs)
+            %   obj.addRegion(fileName, imSize, UIDs)
             % -------------------------------------------------------------
-
             [filePath, ~, ~] = fileparts(fileName);
             if isempty(filePath)
                 fileName = fullfile(obj.Experiment.getAnalysisFolder(), fileName);
             end
-            regions = aod.builtin.regions.Rois(obj.Experiment, fileName, imSize);
-            if nargin > 3 && ~isempty(UIDs)
+            regions = aod.builtin.regions.Rois(obj.Experiment, fileName,... 
+                'Size', imSize, 'Source', source);
+            if nargin > 5 && ~isempty(UIDs)
                 regions.setRoiUIDs(UIDs);
             end
-            obj.Experiment.addRegions(regions);
+            obj.Experiment.addRegion(regions);
+        end
+
+        function clearRegions(obj)
+            % CLEARREGIONS
+            %
+            % Syntax:
+            %   obj.clearRegions()
+            % -------------------------------------------------------------
+            obj.Experiment.clearRegions();
         end
 
         function addRigidTransform(obj, fName, epochIDs, varargin)

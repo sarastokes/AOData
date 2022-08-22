@@ -175,7 +175,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %keepResponse = ip.Results.Keep;
             keepResponse = false;
 
-            if isempty(obj.Parent.Regions)
+            if isempty(obj.Parent.Region)
                 error('Experiment must contain Regions');
             end
             resp = getByClass(obj.Responses, responseClassName);

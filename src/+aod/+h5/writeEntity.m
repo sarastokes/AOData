@@ -58,6 +58,9 @@ function writeEntity(hdfName, obj)
         case EntityTypes.DEVICE
             parentPath = getParentPath(EMT, obj.Parent.UUID);
             hdfPath = [parentPath, '/Devices/', char(obj.label)];
+        case EntityTypes.REGION
+            hdfPath = ['/Experiment/Regions'];
+            parentPath = '/Experiment';
         case EntityTypes.EPOCH
             hdfPath = ['/Experiment/Epochs/', char(obj.shortName)];
             parentPath = '/Experiment';

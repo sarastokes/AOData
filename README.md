@@ -13,7 +13,7 @@ For storing data and metadata associated with an experiment:
     - Channel
       - Device
   - Calibration
-  - Regions
+  - Region
   - Epoch
     - Registration
     - Response

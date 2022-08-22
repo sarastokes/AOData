@@ -19,7 +19,7 @@ classdef PhysiologyExperimentTest < matlab.unittest.TestCase
 
             x.addEpochs(6:39, sara.EpochTypes.Spatial);
             regions = aod.builtin.regions.Rois(x.Experiment, '851_OSR_20220125_RoiSet.zip', [248, 360]);
-            x.addRegions(regions);
+            x.addRegion(regions);
 
             topticaEpochs = 6:39;
             x.addTransforms('851_OSR_20220125_rigid_ref29.txt',... 

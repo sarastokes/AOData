@@ -2,47 +2,56 @@ classdef RegionResponse < aod.core.Response
 % REGIONRESPONSE
 %
 % Description:
-%   The average response with each ROI in Regions
+%   The average response with each ROI
+%
+% Parent:
+%   aod.core.Response
+%
+% Constructor:
+%   obj = RegionResponse(parent, region, varargin)
 %
 % Properties:
-%   Data
-%   responseParameters
-%   dateModified
-% Dependent properties:
-%   Experiment
-%   Regions
+%   Region
+%
 % Private properties:
 %   listeners
+%
+% Methods:
+%   setRegion(obj, region)
 % -------------------------------------------------------------------------
+
+    properties (SetAccess = protected)
+        Region
+    end
 
     properties (Access = private)
         listeners
     end
 
-    properties (Dependent) 
-        Regions
-    end
-
     methods
-        function obj = RegionResponse(parent, varargin)
+        function obj = RegionResponse(parent, region, varargin)
             if nargin < 1
                 parent = [];
             end
             obj = obj@aod.core.Response(parent);
+            obj.setRegion(region);
+
             if isSubclass(obj.Parent, 'aod.core.Epoch')
                 obj.load(varargin{:});
                 % Listen for changes to ROIs and flag for update
-                obj.listeners = addlistener(obj.Regions,... 
+                obj.listeners = addlistener(obj.Region,... 
                     'UpdatedRois', @obj.onUpdatedRois);
             end
-        end
-
-        function value = get.Regions(obj)
-            value = obj.Experiment.Regions;
         end
     end
 
     methods
+        function setRegion(obj, region)
+            assert(isSubclass(region, 'aod.core.Region'),...
+                'Input must be subclass of aod.core.Region');
+            obj.Region = region;
+        end
+
         function signals = getData(obj, IDs) 
             % GETDATA
             %
@@ -73,13 +82,13 @@ classdef RegionResponse < aod.core.Response
             % Description:
             %   Get the average response over all pixels in ROI
             % -------------------------------------------------------------
-            roiMask = double(obj.Regions.Map);
+            roiMask = double(obj.Region.Map);
             sampleRate = obj.Experiment.sampleRate;
             imStack = obj.Parent.getStack();
-            roiList = obj.Regions.roiIDs;
+            roiList = obj.Region.roiIDs;
         
             A = [];
-            for i = 1:obj.Regions.Count
+            for i = 1:obj.Region.Count
                 [a, b] = find(roiMask == roiList(i));
                 % Look for ROIs exceeding image size
                 a(b > size(imStack,2)) = [];
@@ -111,7 +120,7 @@ classdef RegionResponse < aod.core.Response
             if isempty(obj.Responses)
                 obj.load();
             end
-            ID = obj.Regions.parseRoi(ID);
+            ID = obj.Region.parseRoi(ID);
 
             signals = obj.Data.Signals(:, ID)';
             xpts = obj.Data.Time';
