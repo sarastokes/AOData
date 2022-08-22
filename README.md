@@ -19,6 +19,7 @@ For storing data and metadata associated with an experiment:
     - Response
       - Timing
     - Stimulus
+    - Dataset
    - Analysis
 
 Although there are multiple approaches for converting an experiment into a `Experiment` object, the `Creator` class has access to all the building functions within `Experiment` and can provide a standardized way of building customized `Experiment` objects.

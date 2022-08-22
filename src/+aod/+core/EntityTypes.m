@@ -9,10 +9,11 @@ classdef EntityTypes
         DEVICE 
         REGION 
         EPOCH 
-        RESPONSE
-        TIMING
+        DATASET
         STIMULUS 
         REGISTRATION 
+        RESPONSE
+        TIMING
         ANALYSIS 
     end
 
@@ -27,7 +28,7 @@ classdef EntityTypes
                     parents = {'aod.core.System'};
                 case EntityTypes.DEVICE
                     parents = {'aod.core.Channel'};
-                case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE}
+                case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE, EntityTypes.DATASET}
                     parents = {'aod.core.Epoch'};
                 case EntityTypes.TIMING
                     parents = {'aod.core.Response'};
@@ -53,7 +54,7 @@ classdef EntityTypes
                 case EntityTypes.SOURCE 
                     containers = {'Sources'};
                 case EntityTypes.EPOCH
-                    containers = {'Registrations', 'Stimuli', 'Responses'};
+                    containers = {'Registrations', 'Stimuli', 'Responses', 'Datasets'};
                 case EntityTypes.SYSTEM 
                     containers = {'Channels'};
                 case EntityTypes.CHANNEL 
@@ -148,6 +149,8 @@ classdef EntityTypes
                 value = EntityTypes.DEVICE;
             elseif isSubclass(obj, 'aod.core.Epoch')
                 value = EntityTypes.EPOCH;
+            elseif isSubclass(obj, 'aod.core.Dataset')
+                value = EntityTypes.DATASET;
             elseif isSubclass(obj, 'aod.core.Registration')
                 value = EntityTypes.REGISTRATION;
             elseif isSubclass(obj, 'aod.core.Stimulus')

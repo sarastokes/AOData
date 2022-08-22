@@ -16,6 +16,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Registrations                   Container for epoch's registrations
 %   Responses                       Container for epoch's responses
 %   Stimuli                         Container for epoch's stimuli
+%   Datasets                        Container for epoch's datasets
 %   epochParameters                 aod.core.Parameters
 %   files                           aod.core.Parameters
 %
@@ -57,6 +58,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         Registrations               aod.core.Registration
         Responses                   %aod.core.Response  
         Stimuli                     aod.core.Stimulus
+        Datasets                    aod.core.Dataset
         % epochParameters             = aod.core.Parameters
         files                       = aod.core.Parameters  
     end
@@ -267,6 +269,30 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             filePath = erase(filePath, obj.Parent.homeDirectory);
             filePath = strtrim(filePath);
             obj.files(fileName) = filePath;
+        end
+
+        function addDataset(obj, dataset, overwrite)
+            % ADDDATASET
+            %
+            % Syntax:
+            %   obj.addDataset(dataset, overwrite)
+            % -------------------------------------------------------------
+            assert(isSubclass(dataset, 'aod.core.Dataset'),...
+                'Must be a subclass of aod.core.Dataset');
+            
+            if ~isempty(obj.Datasets)
+                idx = find(findByClass(obj.Datasets, dataset));
+                % TODO check name
+                if ~isempty(idx)
+                    if ~overwrite
+                        warning('Set overwrite=true to replace existing datasets');
+                        return
+                    end
+                else
+                    obj.Datasets(idx) = dataset;
+                end
+            end
+            obj.Datasets = cat(1, obj.Datasets, dataset);
         end
 
         function addStimulus(obj, stim, overwrite)

@@ -5,8 +5,10 @@ classdef HDF5 < handle
 %   Utility methods to simplify working with H5 files using both the
 %   low-level HDF5 API and MATLAB's high-level built-in functions
 %
-% Methods:
+% File Methods:
+%   fileID = createFile(fileName, overwrite)
 %   fileID = openFile(fileName, readOnly)
+%
 %   deleteObject(fileName, pathName, name)
 %   createGroups(fileName, pathName, varargin)
 %   createGroup(locID, groupName, varargin)
@@ -29,6 +31,42 @@ classdef HDF5 < handle
 
     properties (Hidden, Constant)
         NEW_GROUP_PROPS = {'H5P_DEFAULT', 'H5P_DEFAULT', 'H5P_DEFAULT'};
+    end
+
+    % File-level methods
+    methods (Static)
+        function fileID = createFile(fileName, overwrite)
+            % CREATEFILE
+            %
+            % Syntax:
+            %   fileID = openFile(fileName, overwrite)
+            %
+            % Inputs:
+            %   fileName            char, HDF5 file name
+            % Optional inputs:
+            %   overwrite           logical, default = false
+            % -------------------------------------------------------------
+            assert(endsWith(fileName, '.h5'), 'File name must end with .h5');
+            if nargin < 2
+                overwrite = false;
+            end
+
+            if exist(fileName, 'file')
+                if overwrite
+                    delete(fileName);
+                else
+                    error("createFile:FileExists",...
+                        "File already exists, set overwrite=true to recreate");
+                end
+            end
+
+            fileID = H5F.create(fileName);
+            fprintf('Created HDF5 file: %s\n', fileName);
+
+            if nargout == 0
+                H5F.close(fileID);
+            end
+        end
     end
 
     methods (Static)

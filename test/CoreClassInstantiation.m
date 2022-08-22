@@ -14,6 +14,7 @@ device = Device([], 'Model', 'P20K', 'Manufacturer', 'ThorLabs');
 stimulus = Stimulus([]);
 response = Response([]);
 registration = aod.builtin.registrations.RigidRegistration([], eye(3));
+dataset = Dataset([], 'DatasetName');
 
 analysis = Analysis([]);
 

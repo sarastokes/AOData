@@ -165,7 +165,6 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             cal = getByClass(obj.Regions, className);
         end
-
     
         function addRegion(obj, region, overwrite)
             % ADDREGIONS
