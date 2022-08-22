@@ -28,16 +28,16 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Data                             
         Timing                              aod.core.Timing
-        responseParameters                  = aod.core.Parameters
+        % responseParameters                  = aod.core.Parameters
     end
 
     properties (Hidden, Dependent)
         Experiment
     end
 
-    properties (Hidden, Access = protected)
+    properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Epoch'};
-        parameterPropertyName = 'responseParameters';
+        % parameterPropertyName = 'responseParameters';
     end
 
     methods

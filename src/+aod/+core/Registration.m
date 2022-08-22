@@ -19,12 +19,12 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Data
         registrationDate(1,1)               datetime
-        registrationParameters              = aod.core.Parameters
+        % registrationParameters              = aod.core.Parameters
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Epoch'};
-        parameterPropertyName = 'registrationParameters';
+        % parameterPropertyName = 'registrationParameters';
     end
 
     % TODO: Add setData method?

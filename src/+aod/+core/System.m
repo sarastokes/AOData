@@ -31,12 +31,12 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     properties
         Name                char
         Channels            = aod.core.Channel.empty();
-        systemParameters    = aod.core.Parameters     
+        % systemParameters    = aod.core.Parameters     
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'};
-        parameterPropertyName = 'systemParameters';
+        % parameterPropertyName = 'systemParameters';
     end
 
     methods
@@ -83,7 +83,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.assignUUID(UUID)
             %
             % See also:
-            %   generateUUID
+            %   aod.util.generateUUID
             % -------------------------------------------------------------
             obj.setUUID(UUID);
         end

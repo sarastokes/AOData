@@ -20,13 +20,13 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 %   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
     properties
-        analysisParameters          = aod.core.Parameters
+        % analysisParameters          = aod.core.Parameters
         analysisDate                datetime
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'}
-        parameterPropertyName = 'analysisParameters'
+        % parameterPropertyName = 'analysisParameters'
     end
 
     methods

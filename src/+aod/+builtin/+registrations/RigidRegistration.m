@@ -31,7 +31,7 @@ classdef RigidRegistration < aod.core.Registration
             end
             obj@aod.core.Registration(parent, data);
 
-            % Additional inputs are added to registrationParameters
+            % Additional inputs are added to parameters
             obj.setParam(varargin{:});
         end
 

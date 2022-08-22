@@ -22,12 +22,12 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = private)
         name                        char
-        sourceParameters            = aod.core.Parameters
+        % sourceParameters            = aod.core.Parameters
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment', 'aod.core.Source'}
-        parameterPropertyName = 'sourceParameters'
+        % parameterPropertyName = 'sourceParameters'
     end
 
     methods
@@ -93,7 +93,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.assignUUID(UUID)
             %
             % See also:
-            %   generateUUID
+            %   aod.util.generateUUID
             % -------------------------------------------------------------
             obj.setUUID(UUID);
         end

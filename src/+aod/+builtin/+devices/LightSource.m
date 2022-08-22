@@ -54,7 +54,7 @@ classdef LightSource < aod.core.Device
     
     methods 
         function setWavelength(obj, wavelength)
-            obj.deviceParameters('Wavelength') = wavelength;
+            obj.setParam('Wavelength', wavelength);
         end
         
         function setSpectra(obj, spectra)
@@ -64,7 +64,11 @@ classdef LightSource < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = [num2str(obj.deviceParameters('Wavelength')), 'nmLightSource'];
+            if obj.hasParam('Wavelength')
+                value = [num2str(obj.getParam('Wavelength')), 'nmLightSource'];
+            else
+                value = 'LightSource';
+            end
         end
     end
 end

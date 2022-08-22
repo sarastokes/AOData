@@ -29,12 +29,12 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = private)
         calibrationDate(1,1)                datetime
-        calibrationParameters               = aod.core.Parameters
+        % calibrationParameters               = aod.core.Parameters
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'};
-        parameterPropertyName = 'calibrationParameters';
+        % parameterPropertyName = 'calibrationParameters';
     end
 
     methods

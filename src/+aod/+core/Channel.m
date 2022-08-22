@@ -32,12 +32,12 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = private)
         Name                        char
         Devices                     aod.core.Device
-        channelParameters           = aod.core.Parameters
+        % channelParameters           = aod.core.Parameters
     end
     
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.System'};
-        parameterPropertyName = 'channelParameters';
+        % parameterPropertyName = 'channelParameters';
     end
 
     methods
@@ -120,7 +120,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.assignUUID(UUID)
             %
             % See also:
-            %   generateUUID
+            %   aod.util.generateUUID
             % -------------------------------------------------------------
             obj.setUUID(UUID);
         end

@@ -48,10 +48,14 @@ classdef (Abstract) Entity < handle
         notes                       string = string.empty()
     end
 
+    properties (SetAccess = protected)
+        parameters                  % aod.core.Parameters()
+    end
+
     
     properties (Abstract, Hidden, SetAccess = protected)
         allowableParentTypes        cell
-        parameterPropertyName       char
+        % parameterPropertyName       char
     end
 
     properties (Dependent)
@@ -67,7 +71,8 @@ classdef (Abstract) Entity < handle
             if nargin > 0
                 obj.setParent(parent);
             end
-            obj.UUID = generateUUID();
+            obj.UUID = aod.util.generateUUID();
+            obj.parameters = aod.core.Parameters();
         end
 
         function value = get.label(obj)
@@ -156,7 +161,8 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = hasParam(obj, paramName)
             % -------------------------------------------------------------
-            tf = obj.(obj.parameterPropertyName).isKey(paramName);
+            % tf = obj.(obj.parameterPropertyName).isKey(paramName);
+            tf = obj.parameters.isKey(paramName);
         end
 
         function paramValue = getParam(obj, paramName, msgType)
@@ -173,25 +179,27 @@ classdef (Abstract) Entity < handle
             % Optional inputs:
             %   msgType         aod.util.MessageTypes (default = ERROR)            
             % -------------------------------------------------------------
+            import aod.util.MessageTypes
             if nargin < 3
-                msgType = aod.util.MessageTypes.ERROR;
+                msgType = MessageTypes.ERROR;
             else
-                msgType = aod.util.MessageTypes.init(msgType);
+                msgType = MessageTypes.init(msgType);
             end
 
             if obj.hasParam(paramName)
-                paramProp = obj.(obj.parameterPropertyName);
-                paramValue = paramProp(paramName);
+                % paramProp = obj.(obj.parameterPropertyName);
+                % paramValue = paramProp(paramName);
+                paramValue = obj.parameters(paramName);
             else
                 switch msgType 
-                    case MessageType.ERROR 
-                        error('GetParam: Did not find %s in %s',... 
+                    case MessageTypes.ERROR 
+                        error('GetParam: Did not find %s in parameters',... 
                             paramName, obj.parameterPropertyName);
-                    case MessageType.WARNING 
-                        warning('GetParam: Did not find %s in %s',... 
-                            paramName, obj.parameterPropertyName);
+                    case MessageTypes.WARNING 
+                        warning('GetParam: Did not find %s in parameters',... 
+                            paramName);
                         paramValue = [];
-                    case MessageType.NONE
+                    case MessageTypes.NONE
                         paramValue = [];
                 end
             end
@@ -212,17 +220,19 @@ classdef (Abstract) Entity < handle
             if nargin == 1
                 return
             end
-            paramProp = obj.(obj.parameterPropertyName);
+            %paramProp = obj.(obj.parameterPropertyName);
 
             if nargin == 2 && isstruct(varargin{1})
                 S = varargin{1};
                 k = fieldnames(S);
                 for i = 1:numel(k)
-                    paramProp(k{i}) = S.(k{i});
+                    % paramProp(k{i}) = S.(k{i});
+                    obj.parameters(k{i}) = S.(k{i});
                 end
             else
                 for i = 1:(nargin - 1)/2
-                    paramProp(varargin{(2*i)-1}) = varargin{2*i};
+                    % paramProp(varargin{(2*i)-1}) = varargin{2*i};
+                    obj.parameters(varargin{(2*i)-1}) = varargin{2*i};
                 end
             end
         end
@@ -281,7 +291,7 @@ classdef (Abstract) Entity < handle
             %   generateUUID
             % -------------------------------------------------------------
             assert(isstring(UUID) & strlength(UUID) == 36,...
-                'ENTITY: UUID is not properly formatted, use generateUUID');
+                'ENTITY: UUID is not properly formatted, use aod.util.generateUUID()');
             obj.UUID = UUID;
         end
     end

@@ -1,5 +1,13 @@
 function writeEntity(hdfName, obj)
-
+% WRITEENTITY
+%
+% Description:
+%   Pipeline for writing aod entities to an HDF5 file
+%
+% Syntax:
+%   writeEntity(hdfName, entity)
+%
+% -------------------------------------------------------------------------
     arguments
         hdfName             {mustBeFile}
         obj                 {mustBeA(obj, 'aod.core.Entity')}
@@ -13,7 +21,7 @@ function writeEntity(hdfName, obj)
     persistedProps = aod.h5.getPersistedProperties(obj);
     % Extract out independently set properties
     hasFiles = ismember(persistedProps, "files");
-    specialProps = ["Parent", "notes", "UUID", "files"];
+    specialProps = ["Parent", "notes", "UUID", "files", "parameters"];
     persistedProps = setdiff(persistedProps, specialProps);
     % Extract out container properties
     containers = entityType.containers();
@@ -33,7 +41,7 @@ function writeEntity(hdfName, obj)
             parentPath = [];
         case EntityTypes.SOURCE
             if isempty(obj.Parent)
-                parentPath = '/Experiment/Sources';
+                parentPath = '/Experiment';
             else
                 parentPath = getParentPath(EMT, obj.Parent.UUID);
             end
@@ -95,9 +103,9 @@ function writeEntity(hdfName, obj)
     end
 
     % Write parameters, if necessary
-    parameters = entityType.parameters(obj);
-    if ~isempty(parameters)
-        aod.h5.writeParameters(hdfName, hdfPath, parameters);
+    % parameters = entityType.parameters(obj);
+    if ~isempty(obj.parameters)
+        aod.h5.writeParameters(hdfName, hdfPath, obj.parameters);
     end
     
     % Write file paths, if necessary
@@ -111,7 +119,7 @@ function writeEntity(hdfName, obj)
     for i = 1:numel(persistedProps)
         prop = obj.(persistedProps(i));
         if isempty(prop)
-            fprintf('Skipping empty property: %s\n', persistedProps(i));
+            % fprintf('Skipping empty property: %s\n', persistedProps(i));
             continue
         end
         % Write links to other entities
@@ -121,17 +129,17 @@ function writeEntity(hdfName, obj)
             HDF5.createLink(hdfName, entityPath, hdfPath, persistedProps(i));
             continue
         end
-        success = aod.h5.writeDataByType(hdfName, hdfPath, persistedProps(i), prop);
+        success = aod.h5.writeDatasetByType(hdfName, hdfPath, persistedProps(i), prop);
 
         if ~success
-            error('Unrecognized property %s of type %s', persistedProps(i), class(prop(i)));
+            error('Unrecognized property %s of type %s', persistedProps(i), class(prop));
         end
     end
 end
 
-function patentPath = getParentPath(EM, parentUUID)
+function parentPath = getParentPath(EMT, parentUUID)
     isEntityInFile(EMT, parentUUID);
-    parentPath = char(EMT(EMT.UUID == parentUUID, 'Path'));
+    parentPath = char(EMT{EMT.UUID == parentUUID, 'Path'});
 end
 
 function tf = doesEntityExist(entity)

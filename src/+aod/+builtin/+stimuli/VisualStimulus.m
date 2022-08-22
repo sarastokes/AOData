@@ -32,7 +32,7 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
             % TODO: Automate calibration identification
             % -------------------------------------------------------------
             protocolFcn = str2func(obj.protocolName);
-            protocol = protocolFcn(calibration, map2struct(obj.stimParameters));
+            protocol = protocolFcn(calibration, map2struct(obj.parameters));
         end
     end
 

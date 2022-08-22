@@ -57,10 +57,10 @@ classdef Eye < aod.core.sources.Eye
         end
         
         function value = get.micronsPerDegree(obj)
-            if isempty(obj.sourceParameters('AxialLength'))
+            if ~obj.hasParam('AxialLength')
                 value = [];
             else
-                value = 291.2 * (obj.sourceParameters('AxialLength') / 24.2);
+                value = 291.2 * (obj.getParam('AxialLength') / 24.2);
             end
         end
     end
@@ -111,11 +111,11 @@ classdef Eye < aod.core.sources.Eye
             % Syntax:
             %   otf = getOTF(obj, wavelength, sf)
             % -------------------------------------------------------------
-            if isempty(obj.sourceParameters('PupilSize'))
+            if ~obj.hasParam('PupilSize')
                 error('OTF calculation requires pupilSize property!');
             end
 
-            u0 = (obj.sourceParameters('PupilSize') * pi * 10e5) / (wavelength * 180);
+            u0 = (obj.getParam('PupilSize') * pi * 10e5) / (wavelength * 180);
             otf = 2/pi * (acos(sf ./ u0) - (sf ./ u0) .* sqrt(1 - (sf./u0).^2));
         end
     end

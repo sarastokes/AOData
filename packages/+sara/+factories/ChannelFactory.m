@@ -39,8 +39,6 @@ classdef ChannelFactory < aod.core.Factory
                 case 'MustangImaging'
                     channel = aod.core.Channel([], 'MustangImaging');
                     channel.setDataFolder('Vis');
-                    channel.addDevice(aod.builtin.devices.PMT([], 'Gain', 0.805,...
-                        'Manufacturer', 'Hamamatsu', 'Model', 'H16722'));
                     channel.addDevice(aod.builtin.devices.LightSource([], 488,...
                         'Manufacturer', 'Qioptiq'));
                     channel.addDevice(aod.builtin.devices.BandpassFilter([], 520, 15));
@@ -97,7 +95,7 @@ classdef ChannelFactory < aod.core.Factory
                 channel = obj.addNDF(channel, NDF);
             end
 
-            % Add additional inputs to channelParameters
+            % Add additional inputs to parameters
             if ~isempty(ip.Unmatched)
                 channel.setParam(ip.Unmatched);
             end

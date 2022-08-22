@@ -57,7 +57,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         Registrations               aod.core.Registration
         Responses                   %aod.core.Response  
         Stimuli                     aod.core.Stimulus
-        epochParameters             = aod.core.Parameters
+        % epochParameters             = aod.core.Parameters
         files                       = aod.core.Parameters  
     end
 
@@ -77,7 +77,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'}
-        parameterPropertyName = 'epochParameters'
+        % parameterPropertyName = 'epochParameters'
     end
 
     % Methods for subclasses to overwrite

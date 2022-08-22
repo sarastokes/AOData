@@ -1,4 +1,4 @@
-classdef (Abstract) Experiment < aod.core.Entity
+classdef Experiment < aod.core.Entity
 % EXPERIMENT
 %
 % Description:
@@ -51,7 +51,7 @@ classdef (Abstract) Experiment < aod.core.Entity
     properties (SetAccess = protected)
         homeDirectory           char
         experimentDate(1,1)     datetime
-        experimentParameters    = aod.core.Parameters
+        % experimentParameters    = aod.core.Parameters
 
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
@@ -68,11 +68,7 @@ classdef (Abstract) Experiment < aod.core.Entity
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'none'};
-        parameterPropertyName = 'experimentParameters'
-    end
-
-    methods (Abstract)
-        value = getFileHeader(obj)
+        % parameterPropertyName = 'experimentParameters'
     end
     
     methods 
@@ -91,6 +87,22 @@ classdef (Abstract) Experiment < aod.core.Entity
 
         function value = get.numEpochs(obj)
             value = numel(obj.Epochs);
+        end
+
+
+        function varargout = getFileHeader(obj, varargin) %#ok<INUSD,STOUT> 
+            % GETFILEHEADER
+            %
+            % Description:
+            %   If files are named with a convention that includes
+            %   Experiment metadata (e.g. experimentDate), define that
+            %   convention here. Otherwise, ignore
+            %
+            % Syntax:
+            %   varargout = getFileHeader(obj, varargin)
+            % -------------------------------------------------------------
+            error("Experiment:NotYetImplemented",...
+                "getFileHeader must be implemented by subclasses, if needed");
         end
 
         function setHomeDirectory(obj, filePath)

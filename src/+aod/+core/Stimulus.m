@@ -16,13 +16,13 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 %   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        stimParameters                      = aod.core.Parameters
-    end
+    % properties (SetAccess = protected)
+    %     stimParameters                      = aod.core.Parameters
+    % end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Epoch'};
-        parameterPropertyName = 'stimParameters';
+        % parameterPropertyName = 'stimParameters';
     end
     
     methods

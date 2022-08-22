@@ -26,7 +26,7 @@ classdef Regions < aod.core.Entity
 
     properties (SetAccess = protected)
         Map                 double
-        regionParameters    = aod.core.Parameters
+        % regionParameters    = aod.core.Parameters
     end
 
     % Enables quick access to commonly-used parameters
@@ -41,7 +41,7 @@ classdef Regions < aod.core.Entity
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'};
-        parameterPropertyName = 'regionParameters';
+        % parameterPropertyName = 'regionParameters';
     end
 
     methods

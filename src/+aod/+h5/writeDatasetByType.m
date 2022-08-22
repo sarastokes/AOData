@@ -21,11 +21,13 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
     if ischar(data)    
         HDF5.makeTextDataset(fileName, pathName, dsetName, data);
         HDF5.writeatts(fileName, fullPath, 'Class', class(data));
+        return
     end
 
     if isstring(data) 
         HDF5.makeStringDataset(fileName, pathName, dsetName, data);
-        HDF5.writeatts(fileName, fullPath, 'Class', class(data))
+        HDF5.writeatts(fileName, fullPath, 'Class', class(data));
+        return
     end
 
     if isstruct(data) || istable(data)
@@ -40,20 +42,22 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
             HDF5.makeStructDataset(fileName, pathName, dsetName, data);
             HDF5.writeatts(fileName, fullPath, 'Class', class(data));
         end
+        return
     end
 
     if isdatetime(data)
         HDF5.makeDateDataset(fileName, pathName, dsetName, data);
+        return
     end
 
     if islogical(data)
         HDF5.makeMatrixDataset(fileName, pathName, dsetName, double(data));
         HDF5.writeatts(fileName, fullPath, 'Class', 'logical');
+        return
     end
 
     if isenum(data)
         HDF5.makeEnumDataset(fileName, pathName, dsetName, data);
-        tf = true;
         return
     end
 
@@ -69,6 +73,7 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
         HDF5.makeMatrixDataset(fileName, pathName, dsetName, seconds(data));
         HDF5.writeatts(fileName, fullPath, 'Class', class(data),...
             'Units', 'seconds');
+        return
     end
 
     % Misc datatypes

@@ -26,12 +26,12 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        deviceParameters                = aod.core.Parameters
-    end
+    % properties (SetAccess = protected)
+        % deviceParameters                = aod.core.Parameters
+    % end
 
     properties (Hidden, SetAccess = protected)
-        parameterPropertyName = 'deviceParameters';
+        % parameterPropertyName = 'deviceParameters';
         allowableParentTypes = {'aod.core.Channel'};
     end
     
@@ -62,7 +62,7 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.assignUUID(UUID)
             %
             % See also:
-            %   generateUUID
+            %   aod.util.generateUUID
             % -------------------------------------------------------------
             obj.setUUID(UUID);
         end

@@ -5,6 +5,8 @@
 - [x] Implement search by UID
 - [x] Replace duplicated epoch from Creator
 - [x] Decide where allowableParentTypes go
+- [ ] Units to dataset metadata?
+- [ ] Mapping Calibration property of Protocol (can't easily go in parameters)
 
 ##### Package
 - [x] Add rotation to 1P-specific SpatialProtocol
@@ -15,8 +17,10 @@
 - [ ] Get specific Calibration (at Dataset) from Stimulus in Epoch
 
 ##### Minor
-- [x] Documentation for `multcontains`
 - [ ] Name vs name
+
+##### Documentation
+- [ ] Handle class
 
 ##### Other
 - [ ] Don't forget to register for SFN by early deadline!!!!!

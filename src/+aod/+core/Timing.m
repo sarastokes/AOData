@@ -26,7 +26,7 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties
-        timingParameters        = aod.core.Parameters
+        % timingParameters        = aod.core.Parameters
     end
 
     properties (Hidden, Dependent)
@@ -35,7 +35,7 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Response'}
-        parameterPropertyName = 'timingParameters'
+        % parameterPropertyName = 'timingParameters'
     end
 
     methods (Abstract, Access = protected)
