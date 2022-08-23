@@ -57,11 +57,19 @@ classdef SawtoothModulation < sara.protocols.SpectralProtocol
             syms f(x);
             f(x) = 1/W * (x-fix(x/W));
             stim = double(f(t));
-            stim = obj.amplitude * stim + obj.baseIntensity;
+            stim = stim/max(stim);
 
             if strcmp(obj.polarityClass, 'positive')
                 stim = fliplr(stim);
+                % Remove first drop
+                [~, firstPeak] = findpeaks(stim);
+                for i = 1:firstPeak
+                    if stim(i) < 0.5
+                        stim(i) = 0.5;
+                    end
+                end
             end
+            stim = 2*obj.amplitude * stim;
 
             stim = obj.appendPreTime(stim);
             stim = obj.appendTailTime(stim);
