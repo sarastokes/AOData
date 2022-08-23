@@ -9,13 +9,17 @@ classdef HDF5 < handle
 %   fileID = createFile(fileName, overwrite)
 %   fileID = openFile(fileName, readOnly)
 %
-%   deleteObject(fileName, pathName, name)
 %   createGroups(fileName, pathName, varargin)
 %   createGroup(locID, groupName, varargin)
+%
 %   makeMatrixDataset(fileName, pathName, dsetName, data)
-%   dsetID = makeTextDataset(fileName, pathName, dsetName, txt)
-%   dsetID = makeDateDataset(fileName, pathName, data)
+%   makeEnumDataset(fileName, pathName, dsetName, data)
+%   makeTextDataset(fileName, pathName, dsetName, txt)
+%   makeDateDataset(fileName, pathName, data)
 %   makeCompoundDataset(fileName, pathName, dsetName, data)
+%   makeStringDataset(fileName, pathName, dsetName, data)
+%
+%   deleteObject(fileName, pathName, name)
 %   writeatts(fileName, pathName, varargin)
 %   createLink(fileName, targetPath, linkPath, linkName)
 %
@@ -27,6 +31,7 @@ classdef HDF5 < handle
 % History:
 %   17Jan2022 - SSP
 %   08Jun2022 - SSP - Additions to ao-data-tools
+%   22Aug2022 - SSP - Dataset ID no longer return option for make methods
 % -------------------------------------------------------------------------
 
     properties (Hidden, Constant)
@@ -61,11 +66,10 @@ classdef HDF5 < handle
             end
 
             fileID = H5F.create(fileName);
-            fprintf('Created HDF5 file: %s\n', fileName);
-
             if nargout == 0
-                H5F.close(fileID);
+                fileIDx = onCleanup(@()H5F.close(fileID));
             end
+            fprintf('Created HDF5 file: %s\n', fileName);
         end
     end
 
@@ -106,11 +110,12 @@ classdef HDF5 < handle
             % -------------------------------------------------------------
             
             fileID = aod.h5.HDF5.openFile(fileName);
+            fileIDx = onCleanup(@()H5F.close(fileID));
             for i = 1:numel(varargin)
                 try
                     groupPath = aod.h5.HDF5.buildPath(pathName, varargin{i});
                     groupID = H5G.create(fileID, groupPath, aod.h5.HDF5.NEW_GROUP_PROPS);
-                    H5G.close(groupID);
+                    groupIDx = onCleanup(@()H5G.close(groupID));
                 catch ME
                     if contains(ME.message, 'name already exists')
                         warning('aod.h5.HDF5:Group %s already exists, skipping', groupPath);
@@ -119,7 +124,6 @@ classdef HDF5 < handle
                     end
                 end
             end
-            H5F.close(fileID);
         end
 
         function groupID = createGroup(locID, groupName, varargin)
@@ -143,8 +147,8 @@ classdef HDF5 < handle
 
             if ~aod.h5.HDF5.exists(locID, groupName)   
                 groupID = H5G.create(locID, groupName, aod.h5.HDF5.NEW_GROUP_PROPS);
-                if nargout == 0
-                    H5G.close(groupID);
+                if nargout == 0            
+                    groupIDx = onCleanup(@()H5G.close(groupID));
                 end
             end
             % Call again for additional groups
@@ -178,34 +182,31 @@ classdef HDF5 < handle
             h5write(fileName, fullPath, data);
         end
 
-        function dsetID = writeEnumDataset(hdfName, pathName, dsetName, value)
-            % WRITEENUMDATASET
+        function makeEnumDataset(hdfName, pathName, dsetName, value)
+            % MAKEENUMDATASET
             %
             % Description:
             %   Create a pseudo enumerated type dataset
             %
             % Syntax:
-            %   dsetID = writeEnumDataset(hdfName, pathName, dsetName, val)
+            %   makeEnumDataset(hdfName, pathName, dsetName, val)
             % -------------------------------------------------------------
             if isstring(dsetName)
                 dsetName = char(dsetName);
             end
-            dsetID = aod.h5.HDF5.makeTextDataset(hdfName, pathName, dsetName, char(value));
+            aod.h5.HDF5.makeTextDataset(hdfName, pathName, dsetName, char(value));
             aod.h5.HDF5.writeatts(hdfName, [pathName, '/', dsetName],... 
                 'Class', 'enum', 'EnumClass', class(value));
-            if nargout == 0
-                H5D.close(dsetID);
-            end
         end
 
-        function dsetID = makeTextDataset(hdfIn, pathName, dsetName, txt) 
+        function makeTextDataset(hdfIn, pathName, dsetName, txt) 
             % MAKETEXTDATASET
             %
             % Description:
             %   Create dataset for char/string data
             %
             % Syntax:
-            %   dsetID = makeTextDataset(fileName, pathName, dsetName, txt)
+            %   makeTextDataset(fileName, pathName, dsetName, txt)
             % -------------------------------------------------------------
             if isstring(dsetName)
                 dsetName = char(dsetName);
@@ -214,41 +215,43 @@ classdef HDF5 < handle
                 fileID = hdfIn;
             else
                 fileID = aod.h5.HDF5.openFile(hdfIn);
+                fileIDx = onCleanup(@()H5F.close(fileID));
             end
                 
             typeID = H5T.copy('H5T_C_S1');
+            typeID = onCleanup(@()H5T.close(typeID));
             H5T.set_size(typeID, 'H5T_VARIABLE');
-            H5T.set_strpad(typeID,'H5T_STR_NULLTERM');
+            H5T.set_strpad(typeID, 'H5T_STR_NULLTERM');
+
             dspaceID = H5S.create('H5S_SCALAR');
+            dspaceIDx = onCleanup(@()H5S.close(dspaceID));
+            
             % Get the parent group, create if doesn't exist
             try
                 groupID = H5G.open(fileID, pathName);
+                groupIDx = onCleanup(@()H5G.close(groupID));
             catch ME
                 if contains(ME.message, 'doesn''t exist')
                     groupID = H5G.create(fileID, pathName, aod.h5.HDF5.NEW_GROUP_PROPS);
+                    groupIDx = onCleanup(@()H5G.close(groupID));
                 else
                     rethrow(ME);
                 end
             end
+
             % Get the dataset
             try
                 dsetID = H5D.create(groupID, dsetName, typeID, dspaceID, 'H5P_DEFAULT');
+                dsetIDx = onCleanup(@()H5D.close(dsetID));
             catch ME
                 if contains(ME.message, 'name already exists')
                     dsetID = H5D.open(groupID, dsetName, 'H5P_DEFAULT');
+                    dsetIDx = onCleanup(@()H5D.close(dsetID));
                 else
                     rethrow(ME);
                 end
             end
             H5D.write(dsetID, 'H5ML_DEFAULT', 'H5S_ALL', 'H5S_ALL', 'H5P_DEFAULT', txt);
-
-            H5T.close(typeID);
-            H5S.close(dspaceID);
-            if nargout == 0
-                H5D.close(dsetID);
-            end
-            H5G.close(groupID);
-            H5F.close(fileID);
         end
 
         function makeStringDataset(fileName, pathName, dsetName, data)
@@ -266,7 +269,7 @@ classdef HDF5 < handle
             h5write(fileName, fullPath, data);
         end
 
-        function dsetID = makeDateDataset(fileName, pathName, dsetName, data)
+        function makeDateDataset(fileName, pathName, dsetName, data)
             % MAKEDATEDATASET
             % 
             % Description:
@@ -274,20 +277,17 @@ classdef HDF5 < handle
             %   stored as attributes 
             %
             % Syntax:
-            %   dsetID = makeDateDataset(fileName, pathName, data)
+            %   makeDateDataset(fileName, pathName, data)
             % -------------------------------------------------------------
             import aod.h5.HDF5
             assert(isdatetime(data), 'makeDateDataset: data must be datetime');
 
-            dsetID = HDF5.makeTextDataset(fileName, pathName, dsetName, datestr(data));
+            HDF5.makeTextDataset(fileName, pathName, dsetName, datestr(data));
             HDF5.writeatts(fileName, HDF5.buildPath(pathName, dsetName),...
                 'Class', 'datetime', 'Format', data.Format);
-            if nargout == 0
-                H5D.close(dsetID);
-            end
         end
 
-        function dsetID = makeStructDataset(fileName, pathName, dsetName, data)
+        function makeStructDataset(fileName, pathName, dsetName, data)
             % MAKESTRUCTDATASET
             % -------------------------------------------------------------
             import aod.h5.HDF5
@@ -298,24 +298,22 @@ classdef HDF5 < handle
                 data = table2struct(data);
             end
 
-            dsetID = HDF5.makeTextDataset(fileName, pathName, dsetName, 'struct');
+            HDF5.makeTextDataset(fileName, pathName, dsetName, 'struct');
+            
             f = fieldnames(data);
             for i = 1:numel(f)
                 HDF5.writeatts(fileName, fullPath, f{i}, HDF5.data2att(data.(f{i})));
             end
-            if nargout == 0
-                H5D.close(dsetID);
-            end
         end
 
-        function dsetID = makeCompoundDataset(fileName, pathName, dsetName, data)
+        function makeCompoundDataset(fileName, pathName, dsetName, data)
             % MAKECOMPOUNDDATASET
             %
             % Description:
             %   Adds table/struct to HDF5 file as compound
             %
             % Syntax:
-            %   dsetID = makeCompoundDataset(fileName, pathName, table);
+            %   makeCompoundDataset(fileName, pathName, table);
             % -------------------------------------------------------------
             import aod.h5.HDF5
 
@@ -339,6 +337,7 @@ classdef HDF5 < handle
             end
 
             fileID = aod.h5.HDF5.openFile(fileName);
+            fileIDx = onCleanup(@()H5F.close(fileID));
         
             names = fieldnames(data);
         
@@ -364,6 +363,7 @@ classdef HDF5 < handle
             end
         
             typeID = H5T.create('H5T_COMPOUND', sum(sizes));
+            typeIDx = onCleanup(@(x)H5T.close(typeID));
             for i = 1:length(names)
                 % Insert columns into compound type
                 H5T.insert(typeID, names{i}, sum(sizes(1:i-1)), typeIDs{i});
@@ -372,21 +372,16 @@ classdef HDF5 < handle
             H5T.pack(typeID);
         
             spaceID = H5S.create_simple(1, nDims, []);
+            spaceIDx = onCleanup(@()H5S.close(spaceID));
             if aod.h5.HDF5.exists(fileName, fullPath)
                 warning('found and replaced %s', fullPath);
                 HDF5.deleteObject(fileName, fullPath);
             end
             dsetID = H5D.create(fileID, fullPath, typeID, spaceID, 'H5P_DEFAULT');
+            dsetIDx = onCleanup(@()H5D.close(dsetID));
+
             H5D.write(dsetID, typeID, spaceID, spaceID, 'H5P_DEFAULT', data);
 
-            % Cleanup
-            H5T.close(typeID);
-            H5S.close(spaceID);
-            if nargout == 0
-                H5D.close(dsetID);
-            end
-            H5F.close(fileID);
-            
             % Write original class and column classes attributes
             HDF5.writeatts(fileName, fullPath, 'Class', dataClass,...
                 'ColumnClass', columnClass);
@@ -406,16 +401,14 @@ classdef HDF5 < handle
                 pathName = aod.h5.HDF5.getPathParent(pathName);
             end
             fileID = aod.h5.HDF5.openFile(fileName);
+            fileIDx = onCleanup(@()H5F.close(fileID));
             if pathName == '/'
                 parentID = fileID;
             else
                 parentID = H5G.open(fileID, pathName);
+                parentIDx = onCleanup(@()H5G.close(parentID));
             end
             H5L.delete(parentID, name, 'H5P_DEFAULT');
-            if pathName ~= '/' 
-                H5G.close(parentID);
-            end
-            H5F.close(fileID);
         end
 
         function writeatts(fileName, pathName, varargin)
@@ -444,6 +437,9 @@ classdef HDF5 < handle
                 if isenum(attValue)
                     attValue = [class(attValue), ',', char(attValue)];
                 end
+                if isSubclass(attValue, 'aod.core.Entity')
+                    continue
+                end
                 h5writeatt(fileName, pathName, k{i},...
                     aod.h5.HDF5.data2att(attValue));
             end
@@ -464,10 +460,12 @@ classdef HDF5 < handle
                 return
             end
             fileID = HDF5.openFile(fileName);
+            fileIDx = onCleanup(@()H5F.close(fileID));
+
             linkID = H5G.open(fileID, linkPath);
+            linkIDx = onCleanup(@()HDG.close(linkID));
+
             H5L.create_soft(targetPath, linkID, linkName, 'H5P_DEFAULT', 'H5P_DEFAULT');
-            H5G.close(linkID);
-            H5F.close(fileID);
         end
     end
 
@@ -480,6 +478,8 @@ classdef HDF5 < handle
                 out = datestr(data);
             elseif isstring(data) && numel(data) == 1
                 out = char(data);
+            % elseif isSubclass(data, 'aod.core.Entity')
+            %     out = data.UUID;
             else
                 out = data;
             end
@@ -513,7 +513,7 @@ classdef HDF5 < handle
                     HDF5.writeatts(fileName, fullPath, 'Class', class(data));
                 catch
                     % Delete dataset created while attempting compound type
-                    if aod.h5.HDF5.exists(fileName, fullPath)
+                    if HDF5.exists(fileName, fullPath)
                         HDF5.deleteObject(fileName, fullPath);
                     end
                     HDF5.makeStructDataset(fileName, pathName, dsetName, data);
@@ -587,6 +587,7 @@ classdef HDF5 < handle
                 tf = H5L.exists(fileName, pathName, 'H5P_DEFAULT');
             else
                 fileID = aod.h5.HDF5.openFile(fileName);
+                fileIDx = onCleanup(@()H5F.close(fileID));
                 try
                     tf = H5L.exists(fileID, pathName, 'H5P_DEFAULT');
                 catch ME
@@ -596,7 +597,6 @@ classdef HDF5 < handle
                         rethrow(ME);
                     end
                 end
-                H5F.close(fileID);
             end
         end
 
