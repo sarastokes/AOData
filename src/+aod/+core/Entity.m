@@ -88,7 +88,6 @@ classdef (Abstract) Entity < handle
                 obj.setName(name);
             end
             obj.UUID = aod.util.generateUUID();
-            obj.parameters = aod.core.Parameters();
         end
 
         function value = get.label(obj)
@@ -379,7 +378,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods (Sealed, Access = {?aod.core.Entity, ?aod.core.Creator})
+    methods (Sealed, Access = protected)
         function setParent(obj, parent)
             % SETPARENT
             %   

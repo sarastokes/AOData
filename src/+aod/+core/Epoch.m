@@ -51,7 +51,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         ID(1,1)                     double     = 0
     end
 
-    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Creator})
+    properties (SetAccess = protected)
         startTime(1,1)              datetime
         Registrations               aod.core.Registration
         Responses                   %aod.core.Response  
@@ -179,9 +179,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             if isempty(resp)
                 constructor = str2func(responseClassName);
                 resp = constructor(obj, varargin{:});
-                if keepResponse
-                    obj.addResponse(resp);
-                end
+                resp.setParent(obj);
+                % if keepResponse
+                %     obj.addResponse(resp);
+                % end
             end
         end
 
@@ -285,6 +286,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 overwrite = false;
             end
 
+            assert(isSubclass(stim, 'aod.core.Stimulus'),... 
+                'stim must be subclass of aod.core.Stimulus');
+            stim.setParent(obj);
+
             if ~isempty(obj.Stimuli)
                 idx = find(findByClass(obj.Stimuli, stim));
                 if ~isempty(idx) 
@@ -309,6 +314,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             if nargin < 3
                 overwrite = false;
             end
+
+            assert(isSubclass(reg, 'aod.core.Registration'),...
+                'addRegistration: input was not a subclass of aod.core.Registration')
+            reg.setParent(obj);
 
             if ~isempty(obj.Registrations)
                 idx = find(findByClass(obj.Registrations, class(reg)));
@@ -340,6 +349,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 resp(1,1)           {mustBeA(resp, 'aod.core.Response')}
                 overwrite(1,1)      logical                             = false 
             end
+
+            resp.addParent(obj);
 
             if ~isempty(obj.Responses)
                 idx = find(findByClass(obj.Responses, class(resp)));

@@ -279,7 +279,7 @@ classdef Experiment < aod.core.Entity
         end
     end
 
-    methods (Access = {?aod.core.Experiment, ?aod.core.Creator})
+    methods
         function addSource(obj, source)
             % ADDSOURCE
             %
@@ -295,6 +295,14 @@ classdef Experiment < aod.core.Entity
             assert(isSubclass(source, 'aod.core.Source'),...
                 'Must be a subclass of aod.core.Source');
             for i = 1:numel(source)
+                % Get the full source hierarchy
+                h = source.getParents();
+                % Set the parent of the top-level source
+                if isempty(h)
+                    source.setParent(obj);
+                else
+                    h(1).setParent(obj);
+                end
                 if ~isempty(obj.Sources)
                     assert(obj.Sources(1).getParentID() == source.getParentID(),...
                         'Experiment may only contain 1 animal');
@@ -315,8 +323,21 @@ classdef Experiment < aod.core.Entity
             assert(isSubclass(system, 'aod.core.System'),...
                 'Must be a subclass of aod.core.System');
             for i = 1:numel(system)
-                obj.Systems = cat(1, obj.Systems, system);
+                system(i).setParent(obj);
+                obj.Systems = cat(1, obj.Systems, system(i));
             end
+        end
+
+        function removeSystem(obj, ID)
+            % REMOVESYSTEM
+            %
+            % Description:
+            %   Remove a sysetm from the experiment
+            %
+            % Syntax:
+            %   removeSystem(obj, ID)
+            % -------------------------------------------------------------
+            obj.Systems(ID) = [];
         end
 
         function clearSystems(obj)
@@ -335,37 +356,45 @@ classdef Experiment < aod.core.Entity
             %   obj.addEpoch(obj, epoch)
             % -------------------------------------------------------------
             assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
+
+            epoch.setParent(obj);
+
             obj.Epochs = cat(1, obj.Epochs, epoch);
             obj.epochIDs = cat(2, obj.epochIDs, epoch.ID);
+
+            obj.sortEpochs();
+        end
+
+        function removeEpochByID(obj, epochID)
+            % REMOVEEPOCHS
+            %
+            % Syntax:
+            %   removeEpoch(obj, epochID)
+            % -------------------------------------------------------------
+            assert(ismember(ID, obj.epochIDs), 'ID not found in epochIDs!');
+            idx = obj.id2index(epochID);
+            obj.Epochs(idx) = [];
+        end
+        
+        function clearEpochs(obj)
+            % CLEAREPOCHS
+            %
+            % Syntax:
+            %   obj.clearEpochs()
+            % -------------------------------------------------------------
+            obj.Epochs = aod.core.Epoch.empty();
         end
 
         function addCalibration(obj, calibration)
             % ADDCALIBRATION
             %
             % Syntax:
-            %   obj.addCalibration(obj, calibration, overwrite)
+            %   obj.addCalibration(obj, calibration)
             % -------------------------------------------------------------
-            if nargin < 3
-                overwrite = false;
+            for i = 1:numel(calibration)
+                calibration(i).setParent(obj);
+                obj.Calibrations = cat(1, obj.Calibrations, calibration);
             end
-
-            % Determine if calibration exists and should be overwritten
-            if ~isempty(obj.Calibrations)
-                idx = find(findByClass(obj.Calibrations, class(calibration)));
-                if ~isempty(idx)
-                    if ~overwrite
-                        warning('Set overwrite=true to replace existing %s', class(calibration));
-                    else % Overwrite existing
-                        if numel(obj.Calibrations) == 1
-                            obj.Calibrations = calibration;
-                        else
-                            obj.Calibrations{idx} = calibration;
-                        end
-                        return
-                    end
-                end
-            end
-            obj.Calibrations = cat(1, obj.Calibrations, calibration);
         end
 
         function clearCalibrations(obj)
@@ -376,7 +405,9 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             obj.Calibrations = aod.core.Calibration.empty();
         end
+    end
 
+    methods (Access = private)
         function sortEpochs(obj)
             % SORTEPOCHS
             %

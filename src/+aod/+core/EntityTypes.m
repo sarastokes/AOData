@@ -66,53 +66,32 @@ classdef EntityTypes
             end
         end
 
-        function prop = parameters(obj, entity)
-            import aod.core.EntityTypes
-
-            switch obj 
-                case EntityTypes.EXPERIMENT 
-                    prop = entity.experimentParameters;
-                case EntityTypes.SOURCE 
-                    prop = entity.sourceParameters;
-                case EntityTypes.CALIBRATION 
-                    prop = entity.calibrationParameters;
-                case EntityTypes.SYSTEM 
-                    prop = entity.systemParameters;
-                case EntityTypes.CHANNEL 
-                    prop = entity.channelParameters;
-                case EntityTypes.DEVICE 
-                    prop = entity.deviceParameters;
-                case EntityTypes.EPOCH 
-                    prop = entity.epochParameters;
-                case EntityTypes.REGISTRATION 
-                    prop = entity.registrationParameters;
-                case EntityTypes.STIMULUS 
-                    prop = entity.stimParameters;
-                case EntityTypes.RESPONSE 
-                    prop = entity.responseParameters;
-                case EntityTypes.REGION 
-                    prop = entity.regionParameters;
-                case EntityTypes.ANALYSIS 
-                    prop = entity.analysisParameters;
-                case EntityTypes.TIMING 
-                    prop = [];
-            end
-        end
-
-        function names = allowableParentTypes(obj)
-            % TODO: Decide whether to do this here or within classes
-            import aod.core.EntityTypes 
-
-            switch obj 
-                case EntityTypes.EXPERIMENT
-                    names = [];
-                case EntityTypes.EPOCH 
-                    names = 'aod.core.Experiment';
-            end
-        end
     end
 
     methods (Static)
+        function out = getEntityGroupName(entity)
+            import aod.core.EntityTypes
+
+            obj = aod.core.EntityTypes.get(entity);
+
+            switch obj
+                case EntityTypes.EXPERIMENT
+                    out = 'Experiment';
+                case EntityTypes.EPOCH
+                    if ~isempty(obj.Name)
+                        out = obj.Name;
+                    else
+                        out = obj.shortLabel;
+                    end
+                otherwise
+                    if ~isempty(entity.Name)
+                        out = entity.Name;
+                    else
+                        out = entity.label;
+                    end
+            end
+        end
+
         function obj = factory(entityType)
             entityType = upper(entityType);
             try
