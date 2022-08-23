@@ -45,16 +45,19 @@ classdef SawtoothModulation < sara.protocols.SpectralProtocol
 
     methods
         function stim = generate(obj)
-            dt = 1/obj.stimRate;
-            t = dt:dt:obj.stimTime;
+            dt = obj.temporalFrequency/obj.stimRate;
+            t = dt:dt:obj.stimTime*obj.temporalFrequency;
 
-            W = obj.stimRate/obj.temporalFrequency;
-
-            syms x y;
-            stim = 1/W * (x-fix(x/W));
+            W = 1; %/obj.temporalFrequency;
 
             %stim = sawtooth(2 * pi * obj.temporalFrequency * t);
-            %stim = obj.amplitude * stim + obj.baseIntensity;
+            % There were odd artifacts in the builtin sawtooth function so
+            % using symbolic math toolbox. Unfortunately, it's slow.
+            digits(6)
+            syms f(x);
+            f(x) = 1/W * (x-fix(x/W));
+            stim = double(f(t));
+            stim = obj.amplitude * stim + obj.baseIntensity;
 
             if strcmp(obj.polarityClass, 'positive')
                 stim = fliplr(stim);

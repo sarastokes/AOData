@@ -92,6 +92,9 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
                 
             stim = obj.generate();
             bkgdPowers = 2 * obj.calibration.stimPowers.Background;
+            if ~isrow(bkgdPowers)
+                bkgdPowers = bkgdPowers';
+            end
 
             import sara.SpectralTypes;
             if obj.spectralClass.isSpectral
