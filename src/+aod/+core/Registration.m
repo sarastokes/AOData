@@ -7,24 +7,20 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = Registration(parent, data)
 %
+% Abstract methods:
+%   varargout = apply(obj, varargin)
+%
 % Sealed methods:
 %   setRegistrationDate(obj, regDate)
-%
-% Inherited methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         Data
         registrationDate(1,1)               datetime
-        % registrationParameters              = aod.core.Parameters
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Epoch'};
-        % parameterPropertyName = 'registrationParameters';
     end
 
     % TODO: Add setData method?

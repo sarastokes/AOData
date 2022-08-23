@@ -8,11 +8,7 @@ classdef Location < aod.core.Source
 %   aod.core.Source
 %
 % Constructor:
-%   obj = Location(parent, name)
-%
-% Inherited properties:
-%   name   
-%   sourceParameters          
+%   obj = Location(parent, name)         
 % -------------------------------------------------------------------------
 
     methods
@@ -23,7 +19,7 @@ classdef Location < aod.core.Source
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = obj.name;
+            value = obj.Name;
         end
     end
 

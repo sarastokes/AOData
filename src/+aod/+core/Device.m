@@ -10,9 +10,6 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = Device(parent, varargin)
 %
-% Properties:
-%   deviceParameters                    aod.core.Parameters
-%
 % Parameters:
 %   Model                               Model of the device
 %   Manufacturer                        Manufacturer of the device
@@ -26,12 +23,7 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
-    % properties (SetAccess = protected)
-        % deviceParameters                = aod.core.Parameters
-    % end
-
     properties (Hidden, SetAccess = protected)
-        % parameterPropertyName = 'deviceParameters';
         allowableParentTypes = {'aod.core.Channel'};
     end
     

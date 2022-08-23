@@ -12,11 +12,9 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = Dataset(parent, data)
 %
 % Properties:
-%   Name
 %   Data
 %
 % Sealed methods:
-%   setName(obj, name)
 %   setData(obj, data)
 %
 % Inherited public methods:
@@ -26,7 +24,6 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Name(1,:)               char
         Data 
     end
 
@@ -36,21 +33,10 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods
         function obj = Dataset(parent, name, data)
-            obj = obj@aod.core.Entity(parent);
-            obj.setName(name);
+            obj = obj@aod.core.Entity(parent, name);
             if nargin > 2
                 obj.setData(data);
             end
-        end
-    end
-
-    methods (Sealed)
-        function setName(obj, name)
-            arguments
-                obj
-                name        char
-            end
-            obj.Name = name;
         end
     end
 

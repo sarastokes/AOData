@@ -15,7 +15,6 @@ classdef Experiment < aod.core.Entity
 %   Systems                     Container for experiment's Systems
 %   homeDirectory               File path for experiment files 
 %   experimentDate              Date the experiment occurred
-%   experimentParameters        Additional parameters related to experiment
 %   epochIDs                    List of epoch IDs in experiment
 %
 % Dependent properties:
@@ -39,19 +38,14 @@ classdef Experiment < aod.core.Entity
 % Protected methods with Creator access:
 %   addCalibration(obj, calibration)
 %   addEpoch(obj, epoch)
+%   addRegion(obj, region)
 %   addSystem(obj, system)
 %   sortEpochs(obj)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         homeDirectory           char
         experimentDate(1,1)     datetime
-        % experimentParameters    = aod.core.Parameters
 
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
@@ -68,7 +62,6 @@ classdef Experiment < aod.core.Entity
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'none'};
-        % parameterPropertyName = 'experimentParameters'
     end
     
     methods 

@@ -21,7 +21,7 @@ classdef EntityManager < handle
             obj.clearMaps();
 
             info = h5info(obj.hdfName);
-            obj.processGroups(info);
+            obj.processGroups(info.Groups);
         end
 
         function T = table(obj)
@@ -38,6 +38,9 @@ classdef EntityManager < handle
             if ~isempty(idx)
                 [idx, className] = findAttribute(info, 'Class');
                 obj.entityMap(UUID) = info.Name;
+                if isempty(className)
+                    className = 'Unknown';
+                end
                 obj.classMap(UUID) = className;
             end
 

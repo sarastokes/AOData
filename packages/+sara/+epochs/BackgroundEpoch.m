@@ -8,7 +8,11 @@ classdef BackgroundEpoch < sara.Epoch
 %   sara.Epoch
 %
 % Constructor:
-%   obj = BackgroundEpoch(parent, ID, source)
+%   obj = BackgroundEpoch(parent, ID, varargin)
+%
+% Properties:
+%   meanValue
+%   stdValue
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

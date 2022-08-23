@@ -39,7 +39,7 @@ classdef Epoch < aod.core.Epoch
 % Inherited protected methods:
 %   imStack = readStack(obj, videoName)
 %   displayName = getLabel(obj)
-%   shortName = getShortName(obj)
+%   shortLabel = getShortLabel(obj)
 % aod.core.Creator methods:
 %   addRegistration(obj, reg, overwrite)
 %   addStimulus(obj, stim)

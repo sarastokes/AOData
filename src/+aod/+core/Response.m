@@ -9,7 +9,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Properties:
 %   Data 
-%   responseParameters
 %   dateCreated
 %
 % Dependent properties:
@@ -18,17 +17,11 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 % Methods:
 %   setData(obj, data)
 %   setTiming(obj, timing)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         Data                             
         Timing                              aod.core.Timing
-        % responseParameters                  = aod.core.Parameters
     end
 
     properties (Hidden, Dependent)
@@ -37,11 +30,13 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Epoch'};
-        % parameterPropertyName = 'responseParameters';
     end
 
     methods
-        function obj = Response(parent)
+        function obj = Response(parent, name)
+            if nargin < 1
+                name = [];
+            end
             obj = obj@aod.core.Entity(parent);
         end
 

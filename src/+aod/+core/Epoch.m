@@ -17,8 +17,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Responses                       Container for epoch's responses
 %   Stimuli                         Container for epoch's stimuli
 %   Datasets                        Container for epoch's datasets
-%   epochParameters                 aod.core.Parameters
-%   files                           aod.core.Parameters
 %
 % Dependent properties:
 %   Source
@@ -59,8 +57,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         Responses                   %aod.core.Response  
         Stimuli                     aod.core.Stimulus
         Datasets                    aod.core.Dataset
-        % epochParameters             = aod.core.Parameters
-        files                       = aod.core.Parameters  
     end
 
     % Entity link properties
@@ -79,7 +75,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'}
-        % parameterPropertyName = 'epochParameters'
     end
 
     % Methods for subclasses to overwrite
@@ -256,21 +251,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.System = system;
         end
 
-        function addFile(obj, fileName, filePath)
-            % ADDFILE
-            %
-            % Description:
-            %   Adds to files prop, stripping out homeDirectory and
-            %   trailing/leading whitespace, if needed
-            %
-            % Syntax:
-            %   obj.addFile(fileName, filePath)
-            % -------------------------------------------------------------
-            filePath = erase(filePath, obj.Parent.homeDirectory);
-            filePath = strtrim(filePath);
-            obj.files(fileName) = filePath;
-        end
-
         function addDataset(obj, dataset, overwrite)
             % ADDDATASET
             %
@@ -382,25 +362,34 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     % Overwritten methods from Entity
+    methods
+        function addFile(obj, fileName, filePath)
+            % ADDFILE
+            %
+            % Description:
+            %   Adds to files prop, stripping out homeDirectory and
+            %   trailing/leading whitespace, if needed
+            %
+            % Syntax:
+            %   obj.addFile(fileName, filePath)
+            % -------------------------------------------------------------
+            filePath = erase(filePath, obj.Parent.homeDirectory);
+            filePath = strtrim(filePath);
+            obj.files(fileName) = filePath;
+        end
+    end
+
     methods (Access = protected)
         function value = getLabel(obj)  
-            % GETLABEL
-            % May be overwritten by subclasses          
-            % -------------------------------------------------------------
             if isempty(obj.Parent)
-                value = obj.shortName;
+                value = obj.shortLabel;
             else
                 value = sprintf("Epoch%u_%s", obj.ID, obj.Parent.label);
             end
         end
 
-        function shortName = getShortName(obj)
-            % GETSHORTNAME
-            % 
-            % Syntax:
-            %   shortName = obj.getShortName()
-            % -------------------------------------------------------------
-            shortName = sprintf('Epoch%u', obj.ID);
+        function value = getShortLabel(obj)
+            value = sprintf('Epoch%u', obj.ID);
         end
     end
 end 

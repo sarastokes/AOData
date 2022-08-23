@@ -35,7 +35,6 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Response'}
-        % parameterPropertyName = 'timingParameters'
     end
 
     methods (Abstract, Access = protected)
@@ -43,11 +42,11 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Timing(parent)
-            obj = obj@aod.core.Entity();
-            if nargin > 0
-                obj.setParent(parent);
+        function obj = Timing(parent, name)
+            if nargin < 2
+                name = [];
             end
+            obj = obj@aod.core.Entity(parent, name);
         end
 
         function value = get.Time(obj)

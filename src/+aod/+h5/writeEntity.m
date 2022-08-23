@@ -6,7 +6,6 @@ function writeEntity(hdfName, obj)
 %
 % Syntax:
 %   writeEntity(hdfName, entity)
-%
 % -------------------------------------------------------------------------
     arguments
         hdfName             {mustBeFile}
@@ -16,11 +15,15 @@ function writeEntity(hdfName, obj)
     import aod.h5.HDF5
     import aod.core.EntityTypes
 
-    entityType = aod.core.EntityTypes.get(obj);
+    entityType = EntityTypes.get(obj);
+
+    if entityType == EntityTypes.EXPERIMENT
+        HDF5.createGroups(hdfName, '/', 'Experiment');
+        HDF5.writeatts(hdfName, '/Experiment', 'Class', class(obj));
+    end
 
     persistedProps = aod.h5.getPersistedProperties(obj);
     % Extract out independently set properties
-    hasFiles = ismember(persistedProps, "files");
     specialProps = ["Parent", "notes", "UUID", "files", "parameters"];
     persistedProps = setdiff(persistedProps, specialProps);
     % Extract out container properties
@@ -45,7 +48,7 @@ function writeEntity(hdfName, obj)
             else
                 parentPath = getParentPath(EMT, obj.Parent.UUID);
             end
-            hdfPath = [parentPath, '/Sources/', char(obj.name)];
+            hdfPath = [parentPath, '/Sources/', char(obj.Name)];
         case EntityTypes.SYSTEM
             hdfPath = ['/Experiment/Systems/', char(obj.Name)];
             parentPath = '/Experiment';
@@ -62,7 +65,7 @@ function writeEntity(hdfName, obj)
             hdfPath = ['/Experiment/Regions'];
             parentPath = '/Experiment';
         case EntityTypes.EPOCH
-            hdfPath = ['/Experiment/Epochs/', char(obj.shortName)];
+            hdfPath = ['/Experiment/Epochs/', char(obj.shortLabel)];
             parentPath = '/Experiment';
         case EntityTypes.REGISTRATION
             parentPath = getParentPath(EMT, obj.Parent.UUID);
@@ -70,6 +73,9 @@ function writeEntity(hdfName, obj)
         case EntityTypes.STIMULUS
             parentPath = getParentPath(EMT, obj.Parent.UUID);
             hdfPath = [parentPath, '/Stimuli/', char(obj.label)];
+        case EntityTypes.DATASET
+            parentPath = getParentPath(EMT, obj.Parent.UUID);
+            hdfPath = [parentPath, '/Datasets/', char(obj.Name)];
         case EntityTypes.RESPONSE
             parentPath = getParentPath(EMT, obj.Parent.UUID);
             hdfPath = [parentPath, '/Responses/', char(obj.label)];
@@ -106,16 +112,15 @@ function writeEntity(hdfName, obj)
     end
 
     % Write parameters, if necessary
-    % parameters = entityType.parameters(obj);
     if ~isempty(obj.parameters)
         aod.h5.writeParameters(hdfName, hdfPath, obj.parameters);
     end
     
     % Write file paths, if necessary
-    if hasFiles
+    if ~isempty(obj.files)
         h = ancestor(obj, 'aod.core.Experiment');
-        HDF5.writeTextDataset(hdfName, hdfPath, 'Files', h.homeDirectory);
-        HDF5.writeParameters(hdfName, [hdfPath, '/Files'], obj.files);
+        HDF5.makeTextDataset(hdfName, hdfPath, 'Files', h.homeDirectory);
+        aod.h5.writeParameters(hdfName, [hdfPath, '/Files'], obj.files);
     end
     
     % Write remaining properties as datasets
@@ -127,9 +132,8 @@ function writeEntity(hdfName, obj)
         end
         % Write links to other entities
         if isSubclass(prop, 'aod.core.Entity')
-            isEntityInFile(EMT, prop);
-            entityPath = char(EMT{EMT.UUID == prop.UUID, 'Path'});
-            HDF5.createLink(hdfName, entityPath, hdfPath, persistedProps(i));
+            parentPath = getParentPath(EMT, prop.UUID);
+            HDF5.createLink(hdfName, parentPath, hdfPath, persistedProps(i));
             continue
         end
         success = aod.h5.writeDatasetByType(hdfName, hdfPath, persistedProps(i), prop);

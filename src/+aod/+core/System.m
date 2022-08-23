@@ -12,39 +12,25 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Properties:
 %   Channels
-%   systemParameters
 %
 % Methods:
+%   addChannel(obj, channel)
 %   removeChannel(obj, ID)
 %   clearChannels(obj)
 %   assignUUID(obj, uuid)
-%
-% Protected methods (with Creator access):
-%   addChannel(obj, channel)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
     
     properties
-        Name                char
         Channels            = aod.core.Channel.empty();
-        % systemParameters    = aod.core.Parameters     
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'};
-        % parameterPropertyName = 'systemParameters';
     end
 
     methods
-        function obj = System(parent, name)
-            obj = obj@aod.core.Entity(parent);
-            if nargin > 1
-                obj.Name = name;
-            end
+        function obj = System(parent, systemName)
+            obj = obj@aod.core.Entity(parent, systemName);
         end      
     end
     
@@ -89,6 +75,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
     
+    % Overloaded methods
     methods (Access = protected)
         function value = getLabel(obj)
             value = [obj.Name, 'System'];

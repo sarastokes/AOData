@@ -19,11 +19,6 @@ classdef Region < aod.core.Entity & matlab.mixin.Heterogeneous
 %   count
 %   roiIDs
 %
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
-%
 % Sealed protected methods:
 %   setData(obj, data)
 % -------------------------------------------------------------------------

@@ -10,9 +10,8 @@ classdef Eye < aod.core.Source
 % Constructor:
 %   obj = Eye(parent, name)
 %
-% Inherited properties:
-%   name   
-%   sourceParameters          
+% Note:
+%   Name is restricted to either 'OD' or 'OS'      
 % -------------------------------------------------------------------------
 
     methods
@@ -22,27 +21,18 @@ classdef Eye < aod.core.Source
         end
     end
 
+    % Overloaded methods
     methods (Access = protected)    
         function value = getLabel(obj)  
-            % LABEL
-            %      
-            % Syntax:
-            %   value = obj.getLabel()
-            % -------------------------------------------------------------
             if ~isempty(obj.Parent)
-                value = [obj.Parent.name, '_', obj.name];
+                value = [obj.Parent.Name, '_', obj.Name];
             else
-                value = obj.name;
+                value = obj.Name;
             end
         end
 
-        function shortName = getShortName(obj)
-            % GETSHORTNAME
-            % 
-            % Syntax:
-            %   shortName = obj.getShortName()
-            % -------------------------------------------------------------
-            shortName = obj.name;
+        function value = getShortLabel(obj)
+            value = obj.Name;
         end
     end
 end

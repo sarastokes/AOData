@@ -12,29 +12,17 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Properties:
 %   calibrationDate         date calibration was performed (yyyyMMdd)
-%   calibrationParameters   aod.core.Parameters
 %
 % Sealed methods:
 %   setCalibrationDate(obj, calibrationDate)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
-%
-% Note:
-%   Inheriting matlab.mixin.Heterogeneous allows creation of arrays
-%   containing different subclasses of aod.core.Calibration
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         calibrationDate(1,1)                datetime
-        % calibrationParameters               = aod.core.Parameters
     end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment'};
-        % parameterPropertyName = 'calibrationParameters';
     end
 
     methods

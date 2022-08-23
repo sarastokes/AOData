@@ -10,30 +10,18 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = Source(parent, name);
 %
-% Properties:
-%   name                            char, some identifier for the source 
-%   sourceParameters                aod.core.Parameters
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
+% Methods:
+%   sources = getParents(obj)
+%   ID = getParentID(obj)
 % -------------------------------------------------------------------------
-
-    properties (SetAccess = private)
-        name                        char
-        % sourceParameters            = aod.core.Parameters
-    end
 
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.Experiment', 'aod.core.Source'}
-        % parameterPropertyName = 'sourceParameters'
     end
 
     methods
         function obj = Source(parent, name)
-            obj = obj@aod.core.Entity(parent);
-            obj.name = name;
+            obj = obj@aod.core.Entity(parent, name);
         end
     end
 
@@ -101,10 +89,10 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Access = protected)
         function value = getLabel(obj)
-            if isnumeric(obj.name)
-                value = num2str(obj.name);
+            if isnumeric(obj.Name)
+                value = num2str(obj.Name);
             else
-                value = obj.name;
+                value = obj.Name;
             end
         end
     end

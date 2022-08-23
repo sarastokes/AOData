@@ -9,26 +9,39 @@ classdef (Abstract) Entity < handle
 %
 % Properties:
 %   Parent                      aod.core.Entity
+%   Name                        char
+%   parameters                  aod.core.Parameters
+%   files                       aod.core.Files
 %   description                 string
 %   notes                       cell
+%
+% Abstract protected properties:
 %   allowableParentTypes        cellstr
 %
 % Dependent properties:
 %   label                       string      (defined by getLabel)
-%   shortName                   string      (defined by shortName)
+%   shortLabel                  string      (defined by getShortLabel)
 %
-% Public:
+% Public methods:
 %   h = ancestor(obj, className)
+%   setName(obj, name)
 %   setDescription(obj, txt, overwrite)
 %   addNote(obj, txt)
 %   clearNotes(obj)
+%
 %   setParam(obj, varargin)
 %   value = getParam(obj, paramName, mustReturnParam)
 %   tf = hasParam(obj, paramName)
+%   removeParam(obj, paramName)
+%   
+%   setFile(obj, fileName, filePath)
+%   value = getFile(obj, fileName, mustReturnFile)
+%   tf = hasFile(obj, fileName)
+%   removeFile(obj, fileName)
 %
 % Protected methods:
-%   x = getShortName(obj)
-%   x = getLabel(obj)
+%   value = getLabel(obj)
+%   value = getShortLabel(obj)
 %
 % Protected methods (with Creator access):
 %   addParent(obj, parent)
@@ -43,19 +56,19 @@ classdef (Abstract) Entity < handle
 
     properties (SetAccess = private)
         Parent                      % aod.core.Entity
+        Name(1,:)                   char = char.empty()
         UUID                        string = string.empty()
         description                 string = string.empty() 
         notes                       string = string.empty()
     end
 
     properties (SetAccess = protected)
-        parameters                  % aod.core.Parameters()
+        files                       = aod.core.Parameters()
+        parameters                  = aod.core.Parameters()
     end
-
     
     properties (Abstract, Hidden, SetAccess = protected)
         allowableParentTypes        cell
-        % parameterPropertyName       char
     end
 
     properties (Dependent)
@@ -63,13 +76,16 @@ classdef (Abstract) Entity < handle
     end
 
     properties (Hidden, Dependent)
-        shortName
+        shortLabel
     end
 
     methods
-        function obj = Entity(parent)
+        function obj = Entity(parent, name)
             if nargin > 0
                 obj.setParent(parent);
+            end
+            if nargin > 1
+                obj.setName(name);
             end
             obj.UUID = aod.util.generateUUID();
             obj.parameters = aod.core.Parameters();
@@ -79,8 +95,8 @@ classdef (Abstract) Entity < handle
             value = obj.getLabel();
         end
 
-        function value = get.shortName(obj)
-            value = obj.getShortName();
+        function value = get.shortLabel(obj)
+            value = obj.getShortLabel();
         end
 
         function h = ancestor(obj, className)
@@ -104,6 +120,19 @@ classdef (Abstract) Entity < handle
     end
 
     methods 
+        function setName(obj, name)
+            % SETNAME
+            %
+            % Syntax:
+            %   setName(obj, name)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                name        char
+            end
+            obj.Name = name;
+        end
+
         function setDescription(obj, txt, overwrite)
             % SETDESCRIPTION
             %
@@ -161,7 +190,6 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = hasParam(obj, paramName)
             % -------------------------------------------------------------
-            % tf = obj.(obj.parameterPropertyName).isKey(paramName);
             tf = obj.parameters.isKey(paramName);
         end
 
@@ -187,17 +215,13 @@ classdef (Abstract) Entity < handle
             end
 
             if obj.hasParam(paramName)
-                % paramProp = obj.(obj.parameterPropertyName);
-                % paramValue = paramProp(paramName);
                 paramValue = obj.parameters(paramName);
             else
                 switch msgType 
                     case MessageTypes.ERROR 
-                        error('GetParam: Did not find %s in parameters',... 
-                            paramName, obj.parameterPropertyName);
+                        error('GetParam: Did not find %s in parameters', paramName);
                     case MessageTypes.WARNING 
-                        warning('GetParam: Did not find %s in parameters',... 
-                            paramName);
+                        warning('GetParam: Did not find %s in parameters', paramName);
                         paramValue = [];
                     case MessageTypes.NONE
                         paramValue = [];
@@ -209,8 +233,7 @@ classdef (Abstract) Entity < handle
             % ADDPARAMETER
             %
             % Description:
-            %   Add parameter(s) to the parameter property defined by
-            %   parameterPropertyName
+            %   Add parameter(s) to the parameter property
             %
             % Syntax:
             %   obj.setParam(paramName, value)
@@ -220,19 +243,112 @@ classdef (Abstract) Entity < handle
             if nargin == 1
                 return
             end
-            %paramProp = obj.(obj.parameterPropertyName);
 
             if nargin == 2 && isstruct(varargin{1})
                 S = varargin{1};
                 k = fieldnames(S);
                 for i = 1:numel(k)
-                    % paramProp(k{i}) = S.(k{i});
                     obj.parameters(k{i}) = S.(k{i});
                 end
             else
                 for i = 1:(nargin - 1)/2
-                    % paramProp(varargin{(2*i)-1}) = varargin{2*i};
                     obj.parameters(varargin{(2*i)-1}) = varargin{2*i};
+                end
+            end
+        end
+
+        function removeParam(obj, paramName)
+            % REMOVEFILE
+            %
+            % Description:
+            %   Remove a parameter by name from parameters property
+            %
+            % Syntax:
+            %   removeParam(obj, paramName)
+            % -------------------------------------------------------------
+            if obj.hasParam(paramName)
+                remove(obj.parameters, paramName);
+            end
+        end
+    end
+
+    % File methods
+    methods 
+        function tf = hasFile(obj, fileName)
+            % HASFILE
+            %
+            % Description:
+            %   Check whether entity files has a specific file name
+            %
+            % Syntax:
+            %   tf = hasFile(obj, fileName)
+            % -------------------------------------------------------------
+            tf = obj.files.isKey(fileName);
+        end
+
+        function setFile(obj, fileName, filePath)
+            % SETFILE
+            %
+            % Description:
+            %   Adds to files prop, stripping out homeDirectory and
+            %   trailing/leading whitespace, if needed
+            %
+            % Syntax:
+            %   obj.addFile(fileName, filePath)
+            % -------------------------------------------------------------
+            if isprop(obj, 'homeDirectory') && ~isempty(obj.homeDirectory)
+                filePath = erase(filePath, obj.homeDirectory);
+            end
+            filePath = strtrim(filePath);
+            obj.files(fileName) = filePath;
+        end
+
+        function removeFile(obj, fileName)
+            % REMOVEFILE
+            %
+            % Description:
+            %   Remove a file by name from files property
+            %
+            % Syntax:
+            %   removeFile(obj, fileName)
+            % -------------------------------------------------------------
+            if obj.hasFile(fileName)
+                remove(obj.files, fileName);
+            end
+        end
+
+        function fileValue = getFile(obj, fileName, msgType)
+            % GETFILE
+            %
+            % Description:
+            %   Return the value of a specific file name 
+            %
+            % Syntax:
+            %   fileValue = getFile(obj, fileName, messageType)
+            %
+            % Inputs:
+            %   fileName       char
+            % Optional inputs:
+            %   msgType         aod.util.MessageTypes (default = ERROR)            
+            % -------------------------------------------------------------
+            import aod.util.MessageTypes
+            if nargin < 3
+                msgType = MessageTypes.ERROR;
+            else
+                msgType = MessageTypes.init(msgType);
+            end
+
+            if obj.hasFile(fileName)
+                fileValue = obj.files(fileName);
+            else
+                switch msgType 
+                    case MessageTypes.ERROR 
+                        error('GetFile: Did not find %s in files', fileName);
+                    case MessageTypes.WARNING 
+                        warning('GetFile: Did not find %s in files', fileName);
+                        fileValue = [];
+                    case MessageTypes.NONE
+                        fileValue = [];
                 end
             end
         end
@@ -246,16 +362,20 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   value = obj.getLabel()
             % -------------------------------------------------------------
-            value = getClassWithoutPackages(obj);
+            if isempty(obj.Name)
+                value = getClassWithoutPackages(obj);
+            else
+                value = obj.Name;
+            end
         end
 
-        function shortName = getShortName(obj)
-            % GETSHORTNAME
+        function value = getShortLabel(obj)
+            % GETSHORTLABEL
             % 
             % Syntax:
-            %   shortName = obj.getShortName()
+            %   value = getShortLabel(obj)
             % -------------------------------------------------------------
-            shortName = obj.getLabel();
+            value = obj.getLabel();
         end
     end
 

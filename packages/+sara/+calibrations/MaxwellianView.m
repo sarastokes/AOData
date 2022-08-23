@@ -20,9 +20,6 @@ classdef MaxwellianView < aod.core.Calibration
         meanChromaticity
         LUTs
         spectra
-        files
-
-        calibrationFile
     end
 
     methods
@@ -49,8 +46,10 @@ classdef MaxwellianView < aod.core.Calibration
         function loadCalibrationFile(obj)
             dataDir = [fileparts(fileparts(mfilename('fullpath'))),...
                 filesep, '+resources', filesep];
-            obj.calibrationFile = [dataDir, 'LedCalibration', char(obj.calibrationDate), '.json'];
-            S = loadjson(obj.calibrationFile);
+            calibrationFile = [dataDir, 'LedCalibration', char(obj.calibrationDate), '.json'];
+            S = loadjson(calibrationFile);
+
+            obj.setFile('CalibrationFile', calibrationFile);
             
             obj.NDF = S.NDF;
             obj.ledMaxPowers = S.LedMaxPowers_uW;
@@ -58,10 +57,10 @@ classdef MaxwellianView < aod.core.Calibration
             obj.meanChromaticity = S.MeanChromaticity_xyY;
 
             for i = 1:numel(S.Files.LUT)
-                obj.files(sprintf('LUT%u',i)) = S.Files.LUT{i};
+                obj.setFile(sprintf('LUT%u',i), S.Files.LUT{i});
             end
             for i = 1:numel(S.Files.Spectra)
-                obj.files(sprintf('Spectra%u',i)) = S.Files.Spectra{i};
+                obj.setFile(sprintf('Spectra%u',i), S.Files.Spectra{i});
             end
             
             obj.stimContrasts = rmfield(S.Stimuli.Contrasts, {'Labels', 'Units'});

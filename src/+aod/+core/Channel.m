@@ -14,36 +14,25 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   DataFolder                  char, folder for the channel's data
 %
 % Properties:
-%   Name                        char, channel name
 %   Devices                     container for all devices in channel
-%   channelParameters           aod.core.Parameters
 %
 % Methods:
 %   assignUUID(obj, uuid)
 %   addDevice(obj, device)
 %   removeDevice(obj, ID)
 %   clearDevices(obj)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
-        Name                        char
         Devices                     aod.core.Device
-        % channelParameters           = aod.core.Parameters
     end
     
     properties (Hidden, SetAccess = protected)
         allowableParentTypes = {'aod.core.System'};
-        % parameterPropertyName = 'channelParameters';
     end
 
     methods
         function obj = Channel(parent, channelName, varargin)
-            obj = obj@aod.core.Entity(parent);
-            obj.setName(channelName);
+            obj = obj@aod.core.Entity(parent, channelName);
 
             ip = aod.util.InputParser();
             addParameter(ip, 'DataFolder', '', @ischar);
@@ -54,18 +43,6 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
-        function setName(obj, channelName)
-            % SETNAME
-            %
-            % Description:
-            %   Assign channel name
-            %
-            % Syntax:
-            %   setName(obj, channelName)
-            % -------------------------------------------------------------
-            obj.Name = channelName;
-        end
-
         function addDevice(obj, device)
             % ADDDEVICE
             %
