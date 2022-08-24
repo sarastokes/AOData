@@ -11,16 +11,16 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = aod.core.Stimulus(parent)
 % -------------------------------------------------------------------------
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Epoch'};
     end
     
     methods
-        function obj = Stimulus(parent, name)
+        function obj = Stimulus(name, parent)
             if nargin < 1
                 name = [];
             end
-            obj = obj@aod.core.Entity(parent);
+            obj = obj@aod.core.Entity(name, parent);
         end
     end
 end

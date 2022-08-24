@@ -13,7 +13,7 @@ classdef PhysiologyLocation < aod.core.sources.Location
     end
 
     methods
-        function obj = PhysiologyLocation(parent, name)
+        function obj = PhysiologyLocation(name)
             
             if ischar(name)
                 name = string(name);
@@ -29,7 +29,7 @@ classdef PhysiologyLocation < aod.core.sources.Location
                 name = "unknown";
             end
 
-            obj = obj@aod.core.sources.Location(parent, char(capitalize(name)));
+            obj = obj@aod.core.sources.Location(char(capitalize(name)));
         end
 
         function setAvgImage(obj, avgImage)

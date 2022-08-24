@@ -26,13 +26,13 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
         Devices                     aod.core.Device
     end
     
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.System'};
     end
 
     methods
-        function obj = Channel(parent, channelName, varargin)
-            obj = obj@aod.core.Entity(parent, channelName);
+        function obj = Channel(channelName, varargin)
+            obj = obj@aod.core.Entity(channelName);
 
             ip = aod.util.InputParser();
             addParameter(ip, 'DataFolder', '', @ischar);

@@ -16,8 +16,8 @@ classdef PhysiologyExperiment < sara.Experiment
     end
 
     methods
-        function obj = PhysiologyExperiment(homeDirectory, expDate, varargin)
-            obj = obj@sara.Experiment(homeDirectory, expDate, varargin{:});
+        function obj = PhysiologyExperiment(name, homeDirectory, expDate, varargin)
+            obj = obj@sara.Experiment(name, homeDirectory, expDate, varargin{:});
         end
 
         function value = get.visualStimuli(obj)

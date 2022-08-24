@@ -15,9 +15,12 @@ classdef Eye < aod.core.Source
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Eye(parent, name)
+        function obj = Eye(name, parent)
             assert(ismember(name, {'OD', 'OS'}), 'Eye: Must be OS or OD');
-            obj = obj@aod.core.Source(parent, name);
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.core.Source(name, parent);
         end
     end
 

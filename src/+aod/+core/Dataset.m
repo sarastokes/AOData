@@ -8,8 +8,8 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Dataset(parent)
-%   obj = Dataset(parent, data)
+%   obj = Dataset(name)
+%   obj = Dataset(name, data)
 %
 % Properties:
 %   Data
@@ -27,14 +27,14 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
         Data 
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Epoch'}
     end
 
     methods
-        function obj = Dataset(parent, name, data)
-            obj = obj@aod.core.Entity(parent, name);
-            if nargin > 2
+        function obj = Dataset(name, data)
+            obj = obj@aod.core.Entity(name);
+            if nargin > 1
                 obj.setData(data);
             end
         end

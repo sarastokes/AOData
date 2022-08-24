@@ -12,8 +12,11 @@ classdef Location < aod.core.Source
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Location(parent, name)
-            obj = obj@aod.core.Source(parent, name);
+        function obj = Location(name, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.core.Source(name, parent);
         end
     end
 

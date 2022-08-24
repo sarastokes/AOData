@@ -8,22 +8,20 @@ classdef Subject < aod.core.Source
 %   aod.core.Source
 %
 % Constructor:
-%   obj = aod.core.sources.Subject(parent, name, varargin)
+%   obj = aod.core.sources.Subject(name)
+%   obj = aod.core.sources.Subject(name, 'Species', value, 'Sex', value,...
+%       'Age', value, 'Demographics', value)
 %
 % Parameters:
 %   Species
 %   Sex
 %   Age
 %   Demographics
-%
-% Inherited properties:
-%   name
-%   sourceParameters
 % -------------------------------------------------------------------------
 
     methods 
-        function obj = Subject(parent, name, varargin)
-            obj@aod.core.Source(parent, name);
+        function obj = Subject(name, varargin)
+            obj@aod.core.Source(name);
 
             ip = aod.util.InputParser();
             addParameter(ip, 'Species', [], @ischar);

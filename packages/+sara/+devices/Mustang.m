@@ -6,7 +6,7 @@ classdef Mustang < aod.builtin.devices.LightSource
 
     methods
         function obj = Mustang(parent, varargin)
-            obj = obj@aod.builtin.devices.LightSource(parent, 488, varargin{:});
+            obj = obj@aod.builtin.devices.LightSource(488, varargin{:});
         end
 
         function value = get.Calibrations(obj)

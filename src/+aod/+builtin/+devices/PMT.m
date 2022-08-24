@@ -7,30 +7,19 @@ classdef PMT < aod.core.Device
 % Parent:
 %   aod.core.Device
 %
-% Constructor:
-%   obj = PMT(parent, varargin)
-%
 % Parameters:
-%   Gain
 %   Position
-% Inherited parameters:
-%   Manufacturer
-%   Model
 %
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
+% Constructor:
+%   obj = PMT(name, varargin)
 % -------------------------------------------------------------------------
 
     methods 
-        function obj = PMT(parent, varargin)
-            obj = obj@aod.core.Device(parent, varargin{:});
+        function obj = PMT(name, varargin)
+            obj = obj@aod.core.Device(varargin{:});
+            obj.setName(name);
             
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            ip.CaseSensitive = false;
-            addParameter(ip, 'Gain', [], @isnumeric);
+            ip = aod.util.InputParser();
             addParameter(ip, 'Position', [], @isnumeric);
             parse(ip, varargin{:});
 

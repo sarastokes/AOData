@@ -8,7 +8,7 @@ classdef LightSource < aod.core.Device
 %   aod.core.Device
 %
 % Constructor:
-%   obj = LightSource(parent, wavelength, varargin)
+%   obj = LightSource(wavelength, varargin)
 %
 % Parameters:
 %   Wavelength
@@ -34,8 +34,8 @@ classdef LightSource < aod.core.Device
     end
     
     methods
-        function obj = LightSource(parent, wavelength, varargin)
-            obj = obj@aod.core.Device(parent, varargin{:});            
+        function obj = LightSource(wavelength, varargin)
+            obj = obj@aod.core.Device(varargin{:});            
             obj.setWavelength(wavelength);
         end
 
@@ -64,10 +64,10 @@ classdef LightSource < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            if obj.hasParam('Wavelength')
-                value = [num2str(obj.getParam('Wavelength')), 'nmLightSource'];
+            if ~isempty(obj.Name)
+                value = [obj.Name, num2str(obj.getParam('Wavelength')), 'nm'];
             else
-                value = 'LightSource';
+                value = [num2str(obj.getParam('Wavelength')), 'nmLightSource'];
             end
         end
     end

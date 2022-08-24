@@ -19,25 +19,21 @@ classdef Pinhole < aod.core.Device
 %
 % Sealed methods:
 %   setDiameter(obj, diameter, diameterUnits)
+%   setDiameterUnits(obj, diameterUnits)
 %
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Pinhole(parent, diameter, varargin)
-            obj = obj@aod.core.Device(parent, varargin{:});
+        function obj = Pinhole(diameter, varargin)
+            obj = obj@aod.core.Device(varargin{:});
             
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            ip.CaseSensitive = false;
+            obj.setDiameter(diameter);
+            
+            ip = aod.util.InputParser();
             addParameter(ip, 'DiameterUnits', 'micron', @istext);
             parse(ip, varargin{:});
             
-            obj.setParam('Diameter', diameter);
-            obj.setParam(ip.Results);
+            obj.setDiameterUnits(ip.Results.DiameterUnits);
         end
     end
     
@@ -55,10 +51,30 @@ classdef Pinhole < aod.core.Device
             % Notes:
             %   Default diameter units is 'microns'
             % -------------------------------------------------------------
+            assert(isnumeric(diameter), 'Diameter must be a number');
+
             obj.setParam('Diameter', diameter);
             if nargin > 2
                 obj.setParam('DiameterUnits', diameterUnits);
             end
+        end
+
+        function setDiameterUnits(obj, diameterUnits)
+            % SETDIAMETERUNITS
+            %
+            % Description:
+            %   Set units of pinhole diameter
+            %
+            % Syntax:
+            %   setDiameterUnits(obj, diameterUnits)
+            %
+            % Notes:
+            %   Default diameter units is 'microns'
+            % -------------------------------------------------------------
+            if isempty(diameterUnits)
+                diameterUnits = 'micron';
+            end
+            obj.setParam('DiameterUnits', diameterUnits);
         end
     end
 

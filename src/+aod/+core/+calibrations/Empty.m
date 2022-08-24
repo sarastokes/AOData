@@ -12,12 +12,8 @@ classdef Empty < aod.core.Calibration
 %   obj = aod.core.calibrations.Empty(parent)
 % -------------------------------------------------------------------------
     methods
-        function obj = Empty(parent)
-            if nargin < 1
-                parent = [];
-            end
-            obj = obj@aod.core.Calibration(parent, []);
-
+        function obj = Empty()
+            obj = obj@aod.core.Calibration('Empty', []);
             obj.setDescription('A placeholder calibration object');
         end
     end

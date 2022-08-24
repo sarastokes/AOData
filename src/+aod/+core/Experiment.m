@@ -43,7 +43,7 @@ classdef Experiment < aod.core.Entity
 %   sortEpochs(obj)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = private)
         homeDirectory           char
         experimentDate(1,1)     datetime
 
@@ -60,14 +60,14 @@ classdef Experiment < aod.core.Entity
         numEpochs
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'none'};
     end
     
     methods 
-        function obj = Experiment(homeDirectory, expDate, varargin)
-            obj = obj@aod.core.Entity();
-            obj.setHomeDirectory(homeDirectory);
+        function obj = Experiment(name, homeFolder, expDate, varargin)
+            obj = obj@aod.core.Entity(name);
+            obj.setHomeDirectory(homeFolder);
             obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
 
             ip = aod.util.InputParser();
@@ -388,12 +388,22 @@ classdef Experiment < aod.core.Entity
         function addCalibration(obj, calibration)
             % ADDCALIBRATION
             %
+            % Description:
+            %   Add calibration(s) to the experiment
+            %
             % Syntax:
             %   obj.addCalibration(obj, calibration)
+            %
+            % Input:
+            %   calibration             aod.core.Calibration subclass
+            %       A calibration or array of calibrations
             % -------------------------------------------------------------
+            assert(isSubclass(calibration, 'aod.core.Calibration'),...
+                'addCalibration: Input must be subclass of aod.core.Calibration');
+            
             for i = 1:numel(calibration)
                 calibration(i).setParent(obj);
-                obj.Calibrations = cat(1, obj.Calibrations, calibration);
+                obj.Calibrations = cat(1, obj.Calibrations, calibration(i));
             end
         end
 

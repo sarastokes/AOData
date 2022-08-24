@@ -9,11 +9,11 @@ classdef Creator < aod.core.Creator
             obj@aod.core.Creator(homeDirectory);
         end
 
-        function createExperiment(obj, expDate, source, varargin)
+        function createExperiment(obj, expName, expDate, source, varargin)
             % CREATEEXPERIMENT
             % -------------------------------------------------------------
             obj.Experiment = sara.experiments.PhysiologyExperiment(...
-                obj.homeDirectory, expDate, varargin{:});
+                expName, obj.homeDirectory, expDate, varargin{:});
             obj.Experiment.addSource(source);
             obj.Experiment.setParam(varargin{:});
         end
@@ -127,7 +127,7 @@ classdef Creator < aod.core.Creator
                 reg = aod.builtin.registrations.RigidRegistration(...
                     ep, squeeze(tforms(:,:,i)), varargin{:});
                 ep.addRegistration(reg);
-                ep.addFile('SiftTransform', erase(fName, obj.homeDirectory));
+                ep.setFile('SiftTransform', erase(fName, obj.homeDirectory));
             end
         end
     end
@@ -136,10 +136,12 @@ classdef Creator < aod.core.Creator
         function ep = makeEpoch(obj, epochID, epochType, varargin)
             % MAKEEPOCH
             if epochType == sara.EpochTypes.Background
-                ep = sara.epochs.BackgroundEpoch(obj.Experiment, epochID, varargin{:});
+                ep = sara.epochs.BackgroundEpoch(epochID, varargin{:});
             else
-                ep = sara.Epoch(obj.Experiment, epochID, epochType, varargin{:});
+                ep = sara.Epoch(epochID, epochType, varargin{:});
             end
+            obj.Experiment.addEpoch(ep);
+
             % Extract epoch imaging parameters
             if epochType.isPhysiology
                 obj.extractEpochAttributes(ep);
@@ -176,7 +178,7 @@ classdef Creator < aod.core.Creator
                 int2fixedwidthstr(ep.ID, 4));
             fName = [obj.Experiment.homeDirectory, filesep, 'Ref', filesep, fName];
             if exist(fName, 'file')
-                ep.addFile('Attributes', fName);
+                ep.setFile('Attributes', fName);
             else
                 fName = [];
             end
@@ -193,7 +195,7 @@ classdef Creator < aod.core.Creator
             ep.startTime = datetime(txt, 'InputFormat', 'yyyy-MM-dd HH:mm:ss');
 
             % Additional file names
-            ep.addFile('TrialFile', readProperty(fName, 'Trial file name = '));
+            ep.setFile('TrialFile', readProperty(fName, 'Trial file name = '));
             txt = strsplit(ep.files('TrialFile'), filesep);
             ep.setParam('StimulusName', txt{end});
 
@@ -255,16 +257,16 @@ classdef Creator < aod.core.Creator
                 readProperty(fName, 'Interval unit = '));
             
             % LUT files (may not be necessary with Calibration class)
-            ep.addFile('LUT1', readProperty(fName, 'LUT1 = '));
-            ep.addFile('LUT2', readProperty(fName, 'LUT2 = '));
-            ep.addFile('LUT3', readProperty(fName, 'LUT3 = '));
+            ep.setFile('LUT1', readProperty(fName, 'LUT1 = '));
+            ep.setFile('LUT2', readProperty(fName, 'LUT2 = '));
+            ep.setFile('LUT3', readProperty(fName, 'LUT3 = '));
         end
 
         function extractSpatialAttributes(obj, ep, fName) %#ok<INUSL> 
             % Video names
-            ep.addFile('StimVideoName',...
+            ep.setFile('StimVideoName',...
                 readProperty(fName, 'Stimulus video = '));
-            ep.addFile('BackgroundVideoName',...
+            ep.setFile('BackgroundVideoName',...
                 readProperty(fName, 'Background video = '));
             
             % Stimulus location
@@ -289,20 +291,20 @@ classdef Creator < aod.core.Creator
             visFiles = deblank(string(visFiles));
             visStr = ['vis_', int2fixedwidthstr(epochID, 4)];
 
-            ep.addFile('RefVideo', ['Ref', filesep,...
+            ep.setFile('RefVideo', ['Ref', filesep,...
                 obj.Experiment.getFileHeader(), '_', refStr, '.avi']);
-            ep.addFile('VisVideo', ['Vis', filesep,...
+            ep.setFile('VisVideo', ['Vis', filesep,...
                 obj.Experiment.getFileHeader(), '_', visStr, '.avi']);
 
             % Processed video for analysis
-            ep.addFile('AnalysisVideo', string(['Analysis', filesep, 'Videos', filesep, visStr, '.tif']));
+            ep.setFile('AnalysisVideo', string(['Analysis', filesep, 'Videos', filesep, visStr, '.tif']));
 
             % Find csv output file
             csvFiles = multicontains(refFiles, {refStr, 'csv'});
             match = csvFiles(~contains(csvFiles, 'motion'));
             if ~isempty(match)
                 match = obj.checkFilesFound(match);
-                ep.addFile('FrameReport', "Ref" + filesep + match);
+                ep.setFile('FrameReport', "Ref" + filesep + match);
             else
                 warning('Frame report for epoch %u not found', epochID);
             end
@@ -317,7 +319,7 @@ classdef Creator < aod.core.Creator
                         numel(match), epochID);
                 end
                 match = obj.checkFilesFound(match);
-                ep.addFile('RegistrationReport', "Ref" + filesep + regFiles(match));
+                ep.setFile('RegistrationReport', "Ref" + filesep + regFiles(match));
             else
                 warning('Registration report for epoch %u not found', epochID);
             end
@@ -327,7 +329,7 @@ classdef Creator < aod.core.Creator
             ind = find(contains(regFiles, refStr));
             if ~isempty(ind)
                 ind = obj.checkFilesFound(ind);
-                ep.addFile('RegistrationParameters', "Ref" + filesep + regFiles(ind));
+                ep.setFile('RegistrationParameters', "Ref" + filesep + regFiles(ind));
             else
                 warning('Registration parameters for epoch %u not found', epochID);
             end
@@ -337,7 +339,7 @@ classdef Creator < aod.core.Creator
                 match = find(contains(refFiles, [refStr, '_linear']));
                 if ~isempty(match)
                     match = obj.checkFilesFound(match);
-                    ep.addFile('ReferenceImage', "Ref" + filesep + match);
+                    ep.setFile('ReferenceImage', "Ref" + filesep + match);
                 else
                     warning('Reference image for epoch %u not found', epochID);
                 end
@@ -347,7 +349,7 @@ classdef Creator < aod.core.Creator
             match = multicontains(refFiles, {refStr, 'frame', '.avi'});
             if ~isempty(match)
                 match = obj.checkFilesFound(match);
-                ep.addFile('RefVideoFrameReg', "Ref" + filesep + match);
+                ep.setFile('RefVideoFrameReg', "Ref" + filesep + match);
             else
                 warning('Frame registered ref video for epoch %u not found', epochID);
             end
@@ -355,7 +357,7 @@ classdef Creator < aod.core.Creator
             match = multicontains(visFiles, {visStr, 'frame', '.avi'});
             if ~isempty(match)
                 match = obj.checkFilesFound(match);
-                ep.addFile('VisVideoFrameReg', "Vis" + filesep + match);
+                ep.setFile('VisVideoFrameReg', "Vis" + filesep + match);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
@@ -364,7 +366,7 @@ classdef Creator < aod.core.Creator
             match = multicontains(refFiles, {refStr, 'strip', '.avi'});
             if ~isempty(match)
                 match = obj.checkFilesFound(match);
-                ep.addFile('RefVideoStripReg', "Ref" + filesep + match);
+                ep.setFile('RefVideoStripReg', "Ref" + filesep + match);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
@@ -372,7 +374,7 @@ classdef Creator < aod.core.Creator
             match = multicontains(visFiles, {visStr, 'strip', '.avi'});
             if ~isempty(match)
                 match = obj.checkFilesFound(match);
-                ep.addFile('VisVideoStripReg', "Vis" + filesep + match);
+                ep.setFile('VisVideoStripReg', "Vis" + filesep + match);
             else
                 warning('Strip registered ref video for epoch %u not found', epochID);
             end
@@ -382,7 +384,7 @@ classdef Creator < aod.core.Creator
                 match = multicontains(visFiles, {visStr, '.json'});
                 if ~isempty(match)
                     match = obj.checkFilesFound(match);
-                    ep.addFile('LedVoltages', "Vis" + filesep + match);
+                    ep.setFile('LedVoltages', "Vis" + filesep + match);
                 else
                     warning('LED voltage json files for epoch %u not found', epochID);
                 end

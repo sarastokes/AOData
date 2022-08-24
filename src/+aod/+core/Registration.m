@@ -16,10 +16,13 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = protected)
         Data
+    end
+
+    properties (SetAccess = private)
         registrationDate(1,1)               datetime
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Epoch'};
     end
 
@@ -29,8 +32,9 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Registration(parent, data)
-            obj = obj@aod.core.Entity(parent);
+        function obj = Registration(registrationDate, data)
+            obj = obj@aod.core.Entity();
+            obj.setRegistrationDate(registrationDate);
 
             if nargin > 1
                 obj.Data = data;
@@ -51,6 +55,9 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   regDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
+            if isempty(regDate)
+                return
+            end
             if ~isdatetime(regDate)
                 try
                     regDate = datetime(regDate, 'Format', 'yyyyMMdd');

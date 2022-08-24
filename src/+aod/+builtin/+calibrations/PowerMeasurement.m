@@ -1,11 +1,14 @@
-classdef (Abstract) PowerMeasurement < aod.core.Calibration
-% POWERMEASUREMENT (abstract)
+classdef PowerMeasurement < aod.core.Calibration
+% POWERMEASUREMENT
+%
+% Description:
+%   Measurements of a light source's power at various settings
 %
 % Parent:
 %   aod.core.Calibration
 %
 % Constructor:
-%   obj = PowerMeasurement(parent, calibrationDate, wavelength, varargin);
+%   obj = PowerMeasurement(calibrationDate, wavelength, varargin);
 %
 % Parameters:
 %   settingUnit             char, device setting unit (no default)
@@ -32,8 +35,11 @@ classdef (Abstract) PowerMeasurement < aod.core.Calibration
     end
 
     methods 
-        function obj = PowerMeasurement(parent, calibrationDate, wavelength, varargin)
-            obj = obj@aod.core.Calibration(parent, calibrationDate);
+        function obj = PowerMeasurement(calibrationDate, wavelength, varargin)
+            obj = obj@aod.core.Calibration([], calibrationDate);
+            if numel(wavelength) > 1 && iscol(wavelength)
+                wavelength = wavelength';
+            end
             obj.setParam('Wavelength', wavelength);
 
             ip = inputParser();

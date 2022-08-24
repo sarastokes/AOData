@@ -8,11 +8,11 @@ classdef BeaconPower < aod.builtin.calibrations.PowerMeasurement
 %   aod.builtin.calibrations.PowerMeasurement
 %
 % Constructor:
-%   obj = BeaconPower(parent, calibrationDate)
+%   obj = BeaconPower(calibrationDate)
 % -------------------------------------------------------------------------
     methods
-        function obj = BeaconPower(parent, calibrationDate)
-            obj = obj@aod.builtin.calibrations.PowerMeasurement(parent,...
+        function obj = BeaconPower(calibrationDate)
+            obj = obj@aod.builtin.calibrations.PowerMeasurement(...
                 calibrationDate, 847, 'SettingUnit', 'mA');
         end
     end

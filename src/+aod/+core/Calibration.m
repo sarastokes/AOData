@@ -21,13 +21,13 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
         calibrationDate(1,1)                datetime
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Experiment'};
     end
 
     methods
-        function obj = Calibration(parent, calibrationDate)
-            obj = obj@aod.core.Entity(parent);
+        function obj = Calibration(name, calibrationDate)
+            obj = obj@aod.core.Entity(name);
             
             if nargin > 1 && ~isempty(calibrationDate)
                 obj.setCalibrationDate(calibrationDate);

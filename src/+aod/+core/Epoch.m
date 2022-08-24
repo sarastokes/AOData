@@ -8,7 +8,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Epoch(parent, ID, varargin)
+%   obj = Epoch(ID, sampleRate)
+%   obj = Epoch(ID, sampleRate, 'Source', source, 'System', system)
+%
+% Parameters:
+%   sampleRate                      Rate data was acquired (Hz)
 %
 % Properties:
 %   ID                              Epoch identifier (integer)
@@ -17,9 +21,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Responses                       Container for epoch's responses
 %   Stimuli                         Container for epoch's stimuli
 %   Datasets                        Container for epoch's datasets
-%
-% Dependent properties:
-%   Source
+%   Source                          Link to Source used during the epoch
+%   System                          Link to System used during the epoch
 %
 % Abstract methods:
 %   videoName = getCoreVideoName(obj)
@@ -27,14 +30,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % Public methods:
 %   imStack = getStack(obj, varargin)
 %   fName = getFilePath(obj, whichFile)
-%   clearResponses(obj)
 %   clearVideoCache(obj)
-%
-% aod.core.Creator methods:
-%   addFile(obj, fileName, filePath)
-%   addParameter(obj, paramName, paramValue)
 %   addRegistration(obj, reg, overwrite)
 %   addResponse(obj, resp)
+%   clearResponses(obj)
 %   addStimulus(obj, stim)
 %
 % Inherited public methods:
@@ -48,13 +47,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        ID(1,1)                     double     = 0
+        ID(1,1)                     double
     end
 
     properties (SetAccess = protected)
         startTime(1,1)              datetime
         Registrations               aod.core.Registration
-        Responses                   %aod.core.Response  
+        Responses                   aod.core.Response  
         Stimuli                     aod.core.Stimulus
         Datasets                    aod.core.Dataset
     end
@@ -73,7 +72,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         cachedVideo
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Experiment'}
     end
 
@@ -84,9 +83,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods 
-        function obj = Epoch(parent, ID, varargin)
-            obj = obj@aod.core.Entity(parent);
+        function obj = Epoch(ID, sampleRate, varargin)
+            obj = obj@aod.core.Entity();
             obj.ID = ID;
+            obj.sampleRate = obj.setParam('SampleRate', sampleRate);
             
             ip = aod.util.InputParser();
             addParameter(ip, 'Source', [], @(x) isSubclass(x, 'aod.core.Source'));
@@ -193,23 +193,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.clearResponses()
             % -------------------------------------------------------------
             obj.Responses = aod.core.Response.empty();
-        end
-
-        function clearRegionResponses(obj)
-            % CLEARREGIONRESPONSES
-            %
-            % Syntax:
-            %   obj.clearRegionResponses()
-            % -------------------------------------------------------------
-            if isempty(obj.Responses)
-                return
-            end
-            idx = findByClass(obj.Responses, 'aod.builtin.responses.RegionResponse');
-            if numel(obj.Responses) > 1
-                obj.Responses{idx} = [];
-            else
-                obj.Responses(idx) = [];
-            end
         end
     end
 
@@ -374,7 +357,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     % Overwritten methods from Entity
     methods
-        function addFile(obj, fileName, filePath)
+        function setFile(obj, fileName, filePath)
             % ADDFILE
             %
             % Description:

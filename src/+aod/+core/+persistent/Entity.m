@@ -1,10 +1,13 @@
 classdef Entity < handle & dynamicprops
 
     properties (SetAccess = private)
-        entityClassName
-        parameters              = aod.core.Parameters
-        UUID 
-        description 
+        entityClassName         string
+        parameters              = aod.core.Parameters()
+        files                   = aod.core.Parameters()
+        UUID                    string
+        description             char
+        label                   char 
+        shortLabel              char
     end
 
     properties (Dependent)
@@ -15,16 +18,15 @@ classdef Entity < handle & dynamicprops
         hdfName 
         hdfPath 
         entityType
-
         parentUUID 
     end
 
     events 
         ChangedDescription
+        ChangedNote
         AddedParameter
         RemovedParameter
         ChangedParameter
-
     end
 
     methods
@@ -37,6 +39,10 @@ classdef Entity < handle & dynamicprops
             obj.populateEntityFromFile();
         end
 
+        function value = get.Parent(obj)
+            % TODO Need Entity Manager
+            value = [];
+        end
     end
 
     methods (Access = protected)
@@ -49,9 +55,11 @@ classdef Entity < handle & dynamicprops
 
             specialAttributes = ["description", "Class", "EntityType"];
 
+
             % Handle special attributes
             obj.setDescription(h5readatt(obj.hdfName, obj.hdfPath, 'description'));
             obj.UUID = h5readatt(obj.hdfName, obj.hdfPath, 'UUID');
+            % Parse the remaining attributes
             for i = 1:numel(attributeNames)
                 if ~ismember(attributeNames(i), specialAttributes)
                     obj.parameters(char(attributeNames(i))) = ...

@@ -8,8 +8,8 @@ classdef TimeRate < aod.core.Timing
 %   aod.core.Timing
 %
 % Constructor:
-%   obj = TimeRate(parent, timeInterval, timeCount)
-%   obj = TimeRate(parent, timeInterval, timeCount, timeStart)
+%   obj = TimeRate(timeInterval, timeCount)
+%   obj = TimeRate(timeInterval, timeCount, timeStart)
 %
 % Inputs:
 %   parent                  aod.core.Response or []
@@ -34,12 +34,12 @@ classdef TimeRate < aod.core.Timing
     end
 
     methods 
-        function obj = TimeRate(parent, timeInterval, timeCount, timeStart)
-            obj = obj@aod.core.Timing(parent);
+        function obj = TimeRate(timeInterval, timeCount, timeStart)
+            obj = obj@aod.core.Timing();
             obj.Interval = timeInterval;
             obj.Count = timeCount;
 
-            if nargin > 3
+            if nargin > 2
                 obj.Start = timeStart;
             else
                 obj.Start = obj.Interval;

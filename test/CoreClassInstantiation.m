@@ -6,8 +6,8 @@ import aod.core.*
 
 calibration = Calibration([], '20220822'); %#ok<*NASGU> 
 
-source = Source([], 'SourceName');
-subsource = Source(source, 'SubSourceName');
+source = Source('SourceName');
+source.addSource(Source('SubSourceName'));
 
 system = System([], 'SystemName');
 channel = Channel([], 'ChannelName');

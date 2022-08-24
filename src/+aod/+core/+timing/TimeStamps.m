@@ -8,7 +8,7 @@ classdef TimeStamps < aod.core.Timing
 %   aod.core.Timing
 %
 % Constructor:
-%   obj = TimeStamps(parent, timestamps)
+%   obj = TimeStamps(timestamps)
 %
 % Inputs:
 %   parent              aod.core.Response or []
@@ -23,8 +23,8 @@ classdef TimeStamps < aod.core.Timing
     end
 
     methods 
-        function obj = TimeStamps(parent, data)
-            obj = obj@aod.core.Timing(parent);
+        function obj = TimeStamps(data)
+            obj = obj@aod.core.Timing();
             obj.timestamps = data;
         end
     end

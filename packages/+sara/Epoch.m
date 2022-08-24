@@ -8,7 +8,7 @@ classdef Epoch < aod.core.Epoch
 %   aod.core.Epoch
 %
 % Constructor:
-%   obj = Epoch(parent, ID, source, epochType)
+%   obj = Epoch(ID, source, epochType)
 %
 % Properties:
 %   epochType           sara.EpochTypes
@@ -54,10 +54,11 @@ classdef Epoch < aod.core.Epoch
     end
 
     methods
-        function obj = Epoch(parent, ID, epochType, varargin)
-            obj@aod.core.Epoch(parent, ID, varargin{:});
+        function obj = Epoch(ID, epochType, varargin)
+            obj@aod.core.Epoch(ID, 25, varargin{:});
             obj.epochType = epochType;
         end
+        
         function value = get.transform(obj)
             value = [];
             if isempty(obj.Registrations)
@@ -115,6 +116,23 @@ classdef Epoch < aod.core.Epoch
 
         function R = getDff(obj, varargin)
             R = obj.getResponse('sara.responses.Dff', varargin{:});
+        end
+
+        function clearRegionResponses(obj)
+            % CLEARREGIONRESPONSES
+            %
+            % Syntax:
+            %   obj.clearRegionResponses()
+            % -------------------------------------------------------------
+            if isempty(obj.Responses)
+                return
+            end
+            idx = findByClass(obj.Responses, 'aod.builtin.responses.RegionResponse');
+            if numel(obj.Responses) > 1
+                obj.Responses{idx} = [];
+            else
+                obj.Responses(idx) = [];
+            end
         end
 
         function clearRigidTransform(obj)

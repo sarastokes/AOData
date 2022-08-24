@@ -8,7 +8,7 @@ classdef RoomMeasurement < aod.core.Calibration
 %   aod.core.Calibration
 % 
 % Syntax:
-%   obj = RoomMeasurement(parent, calibrationDate)
+%   obj = RoomMeasurement(calibrationDate)
 %
 % Properties:
 %   measurements
@@ -23,8 +23,15 @@ classdef RoomMeasurement < aod.core.Calibration
     end
 
     methods
-        function obj = RoomMeasurement(varargin)
-            obj = obj@aod.core.Calibration(varargin{:});
+        function obj = RoomMeasurement(calibrationDate, varargin)
+            obj = obj@aod.core.Calibration([], calibrationDate);
+
+            ip = aod.util.InputParser();
+            addParameter(ip, 'TemperatureUnits', 'F', @ischar);
+            addParameter(ip, 'HumitityUnits', '%', @ischar);
+            parse(ip, varargin{:});
+
+            obj.setParam(ip.Results);
         end
 
         function addMeasurement(obj, timestamp, temperature, humidity)

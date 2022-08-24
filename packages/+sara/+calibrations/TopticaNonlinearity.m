@@ -5,7 +5,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
 %   Nonlinearity in visual stimuli presented with Toptica.
 %
 % Syntax:
-%   obj = TopticaNonlinearity(parent, calibrationDate, laserLine)
+%   obj = TopticaNonlinearity(calibrationDate, laserLine)
 %
 % Parent:
 %   aod.core.Calibration
@@ -34,7 +34,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
     end
 
     methods
-        function obj = TopticaNonlinearity(parent, calibrationDate, laserLine)
+        function obj = TopticaNonlinearity(calibrationDate, laserLine)
             if nargin < 0
                 parent = [];
             end
@@ -44,7 +44,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
             if nargin < 3
                 laserLine = 561;
             end
-            obj = obj@aod.core.Calibration(parent, calibrationDate);
+            obj = obj@aod.core.Calibration(calibrationDate);
             obj.laserLine = laserLine;
         
             obj.loadCalibration();

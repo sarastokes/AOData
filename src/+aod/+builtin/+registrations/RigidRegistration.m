@@ -8,7 +8,7 @@ classdef RigidRegistration < aod.core.Registration
 %   aod.core.Registration
 %
 % Constructor:
-%   obj = RigidRegistration(parent, data, varargin)
+%   obj = RigidRegistration(data, varargin)
 %
 % Inherited properties:
 %   Data
@@ -19,17 +19,22 @@ classdef RigidRegistration < aod.core.Registration
 %
 % Inherited methods:
 %   setRegistrationDate(obj, regDate)
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = RigidRegistration(parent, data, varargin)
+        function obj = RigidRegistration(registrationDate, data, varargin)
             if ~isa(data, 'affine2d')
-                data = affine2d(data);
+                try
+                    data = affine2d(data);
+                catch ME
+                    if strcmp(ME.identifier, 'MATLAB:affine2d:set:T:incorrectSize')
+                        error("RigidRegistration:IncorrectSize",...
+                            'Transformation matrix was not 3x3 as expected');
+                    end
+                end
+
             end
-            obj@aod.core.Registration(parent, data);
+            obj@aod.core.Registration(registrationDate, data);
 
             % Additional inputs are added to parameters
             obj.setParam(varargin{:});

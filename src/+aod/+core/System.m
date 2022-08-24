@@ -20,17 +20,20 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   assignUUID(obj, uuid)
 % -------------------------------------------------------------------------
     
-    properties
+    properties (SetAccess = protected)
         Channels            = aod.core.Channel.empty();
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Experiment'};
     end
 
     methods
-        function obj = System(parent, systemName)
-            obj = obj@aod.core.Entity(parent, systemName);
+        function obj = System(systemName, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.core.Entity(systemName, parent);
         end      
     end
     

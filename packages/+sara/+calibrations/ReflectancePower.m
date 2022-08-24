@@ -8,12 +8,12 @@ classdef ReflectancePower < aod.builtin.calibrations.PowerMeasurement
 %   aod.builtin.calibrations.PowerMeasurement
 %
 % Constructor:
-%   obj = ReflectancePower(parent, calibrationDate);
+%   obj = ReflectancePower(calibrationDate);
 % -------------------------------------------------------------------------
 
     methods
-        function obj = ReflectancePower(parent, calibrationDate)
-            obj = obj@aod.builtin.calibrations.PowerMeasurement(parent,...
+        function obj = ReflectancePower(calibrationDate)
+            obj = obj@aod.builtin.calibrations.PowerMeasurement(...
                 calibrationDate, 796, 'SettingUnit', 'None');
         end
     end

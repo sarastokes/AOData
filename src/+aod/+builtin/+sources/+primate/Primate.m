@@ -8,7 +8,7 @@ classdef Primate < aod.core.sources.Subject
     %   aod.core.sources.Subject
     %
     % Constructor:
-    %   obj = Primate(parent, name)
+    %   obj = Primate(name)
     %
     % Dependent properties:
     %   ID                      double, ID extracted from name
@@ -19,8 +19,8 @@ classdef Primate < aod.core.sources.Subject
     end
 
     methods
-        function obj = Primate(parent, name, varargin)
-            obj = obj@aod.core.sources.Subject(parent, name, varargin{:});
+        function obj = Primate(name, varargin)
+            obj = obj@aod.core.sources.Subject(name, varargin{:});
         end
 
         function value = get.ID(obj)

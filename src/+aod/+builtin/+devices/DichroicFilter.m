@@ -8,7 +8,7 @@ classdef DichroicFilter < aod.core.Device
 %   aod.core.Device
 %
 % Constructor:
-%   obj = DichroicFilter(parent, wavelength, passType, varargin)
+%   obj = DichroicFilter(wavelength, passType, varargin)
 %   
 % Parameters:
 %   Wavelength                      numeric
@@ -30,8 +30,8 @@ classdef DichroicFilter < aod.core.Device
     end
     
     methods
-        function obj = DichroicFilter(parent, wavelength, passType, varargin)
-            obj = obj@aod.core.Device(parent, varargin{:});
+        function obj = DichroicFilter(wavelength, passType, varargin)
+            obj = obj@aod.core.Device(varargin{:});
             
             obj.setWavelength(wavelength);
             obj.setPassType(passType);

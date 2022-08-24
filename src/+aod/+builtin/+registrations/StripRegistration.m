@@ -7,6 +7,12 @@ classdef StripRegistration < aod.core.Registration
 % Parent:
 %   aod.core.Registration
 %
+% Constructor:
+%   obj = StripRegistration(parent)
+%
+% Inputs:
+%   parent                      aod.core.Epoch, needed to extract file name
+%
 % Properties:
 %   usedFrame (logical; whether strip or frame reg was ultimately used)
 %
@@ -28,7 +34,8 @@ classdef StripRegistration < aod.core.Registration
         end
 
         function apply(~)
-            warning('NotImplemented: StripRegistration is applied offline');
+            warning("StripRegistration:AlreadyApplied",... 
+                "Strip Registration is applied offline");
         end
 
         function loadData(obj, fName)

@@ -8,7 +8,7 @@ classdef Toptica < aod.core.LightSource
 %   aod.core.LightSource
 %
 % Constructor:
-%   obj = Toptica(parent, laserLine, varargin)
+%   obj = Toptica(laserLine, varargin)
 % -------------------------------------------------------------------------
 
     properties (Hidden, Constant)
@@ -20,8 +20,8 @@ classdef Toptica < aod.core.LightSource
     end
 
     methods
-        function obj = Toptica(parent, laserLine, varargin)
-            obj = obj@aod.core.LightSource(parent, laserLine,...
+        function obj = Toptica(laserLine, varargin)
+            obj = obj@aod.core.LightSource(laserLine,...
                 'Manufacturer', 'Toptica', 'Model', 'iChrome MLE',...
                 varargin{:});
             assert(ismember(laserLine, obj.LASER_LINES), 'Invalid laser line');

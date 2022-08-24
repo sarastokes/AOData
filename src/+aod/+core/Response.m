@@ -28,7 +28,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         Experiment
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Epoch'};
     end
 

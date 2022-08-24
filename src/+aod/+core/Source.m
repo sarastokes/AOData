@@ -8,20 +8,28 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Source(parent, name);
+%   obj = Source(name)
+%   obj = Source(name, parent)
 %
 % Methods:
 %   sources = getParents(obj)
 %   ID = getParentID(obj)
 % -------------------------------------------------------------------------
 
-    properties (Hidden, SetAccess = protected)
+    properties (SetAccess = protected)
+        Sources                         = aod.core.Source.empty()
+    end
+
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Experiment', 'aod.core.Source'}
     end
 
     methods
-        function obj = Source(parent, name)
-            obj = obj@aod.core.Entity(parent, name);
+        function obj = Source(name, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.core.Entity(name, parent);
         end
     end
 
@@ -66,6 +74,22 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 parent = parent.Parent;
             end
             ID = parent.ID;
+        end
+
+        function addSource(obj, subSource)
+            % ADDSOURCE
+            %
+            % Description:
+            %   Add a sub-source to the current source
+            %
+            % Syntax:
+            %   addSource(obj, subSource)
+            % -------------------------------------------------------------
+            assert(isSubclass(obj, 'aod.core.Source'),... 
+                'Must be subclass of aod.core.Source');
+
+            subSource.setParent(obj);
+            obj.Sources = cat(1, obj.Sources, subSource);
         end
 
         function assignUUID(obj, UUID)

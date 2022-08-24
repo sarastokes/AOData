@@ -33,12 +33,10 @@ classdef Eye < aod.core.sources.Eye
     end
 
     methods
-        function obj = Eye(parent, whichEye, varargin)
-            obj = obj@aod.core.sources.Eye(parent, whichEye);
+        function obj = Eye(whichEye, varargin)
+            obj = obj@aod.core.sources.Eye(whichEye);
 
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            ip.CaseSensitive = false;
+            ip = aod.util.InputParser();
             addParameter(ip, 'ContactLens', [], @ischar);
             addParameter(ip, 'AxialLength', [], @isnumeric);
             addParameter(ip, 'PupilSize', [], @isnumeric);

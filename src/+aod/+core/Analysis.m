@@ -22,13 +22,13 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
         analysisDate                datetime
     end
 
-    properties (Hidden, SetAccess = protected)
+    properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Experiment'}
     end
 
     methods
         function obj = Analysis(parent, name, analysisDate)
-            obj = obj@aod.core.Entity(parent, name);
+            obj = obj@aod.core.Entity(name, parent);
             if nargin > 2
                 obj.setAnalysisDate(analysisDate);
             end

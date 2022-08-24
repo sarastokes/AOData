@@ -11,8 +11,8 @@ classdef SubjectFactory < aod.core.Factory
 %   obj = SubjectFactory()
 %
 % Methods:
-%   subject = get(obj, ID, whichEye, parent)
-%   subject = create(ID, whichEye, location, parent)
+%   subject = get(obj, ID, whichEye)
+%   subject = create(ID, whichEye, location)
 %
 % Quick initialization:
 %   subject = SubjectFactory(ID, whichEye, location, parent)
@@ -33,7 +33,7 @@ classdef SubjectFactory < aod.core.Factory
             % Do nothing
         end
 
-        function subject = get(obj, ID, whichEye, location, parent)
+        function subject = get(obj, ID, whichEye, location)
             % GET
             %
             % Inputs:
@@ -43,10 +43,6 @@ classdef SubjectFactory < aod.core.Factory
             %   parent              aod.core.Entity subclass
             % -------------------------------------------------------------
 
-            if nargin < 5 
-                parent = [];
-            end
-            
             if nargin < 4 || isempty(location)
                 location = "Unknown";
             else
@@ -65,7 +61,7 @@ classdef SubjectFactory < aod.core.Factory
             switch ID
                 case 838
                     subject = aod.builtin.sources.primate.Primate(...
-                        parent, 'MC00838',...
+                        'MC00838',...
                         'Species', 'macaca fascicularis',...
                         'Sex', 'female',...
                         'Demographics', 'GCaMP6s');
@@ -73,9 +69,10 @@ classdef SubjectFactory < aod.core.Factory
 
                     % Add the eye
                     if strcmp(whichEye, 'OD')
-                        subject = aod.builtin.sources.primate.Eye(subject, 'OD',...
+                        subjectEye = aod.builtin.sources.primate.Eye('OD',...
                             'AxialLength', 16.56, nhpProps{:});
-                        subject.assignUUID("bc7aea0b-ada1-42c1-8f45-695dfb664861");
+                        subjectEye.assignUUID("bc7aea0b-ada1-42c1-8f45-695dfb664861");
+                        subject.addSource(subjectEye);
                         
                         % Add location, if standardized
                         ID = find(obj.PHYSIOLOGY_LOCATIONS == location);
@@ -85,14 +82,13 @@ classdef SubjectFactory < aod.core.Factory
                                 "46f21172-a773-469a-b866-9a3cd10ca7bd"
                                 "fcd32ad9-f53b-4879-8686-d8514230dde5"
                                 "e534bdca-fa2b-46ae-a099-4f28efbfd253"];
-                            subject = sara.sources.PhysiologyLocation(...
-                                subject, location);
-                            subject.assignUUID(locationUUIDs(ID));
+                            subjectLoc = sara.sources.PhysiologyLocation(location);
+                            subjectLoc.assignUUID(locationUUIDs(ID));
+                            subjectEye.addSource(subjectLoc);
                         end
                     end
                 case 848
-                    subject = aod.builtin.sources.primate.Primate(...
-                        parent, 'MC00848',...
+                    subject = aod.builtin.sources.primate.Primate('MC00848',...
                         'Species', 'macaca fascicularis',...
                         'Sex', 'male',...
                         'Demographics', 'rhodamine');
@@ -100,17 +96,17 @@ classdef SubjectFactory < aod.core.Factory
 
                     % Add the eye
                     if strcmp(whichEye, 'OD')
-                        subject = aod.builtin.sources.primate.Eye(subject, 'OD',...
+                        subjectEye = aod.builtin.sources.primate.Eye('OD',...
                             'AxialLength', 18.47, nhpProps{:});
-                        subject.assignUUID("a0a28abd-c677-44d5-ab21-0a82452ab4e3");
+                        subjectEye.assignUUID("a0a28abd-c677-44d5-ab21-0a82452ab4e3");
                     else
-                        subject = aod.builtin.sources.primate.Eye(subject, 'OS',...
+                        subjectEye = aod.builtin.sources.primate.Eye('OS',...
                             'AxialLength', 18.59, nhpProps{:});
-                        subject.assignUUID("d305a3ba-4bb0-479a-9538-be2c18b65a2a");
+                        subjectEye.assignUUID("d305a3ba-4bb0-479a-9538-be2c18b65a2a");
                     end
+                    subject.addSource(subjectEye);
                 case 851
-                    subject = aod.builtin.sources.primate.Primate(...
-                        parent, 'MC00851',...
+                    subject = aod.builtin.sources.primate.Primate('MC00851',...
                         'Species', 'macaca fasciularis',...
                         'Sex', 'male',...
                         'Demographics', 'GCaMP6s, rhodamine');
@@ -118,10 +114,11 @@ classdef SubjectFactory < aod.core.Factory
 
                     % Add the eye
                     if strcmp(whichEye, 'OD')
-                        subject = aod.builtin.sources.primate.Eye(subject, 'OD',...
+                        subjectEye = aod.builtin.sources.primate.Eye('OD',...
                             'AxialLength', 16.88, nhpProps{:});
-                        subject.assignUUID("5c6327dd-52b5-4832-88f4-a3e3977258e9")
-                        
+                        subjectEye.assignUUID("5c6327dd-52b5-4832-88f4-a3e3977258e9")
+                        subject.addSource(subjectEye);
+
                         % Add location, if standardized
                         ID = find(obj.PHYSIOLOGY_LOCATIONS == location);
                         if ~isempty(ID)
@@ -130,15 +127,16 @@ classdef SubjectFactory < aod.core.Factory
                                 "5b6c09f3-e221-49e9-8d10-67825c5e5318"
                                 "21e804eb-d0b8-43e0-96ef-98718c84028d"
                                 "b2208ed0-7abd-4bda-834e-75b0f1133359"];
-                            subject = sara.sources.PhysiologyLocation(...
-                                subject, location);
-                            subject.assignUUID(locationUUIDs(ID));
+                            subjectLoc = sara.sources.PhysiologyLocation(location);
+                            subjectLoc.assignUUID(locationUUIDs(ID));
+                            subjectEye.addSource(subjectLoc);
                         end
                     else
-                        subject = aod.builtin.sources.primate.Eye(subject, 'OS',...
+                        subjectEye = aod.builtin.sources.primate.Eye('OS',...
                             'AxialLength', 16.97, nhpProps{:});
-                        subject.setParam('ContactLens', '12.2mm/5.8mm/plano');
-                        subject.assignUUID("5e8118e0-a165-4c4f-a261-47fb31e9059c");
+                        subjectEye.setParam('ContactLens', '12.2mm/5.8mm/plano');
+                        subjectEye.assignUUID("5e8118e0-a165-4c4f-a261-47fb31e9059c");
+                        subject.addSource(subjectEye);
                         
                         % Add location, if standardized
                         ID = find(obj.PHYSIOLOGY_LOCATIONS == location);
@@ -148,18 +146,13 @@ classdef SubjectFactory < aod.core.Factory
                                 "8e76e7de-694e-48bb-91b3-b5333938071b"
                                 "1ca0286f-1816-4093-9224-c0cad59491c2"
                                 "fc161ba0-25aa-4a3b-b2fc-8d9b42c1e685"];
-                            subject = sara.sources.PhysiologyLocation(...
-                                subject, location);
-                            subject.assignUUID(locationUUIDs(ID));
+                            subjectLoc = sara.sources.PhysiologyLocation(location);
+                            subjectLoc.assignUUID(locationUUIDs(ID));
+                            subjectEye.addSource(subjectLoc);
                         end
                     end
                 otherwise
                     error('Unrecognized ID %u', ID);
-            end
-
-            % If imaging location wasn't specified, output as unknown
-            if ~isSubclass(subject, 'aod.core.sources.Location')
-                subject = aod.core.sources.Location(subject, "Unknown");
             end
         end
     end

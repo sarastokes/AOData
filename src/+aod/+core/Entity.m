@@ -43,7 +43,7 @@ classdef (Abstract) Entity < handle
 %   value = getLabel(obj)
 %   value = getShortLabel(obj)
 %
-% Protected methods (with Creator access):
+% Sealed Protected methods:
 %   addParent(obj, parent)
 %   setUUID(obj, uuid)
 %
@@ -67,7 +67,7 @@ classdef (Abstract) Entity < handle
         parameters                  = aod.core.Parameters()
     end
     
-    properties (Abstract, Hidden, SetAccess = protected)
+    properties (Abstract, Hidden, Access = protected)
         allowableParentTypes        cell
     end
 
@@ -80,12 +80,12 @@ classdef (Abstract) Entity < handle
     end
 
     methods
-        function obj = Entity(parent, name)
+        function obj = Entity(name, parent)
             if nargin > 0
-                obj.setParent(parent);
+                obj.setName(name);
             end
             if nargin > 1
-                obj.setName(name);
+                obj.setParent(parent);
             end
             obj.UUID = aod.util.generateUUID();
         end
@@ -378,7 +378,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods (Sealed, Access = protected)
+    methods (Sealed, Access = {?aod.core.Entity, ?aod.core.Creator})
         function setParent(obj, parent)
             % SETPARENT
             %   

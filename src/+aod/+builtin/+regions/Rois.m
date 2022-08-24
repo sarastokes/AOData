@@ -51,8 +51,8 @@ classdef Rois < aod.core.Region
     end
 
     methods
-        function obj = Rois(parent, rois, varargin)
-            obj@aod.core.Region(parent, varargin{:});
+        function obj = Rois(rois, varargin)
+            obj@aod.core.Region(varargin{:});
 
             ip = aod.util.InputParser();
             addParameter(ip, 'Size', [], @isnumeric);

@@ -22,8 +22,8 @@ classdef Experiment < aod.core.Experiment
     end
 
     methods
-        function obj = Experiment(homeDirectory, expDate, varargin)
-            obj = obj@aod.core.Experiment(homeDirectory, expDate, varargin{:});
+        function obj = Experiment(name, homeDirectory, expDate, varargin)
+            obj = obj@aod.core.Experiment(name, homeDirectory, expDate, varargin{:});
         end
 
         function value = getFileHeader(obj)

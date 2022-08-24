@@ -29,8 +29,8 @@ classdef BandpassFilter < aod.core.Device
     end
 
     methods 
-        function obj = BandpassFilter(parent, wavelength, bandwidth, varargin)
-            obj = obj@aod.core.Device(parent, varargin{:});
+        function obj = BandpassFilter(wavelength, bandwidth, varargin)
+            obj = obj@aod.core.Device(varargin{:});
             
             obj.setWavelength(wavelength);
             obj.setBandwidth(bandwidth);
