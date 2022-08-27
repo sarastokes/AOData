@@ -149,9 +149,10 @@ classdef H5TreeView < handle
                         case {'table', 'timeseries'}
                             iNode.Icon = [obj.ICON_DIR, 'table.png'];
                         otherwise
-                            
                             iNode.Icon = [obj.ICON_DIR, 'data.png'];
-                            warning('Unrecognized dataset class %s', nodeClass);
+                            if ~contains(nodeClass, 'int')
+                                warning('Unrecognized dataset class %s', nodeClass);
+                            end
                     end
                     iNode.Tag = iNode.NodeData('Class');
                 else

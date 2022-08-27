@@ -1,19 +1,18 @@
 classdef EpochTypes
 
     enumeration
-        Spectral
-        Spatial
-        AnatomyOneChannel
-        AnatomyTwoChannel
-        Background
-        Unknown
+        SPECTRAL
+        SPATIAL
+        ANATOMYONECHANNEL
+        ANATOMYTWOCHANNEL
+        BACKGROUND
     end
 
     methods
         function tf = isPhysiology(obj)
             import sara.EpochTypes;
             switch obj
-                case {EpochTypes.Spectral, EpochTypes.Spatial}
+                case {EpochTypes.SPECTRAL, EpochTypes.SPATIAL}
                     tf = true;
                 otherwise
                     tf = false;
@@ -21,7 +20,7 @@ classdef EpochTypes
         end
 
         function value = numChannels(obj)
-            if obj == sara.EpochTypes.AnatomyOneChannel
+            if obj == sara.EpochTypes.ANATOMYONECHANNEL
                 value = 1;
             else
                 value = 2;
@@ -38,17 +37,15 @@ classdef EpochTypes
 
             switch lower(eType)
                 case 'spectral'
-                    obj = sara.EpochTypes.Spectral;
+                    obj = sara.EpochTypes.SPECTRAL;
                 case 'spatial'
-                    obj = sara.EpochTypes.Spatial;
+                    obj = sara.EpochTypes.SPATIAL;
                 case 'anatomy1'
-                    obj = sara.EpochTypes.AnatomyOneChannel;
+                    obj = sara.EpochTypes.ANATOMYONECHANNEL;
                 case 'anatomy2'
-                    obj = sara.EpochTypes.AnatomyTwoChannel;
+                    obj = sara.EpochTypes.ANATOMYTWOCHANNEL;
                 case 'backgroumd'
-                    obj = sara.EpochTypes.Background;
-                case 'unknown'
-                    obj = sara.EpochTypes.Unknown;
+                    obj = sara.EpochTypes.BACKGROUND;
                 otherwise
                     error('Unrecognized epoch type: %s', eType);
             end

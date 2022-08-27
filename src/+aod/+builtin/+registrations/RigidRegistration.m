@@ -10,19 +10,27 @@ classdef RigidRegistration < aod.core.Registration
 % Constructor:
 %   obj = RigidRegistration(data, varargin)
 %
+% Properties:
+%   tform
+%
 % Inherited properties:
-%   Data
 %   registrationDate
 %
 % Methods:
-%   imStack = apply(obj, imStack)
+%   data = apply(obj, data)
 %
 % Inherited methods:
 %   setRegistrationDate(obj, regDate)
 % -------------------------------------------------------------------------
 
+    properties (SetAccess = protected)
+        tform                   
+    end
+
     methods
-        function obj = RigidRegistration(registrationDate, data, varargin)
+        function obj = RigidRegistration(registrationDate, data)
+            obj@aod.core.Registration(registrationDate);
+
             if ~isa(data, 'affine2d')
                 try
                     data = affine2d(data);
@@ -32,27 +40,31 @@ classdef RigidRegistration < aod.core.Registration
                             'Transformation matrix was not 3x3 as expected');
                     end
                 end
-
             end
-            obj@aod.core.Registration(registrationDate, data);
-
-            % Additional inputs are added to parameters
-            obj.setParam(varargin{:});
+            obj.tform = data;
         end
 
-        function imStack = apply(obj, imStack)
+        function data = apply(obj, data)
+            if ndims(data) == 2
+                refObj = imref2d([size(data, 1), size(data, 2)]);
+                data = imwarp(data, refObj, obj.tform,...
+                    'OutputView', refObj);
+                return 
+            end
+
             try
-                tform = affine2d_to_3d(obj.Data);
-                viewObj = affineOutputView(size(imStack), tform,...
+                tForm = affine2d_to_3d(obj.tform);
+                viewObj = affineOutputView(size(data), tForm,...
                     'BoundsStyle', 'SameAsInput');
-                imStack = imwarp(imStack, tform, 'OutputView', viewObj);
+                data = imwarp(data, tForm, 'OutputView', viewObj);
             catch
-                [x, y, t] = size(imStack);
+                [x, y, t] = size(data);
                 refObj = imref2d([x y]);
                 for i = 1:t
-                    imStack(:,:,i) = imwarp(imStack(:,:,i), refObj,...
-                        obj.Data, 'OutputView', refObj);
+                    data(:,:,i) = imwarp(data(:,:,i), refObj,...
+                        obj.tform, 'OutputView', refObj);
                 end 
+                warning('RigidRegistration:UsedSlowProcess');
             end
         end
     end

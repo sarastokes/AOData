@@ -13,11 +13,11 @@ classdef Mustang < aod.builtin.stimuli.ImagingLight
 % -------------------------------------------------------------------------
  
     methods
-        function obj = Mustang(parent, value, units)
-            if nargin < 3
+        function obj = Mustang(value, units)
+            if nargin < 2
                 units = '%';
             end
-            obj@aod.builtin.stimuli.ImagingLight(parent, value, units)
+            obj@aod.builtin.stimuli.ImagingLight(value, units)
         end
     end
 

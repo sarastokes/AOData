@@ -63,8 +63,8 @@ classdef (Abstract) Entity < handle
     end
 
     properties (SetAccess = protected)
-        files                       = aod.core.Parameters()
-        parameters                  = aod.core.Parameters()
+        files                       % aod.core.Parameters
+        parameters                  % aod.core.Parameters
     end
     
     properties (Abstract, Hidden, Access = protected)
@@ -87,6 +87,10 @@ classdef (Abstract) Entity < handle
             if nargin > 1
                 obj.setParent(parent);
             end
+
+            obj.files = aod.core.Parameters();
+            obj.parameters = aod.core.Parameters();
+            
             obj.UUID = aod.util.generateUUID();
         end
 
@@ -295,6 +299,9 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.addFile(fileName, filePath)
             % -------------------------------------------------------------
+            if isstring(filePath)
+                filePath = char(filePath);
+            end
             if isprop(obj, 'homeDirectory') && ~isempty(obj.homeDirectory)
                 filePath = erase(filePath, obj.homeDirectory);
             end

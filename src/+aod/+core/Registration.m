@@ -14,10 +14,6 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 %   setRegistrationDate(obj, regDate)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        Data
-    end
-
     properties (SetAccess = private)
         registrationDate(1,1)               datetime
     end
@@ -26,19 +22,14 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
         allowableParentTypes = {'aod.core.Epoch'};
     end
 
-    % TODO: Add setData method?
     methods (Abstract)
         varargout = apply(obj, varargin)
     end
 
     methods
-        function obj = Registration(registrationDate, data)
+        function obj = Registration(registrationDate)
             obj = obj@aod.core.Entity();
             obj.setRegistrationDate(registrationDate);
-
-            if nargin > 1
-                obj.Data = data;
-            end
         end
     end
 

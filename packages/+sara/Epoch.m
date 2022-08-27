@@ -36,13 +36,6 @@ classdef Epoch < aod.core.Epoch
 % Protected methods:
 %   imStack = applyTransform(obj, imStack)   
 %   videoName = getCoreVideoName(obj)
-% Inherited protected methods:
-%   imStack = readStack(obj, videoName)
-%   displayName = getLabel(obj)
-%   shortLabel = getShortLabel(obj)
-% aod.core.Creator methods:
-%   addRegistration(obj, reg, overwrite)
-%   addStimulus(obj, stim)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -57,6 +50,10 @@ classdef Epoch < aod.core.Epoch
         function obj = Epoch(ID, epochType, varargin)
             obj@aod.core.Epoch(ID, 25, varargin{:});
             obj.epochType = epochType;
+            obj.setFile('CH1', 'Ref');
+            if epochType.numChannels == 2
+                obj.setFile('CH2', 'Vis');
+            end
         end
         
         function value = get.transform(obj)

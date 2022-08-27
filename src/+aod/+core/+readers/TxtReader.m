@@ -1,4 +1,4 @@
-classdef (Abstract) TextReader < aod.core.FileReader
+classdef (Abstract) TxtReader < aod.core.FileReader
 % TEXTREADER (abstract)
 %
 % Description:
@@ -8,45 +8,45 @@ classdef (Abstract) TextReader < aod.core.FileReader
 %   obj = aod.core.FileReader
 %
 % Constructor:
-%   obj = TextReader(varargin)
+%   obj = TxtReader(varargin)
 %
 % Protected methods:
 %   txt = readProperty(obj, header, N)
 % -------------------------------------------------------------------------
 
-    properties (Hidden, SetAccess = protected)
-        validExtensions = '*.txt';
-    end
-
     methods
-        function obj = TextReader(varargin)
+        function obj = TxtReader(varargin)
             obj = obj@aod.core.FileReader(varargin{:});
+            obj.validExtensions = '*.txt';
         end
     end
 
     methods (Access = protected)
-        function lineValue = readProperty(obj, headerText, N)
+        function lineValue = readProperty(obj, header, N)
             % READPROPERTY
             % 
             % Description:
             %   Read a line from parameter file based on starting text
             % 
             % Syntax:
-            %   lineValue = obj.readProperty(headerText, N)
+            %   lineValue = readProperty(obj, header, N)
             % -------------------------------------------------------------
             if nargin < 3
                 N = 1;
             end
-            fid = open(obj.fullFile, 'r');
+            
+            fid = fopen(obj.fullFile, 'r');
             if fid == -1
-                error('File %s count not be opened', obj.fullFile);
+                warning('File %s could not be opened', obj.fullFile);
+                lineValue = 'NaN'; 
+                return
             end
-    
+            
             counter = 0;
             lineValue = [];
             tline = fgetl(fid);
             while ischar(tline)
-                ind = strfind(tline, headerText);
+                ind = strfind(tline, header);
                 if ~isempty(ind)
                     counter = counter + 1;
                     if counter == N
@@ -60,6 +60,31 @@ classdef (Abstract) TextReader < aod.core.FileReader
                 end
             end
             fclose(fid);
+        end
+ 
+        function out = readText(obj, header)
+            out = obj.strtrim(obj.readProperty(header));
+        end
+
+        function out = readNumber(obj, header)
+            out = str2double(obj.strtrim(obj.readProperty(header)));
+        end
+
+        function out = readYesNo(obj, header)
+            out = convertYesNo(obj.strtrim(obj.readProperty(header)));
+        end
+
+        function out = strtrim(obj, txt)
+            % STRTRIM 
+            %
+            % Description:
+            %   Identical to builtin version but no error for empty txt
+            % -------------------------------------------------------------
+            if isempty(txt)
+                out = [];
+            else
+                out = strtrim(txt);
+            end
         end
     end
 end

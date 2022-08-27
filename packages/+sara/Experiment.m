@@ -72,23 +72,24 @@ classdef Experiment < aod.core.Experiment
             end
         end
 
-        function loadTransforms(obj, tforms, epochIDs, varargin)
-            % LOADTRANSFORMS
+        function addSiftTransforms(obj, tforms, epochIDs, regDate, refID, varargin)
+            % LOADSIFTTRANSFORMS
             %
             % Syntax:
             %   loadTransforms(obj, tforms, epochIDs, varargin)
             % -------------------------------------------------------------
-            ip = inputParser();
-            addParameter(ip, 'TransformType', 'rigid', @ischar);
-            addParameter(ip, 'ReferenceEpoch', [], @isnumeric);
+            ip = aod.util.InputParser();
             addParameter(ip, 'WhichTforms', [], @isnumeric);
             parse(ip, varargin{:});
 
-            whichTforms = ip.Results.whichTforms;
+            whichTforms = ip.Results.WhichTforms;
 
             if ischar(tforms)
-                TR = ao.builtin.RigidTransformReader(tforms);
-                tforms = tformReader.read();
+                if ~isfile(tforms)
+                    tforms = fullfile(obj.getAnalysisFolder(), tforms);
+                end
+                TR = sara.readers.RigidTransformReader(tforms);
+                tforms = TR.read();
                 if ~isempty(whichTforms)
                     tforms = tforms(:, :, whichTforms);
                 end
@@ -97,16 +98,14 @@ classdef Experiment < aod.core.Experiment
             end
 
             for i = 1:numel(epochIDs)
-                reg = aod.builtin.registrations.RigidRegistration(...
-                    squeeze(tforms(:,:,i)));
-                reg.setParam('TransformType', ip.Results.TransformType);
-                reg.setParam('ReferenceEpoch', ip.Results.ReferenceEpoch);
+                reg = sara.registrations.SiftRegistration(...
+                    regDate, squeeze(tforms(:,:,i)), refID, varargin{:});
                 if ~isempty(whichTforms)
                     reg.setParam('WhichTforms', whichTforms);
                 else
                     reg.setParam('WhichTforms', 1:numel(epochIDs));
                 end
-                obj.Epochs(obj.idx2epoch(epochIDs(i))).addRegistration(reg);
+                obj.Epochs(obj.id2index(epochIDs(i))).addRegistration(reg);
             end
         end
 

@@ -20,12 +20,8 @@ classdef ImagingLight < aod.core.Stimulus
     end
     
     methods
-        function obj = ImagingLight(parent, value, units)
-            if nargin == 0
-                parent = [];
-            end
-
-            obj@aod.core.Stimulus(parent);
+        function obj = ImagingLight(value, units)
+            obj@aod.core.Stimulus();
 
             if nargin > 1
                 obj.setValue(value);

@@ -33,8 +33,13 @@ classdef LedFrameTableReader < aod.core.FileReader
                 imStack = readTiffStack(videoPath);
                 numFrames = size(imStack, 3) + 1;
             catch
-                videoPath = strrep(obj.fullFile, '.csv', '.avi');
-                v = VideoReader(videoPath);
+                try
+                    videoPath = strrep(obj.fullFile, '.csv', '.avi');
+                    v = VideoReader(videoPath);
+                catch
+                    videoPath = strrep(obj.fullFile, '.csv', 'O.avi');
+                    v = VideoReader(videoPath);
+                end
                 numFrames = v.NumFrames;
             end
         

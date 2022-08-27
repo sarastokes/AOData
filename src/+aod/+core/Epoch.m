@@ -50,7 +50,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         ID(1,1)                     double
     end
 
-    properties (SetAccess = protected)
+    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         startTime(1,1)              datetime
         Registrations               aod.core.Registration
         Responses                   aod.core.Response  
@@ -86,7 +86,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         function obj = Epoch(ID, sampleRate, varargin)
             obj = obj@aod.core.Entity();
             obj.ID = ID;
-            obj.sampleRate = obj.setParam('SampleRate', sampleRate);
+            obj.setParam('SampleRate', sampleRate);
             
             ip = aod.util.InputParser();
             addParameter(ip, 'Source', [], @(x) isSubclass(x, 'aod.core.Source'));
@@ -196,7 +196,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Sealed)%(Sealed, Access = {?aod.core.Epoch, ?aod.core.Creator})       
+    methods (Sealed)  
         function setSource(obj, source)
             % SETSOURCE
             %
@@ -288,36 +288,16 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Stimuli = cat(1, obj.Stimuli, stim);
         end
 
-        function addRegistration(obj, reg, overwrite)
+        function addRegistration(obj, reg)
             % ADDREGISTRATION
             %
             % Syntax:
-            %   obj.addRegistration(reg, overwrite)
+            %   obj.addRegistration(reg)
             % -------------------------------------------------------------
-            if nargin < 3
-                overwrite = false;
-            end
-
             assert(isSubclass(reg, 'aod.core.Registration'),...
                 'addRegistration: input was not a subclass of aod.core.Registration')
             reg.setParent(obj);
 
-            if ~isempty(obj.Registrations)
-                idx = find(findByClass(obj.Registrations, class(reg)));
-                if ~isempty(idx) 
-                    if ~overwrite
-                        warning('Set overwrite=true to replace existing registration');
-                        return
-                    else % overwrite existing
-                        if numel(obj.Registrations) == 1
-                            obj.Registrations = reg;
-                        else
-                            obj.Registrations(idx) = reg;
-                        end
-                        return
-                    end
-                end
-            end
             obj.Registrations = cat(1, obj.Registrations, reg);
         end
 
@@ -353,10 +333,34 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             end
             obj.Responses = cat(1, obj.Responses, resp);
         end
+        
+        function setStartTime(obj, startTime)
+            obj.startTime = startTime;
+        end
     end
 
     % Overwritten methods from Entity
     methods
+        function value = getFile(obj, fileName, isRelative)
+            % GETFILE
+            %
+            % Syntax:
+            %   getFile(obj, fileName)
+            % -------------------------------------------------------------
+            if nargin < 3
+                isRelative = true;
+            end
+            value = getFile@aod.core.Entity(obj, fileName);
+            if isRelative
+                if isempty(obj.Parent)
+                    error('getFile:MissingParent', ...
+                        'Assign epoch to Experiment for complete relative file names');
+                else
+                    value = fullfile(obj.Parent.homeDirectory, value);
+                end
+            end
+        end
+
         function setFile(obj, fileName, filePath)
             % ADDFILE
             %
@@ -367,7 +371,12 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   obj.addFile(fileName, filePath)
             % -------------------------------------------------------------
-            filePath = erase(filePath, obj.Parent.homeDirectory);
+            if isstring(filePath)
+                filePath = char(filePath);
+            end
+            if ~isempty(obj.Parent)
+                filePath = erase(filePath, obj.Parent.homeDirectory);
+            end
             filePath = strtrim(filePath);
             obj.files(fileName) = filePath;
         end

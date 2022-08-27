@@ -43,7 +43,7 @@ classdef Experiment < aod.core.Entity
 %   sortEpochs(obj)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         homeDirectory           char
         experimentDate(1,1)     datetime
 
@@ -154,9 +154,9 @@ classdef Experiment < aod.core.Entity
             % GETREGION
             %
             % Syntax:
-            %   cal = obj.getRegion(className)
+            %   region = obj.getRegion(className)
             % -------------------------------------------------------------
-            cal = getByClass(obj.Regions, className);
+            region = getByClass(obj.Regions, className);
         end
     
         function addRegion(obj, region, overwrite)
@@ -371,9 +371,10 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   removeEpoch(obj, epochID)
             % -------------------------------------------------------------
-            assert(ismember(ID, obj.epochIDs), 'ID not found in epochIDs!');
+            assert(ismember(epochID, obj.epochIDs), 'ID not found in epochIDs!');
             idx = obj.id2index(epochID);
             obj.Epochs(idx) = [];
+            obj.epochIDs(obj.epochIDs == epochID) = [];
         end
         
         function clearEpochs(obj)
@@ -383,6 +384,7 @@ classdef Experiment < aod.core.Entity
             %   obj.clearEpochs()
             % -------------------------------------------------------------
             obj.Epochs = aod.core.Epoch.empty();
+            obj.epochIDs = [];
         end
 
         function addCalibration(obj, calibration)
@@ -415,9 +417,15 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             obj.Calibrations = aod.core.Calibration.empty();
         end
+
+        function clearAllRegistrations(obj)
+            for i = 1:numel(obj.Epochs)
+                obj.Epochs(i).Registrations = aod.core.Registration.empty();
+            end
+        end
     end
 
-    methods (Access = private)
+    methods (Access = protected)
         function sortEpochs(obj)
             % SORTEPOCHS
             %
@@ -427,6 +435,9 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   obj.sortEpochs();
             % -------------------------------------------------------------
+            if obj.numEpochs < 2
+                return
+            end
             [obj.epochIDs, idx] = sort(obj.epochIDs);
             obj.Epochs = obj.Epochs(idx);
         end

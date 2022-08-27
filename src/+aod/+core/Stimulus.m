@@ -16,11 +16,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods
-        function obj = Stimulus(name, parent)
-            if nargin < 1
-                name = [];
-            end
-            obj = obj@aod.core.Entity(name, parent);
+        function obj = Stimulus(varargin)
+            obj = obj@aod.core.Entity(varargin{:});
         end
     end
 end

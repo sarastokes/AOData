@@ -11,9 +11,9 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
     end
 
     methods
-        function obj = VisualStimulus(parent, protocol)
-            obj = obj@aod.core.Stimulus(parent);
-            if nargin > 1
+        function obj = VisualStimulus(protocol)
+            obj = obj@aod.core.Stimulus();
+            if nargin > 0
                 obj.protocolName = class(protocol);
                 obj.getProtocolParameters(protocol);
                 [~, obj.defaultProtocolFile, ~] = fileparts(protocol.getFileName());

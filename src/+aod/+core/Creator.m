@@ -6,13 +6,15 @@ classdef (Abstract) Creator < handle
 %   to populate Experiment, Epoch, etc 
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        homeDirectory
+    properties (SetAccess = private)
+        Experiment
     end
 
     methods
-        function obj = Creator(homeDirectory, varargin)
-            obj.homeDirectory = homeDirectory;
+        function obj = Creator(experiment)
+            assert(isSubclass(experiment, 'aod.core.Experiment'),...
+                'Input must be subclass of aod.core.Experiment');
+            obj.Experiment = experiment;
         end
     end
 end

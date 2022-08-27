@@ -1,8 +1,14 @@
-classdef RegistrationParameterReader < aod.core.FileReader 
+classdef RegistrationParameterReader < aod.core.readers.TxtReader 
 % REGISTRATIONPARAMETERREADER
 %
 % Description:
 %   Creates a struct containing all strip registration parameters
+%
+% Parent:
+%   aod.core.readers.TxtReader
+%
+% Syntax:
+%   obj = RegistrationParameterReader(fileName)
 %
 % See also:
 %   aod.builtin.registrations.StripRegistration
@@ -10,7 +16,7 @@ classdef RegistrationParameterReader < aod.core.FileReader
 
     methods
         function obj = RegistrationParameterReader(fName)
-            obj@aod.core.FileReader(fName);
+            obj@aod.core.readers.TxtReader(fName);
         end
 
         function out = read(obj)
@@ -39,24 +45,37 @@ classdef RegistrationParameterReader < aod.core.FileReader
             out.RefFrameNumber = obj.readNumber('Run video frames with reference #:');
             out.AutoRef = obj.readYesNo('Run video with automatic reference:');
             out.RefImage = obj.readYesNo('Run video with a reference image:');
-            out.RefImageName = obj.readText('Run video with reference image name:');
+            out.RefImageName = obj.readText('Run video with a reference image name:');
             out.Rotate90Degrees = obj.readYesNo('Run video rotating 90 degrees:');
             out.Desinusoid = obj.readYesNo('Run video with desinusoiding:');
             obj.Data = out;
         end
     end
 
-    methods (Access = private)
-        function out = readText(obj, header)
-            out = removeTabs(readProperty(obj.fullFile, header));
-        end
+    methods (Static)
+        function obj = init(folderPath, ID)
+            arguments
+                folderPath      {mustBeFolder}
+                ID              {mustBeInteger}
+            end
 
-        function out = readNumber(obj, header)
-            out = str2double(removeTabs(readProperty(obj.fullFile, header)));
-        end
+            files = ls(folderPath);
+            files = deblank(string(files));
+            files = multicontains(files, {'params', '.txt'});
+            [~, idx] = extractMatches(files,... 
+                digitBoundary + int2fixedwidthstr(ID, 4) + digitBoundary);
 
-        function out = readYesNo(obj, header)
-            out = convertYesNo(removeTabs(readProperty(obj.fullFile, header)));
+            if isempty(idx)
+                error('File for ID %u not found in %s!', ID, folderPath);
+            elseif numel(idx) > 1 
+                warning('Epoch %u - %u registration files found! Using last',... 
+                    ID, numel(idx));
+                disp(files(idx));
+                idx = idx(end);
+            end
+            
+            obj = aod.builtin.readers.RegistrationParameterReader(...
+                fullfile(folderPath, char(files(idx))));
         end
     end
 end

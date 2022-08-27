@@ -21,35 +21,42 @@ classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
     end
 
     methods
-        function obj = SpectralStimulus(parent, protocol)
-            if nargin < 1
-                parent = [];
-            end
-            obj = obj@aod.builtin.stimuli.VisualStimulus(parent, protocol);
-            if isSubclass(obj.Parent, 'aod.core.Epoch')
-                obj.importStimulusFiles();
-            end
+        function obj = SpectralStimulus(protocol)
+            obj = obj@aod.builtin.stimuli.VisualStimulus(protocol);
         end
-    end
 
-    methods (Access = private)
-        function importStimulusFiles(obj)
-            % IMPORTLEDFILES
+        function setFrameRate(obj, frameRate)
+            assert(isnumeric(frameRate), 'frameRate must be a number');
+            obj.frameRate = frameRate;
+        end
+
+        function setPresentation(obj, presentation)
+            obj.presentation = presentation;
+        end
+
+        function setVoltages(obj, voltages)
+            obj.voltages = voltages;
+        end
+
+        function loadFrames(obj, fName)
+            % IMPORTPRESENTATION
             %
-            % Syntax:
-            %   obj.setPresentation(presentation)
+            % Description:
+            %   Get the LED values during each frame
             % -------------------------------------------------------------
-            
-            % Get the LED values during each sample
-            reader = aod.builtin.readers.LedFrameTableReader(...
-                obj.Parent.getFilePath('FrameReport'));
-            obj.presentation = reader.read();
-            obj.frameRate = reader.frameRate;
+            reader = aod.builtin.readers.LedFrameTableReader(fName);
+            obj.setPresentation(reader.read());
+            obj.setFrameRate(reader.frameRate);
+        end
 
-            % Get the command voltages in LED timing
-            reader = aod.builtin.readers.LedVoltageReader(...
-                obj.Parent.getFilePath('LedVoltages'));
-            obj.voltages = reader.read();
+        function loadVoltages(obj, fName)
+            % IMPORTVOLTAGES
+            %
+            % Description:
+            %   Get the command voltages in LED timing
+            % -------------------------------------------------------------
+            reader = aod.builtin.readers.LedVoltageReader(fName);
+            obj.setVoltages(reader.read());
         end
     end
 end
