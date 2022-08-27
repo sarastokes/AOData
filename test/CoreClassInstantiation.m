@@ -4,20 +4,20 @@
 
 import aod.core.*
 
-calibration = Calibration([], '20220822'); %#ok<*NASGU> 
+calibration = Calibration('20220822'); %#ok<*NASGU> 
 
 source = Source('SourceName');
 source.addSource(Source('SubSourceName'));
 
-system = System([], 'SystemName');
-channel = Channel([], 'ChannelName');
-device = Device([], 'Model', 'P20K', 'Manufacturer', 'ThorLabs');
+system = System('SystemName');
+channel = Channel('ChannelName');
+device = Device('Model', 'P20K', 'Manufacturer', 'ThorLabs');
 
-stimulus = Stimulus([]);
+stimulus = Stimulus();
 registration = aod.builtin.registrations.RigidRegistration([], eye(3));
-dataset = Dataset([], 'DatasetName');
+dataset = Dataset('DatasetName');
 response = Response([]);
-timing = aod.core.timing.TimeStamps(response, 1:4);
+timing = aod.core.timing.TimeStamps(1:4);
 
 analysis = Analysis([], 'AnalysisName');
 

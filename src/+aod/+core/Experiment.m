@@ -35,7 +35,6 @@ classdef Experiment < aod.core.Entity
 %   data = getRegionResponses(obj, epochIDs)
 %   clearAllResponses(obj, epochIDs)
 %
-% Protected methods with Creator access:
 %   addCalibration(obj, calibration)
 %   addEpoch(obj, epoch)
 %   addRegion(obj, region)

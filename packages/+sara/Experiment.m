@@ -61,7 +61,7 @@ classdef Experiment < aod.core.Experiment
             end
         end
 
-        function clearRigidTransforms(obj)
+        function clearSiftTransforms(obj)
             % CLEARRIGIDTRANSFORMS
             %
             % Syntax:
