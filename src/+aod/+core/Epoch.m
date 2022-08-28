@@ -29,7 +29,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % 
 % Public methods:
 %   imStack = getStack(obj, varargin)
-%   fName = getFilePath(obj, whichFile)
 %   clearVideoCache(obj)
 %   addRegistration(obj, reg, overwrite)
 %   addResponse(obj, resp)
@@ -64,10 +63,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         System                      = aod.core.System.empty()
     end
 
-    properties (Dependent, Hidden)
-        homeDirectory
-    end
-
     properties (Hidden, Transient, Access = protected)
         cachedVideo
     end
@@ -96,35 +91,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.setSource(ip.Results.Source);
             obj.setSystem(ip.Results.System);
         end
-
-        function value = get.homeDirectory(obj)
-            if ~isempty(obj.Parent)
-                value = obj.Parent.homeDirectory;
-            else
-                value = [];
-            end
-        end
     end
 
     methods (Sealed)
-        function fName = getFilePath(obj, whichFile)
-            % GETFILEPATH
-            %
-            % Syntax:
-            %   fName = obj.getFilePath(whichFile)
-            % -------------------------------------------------------------
-            if ~isKey(obj.files, whichFile)
-                warning('File named %s not found', whichFile);
-                fName = [];
-                return
-            end
-            fName = obj.files(whichFile);
-            % TODO: This might be an issue for Mac
-            if ~contains(fName, ':\')
-                fName = obj.Parent.homeDirectory + fName;
-            end
-        end
-
         function clearVideoCache(obj)
             % CLEARVIDEOCACHE
             %
@@ -197,6 +166,18 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Sealed)  
+        function setStartTime(obj, startTime)
+            % SETSTARTTIME
+            %
+            % Description:
+            %   Set the time the epoch began
+            %
+            % Syntax:
+            %   setStartTime(obj, startTime)
+            % -------------------------------------------------------------
+            obj.startTime = startTime;
+        end
+
         function setSource(obj, source)
             % SETSOURCE
             %
@@ -235,28 +216,47 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.System = system;
         end
 
-        function addDataset(obj, dataset, overwrite)
+        function addDataset(obj, dataset)
             % ADDDATASET
             %
             % Syntax:
-            %   obj.addDataset(dataset, overwrite)
+            %   obj.addDataset(dataset)
             % -------------------------------------------------------------
             assert(isSubclass(dataset, 'aod.core.Dataset'),...
                 'Must be a subclass of aod.core.Dataset');
-            
-            if ~isempty(obj.Datasets)
-                idx = find(findByClass(obj.Datasets, dataset));
-                % TODO check name
-                if ~isempty(idx)
-                    if ~overwrite
-                        warning('Set overwrite=true to replace existing datasets');
-                        return
-                    end
-                else
-                    obj.Datasets(idx) = dataset;
-                end
-            end
+            dataset.addParent(obj);
             obj.Datasets = cat(1, obj.Datasets, dataset);
+        end
+
+        function removeDataset(obj, ID)
+            % REMOVEDATASET
+            %
+            % Syntax:
+            %   removeDataset(obj, ID)
+            %
+            % Inputs:
+            %   ID can be index or dataset name
+            % -------------------------------------------------------------
+            if istext(ID)
+                ID = find(vertcat(obj.Datasets.Name) == ID);
+                if isempty(ID)
+                    error("removeDataset:InvalidName",...
+                        "Dataset named %s not found", ID);
+                end
+            elseif isnumeric(ID)
+                assert(ID > 0 & ID <= numel(obj.Datasets),...
+                    "Invalid dataset number, only %u are present", ID);                
+            end
+            obj.Datasets(ID) = [];
+        end
+
+        function clearDatasets(obj)
+            % CLEARDATASETS
+            %
+            % Syntax:
+            %   clearDatasets(obj)
+            % -------------------------------------------------------------
+            obj.Datasets = aod.core.Dataset.empty();
         end
 
         function addStimulus(obj, stim, overwrite)
@@ -265,26 +265,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   obj.addStimulus(stim, overwrite)
             % -------------------------------------------------------------
-            if nargin < 3
-                overwrite = false;
-            end
 
             assert(isSubclass(stim, 'aod.core.Stimulus'),... 
                 'stim must be subclass of aod.core.Stimulus');
             stim.setParent(obj);
 
-            if ~isempty(obj.Stimuli)
-                idx = find(findByClass(obj.Stimuli, stim));
-                if ~isempty(idx) 
-                    if ~overwrite
-                        warning('Set overwrite=true to replace existing stimuli');
-                        return
-                    else
-                        obj.Stimuli(idx) = stim;
-                        return
-                    end
-                end
-            end
             obj.Stimuli = cat(1, obj.Stimuli, stim);
         end
 
@@ -295,13 +280,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.addRegistration(reg)
             % -------------------------------------------------------------
             assert(isSubclass(reg, 'aod.core.Registration'),...
-                'addRegistration: input was not a subclass of aod.core.Registration')
-            reg.setParent(obj);
+                'addRegistration: input was not a subclass of aod.core.Registration');
 
+            reg.setParent(obj);
             obj.Registrations = cat(1, obj.Registrations, reg);
         end
 
-        function addResponse(obj, resp, overwrite)
+        function addResponse(obj, resp)
             % ADDRESPONSE
             %
             % Syntax:
@@ -310,75 +295,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             arguments 
                 obj
                 resp(1,1)           {mustBeA(resp, 'aod.core.Response')}
-                overwrite(1,1)      logical                             = false 
             end
 
             resp.addParent(obj);
-
-            if ~isempty(obj.Responses)
-                idx = find(findByClass(obj.Responses, class(resp)));
-                if ~isempty(idx)
-                    if ~overwrite
-                        warning('Set overwrite=true to replace existing %s', class(resp));
-                        return
-                    else  % Overwrite existing
-                        if numel(obj.Responses) == 1
-                            obj.Responses = resp;
-                        else
-                            obj.Responses(idx) = resp;
-                        end
-                        return
-                    end
-                end
-            end
             obj.Responses = cat(1, obj.Responses, resp);
-        end
-        
-        function setStartTime(obj, startTime)
-            obj.startTime = startTime;
-        end
-    end
-
-    % Overwritten methods from Entity
-    methods
-        function value = getFile(obj, fileName, isRelative)
-            % GETFILE
-            %
-            % Syntax:
-            %   getFile(obj, fileName)
-            % -------------------------------------------------------------
-            if nargin < 3
-                isRelative = true;
-            end
-            value = getFile@aod.core.Entity(obj, fileName);
-            if isRelative
-                if isempty(obj.Parent)
-                    error('getFile:MissingParent', ...
-                        'Assign epoch to Experiment for complete relative file names');
-                else
-                    value = fullfile(obj.Parent.homeDirectory, value);
-                end
-            end
-        end
-
-        function setFile(obj, fileName, filePath)
-            % ADDFILE
-            %
-            % Description:
-            %   Adds to files prop, stripping out homeDirectory and
-            %   trailing/leading whitespace, if needed
-            %
-            % Syntax:
-            %   obj.addFile(fileName, filePath)
-            % -------------------------------------------------------------
-            if isstring(filePath)
-                filePath = char(filePath);
-            end
-            if ~isempty(obj.Parent)
-                filePath = erase(filePath, obj.Parent.homeDirectory);
-            end
-            filePath = strtrim(filePath);
-            obj.files(fileName) = filePath;
         end
     end
 

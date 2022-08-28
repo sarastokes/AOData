@@ -22,15 +22,15 @@ classdef EpochFactory < aod.core.Factory
 
             % Add imaging parameters, if necessary
             if ep.hasFile('ImagingParams')
-                reader = sara.readers.EpochParameterReader(ep.getFile('ImagingParams'));
+                reader = sara.readers.EpochParameterReader(ep.getExptFile('ImagingParams'));
                 ep = reader.read(ep);
             end
 
             % Add registration, if necessary
             if ep.hasFile('RegMotion')
                 reg = aod.builtin.registrations.StripRegistration();
-                reg.loadData(ep.getFile('RegMotion'));
-                reg.loadParameters(ep.getFile('RegParams'));
+                reg.loadData(ep.getExptFile('RegMotion'));
+                reg.loadParameters(ep.getExptFile('RegParams'));
                 ep.addRegistration(reg);
             end
 
@@ -40,8 +40,8 @@ classdef EpochFactory < aod.core.Factory
                     EXPT.getCalibration('sara.calibrations.MaxwellianView'),... 
                     ep.getParam('StimulusName'));
                 stim = sara.stimuli.SpectralStimulus(protocol);
-                stim.loadVoltages(ep.getFile('LedVoltages'));
-                stim.loadFrames(ep.getFile('FrameTable'));
+                stim.loadVoltages(ep.getExptFile('LedVoltages'));
+                stim.loadFrames(ep.getExptFile('FrameTable'));
                 ep.addStimulus(stim);
             elseif epochType == sara.EpochTypes.Spatial
                 protocol = sara.factories.SpatialProtocolFactory.create(...
@@ -57,8 +57,8 @@ classdef EpochFactory < aod.core.Factory
         function ep = addStripRegistration(ep)
             if ep.hasFile('RegMotion')
                 reg = aod.builtin.registrations.StripRegistration();
-                reg.loadData(ep.getFile('RegMotion'));
-                reg.loadParameters(ep.getFile('RegParams'));
+                reg.loadData(ep.getExptFile('RegMotion'));
+                reg.loadParameters(ep.getExptFile('RegParams'));
                 ep.addRegistration(reg);
             end
         end

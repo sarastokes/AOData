@@ -65,7 +65,6 @@ classdef EntityTypes
                     containers = [];
             end
         end
-
     end
 
     methods (Static)
@@ -144,6 +143,20 @@ classdef EntityTypes
                 value = EntityTypes.TIMING;
             else
                 error('Unrecognized entity type: %s', class(obj));
+            end
+        end
+
+        function obj = init(entityName)
+            if isa(entityType, 'aod.util.EntityTypes')
+                obj = entityName;
+                return
+            end
+
+            try
+                obj = aod.util.EntityTypes.(upper(entityName));
+            catch
+                error("init:InvalidEntityName",...
+                    "No EntityType found matching %s", entityName);
             end
         end
     end

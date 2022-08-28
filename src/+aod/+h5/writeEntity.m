@@ -118,8 +118,8 @@ function writeEntity(hdfName, obj)
     
     % Write file paths, if necessary
     if ~isempty(obj.files)
-        h = ancestor(obj, 'aod.core.Experiment');
-        HDF5.makeTextDataset(hdfName, hdfPath, 'Files', h.homeDirectory);
+        fileText = sprintf('%u file paths', numel(obj.files));
+        HDF5.makeTextDataset(hdfName, hdfPath, 'Files', fileText);
         aod.h5.writeParameters(hdfName, [hdfPath, '/Files'], obj.files);
     end
     

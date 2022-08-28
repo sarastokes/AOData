@@ -6,16 +6,8 @@ classdef Experiment < aod.core.Experiment
 %
 % Methods:
 %   getFileHeader(obj)
-%   initParameters(obj, varargin)
-%   loadTransforms(obj, fName)
-%   clearRigidTransforms(obj)
-%
-% Inherited public methods:
-%   setHomeDirectory(obj, filePath)
-%   id = id2epoch(obj, epochID)
-%   idx = id2idx(obj, epochID)
-%   imStack = getStacks(obj, epochIDs)
-%   data = getRegionResponses(obj, epochIDs)  
+%   loadSiftTransforms(obj, fName)
+%   clearSiftTransforms(obj)
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         sampleRate = 25  % Hz
@@ -45,7 +37,7 @@ classdef Experiment < aod.core.Experiment
             % Syntax:
             %   fPath = getAnalysisFolder(obj)
             % -------------------------------------------------------------
-            fPath = [obj.homeDirectory, filesep, 'Analysis', filesep];
+            fPath = fullfile(obj.homeDirectory, 'Analysis');
         end
     end
 

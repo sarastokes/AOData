@@ -29,24 +29,12 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = System(systemName, parent)
-            if nargin < 2
-                parent = [];
-            end
-            obj = obj@aod.core.Entity(systemName, parent);
+        function obj = System(systemName)
+            obj = obj@aod.core.Entity(systemName);
         end      
     end
     
     methods (Sealed)
-        function removeChannel(obj, channelID)
-            assert(channelID <= numel(obj.Channels), 'Invalid Channel number');
-            obj.Channels(channelID) = [];
-        end
-        
-        function clearChannels(obj)
-            obj.Channels = [];
-        end
- 
         function addChannel(obj, channel)
             % ADDCHANNEL
             %
@@ -57,6 +45,31 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
                 'Invalid type: must be a subclass of aod.core.Channel');
             channel.setParent(obj);
             obj.Channels = cat(1, obj.Channels, channel);
+        end
+
+        function removeChannel(obj, ID)
+            if ischar(ID)
+                ID = find(strcmp(obj.Channels.Name, ID));
+                if isempty(ID)
+                    error("removeChannel:NameDoesNotExist",...
+                        "No channel found named %s", ID);
+                end
+            elseif isnumeric(ID)
+                assert(ID <= numel(obj.Channels), 'Invalid Channel number');
+            end
+            obj.Channels(ID) = [];
+        end
+        
+        function clearChannels(obj)
+            % CLEARCHANNELS
+            %
+            % Description:
+            %   Clear all channels
+            %
+            % Syntax:
+            %   clearChannels(obj)
+            % -------------------------------------------------------------
+            obj.Channels = [];
         end
 
         function assignUUID(obj, UUID)

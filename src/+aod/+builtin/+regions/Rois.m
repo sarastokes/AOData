@@ -38,6 +38,7 @@ classdef Rois < aod.core.Region
 
     properties (SetAccess = protected)
         Metadata            table            = table.empty()
+        Image
     end
 
     properties (SetAccess = private)
@@ -122,6 +123,23 @@ classdef Rois < aod.core.Region
             obj.setMap(newMap);
             obj.setMetadata();
             notify(obj, 'UpdatedRois');
+        end
+
+        function setImage(obj, img)
+            % SETIMAGE
+            % 
+            % Description:
+            %   Set an image used for segmentation
+            %
+            % Syntax
+            %   setImage(obj, img)
+            % -------------------------------------------------------------
+            if istext(img)
+                obj.Image = imread(img);
+                obj.setFile('Image', img);
+            else
+                obj.Image = img;
+            end
         end
     end
 

@@ -22,8 +22,6 @@ classdef Epoch < aod.core.Epoch
 %   files               aod.core.Parameters
 % Dependent properties:
 %   transform           aod.builtin.registrations.RigidRegistration
-% Inherited dependent properties:
-%   homeDirectory
 %
 % Public methods:
 %   makeStackSnapshots(obj, fPath)
@@ -32,7 +30,6 @@ classdef Epoch < aod.core.Epoch
 %   imStack = getStack(obj)
 % Inherited public methods:
 %   clearVideoCache(obj)
-%   fPath = getFilePath(obj, whichFile)
 % Protected methods:
 %   imStack = applyTransform(obj, imStack)   
 %   videoName = getCoreVideoName(obj)
@@ -173,7 +170,7 @@ classdef Epoch < aod.core.Epoch
 
     methods (Access = protected)
         function videoName = getCoreVideoName(obj)
-            videoName = obj.getFilePath('AnalysisVideo');
+            videoName = obj.getExptFile('AnalysisVideo');
         end
 
         function value = getLabel(obj)

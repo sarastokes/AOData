@@ -20,4 +20,10 @@ classdef TopticaPower < aod.builtin.calibrations.PowerMeasurement
                 calibrationDate, wavelength, 'SettingUnit', '%');
         end
     end
+
+    methods (Access = protected)
+        function value = setLabel(obj)
+            value = sprintf('TopticaPower%unm', obj.wavelength);
+        end
+    end
 end 

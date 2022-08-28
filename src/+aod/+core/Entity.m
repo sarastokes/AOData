@@ -35,7 +35,8 @@ classdef (Abstract) Entity < handle
 %   removeParam(obj, paramName)
 %   
 %   setFile(obj, fileName, filePath)
-%   value = getFile(obj, fileName, mustReturnFile)
+%   value = getFile(obj, fileName, msgType)
+%   value = getExptFile(obj, fileName, varargin)
 %   tf = hasFile(obj, fileName)
 %   removeFile(obj, fileName)
 %
@@ -299,11 +300,15 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.addFile(fileName, filePath)
             % -------------------------------------------------------------
-            if isstring(filePath)
-                filePath = char(filePath);
+            arguments
+                obj
+                fileName                char
+                filePath                char
             end
-            if isprop(obj, 'homeDirectory') && ~isempty(obj.homeDirectory)
-                filePath = erase(filePath, obj.homeDirectory);
+
+            fPath = obj.getHomeDirectory();
+            if ~isempty(fPath)
+                filePath = erase(filePath, fPath);
             end
             filePath = strtrim(filePath);
             obj.files(fileName) = filePath;
@@ -358,6 +363,55 @@ classdef (Abstract) Entity < handle
                 end
             end
         end
+
+        function fileValue = getExptFile(obj, fileName, varargin)
+            % GETEXPTFILE
+            %
+            % Description:
+            %   Same as getFile but appends experiment path to the output.
+            %   Use when working with file paths relative to the experiment
+            %   folder.
+            %
+            % Syntax:
+            %   fileValue = getExptFile(obj, fileName, varargin)
+            %
+            % Notes:
+            %   Optional inputs are passed to getFile()
+            % -------------------------------------------------------------
+            fPath = obj.getHomeDirectory();
+            if isempty(fPath)
+                error("getExptFile:NoHomeDirectory",...
+                    "Add entity to experiment to use getExptFile");
+            end
+
+            fileValue = obj.getFile(fileName, varargin{:});
+            if ~isempty(fileValue)
+                out = [];
+            else
+                fileValue = fullfile(fPath, fileValue);
+            end
+        end
+
+        function out = getHomeDirectory(obj)
+            % GETHOMEDIRECTORY
+            %
+            % Description:
+            %   Recursively searches Parent for Experiment and returns the
+            %   homeDirectory property
+            %
+            % Syntax:
+            %   out = getHomeDirectory(obj)
+            % -------------------------------------------------------------
+            h = ancestor(obj, 'aod.core.Experiment');
+            if ~isempty(h)
+                out = h.homeDirectory;
+            else
+                warning("getHomeDirectory:NotFound", ...
+                    "Ensure entity is added to experiment")
+                out = [];
+            end
+        end
+
     end
 
     % Methods likely to be overwritten by subclasses
