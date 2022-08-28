@@ -414,7 +414,7 @@ classdef (Abstract) Entity < handle
 
     end
 
-    % Methods likely to be overwritten by subclasses
+    % Methods meant to be overwritten by subclasses, if needed
     methods (Access = protected)
         function value = getLabel(obj)  
             % GETLABEL
@@ -437,6 +437,16 @@ classdef (Abstract) Entity < handle
             % -------------------------------------------------------------
             value = obj.getLabel();
         end
+
+        function sync(obj) %#ok<MANU> 
+            % SYNC
+            % 
+            % Description:
+            %   Sync is called when an object's Parent is set. Use for 
+            %   aspects of entity building that require access to the 
+            %   experiment hierarchy
+            % -------------------------------------------------------------
+        end
     end
 
     methods (Sealed, Access = {?aod.core.Entity})
@@ -455,6 +465,8 @@ classdef (Abstract) Entity < handle
             else
                 error('%s is not a valid parent', class(parent));
             end
+            
+            obj.sync();
         end
 
         function setUUID(obj, UUID)

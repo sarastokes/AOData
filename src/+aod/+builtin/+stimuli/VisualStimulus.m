@@ -44,6 +44,16 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
                 value = [value, capitalize(txt{i})]; %#ok<AGROW> 
             end
         end
+
+        function sync(obj)
+            if ~isempty(obj.Calibration)
+                h = ancestor(obj, 'aod.core.Experiment');
+                cal = h.getCalibration(class(obj.Calibration));
+                if cal.calibrationDate == obj.Calibration.calibrationDate
+                    obj.setCalibration(cal);
+                end
+            end
+        end
     end
 
     methods (Access = private)
@@ -58,6 +68,9 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
                 if strcmp(mc.PropertyList(i).GetAccess, 'public')
                     if isnumeric(mc.PropertyList(i).Name) && isnan(mc.PropertyList(i).Name)
                         continue
+                    end
+                    if strcmpi(mc.PropertyList(i).Name, 'Calibration')
+                        obj.setCalibration(protocol.(mc.PropertyList(i).Name));
                     end
                     obj.setParam(mc.PropertyList(i).Name,...
                         protocol.(mc.PropertyList(i).Name));
