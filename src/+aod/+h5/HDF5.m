@@ -219,7 +219,7 @@ classdef HDF5 < handle
             end
                 
             typeID = H5T.copy('H5T_C_S1');
-            typeID = onCleanup(@()H5T.close(typeID));
+            typeIDx = onCleanup(@()H5T.close(typeID));
             H5T.set_size(typeID, 'H5T_VARIABLE');
             H5T.set_strpad(typeID, 'H5T_STR_NULLTERM');
 
@@ -264,8 +264,10 @@ classdef HDF5 < handle
             %   makeStringDataset(fileName, pathName, dsetName, data)
             % ------------------------------------------------------------
             fullPath = aod.h5.HDF5.buildPath(pathName, dsetName);
-            h5create(fileName, fullPath, size(data),...
-                'DataType', 'string');
+            if ~aod.h5.HDF5.exists(fileName, fullPath)
+                h5create(fileName, fullPath, size(data),...
+                    'DataType', 'string');
+            end
             h5write(fileName, fullPath, data);
         end
 
@@ -322,16 +324,33 @@ classdef HDF5 < handle
             % Record original class and column classes
             dataClass = class(data);
             columnClass = [];
+            colsToFix = [];
             if istable(data)
                 for i = 1:size(data, 2)
-                    columnClass = [columnClass, ', ', class(data(:,i))]; %#ok<AGROW> 
+                    if iscellstr(data{:,i})
+                        % fix for cellstr is being transposed oddly 
+                        columnClass = [columnClass, ', ', 'cellstr']; %#ok<*AGROW> 
+                        colsToFix = cat(2, colsToFix, i);
+                    else
+                        columnClass = [columnClass, ', ', class(data{:,i})];  
+                    end
+                end
+
+                columnClass = columnClass(3:end); % FIX
+                for i = 1:numel(colsToFix)
+                    % Am I missing something, why is this so hard
+                    colData = string(data{:,colsToFix}')';
+                    varName = data.Properties.VariableNames{colsToFix(i)};
+                    data = removevars(data, colsToFix(i));
+                    data.(varName) = colData;
+                    data = movevars(data, varName, 'Before', colsToFix(i));
                 end
                 nDims = height(data);
                 data = table2struct(data);
             else
                 f = fieldnames(data);
                 for i = 1:numel(f)
-                    columnClass = [columnClass, ', ', class(data.(f{i}))]; %#ok<AGROW> 
+                    columnClass = [columnClass, ', ', class(data.(f{i}))];
                 end
                 nDims = max(@numel, data);
             end
@@ -437,7 +456,8 @@ classdef HDF5 < handle
                 if isenum(attValue)
                     attValue = [class(attValue), ',', char(attValue)];
                 end
-                if isSubclass(attValue, 'aod.core.Entity')
+                if ~istext(attValue) && isSubclass(attValue, 'aod.core.Entity')
+                    warning('writeatts:Skipping Entity %s', class(attValue));
                     continue
                 end
                 h5writeatt(fileName, pathName, k{i},...
@@ -463,7 +483,7 @@ classdef HDF5 < handle
             fileIDx = onCleanup(@()H5F.close(fileID));
 
             linkID = H5G.open(fileID, linkPath);
-            linkIDx = onCleanup(@()HDG.close(linkID));
+            linkIDx = onCleanup(@()H5G.close(linkID));
 
             H5L.create_soft(targetPath, linkID, linkName, 'H5P_DEFAULT', 'H5P_DEFAULT');
         end

@@ -33,9 +33,11 @@ function writeEntity(hdfName, obj)
     end
 
     % Collect UUIDs of entities within the HDF5 file
-    EM = aod.h5.EntityManager(hdfName);
-    EM.collect();
-    EMT = table(EM);
+    if entityType ~= EntityTypes.EXPERIMENT
+        EM = aod.h5.EntityManager(hdfName);
+        EM.collect();
+        EMT = table(EM);
+    end
 
     % Determine class-specific location
     switch entityType 
@@ -118,8 +120,8 @@ function writeEntity(hdfName, obj)
     
     % Write file paths, if necessary
     if ~isempty(obj.files)
-        fileText = sprintf('%u file paths', numel(obj.files));
-        HDF5.makeTextDataset(hdfName, hdfPath, 'Files', fileText);
+        h = ancestor(obj, 'aod.core.Experiment');
+        HDF5.makeTextDataset(hdfName, hdfPath, 'Files', h.homeDirectory);
         aod.h5.writeParameters(hdfName, [hdfPath, '/Files'], obj.files);
     end
     
@@ -130,8 +132,11 @@ function writeEntity(hdfName, obj)
             % fprintf('Skipping empty property: %s\n', persistedProps(i));
             continue
         end
+        if strcmp(prop, 'Parent')
+            disp('Yeah parent property is sneaking thru')
+        end
         % Write links to other entities
-        if isSubclass(prop, 'aod.core.Entity')
+        if isSubclass(class(prop), 'aod.core.Entity')
             parentPath = getParentPath(EMT, prop.UUID);
             HDF5.createLink(hdfName, parentPath, hdfPath, persistedProps(i));
             continue

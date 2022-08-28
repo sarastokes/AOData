@@ -1,11 +1,12 @@
-classdef Entity < handle & dynamicprops
+classdef Entity < handle
 
     properties (SetAccess = private)
         entityClassName         string
-        parameters              = aod.core.Parameters()
-        files                   = aod.core.Parameters()
+        parameters              % aod.core.Parameters
+        files                   % aod.core.Parameters
         UUID                    string
-        description             char
+        description             string
+        Name                    char
         label                   char 
         shortLabel              char
     end
@@ -14,10 +15,12 @@ classdef Entity < handle & dynamicprops
         Parent
     end
 
-    properties (Access = private)
+    properties (Access = protected)
         hdfName 
         hdfPath 
+        info
         entityType
+        entityFactory
         parentUUID 
     end
 
@@ -30,35 +33,51 @@ classdef Entity < handle & dynamicprops
     end
 
     methods
-        function obj = Entity(hdfName, hdfPath, entityType)
-            if nargin < 3
+        function obj = Entity(hdfName, hdfPath, entityFactory)
+            if nargin < 3 || isempty(entityFactory)
                 obj.entityFactory = @(x)aod.core.EntityTypes.(x);
+            else
+                obj.entityFactory = entityFactory;
             end
             obj.hdfName = hdfName;
             obj.hdfPath = hdfPath;
+
+            % Initialize parameters 
+            obj.files = aod.core.Parameters();
+            obj.parameters = aod.core.Parameters();
+
+            % Create entity from file
             obj.populateEntityFromFile();
         end
 
         function value = get.Parent(obj)
-            % TODO Need Entity Manager
-            value = [];
+            % TODO Figure this out later
+            value = obj.parentUUID;
         end
     end
 
     methods (Access = protected)
         function populateEntityFromFile(obj)
-            info = h5info(obj.hdfName, obj.hdfPath);
+            obj.info = h5info(obj.hdfName, obj.hdfPath);
 
-            attributeNames = string({info.Attributes.Name});
-            datasetNames = string({info.Datasets.Name});
-            linkNames = string({info.Links.Name})
+            if ~isempty(obj.info.Datasets)
+                datasetNames = string({obj.info.Datasets.Name});
+            end
+            if ismember("Name", datasetNames)
+                obj.Name = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'Name');
+            end
 
-            specialAttributes = ["description", "Class", "EntityType"];
+            attributeNames = string({obj.info.Attributes.Name});
 
-
-            % Handle special attributes
-            obj.setDescription(h5readatt(obj.hdfName, obj.hdfPath, 'description'));
+            % Special attributes (universal ones mapping to properties)
+            specialAttributes = ["UUID", "description", "Class", "EntityType"];
             obj.UUID = h5readatt(obj.hdfName, obj.hdfPath, 'UUID');
+            obj.entityType = h5readatt(obj.hdfName, obj.hdfPath, 'EntityType');
+            obj.entityClassName = h5readatt(obj.hdfName, obj.hdfPath, 'Class');
+            if ismember("description", attributeNames)
+                obj.description = h5readatt(obj.hdfName, obj.hdfPath, 'description');
+            end
+
             % Parse the remaining attributes
             for i = 1:numel(attributeNames)
                 if ~ismember(attributeNames(i), specialAttributes)
