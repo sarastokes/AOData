@@ -57,16 +57,27 @@ classdef Entity < handle
     end
 
     methods (Access = protected)
-        function populateEntityFromFile(obj)
+        function [datasetNames, linkNames] = populateEntityFromFile(obj)
             obj.info = h5info(obj.hdfName, obj.hdfPath);
 
             if ~isempty(obj.info.Datasets)
                 datasetNames = string({obj.info.Datasets.Name});
+            else
+                datasetNames = [];
             end
+
             if ismember("Name", datasetNames)
                 obj.Name = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'Name');
             end
 
+            % LINKS
+            if ~isempty(obj.info.Links)
+                linkNames = string({obj.info.Links.Name});
+            else
+                linkNames = [];
+            end
+
+            % ATTRIBUTES
             attributeNames = string({obj.info.Attributes.Name});
 
             % Special attributes (universal ones mapping to properties)
@@ -83,6 +94,33 @@ classdef Entity < handle
                 if ~ismember(attributeNames(i), specialAttributes)
                     obj.parameters(char(attributeNames(i))) = ...
                         h5readatt(obj.hdfName, obj.hdfPath, attributeNames(i));
+                end
+            end
+        end
+
+        function setDatasetsToDynProps(obj, datasetNames)
+            % SETDATASETSTODYNPROPS
+            %
+            % Description:
+            %   Creates a dynamic property for all datasets not matching an
+            %   existing property of the class
+            %
+            % Syntax:
+            %   setDatasetsToDynProps(obj)
+            % -------------------------------------------------------------
+            if nargin < 2
+                if isempty(obj.info.Datasets)
+                    return
+                else
+                    datasetNames = string({obj.info.Datasets.Name});
+                end
+            end
+
+            for i = 1:numel(datasetNames)
+                if ~isprop(obj, datasetNames(i))
+                    obj.addprop(datasetNames(i));
+                    obj.(datasetNames(i)) = aod.h5.readDatasetByType(...
+                        obj.hdfName, obj.hdfPath, char(datasetNames(i)));
                 end
             end
         end

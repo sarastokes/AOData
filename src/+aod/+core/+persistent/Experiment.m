@@ -51,14 +51,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
                 obj.homeDirectory = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'homeDirectory');
             end
             
-            for i = 1:numel(datasetNames)
-                if ~isprop(obj, datasetNames(i))
-                    obj.addprop(datasetNames(i));
-                    obj.(datasetNames(i)) = aod.h5.readDatasetByType(...
-                        obj.hdfName, obj.hdfPath, char(datasetNames(i)));
-                end
-            end
-            
+            obj.setDatasetsToDynProps(datasetNames);
         end
     end
 end

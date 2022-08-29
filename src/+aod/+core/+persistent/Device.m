@@ -9,7 +9,7 @@ classdef Device < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods 
+    methods (Access = protected)
         function populateEntityFromFile(obj)
             populateEntityFromFile@aod.core.persistent.Entity(obj);
             
@@ -21,12 +21,8 @@ classdef Device < aod.core.persistent.Entity & dynamicprops
                 disp(linkNames)
             end
 
-            for i = 1:numel(datasetNames)
-                if ~isprop(obj, datasetNames(i))
-                    obj.addprop(datasetNames(i));
-                    obj.(datasetNames(i)) = aod.h5.readDatasetByType(...
-                        obj.hdfName, obj.hdfPath, char(datasetNames(i)));
-                end
+            if ~isempty(datasetNames)
+                obj.setDatasetsToDynProps(datasetNames);
             end
         end
     end

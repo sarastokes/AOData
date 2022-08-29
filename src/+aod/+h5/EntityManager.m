@@ -2,6 +2,7 @@ classdef EntityManager < handle
 
     properties
         hdfName
+        pathMap
         classMap
         entityMap
     end
@@ -15,6 +16,7 @@ classdef EntityManager < handle
         function clearMaps(obj)
             obj.entityMap = containers.Map();
             obj.classMap = containers.Map();
+            obj.pathMap = containers.Map();
         end
 
         function collect(obj)
@@ -26,9 +28,10 @@ classdef EntityManager < handle
 
         function T = table(obj)
             T = table(string(obj.entityMap.keys'),... 
-                string(obj.classMap.values'),...
                 string(obj.entityMap.values'),...
-                'VariableNames', {'UUID', 'Class', 'Path'});
+                string(obj.classMap.values'),...
+                string(obj.pathMap.values'),...
+                'VariableNames', {'UUID', 'Entity', 'Class', 'Path'});
         end
     end
 
@@ -36,12 +39,14 @@ classdef EntityManager < handle
         function processGroups(obj, info)
             [idx, UUID] = findAttribute(info, 'UUID');
             if ~isempty(idx)
-                [idx, className] = findAttribute(info, 'Class');
-                obj.entityMap(UUID) = info.Name;
+                [~, className] = findAttribute(info, 'Class');
+                obj.pathMap(UUID) = info.Name;
                 if isempty(className)
                     className = 'Unknown';
                 end
                 obj.classMap(UUID) = className;
+                [~, entityType] = findAttribute(info, 'EntityType');
+                obj.entityMap(UUID) = entityType;
             end
 
             % Recursively call for child groups
