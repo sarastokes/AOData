@@ -20,7 +20,6 @@ classdef (Abstract) Entity < handle
 %
 % Dependent properties:
 %   label                       string      (defined by getLabel)
-%   shortLabel                  string      (defined by getShortLabel)
 %
 % Public methods:
 %   h = ancestor(obj, className)
@@ -42,7 +41,6 @@ classdef (Abstract) Entity < handle
 %
 % Protected methods:
 %   value = getLabel(obj)
-%   value = getShortLabel(obj)
 %
 % Sealed Protected methods:
 %   addParent(obj, parent)
@@ -76,10 +74,6 @@ classdef (Abstract) Entity < handle
         label
     end
 
-    properties (Hidden, Dependent)
-        shortLabel
-    end
-
     methods
         function obj = Entity(name, parent)
             if nargin > 0
@@ -97,10 +91,6 @@ classdef (Abstract) Entity < handle
 
         function value = get.label(obj)
             value = obj.getLabel();
-        end
-
-        function value = get.shortLabel(obj)
-            value = obj.getShortLabel();
         end
 
         function h = ancestor(obj, className)
@@ -429,15 +419,6 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function value = getShortLabel(obj)
-            % GETSHORTLABEL
-            % 
-            % Syntax:
-            %   value = getShortLabel(obj)
-            % -------------------------------------------------------------
-            value = obj.getLabel();
-        end
-
         function sync(obj) %#ok<MANU> 
             % SYNC
             % 
@@ -465,7 +446,7 @@ classdef (Abstract) Entity < handle
             else
                 error('%s is not a valid parent', class(parent));
             end
-            
+
             obj.sync();
         end
 

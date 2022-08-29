@@ -80,7 +80,7 @@ classdef EntityTypes
                     if ~isempty(obj.Name)
                         out = obj.Name;
                     else
-                        out = obj.shortLabel;
+                        out = ['Epoch', int2fixedwidthstr(entity.ID, 4)];
                     end
                 otherwise
                     if ~isempty(entity.Name)

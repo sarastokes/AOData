@@ -33,9 +33,5 @@ classdef Eye < aod.core.Source
                 value = obj.Name;
             end
         end
-
-        function value = getShortLabel(obj)
-            value = obj.Name;
-        end
     end
 end

@@ -8,7 +8,6 @@ classdef Entity < handle
         description             string
         Name                    char
         label                   char 
-        shortLabel              char
     end
 
     properties (Dependent)

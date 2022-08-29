@@ -305,14 +305,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     methods (Access = protected)
         function value = getLabel(obj)  
             if isempty(obj.Parent)
-                value = obj.shortLabel;
+                value = ['Epoch', int2fixedwidthstr(obj.ID, 4)];
             else
-                value = sprintf("Epoch%u_%s", obj.ID, obj.Parent.label);
+                value = sprintf('Epoch%u_%s', obj.ID, obj.Parent.label);
             end
-        end
-
-        function value = getShortLabel(obj)
-            value = sprintf('Epoch%u', obj.ID);
         end
     end
 end 
