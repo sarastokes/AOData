@@ -52,13 +52,21 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Data = data;
         end
 
-        function addTiming(obj, timing)
+        function setTiming(obj, timing)
             % SETTIMING
             %
             % Syntax:
             %   addTiming(obj, timing)
             % -------------------------------------------------------------
             obj.Timing = timing;
+        end
+    end
+
+    methods (Access = protected)
+        function sync(obj)
+            if isempty(obj.Timing) & ~isempty(obj.Parent.Timing)
+                obj.Timing = obj.Parent.Timing;
+            end
         end
     end
 end

@@ -22,7 +22,7 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Response'}
+        allowableParentTypes = {'aod.core.Epoch', 'aod.core.Response'}
     end
 
     methods (Abstract, Access = protected)

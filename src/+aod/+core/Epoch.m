@@ -24,20 +24,15 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Source                          Link to Source used during the epoch
 %   System                          Link to System used during the epoch
 %
-% Abstract methods:
-%   videoName = getCoreVideoName(obj)
-% 
 % Public methods:
-%   clearVideoCache(obj)
-%   addRegistration(obj, reg, overwrite)
-%   addResponse(obj, resp)
-%   clearResponses(obj)
+%   addDataset(obj, dataset)
+%   addResponse(obj, response)
+%   addRegistration(obj, registration)
 %   addStimulus(obj, stim)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
+%   clearDatasets(obj)
+%   clearRegistrations(obj)
+%   clearResponses(obj)
+%   clearStimuli(obj)
 %
 % Notes:
 %   Inheritance from matlab.mixin.Heterogeneous allows forming arrays of 
@@ -54,6 +49,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         Responses                   aod.core.Response  
         Stimuli                     aod.core.Stimulus
         Datasets                    aod.core.Dataset
+        Timing                      % aod.core.Timing
     end
 
     % Entity link properties
@@ -62,18 +58,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         System                      = aod.core.System.empty()
     end
 
-    properties (Hidden, Transient, Access = protected)
-        cachedVideo
-    end
-
     properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Experiment'}
-    end
-
-    % Methods for subclasses to overwrite
-    methods (Abstract, Access = protected)
-        % Main analysis video name
-        videoName = getCoreVideoName(obj);
     end
 
     methods 
@@ -90,18 +76,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.setSource(ip.Results.Source);
             obj.setSystem(ip.Results.System);
         end
-    end
-
-    methods (Sealed)
-        function clearVideoCache(obj)
-            % CLEARVIDEOCACHE
-            %
-            % Syntax:
-            %   obj.clearVideoCache()
-            % -------------------------------------------------------------
-            obj.cachedVideo = [];
-        end
-    end
+    end 
 
     % Access methods
     methods (Sealed)
@@ -152,15 +127,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 %     obj.addResponse(resp);
                 % end
             end
-        end
-
-        function clearResponses(obj)
-            % CLEARRESPONSES
-            %
-            % Syntax:
-            %   obj.clearResponses()
-            % -------------------------------------------------------------
-            obj.Responses = aod.core.Response.empty();
         end
     end
 
@@ -214,7 +180,41 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 'System be part of the same Experiment');
             obj.System = system;
         end
+    end
 
+    % Timing methods
+    methods
+        function setTiming(obj, timing)
+            % SETTIMING
+            %
+            % Description:
+            %   Set Epoch timing
+            %
+            % Syntax:
+            %   setTiming(obj, timing)
+            % -------------------------------------------------------------
+            assert(isSubclass(timing, 'aod.core.Timing'),...
+                'Input must be subclass of aod.core.Timing');
+            
+            timing.setParent(obj);
+            obj.Timing = timing;
+        end
+
+        function clearTiming(obj)
+            % CLEARTIMING
+            %
+            % Description:
+            %   Remove Epoch timing
+            %
+            % Syntax:
+            %   clearTiming(obj)
+            % -------------------------------------------------------------
+            obj.Timing = [];
+        end
+    end
+
+    % Dataset methods
+    methods
         function addDataset(obj, dataset)
             % ADDDATASET
             %
@@ -257,20 +257,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             obj.Datasets = aod.core.Dataset.empty();
         end
+    end
 
-        function addStimulus(obj, stim, overwrite)
-            % ADDSTIMULUS
-            %
-            % Syntax:
-            %   obj.addStimulus(stim, overwrite)
-            % -------------------------------------------------------------
-
-            assert(isSubclass(stim, 'aod.core.Stimulus'),... 
-                'stim must be subclass of aod.core.Stimulus');
-            stim.setParent(obj);
-
-            obj.Stimuli = cat(1, obj.Stimuli, stim);
-        end
+    % Registration methods
+    methods
 
         function addRegistration(obj, reg)
             % ADDREGISTRATION
@@ -285,11 +275,42 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Registrations = cat(1, obj.Registrations, reg);
         end
 
+        function removeRegistration(obj, ID)
+            % REMOVEREGISTRATION
+            %
+            % Description:
+            %   Remove a specific registration from the Epoch
+            %
+            % Syntax:
+            %   removeRegistration(obj, ID)
+            % -------------------------------------------------------------
+            assert(ID > 0 & ID < numel(obj.Registrations),...
+                'Invalid ID %u, must be between 1-%u', ID, numel(obj.Registrations));
+                
+            obj.Registrations(ID) = [];
+        end
+
+        function clearRegistrations(obj)
+            % CLEARRESPONSES
+            %
+            % Description:
+            %   Clear all registrations associated with the epoch
+            %
+            % Syntax:
+            %   obj.clearRegistrations()
+            % -------------------------------------------------------------
+            obj.Registrations = aod.core.Registration.empty();
+        end
+
+    end
+
+    % Response methods
+    methods
         function addResponse(obj, resp)
             % ADDRESPONSE
             %
             % Syntax:
-            %   obj.addResponse(reg, overwrite)
+            %   addResponse(obj, response)
             % -------------------------------------------------------------
             arguments 
                 obj
@@ -298,6 +319,71 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
             resp.addParent(obj);
             obj.Responses = cat(1, obj.Responses, resp);
+        end
+
+        function removeResponse(obj, ID)
+            % REMOVERESPONSE
+            %
+            % Description:
+            %   Remove a specific response from the Epoch
+            %
+            % Syntax:
+            %   removeResponse(obj, ID)
+            % -------------------------------------------------------------
+            assert(ID > 0 & ID < numel(obj.Responses),...
+                'Invalid ID %u, must be between 1-%u', ID, numel(obj.Responses));
+                
+            obj.Responses(ID) = [];
+        end
+
+        function clearResponses(obj)
+            % CLEARRESPONSES
+            %
+            % Syntax:
+            %   obj.clearResponses()
+            % -------------------------------------------------------------
+            obj.Responses = aod.core.Response.empty();
+        end
+    end
+
+    % Stimulus methods
+    methods 
+        function addStimulus(obj, stim)
+            % ADDSTIMULUS
+            %
+            % Syntax:
+            %   obj.addStimulus(stim)
+            % -------------------------------------------------------------
+
+            assert(isSubclass(stim, 'aod.core.Stimulus'),... 
+                'stim must be subclass of aod.core.Stimulus');
+
+            stim.setParent(obj);
+            obj.Stimuli = cat(1, obj.Stimuli, stim);
+        end
+
+        function removeStimulus(obj, ID)
+            % REMOVESTIMULUS
+            %
+            % Description:
+            %   Remove a specific stimulus from the Epoch
+            %
+            % Syntax:
+            %   removeStimulus(obj, ID)
+            % -------------------------------------------------------------
+            assert(ID > 0 & ID < numel(obj.Stimuli),...
+                'Invalid ID %u, must be between 1-%u', ID, numel(obj.Stimuli));
+
+            obj.Stimuli(ID) = [];
+        end
+
+        function clearStimuli(obj)
+            % ADDSTIMULUS
+            %
+            % Syntax:
+            %   obj.addStimulus(stim, overwrite)
+            % -------------------------------------------------------------
+            obj.Stimuli = aod.core.Stimulus.empty();
         end
     end
 

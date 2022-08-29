@@ -166,6 +166,15 @@ classdef Epoch < aod.core.Epoch
             imwrite(im2uint8(imadjust(std(im2double(imStack), [], 3))),... 
                 fullfile(fPath, ['STD', baseName]), 'png');
         end
+        
+        function clearVideoCache(obj)
+            % CLEARVIDEOCACHE
+            %
+            % Syntax:
+            %   obj.clearVideoCache()
+            % -------------------------------------------------------------
+            obj.cachedVideo = [];
+        end
     end
 
     methods (Access = protected)

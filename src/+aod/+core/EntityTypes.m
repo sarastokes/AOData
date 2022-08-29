@@ -22,8 +22,12 @@ classdef EntityTypes
             import aod.core.EntityTypes
 
             switch obj 
+                case EntityTypes.EXPERIMENT
+                    parents = {};
                 case EntityTypes.SOURCE
                     parents = {'aod.core.Experiment', 'aod.core.Source'};
+                case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.REGION, EntityTypes.CALIBRATION}
+                    parents = {'aod.core.Experiment'};
                 case EntityTypes.CHANNEL 
                     parents = {'aod.core.System'};
                 case EntityTypes.DEVICE
@@ -31,11 +35,7 @@ classdef EntityTypes
                 case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE, EntityTypes.DATASET}
                     parents = {'aod.core.Epoch'};
                 case EntityTypes.TIMING
-                    parents = {'aod.core.Response'};
-                case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.REGION, EntityTypes.CALIBRATION}
-                    parents = {'aod.core.Experiment'};
-                case EntityTypes.EXPERIMENT
-                    parents = {};
+                    parents = {'aod.core.Epoch', 'aod.core.Response'};
             end
         end
 
@@ -54,7 +54,7 @@ classdef EntityTypes
                 case EntityTypes.SOURCE 
                     containers = {'Sources'};
                 case EntityTypes.EPOCH
-                    containers = {'Registrations', 'Stimuli', 'Responses', 'Datasets'};
+                    containers = {'Registrations', 'Stimuli', 'Responses', 'Datasets', 'Timing'};
                 case EntityTypes.SYSTEM 
                     containers = {'Channels'};
                 case EntityTypes.CHANNEL 

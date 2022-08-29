@@ -12,6 +12,10 @@ classdef Experiment < aod.core.Experiment
     properties (SetAccess = protected)
         sampleRate = 25  % Hz
     end
+    
+    properties (Hidden, Transient, Access = protected)
+        cachedVideo
+    end
 
     methods
         function obj = Experiment(name, homeDirectory, expDate, varargin)
