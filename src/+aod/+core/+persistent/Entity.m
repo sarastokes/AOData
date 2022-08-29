@@ -1,26 +1,26 @@
 classdef Entity < handle
 
-    properties (SetAccess = private)
+    properties %(SetAccess = private)
         entityClassName         string
         parameters              % aod.core.Parameters
-        files                   % aod.core.Parameters
+        Files                   % aod.core.Parameters
         UUID                    string
         description             string
         Name                    char
         label                   char 
-    end
-
-    properties (Dependent)
         Parent
     end
 
-    properties (Access = protected)
+    properties %(Access = protected)
         hdfName 
         hdfPath 
         info
         entityType
-        entityFactory
-        parentUUID 
+        parentLink 
+    end
+
+    properties
+        factory
     end
 
     events 
@@ -33,32 +33,24 @@ classdef Entity < handle
 
     methods
         function obj = Entity(hdfName, hdfPath, entityFactory)
-            if nargin < 3 || isempty(entityFactory)
-                obj.entityFactory = @(x)aod.core.EntityTypes.(x);
-            else
-                obj.entityFactory = entityFactory;
-            end
             obj.hdfName = hdfName;
             obj.hdfPath = hdfPath;
+            obj.factory = entityFactory;
 
             % Initialize parameters 
-            obj.files = aod.core.Parameters();
+            obj.Files = aod.core.Parameters();
             obj.parameters = aod.core.Parameters();
 
             % Create entity from file
-            obj.populateEntityFromFile();
-        end
-
-        function value = get.Parent(obj)
-            % TODO Figure this out later
-            value = obj.parentUUID;
+            obj.populate();
         end
     end
 
     methods (Access = protected)
-        function [datasetNames, linkNames] = populateEntityFromFile(obj)
+        function [datasetNames, linkNames] = populate(obj)
             obj.info = h5info(obj.hdfName, obj.hdfPath);
 
+            % DATASETS
             if ~isempty(obj.info.Datasets)
                 datasetNames = string({obj.info.Datasets.Name});
             else
@@ -69,11 +61,24 @@ classdef Entity < handle
                 obj.Name = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'Name');
             end
 
+            if ismember("Files", datasetNames)
+                obj.Files = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'Files',...
+                    'aod.core.Parameters');
+            end
+
             % LINKS
             if ~isempty(obj.info.Links)
                 linkNames = string({obj.info.Links.Name});
             else
                 linkNames = [];
+            end
+
+            if ~isempty(linkNames)
+                if ismember("Parent", linkNames)
+                    idx = find(linkNames == "Parent");
+                    obj.parentLink = obj.info.Links(idx).Value{1};
+                    obj.Parent = obj.factory.create(obj.parentLink);
+                end
             end
 
             % ATTRIBUTES
@@ -95,6 +100,16 @@ classdef Entity < handle
                         h5readatt(obj.hdfName, obj.hdfPath, attributeNames(i));
                 end
             end
+        end
+
+        function e = createFromLink(obj, linkNames, name)
+            if isempty(linkNames)
+                e = [];
+                return
+            end
+            idx = find(linkNames == name);
+            linkPath = obj.info.Links(idx).Value{1};
+            e = obj.factory.create(linkPath);
         end
 
         function setDatasetsToDynProps(obj, datasetNames)

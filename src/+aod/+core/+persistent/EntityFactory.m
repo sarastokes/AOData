@@ -6,10 +6,13 @@ classdef EntityFactory < handle
 %
 % Constructor:
 %   obj = EntityFactory(hdfName)
+%
+% Static method access:
+%   experiment = EntityFactory.init(hdfName)
 % -------------------------------------------------------------------------
 
-    properties (Access = private)
-        hdfName 
+    properties (SetAccess = private)
+        hdfName
         entityManager 
         cache 
     end
@@ -21,28 +24,49 @@ classdef EntityFactory < handle
             obj.cache = containers.Map();
         end
 
+        function e = getExperiment(obj)
+            e  = obj.create('/Experiment');
+        end
+
+        function clearCache(obj)
+            obj.cache = aod.core.Parameters();
+        end
+
         function e = create(obj, hdfPath)
-            uuid = h5readatt(obj.hdfName, hdfPath, 'UUID');
-            if obj.cache.isKey(uuid)
-                e = obj.cache(uuid);
+            T = table(obj.entityManager);
+            uuid = T{T.Path == hdfPath, 'UUID'};
+            % uuid = h5readatt(obj.hdfName, hdfPath, 'UUID');
+            if obj.cache.isKey(dehyphenate(uuid))
+                e = obj.cache(dehyphenate(uuid));
                 return
             end
 
-            entityType = EM.entityMap(uuid);
+            entityType = obj.entityManager.entityMap(uuid);
             switch entityType 
                 case "EXPERIMENT"
-                    e = aod.core.persistent.Experiment(obj.hdfFile, hdfPath, obj);
+                    e = aod.core.persistent.Experiment(obj.hdfName, hdfPath, obj);
                 case "SYSTEM"
-                    e = aod.core.persistent.System(obj.hdfFile, hdfPath, obj);
+                    e = aod.core.persistent.System(obj.hdfName, hdfPath, obj);
                 case "CHANNEL"
-                    e = aod.core.persistent.Channel(obj.hdfFile, hdfPath, obj);
+                    e = aod.core.persistent.Channel(obj.hdfName, hdfPath, obj);
                 case "DEVICE"
-                    e = aod.core.persistent.Device(obj.hdfFile, hdfPath, obj);
+                    e = aod.core.persistent.Device(obj.hdfName, hdfPath, obj);
+                case "CALIBRATION"
+                    e = aod.core.persistent.Calibration(obj.hdfName, hdfPath, obj);
+                case "EPOCH"
+                    e = aod.core.persistent.Epoch(obj.hdfName, hdfPath, obj);
                 otherwise
                     error("EntityFactorycreate:UnrecognizedEntity",...
                         "Did not recognize entity name: %s", entityType);
             end
-            obj.cache(uuid) = e;
+            obj.cache(dehyphenate(uuid)) = e;
+        end
+    end
+
+    methods (Static)
+        function experiment = init(hdfName)
+            obj = aod.core.persistent.EntityFactory(hdfName);
+            experiment = obj.getExperiment();
         end
     end
 end 

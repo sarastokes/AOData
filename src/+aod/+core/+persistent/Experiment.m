@@ -3,55 +3,57 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
     properties (SetAccess = protected)
         homeDirectory           char
         experimentDate(1,1)     datetime
+        epochIDs
 
-        Epochs                  aod.core.Epoch
-        Sources                 aod.core.Source
-        Regions                 aod.core.Region
-        Calibrations            aod.core.Calibration
-        Systems                 aod.core.System
+        Analyses                
+        Epochs                  
+        Sources                 
+        Regions                 
+        Calibrations            
+        Systems                 
     end
 
     properties (Dependent)
-        epochIDs
         numEpochs
     end
 
     methods
-        function obj = Experiment(hdfName, hdfPath, entityFactory)
-            if nargin < 3
-                entityFactory = [];
-            end
-            obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, entityFactory);
-        end
-        
-        function value = get.epochIDs(obj)
-            value = [];
+        function obj = Experiment(hdfName, hdfPath, factory)
+            obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
         end
 
         function value = get.numEpochs(obj)
-            value = [];
+            value = max(size(obj.Epochs));
         end
     end
 
     methods (Access = protected)
-        function populateEntityFromFile(obj)
-            populateEntityFromFile@aod.core.persistent.Entity(obj);
-            if ~isempty(obj.info.Datasets)
-                datasetNames = string({obj.info.Datasets.Name});
-            end
-            if ~isempty(obj.info.Links)
-                linkNames = string({obj.info.Links.Name});
-                disp(linkNames)
-            end
+        function populate(obj)
+            [datasetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
             if ismember("experimentDate", datasetNames)
                 obj.experimentDate = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'experimentDate');
             end
+
             if ismember("homeDirectory", datasetNames)
                 obj.homeDirectory = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'homeDirectory');
             end
             
             obj.setDatasetsToDynProps(datasetNames);
+
+            % Create containers
+            obj.Analyses = aod.core.persistent.EntityContainer(...
+                aod.h5.HDF5.buildPath(obj.hdfPath, 'Analyses'), obj.factory);
+            obj.Calibrations = aod.core.persistent.EntityContainer(...
+                aod.h5.HDF5.buildPath(obj.hdfPath, 'Calibrations'), obj.factory);
+            obj.Epochs = aod.core.persistent.EntityContainer(...
+                aod.h5.HDF5.buildPath(obj.hdfPath, 'Epochs'), obj.factory);
+            obj.Regions = aod.core.persistent.EntityContainer(...
+                aod.h5.HDF5.buildPath(obj.hdfPath, 'Regions'), obj.factory);
+            obj.Sources = aod.core.persistent.EntityContainer(...
+                aod.h5.HDF5.buildPath(obj.hdfPath, 'Sources'), obj.factory);
+            obj.Systems = aod.core.persistent.EntityContainer(...
+                aod.h5.HDF5.buildPath(obj.hdfPath, 'Systems'), obj.factory);
         end
     end
 end

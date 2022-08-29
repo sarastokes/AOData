@@ -1,28 +1,17 @@
 classdef Device < aod.core.persistent.Entity & dynamicprops
 
     methods
-        function obj = Device(hdfName, hdfPath, entityFactory)
-            if nargin < 3
-                entityFactory = [];
-            end
-            obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, entityFactory);
+        function obj = Device(hdfName, hdfPath, factory)
+            obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
         end
     end
 
     methods (Access = protected)
-        function populateEntityFromFile(obj)
-            populateEntityFromFile@aod.core.persistent.Entity(obj);
-            
-            if ~isempty(obj.info.Datasets)
-                datasetNames = string({obj.info.Datasets.Name});
-            end
-            if ~isempty(obj.info.Links)
-                linkNames = string({obj.info.Links.Name});
-                disp(linkNames)
-            end
+        function populate(obj)
+            [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
-            if ~isempty(datasetNames)
-                obj.setDatasetsToDynProps(datasetNames);
+            if ~isempty(dsetNames)
+                obj.setDatasetsToDynProps(dsetNames);
             end
         end
     end

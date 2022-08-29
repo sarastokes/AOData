@@ -16,7 +16,6 @@ classdef Eye < aod.core.sources.Eye
 %   ContactLens
 %
 % Dependent properties:
-%   subjectName                 name of parent aod.core.sources.Subject
 %   micronsPerDegree
 %
 % Methods:
@@ -28,7 +27,6 @@ classdef Eye < aod.core.sources.Eye
 % -------------------------------------------------------------------------
 
     properties (Dependent)
-        subjectName
         micronsPerDegree
     end
 
@@ -43,15 +41,6 @@ classdef Eye < aod.core.sources.Eye
             parse(ip, varargin{:});
 
             obj.setParam(ip.Results);
-        end
-
-        function value = get.subjectName(obj)
-            h = obj.ancestor('aod.core.sources.Subject');
-            if ~isempty(h)
-                value = h.Name;
-            else
-                value = [];
-            end
         end
         
         function value = get.micronsPerDegree(obj)

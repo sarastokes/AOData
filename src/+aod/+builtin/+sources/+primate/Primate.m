@@ -14,7 +14,7 @@ classdef Primate < aod.core.sources.Subject
     %   ID                      double, ID extracted from name
     % ---------------------------------------------------------------------
     
-    properties (Hidden, Dependent)
+    properties (Dependent)
         ID
     end
 

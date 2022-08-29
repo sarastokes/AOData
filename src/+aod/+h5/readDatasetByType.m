@@ -1,14 +1,32 @@
-function out = readDatasetByType(hdfName, groupPath, dsetName)
+function out = readDatasetByType(hdfName, groupPath, dsetName, className)
 
     import aod.h5.HDF5
 
     fullPath = HDF5.buildPath(groupPath, dsetName);
     disp(fullPath)
 
-    data = h5read(hdfName, fullPath);
+    if nargin < 4
+        className = h5readatt(hdfName, fullPath, 'Class');
+    end
 
-    % numAtts = numel(D.Attributes);
-    className = h5readatt(hdfName, fullPath, 'Class');
+    if ismember(className, {'containers.Map', 'aod.core.Parameters'})
+        if strcmp(className, 'containers.Map')
+            out = containers.Map();
+        else
+            out = aod.core.Parameters();
+        end
+        info = h5info(hdfName, fullPath);
+        if isempty(info.Attributes)
+            return
+        end
+        for i = 1:numel(info.Attributes)
+            out(info.Attributes(i).Name) = info.Attributes(i).Value;
+        end
+        return
+    else
+        data = h5read(hdfName, fullPath);
+    end
+
 
     switch className 
         case 'datetime'

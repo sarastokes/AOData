@@ -30,7 +30,6 @@ classdef Toptica < aod.core.LightSource
         function value = get.Calibrations(obj)
             parent = obj.ancestor('aod.core.Experiment');
             value = cat(1,...
-                parent.getCalibration('sara.calibrations.TopticaNonlinearity'),...
                 parent.getCalibration('sara.calibrations.TopticaPower'));
         end
     end

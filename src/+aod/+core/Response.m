@@ -11,9 +11,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Data 
 %   dateCreated
 %
-% Dependent properties:
-%   Experiment 
-%
 % Methods:
 %   setData(obj, data)
 %   addTiming(obj, timing)
@@ -24,10 +21,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         Timing                              aod.core.Timing
     end
 
-    properties (Hidden, Dependent)
-        Experiment
-    end
-
     properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Epoch'};
     end
@@ -35,10 +28,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
     methods
         function obj = Response(name)
             obj = obj@aod.core.Entity(name);
-        end
-
-        function value = get.Experiment(obj)
-            value = obj.ancestor('aod.core.Experiment');
         end
     end
 
