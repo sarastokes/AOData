@@ -26,23 +26,26 @@ classdef Experiment < aod.core.Entity
 %   idx = id2index(obj, epochID)
 %
 %   calibration = getCalibration(obj, className)
+%   data = getResponse(obj, epochIDs, className, varargin)
 %   imStack = getStacks(obj, epochIDs)
 %
-%   data = getResponse(obj, epochIDs, className, varargin)
-%   data = getRegionResponses(obj, epochIDs)
-%   clearAllResponses(obj, epochIDs)
-%
+%   addAnalysis(obj, analysis)
 %   addCalibration(obj, calibration)
 %   addEpoch(obj, epoch)
 %   addRegion(obj, region)
 %   addSystem(obj, system)
-%   sortEpochs(obj)
+%
+%   clearEpochDatasets(obj, epochIDs)
+%   clearEpochRegistrations(obj, epochIDs)
+%   clearEpochResponses(obj, epochIDs)
+%   clearEpochStimuli(obj, epochIDs)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         homeDirectory           char
         experimentDate(1,1)     datetime
 
+        Analyses                aod.core.Analysis
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
         Regions                 aod.core.Region
@@ -144,43 +147,7 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             region = getByClass(obj.Regions, className);
         end
-    
-        function addRegion(obj, region)
-            % ADDREGIONS
-            %
-            % Syntax:
-            %   imStack = addRegion(obj, region, overwrite)
-            % -------------------------------------------------------------
-            assert(isa(region, 'aod.core.Region'), 'Input must be Region subclass');
-            
-            region.setParent(obj);
-            obj.Regions = cat(1, obj.Regions, region);
-        end
-
-        function removeRegions(obj, ID)
-            % REMOVEREGIONS
-            %
-            % Syntax:
-            %   imStack = removeRegions(obj, ID)
-            % -------------------------------------------------------------
-            if ID > numel(obj.Regions)
-                error('removeRegions:InvalidID',... 
-                    'Only %u regions present', numel(obj.Regions));
-            end
-            obj.Regions(ID) = [];
-        end
-
-        function clearRegions(obj)
-            % CLEARREGIONS
-            %
-            % Syntax:
-            %   obj.clearRegions()
-            % -------------------------------------------------------------
-            obj.Regions = aod.core.Region.empty();
-        end
-    end
-
-    methods 
+        
         function imStack = getStacks(obj, epochIDs, varargin)
             % GETSTACKS
             %
@@ -233,6 +200,41 @@ classdef Experiment < aod.core.Entity
         end
     end
 
+    % Region methods
+    methods 
+        function addRegion(obj, region)
+            % ADDREGIONS
+            %
+            % Syntax:
+            %   imStack = addRegion(obj, region, overwrite)
+            % -------------------------------------------------------------
+            assert(isa(region, 'aod.core.Region'), 'Input must be Region subclass');
+            
+            region.setParent(obj);
+            obj.Regions = cat(1, obj.Regions, region);
+        end
+
+        function removeRegions(obj, ID)
+            % REMOVEREGIONS
+            %
+            % Syntax:
+            %   imStack = removeRegions(obj, ID)
+            % -------------------------------------------------------------
+            assert(ID > 0 & ID < numel(obj.Regions),...
+                'ID %u invalid, must be between 1-%u', ID, numel(obj.Regions));
+            obj.Regions(ID) = [];
+        end
+
+        function clearRegions(obj)
+            % CLEARREGIONS
+            %
+            % Syntax:
+            %   obj.clearRegions()
+            % -------------------------------------------------------------
+            obj.Regions = aod.core.Region.empty();
+        end
+    end
+
     % Source methods
     methods
         function addSource(obj, source)
@@ -266,6 +268,33 @@ classdef Experiment < aod.core.Entity
             end
         end
 
+        function removeSource(obj, ID)
+            % REMOVESOURCE
+            %  
+            % Description:
+            %   Remove a specific source by index
+            %
+            % Syntax:
+            %   removeSource(obj, ID)
+            % -------------------------------------------------------------
+            assert(ID > 0 & ID < numel(obj.Sources),...
+                'ID %u is invalid, must be between 1 and %u', ID, numel(obj.Sources));
+            obj.Sources(ID) = [];
+        end
+
+        function clearSources(obj)
+            % CLEARSOURCES
+            %
+            % Description:
+            %   Remove all sources in the experiment
+            % 
+            % Syntax:
+            %   clearSources(obj)
+            % -------------------------------------------------------------
+            obj.Sources = aod.core.Sources.empty();
+        end
+        
+
         function sources = getAllSources(obj)
             % GETALLSOURCES
             %
@@ -296,7 +325,10 @@ classdef Experiment < aod.core.Entity
             end
             sources = cat(1, sources, firstOrderSources);
         end
+    end
 
+    % System methods
+    methods 
         function addSystem(obj, system)
             % ADDSYSTEM
             %
@@ -318,11 +350,13 @@ classdef Experiment < aod.core.Entity
             % REMOVESYSTEM
             %
             % Description:
-            %   Remove a sysetm from the experiment
+            %   Remove a system from the experiment
             %
             % Syntax:
             %   removeSystem(obj, ID)
             % -------------------------------------------------------------
+            assert(ID > 0 & ID < numel(obj.Systems),...
+                'ID %u invalid, must be between 1-%u', ID, numel(obj.Systems));
             obj.Systems(ID) = [];
         end
 
@@ -410,7 +444,7 @@ classdef Experiment < aod.core.Entity
             %   obj.removeCalibrations(ID)
             % -------------------------------------------------------------
             assert(ID > 0 & ID <= numel(obj.Calibrations),...
-                'ID must be between 1-%u, the number of calibrations', numel(obj.Calibrations));
+                'ID %u is invalid, must be between 1-%u', ID numel(obj.Calibrations));
             obj.Calibrations(ID) = [];
         end
 
@@ -424,17 +458,86 @@ classdef Experiment < aod.core.Entity
         end
     end
 
+    % Analysis methods
+    methods 
+        function addAnalysis(obj, analysis)
+            % ADDANALYSIS
+            %
+            % Description:
+            %   Add analysis to experiment
+            %
+            % Syntax:
+            %   addAnalysis(obj, analysis)
+            % -------------------------------------------------------------
+            assert(isSubclass(analysis, 'aod.core.Analysis'),... 
+            'Input must be subclass of aod.core.Analysis');
+
+            obj.Analyses = cat(1, obj.Analyses, analysis);
+        end
+
+        function removeAnalysis(obj, ID)
+            % REMOVEANALYSIS
+            %
+            % Description:
+            %   Remove a system from the experiment
+            %
+            % Syntax:
+            %   removeAnalysis(obj, ID)
+            % -------------------------------------------------------------
+            assert(ID > 0 & ID < numel(obj.Analyses),...
+                'ID %u invalid, must be between 1 and %u', ID, numel(obj.Analyses));
+            obj.Analyses(ID) = [];
+        end
+
+        function clearAnalyses(obj)
+            % CLEARANALYSES
+            %
+            % Description:
+            %   Clear all analyses in the experiment
+            % 
+            % Syntax:
+            %   clearAnalyses(obj)
+            % -------------------------------------------------------------
+            obj.Analyses = aod.core.Analysis.empty();
+        end
+    end
+
     % Control of Epoch properties, use at own risk
     methods
-        function clearAllResponses(obj, epochIDs)
+        function clearEpochDatasets(obj, epochIDs)
+            % CLEAREPOCHDATASETS
+            %
+            % Description:
+            %   Clear responses in all or a subset of Epochs
+            %
+            % Syntax:
+            %   clearEpochDatasets(obj)
+            %   clearEpochDatasets(obj, epochIDs)
+            %
+            % Note:
+            %   If epochIDs is not provided, will clear all epochIDs
+            % -------------------------------------------------------------
+            if nargin < 2
+                epochIDs = obj.epochIDs;
+            end
+            for i = 1:numel(epochIDs)
+                ep = obj.id2epoch(epochIDs(i));
+                ep.clearDatasets();
+            end
+        end
+
+        function clearEpochResponses(obj, epochIDs)
             % CLEARALLRESPONSES
             %
             % Description:
             %   Clear responses in all or a subset of Epochs
             %
             % Syntax:
-            %   clearAllResponses(obj)
-            %   clearAllResponses(obj, epochIDs)
+            %   clearEpochResponses(obj)
+            %   clearEpochResponses(obj, epochIDs)
+            %
+            % Note:
+            %   If epochIDs is not provided, will clear all epochIDs
             % -------------------------------------------------------------
             if nargin < 2
                 epochIDs = obj.epochIDs;
@@ -445,14 +548,47 @@ classdef Experiment < aod.core.Entity
             end
         end
 
-        function clearAllRegistrations(obj)
-            % CLEARALLREGISTRATIONS
+        function clearEpochRegistrations(obj, epochIDs)
+            % CLEAREPOCHREGISTRATIONS
             %
             % Syntax:
-            %   clearAllRegistrations(obj)
+            %   clearEpochRegistrations(obj)
+            %   clearEpochRegistrations(obj, epochIDs)
+            %
+            % Note:
+            %   If epochIDs is not provided, will clear all epochIDs
             % -------------------------------------------------------------
-            for i = 1:numel(obj.Epochs)
-                obj.Epochs(i).Registrations = aod.core.Registration.empty();
+            if nargin < 2
+                epochIDs = obj.epochIDs;
+            end
+
+            for i = 1:numel(epochIDs)
+                ep = obj.id2epoch(epochIDs(i));
+                ep.clearRegistrations();
+            end
+        end
+
+        function clearEpochStimuli(obj, epochIDs)
+            % CLEAREPOCHSTIMULI
+            %
+            % Description:
+            %   Clears stimuli in all or a subset of Epochs
+            %
+            % Syntax:
+            %   clearEpochStimuli(obj)
+            %   clearEpochStimuli(obj, epochIDs)
+            %
+            %
+            % Note:
+            %   If epochIDs is not provided, will clear all epochIDs
+            % -------------------------------------------------------------
+            if nargin < 2
+                epochIDs = obj.epochIDs;
+            end
+
+            for i = 1:numel(epochIDs)
+                ep = obj.id2epoch(epochIDs(i));
+                ep.clearStimuli();
             end
         end
     end
