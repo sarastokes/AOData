@@ -6,18 +6,14 @@ classdef Region < aod.core.Entity & matlab.mixin.Heterogeneous
 %   experiment, coordinates of structures of interest, etc.
 %
 % Constructor:
-%   obj = Region(parent, data, varargin)
-%   obj = Region(parent, varargin)
+%   obj = Region(name, varargin)
+%   obj = Region(name, data, varargin)
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Properties:
 %   Data                    
-%
-% Dependent properties:
-%   count
-%   roiIDs
 %
 % Sealed protected methods:
 %   setData(obj, data)

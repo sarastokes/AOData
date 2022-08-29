@@ -15,7 +15,8 @@ classdef StripRegistration < aod.core.Registration
 %
 % Properties:
 %   usedFrame (logical; whether strip or frame reg was ultimately used)
-%
+% Derived Properties:
+%   corrCoef regFlag stripX stripY frameXY regDescription rotationAngle
 % -------------------------------------------------------------------------
 
     properties
@@ -29,16 +30,19 @@ classdef StripRegistration < aod.core.Registration
         stripY
         frameXY
         regDescription
-        extraCol
+        rotationAngle
     end
 
     methods
-        function obj = StripRegistration(registrationDate, usedFrame)
-            if nargin == 0
+        function obj = StripRegistration(name, registrationDate, usedFrame)
+            if nargin < 1
+                name = [];
+            end
+            if nargin < 2
                 registrationDate = [];
             end
-            obj@aod.core.Registration(registrationDate);
-            if nargin > 1
+            obj@aod.core.Registration(name, registrationDate);
+            if nargin > 2
                 obj.usedFrame = usedFrame;
             end
         end

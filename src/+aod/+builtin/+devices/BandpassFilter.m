@@ -18,11 +18,6 @@ classdef BandpassFilter < aod.core.Device
 %   setWavelength(obj, wavelength)
 %   setBandwidth(obj, bandwidth)
 %   setTransmission(obj, transmission)
-%
-% Inherited methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         transmission
@@ -30,7 +25,7 @@ classdef BandpassFilter < aod.core.Device
 
     methods 
         function obj = BandpassFilter(wavelength, bandwidth, varargin)
-            obj = obj@aod.core.Device(varargin{:});
+            obj = obj@aod.core.Device([], varargin{:});
             
             obj.setWavelength(wavelength);
             obj.setBandwidth(bandwidth);

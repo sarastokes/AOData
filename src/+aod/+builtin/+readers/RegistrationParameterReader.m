@@ -14,12 +14,20 @@ classdef RegistrationParameterReader < aod.core.readers.TxtReader
 %   aod.builtin.registrations.StripRegistration
 % -------------------------------------------------------------------------
 
+    properties (SetAccess = private)
+        registrationDate 
+    end
+
     methods
         function obj = RegistrationParameterReader(fName)
             obj@aod.core.readers.TxtReader(fName);
+
+            % Try to extract date from fName
+            obj.extractDate();
         end
 
         function out = read(obj)
+
             out = struct();
             out.FilteringOption = obj.readText('Filtering option:');
             out.System = obj.readText('Algorithm runs on:');
@@ -49,6 +57,18 @@ classdef RegistrationParameterReader < aod.core.readers.TxtReader
             out.Rotate90Degrees = obj.readYesNo('Run video rotating 90 degrees:');
             out.Desinusoid = obj.readYesNo('Run video with desinusoiding:');
             obj.Data = out;
+        end
+
+        function extractDate(obj)
+            % EXTRACTDATE
+            %
+            %   Assumes there are two dates in file name and second is the
+            %   date the file was registered
+            % -------------------------------------------------------------
+            matches = extract(obj.Name, digitsPattern(8));
+            if numel(matches) == 2
+                obj.registrationDate = matches{2};
+            end
         end
     end
 

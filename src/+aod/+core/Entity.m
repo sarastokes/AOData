@@ -75,12 +75,9 @@ classdef (Abstract) Entity < handle
     end
 
     methods
-        function obj = Entity(name, parent)
+        function obj = Entity(name)
             if nargin > 0
                 obj.setName(name);
-            end
-            if nargin > 1
-                obj.setParent(parent);
             end
 
             obj.files = aod.core.Parameters();

@@ -28,8 +28,9 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods
-        function obj = Device(varargin)
-
+        function obj = Device(name, varargin)
+            obj = obj@aod.core.Entity(name);
+            
             ip = aod.util.InputParser();
             addParameter(ip, 'Model', [], @ischar);
             addParameter(ip, 'Manufacturer', [], @ischar);

@@ -25,11 +25,8 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Source(name, parent)
-            if nargin < 2
-                parent = [];
-            end
-            obj = obj@aod.core.Entity(name, parent);
+        function obj = Source(name)
+            obj = obj@aod.core.Entity(name);
         end
     end
 
@@ -111,10 +108,12 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Access = protected)
-        function value = getLabel(obj)
-            if isnumeric(obj.Name)
-                value = num2str(obj.Name);
+    
+    % Overloaded methods
+    methods (Access = protected)    
+        function value = getLabel(obj)  
+            if isempty(obj.Parent) && isSubclass(obj.Parent, 'aod.core.Source')
+                value = [obj.Parent.Name, '_', obj.Name];
             else
                 value = obj.Name;
             end

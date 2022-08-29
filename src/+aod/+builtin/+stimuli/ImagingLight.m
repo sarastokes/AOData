@@ -8,7 +8,7 @@ classdef ImagingLight < aod.core.Stimulus
 %   aod.core.Stimulus
 %
 % Constructor:
-%   obj = ImagingLight(parent, value, units)
+%   obj = ImagingLight(name, value, units)
 %
 % Methods:
 %   setValue(obj, value, units)
@@ -20,8 +20,8 @@ classdef ImagingLight < aod.core.Stimulus
     end
     
     methods
-        function obj = ImagingLight(value, units)
-            obj@aod.core.Stimulus();
+        function obj = ImagingLight(name, value, units)
+            obj@aod.core.Stimulus(name);
 
             if nargin > 1
                 obj.setValue(value);
@@ -38,6 +38,7 @@ classdef ImagingLight < aod.core.Stimulus
             %   Set imaging light value and, optionally, units
             %
             % Syntax:
+            %   obj.setValue(value)
             %   obj.setValue(value, units)
             % -------------------------------------------------------------
             obj.value = value;

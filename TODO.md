@@ -7,7 +7,7 @@
 - [x] Decide where allowableParentTypes go
 - [ ] Units to dataset metadata?
 - [ ] Mapping Calibration property of Protocol (can't easily go in parameters)
-- [ ] Where should converting files to relative be done?
+- [x] Where should converting files to relative be done?
 
 ##### Package
 - [x] Add rotation to 1P-specific SpatialProtocol

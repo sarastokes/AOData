@@ -16,11 +16,6 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Sealed methods:
 %   setData(obj, data)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

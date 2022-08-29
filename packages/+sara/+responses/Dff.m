@@ -21,7 +21,8 @@ classdef Dff < aod.builtin.responses.RegionResponse
 % ----------------------------------------------------------------------
     methods
         function obj = Dff(parent, varargin)
-            obj = obj@aod.builtin.responses.RegionResponse(parent, varargin{:});
+            obj = obj@aod.builtin.responses.RegionResponse('Dff', varargin{:});
+            obj.setParent(parent);
             obj.load(varargin{:});
         end
 

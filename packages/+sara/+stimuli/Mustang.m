@@ -8,22 +8,19 @@ classdef Mustang < aod.builtin.stimuli.ImagingLight
 %   aod.builtin.stimuli.ImagingLight
 %
 % Constructor:
-%   obj = sara.stimuli.Mustang(parent, value)
+%   obj = sara.stimuli.Mustang(value)
 %
 % -------------------------------------------------------------------------
  
     methods
-        function obj = Mustang(value, units)
-            if nargin < 2
-                units = '%';
-            end
-            obj@aod.builtin.stimuli.ImagingLight(value, units)
+        function obj = Mustang(value)
+            obj@aod.builtin.stimuli.ImagingLight([], value, '%')
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = sprintf('Mustang%u', obj.value);
+            value = sprintf('Mustang%u', round(obj.value));
         end
     end
 end

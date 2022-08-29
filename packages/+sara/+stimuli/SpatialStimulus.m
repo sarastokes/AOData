@@ -16,7 +16,7 @@ classdef SpatialStimulus < aod.builtin.stimuli.VisualStimulus
 
     methods
         function obj = SpatialStimulus(protocol, basePower)
-            obj = obj@aod.builtin.stimuli.VisualStimulus(protocol);
+            obj = obj@aod.builtin.stimuli.VisualStimulus([], protocol);
             
             if nargin < 2
                 obj.setBasePower(ip.Results.BasePower);

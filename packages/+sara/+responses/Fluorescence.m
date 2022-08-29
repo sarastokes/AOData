@@ -8,11 +8,12 @@ classdef Fluorescence < aod.builtin.responses.RegionResponse
 %   aod.builtin.responses.RegionResponses
 %
 % Constructor:
-%   obj = Fluorescence(parent, varargin)
+%   obj = Fluorescence(parent,region, varargin)
 % -------------------------------------------------------------------------
     methods
-        function obj = Fluorescence(parent, varargin)
-            obj = obj@aod.builtin.responses.RegionResponse(parent);
+        function obj = Fluorescence(parent, region, varargin)
+            obj = obj@aod.builtin.responses.RegionResponse(...
+                'Fluorescence', parent, region, varargin{:});
         end
 
         function load(obj)

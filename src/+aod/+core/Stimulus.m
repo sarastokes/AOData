@@ -20,8 +20,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods
-        function obj = Stimulus(varargin)
-            obj = obj@aod.core.Entity(varargin{:});
+        function obj = Stimulus(name, varargin)
+            obj = obj@aod.core.Entity(name, varargin{:});
         end
     end
 

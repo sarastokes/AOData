@@ -8,7 +8,7 @@ classdef SiftRegistration < aod.builtin.registrations.RigidRegistration
 %   aod.builtin.registrations.RigidRegistration
 %
 % Constructor:
-%   obj = SiftRegistration(registrationDate, data, 'ReferenceID', ID)
+%   obj = SiftRegistration(registrationDate, data, ID)
 %
 % Required parameters:
 %   ReferenceID             Epoch ID used as starting point
@@ -18,7 +18,7 @@ classdef SiftRegistration < aod.builtin.registrations.RigidRegistration
     methods
         function obj = SiftRegistration(registrationDate, data, varargin)
             obj = obj@aod.builtin.registrations.RigidRegistration(...
-                registrationDate, data);
+                'SIFT', registrationDate, data);
            
             ip = aod.util.InputParser();
             addRequired(ip, 'ReferenceID', @isnumeric);

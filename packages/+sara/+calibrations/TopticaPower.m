@@ -17,7 +17,7 @@ classdef TopticaPower < aod.builtin.calibrations.PowerMeasurement
             assert(ismember(wavelength, laserLines), 'TopticaPower: Invalid laser line!');
             
             obj = obj@aod.builtin.calibrations.PowerMeasurement(...
-                calibrationDate, wavelength, 'SettingUnit', '%');
+                [], calibrationDate, wavelength, 'SettingUnit', '%');
         end
     end
 

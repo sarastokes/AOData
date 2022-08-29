@@ -8,30 +8,16 @@ classdef Eye < aod.core.Source
 %   aod.core.Source
 %
 % Constructor:
-%   obj = Eye(parent, name)
+%   obj = Eye(name)
 %
 % Note:
 %   Name is restricted to either 'OD' or 'OS'      
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Eye(name, parent)
+        function obj = Eye(name)
             assert(ismember(name, {'OD', 'OS'}), 'Eye: Must be OS or OD');
-            if nargin < 2
-                parent = [];
-            end
-            obj = obj@aod.core.Source(name, parent);
-        end
-    end
-
-    % Overloaded methods
-    methods (Access = protected)    
-        function value = getLabel(obj)  
-            if ~isempty(obj.Parent)
-                value = [obj.Parent.Name, '_', obj.Name];
-            else
-                value = obj.Name;
-            end
+            obj = obj@aod.core.Source(name);
         end
     end
 end

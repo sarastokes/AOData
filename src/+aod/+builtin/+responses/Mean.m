@@ -13,7 +13,8 @@ classdef Mean < aod.core.Response
 
     methods
         function obj = Mean(parent)
-            obj = obj@aod.core.Response(parent);
+            obj = obj@aod.core.Response('Mean');
+            obj.setParent(parent);
             obj.load();
         end
 

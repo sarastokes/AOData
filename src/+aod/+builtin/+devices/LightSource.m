@@ -35,7 +35,7 @@ classdef LightSource < aod.core.Device
     
     methods
         function obj = LightSource(wavelength, varargin)
-            obj = obj@aod.core.Device(varargin{:});            
+            obj = obj@aod.core.Device([], varargin{:});            
             obj.setWavelength(wavelength);
         end
 

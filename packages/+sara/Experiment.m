@@ -100,7 +100,9 @@ classdef Experiment < aod.core.Experiment
                 obj.Epochs(obj.id2index(epochIDs(i))).addRegistration(reg);
             end
         end
+    end
 
+    methods 
         function makeStackSnapshots(obj, epochIDs)
             % MAKESTACKSNAPSHOTS
             %

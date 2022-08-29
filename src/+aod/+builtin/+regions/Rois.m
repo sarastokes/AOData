@@ -8,25 +8,25 @@ classdef Rois < aod.core.Region
 %   aod.core.Region
 %
 % Constructor:
-%   obj = Rois(parent, rois, imSize)
+%   obj = Rois(name, rois)
+%   obj = Rois(name, rois, 'Size', value)
 %
-% Private parameters (automatically calculated from Data):
+% Optional Parameters:
+%   Size            % needed for loading ImageJRois, otherwise calculated
+%
+% Derived Parameters (automatically calculated from Data):
 %   Count
 %   RoiIDs
 %
 % Methods:
 %   load(obj)
 %   reload(obj)
+%   setImage(obj, im)
 %   ID = parseRoi(obj, ID)
 %   roiID = uid2roi(obj, UID)
 %   uid = roi2uid(obj, roiID)
 %   addRoiUID(obj, roiID, roiUID)
 %   setRoiUIDs(obj, roiUIDs)
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 %
 % Protected methods:
 %   setMap(obj, map);
@@ -52,8 +52,8 @@ classdef Rois < aod.core.Region
     end
 
     methods
-        function obj = Rois(rois, varargin)
-            obj@aod.core.Region(varargin{:});
+        function obj = Rois(name, rois, varargin)
+            obj@aod.core.Region(name, varargin{:});
 
             ip = aod.util.InputParser();
             addParameter(ip, 'Size', [], @isnumeric);

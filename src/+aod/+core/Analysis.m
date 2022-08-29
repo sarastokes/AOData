@@ -27,8 +27,8 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Analysis(parent, name, analysisDate)
-            obj = obj@aod.core.Entity(name, parent);
+        function obj = Analysis(name, analysisDate)
+            obj = obj@aod.core.Entity(name);
             if nargin > 2
                 obj.setAnalysisDate(analysisDate);
             end

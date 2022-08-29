@@ -29,8 +29,8 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = System(systemName)
-            obj = obj@aod.core.Entity(systemName);
+        function obj = System(name)
+            obj = obj@aod.core.Entity(name);
         end      
     end
     

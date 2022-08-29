@@ -14,7 +14,7 @@ classdef MustangPower < aod.builtin.calibrations.PowerMeasurement
     methods
         function obj = MustangPower(calibrationDate)
             obj = obj@aod.builtin.calibrations.PowerMeasurement(...
-                calibrationDate, 488, 'SettingUnit', 'Normalized');
+                [], calibrationDate, 488, 'SettingUnit', 'Normalized');
         end
     end
 end 

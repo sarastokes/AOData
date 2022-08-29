@@ -8,22 +8,12 @@ classdef Location < aod.core.Source
 %   aod.core.Source
 %
 % Constructor:
-%   obj = Location(parent, name)         
+%   obj = Location(name)         
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Location(name, parent)
-            if nargin < 2
-                parent = [];
-            end
-            obj = obj@aod.core.Source(name, parent);
+        function obj = Location(name)
+            obj = obj@aod.core.Source(name);
         end
     end
-
-    methods (Access = protected)
-        function value = getLabel(obj)
-            value = obj.Name;
-        end
-    end
-
 end

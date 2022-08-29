@@ -1,8 +1,12 @@
 classdef (Abstract) VisualStimulus < aod.core.Stimulus 
 % VISUALSTIMULUS
 %
-% Inherited properties:
-%   stimParameters
+% Parent:
+%   aod.core.Stimulus
+%
+% Constructor:
+%   obj = VisualStimulus(protocol)
+%
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -12,7 +16,7 @@ classdef (Abstract) VisualStimulus < aod.core.Stimulus
 
     methods
         function obj = VisualStimulus(protocol)
-            obj = obj@aod.core.Stimulus();
+            obj = obj@aod.core.Stimulus([]);
             if nargin > 0
                 obj.protocolName = class(protocol);
                 obj.getProtocolParameters(protocol);

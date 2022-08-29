@@ -17,7 +17,7 @@ classdef MaxwellianViewPower < aod.core.PowerMeasurement
     methods
         function obj = MaxwellianViewPower(calibrationDate, whichLEDs)
             obj = obj@aod.builtin.calibrations.PowerMeasurement(...
-                calibrationDate, whichLEDs, 'SettingUnit', 'V');
+                [], calibrationDate, whichLEDs, 'SettingUnit', 'V');
         end
     end
 

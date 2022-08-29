@@ -5,7 +5,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %   A calibration associated with the system or experiment
 %
 % Constructor:
-%   obj = aod.core.Calibration(parent, calibrationDate)
+%   obj = aod.core.Calibration(name, calibrationDate)
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous

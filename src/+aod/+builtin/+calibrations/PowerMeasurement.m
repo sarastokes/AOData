@@ -8,7 +8,7 @@ classdef PowerMeasurement < aod.core.Calibration
 %   aod.core.Calibration
 %
 % Constructor:
-%   obj = PowerMeasurement(calibrationDate, wavelength, varargin);
+%   obj = PowerMeasurement(name, calibrationDate, wavelength, varargin);
 %
 % Parameters:
 %   settingUnit             char, device setting unit (no default)
@@ -35,8 +35,8 @@ classdef PowerMeasurement < aod.core.Calibration
     end
 
     methods 
-        function obj = PowerMeasurement(calibrationDate, wavelength, varargin)
-            obj = obj@aod.core.Calibration([], calibrationDate);
+        function obj = PowerMeasurement(name, calibrationDate, wavelength, varargin)
+            obj = obj@aod.core.Calibration(name, calibrationDate);
             if numel(wavelength) > 1 && iscol(wavelength)
                 wavelength = wavelength';
             end

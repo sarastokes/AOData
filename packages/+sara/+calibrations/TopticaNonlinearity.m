@@ -4,11 +4,11 @@ classdef TopticaNonlinearity < aod.core.Calibration
 % Description:
 %   Nonlinearity in visual stimuli presented with Toptica.
 %
-% Syntax:
-%   obj = TopticaNonlinearity(calibrationDate, laserLine)
-%
 % Parent:
 %   aod.core.Calibration
+%
+% Syntax:
+%   obj = TopticaNonlinearity(calibrationDate, laserLine)
 %
 % Methods:
 %   loadCalibration(obj)
@@ -21,8 +21,6 @@ classdef TopticaNonlinearity < aod.core.Calibration
 %   wavelengths and baseline Toptica output levels.  The measurement here
 %   was made at 2% on the Toptica and checked in Nov 2021 with other
 %   Toptica output levels.
-%
-% TODO: Support for additional laser lines
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         Data 
@@ -34,17 +32,14 @@ classdef TopticaNonlinearity < aod.core.Calibration
     end
 
     methods
-        function obj = TopticaNonlinearity(calibrationDate, laserLine)
-            if nargin < 0
-                parent = [];
+        function obj = TopticaNonlinearity(laserLine, calibrationDate)
+            if nargin < 1
+                laserLine = 561;
             end
             if nargin < 2
                 calibrationDate = '20210801';
             end
-            if nargin < 3
-                laserLine = 561;
-            end
-            obj = obj@aod.core.Calibration(calibrationDate);
+            obj = obj@aod.core.Calibration([], calibrationDate);
             obj.laserLine = laserLine;
         
             obj.loadCalibration();

@@ -13,7 +13,7 @@ classdef BeaconPower < aod.builtin.calibrations.PowerMeasurement
     methods
         function obj = BeaconPower(calibrationDate)
             obj = obj@aod.builtin.calibrations.PowerMeasurement(...
-                calibrationDate, 847, 'SettingUnit', 'mA');
+                [], calibrationDate, 847, 'SettingUnit', 'mA');
         end
     end
 end 

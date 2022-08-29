@@ -30,14 +30,8 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Timing(name, parent)
-            if nargin < 1
-                name = [];
-            end
-            if nargin < 2
-                parent = [];
-            end
-            obj = obj@aod.core.Entity(name, parent);
+        function obj = Timing(name)
+            obj = obj@aod.core.Entity(name);
         end
 
         function value = get.Time(obj)

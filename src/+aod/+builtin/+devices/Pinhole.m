@@ -13,7 +13,7 @@ classdef Pinhole < aod.core.Device
 % Parameters:
 %   Diameter
 %   DiameterUnits           (default = 'micron')
-% Inherited parameters:
+% Inherited Parameters:
 %   Model
 %   Manufacturer
 %
@@ -25,7 +25,7 @@ classdef Pinhole < aod.core.Device
 
     methods
         function obj = Pinhole(diameter, varargin)
-            obj = obj@aod.core.Device(varargin{:});
+            obj = obj@aod.core.Device([], varargin{:});
             
             obj.setDiameter(diameter);
             
@@ -37,7 +37,7 @@ classdef Pinhole < aod.core.Device
         end
     end
     
-    methods (Sealed)
+    methods
         function setDiameter(obj, diameter, diameterUnits)
             % SETDIAMETER
             %

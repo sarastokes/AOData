@@ -27,8 +27,8 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Registration(registrationDate)
-            obj = obj@aod.core.Entity();
+        function obj = Registration(name, registrationDate)
+            obj = obj@aod.core.Entity(name);
             obj.setRegistrationDate(registrationDate);
         end
     end

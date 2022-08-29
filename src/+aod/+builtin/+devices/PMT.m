@@ -7,8 +7,13 @@ classdef PMT < aod.core.Device
 % Parent:
 %   aod.core.Device
 %
-% Parameters:
+% Constructor:
+%   obj = PMT(name)
+%   obj = PMT(name, 'Manufacturer', value, 'Model', value);
+%
+% Optional Parameters:
 %   Position
+%   Gain
 %
 % Constructor:
 %   obj = PMT(name, varargin)
@@ -16,11 +21,11 @@ classdef PMT < aod.core.Device
 
     methods 
         function obj = PMT(name, varargin)
-            obj = obj@aod.core.Device(varargin{:});
-            obj.setName(name);
+            obj = obj@aod.core.Device(name, varargin{:});
             
             ip = aod.util.InputParser();
             addParameter(ip, 'Position', [], @isnumeric);
+            addParameter(ip, 'Gain', [], @isnumeric);
             parse(ip, varargin{:});
 
             obj.setParam(ip.Results);

@@ -60,7 +60,7 @@ classdef RegistrationReportReader < aod.core.FileReader
             obj.Data.regDescription = string(T{:, contains(V, "description")});
 
             if numel(V) < numel(T)
-                obj.Data.extraCol = T{:, end};
+                obj.Data.rotationAngle = T{:, end};
             end
 
             out = obj.Data;

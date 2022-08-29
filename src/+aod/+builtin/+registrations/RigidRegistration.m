@@ -28,8 +28,8 @@ classdef RigidRegistration < aod.core.Registration
     end
 
     methods
-        function obj = RigidRegistration(registrationDate, data)
-            obj@aod.core.Registration(registrationDate);
+        function obj = RigidRegistration(name, registrationDate, data)
+            obj@aod.core.Registration(name, registrationDate);
 
             if ~isa(data, 'affine2d')
                 try

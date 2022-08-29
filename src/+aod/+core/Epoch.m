@@ -28,7 +28,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   videoName = getCoreVideoName(obj)
 % 
 % Public methods:
-%   imStack = getStack(obj, varargin)
 %   clearVideoCache(obj)
 %   addRegistration(obj, reg, overwrite)
 %   addResponse(obj, resp)

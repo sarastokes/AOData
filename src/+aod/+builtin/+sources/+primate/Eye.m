@@ -8,7 +8,7 @@ classdef Eye < aod.core.sources.Eye
 %   aod.core.sources.Eye
 %
 % Constructor:
-%   obj = Eye(parent, whichEye, varargin)
+%   obj = Eye(whichEye, varargin)
 %
 % Parameters:
 %   AxialLength                 double, axial length in mm

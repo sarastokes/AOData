@@ -8,7 +8,7 @@ classdef RegionResponse < aod.core.Response
 %   aod.core.Response
 %
 % Constructor:
-%   obj = RegionResponse(parent, region, varargin)
+%   obj = RegionResponse(name, parent, region, varargin)
 %
 % Properties:
 %   Region
@@ -29,19 +29,15 @@ classdef RegionResponse < aod.core.Response
     end
 
     methods
-        function obj = RegionResponse(parent, region, varargin)
-            if nargin < 1
-                parent = [];
-            end
-            obj = obj@aod.core.Response(parent);
+        function obj = RegionResponse(name, parent, region, varargin)
+            obj = obj@aod.core.Response(name);
+            obj.setParent(parent);
             obj.setRegion(region);
 
-            if isSubclass(obj.Parent, 'aod.core.Epoch')
-                obj.load(varargin{:});
-                % Listen for changes to ROIs and flag for update
-                obj.listeners = addlistener(obj.Region,... 
-                    'UpdatedRois', @obj.onUpdatedRois);
-            end
+            obj.load(varargin{:});
+            % Listen for changes to ROIs and flag for update
+            obj.listeners = addlistener(obj.Region,... 
+                'UpdatedRois', @obj.onUpdatedRois);
         end
     end
 

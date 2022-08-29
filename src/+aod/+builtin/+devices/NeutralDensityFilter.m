@@ -30,7 +30,7 @@ classdef NeutralDensityFilter < aod.core.Device
     
     methods
         function obj = NeutralDensityFilter(attenuation, varargin)
-            obj = obj@aod.core.Device(varargin{:});
+            obj = obj@aod.core.Device([], varargin{:});
             obj.setAttenuation(attenuation);
         end
     end

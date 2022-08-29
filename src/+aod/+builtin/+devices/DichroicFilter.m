@@ -13,7 +13,7 @@ classdef DichroicFilter < aod.core.Device
 % Parameters:
 %   Wavelength                      numeric
 %   PassType                        char, 'low' or 'high'
-% Inherited properties:
+% Inherited Parameters:
 %   Manufacturer
 %   Model
 %
@@ -31,7 +31,7 @@ classdef DichroicFilter < aod.core.Device
     
     methods
         function obj = DichroicFilter(wavelength, passType, varargin)
-            obj = obj@aod.core.Device(varargin{:});
+            obj = obj@aod.core.Device([], varargin{:});
             
             obj.setWavelength(wavelength);
             obj.setPassType(passType);

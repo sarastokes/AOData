@@ -16,7 +16,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Methods:
 %   setData(obj, data)
-%   setTiming(obj, timing)
+%   addTiming(obj, timing)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -33,11 +33,8 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Response(parent, name)
-            if nargin < 1
-                name = [];
-            end
-            obj = obj@aod.core.Entity(parent);
+        function obj = Response(name)
+            obj = obj@aod.core.Entity(name);
         end
 
         function value = get.Experiment(obj)
@@ -55,11 +52,11 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Data = data;
         end
 
-        function setTiming(obj, timing)
+        function addTiming(obj, timing)
             % SETTIMING
             %
             % Syntax:
-            %   obj.setTiming(timing)
+            %   addTiming(obj, timing)
             % -------------------------------------------------------------
             obj.Timing = timing;
         end
