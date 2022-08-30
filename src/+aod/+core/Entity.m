@@ -154,10 +154,30 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.addNote(txt)
             % -------------------------------------------------------------
-            if ~isempty(obj.notes)
-                obj.notes = obj.notes + '; ';
+            if isempty(txt)
+                return
             end
-            obj.notes = obj.notes + txt;
+            
+            obj.notes = [obj.notes, '[[x]]', txt];
+        end
+
+        function removeNote(obj, ID)
+            % REMOVENOTE
+            % 
+            % Description:
+            %   Remove a specific note
+            %
+            % Syntax:
+            %   obj.removeNote(obj, ID)
+            % -------------------------------------------------------------
+            out = strfind(obj.notes, '[[');
+            assert(ID > 1 && ID <= numel(out),...
+                'Invalid ID %u, must be between 1-%u', ID, max(noteIDs));
+            if ID == numel(out)
+                obj.notes = obj.notes(out(end):end);
+            else
+                obj.notes = [obj.notes(1:out(ID)-1), obj.notes(out(ID+1):end)];
+            end
         end
 
         function clearNotes(obj)
