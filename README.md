@@ -1,6 +1,6 @@
 # ao-data-tools
 
-Framework for organizing and analyzing imaging experiments. Designed with adaptive optics experiments in mind but applies well to other imaging datasets. Draws on ideas from other open source data frameworks, especially [NeurodataWithoutBorders](https://github.com/NeurodataWithoutBorders) and [Symphony](https://github.com/Symphony-DAS/symphony-matlab). 
+Object-oriented framework for organizing the data, metadata and code related to an experiment. Designed with adaptive optics experiments in mind but applies well to other imaging datasets. 
 
 ### Organization 
 
@@ -15,14 +15,13 @@ For storing data and metadata associated with an experiment:
   - Calibration
   - Region
   - Epoch
+    - Dataset
     - Registration
     - Response
-      - Timing
     - Stimulus
-    - Dataset
-   - Analysis
+  - Analysis
 
-Although there are multiple approaches for converting an experiment into a `Experiment` object, the `Creator` class has access to all the building functions within `Experiment` and can provide a standardized way of building customized `Experiment` objects.
+After creating the experiment hierarchy, the experiment is written to an HDF5 file and can be read back into MATLAB or taken to other programming languages.
 
 For creating stimulus protocols, there is also the `Protocol` class. The advantage of using this class is standardizing stimulus creation. The `Stimulus` class stores the `Protocol` name and parameters, making it possible to recreate the `Protocol` object later on and regenerate the exact stimulus used.
 
@@ -30,7 +29,7 @@ For creating stimulus protocols, there is also the `Protocol` class. The advanta
 Each class is generic and meant to be subclassed and tailored to specific imaging experiments. Examples can be found in the `\packages` folder.
 
 ### Dependencies
-- MATLAB (developed in 2022a, compatible with 2021a and 2021b)
+- MATLAB 2022a
 - The core classes do not require additional toolboxes. Some of the examples in `\packages` require the following additional MATLAB toolboxes: Signal Processing, Image Processing and Symbolic Math.
 
 ### Included 3rd party toolboxes:

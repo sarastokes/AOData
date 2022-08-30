@@ -8,7 +8,8 @@
 - [ ] Units to dataset metadata?
 - [ ] Mapping Calibration property of Protocol (can't easily go in parameters)
 - [x] Where should converting files to relative be done?
-- [ ] Dependent but not hidden properties should be written (e.g. epochIDs)
+- [x] Dependent but not hidden properties should be written (e.g. epochIDs)
+- [x] Abandon Timing core class
 
 ##### Package
 - [x] Add rotation to 1P-specific SpatialProtocol
@@ -20,7 +21,8 @@
 
 ##### Minor
 - [x] Name vs name
-- [ ] files property should be lowercase
+- [x] files property should be lowercase
+- [ ] How to handle Reader properties
 
 ##### Documentation
 - [x] Handle class

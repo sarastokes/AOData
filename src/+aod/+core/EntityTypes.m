@@ -54,15 +54,86 @@ classdef EntityTypes
                 case EntityTypes.SOURCE 
                     containers = {'Sources'};
                 case EntityTypes.EPOCH
-                    containers = {'Registrations', 'Stimuli', 'Responses', 'Datasets', 'Timing'};
+                    containers = {'Registrations', 'Stimuli', 'Responses', 'Datasets'};
                 case EntityTypes.SYSTEM 
                     containers = {'Channels'};
                 case EntityTypes.CHANNEL 
                     containers = {'Devices'};
-                case EntityTypes.RESPONSE
-                    containers = {'Timing'};
                 otherwise
                     containers = [];
+            end
+        end
+
+        function hdfPath = getPath(obj, entity, manager, parentPath)
+            assert(isSubclass(entity, 'aod.core.Entity'),...
+                'entity must be a subclass of aod.core.Entity');
+            assert(isSubclass(manager, 'aod.h5.EntityManager'),...
+                'manager must be a subclass of aod.h5.EntityManager');
+
+            if nargin < 4
+                parentPath = obj.parentPath(entity, manager);
+            end
+            groupName = obj.getEntityGroupName(entity);
+
+            import aod.core.EntityTypes
+
+            switch obj 
+                case EntityTypes.EXPERIMENT
+                    hdfPath = '/Experiment';
+                case EntityTypes.SOURCE
+                    hdfPath = [parentPath, '/Sources/', groupName];
+                case EntityTypes.SYSTEM
+                    hdfPath = [parentPath, '/Systems/', groupName];
+                case EntityTypes.CHANNEL
+                    hdfPath = [parentPath, '/Channels/', groupName];
+                case EntityTypes.DEVICE
+                    hdfPath = [parentPath, '/Devices/', groupName];
+                case EntityTypes.CALIBRATION
+                    hdfPath = [parentPath, '/Calibrations/', groupName];
+                case EntityTypes.EPOCH
+                    hdfPath = [parentPath, '/Epochs/', groupName];
+                case EntityTypes.DATASET
+                    hdfPath = [parentPath, '/Datasets/', groupName];
+                case EntityTypes.REGISTRATION
+                    hdfPath = [parentPath, '/Registrations/', groupName];
+                case EntityTypes.STIMULUS
+                    hdfPath = [parentPath, '/Stimuli/', groupName];
+                case EntityTypes.RESPONSE
+                    hdfPath = [parentPath, '/Responses/', groupName];
+                case EntityTypes.TIMING
+                    hdfPath = [parentPath, '/Timing/'];
+                case EntityTypes.ANALYSIS
+                    hdfPath = [parentPath, '/Analyses/', groupName];
+            end
+        end
+
+        function hdfPath = parentPath(obj, entity, manager)
+            % PARENTPATH
+            %
+            % Syntax:
+            %   hdfPath = parentPath(obj, entity, manager)
+            % -------------------------------------------------------------
+            assert(isSubclass(entity, 'aod.core.Entity'),...
+                'entity must be a subclass of aod.core.Entity');
+            assert(isSubclass(manager, 'aod.h5.EntityManager'),...
+                'manager must be a subclass of aod.h5.EntityManager');
+
+            import aod.core.EntityTypes
+
+            switch obj 
+                case EntityTypes.EXPERIMENT 
+                    hdfPath = [];
+                case {EntityTypes.SYSTEM, EntityTypes.EPOCH, EntityTypes.REGION,...
+                        EntityTypes.ANALYSIS, EntityTypes.CALIBRATION}
+                    hdfPath = '/Experiment';
+                case EntityTypes.SOURCE 
+                    if isempty(entity.Parent)
+                        hdfPath = '/Experiment';
+                    else
+                        hdfPath = manager.uuid2path(entity.Parent.UUID);
+                    end
+                otherwise
+                    hdfPath = manager.uuid2path(entity.Parent.UUID);
             end
         end
     end
@@ -77,8 +148,8 @@ classdef EntityTypes
                 case EntityTypes.EXPERIMENT
                     out = 'Experiment';
                 case EntityTypes.EPOCH
-                    if ~isempty(obj.Name)
-                        out = obj.Name;
+                    if ~isempty(entity.Name)
+                        out = entity.Name;
                     else
                         out = ['Epoch', int2fixedwidthstr(entity.ID, 4)];
                     end

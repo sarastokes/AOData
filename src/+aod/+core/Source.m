@@ -112,7 +112,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
     % Overloaded methods
     methods (Access = protected)    
         function value = getLabel(obj)  
-            if isempty(obj.Parent) && isSubclass(obj.Parent, 'aod.core.Source')
+            if ~isempty(obj.Parent) && isSubclass(obj.Parent, 'aod.core.Source')
                 value = [obj.Parent.Name, '_', obj.Name];
             else
                 value = obj.Name;

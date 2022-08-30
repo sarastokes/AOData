@@ -14,11 +14,12 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 % Methods:
 %   setData(obj, data)
 %   addTiming(obj, timing)
+%   clearTiming(obj)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         Data                             
-        Timing                              aod.core.Timing
+        Timing                              % aod.core.Timing
     end
 
     properties (Hidden, Access = protected)
@@ -48,6 +49,15 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             %   addTiming(obj, timing)
             % -------------------------------------------------------------
             obj.Timing = timing;
+        end
+
+        function clearTiming(obj)
+            % CLEARTIMING
+            %
+            % Syntax:
+            %   clearTiming(obj)
+            % -------------------------------------------------------------
+            obj.Timing = [];
         end
     end
 

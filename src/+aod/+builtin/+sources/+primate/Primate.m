@@ -27,10 +27,4 @@ classdef Primate < aod.core.sources.Subject
             value = str2double(erase(obj.Name, 'MC'));
         end
     end
-
-    methods (Access = protected)
-        function value = getLabel(obj)
-            value = obj.Name;
-        end
-    end
 end

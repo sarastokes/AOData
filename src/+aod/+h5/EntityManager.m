@@ -1,10 +1,20 @@
 classdef EntityManager < handle 
+% ENTITYMANAGER
+%
+% Description:
+%   Indexes all entities within an HDF5 file by their path name, UUID and
+%   entity type.
+%
+% Constructor:
+%   obj = EntityManager(hdfName)
+% -------------------------------------------------------------------------
 
     properties
         hdfName
         pathMap
         classMap
         entityMap
+        Table
     end
 
     methods
@@ -17,6 +27,7 @@ classdef EntityManager < handle
             obj.entityMap = containers.Map();
             obj.classMap = containers.Map();
             obj.pathMap = containers.Map();
+            obj.Table = [];
         end
 
         function collect(obj)
@@ -24,6 +35,8 @@ classdef EntityManager < handle
 
             info = h5info(obj.hdfName);
             obj.processGroups(info.Groups);
+
+            obj.Table = table(obj);
         end
 
         function T = table(obj)
@@ -32,6 +45,18 @@ classdef EntityManager < handle
                 string(obj.classMap.values'),...
                 string(obj.pathMap.values'),...
                 'VariableNames', {'UUID', 'Entity', 'Class', 'Path'});
+        end
+
+        function hdfPath = uuid2path(obj, uuid)
+            if ~obj.hasUUID(uuid)
+                error("EntityManager:UuidNotFound",...
+                    "The UUID %s is not present", uuid);
+            end
+            hdfPath = char(obj.Table{obj.Table.UUID == uuid, 'Path'});
+        end
+
+        function tf = hasUUID(obj, uuid)
+            tf = ismember(uuid, obj.Table.UUID);
         end
     end
 

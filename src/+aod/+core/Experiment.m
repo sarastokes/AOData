@@ -444,7 +444,7 @@ classdef Experiment < aod.core.Entity
             %   obj.removeCalibrations(ID)
             % -------------------------------------------------------------
             assert(ID > 0 & ID <= numel(obj.Calibrations),...
-                'ID %u is invalid, must be between 1-%u', ID numel(obj.Calibrations));
+                'ID %u is invalid, must be between 1-%u', ID, numel(obj.Calibrations));
             obj.Calibrations(ID) = [];
         end
 

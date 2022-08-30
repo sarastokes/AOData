@@ -504,67 +504,7 @@ classdef HDF5 < handle
                 out = data;
             end
         end
-
-        function tf = writeDataByType(fileName, pathName, dsetName, data)
-            % WRITEDATABYTYPE
-            %
-            % Description:
-            %   Call the appropriate "make" function for given data type 
-            %   and tags with original MATLAB class information
-            %
-            % Syntax:
-            %   tf = writeDataByType(fileName, pathName, dsetName, data)
-            % -------------------------------------------------------------
-            import aod.h5.HDF5
-
-            if isstring(dsetName)
-                dsetName = char(dsetName);
-            end
-
-            fullPath = HDF5.buildPath(pathName, dsetName);
-
-            tf = true;
-
-            if isenum(data)
-                HDF5.makeEnumDataset(fileName, pathName, dsetName, data);
-            elseif isstruct(data) || istable(data)
-                try
-                    HDF5.makeCompoundDataset(fileName, pathName, dsetName, data);
-                    HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-                catch
-                    % Delete dataset created while attempting compound type
-                    if HDF5.exists(fileName, fullPath)
-                        HDF5.deleteObject(fileName, fullPath);
-                    end
-                    HDF5.makeStructDataset(fileName, pathName, dsetName, data);
-                end
-            elseif istimetable(data)
-                T = timetable2table(data);
-                T.Time = seconds(T.Time);
-                HDF5.makeCompoundDataset(fileName, pathName, dsetName, T);
-                HDF5.writeatts(fileName, pathName, 'Class', class(data));
-            elseif isnumeric(data)
-                HDF5.makeMatrixDataset(fileName, pathName, dsetName, data);
-                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-            elseif islogical(data)
-                HDF5.makeMatrixDataset(fileName, pathName, dsetName, double(data));
-                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-            elseif ischar(data)
-                HDF5.makeTextDataset(fileName, pathName, dsetName, data);
-                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-            elseif isstring(data)
-                HDF5.makeTextDataset(fileName, pathName, dsetName, char(data));
-                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-            elseif isdatetime(data)
-                HDF5.makeDateDataset(fileName, pathName, dsetName, data);
-            elseif isa(data, 'affine2d')
-                HDF5.makeMatrixDataset(fileName, pathName, dsetName, data.T);
-                HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-            else
-                tf = false;
-            end
-        end    
-
+        
         function typeID = getDataType(var)
             % GETDATATYPE
             %

@@ -83,6 +83,4 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
             HDF5.writeatts(fileName, fullPath, 'Class', class(data));
         otherwise
             success = false;
-            % error("aod.h6.writeDataByType:UnrecognizedClass",...
-            %     "Data class %s was not recognized", class(data));
     end

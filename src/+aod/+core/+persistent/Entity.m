@@ -89,6 +89,7 @@ classdef Entity < handle
             obj.UUID = h5readatt(obj.hdfName, obj.hdfPath, 'UUID');
             obj.entityType = h5readatt(obj.hdfName, obj.hdfPath, 'EntityType');
             obj.entityClassName = h5readatt(obj.hdfName, obj.hdfPath, 'Class');
+            % Optional special attributes which may not be present
             if ismember("description", attributeNames)
                 obj.description = h5readatt(obj.hdfName, obj.hdfPath, 'description');
             end
@@ -103,7 +104,15 @@ classdef Entity < handle
         end
 
         function e = loadLink(obj, linkNames, name)
-            if isempty(linkNames)
+            % LOADLINK
+            %
+            % Description:
+            %   Check if a link is present and if so, assign to property
+            %
+            % Syntax:
+            %   d = loadLink(obj, linkNames, name)
+            % -------------------------------------------------------------
+            if isempty(linkNames) || ~ismember(name, linkNames)
                 e = [];
                 return
             end
@@ -113,6 +122,14 @@ classdef Entity < handle
         end
 
         function d = loadDataset(obj, dsetNames, name)
+            % LOADDATASET
+            %
+            % Description:
+            %   Check if a dataset is present and if so, assign to property
+            %
+            % Syntax:
+            %   d = loadDataset(obj, dsetNames, name)
+            % -------------------------------------------------------------
             if ~isempty(dsetNames) && ismember(name, dsetNames)
                 d = aod.h5.createDatasetByType(obj.hdfName, obj.hdfPath, name);
             else

@@ -67,6 +67,7 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
     % Write the epochs and their stimuli, registrations, responses, datasets
     for i = 1:numel(obj.Epochs)
         aod.h5.writeEntity(hdfName, obj.Epochs(i));
+
         if ~isempty(obj.Epochs(i).Registrations)
             for j = 1:numel(obj.Epochs(i).Registrations)
                 aod.h5.writeEntity(hdfName, obj.Epochs(i).Registrations(j));

@@ -18,7 +18,7 @@ function value = extractCrop(txt, varargin)
     %   25Jul2022 - SSP
     % ---------------------------------------------------------------------
 
-    isPattern = false(1, numel(varargin{:}));
+    isPattern = false(1, nargin-1);
     pattern = "";
     for i = 1:numel(varargin)
         if isa(varargin{i}, 'pattern')

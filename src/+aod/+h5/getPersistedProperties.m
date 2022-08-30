@@ -26,7 +26,7 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
     
     alwaysPersistedProps = ["notes", "Parent", "Name", "files"]';
     alwaysAttributeProps = ["UUID", "description", "parameters"];
-    alwaysAbandonedProps = ["allowableParentTypes", "Reader"]; % TODO
+    alwaysAbandonedProps = ["allowableParentTypes", "Reader"];
     persistedProps = [];
     attributeProps = [];
     abandonedProps = [];
@@ -43,21 +43,26 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
             abandonedProps = cat(1, abandonedProps,...
                 string(mc.PropertyList(i).Name));
         elseif ismember(mc.PropertyList(i).Name, containerProps)
-            % Containers are not persisted
+            % Containers are not persisted with containing entity
             abandonedProps = cat(1, abandonedProps,...
                 string(mc.PropertyList(i).Name));
         elseif contains(mc.PropertyList(i).Name, 'Parameters')
             % Properties with "parameters" in the name are attributes
             attributeProps = cat(1, attributeProps,...
                 string(mc.PropertyList(i).Name));
-        elseif mc.PropertyList(i).Dependent
-            % Dependent properties are not persisted
-            abandonedProps = cat(1, abandonedProps,...
-                string(mc.PropertyList(i).Name));
         elseif mc.PropertyList(i).Transient
-            % Transient properties are not persisted
+            % Transient properties are akways abandoned
             abandonedProps = cat(1, abandonedProps,...
                 string(mc.PropertyList(i).Name));
+        elseif mc.PropertyList(i).Dependent
+            % Dependent properties are persisted unless hidden
+            if mc.PropertyList(i).Hidden
+                abandonedProps = cat(1, abandonedProps,...
+                    string(mc.PropertyList(i).Name));
+            else
+                persistedProps = cat(1, persistedProps,...
+                    string(mc.PropertyList(i).Name));
+            end
         else
             persistedProps = cat(1, persistedProps,...
                 string(mc.PropertyList(i).Name));

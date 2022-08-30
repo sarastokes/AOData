@@ -45,11 +45,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         startTime(1,1)              datetime
+        Timing                      
         Registrations               aod.core.Registration
         Responses                   aod.core.Response  
         Stimuli                     aod.core.Stimulus
         Datasets                    aod.core.Dataset
-        Timing                      % aod.core.Timing
     end
 
     % Entity link properties
@@ -63,10 +63,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods 
-        function obj = Epoch(ID, sampleRate, varargin)
+        function obj = Epoch(ID, varargin)
             obj = obj@aod.core.Entity();
             obj.ID = ID;
-            obj.setParam('SampleRate', sampleRate);
             
             ip = aod.util.InputParser();
             addParameter(ip, 'Source', [], @(x) isSubclass(x, 'aod.core.Source'));
@@ -131,18 +130,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Sealed)  
-        function setStartTime(obj, startTime)
-            % SETSTARTTIME
-            %
-            % Description:
-            %   Set the time the epoch began
-            %
-            % Syntax:
-            %   setStartTime(obj, startTime)
-            % -------------------------------------------------------------
-            obj.startTime = startTime;
-        end
-
         function setSource(obj, source)
             % SETSOURCE
             %
@@ -157,8 +144,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             end
             assert(isSubclass(source, 'aod.core.Source'),...
                 'source must be subclass of aod.core.Source');
-            assert(~isempty(findByUUID(obj.Parent.Sources, source.UUID)),... 
-                'Source be part of the same Experiment');
+            % assert(~isempty(findByUUID(obj.Parent.Sources, source.UUID)),... 
+            %     'Source be part of the same Experiment');
             obj.Source = source;
         end
 
@@ -176,14 +163,26 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             end
             assert(isSubclass(system, 'aod.core.System'),...
                 'System must be a subclass of aod.core.System');
-            assert(~isempty(findByUUID(obj.Parent.Systems, system.UUID)),... 
-                'System be part of the same Experiment');
+            % assert(~isempty(findByUUID(obj.Parent.Systems, system.UUID)),... 
+            %     'System be part of the same Experiment');
             obj.System = system;
         end
     end
 
     % Timing methods
-    methods
+    methods (Sealed)
+        function setStartTime(obj, startTime)
+            % SETSTARTTIME
+            %
+            % Description:
+            %   Set the time the epoch began
+            %
+            % Syntax:
+            %   setStartTime(obj, startTime)
+            % -------------------------------------------------------------
+            obj.startTime = startTime;
+        end
+
         function setTiming(obj, timing)
             % SETTIMING
             %
@@ -193,10 +192,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setTiming(obj, timing)
             % -------------------------------------------------------------
-            assert(isSubclass(timing, 'aod.core.Timing'),...
-                'Input must be subclass of aod.core.Timing');
-            
-            timing.setParent(obj);
+            assert(isnumeric(timing), 'Timing must be numeric');
             obj.Timing = timing;
         end
 
@@ -223,7 +219,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             assert(isSubclass(dataset, 'aod.core.Dataset'),...
                 'Must be a subclass of aod.core.Dataset');
-            dataset.addParent(obj);
+            dataset.setParent(obj);
             obj.Datasets = cat(1, obj.Datasets, dataset);
         end
 
@@ -261,7 +257,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     % Registration methods
     methods
-
         function addRegistration(obj, reg)
             % ADDREGISTRATION
             %
@@ -317,7 +312,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 resp(1,1)           {mustBeA(resp, 'aod.core.Response')}
             end
 
-            resp.addParent(obj);
+            resp.setParent(obj);
             obj.Responses = cat(1, obj.Responses, resp);
         end
 
@@ -393,6 +388,20 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 value = ['Epoch', int2fixedwidthstr(obj.ID, 4)];
             else
                 value = sprintf('Epoch%u_%s', obj.ID, obj.Parent.label);
+            end
+        end
+
+        function sync(obj)
+            if ~isempty(obj.Source)
+                if isempty(findByUUID(obj.Parent.getAllSources(), obj.Source.UUID))
+                    warning('Source be part of the same Experiment');
+                end
+            end
+
+            if ~isempty(obj.System)
+                if isempty(findByUUID(obj.Parent.Systems, obj.System.UUID))
+                    warning('System must be part of the same Experiment');
+                end
             end
         end
     end
