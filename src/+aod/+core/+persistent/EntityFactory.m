@@ -45,6 +45,10 @@ classdef EntityFactory < handle
             switch entityType 
                 case "EXPERIMENT"
                     e = aod.core.persistent.Experiment(obj.hdfName, hdfPath, obj);
+                case "ANALYSIS"
+                    e = aod.core.persistent.Analysis(obj.hdfName, hdfPath, obj);
+                case "SOURCE"
+                    e = aod.core.persistent.Source(obj.hdfName, hdfPath, obj);
                 case "SYSTEM"
                     e = aod.core.persistent.System(obj.hdfName, hdfPath, obj);
                 case "CHANNEL"
@@ -55,6 +59,12 @@ classdef EntityFactory < handle
                     e = aod.core.persistent.Calibration(obj.hdfName, hdfPath, obj);
                 case "EPOCH"
                     e = aod.core.persistent.Epoch(obj.hdfName, hdfPath, obj);
+                case "RESPONSE"
+                    e = aod.core.persistent.Response(obj.hdfName, hdfPath, obj);
+                case "STIMULUS"
+                    e = aod.core.persistent.Stimulus(obj.hdfName, hdfPath, obj);
+                case "TIMING"
+                    e = aod.core.persistent.Timing(obj.hdfName, hdfPath, obj);
                 otherwise
                     error("EntityFactorycreate:UnrecognizedEntity",...
                         "Did not recognize entity name: %s", entityType);

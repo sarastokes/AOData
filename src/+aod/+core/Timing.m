@@ -17,7 +17,7 @@ classdef Timing < aod.core.Entity & matlab.mixin.Heterogeneous
 %   T = getTiming(obj)
 % -------------------------------------------------------------------------
 
-    properties (Hidden, Dependent)
+    properties (Dependent)
         Time
     end
 

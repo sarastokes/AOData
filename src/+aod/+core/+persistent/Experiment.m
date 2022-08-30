@@ -40,6 +40,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
             end
             
             obj.setDatasetsToDynProps(datasetNames);
+            obj.setLinksToDynProps(linkNames);
 
             % Create containers
             obj.Analyses = aod.core.persistent.EntityContainer(...

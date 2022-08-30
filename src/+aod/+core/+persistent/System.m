@@ -14,9 +14,8 @@ classdef System < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
-            if ~isempty(dsetNames)
-                obj.setDatasetsToDynProps(dsetNames);
-            end
+            obj.setDatasetsToDynProps(dsetNames);
+            obj.setLinksToDynProps(linkNames);
 
             obj.Channels = aod.core.persistent.EntityContainer(...
                 aod.h5.HDF5.buildPath(obj.hdfPath, 'Channels'), obj.factory);

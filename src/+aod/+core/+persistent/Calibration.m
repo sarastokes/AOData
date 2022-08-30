@@ -18,9 +18,8 @@ classdef Calibration < aod.core.persistent.Entity & dynamicprops
                 obj.calibrationDate = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'calibrationDate');
             end
 
-            if ~isempty(dsetNames)
-                obj.setDatasetsToDynProps(dsetNames);
-            end
+            obj.setDatasetsToDynProps(dsetNames);
+            obj.setLinksToDynProps(linkNames);
         end
     end
 end

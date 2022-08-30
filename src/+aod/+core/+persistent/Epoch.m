@@ -1,8 +1,8 @@
 classdef Epoch < aod.core.persistent.Entity & dynamicprops 
 
     properties (SetAccess = protected)
-        ID 
-        startTime
+        ID(1,1)
+        startTime(1,1)                  datetime 
 
         Source 
         System 
@@ -12,10 +12,6 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
         Responses
         Stimuli
         Timing
-    end
-
-    properties (SetAccess = private)
-        epochType
     end
 
     methods
@@ -28,6 +24,7 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
             
+            % DATASETS
             if ismember("ID", dsetNames)
                 obj.ID = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, "ID");
             end
@@ -36,14 +33,20 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
                 obj.startTime = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, "startTime");
             end
 
-            if ~isempty(dsetNames)
-                obj.setDatasetsToDynProps(dsetNames);
+            obj.setDatasetsToDynProps();
+
+            % LINKS
+            obj.Source = obj.createFromLink(linkNames, "Source");
+            obj.System = obj.loadLink(linkNames, "System");
+            obj.setLinksToDynProps();
+
+            % GROUPS
+            tinfo = h5info(aod.h5.HDF5.buildPath(obj.hdfName, 'Timing'));
+            if ~isempty(tinfo.Datasets)
+                obj.Timing = obj.factory.create(aod.h5.HDF5.buildPath(obj.hdfName, 'Timing'));
             end
 
-            % obj.Source = obj.createFromLink(linkNames, "Source");
-            obj.System = obj.createFromLink(linkNames, "System");
-
-            % Create containers
+            % CONTAINERS
             obj.Datasets = aod.core.persistent.EntityContainer(...
                 aod.h5.HDF5.buildPath(obj.hdfPath, 'Datasets'), obj.factory);
             obj.Registrations = aod.core.persistent.EntityContainer(...

@@ -10,9 +10,8 @@ classdef Device < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
-            if ~isempty(dsetNames)
-                obj.setDatasetsToDynProps(dsetNames);
-            end
+            obj.setDatasetsToDynProps(dsetNames);
+            obj.setLinksToDynProps(linkNames);
         end
     end
 end

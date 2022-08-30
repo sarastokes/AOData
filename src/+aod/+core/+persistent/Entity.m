@@ -102,7 +102,7 @@ classdef Entity < handle
             end
         end
 
-        function e = createFromLink(obj, linkNames, name)
+        function e = loadLink(obj, linkNames, name)
             if isempty(linkNames)
                 e = [];
                 return
@@ -110,6 +110,14 @@ classdef Entity < handle
             idx = find(linkNames == name);
             linkPath = obj.info.Links(idx).Value{1};
             e = obj.factory.create(linkPath);
+        end
+
+        function d = loadDataset(obj, dsetNames, name)
+            if ~isempty(dsetNames) && ismember(name, dsetNames)
+                d = aod.h5.createDatasetByType(obj.hdfName, obj.hdfPath, name);
+            else
+                d = [];
+            end
         end
 
         function setDatasetsToDynProps(obj, datasetNames)
@@ -130,11 +138,35 @@ classdef Entity < handle
                 end
             end
 
+            if isempty(datasetNames)
+                return
+            end
+
             for i = 1:numel(datasetNames)
                 if ~isprop(obj, datasetNames(i))
                     obj.addprop(datasetNames(i));
                     obj.(datasetNames(i)) = aod.h5.readDatasetByType(...
                         obj.hdfName, obj.hdfPath, char(datasetNames(i)));
+                end
+            end
+        end
+
+        function setLinksToDynProps(obj, linkNames)
+            if nargin < 2
+                if isempty(obj.info.Links)
+                    return
+                else
+                    linkNames = string({obj.info.Links.Name});
+                end
+            end
+
+            if isempty(linkNames)
+                return
+            end
+
+            for i = 1:numel(linkNames)
+                if ~isprop(obj.linkNames(i))
+                    obj.(linkNames(i)) = obj.loadLink(linkNames, linkNames(i));
                 end
             end
         end

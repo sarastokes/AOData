@@ -1,6 +1,6 @@
 classdef Channel < aod.core.persistent.Entity & dynamicprops
 
-    properties (SetAcces = protected)
+    properties (SetAccess = protected)
         Devices
     end
 
@@ -14,9 +14,8 @@ classdef Channel < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
-            if ~isempty(dsetNames)
-                obj.setDatasetsToDynProps(dsetNames);
-            end
+            obj.setDatasetsToDynProps(dsetNames);
+            obj.setLinksToDynProps(linkNames);
             
             % Create containers
             obj.Devices = aod.core.persistent.EntityContainer(...
