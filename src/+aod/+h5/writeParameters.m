@@ -3,7 +3,7 @@ function writeParameters(hdfName, groupPath, params)
     arguments 
         hdfName             {mustBeFile}
         groupPath           char 
-        params              {mustBeA(params, 'aod.core.Parameters')}
+        params              {mustBeA(params, 'aod.util.Parameters')}
     end
     
     keys = params.keys;

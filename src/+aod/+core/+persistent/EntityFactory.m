@@ -29,7 +29,7 @@ classdef EntityFactory < handle
         end
 
         function clearCache(obj)
-            obj.cache = aod.core.Parameters();
+            obj.cache = aod.util.Parameters();
         end
 
         function e = create(obj, hdfPath)

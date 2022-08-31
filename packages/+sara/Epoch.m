@@ -18,8 +18,8 @@ classdef Epoch < aod.core.Epoch
 %   Registrations       aod.core.Registration
 %   Responses           aod.core.Response
 %   Stimuli             aod.core.Stimuli
-%   epochParameters     aod.core.Parameters
-%   files               aod.core.Parameters
+%   epochParameters     aod.util.Parameters
+%   files               aod.util.Parameters
 % Dependent properties:
 %   transform           aod.builtin.registrations.RigidRegistration
 %

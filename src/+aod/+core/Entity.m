@@ -10,7 +10,7 @@ classdef (Abstract) Entity < handle
 % Properties:
 %   Parent                      aod.core.Entity
 %   Name                        char
-%   parameters                  aod.core.Parameters
+%   parameters                  aod.util.Parameters
 %   files                       aod.core.Files
 %   description                 string
 %   notes                       cell
@@ -62,8 +62,8 @@ classdef (Abstract) Entity < handle
     end
 
     properties (SetAccess = protected)
-        files                       % aod.core.Parameters
-        parameters                  % aod.core.Parameters
+        files                       % aod.util.Parameters
+        parameters                  % aod.util.Parameters
     end
     
     properties (Abstract, Hidden, Access = protected)
@@ -80,8 +80,8 @@ classdef (Abstract) Entity < handle
                 obj.setName(name);
             end
 
-            obj.files = aod.core.Parameters();
-            obj.parameters = aod.core.Parameters();
+            obj.files = aod.util.Parameters();
+            obj.parameters = aod.util.Parameters();
             
             obj.UUID = aod.util.generateUUID();
         end

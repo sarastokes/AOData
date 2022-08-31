@@ -26,7 +26,6 @@ classdef MaxwellianView < aod.core.Calibration
         function obj = MaxwellianView(calibrationDate)
             obj = obj@aod.core.Calibration([], calibrationDate);
 
-            obj.files = aod.core.Parameters;
             obj.loadCalibrationFile()
         end
 

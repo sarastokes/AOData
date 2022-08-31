@@ -9,11 +9,11 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
         className = h5readatt(hdfName, fullPath, 'Class');
     end
 
-    if ismember(className, {'containers.Map', 'aod.core.Parameters'})
+    if ismember(className, {'containers.Map', 'aod.util.Parameters'})
         if strcmp(className, 'containers.Map')
             out = containers.Map();
         else
-            out = aod.core.Parameters();
+            out = aod.util.Parameters();
         end
         info = h5info(hdfName, fullPath);
         if isempty(info.Attributes)

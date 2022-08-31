@@ -2,8 +2,8 @@ classdef Entity < handle
 
     properties %(SetAccess = private)
         entityClassName         string
-        parameters              % aod.core.Parameters
-        Files                   % aod.core.Parameters
+        parameters              % aod.util.Parameters
+        Files                   % aod.util.Parameters
         UUID                    string
         description             string
         Name                    char
@@ -38,8 +38,8 @@ classdef Entity < handle
             obj.factory = entityFactory;
 
             % Initialize parameters 
-            obj.Files = aod.core.Parameters();
-            obj.parameters = aod.core.Parameters();
+            obj.Files = aod.util.Parameters();
+            obj.parameters = aod.util.Parameters();
 
             % Create entity from file
             obj.populate();
@@ -63,7 +63,7 @@ classdef Entity < handle
 
             if ismember("Files", datasetNames)
                 obj.Files = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'Files',...
-                    'aod.core.Parameters');
+                    'aod.util.Parameters');
             end
 
             % LINKS
