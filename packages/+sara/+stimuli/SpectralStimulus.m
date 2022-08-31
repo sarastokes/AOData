@@ -44,7 +44,7 @@ classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
             % Description:
             %   Get the LED values during each frame
             % -------------------------------------------------------------
-            reader = aod.builtin.readers.LedFrameTableReader(fName);
+            reader = sara.readers.LedFrameTableReader(fName);
             obj.setPresentation(reader.read());
             obj.setFrameRate(reader.frameRate);
         end
@@ -55,7 +55,7 @@ classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
             % Description:
             %   Get the command voltages in LED timing
             % -------------------------------------------------------------
-            reader = aod.builtin.readers.LedVoltageReader(fName);
+            reader = sara.readers.LedVoltageReader(fName);
             obj.setVoltages(reader.read());
         end
     end
