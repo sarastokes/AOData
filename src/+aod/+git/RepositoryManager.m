@@ -1,5 +1,5 @@
-classdef PackageManager < handle 
-% PACKAGEMANAGER
+classdef RepositoryManager < handle 
+% REPOSITORYMANAGER
 %
 % Description:
 %   Preference setting for base aod-tools package and user-defined packages
@@ -8,15 +8,17 @@ classdef PackageManager < handle
 %   handle
 %
 % Constructor:
-%   obj = PackageManager()
+%   obj = RepositoryManager()
 %
 % Properties:
 %   basePackage - file path of base aod-tools repository
 %   userPackages - file path(s) of user-defined packages
+%   commitIDs - containers.Map: package names as keys, commit IDs as values
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
         basePackage
         userPackages
+        commitIDs
     end
 
     properties (Hidden, Constant)
@@ -29,6 +31,12 @@ classdef PackageManager < handle
             obj.findPackages();
             % Ensure full packages are added to MATLAB's search path
             obj.addPackagesToPath();
+            % Get repo information
+            obj.compileCommitIDs();
+        end
+
+        function refreshIDs(obj)
+            obj.compileCommitIDs();
         end
 
         function listPackages(obj)
@@ -71,6 +79,23 @@ classdef PackageManager < handle
     end
 
     methods (Access = private)
+        function compileCommitIDs(obj)
+            obj.commitIDs = containers.Map();
+            ID = obj.getCommitHash(obj.basePackage);
+            repo = obj.getRepoName(obj.basePackage);
+            obj.commitIDs(repo) = ID;
+
+            if isempty(obj.userPackages)
+                return
+            end
+
+            for i = 1:numel(obj.userPackages)
+                ID = obj.getCommitHash(obj.userPackages(i));
+                repo = obj.getRepoName(obj.userPackages(i));
+                obj.commitIDs(repo) = ID;
+            end
+        end
+
         function addPackagesToPath(obj)
             addpath(genpath(obj.basePackage));
             if ~isempty(obj.userPackages)
@@ -125,6 +150,39 @@ classdef PackageManager < handle
 
         function setUserPackages(obj)
             setpref('AODTools', 'UserPackages', obj.userPackages);
+        end
+    end
+
+    methods (Static)
+        function ID = getCommitHash(fPath)
+            % GETCOMMITHASH
+            %
+            % Description:
+            %   Gets commit hash given repository file path
+            %
+            % Syntax:
+            %   ID = PackageManager.getCommitHash(fPath)
+            % -------------------------------------------------------------
+            [~, ID] = system('git -C %s rev-parse HEAD');
+            if ~isempty(ID)
+                ID = strtrim(ID);
+            end
+        end
+
+        function repoName = getRepoName(fPath)
+            % GETREPONAME
+            %
+            % Description:
+            %   Takes file path and returns the repository name
+            %
+            % Syntax:
+            %   ID = PackageManager.getRepoName(fPath)
+            % -------------------------------------------------------------
+            txt = strsplit(fPath, filesep);
+            if isempty(txt{end})
+                txt = txt{1:end-1};
+            end
+            repoName = txt{end};
         end
     end
 end 

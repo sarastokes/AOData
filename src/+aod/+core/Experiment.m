@@ -51,6 +51,8 @@ classdef Experiment < aod.core.Entity
         Regions                 aod.core.Region
         Calibrations            aod.core.Calibration
         Systems                 aod.core.System
+
+        Code                    % containers.Map
     end
 
     properties (Dependent)
@@ -72,8 +74,9 @@ classdef Experiment < aod.core.Entity
             addParameter(ip, 'Administrator', '', @ischar);
             addParameter(ip, 'System', '', @ischar);
             parse(ip, varargin{:});
-
             obj.setParam(ip.Results);
+
+            obj.appendGitHashes();
         end
 
         function value = get.numEpochs(obj)
@@ -99,6 +102,23 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             assert(isfolder(filePath), 'filePath is not valid!');
             obj.homeDirectory = filePath;
+        end
+
+        function appendGitHashes(obj)
+            % APPENDGITHASHES
+            %
+            % Description:
+            %   Append git hashes
+            %
+            % Syntax:
+            %   appendGitHashes(obj)
+            % -------------------------------------------------------------
+            try
+                RM = aod.git.RepositoryManager();
+                obj.Code = RM.commitIDs();
+            catch ME  % Rethrow as warning instead of error
+                disp(getReport(ME, 'extended', 'hyperlinks', 'on'));
+            end
         end
     end
 

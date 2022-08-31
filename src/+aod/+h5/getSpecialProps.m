@@ -10,4 +10,4 @@ function specialProps = getSpecialProps()
     % ---------------------------------------------------------------------
     
     specialProps = ["Parent", "notes", "Name", "files",...
-        "UUID", "description", "parameters", "Timing"];
+        "UUID", "description", "parameters", "Timing", "Code"];
