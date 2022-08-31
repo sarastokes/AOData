@@ -1,4 +1,4 @@
-classdef ChannelFactory < aod.core.Factory
+classdef ChannelFactory < aod.util.Factory
 
     methods
         function obj = ChannelFactory()

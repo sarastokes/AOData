@@ -1,11 +1,11 @@
-classdef EpochParameterReader < aod.core.readers.TxtReader 
+classdef EpochParameterReader < aod.util.readers.TxtReader 
 % EPOCHPARAMETERREADER
 %
 % Description:
 %   Reads epoch parameter files and makes according adjustments to epoch
 %
 % Parent:
-%   aod.core.readers.TxtReader
+%   aod.util.readers.TxtReader
 %
 % Syntax:
 %   obj = EpochParameterReader(fileName)
@@ -13,7 +13,7 @@ classdef EpochParameterReader < aod.core.readers.TxtReader
 
     methods
         function obj = EpochParameterReader(varargin)
-            obj@aod.core.readers.TxtReader(varargin{:});
+            obj@aod.util.readers.TxtReader(varargin{:});
         end
 
         function getFileName(obj, varargin)

@@ -1,11 +1,11 @@
-classdef RegistrationParameterReader < aod.core.readers.TxtReader 
+classdef RegistrationParameterReader < aod.util.readers.TxtReader 
 % REGISTRATIONPARAMETERREADER
 %
 % Description:
 %   Creates a struct containing all strip registration parameters
 %
 % Parent:
-%   aod.core.readers.TxtReader
+%   aod.util.readers.TxtReader
 %
 % Syntax:
 %   obj = RegistrationParameterReader(fileName)
@@ -20,7 +20,7 @@ classdef RegistrationParameterReader < aod.core.readers.TxtReader
 
     methods
         function obj = RegistrationParameterReader(fName)
-            obj@aod.core.readers.TxtReader(fName);
+            obj@aod.util.readers.TxtReader(fName);
 
             % Try to extract date from fName
             obj.extractDate();

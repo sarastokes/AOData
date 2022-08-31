@@ -1,15 +1,19 @@
-classdef MatReader < aod.core.FileReader
+classdef MatReader < aod.util.FileReader
 % MATREADER
 %
 % Description:
 %   Reads in a .mat file
 %
 % Parent:
-%   aod.core.FileReader
+%   aod.util.FileReader
+%
+% Syntax:
+%   obj = MatReader(fName)
+%   obj = MatReader(varargin)
 % -------------------------------------------------------------------------
     methods
         function obj = MatReader(varargin)
-            obj = obj@aod.core.FileReader(varargin{:});
+            obj = obj@aod.util.FileReader(varargin{:});
             obj.validExtensions = '*.mat';
         end
 

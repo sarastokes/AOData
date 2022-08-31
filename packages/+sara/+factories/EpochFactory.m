@@ -1,4 +1,4 @@
-classdef EpochFactory < aod.core.Factory 
+classdef EpochFactory < aod.util.Factory 
 
     methods
         function obj = EpochFactory()

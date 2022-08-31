@@ -1,5 +1,9 @@
-classdef RigidTransformReader < aod.core.FileReader
+classdef RigidTransformReader < aod.util.FileReader
 % RIGIDTRANSFORMREADER
+%
+%
+% Parent:
+%   aod.util.FileReader
 %
 % Constructor:
 %   obj = RigidTransformReader(fullFilePath)
@@ -17,7 +21,7 @@ classdef RigidTransformReader < aod.core.FileReader
 
     methods
         function obj = RigidTransformReader(varargin)
-            obj@aod.core.FileReader(varargin{:});
+            obj@aod.util.FileReader(varargin{:});
         end
 
         function getFileName(~, ~)

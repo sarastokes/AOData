@@ -1,4 +1,4 @@
-classdef SpectralProtocolFactory < aod.core.Factory
+classdef SpectralProtocolFactory < aod.util.Factory
 
     properties
         calibration

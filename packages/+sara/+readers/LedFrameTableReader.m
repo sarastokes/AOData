@@ -1,11 +1,11 @@
-classdef LedFrameTableReader < aod.core.FileReader
+classdef LedFrameTableReader < aod.util.FileReader
 % LEDFRAMETABLEREADER
 %
 % Description:
 %   Read the frame table with additional 
 %
 % Parent:
-%   aod.core.FileReader
+%   aod.util.FileReader
 %
 % Constructor:
 %   obj = LedFrameTableReader(fName)
@@ -18,7 +18,7 @@ classdef LedFrameTableReader < aod.core.FileReader
 
     methods
         function obj = LedFrameTableReader(fName)
-            obj = obj@aod.core.FileReader(fName);
+            obj = obj@aod.util.FileReader(fName);
 
             obj.read();
         end

@@ -1,22 +1,25 @@
-classdef (Abstract) TxtReader < aod.core.FileReader
+classdef (Abstract) TxtReader < aod.util.FileReader
 % TEXTREADER (abstract)
 %
 % Description:
-%   Superclass for text reader classes, useful methods for robust code
+%   Superclass for text reader classes with useful methods for robust code
 %
 % Parent:
-%   obj = aod.core.FileReader
+%   obj = aod.util.FileReader
 %
 % Constructor:
 %   obj = TxtReader(varargin)
 %
 % Protected methods:
 %   txt = readProperty(obj, header, N)
+%   out = readText(obj, header)
+%   out = readNumber(obj, header)
+%   out = readYesNo(obj, header)
 % -------------------------------------------------------------------------
 
     methods
         function obj = TxtReader(varargin)
-            obj = obj@aod.core.FileReader(varargin{:});
+            obj = obj@aod.util.FileReader(varargin{:});
             obj.validExtensions = '*.txt';
         end
     end
@@ -74,7 +77,10 @@ classdef (Abstract) TxtReader < aod.core.FileReader
             out = convertYesNo(obj.strtrim(obj.readProperty(header)));
         end
 
-        function out = strtrim(obj, txt)
+    end
+
+    methods (Static)
+        function out = strtrim(txt)
             % STRTRIM 
             %
             % Description:

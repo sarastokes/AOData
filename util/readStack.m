@@ -7,9 +7,9 @@ function imStack = readStack(videoName)
     [~, ~, extension] = fileparts(videoName);
     switch extension
         case {'.tif', '.tiff'}
-            reader = aod.core.readers.TiffReader(videoName);
+            reader = aod.util.readers.TiffReader(videoName);
         case '.avi'
-            reader = aod.core.readers.AviReader(videoName);
+            reader = aod.util.readers.AviReader(videoName);
         otherwise
             error('Unrecognized file extension!');
     end

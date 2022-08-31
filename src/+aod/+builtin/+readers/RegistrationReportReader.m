@@ -1,11 +1,11 @@
-classdef RegistrationReportReader < aod.core.FileReader
+classdef RegistrationReportReader < aod.util.FileReader
 % REGISTRATIONREPORTREADER
 %
 % Description:
 %   Reads in registration reports from Qiang's ImageReg software
 %
 % Parent:
-%   aod.core.FileReader
+%   aod.util.FileReader
 %
 % Constructor:
 %   obj = RegistrationReportReader(fileName)
@@ -20,7 +20,7 @@ classdef RegistrationReportReader < aod.core.FileReader
 
     methods
         function obj = RegistrationReportReader(fileName)
-            obj@aod.core.FileReader(fileName);
+            obj@aod.util.FileReader(fileName);
         end
 
         function out = read(obj)

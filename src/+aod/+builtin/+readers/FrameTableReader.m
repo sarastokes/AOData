@@ -1,12 +1,19 @@
-classdef FrameTableReader < aod.core.FileReader 
-
+classdef FrameTableReader < aod.util.FileReader 
+% FRAMETABLEREADER
+%
+% Description:
+%   Read first 3 columns of frame table .csv file and extract timing
+%
+% Constructor:
+%   obj = FrameTableReader(fName)
+% -------------------------------------------------------------------------
     properties (SetAccess = protected)
         frameRate 
     end
 
     methods
         function obj = FrameTableReader(fName)
-            obj = obj@aod.core.FileReader(fName);
+            obj = obj@aod.util.FileReader(fName);
         end
 
         function out = read(obj)

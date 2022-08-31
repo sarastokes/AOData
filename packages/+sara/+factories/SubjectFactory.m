@@ -1,11 +1,11 @@
-classdef SubjectFactory < aod.core.Factory
+classdef SubjectFactory < aod.util.Factory
 % SUBJECTFACTORY
 %
 % Description:
 %   Creates the standardized Subject hierarchies with consistent UUIDs 
 %
 % Parent:
-%   aod.core.Factory
+%   aod.util.Factory
 %
 % Constructor:
 %   obj = SubjectFactory()

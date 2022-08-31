@@ -1,8 +1,18 @@
-classdef TiffReader < aod.core.FileReader
-
+classdef TiffReader < aod.util.FileReader
+% TIFFREADER
+%
+% Description:
+%   Reads in TIFF files
+%
+% Parent:
+%   aod.util.FileReader
+%
+% Constructor:
+%   obj = TiffReader(fName)
+% -------------------------------------------------------------------------
     methods
         function obj = TiffReader(varargin)
-            obj = obj@aod.core.FileReader(varargin{:});
+            obj = obj@aod.util.FileReader(varargin{:});
             obj.validExtensions = {'*.tif', '*.tiff'};
         end
 

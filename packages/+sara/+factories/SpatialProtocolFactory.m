@@ -1,4 +1,4 @@
-classdef SpatialProtocolFactory < aod.core.Factory
+classdef SpatialProtocolFactory < aod.util.Factory
 % SPATIALPROTOCOLFACTORY
 %
 % Description:
