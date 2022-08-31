@@ -33,18 +33,16 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
                 obj.startTime = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, "startTime");
             end
 
+            if ismember("Timing", dsetNames)
+                obj.Timing = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, "Timing");
+            end
+
             obj.setDatasetsToDynProps();
 
             % LINKS
             obj.Source = obj.createFromLink(linkNames, "Source");
             obj.System = obj.loadLink(linkNames, "System");
             obj.setLinksToDynProps();
-
-            % GROUPS
-            tinfo = h5info(aod.h5.HDF5.buildPath(obj.hdfName, 'Timing'));
-            if ~isempty(tinfo.Datasets)
-                obj.Timing = obj.factory.create(aod.h5.HDF5.buildPath(obj.hdfName, 'Timing'));
-            end
 
             % CONTAINERS
             obj.Datasets = aod.core.persistent.EntityContainer(...

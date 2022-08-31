@@ -63,8 +63,6 @@ classdef EntityFactory < handle
                     e = aod.core.persistent.Response(obj.hdfName, hdfPath, obj);
                 case "STIMULUS"
                     e = aod.core.persistent.Stimulus(obj.hdfName, hdfPath, obj);
-                case "TIMING"
-                    e = aod.core.persistent.Timing(obj.hdfName, hdfPath, obj);
                 otherwise
                     error("EntityFactorycreate:UnrecognizedEntity",...
                         "Did not recognize entity name: %s", entityType);
