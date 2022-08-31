@@ -33,8 +33,8 @@ classdef Region < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Region(varargin)
-            obj = obj@aod.core.Entity();
+        function obj = Region(name, varargin)
+            obj = obj@aod.core.Entity(name);
 
             ip = aod.util.InputParser();
             addOptional(ip, 'Data', []);

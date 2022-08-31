@@ -11,8 +11,8 @@ classdef Toptica < aod.core.LightSource
 %   obj = Toptica(laserLine, varargin)
 % -------------------------------------------------------------------------
 
-    properties (Hidden, Constant)
-        LASER_LINES = [488, 515, 561, 630];
+    properties (SetAccess = protected)
+        laserLines
     end
 
     properties (Dependent)
@@ -25,6 +25,18 @@ classdef Toptica < aod.core.LightSource
                 'Manufacturer', 'Toptica', 'Model', 'iChrome MLE',...
                 varargin{:});
             assert(ismember(laserLine, obj.LASER_LINES), 'Invalid laser line');
+            ip = inputParser();
+            addParameter(ip, 'HunterLab', true, @islogical);
+            parse(ip, varargin{:});
+
+            if ip.Results.HunterLab
+                obj.laserLines = [480, 561, 640];
+                obj.assignUUID("9fcdc239-6154-496d-bb6c-434276b12fd0");
+                obj.setDescription('Borrowed from Hunter lab');
+            else
+                obj.laserLines = [480, 515, 561, 640];
+                obj.assignUUID("e07a1753-07e4-420f-bbb5-5d27eb35e573");
+            end
         end
         
         function value = get.Calibrations(obj)

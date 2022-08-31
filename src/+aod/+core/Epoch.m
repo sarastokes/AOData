@@ -296,7 +296,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             obj.Registrations = aod.core.Registration.empty();
         end
-
     end
 
     % Response methods
@@ -392,15 +391,18 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function sync(obj)
+            sync@aod.core.Entity(obj);
             if ~isempty(obj.Source)
                 if isempty(findByUUID(obj.Parent.getAllSources(), obj.Source.UUID))
-                    warning('Source be part of the same Experiment');
+                    warning("Epoch:SyncError",...
+                        "Epoch Source does not match any Experiment Sources");
                 end
             end
 
             if ~isempty(obj.System)
                 if isempty(findByUUID(obj.Parent.Systems, obj.System.UUID))
-                    warning('System must be part of the same Experiment');
+                    warning("Epoch:SyncError",...
+                        "Epoch System does not match any Experiment Systems");
                 end
             end
         end

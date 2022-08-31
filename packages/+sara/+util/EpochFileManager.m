@@ -11,7 +11,7 @@ classdef EpochFileManager < aod.util.FileManager
             ep = obj.populateAnalysisFiles(ep);
 
             % Display the files identified
-            fprintf('Epoch %u - %u files found:\n', ep.ID, numel(ep.files));
+            fprintf('Epoch %u - %u files found\n', ep.ID, numel(ep.files.keys));
         end
     end
 
@@ -119,13 +119,15 @@ classdef EpochFileManager < aod.util.FileManager
             end
 
             % Assumptions:
-            % - The shortest .txt file was created during the experiment
-            %   and contains the imaging parameters
             % - The .txt file containing params was from registration
+            % - The additional .txt file that does not contain params is
+            %   the imaging parameter output
             txtFiles = epochFiles(contains(epochFiles, '.txt'));
             if ~isempty(txtFiles)
-                [~, idx] = min(arrayfun(@strlength, txtFiles));
-                ep.setFile('ImagingParams', txtFiles(idx));
+                idx = find(~contains(txtFiles, 'params'));
+                if ~isempty(idx)
+                    ep.setFile('ImagingParams', txtFiles(idx));
+                end
 
                 idx = find(contains(txtFiles, 'params'));
                 if ~isempty(idx)

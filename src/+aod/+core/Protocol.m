@@ -27,7 +27,7 @@ classdef (Abstract) Protocol < handle
 % -------------------------------------------------------------------------
 
     properties  
-        calibration     aod.core.Calibration    = aod.core.Calibration.empty()
+        Calibration     aod.core.Calibration    = aod.core.Calibration.empty()
         dateCreated     datetime                = datetime.empty()
     end
 
@@ -47,9 +47,7 @@ classdef (Abstract) Protocol < handle
             if nargin > 0 && ~isempty(calibration)
                 assert(isSubclass(calibration, 'aod.core.Calibration'),...
                     'Input must be of class aod.core.Calibration');
-                obj.calibration = calibration;
-            else
-                obj.calibration = aod.core.calibrations.Empty();
+                obj.Calibration = calibration;
             end
         end
     end

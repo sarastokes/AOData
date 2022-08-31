@@ -5,13 +5,15 @@ classdef EpochFactory < aod.util.Factory
             % Do nothing
         end
 
-        function ep = get(obj, EXPT, epochID, epochType, source, system)
+        function ep = get(~, EXPT, epochID, epochType, source, system)
 
-            ep = sara.Epoch(epochID, epochType);
-
-            % Add to Experiment to facilitate relative file names and 
-            % references to existing source/system entities
+            if epochType == sara.EpochTypes.BACKGROUND
+                ep = sara.epochs.BackgroundEpoch(epochID);
+            else
+                ep = sara.Epoch(epochID, epochType);
+            end
             EXPT.addEpoch(ep);
+
             % Set source and system
             ep.setSource(source);
             ep.setSystem(system);
@@ -19,6 +21,13 @@ classdef EpochFactory < aod.util.Factory
             % Get the file names associated with this epoch
             EFM = sara.util.EpochFileManager(EXPT.homeDirectory);
             ep = EFM.populateFileNames(ep);
+
+            % Get the epoch timing
+            if ep.hasFile('FrameTable')
+                reader = aod.builtin.readers.FrameTableReader(...
+                    ep.getExptFile('FrameTable'));
+                ep.setTiming(reader.read());
+            end
 
             % Add imaging parameters, if necessary
             if ep.hasFile('ImagingParams')
@@ -43,7 +52,7 @@ classdef EpochFactory < aod.util.Factory
                 stim.loadVoltages(ep.getExptFile('LedVoltages'));
                 stim.loadFrames(ep.getExptFile('FrameTable'));
                 ep.addStimulus(stim);
-            elseif epochType == sara.EpochTypes.Spatial
+            elseif epochType == sara.EpochTypes.SPATIAL
                 protocol = sara.factories.SpatialProtocolFactory.create(...
                     EXPT.getCalibration('sara.calibrations.TopticaNonlinearity'),...
                     ep.getParam('StimulusName'));
@@ -65,11 +74,11 @@ classdef EpochFactory < aod.util.Factory
     end
 
     methods (Static)
-        function EXPT = create(obj, EXPT, epochIDs, epochType, source, system)
+        function EXPT = create(EXPT, epochIDs, epochType, source, system)
             obj = sara.factories.EpochFactory();
 
             for i = 1:numel(epochIDs)
-                EXPT = obj.get(EXPT, epochIDs(i), epochType, source, system);
+                obj.get(EXPT, epochIDs(i), epochType, source, system);
             end
         end
     end

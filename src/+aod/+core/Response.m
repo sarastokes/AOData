@@ -63,6 +63,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Access = protected)
         function sync(obj)
+            sync@aod.core.Entity(obj);
             if isempty(obj.Timing) & ~isempty(obj.Parent.Timing)
                 obj.Timing = obj.Parent.Timing;
             end

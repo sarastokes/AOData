@@ -1,4 +1,4 @@
-classdef MaxwellianViewPower < aod.core.PowerMeasurement
+classdef MaxwellianViewPower < aod.builtin.calibrations.PowerMeasurement
 % MAXWELLIANVIEWPOWER
 %
 % Description:

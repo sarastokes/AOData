@@ -392,8 +392,8 @@ classdef (Abstract) Entity < handle
             end
 
             fileValue = obj.getFile(fileName, varargin{:});
-            if ~isempty(fileValue)
-                out = [];
+            if isempty(fileValue)
+                fileValue = [];
             else
                 fileValue = fullfile(fPath, fileValue);
             end
@@ -413,8 +413,6 @@ classdef (Abstract) Entity < handle
             if ~isempty(h)
                 out = h.homeDirectory;
             else
-                warning("getHomeDirectory:NotFound", ...
-                    "Ensure entity is added to experiment")
                 out = [];
             end
         end
@@ -436,14 +434,24 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function sync(obj) %#ok<MANU> 
+        function sync(obj)
             % SYNC
             % 
             % Description:
             %   Sync is called when an object's Parent is set. Use for 
             %   aspects of entity building that require access to the 
-            %   experiment hierarchy
+            %   experiment hierarchy.
+            %   By default, sync ensures the homeDirectory is purged from
+            %   file names containing the homeDirectory to facilitate 
+            %   relative file paths later on
             % -------------------------------------------------------------
+            if ~isempty(obj.files)
+                h = obj.ancestor('aod.core.Experiment');
+                k = obj.files.keys;
+                for i = 1:numel(k)
+                    obj.files(k{i}) = erase(obj.files(k{i}), h.homeDirectory);
+                end
+            end
         end
     end
 

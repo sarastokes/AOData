@@ -179,7 +179,7 @@ classdef SpectralProtocolFactory < aod.util.Factory
         function protocol = create(calibration, fileName)
             obj = sara.factories.SpectralProtocolFactory(calibration);
             protocol = obj.get(fileName);
-            fprintf('\t%s --- %s\n', class(protocol), fileName);
+            fprintf('\t%s <-- %s\n', class(protocol), fileName);
         end
     end
 end 

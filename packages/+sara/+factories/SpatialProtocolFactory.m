@@ -168,6 +168,7 @@ classdef SpatialProtocolFactory < aod.util.Factory
         function protocol = create(calibration, fileName)
             obj = sara.factories.SpatialProtocolFactory(calibration);
             protocol = obj.get(fileName);
+            fprintf('\t%s <-- %s\n', class(protocol), fileName);
         end
     end
 end 

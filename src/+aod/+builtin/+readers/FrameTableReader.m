@@ -4,6 +4,9 @@ classdef FrameTableReader < aod.util.FileReader
 % Description:
 %   Read first 3 columns of frame table .csv file and extract timing
 %
+% Parent:
+%   aod.util.FileReader
+%
 % Constructor:
 %   obj = FrameTableReader(fName)
 % -------------------------------------------------------------------------
@@ -19,6 +22,10 @@ classdef FrameTableReader < aod.util.FileReader
         function out = read(obj)
             warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
             T = readtable(obj.fullFile);
+            if isempty(T)
+                out = [];
+                return
+            end
             T = T(:, 1:3);
             T.Properties.VariableNames = {'Frame', 'TimeInterval', 'TimeStamp'};
             warning('on', 'MATLAB:table:ModifiedAndSavedVarnames');

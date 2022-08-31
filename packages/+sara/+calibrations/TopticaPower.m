@@ -13,7 +13,7 @@ classdef TopticaPower < aod.builtin.calibrations.PowerMeasurement
 
     methods
         function obj = TopticaPower(calibrationDate, wavelength)
-            laserLines = [488, 515, 561, 630];
+            laserLines = [488, 515, 561, 640];
             assert(ismember(wavelength, laserLines), 'TopticaPower: Invalid laser line!');
             
             obj = obj@aod.builtin.calibrations.PowerMeasurement(...

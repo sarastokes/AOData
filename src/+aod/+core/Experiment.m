@@ -429,7 +429,6 @@ classdef Experiment < aod.core.Entity
             %   obj.clearEpochs()
             % -------------------------------------------------------------
             obj.Epochs = aod.core.Epoch.empty();
-            obj.epochIDs = [];
         end
     end
 

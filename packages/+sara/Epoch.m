@@ -45,7 +45,7 @@ classdef Epoch < aod.core.Epoch
 
     methods
         function obj = Epoch(ID, epochType, varargin)
-            obj@aod.core.Epoch(ID, 25, varargin{:});
+            obj@aod.core.Epoch(ID, varargin{:});
             obj.epochType = epochType;
             obj.setFile('CH1', 'Ref');
             if epochType.numChannels == 2

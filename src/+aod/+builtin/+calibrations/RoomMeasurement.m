@@ -43,17 +43,24 @@ classdef RoomMeasurement < aod.core.Calibration
             % Example:
             %   obj.addMeasurement('11:30', 71.1, 55);
             % -------------------------------------------------------------
-            timestamp = datetime([datestr(obj.calibrationDate), ' ', timestamp],... 
-                'InputFormat', 'dd-MMM-yyyy HH:mm');
-            if isempty(obj.measurements)
-                obj.measurements = cell2table({timestamp, temperature, humidity});
-                obj.measurements.Properties.VariableNames = {'Time', 'Temperature', 'Humidity'};
-                %obj.measurements = table(...
-                %    timestamp(i), temperature(i), humidity(i),...
-                %    'VariableNames', {'Time', 'Temperature', 'Humidity'});
-            else
-                obj.measurements = [obj.measurements;...
-                    {timestamp, temperature, humidity}];
+            arguments
+                obj
+                timestamp               string
+                temperature             double
+                humidity                double
+            end
+
+            for i = numel(timestamp)
+                datestamp = datetime([...
+                    datestr(obj.calibrationDate), ' ', char(timestamp(i))],... 
+                    'InputFormat', 'dd-MMM-yyyy HH:mm');
+                if isempty(obj.measurements)
+                    obj.measurements = cell2table({datestamp, temperature(i), humidity(i)});
+                    obj.measurements.Properties.VariableNames = {'Time', 'Temperature', 'Humidity'};
+                else
+                    obj.measurements = [obj.measurements;...
+                        {datestamp, temperature(i), humidity(i)}];
+                end
             end
         end
     end
