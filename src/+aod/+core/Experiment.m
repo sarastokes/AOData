@@ -90,6 +90,9 @@ classdef Experiment < aod.core.Entity
                 value = horzcat(obj.Epochs.ID);
             end
         end
+    end
+
+    methods
         function setHomeDirectory(obj, filePath)
             % SETHOMEDIRECTORY
             %
@@ -102,6 +105,44 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             assert(isfolder(filePath), 'filePath is not valid!');
             obj.homeDirectory = filePath;
+        end
+
+        function add(obj, entity)
+            % ADD 
+            %
+            % Description:
+            %   Add a new entity to the experiment
+            %
+            % Syntax:
+            %   add(obj, entity)
+            %
+            % Notes: Only entities contained by  experiment can be added:
+            %   Analysis, Epoch, Calibration, Region, Source, System
+            % ------------------------------------------------------------- 
+            import aod.core.EntityTypes
+            entityType = EntityTypes.get(entity);
+
+            switch entityType 
+                case Entity.ANALYSIS
+                    entity.setParent(obj);
+                    obj.Analyses = cat(1, obj.Analyses, entity);
+                case Entity.CALIBRATION
+                    entity.setParent(obj);
+                    obj.Calibrations = cat(1, obj.Calibrations, entity);
+                case Entity.EPOCH
+                    obj.addEpoch(entity);
+                case Entity.REGION
+                    entity.setParent(obj);
+                    obj.Region = cat(1, obj.Region, entity);
+                case Entity.SYSTEM 
+                    entity.setParent(obj);
+                    obj.Systems = cat(1, obj.Systems, entity);
+                case Entity.SOURCE 
+                    obj.addSource(entity);
+                otherwise
+                    error("Experiment:AddedInvalidEntity",...
+                        "Entity must be Analysis, Calibration, Region, Source or System");
+            end
         end
 
         function appendGitHashes(obj)
@@ -167,29 +208,6 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             region = getByClass(obj.Regions, className);
         end
-        
-        function imStack = getStacks(obj, epochIDs, varargin)
-            % GETSTACKS
-            %
-            % Syntax:
-            %   imStack = getStack(obj, epochIDs, varargin)
-            %
-            % -------------------------------------------------------------
-            ip = inputParser();
-            addParameter(ip, 'Average', false, @islogical);
-            parse(ip, varargin{:});
-            avgFlag = ip.Results.Average;
-
-            imStack = [];
-            for i = 1:numel(epochIDs)
-                epoch = obj.id2epoch(epochIDs(i));
-                imStack = cat(4, imStack, epoch.getStack());
-            end
-
-            if avgFlag && ndims(imStack) == 4
-                imStack = mean(imStack, 4);
-            end
-        end
 
         function data = getResponse(obj, epochIDs, className, varargin)
             % GETRESPONSE
@@ -221,24 +239,32 @@ classdef Experiment < aod.core.Entity
     end
 
     % Region methods
-    methods 
+    methods
         function addRegion(obj, region)
-            % ADDREGIONS
+            % REMOVEREGIONS
+            %
+            % Description:
+            %   Add aod.core.Region entity to the Experiment
             %
             % Syntax:
-            %   imStack = addRegion(obj, region, overwrite)
+            %   addRegion(obj, region)
             % -------------------------------------------------------------
-            assert(isa(region, 'aod.core.Region'), 'Input must be Region subclass');
-            
+            assert(isSubclass(region, 'aod.core.Region'),... 
+                'Input must be subclass of aod.core.Region');
+
             region.setParent(obj);
             obj.Regions = cat(1, obj.Regions, region);
         end
 
-        function removeRegions(obj, ID)
+
+        function removeRegion(obj, ID)
             % REMOVEREGIONS
             %
+            % Description:
+            %   
+            %
             % Syntax:
-            %   imStack = removeRegions(obj, ID)
+            %   removeRegion(obj, ID)
             % -------------------------------------------------------------
             assert(ID > 0 & ID < numel(obj.Regions),...
                 'ID %u invalid, must be between 1-%u', ID, numel(obj.Regions));
@@ -247,6 +273,9 @@ classdef Experiment < aod.core.Entity
 
         function clearRegions(obj)
             % CLEARREGIONS
+            %
+            % Description:
+            %   Clear all regions in the experiment
             %
             % Syntax:
             %   obj.clearRegions()
@@ -266,8 +295,9 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   obj.addSource(source, overwrite)
             %
-            % See also:
-            %   aod.core.Source
+            % Note:
+            %   To add a new Source to an existing source, use the 
+            %   addSource function of the target parent aod.core.Source
             % -------------------------------------------------------------
             assert(isSubclass(source, 'aod.core.Source'),...
                 'Must be a subclass of aod.core.Source');
@@ -279,10 +309,6 @@ classdef Experiment < aod.core.Entity
                     source.setParent(obj);
                 else
                     h(1).setParent(obj);
-                end
-                if ~isempty(obj.Sources)
-                    assert(obj.Sources(1).getParentID() == source.getParentID(),...
-                        'Experiment may only contain 1 animal');
                 end
                 obj.Sources = cat(1, obj.Sources, source);
             end
@@ -388,6 +414,35 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             obj.Systems = aod.core.System.empty();
         end
+
+        function channels = getAllChannels(obj)
+
+            channels = aod.core.Channel.empty();
+
+            if isempty(obj.Systems)
+                return
+            end
+
+            for i = 1:numel(obj.Systems)
+                channels = cat(1, channels, obj.Systems(i).Channels);
+            end
+        end
+
+        function devices = getAllDevices(obj)
+            devices = aod.core.Devices.empty();
+
+            if isempty(obj.Systems)
+                return
+            end
+
+            for i = 1:numel(obj.Systems)
+                if ~isempty(obj.Systems(i).Channels)
+                    for j = 1:numel(obj.Systems(i).Channels)
+                        devices = cat(1, devices, obj.Systems(i).Channels(j).Devices);
+                    end
+                end
+            end
+        end
     end
 
     % Epoch methods
@@ -410,7 +465,7 @@ classdef Experiment < aod.core.Entity
             obj.Epochs = cat(1, obj.Epochs, epoch);
             obj.sortEpochs();
         end
-
+        
         function removeEpochByID(obj, epochID)
             % REMOVEEPOCHS
             %
@@ -478,7 +533,7 @@ classdef Experiment < aod.core.Entity
     end
 
     % Analysis methods
-    methods 
+    methods
         function addAnalysis(obj, analysis)
             % ADDANALYSIS
             %
@@ -491,6 +546,7 @@ classdef Experiment < aod.core.Entity
             assert(isSubclass(analysis, 'aod.core.Analysis'),... 
             'Input must be subclass of aod.core.Analysis');
 
+            analysis.setParent(obj);
             obj.Analyses = cat(1, obj.Analyses, analysis);
         end
 

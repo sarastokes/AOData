@@ -21,6 +21,10 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
         calibrationDate(1,1)                datetime
     end
 
+    properties (SetAccess = protected)
+        Target       % System, Channel or Device calibrated
+    end
+
     properties (Hidden, Access = protected)
         allowableParentTypes = {'aod.core.Experiment'};
     end
@@ -36,6 +40,19 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Sealed)
+        function setTarget(obj, target)
+            import aod.core.EntityTypes
+            entityType = EntityTypes.get(target);
+            
+            switch entityType 
+                case {EntityTypes.SYSTEM, EntityTypes.CHANNEL, EntityTypes.DEVICE}
+                    obj.Target = target;
+                otherwise
+                    error("Calibration:InvalidTarget",...
+                        "Calibration Target must be a System, Channel or Device");
+            end
+        end
+
         function setCalibrationDate(obj, calDate)
             % SETCALIBRATIONDATE
             %
@@ -61,6 +78,22 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                 end
             end
             obj.calibrationDate = calDate;
+        end
+    end
+
+    % Overloaded Entity methods
+    methods (Access = protected)
+        function sync(obj)
+            sync@aod.core.Entity(obj);
+
+            if ~isempty(obj.Target)
+                if isempty(findByUUID(obj.Parent.Systems(), obj.Target.UUID)) ...
+                        && isempty(findByUUID(obj.Parent.getAllChannels(), obj.Target.UUID))...
+                        && isempty(findByUUID(obj.Parent.getAllDevices(), obj.Target.UUID))
+                    warning("Calibration:SyncError",...
+                        "Calibration Target does not match any Experiment Systems, Channels or Devices");
+                end
+            end
         end
     end
 end

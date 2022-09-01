@@ -11,7 +11,7 @@ classdef (Abstract) Entity < handle
 %   Parent                      aod.core.Entity
 %   Name                        char
 %   parameters                  aod.util.Parameters
-%   files                       aod.core.Files
+%   files                       aod.util.Parameters
 %   description                 string
 %   notes                       cell
 %
@@ -26,25 +26,30 @@ classdef (Abstract) Entity < handle
 %   setName(obj, name)
 %   setDescription(obj, txt, overwrite)
 %   addNote(obj, txt)
+%   removeNote(obj, ID)
 %   clearNotes(obj)
 %
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
 %   tf = hasParam(obj, paramName)
+%   setParam(obj, varargin)
+%   value = getParam(obj, paramName, msgLevel)
 %   removeParam(obj, paramName)
 %   
+%   tf = hasFile(obj, fileName)
 %   setFile(obj, fileName, filePath)
 %   value = getFile(obj, fileName, msgType)
 %   value = getExptFile(obj, fileName, varargin)
-%   tf = hasFile(obj, fileName)
 %   removeFile(obj, fileName)
 %
 % Protected methods:
 %   value = getLabel(obj)
+%   sync(obj)
+%   checkGroupNames(obj)
 %
 % Sealed Protected methods:
-%   addParent(obj, parent)
 %   setUUID(obj, uuid)
+%
+% Protected methods accessible by any subclass of aod.core.Entity
+%   addParent(obj, parent)
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
@@ -428,7 +433,7 @@ classdef (Abstract) Entity < handle
             %   value = obj.getLabel()
             % -------------------------------------------------------------
             if isempty(obj.Name)
-                value = getClassWithoutPackages(obj);
+                value = char(getClassWithoutPackages(obj));
             else
                 value = obj.Name;
             end
@@ -453,6 +458,36 @@ classdef (Abstract) Entity < handle
                 end
             end
         end
+
+        function isUnique = checkGroupNames(obj)
+            % CHECKGROUPNAMES
+            % 
+            % Description:
+            %   Checks whether entity shares a label with existing entities
+            %   in the experiment (meaning that the newest entity will
+            %   overwrite the previous entity when writing to HDF5.
+            %   Subclasses can add to this method to establish rules for
+            %   duplicates, such as overwriting the existing entity.
+            %
+            % Syntax:
+            %   isUnique = checkGroupNames(obj)
+            % -------------------------------------------------------------
+            entityType = aod.core.EntityTypes.get(obj);
+            containerName = entityType.containerName();
+            isUnique = true;
+
+            if isempty(obj.Parent.(containerName))
+                return
+            end
+
+            existingEntities = obj.Parent.(containerName);
+            groupNames = string({existingEntities.Name});
+            if ismember(obj.label, groupNames)
+                isUnique = false;
+                warning("Entity:DuplicateGroupName",...
+                    "Entity shares a group name with an existing entity: %s", obj.label);
+            end
+        end
     end
 
     methods (Sealed, Access = {?aod.core.Entity})
@@ -473,6 +508,7 @@ classdef (Abstract) Entity < handle
             end
 
             obj.sync();
+            obj.checkGroupNames();
         end
 
         function setUUID(obj, UUID)

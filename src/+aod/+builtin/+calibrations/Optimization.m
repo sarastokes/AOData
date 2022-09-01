@@ -3,6 +3,7 @@ classdef Optimization < aod.core.Calibration
 %
 % Description:
 %   Logs optimization of PMT and source position prior to an experiment
+%   and optionally adds adjustments made during the experiment
 %
 % Syntax:
 %   obj = Optimization(name, calibrationDate, varargin)
@@ -12,11 +13,17 @@ classdef Optimization < aod.core.Calibration
 %   yPMT
 %   zPMT
 %   zLightSource
+%   xPMT_InVivo
+%   yPMT_InVivo
+%   zPMT_InVivo
+%   zLightSource
 %
 % Methods:
 %   setPMT(obj, x, y, z)
 %   setLightSource(obj, z)
-%   setSource(obj, source)
+%   setSource(obj, z)
+%   setLightSource_InVivo(obj, z)
+%   setSource_InVivo(obj, z)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -25,7 +32,7 @@ classdef Optimization < aod.core.Calibration
 
     methods
         function obj = Optimization(name, calibrationDate, varargin)
-            obj = aod.core.Calibration(name, calibrationDate);
+            obj = obj@aod.core.Calibration(name, calibrationDate);
             
             ip = aod.util.InputParser();
             addParameter(ip, 'xPMT', [], @isnumeric);
@@ -34,7 +41,7 @@ classdef Optimization < aod.core.Calibration
             addParameter(ip, 'zLightSource', [], @isnumeric);
             parse(ip, varargin{:});
 
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
         end
 
         function setPMT(obj, x, y, z)
@@ -52,6 +59,33 @@ classdef Optimization < aod.core.Calibration
         function setLightSource(obj, z)
             if ~isempty(z)
                 obj.setParam('zLightSource', z);
+            end
+        end
+
+        function setPMT_InVivo(obj, x, y, z)
+            if ~isempty(x)
+                obj.setParam('xPMT_InVivo', x);
+            end
+            if nargin > 2 && ~isempty(y)
+                obj.setParam('yPMT_InVivo', y);
+            end
+            if nargin > 3 && ~isempty(z)
+                obj.setParam('zPMT_InVivo', z);
+            end
+        end
+
+        function setLightSource_InVivo(obj, z)
+            if ~isempty(z)
+                obj.setParam('zLightSource_InVivo', z);
+            end
+        end
+    end
+
+    methods (Access = protected)
+        function value = getLabel(obj)
+            value = getLabel@aod.core.Calibration(obj);
+            if ~isempty(obj.Name)
+                value = [obj.Name, 'Optimization'];
             end
         end
     end

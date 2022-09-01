@@ -24,6 +24,7 @@ classdef SiftRegistration < aod.builtin.registrations.RigidRegistration
             addRequired(ip, 'ReferenceID', @isnumeric);
             % Whether stack was bleach-corrected first
             addParameter(ip, 'DUP', false, @islogical);
+            addParameter(ip, 'WhichStack', 'AVG', @ischar);
             % The default parameters for SIFT, only need to specify if one
             % of the defaults presented in ImageJ is changed
             addParameter(ip, 'InitialGaussianBlur', 1.6, @isnumeric);

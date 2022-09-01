@@ -34,6 +34,14 @@ classdef EpochFactory < aod.util.Factory
                 reader = sara.readers.EpochParameterReader(ep.getExptFile('ImagingParams'));
                 ep = reader.read(ep);
             end
+            
+            % Add stimuli defined in epoch parameters
+            if epochType.isPhysiology()
+                if hasParam(ep, 'AOM1');
+                    stim = sara.stimuli.Mustang(ep.getParam('AOM1'));
+                    ep.addStimulus(stim);
+                end
+            end
 
             % Add registration, if necessary
             if ep.hasFile('RegMotion')

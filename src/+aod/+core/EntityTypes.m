@@ -1,4 +1,9 @@
 classdef EntityTypes
+% ENTITYTYPES
+%
+% Description:
+%   Establishes business logic for entities
+% -------------------------------------------------------------------------
 
     enumeration
         EXPERIMENT
@@ -39,6 +44,47 @@ classdef EntityTypes
             end
         end
 
+        function value = containerName(obj)
+            % CONTAINERNAME
+            %
+            % Description:
+            %   Returns the container name for a given entity
+            % 
+            % Syntax:
+            %   value = containerName(obj)
+            % -------------------------------------------------------------
+            import aod.core.EntityTypes
+
+            switch obj
+                case EntityTypes.ANALYSIS
+                    value = 'Analysis';
+                case EntityTypes.CALIBRATION
+                    value = 'Calibrations';
+                case EntityTypes.CHANNEL
+                    value = 'Channels';
+                case EntityTypes.DATASET
+                    value = 'Datasets';
+                case EntityTypes.DEVICE
+                    value = 'Devices';
+                case EntityTypes.EPOCH
+                    value = 'Epochs';
+                case EntityTypes.REGION
+                    value = 'Regions';
+                case EntityTypes.REGISTRATION
+                    value = 'Registrations';
+                case EntityTypes.RESPONSE
+                    value = 'Responses';
+                case EntityTypes.SOURCE
+                    value = 'Sources';
+                case EntityTypes.STIMULUS
+                    value = 'Stimuli';
+                case EntityType.SYSTEM
+                    value = 'Systems';
+                otherwise
+                    value = [];
+            end
+        end
+
         function containers = containers(obj)
             % CONTAINERS
             %
@@ -65,6 +111,14 @@ classdef EntityTypes
         end
 
         function hdfPath = getPath(obj, entity, manager, parentPath)
+            % GETPATH
+            %
+            % Description:
+            %   Determines entity's HDF5 path
+            %
+            % Syntax:
+            %   hdfPath = getPath(obj, entity, manager, parentPath)
+            % -------------------------------------------------------------
             assert(isSubclass(entity, 'aod.core.Entity'),...
                 'entity must be a subclass of aod.core.Entity');
             assert(isSubclass(manager, 'aod.h5.EntityManager'),...
@@ -73,7 +127,7 @@ classdef EntityTypes
             if nargin < 4
                 parentPath = obj.parentPath(entity, manager);
             end
-            groupName = obj.getEntityGroupName(entity);
+            groupName = obj.getGroupName(entity);
 
             import aod.core.EntityTypes
 
@@ -90,6 +144,8 @@ classdef EntityTypes
                     hdfPath = [parentPath, '/Devices/', groupName];
                 case EntityTypes.CALIBRATION
                     hdfPath = [parentPath, '/Calibrations/', groupName];
+                case EntityTypes.REGION
+                    hdfPath = [parentPath, '/Regions/', groupName];
                 case EntityTypes.EPOCH
                     hdfPath = [parentPath, '/Epochs/', groupName];
                 case EntityTypes.DATASET
@@ -139,7 +195,15 @@ classdef EntityTypes
     end
 
     methods (Static)
-        function out = getEntityGroupName(entity)
+        function out = getGroupName(entity)
+            % GETGROUPNAME
+            %
+            % Description:
+            %   Determines the name of an entity's HDF group
+            %
+            % Syntax:
+            %   out = getGroupName(entity)
+            % -------------------------------------------------------------
             import aod.core.EntityTypes
 
             obj = aod.core.EntityTypes.get(entity);
@@ -151,14 +215,11 @@ classdef EntityTypes
                     if ~isempty(entity.Name)
                         out = entity.Name;
                     else
-                        out = ['Epoch', int2fixedwidthstr(entity.ID, 4)];
+                        out = int2fixedwidthstr(entity.ID, 4);
                     end
                 otherwise
-                    if ~isempty(entity.Name)
-                        out = entity.Name;
-                    else
-                        out = entity.label;
-                    end
+                    % Default label is Name, if set, className if not
+                    out = entity.label;
             end
         end
 

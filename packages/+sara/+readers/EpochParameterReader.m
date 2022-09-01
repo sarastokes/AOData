@@ -70,7 +70,7 @@ classdef EpochParameterReader < aod.util.readers.TxtReader
             ep.setParam('RefOffset', obj.readNumber('ADC channel 1, offset = '));
             ep.setParam('VisOffset', obj.readNumber('ADC channel 2, offset = '));
             ep.setParam('RefPmtGain', obj.readNumber('Reflectance PMT gain  = '));
-            ep.setParam('VisPmtGain', obj.readNumber('Fluorescence PMT gain  = '));
+            ep.setParam('VisPmtGain', obj.readNumber('Fluorescence PMT gain = '));
             ep.setParam('AOM1', obj.readNumber('AOM_VALUE1 = '));
             ep.setParam('AOM2', obj.readNumber('AOM_VALUE2 = '));
             ep.setParam('AOM3', obj.readNumber('AOM_VALUE3 = '));

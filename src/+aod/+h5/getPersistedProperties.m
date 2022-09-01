@@ -24,8 +24,8 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
     entityType = aod.core.EntityTypes.get(obj);
     containerProps = entityType.containers();
     
-    alwaysPersistedProps = ["notes", "Parent", "Name", "files"]';
-    alwaysAttributeProps = ["UUID", "description", "parameters"];
+    alwaysPersistedProps = ["notes", "Parent", "files"];
+    alwaysAttributeProps = ["UUID", "Name", "label", "description", "parameters"];
     alwaysAbandonedProps = ["allowableParentTypes", "Reader"];
     persistedProps = [];
     attributeProps = [];
@@ -45,10 +45,6 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
         elseif ismember(mc.PropertyList(i).Name, containerProps)
             % Containers are not persisted with containing entity
             abandonedProps = cat(1, abandonedProps,...
-                string(mc.PropertyList(i).Name));
-        elseif contains(mc.PropertyList(i).Name, 'Parameters')
-            % Properties with "parameters" in the name are attributes
-            attributeProps = cat(1, attributeProps,...
                 string(mc.PropertyList(i).Name));
         elseif mc.PropertyList(i).Transient
             % Transient properties are akways abandoned

@@ -56,6 +56,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Source                      = aod.core.Source.empty()
         System                      = aod.core.System.empty()
+        Region                      = aod.core.Region.empty()
     end
 
     properties (Hidden, Access = protected)
@@ -107,13 +108,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Additional key/value inputs are sent to response constructor
             % -------------------------------------------------------------
 
-            %ip = inputParser();
-            %ip.KeepUnmatched = true;
-            %addOptional(ip, 'Keep', false, @islogical);
-            %parse(ip, varargin{:});
-            %keepResponse = ip.Results.Keep;
-            keepResponse = false;
-
             if isempty(obj.Parent.Region)
                 error('Experiment must contain Regions');
             end
@@ -122,9 +116,32 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 constructor = str2func(responseClassName);
                 resp = constructor(obj, varargin{:});
                 resp.setParent(obj);
-                % if keepResponse
-                %     obj.addResponse(resp);
-                % end
+            end
+        end
+    end
+
+    % Addition methods
+    methods (Sealed)
+        function add(obj, entity)
+            import aod.core.EntityTypes
+            entityType = EntityTypes.get(entity);
+
+            switch entityType
+                case Entity.DATASET
+                    entity.setParent(obj);
+                    obj.Datasets = cat(1, obj.Datasets, entity);
+                case Entity.RESPONSE
+                    entity.setParent(obj);
+                    obj.Responses = cat(1, obj.Responses, entity);
+                case Entity.REGISTRATION
+                    entity.setParent(obj);
+                    obj.Registrations = cat(1, obj.Registrations, entity);
+                case Entity.STIMULUS
+                    entity.setParent(obj);
+                    obj.Registrations = cat(1, obj.Stimulus, entity);
+                otherwise
+                    error("Epoch:AddedInvalidEntity",...
+                        "Entity must be Dataset, Registration, Response or Stimulus");
             end
         end
     end

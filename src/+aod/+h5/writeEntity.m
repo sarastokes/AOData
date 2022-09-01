@@ -107,7 +107,7 @@ function writeEntity(hdfName, obj)
         aod.h5.writeParameters(hdfName, [hdfPath, '/files'], obj.files);
     end
 
-    if isprop(obj.Code) && ~isempty(obj.Code)
+    if isprop(obj, 'Code') && ~isempty(obj.Code)
         HDF5.makeTextDataset(hdfName, hdfPath, 'Code',... 
             'Attributes contain git hashes of all registered repositories');
         aod.h5.writeParameters(hdfName, [hdfPath, '/Code'], obj.Code);
