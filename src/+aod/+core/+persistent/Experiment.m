@@ -29,32 +29,21 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
 
     methods (Access = protected)
         function populate(obj)
-            [datasetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
-
-            if ismember("experimentDate", datasetNames)
-                obj.experimentDate = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'experimentDate');
-            end
-
-            if ismember("homeDirectory", datasetNames)
-                obj.homeDirectory = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'homeDirectory');
-            end
-            
+            [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
+ 
+            obj.experimentDate = obj.loadDataset(dsetNames, 'experimentDate');
+            obj.homeDirectory = obj.loadDataset(dsetNames, 'homeDirectory');
+            obj.epochIDs = obj.loadDataset(dsetNames, 'epochIDs');
             obj.setDatasetsToDynProps(datasetNames);
+
             obj.setLinksToDynProps(linkNames);
 
-            % Create containers
-            obj.Analyses = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Analyses'), obj.factory);
-            obj.Calibrations = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Calibrations'), obj.factory);
-            obj.Epochs = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Epochs'), obj.factory);
-            obj.Regions = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Regions'), obj.factory);
-            obj.Sources = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Sources'), obj.factory);
-            obj.Systems = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Systems'), obj.factory);
+            obj.Analyses = obj.loadContainer('Analyses');
+            obj.Calibrations = obj.loadContainer('Calibrations');
+            obj.Epochs = obj.loadContainer('Epochs');
+            obj.Regions = obj.loadContainer('Regions');
+            obj.Sources = obj.loadContainer('Sources');
+            obj.Systems = obj.loadContainer('Systems');
         end
     end
 end

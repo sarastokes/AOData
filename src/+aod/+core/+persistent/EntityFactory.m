@@ -67,6 +67,7 @@ classdef EntityFactory < handle
                     error("EntityFactorycreate:UnrecognizedEntity",...
                         "Did not recognize entity name: %s", entityType);
             end
+            % obj.Persistor.bind(e);  %% TODO
             obj.cache(dehyphenate(uuid)) = e;
         end
     end

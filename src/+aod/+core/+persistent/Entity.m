@@ -3,7 +3,7 @@ classdef Entity < handle
     properties %(SetAccess = private)
         entityClassName         string
         parameters              % aod.util.Parameters
-        Files                   % aod.util.Parameters
+        files                   % aod.util.Parameters
         UUID                    string
         description             string
         Name                    char
@@ -11,7 +11,7 @@ classdef Entity < handle
         Parent
     end
 
-    properties %(Access = protected)
+    properties (Hidden, SetAccess = private)
         hdfName 
         hdfPath 
         info
@@ -38,7 +38,7 @@ classdef Entity < handle
             obj.factory = entityFactory;
 
             % Initialize parameters 
-            obj.Files = aod.util.Parameters();
+            obj.files = aod.util.Parameters();
             obj.parameters = aod.util.Parameters();
 
             % Create entity from file
@@ -56,15 +56,7 @@ classdef Entity < handle
             else
                 datasetNames = [];
             end
-
-            if ismember("Name", datasetNames)
-                obj.Name = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'Name');
-            end
-
-            if ismember("Files", datasetNames)
-                obj.Files = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'Files',...
-                    'aod.util.Parameters');
-            end
+            obj.files = obj.loadDataset(datasetNames, 'files', 'aod.util.Parameters');
 
             % LINKS
             if ~isempty(obj.info.Links)
@@ -72,27 +64,25 @@ classdef Entity < handle
             else
                 linkNames = [];
             end
-
-            if ~isempty(linkNames)
-                if ismember("Parent", linkNames)
-                    idx = find(linkNames == "Parent");
-                    obj.parentLink = obj.info.Links(idx).Value{1};
-                    obj.Parent = obj.factory.create(obj.parentLink);
-                end
-            end
+            obj.Parent = obj.loadLink(linkNames, 'Parent');
 
             % ATTRIBUTES
-            attributeNames = string({obj.info.Attributes.Name});
+            if ~isempty(obj.info.Attributes)
+                attributeNames = string({obj.info.Attributes.Name});
+            else
+                attributeNames = [];
+            end
 
             % Special attributes (universal ones mapping to properties)
             specialAttributes = ["UUID", "description", "Class", "EntityType"];
-            obj.UUID = h5readatt(obj.hdfName, obj.hdfPath, 'UUID');
-            obj.entityType = h5readatt(obj.hdfName, obj.hdfPath, 'EntityType');
-            obj.entityClassName = h5readatt(obj.hdfName, obj.hdfPath, 'Class');
+            obj.label = obj.loadAttribute(attributeNames, 'label');
+            obj.UUID = obj.loadAttribute(attributeNames, 'UUID');
+            obj.entityType = obj.loadAttribute(attributeNames, 'EntityType');
+            obj.entityClassName = obj.loadAttribute(attributeNames, 'Class');
+
             % Optional special attributes which may not be present
-            if ismember("description", attributeNames)
-                obj.description = h5readatt(obj.hdfName, obj.hdfPath, 'description');
-            end
+            obj.description = obj.loadAttribute(attributeNames, 'description');
+            obj.Name = obj.loadAttribute(attributeNames, 'Name');
 
             % Parse the remaining attributes
             for i = 1:numel(attributeNames)
@@ -102,12 +92,31 @@ classdef Entity < handle
                 end
             end
         end
+    end
+
+    % Loading methods
+    methods (Access = protected)
+        function a = loadAttribute(obj, attNames, name)
+            % LOADLINK
+            %
+            % Description:
+            %   Check if an attribute is present and if so, read it
+            %
+            % Syntax:
+            %   d = loadLink(obj, linkNames, name)
+            % -------------------------------------------------------------
+            if isempty(attNames) || ~ismember(name, attNames)
+                a = [];
+                return
+            end
+            a = h5readatt(obj.hdfName, obj.hdfPath, name);
+        end
 
         function e = loadLink(obj, linkNames, name)
             % LOADLINK
             %
             % Description:
-            %   Check if a link is present and if so, assign to property
+            %   Check if a link is present and if so, read it
             %
             % Syntax:
             %   d = loadLink(obj, linkNames, name)
@@ -121,22 +130,38 @@ classdef Entity < handle
             e = obj.factory.create(linkPath);
         end
 
-        function d = loadDataset(obj, dsetNames, name)
+        function d = loadDataset(obj, dsetNames, name, varargin)
             % LOADDATASET
             %
             % Description:
-            %   Check if a dataset is present and if so, assign to property
+            %   Check if a dataset is present and if so, read it
             %
             % Syntax:
-            %   d = loadDataset(obj, dsetNames, name)
+            %   d = loadDataset(obj, dsetNames, name, varargin)
             % -------------------------------------------------------------
-            if ~isempty(dsetNames) && ismember(name, dsetNames)
-                d = aod.h5.createDatasetByType(obj.hdfName, obj.hdfPath, name);
-            else
+            if isempty(dsetNames) && ~ismember(name, dsetNames)
                 d = [];
+                return
             end
+            d = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, name, varargin{:});
         end
 
+        function c = loadContainer(obj, containerName)
+            % LOADCONTAINER
+            %
+            % Description:
+            %   Load an entity container
+            %
+            % Syntax:
+            %   c = loadContainer(obj, containerName)
+            % -------------------------------------------------------------
+            c = aod.core.persistent.EntityContainer(...
+                aod.h5.HDF5.buildPath(obj.hdfPath, containerName), obj.factory);
+        end
+    end
+
+    % Dynamic property assignment methods
+    methods (Access = protected)
         function setDatasetsToDynProps(obj, datasetNames)
             % SETDATASETSTODYNPROPS
             %
@@ -146,6 +171,7 @@ classdef Entity < handle
             %
             % Syntax:
             %   setDatasetsToDynProps(obj)
+            %   setDatasetsToDynProps(obj, dsetNames)
             % -------------------------------------------------------------
             if nargin < 2
                 if isempty(obj.info.Datasets)
@@ -169,6 +195,16 @@ classdef Entity < handle
         end
 
         function setLinksToDynProps(obj, linkNames)
+            % SETLINKSTODYNPROPS
+            %
+            % Description:
+            %   Creates a dynamic property for all ad hoc links not already
+            %   set as an existing property of the class
+            %
+            % Syntax:
+            %   setLinksToDynProps(obj)
+            %   setLinksToDynProps(obj, dsetNames)
+            % -------------------------------------------------------------
             if nargin < 2
                 if isempty(obj.info.Links)
                     return
@@ -182,7 +218,7 @@ classdef Entity < handle
             end
 
             for i = 1:numel(linkNames)
-                if ~isprop(obj.linkNames(i))
+                if ~isprop(obj, linkNames(i))
                     obj.(linkNames(i)) = obj.loadLink(linkNames, linkNames(i));
                 end
             end

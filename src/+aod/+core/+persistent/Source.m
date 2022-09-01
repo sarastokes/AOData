@@ -15,10 +15,8 @@ classdef Source < aod.core.persistent.Entity & dynamicprops
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
             
             obj.setDatasetsToDynProps(dsetNames);
-            obj.setLinksToDynProps(linkNames);
-            
-            obj.Sources = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Sources'), obj.factory);
+            obj.setLinksToDynProps(linkNames);           
+            obj.Sources = obj.loadContainer('Sources');
         end
     end
 end 

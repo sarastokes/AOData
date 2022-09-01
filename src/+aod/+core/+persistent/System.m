@@ -16,9 +16,7 @@ classdef System < aod.core.persistent.Entity & dynamicprops
 
             obj.setDatasetsToDynProps(dsetNames);
             obj.setLinksToDynProps(linkNames);
-
-            obj.Channels = aod.core.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, 'Channels'), obj.factory);
+            obj.Channels = obj.loadContainer('Channels');
         end
     end
 end

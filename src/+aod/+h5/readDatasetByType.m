@@ -54,7 +54,8 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
         case 'duration'
             out = seconds(data);
         case 'enum'
-            eval(sprintf('out = %s', data));
+            enumClass = h5readatt(hdfName, fullPath, 'EnumClass');
+            eval(sprintf('out = %s.%s', enumClass, data));
         case 'affine2d'
             out = affine2d(data);
         otherwise

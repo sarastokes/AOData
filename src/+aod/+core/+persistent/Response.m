@@ -15,19 +15,15 @@ classdef Response < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
-            if ismember("Data", dsetNames)
-                obj.Data = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, "Data");
-            end
-            
-            % Determine how to map timing
+            obj.Data = obj.loadDataset(dsetNames, "Data");
             if ~isempty(obj.info.Groups) && contains(obj.info.Groups(1).Name, 'Timing')
                 obj.Timing = obj.factory.create(obj.info.Groups.Name);
             else
                 obj.Timing = obj.Parent.Timing;
             end
             obj.setDatasetsToDynProps(dsetNames);
+            
             obj.setLinksToDynProps(linkNames);
-
         end
     end
 end 

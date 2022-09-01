@@ -14,11 +14,9 @@ classdef Analysis < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
-            if ismember("analysisDate", dsetNames)
-                obj.analysisDate = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, "analysisDate");
-            end
-
+            obj.analysisDate = obj.loadDataset(dsetNames, "analysisDate");
             obj.setDatasetsToDynProps(dsetNames);
+            
             obj.setLinksToDynProps(linkNames);
         end 
     end

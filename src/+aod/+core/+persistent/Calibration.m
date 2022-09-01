@@ -14,11 +14,9 @@ classdef Calibration < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
 
-            if ismember("calibrationDate", dsetNames)
-                obj.calibrationDate = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, 'calibrationDate');
-            end
-
+            obj.calibrationDate = obj.loadDataset(dsetNames, 'calibrationDate');
             obj.setDatasetsToDynProps(dsetNames);
+            
             obj.setLinksToDynProps(linkNames);
         end
     end
