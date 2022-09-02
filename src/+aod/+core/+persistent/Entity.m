@@ -1,32 +1,40 @@
-classdef Entity < handle
+classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
+% ENTITY
+%
+% Description:
+%   Parent class for all persistent entities read from an HDF5 file
+%
+% Constructor:
+%   obj = Entity(hdfName, hdfPath)
+%   obj = Entity(hdfName, hdfPath, entityFactory)
+% -------------------------------------------------------------------------
 
-    properties %(SetAccess = private)
-        entityClassName         string
+    properties (SetAccess = protected)
         parameters              % aod.util.Parameters
         files                   % aod.util.Parameters
-        UUID                    string
         description             string
-        Name                    char
-        label                   char 
-        Parent
+    end
+
+    properties (SetAccess = private)
+        Parent                  % aod.core.persistent.Entity
+        UUID                    string
     end
 
     properties (Hidden, SetAccess = private)
         hdfName 
         hdfPath 
-        info
+        Name                    char
+        label                   char 
         entityType
-        parentLink 
-    end
+        entityClassName         
 
-    properties
+        info
         factory
     end
 
     events 
-        ChangedDescription
-        ChangedNote
         ChangedAttribute
+        ChangedDataset
     end
 
     methods
@@ -42,17 +50,111 @@ classdef Entity < handle
             % Create entity from file
             obj.populate();
         end
+    end
 
-        function setParamTest(obj, paramName, paramValue)
+    % Dataset methods
+    methods
+        function addDataset(obj, dsetName, dsetValue)
+
+            % Format event data by whether dataset exists or not
+            if ismember(dsetName, string({obj.info.Datasets.Name}))
+                evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue,...
+                    obj.(dsetName));
+            else
+                evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue);
+            end
+
+            notify(obj, 'ChangedDataset', evtData);
+        end
+    end
+
+    % Parameter methods  % TODO: Get param
+    methods
+        function tf = hasParam(obj, paramName)
+            % HASPARAM
+            %
+            % Description:
+            %   Check whether parameter is present
+            %
+            % Syntax:
+            %   tf = hasParam(obj, paramName)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                paramName           char
+            end
+            tf = ismember(paramName, string(obj.parameters.keys));
+        end
+
+        function setParam(obj, paramName, paramValue)
+            % SETPARAM
+            %
+            % Description:
+            %   Add new parameter or change value of existing parameter
+            %
+            % Syntax:
+            %   setParam(obj, paramName, paramValue)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                paramName           char
+                paramValue
+            end
+
+            if ismember(paramName, aod.h5.getSystemAttributes)
+                warning("setParam:SystemAttribute",...
+                    "Attribute not set, member of uneditable system attributes");
+                return
+            end
+
             evtData = aod.h5.events.AttributeEvent(obj.hdfPath, paramName, paramValue);
             notify(obj, 'ChangedAttribute', evtData);
-            disp('Notification Sent!')
+
+            obj.parameters(paramName) = paramValue;
+        end
+
+        function removeParam(obj, paramName)
+            % REMOVEPARAM
+            %
+            % Description:
+            %   Remove a parameter from the entity
+            %
+            % Syntax:
+            %   removeParam(obj, paramName)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                paramName           char
+            end
+
+            if ismember(paramName, aod.h5.getSystemAttributes)
+                warning("setParam:SystemAttribute",...
+                    "Parameter %s not set, member of system attributes", paramName);
+                return
+            end
+            
+            if ~obj.hasParam(paramName)
+                warning("removeParam:ParamNotFound",...
+                    "Parameter %s not found in parameters property!", paramName);
+                return
+            end
+
+            evtData = aod.h5.events.AttributeEvent(obj.hdfPath, paramName);
+            notify(obj, 'ChangedAttribute', evtData);
+
+            remove(obj.parameters, paramName);
         end
     end
 
     % Initialization
     methods (Access = protected)
         function [datasetNames, linkNames] = populate(obj)
+            % POPULATE
+            %
+            % Description:
+            %   Load datasets and attributes from the HDF5 file, assigning
+            %   defined ones to the appropriate places. 
+            % -------------------------------------------------------------
             obj.info = h5info(obj.hdfName, obj.hdfPath);
 
             % DATASETS
@@ -228,6 +330,19 @@ classdef Entity < handle
                 if ~isprop(obj, linkNames(i))
                     obj.(linkNames(i)) = obj.loadLink(linkNames, linkNames(i));
                 end
+            end
+        end
+    end
+
+    % CustomDisplay methods
+    methods (Access = protected)
+        function header = getHeader(obj)
+            if ~isscalar(obj)
+                header = getHeader@matlab.mixin.CustomDisplay(obj);
+            else
+                headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
+                header = sprintf('%s (%s, %s)\n',... 
+                    headerStr, obj.label, char(obj.entityClassName));
             end
         end
     end

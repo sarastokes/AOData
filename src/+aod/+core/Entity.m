@@ -13,7 +13,7 @@ classdef (Abstract) Entity < handle
 %   parameters                  aod.util.Parameters
 %   files                       aod.util.Parameters
 %   description                 string
-%   notes                       cell
+%   notes                       char
 %
 % Dependent properties:
 %   label                       string      (defined by getLabel)
@@ -59,8 +59,8 @@ classdef (Abstract) Entity < handle
         Parent                      % aod.core.Entity
         Name(1,:)                   char = char.empty()
         UUID                        string = string.empty()
-        description                 string = string.empty() 
-        notes                       string = string.empty()
+        description                 char = char.empty() 
+        notes                       char = char.empty()
         entityType                  %aod.core.EntityTypes
     end
 
@@ -144,6 +144,7 @@ classdef (Abstract) Entity < handle
             if nargin < 3
                 overwrite = false;
             end
+            assert(istext(txt), 'Description must be char or string')
 
             if ~isempty(obj.description) && ~overwrite 
                 warning('Set overwrite=true to change existing description');
@@ -161,8 +162,8 @@ classdef (Abstract) Entity < handle
             if isempty(txt)
                 return
             end
-            
-            obj.notes = [obj.notes, '[[x]]', txt];
+            assert(istext(txt), 'Input to notes must be char or string');
+            obj.notes = [obj.notes, char(txt), '; '];
         end
 
         function removeNote(obj, ID)
@@ -174,7 +175,7 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.removeNote(obj, ID)
             % -------------------------------------------------------------
-            out = strfind(obj.notes, '[[');
+            out = strfind(obj.notes, ';');
             assert(ID > 1 && ID <= numel(out),...
                 'Invalid ID %u, must be between 1-%u', ID, max(noteIDs));
             if ID == numel(out)
@@ -190,7 +191,7 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.clearNotes()
             % -------------------------------------------------------------
-            obj.notes = string.empty();
+            obj.notes = char.empty();
         end
     end
 

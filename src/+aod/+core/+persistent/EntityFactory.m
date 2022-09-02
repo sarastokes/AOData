@@ -22,7 +22,7 @@ classdef EntityFactory < handle
         function obj = EntityFactory(hdfName)
             obj.hdfName = hdfName;
             obj.entityManager = aod.h5.EntityManager(hdfName);
-            obj.persistor = TestPersistor(hdfName);
+            obj.persistor = aod.core.persistent.Persistor(hdfName);
             obj.cache = containers.Map();
         end
 

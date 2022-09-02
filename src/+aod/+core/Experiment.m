@@ -151,7 +151,7 @@ classdef Experiment < aod.core.Entity
             %   appendGitHashes(obj)
             % -------------------------------------------------------------
             try
-                RM = aod.git.RepositoryManager();
+                RM = aod.infra.RepositoryManager();
                 obj.Code = RM.commitIDs();
             catch ME  % Rethrow as warning instead of error
                 disp(getReport(ME, 'extended', 'hyperlinks', 'on'));

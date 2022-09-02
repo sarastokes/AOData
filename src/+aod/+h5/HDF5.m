@@ -664,9 +664,3 @@ classdef HDF5 < handle
         end
     end
 end 
-
-% if isstring(prop) && numel(prop) > 1
-%    HDF5.makeMatrixDataset(hdfName, hdfPath, persistedProps(i), prop);
-% else
-%     HDF5.makeTextDataset(hdfName, hdfPath, persistedProps(i), prop);
-% end
