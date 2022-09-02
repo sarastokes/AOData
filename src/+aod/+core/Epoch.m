@@ -8,11 +8,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Epoch(ID, sampleRate)
-%   obj = Epoch(ID, sampleRate, 'Source', source, 'System', system)
-%
-% Parameters:
-%   sampleRate                      Rate data was acquired (Hz)
+%   obj = Epoch(ID)
 %
 % Properties:
 %   ID                              Epoch identifier (integer)
@@ -58,11 +54,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         System                      = aod.core.System.empty()
         Region                      = aod.core.Region.empty()
     end
-
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Experiment'}
-    end
-
+    
     methods 
         function obj = Epoch(ID, varargin)
             obj = obj@aod.core.Entity();
@@ -120,32 +112,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
-    % Addition methods
-    methods (Sealed)
-        function add(obj, entity)
-            import aod.core.EntityTypes
-            entityType = EntityTypes.get(entity);
-
-            switch entityType
-                case Entity.DATASET
-                    entity.setParent(obj);
-                    obj.Datasets = cat(1, obj.Datasets, entity);
-                case Entity.RESPONSE
-                    entity.setParent(obj);
-                    obj.Responses = cat(1, obj.Responses, entity);
-                case Entity.REGISTRATION
-                    entity.setParent(obj);
-                    obj.Registrations = cat(1, obj.Registrations, entity);
-                case Entity.STIMULUS
-                    entity.setParent(obj);
-                    obj.Registrations = cat(1, obj.Stimulus, entity);
-                otherwise
-                    error("Epoch:AddedInvalidEntity",...
-                        "Entity must be Dataset, Registration, Response or Stimulus");
-            end
-        end
-    end
-
     methods (Sealed)  
         function setSource(obj, source)
             % SETSOURCE
@@ -159,10 +125,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             if isempty(source)
                 return
             end
+            
             assert(isSubclass(source, 'aod.core.Source'),...
                 'source must be subclass of aod.core.Source');
-            % assert(~isempty(findByUUID(obj.Parent.Sources, source.UUID)),... 
-            %     'Source be part of the same Experiment');
             obj.Source = source;
         end
 
@@ -178,10 +143,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             if isempty(system)
                 return
             end
+
             assert(isSubclass(system, 'aod.core.System'),...
                 'System must be a subclass of aod.core.System');
-            % assert(~isempty(findByUUID(obj.Parent.Systems, system.UUID)),... 
-            %     'System be part of the same Experiment');
             obj.System = system;
         end
     end
@@ -404,23 +368,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 value = ['Epoch', int2fixedwidthstr(obj.ID, 4)];
             else
                 value = sprintf('Epoch%u_%s', obj.ID, obj.Parent.label);
-            end
-        end
-
-        function sync(obj)
-            sync@aod.core.Entity(obj);
-            if ~isempty(obj.Source)
-                if isempty(findByUUID(obj.Parent.getAllSources(), obj.Source.UUID))
-                    warning("Epoch:SyncError",...
-                        "Epoch Source does not match any Experiment Sources");
-                end
-            end
-
-            if ~isempty(obj.System)
-                if isempty(findByUUID(obj.Parent.Systems, obj.System.UUID))
-                    warning("Epoch:SyncError",...
-                        "Epoch System does not match any Experiment Systems");
-                end
             end
         end
     end

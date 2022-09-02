@@ -13,6 +13,7 @@ classdef EntityFactory < handle
 
     properties (SetAccess = private)
         hdfName
+        persistor
         entityManager 
         cache 
     end
@@ -21,6 +22,7 @@ classdef EntityFactory < handle
         function obj = EntityFactory(hdfName)
             obj.hdfName = hdfName;
             obj.entityManager = aod.h5.EntityManager(hdfName);
+            obj.persistor = TestPersistor(hdfName);
             obj.cache = containers.Map();
         end
 
@@ -67,7 +69,7 @@ classdef EntityFactory < handle
                     error("EntityFactorycreate:UnrecognizedEntity",...
                         "Did not recognize entity name: %s", entityType);
             end
-            % obj.Persistor.bind(e);  %% TODO
+            obj.persistor.bind(e);  %% TODO
             obj.cache(dehyphenate(uuid)) = e;
         end
     end

@@ -59,10 +59,6 @@ classdef Experiment < aod.core.Entity
         epochIDs
         numEpochs
     end
-
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'none'};
-    end
     
     methods 
         function obj = Experiment(name, homeFolder, expDate, varargin)
@@ -416,31 +412,35 @@ classdef Experiment < aod.core.Entity
         end
 
         function channels = getAllChannels(obj)
-
-            channels = aod.core.Channel.empty();
-
+            % GETALLCHANNELS
+            %
+            % Description:
+            %   Returns all channels within the experiment
+            %
+            % Syntax:
+            %   channels = getAllChannels(obj)
+            % -------------------------------------------------------------
             if isempty(obj.Systems)
-                return
-            end
-
-            for i = 1:numel(obj.Systems)
-                channels = cat(1, channels, obj.Systems(i).Channels);
+                channels = aod.core.Channel.empty();
+            else
+                channels = vertcat(obj.Systems.Channels);
             end
         end
 
         function devices = getAllDevices(obj)
-            devices = aod.core.Devices.empty();
-
+            % GETALLDEVICES
+            %
+            % Description:
+            %   Returns all devices within the experiment
+            %
+            % Syntax:
+            %   devices = getAllDevices(obj)
+            % -------------------------------------------------------------
+            
             if isempty(obj.Systems)
-                return
-            end
-
-            for i = 1:numel(obj.Systems)
-                if ~isempty(obj.Systems(i).Channels)
-                    for j = 1:numel(obj.Systems(i).Channels)
-                        devices = cat(1, devices, obj.Systems(i).Channels(j).Devices);
-                    end
-                end
+                devices = aod.core.Devices.empty();
+            else
+                devices = vertcat(obj.Systems.Channels.Devices);
             end
         end
     end

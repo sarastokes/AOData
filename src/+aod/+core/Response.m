@@ -22,10 +22,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         Timing                              % aod.core.Timing
     end
 
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Epoch'};
-    end
-
     methods
         function obj = Response(name)
             obj = obj@aod.core.Entity(name);

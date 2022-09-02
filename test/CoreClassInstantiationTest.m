@@ -35,15 +35,15 @@ classdef CoreClassInstantiationTest < matlab.unittest.TestCase
 
         function testResponse(testCase)
             resp = aod.core.Response('MyResponse');
-            resp.addTiming(aod.core.Timing.TimeStamps(1:4));
+            resp.setTiming(1:4);
         end
 
         function testDataset(testCase)
-            obj = aod.core.Dataset('MyDataset');
+            dset = aod.core.Dataset('MyDataset');
         end
 
         function testStimulus(testCase)
-            obj = aod.core.Stimulus('MyStimulus');
+            stim = aod.core.Stimulus('MyStimulus');
         end
 
         function testAnalysis(testCase)

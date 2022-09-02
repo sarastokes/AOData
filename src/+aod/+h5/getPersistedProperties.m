@@ -22,7 +22,7 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
     end
 
     entityType = aod.core.EntityTypes.get(obj);
-    containerProps = entityType.containers();
+    containerProps = entityType.childContainers();
     
     alwaysPersistedProps = ["notes", "Parent", "files"];
     alwaysAttributeProps = ["UUID", "Name", "label", "description", "parameters"];

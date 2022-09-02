@@ -22,10 +22,6 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
         Data 
     end
 
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Epoch'}
-    end
-
     methods
         function obj = Dataset(name, data)
             obj = obj@aod.core.Entity(name);

@@ -6,7 +6,14 @@ function [entity, idx] = findByUUID(entities, uuid)
 %
 % History:
 %   09Aug2022 - SSP
+%   02Sep2022 - SSP - Added catch for passing an empty array of entities
 % -------------------------------------------------------------------------
+
+    if isempty(entities)
+        entity = [];
+        idx = [];
+        return
+    end
     
     if iscell(entities)
         idx = false(1, numel(entities));
@@ -27,4 +34,6 @@ function [entity, idx] = findByUUID(entities, uuid)
         else
             entity = entities(idx);
         end
+    else
+        entity = [];
     end

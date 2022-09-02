@@ -34,7 +34,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
             obj.experimentDate = obj.loadDataset(dsetNames, 'experimentDate');
             obj.homeDirectory = obj.loadDataset(dsetNames, 'homeDirectory');
             obj.epochIDs = obj.loadDataset(dsetNames, 'epochIDs');
-            obj.setDatasetsToDynProps(datasetNames);
+            obj.setDatasetsToDynProps(dsetNames);
 
             obj.setLinksToDynProps(linkNames);
 

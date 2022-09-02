@@ -15,9 +15,6 @@ classdef (Abstract) Entity < handle
 %   description                 string
 %   notes                       cell
 %
-% Abstract protected properties:
-%   allowableParentTypes        cellstr
-%
 % Dependent properties:
 %   label                       string      (defined by getLabel)
 %
@@ -64,6 +61,7 @@ classdef (Abstract) Entity < handle
         UUID                        string = string.empty()
         description                 string = string.empty() 
         notes                       string = string.empty()
+        entityType                  %aod.core.EntityTypes
     end
 
     properties (SetAccess = protected)
@@ -71,10 +69,6 @@ classdef (Abstract) Entity < handle
         parameters                  % aod.util.Parameters
     end
     
-    properties (Abstract, Hidden, Access = protected)
-        allowableParentTypes        cell
-    end
-
     properties (Dependent)
         label
     end
@@ -88,7 +82,12 @@ classdef (Abstract) Entity < handle
             obj.files = aod.util.Parameters();
             obj.parameters = aod.util.Parameters();
             
+            % Generate a random unique identifier to distinguish the class
             obj.UUID = aod.util.generateUUID();
+
+            % Assign entity type
+            entityType = aod.core.EntityTypes.get(obj);
+            obj.entityType = entityType;
         end
 
         function value = get.label(obj)
@@ -421,7 +420,6 @@ classdef (Abstract) Entity < handle
                 out = [];
             end
         end
-
     end
 
     % Methods meant to be overwritten by subclasses, if needed
@@ -448,13 +446,44 @@ classdef (Abstract) Entity < handle
             %   experiment hierarchy.
             %   By default, sync ensures the homeDirectory is purged from
             %   file names containing the homeDirectory to facilitate 
-            %   relative file paths later on
+            %   relative file paths later on. Any properties containing an
+            %   aod.core.Entity subclass that are not Parent or a container
+            %   are checked against the full experiment hierarchy to 
+            %   ensure a matching UUID is present (will be needed when 
+            %   writing to HDF5 as a link)
             % -------------------------------------------------------------
+            h = obj.ancestor('aod.core.Experiment');
+            if isempty(h)
+                return
+            end
+
             if ~isempty(obj.files)
-                h = obj.ancestor('aod.core.Experiment');
                 k = obj.files.keys;
                 for i = 1:numel(k)
                     obj.files(k{i}) = erase(obj.files(k{i}), h.homeDirectory);
+                end
+            end
+
+            mc = metaclass(obj);
+            propList = string({mc.PropertyList.Name});
+            propList = setdiff(propList, aod.h5.getSpecialProps());
+            if ~isempty(obj.entityType.childContainers())
+                propList = setdiff(propList, obj.entityType.childContainers());
+            end
+
+            for i = 1:numel(propList)
+                if isSubclass(obj.(propList(i)), 'aod.core.Entity')
+                    if isempty(obj.(propList(i)))
+                        continue
+                    end
+                    propValue = obj.(propList(i));
+                    propType = aod.core.EntityTypes.get(propValue);
+                    matches = findByUUID(propType.collectAll(h), propValue.UUID);
+                    if isempty(matches)
+                        warning("Entity:SyncWarning",...
+                            "prop %s (%s) does not match any existing entities in experiment",...
+                            propList(i), propType);
+                    end
                 end
             end
         end
@@ -472,8 +501,7 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   isUnique = checkGroupNames(obj)
             % -------------------------------------------------------------
-            entityType = aod.core.EntityTypes.get(obj);
-            containerName = entityType.containerName();
+            containerName = obj.entityType.parentContainer();
             isUnique = true;
 
             if isempty(obj.Parent.(containerName))
@@ -540,39 +568,24 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = isValidParent(parent)
             % -------------------------------------------------------------
-            tf = false;
-            if isempty(obj.allowableParentTypes)
+            validParents = obj.entityType.validParentTypes;
+
+            if isempty(validParents)
                 tf = true;
                 return;
-            elseif strcmp(obj.allowableParentTypes, {'none'})
+            elseif strcmp(validParents, {'none'})
                 tf = false;
                 return
             end
 
-            for i = 1:numel(obj.allowableParentTypes)
-                if ~tf
-                    if isa(parent, obj.allowableParentTypes{i}) ...
-                            || ismember(obj.allowableParentTypes{i}, superclasses(class(parent)))
-                        tf = true;
-                    else
-                        tf = false;
-                    end
+            for i = 1:numel(validParents)
+                if isSubclass(parent, validParents{i})
+                    tf = true;
+                    break
+                else
+                    tf = false;
                 end
             end
-        end
-    end
-
-    methods (Static)
-        function tf = isEntity(x)
-            % ISENTITY
-            %
-            % Description:
-            %   Determines whether input is a subclass of Entity
-            %
-            % Syntax:
-            %   tf = aod.core.Entity.isEntity(x)
-            % -------------------------------------------------------------
-            tf = isSubclass(x, 'aod.core.Entity');
         end
     end
 end 

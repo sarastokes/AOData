@@ -23,11 +23,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Channels            = aod.core.Channel.empty();
     end
-
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Experiment'};
-    end
-
+    
     methods
         function obj = System(name)
             obj = obj@aod.core.Entity(name);

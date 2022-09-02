@@ -18,10 +18,6 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
         protocolClass
         protocolName
     end
-
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Epoch'};
-    end
     
     methods
         function obj = Stimulus(name, protocol)
@@ -117,24 +113,6 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
     methods (Access = protected)
         function value = getLabel(obj)
             value = obj.protocolName;
-        end
-        
-        function sync(obj)
-            if ~isempty(obj.Calibration)
-                success = false;
-                h = ancestor(obj, 'aod.core.Experiment');
-                cal = h.getCalibration(class(obj.Calibration));
-                if ~isempty(cal)
-                    if cal.calibrationDate == obj.Calibration.calibrationDate
-                        obj.setCalibration(cal);
-                        success = true;
-                    end
-                end
-                if ~success
-                    warning("Stimulus:CalibrationSyncError",... 
-                        "Protocol calibration could not be matched to an experiment calibration");
-                end
-            end
         end
     end
 end

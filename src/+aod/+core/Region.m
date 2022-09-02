@@ -28,10 +28,6 @@ classdef Region < aod.core.Entity & matlab.mixin.Heterogeneous
         Reader
     end
 
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Experiment'};
-    end
-
     methods
         function obj = Region(name, varargin)
             obj = obj@aod.core.Entity(name);

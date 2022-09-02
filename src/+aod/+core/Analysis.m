@@ -12,18 +12,9 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Properties:
 %   analysisDate                date of analysis ('yyyyMMdd')
-%
-% Inherited public methods:
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, mustReturnParam)
-%   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
     properties
         analysisDate                datetime
-    end
-
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Experiment'}
     end
 
     methods

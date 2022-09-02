@@ -20,10 +20,6 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         Sources                         = aod.core.Source.empty()
     end
 
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Experiment', 'aod.core.Source'}
-    end
-
     methods
         function obj = Source(name)
             obj = obj@aod.core.Entity(name);

@@ -405,6 +405,24 @@ classdef HDF5 < handle
             HDF5.writeatts(fileName, fullPath, 'Class', dataClass,...
                 'ColumnClass', columnClass);
         end
+
+        function deleteAttribute(fileName, pathName, name)
+            % DELETEATTRIBUTE
+            %
+            % Description:
+            %   Delete an attribute
+            %
+            % Syntax:
+            %   deleteAttribute(fileName, pathName, name)
+            % -------------------------------------------------------------
+            fileID = aod.h5.HDF5.openFile(fileName);
+            fileIDx = onCleanup(@()H5F.close(fileID));
+
+            groupID = H5G.open(fileID, pathName);
+            groupIDx = onCleanup(@()H5G.close(groupID));
+
+            H5A.delete(groupID, name);
+        end
         
         function deleteObject(fileName, pathName, name)
             % DELETEOBJECT

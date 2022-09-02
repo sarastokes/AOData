@@ -25,10 +25,6 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = private)
         Devices                     aod.core.Device
     end
-    
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.System'};
-    end
 
     methods
         function obj = Channel(name, varargin)

@@ -17,11 +17,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = private)
         registrationDate(1,1)               datetime
     end
-
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Epoch'};
-    end
-
+    
     methods (Abstract)
         varargout = apply(obj, varargin)
     end

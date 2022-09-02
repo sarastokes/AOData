@@ -22,10 +22,6 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   value = getParam(obj, paramName, mustReturnParam)
 %   tf = hasParam(obj, paramName)
 % -------------------------------------------------------------------------
-
-    properties (Hidden, Access = protected)
-        allowableParentTypes = {'aod.core.Channel'};
-    end
     
     methods
         function obj = Device(name, varargin)

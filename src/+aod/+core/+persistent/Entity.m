@@ -26,9 +26,7 @@ classdef Entity < handle
     events 
         ChangedDescription
         ChangedNote
-        AddedParameter
-        RemovedParameter
-        ChangedParameter
+        ChangedAttribute
     end
 
     methods
@@ -44,8 +42,15 @@ classdef Entity < handle
             % Create entity from file
             obj.populate();
         end
+
+        function setParamTest(obj, paramName, paramValue)
+            evtData = aod.h5.events.AttributeEvent(obj.hdfPath, paramName, paramValue);
+            notify(obj, 'ChangedAttribute', evtData);
+            disp('Notification Sent!')
+        end
     end
 
+    % Initialization
     methods (Access = protected)
         function [datasetNames, linkNames] = populate(obj)
             obj.info = h5info(obj.hdfName, obj.hdfPath);
@@ -56,7 +61,9 @@ classdef Entity < handle
             else
                 datasetNames = [];
             end
-            obj.files = obj.loadDataset(datasetNames, 'files', 'aod.util.Parameters');
+            if ismember(datasetNames, "files")
+                obj.files = obj.loadDataset(datasetNames, 'files', 'aod.util.Parameters');
+            end
 
             % LINKS
             if ~isempty(obj.info.Links)
