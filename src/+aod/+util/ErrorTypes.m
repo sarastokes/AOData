@@ -1,4 +1,4 @@
-classdef MessageTypes 
+classdef ErrorTypes 
 
     enumeration
         ERROR
@@ -8,20 +8,22 @@ classdef MessageTypes
 
     methods (Static)
         function obj = init(value)
-            if isa(value, 'aod.util.MessageTypes')
+            if isa(value, 'aod.util.ErrorTypes')
                 obj = value;
                 return 
             end
 
+            import aod.util.ErrorTypes
+
             switch lower(value)
                 case 'error'
-                    obj = aod.util.MessageTypes.ERROR;
+                    obj = aod.util.ErrorTypes.ERROR;
                 case 'warning'
-                    obj = aod.util.MessageTypes.WARNING;
+                    obj = aod.util.ErrorTypes.WARNING;
                 case 'none'
-                    obj = aod.util.MessageTypes.NONE;
+                    obj = aod.util.ErrorTypes.NONE;
                 otherwise
-                    error("MessageTypes:UnrecognizedInput",...
+                    error("ErrorTypes:UnrecognizedInput",...
                         'Message levels are error, warning and none');
             end
         end

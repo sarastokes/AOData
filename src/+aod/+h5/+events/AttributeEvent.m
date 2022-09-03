@@ -1,6 +1,9 @@
 classdef (ConstructOnLoad) AttributeEvent < event.EventData
 % PARAMETEREVENT
 %
+% Description:
+%   An event triggered when an HDF5 dataset is added/changed/removed
+%
 % Parent:
 %   event.EventData
 %
@@ -15,14 +18,12 @@ classdef (ConstructOnLoad) AttributeEvent < event.EventData
     end
 
     methods
-        function obj = AttributeEvent(hdfPath, name, value)
+        function obj = AttributeEvent(name, value)
             arguments
-                hdfPath             char
                 name                char 
                 value               = []
             end
 
-            obj.hdfPath = hdfPath;
             obj.Name = name;
             obj.Value = value;
         end

@@ -174,7 +174,7 @@ classdef HDF5 < handle
                 h5create(fileName, fullPath, size(data), 'Datatype', class(data));
             catch ME
                 if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-                    warning('Dataset %s already existed', fullPath);
+                    % warning('Dataset %s already existed', fullPath);
                 else
                     rethrow(ME);
                 end

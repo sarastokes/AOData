@@ -65,11 +65,11 @@ classdef Rois < aod.core.Region
         end
 
         function value = get.count(obj)
-            value = obj.getParam('Count', aod.util.MessageTypes.NONE);
+            value = obj.getParam('Count', aod.util.ErrorTypes.NONE);
         end
 
         function value = get.roiIDs(obj)
-            value = obj.getParam('RoiIDs', aod.util.MessageTypes.NONE);
+            value = obj.getParam('RoiIDs', aod.util.ErrorTypes.NONE);
         end
     end
 

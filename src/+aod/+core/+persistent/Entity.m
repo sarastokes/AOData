@@ -86,6 +86,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             tf = ismember(paramName, string(obj.parameters.keys));
         end
 
+        function getParam(obj, paramName, errorLevel)
+
+            
+        end
+
         function setParam(obj, paramName, paramValue)
             % SETPARAM
             %

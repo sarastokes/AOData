@@ -33,7 +33,7 @@ classdef (Abstract) Entity < handle
 %   
 %   tf = hasFile(obj, fileName)
 %   setFile(obj, fileName, filePath)
-%   value = getFile(obj, fileName, msgType)
+%   value = getFile(obj, fileName, errorType)
 %   value = getExptFile(obj, fileName, varargin)
 %   removeFile(obj, fileName)
 %
@@ -209,7 +209,7 @@ classdef (Abstract) Entity < handle
             tf = obj.parameters.isKey(paramName);
         end
 
-        function paramValue = getParam(obj, paramName, msgType)
+        function paramValue = getParam(obj, paramName, errorTypes)
             % GETPARAM
             %
             % Description:
@@ -221,25 +221,25 @@ classdef (Abstract) Entity < handle
             % Inputs:
             %   paramName       char
             % Optional inputs:
-            %   msgType         aod.util.MessageTypes (default = ERROR)            
+            %   errorType       aod.util.ErrorTypes (default = ERROR)            
             % -------------------------------------------------------------
-            import aod.util.MessageTypes
+            import aod.util.ErrorTypes
             if nargin < 3
-                msgType = MessageTypes.ERROR;
+                errorType = ErrorTypes.ERROR;
             else
-                msgType = MessageTypes.init(msgType);
+                errorType = ErrorTypes.init(errorType);
             end
 
             if obj.hasParam(paramName)
                 paramValue = obj.parameters(paramName);
             else
-                switch msgType 
-                    case MessageTypes.ERROR 
+                switch errorType 
+                    case ErrorTypes.ERROR 
                         error('GetParam: Did not find %s in parameters', paramName);
-                    case MessageTypes.WARNING 
+                    case ErrorTypes.WARNING 
                         warning('GetParam: Did not find %s in parameters', paramName);
                         paramValue = [];
-                    case MessageTypes.NONE
+                    case ErrorTypes.NONE
                         paramValue = [];
                 end
             end
@@ -340,7 +340,7 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function fileValue = getFile(obj, fileName, msgType)
+        function fileValue = getFile(obj, fileName, errorType)
             % GETFILE
             %
             % Description:
@@ -352,25 +352,25 @@ classdef (Abstract) Entity < handle
             % Inputs:
             %   fileName       char
             % Optional inputs:
-            %   msgType         aod.util.MessageTypes (default = ERROR)            
+            %   errorType      aod.util.ErrorTypes (default = ERROR)            
             % -------------------------------------------------------------
-            import aod.util.MessageTypes
+            import aod.util.ErrorTypes
             if nargin < 3
-                msgType = MessageTypes.ERROR;
+                errorType = ErrorTypes.ERROR;
             else
-                msgType = MessageTypes.init(msgType);
+                errorType = ErrorTypes.init(errorType);
             end
 
             if obj.hasFile(fileName)
                 fileValue = obj.files(fileName);
             else
-                switch msgType 
-                    case MessageTypes.ERROR 
+                switch errorType 
+                    case ErrorTypes.ERROR 
                         error('GetFile: Did not find %s in files', fileName);
-                    case MessageTypes.WARNING 
+                    case ErrorTypes.WARNING 
                         warning('GetFile: Did not find %s in files', fileName);
                         fileValue = [];
-                    case MessageTypes.NONE
+                    case ErrorTypes.NONE
                         fileValue = [];
                 end
             end

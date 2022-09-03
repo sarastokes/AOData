@@ -3,7 +3,7 @@ classdef FileManager < handle
     properties (SetAccess = protected)
         baseFolderPath
         baseFolderName
-        messageLevel = aod.util.MessageTypes.WARNING 
+        messageLevel = aod.util.ErrorTypes.WARNING 
     end
 
     methods (Abstract)
@@ -21,8 +21,8 @@ classdef FileManager < handle
             end
         end
 
-        function setMessageType(obj, msgType)
-            obj.messageLevel = aod.util.MessageTypes.init(msgType);
+        function setErrorType(obj, errorType)
+            obj.messageLevel = aod.util.ErrorTypes.init(errorType);
         end
     end
 
