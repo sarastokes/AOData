@@ -62,9 +62,9 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
                     "There are no member paths to return");
             end
 
-            if numel(indexOp.Indices) > 1
+            if numel(indexOp.Indices) > 2
                 error("EntityContainer:IncorrectDimensions",...
-                    "The number of dimensions should be 1");
+                    "The number of dimensions should be 1-2");
             end
 
             pathIdx = indexOp.Indices{1};
@@ -75,10 +75,10 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
         end
 
         function n = parenListLength(obj, indexOp, indexContext)
-            assignin('base', 'indexingContext', indexingContext);
+            assignin('base', 'indexingContext', indexContext);
             assignin('base', 'indexOp', indexOp);
             warning('Responses/parenListLength triggered!')
-            n = listLength(size(obj.memberPaths), indexOp, indexContext);
+            n = numel(obj.memberPaths);%listLength(size(obj), indexOp, indexContext);
         end
 
         function obj = parenAssign(~, ~, ~)

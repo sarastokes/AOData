@@ -22,22 +22,22 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
 
     methods (Access = protected)
         function populate(obj)
-            [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
+            populate@aod.core.persistent.Entity(obj);
             
             % DATASETS
-            obj.ID = obj.loadDataset(dsetNames, "ID");
-            obj.startTime = obj.loadDataset(dsetNames, "startTime");
-            obj.Timing = obj.loadDataset(dsetNames, "Timing");
+            obj.ID = obj.loadDataset("ID");
+            obj.startTime = obj.loadDataset("startTime");
+            obj.Timing = obj.loadDataset("Timing");
             obj.setDatasetsToDynProps();
 
             % LINKS
-            obj.Source = obj.loadLink(linkNames, "Source");
-            obj.System = obj.loadLink(linkNames, "System");
+            obj.Source = obj.loadLink("Source");
+            obj.System = obj.loadLink("System");
             obj.setLinksToDynProps();
 
             % CONTAINERS
             obj.Datasets = obj.loadContainer('Datasets');
-            obj.Registration = obj.loadContainer('Registration');
+            obj.Registrations = obj.loadContainer('Registrations');
             obj.Responses = obj.loadContainer('Responses');
             obj.Stimuli = obj.loadContainer('Stimuli');
         end

@@ -32,14 +32,14 @@ classdef EntityFactory < handle
 
         function clearCache(obj)
             obj.cache = aod.util.Parameters();
+            obj.persistor.unbind();
         end
 
         function e = create(obj, hdfPath)
             T = table(obj.entityManager);
             uuid = T{T.Path == hdfPath, 'UUID'};
-            % uuid = h5readatt(obj.hdfName, hdfPath, 'UUID');
-            if obj.cache.isKey(dehyphenate(uuid))
-                e = obj.cache(dehyphenate(uuid));
+            if obj.cache.isKey(uuid)
+                e = obj.cache(uuid);
                 return
             end
 
@@ -59,18 +59,24 @@ classdef EntityFactory < handle
                     e = aod.core.persistent.Device(obj.hdfName, hdfPath, obj);
                 case "CALIBRATION"
                     e = aod.core.persistent.Calibration(obj.hdfName, hdfPath, obj);
+                case "REGION"
+                    e = aod.core.persistent.Region(obj.hdfName, hdfPath, obj);
                 case "EPOCH"
                     e = aod.core.persistent.Epoch(obj.hdfName, hdfPath, obj);
                 case "RESPONSE"
                     e = aod.core.persistent.Response(obj.hdfName, hdfPath, obj);
                 case "STIMULUS"
                     e = aod.core.persistent.Stimulus(obj.hdfName, hdfPath, obj);
+                case 'REGISTRATION'
+                    e = aod.core.persistent.Registration(obj.hdfName, hdfPath, obj);
+                case 'DATASET'
+                    e = aod.core.persistent.Dataset(obj.hdfName, hdfPath, obj);
                 otherwise
-                    error("EntityFactorycreate:UnrecognizedEntity",...
+                    error("EntityFactory:UnrecognizedEntity",...
                         "Did not recognize entity name: %s", entityType);
             end
-            obj.persistor.bind(e);  %% TODO
-            obj.cache(dehyphenate(uuid)) = e;
+            obj.persistor.bind(e);
+            obj.cache(uuid) = e;
         end
     end
 

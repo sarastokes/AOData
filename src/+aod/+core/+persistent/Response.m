@@ -13,17 +13,20 @@ classdef Response < aod.core.persistent.Entity & dynamicprops
 
     methods (Access = protected)
         function populate(obj)
-            [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
+            populate@aod.core.persistent.Entity(obj);
 
-            obj.Data = obj.loadDataset(dsetNames, "Data");
-            if ~isempty(obj.info.Groups) && contains(obj.info.Groups(1).Name, 'Timing')
-                obj.Timing = obj.factory.create(obj.info.Groups.Name);
+            % Special handling of Timing w/ implicit inheritance from Epoch
+            info = h5info(obj.hdfName, obj.hdfPath);
+            if ~isempty(info.Groups) && contains(info.Groups(1).Name, 'Timing')
+                obj.Timing = obj.factory.create(info.Groups.Name);
             else
                 obj.Timing = obj.Parent.Timing;
             end
-            obj.setDatasetsToDynProps(dsetNames);
             
-            obj.setLinksToDynProps(linkNames);
+            obj.Data = obj.loadDataset("Data");
+            obj.setDatasetsToDynProps();
+            
+            obj.setLinksToDynProps();
         end
     end
 end 

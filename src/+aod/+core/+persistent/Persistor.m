@@ -19,6 +19,12 @@ classdef Persistor < handle
             obj.datasetListeners = cat(1, obj.datasetListeners,...
                 addlistener(entity, 'ChangedDataset', @obj.onDatasetChanged));
         end
+
+        function unbind(obj)
+            % TODO not sure this is sufficient
+            obj.attributeListeners = [];
+            obj.datasetListeners = [];
+        end
     end
 
     methods (Access = protected)

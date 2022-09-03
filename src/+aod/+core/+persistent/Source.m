@@ -12,10 +12,10 @@ classdef Source < aod.core.persistent.Entity & dynamicprops
 
     methods (Access = protected)
         function populate(obj)
-            [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
+            populate@aod.core.persistent.Entity(obj);
             
-            obj.setDatasetsToDynProps(dsetNames);
-            obj.setLinksToDynProps(linkNames);           
+            obj.setDatasetsToDynProps();
+            obj.setLinksToDynProps();           
             obj.Sources = obj.loadContainer('Sources');
         end
     end

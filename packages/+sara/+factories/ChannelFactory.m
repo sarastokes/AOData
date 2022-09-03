@@ -103,7 +103,7 @@ classdef ChannelFactory < aod.util.Factory
     end
     
     methods (Static)
-        function out = create(channelName, system, varargin)
+        function [channel, system] = create(channelName, system, varargin)
             obj = sara.factories.ChannelFactory();
             channel = obj.get(channelName, varargin{:});
             if nargin > 1
@@ -111,7 +111,7 @@ classdef ChannelFactory < aod.util.Factory
                 system.addChannel(channel);
                 out = system;
             else
-                out = channel;
+                system = [];
             end
         end
 

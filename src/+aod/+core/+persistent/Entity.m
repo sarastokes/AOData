@@ -21,14 +21,20 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     end
 
     properties (Hidden, SetAccess = private)
-        hdfName 
-        hdfPath 
+        % Entity properties
         Name                    char
         label                   char 
         entityType
         entityClassName         
 
-        info
+        % HDF5 properties
+        hdfName 
+        hdfPath 
+        linkNames
+        dsetNames
+        attNames
+
+        % Persistence properties
         factory
     end
 
@@ -55,20 +61,58 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % Dataset methods
     methods
         function addDataset(obj, dsetName, dsetValue)
+            % ADDDATASET
+            %
+            % Description:
+            %   Add a new dataset to the entity
+            %
+            % Syntax:
+            %   addDataset(obj, dsetName, dsetValue)
+            % -------------------------------------------------------------
 
-            % Format event data by whether dataset exists or not
-            if ismember(dsetName, string({obj.info.Datasets.Name}))
+            newDset = ~obj.ismember(dsetName, string({obj.dsetNames}));
+            if newDset
+                evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue);
+            else
                 evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue,...
                     obj.(dsetName));
-            else
-                evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue);
+            end
+            notify(obj, 'ChangedDataset', evtData);
+
+            if newDset
+                obj.addprop(dsetName)
+            end
+            obj.(dsetName) = dsetValue;
+
+            obj.loadInfo();
+        end
+
+        function removeDataset(obj, dsetName)
+            % REMOVEDATASET
+            %
+            % Description:
+            %   Remove a dataset from the entity
+            %
+            % Syntax:
+            %   removeDataset(obj, dsetName)
+            % -------------------------------------------------------------
+
+            if ~obj.ismember(dsetName, string({obj.dsetNames}))
+                error("removeDataset:DatasetDoesNotExist",...
+                    "Dataset %s not found", dsetName);
             end
 
+            evtData = aod.h5.events.DatasetEvent(dsetName);
             notify(obj, 'ChangedDataset', evtData);
+
+            p = findprop(obj, dsetName);
+            delete(p);
+
+            obj.loadInfo();
         end
     end
 
-    % Parameter methods  % TODO: Get param
+    % Parameter methods
     methods
         function tf = hasParam(obj, paramName)
             % HASPARAM
@@ -83,12 +127,42 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 obj
                 paramName           char
             end
-            tf = ismember(paramName, string(obj.parameters.keys));
+
+            tf = obj.ismember(paramName, string(obj.parameters.keys));
         end
 
-        function getParam(obj, paramName, errorLevel)
+        function out = getParam(obj, paramName, errorLevel)
+            % GETPARAM
+            %
+            % Description:
+            %   Check whether parameter is present
+            %
+            % Syntax:
+            %   out = getParam(obj, paramName)
+            %   out = getParam(obj, paramName, errorType)
+            % -------------------------------------------------------------
+            import aod.util.ErrorTypes
+            if nargin < 3
+                errorType = ErrorTypes.WARNING;
+            end
 
-            
+            if ~obj.hasParam(paramName)
+                switch errorType 
+                    case ErrorTypes.ERROR
+                        error("getParam:ParamNotFound",...
+                            "Parameter %s not present", paramName);
+                    case ErrorTypes.WARNING
+                        warning("getParam:ParamNotFound",...
+                            "Parameter %s not present", paramName);
+                        out = [];
+                        return
+                    case ErrorTypes.NONE
+                        out = [];
+                        return
+                end
+            else
+                out = obj.parameters(paramName);
+            end
         end
 
         function setParam(obj, paramName, paramValue)
@@ -106,7 +180,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 paramValue
             end
 
-            if ismember(paramName, aod.h5.getSystemAttributes)
+            if ismember(paramName, aod.h5.getSystemAttributes())
                 warning("setParam:SystemAttribute",...
                     "Attribute not set, member of uneditable system attributes");
                 return
@@ -132,7 +206,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 paramName           char
             end
 
-            if ismember(paramName, aod.h5.getSystemAttributes)
+            if ismember(paramName, aod.h5.getSystemAttributes())
                 warning("setParam:SystemAttribute",...
                     "Parameter %s not set, member of system attributes", paramName);
                 return
@@ -148,61 +222,50 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             notify(obj, 'ChangedAttribute', evtData);
 
             remove(obj.parameters, paramName);
+
+            obj.loadInfo();
         end
     end
 
     % Initialization
     methods (Access = protected)
-        function [datasetNames, linkNames] = populate(obj)
+        function populate(obj)
             % POPULATE
+            %
+            % Syntax:
+            %   populate(obj)
             %
             % Description:
             %   Load datasets and attributes from the HDF5 file, assigning
             %   defined ones to the appropriate places. 
             % -------------------------------------------------------------
-            obj.info = h5info(obj.hdfName, obj.hdfPath);
+            obj.loadInfo();
 
             % DATASETS
-            if ~isempty(obj.info.Datasets)
-                datasetNames = string({obj.info.Datasets.Name});
-            else
-                datasetNames = [];
-            end
-            if ismember(datasetNames, "files")
-                obj.files = obj.loadDataset(datasetNames, 'files', 'aod.util.Parameters');
+            if obj.ismember('files', obj.dsetNames)
+                obj.files = obj.loadDataset('files', 'aod.util.Parameters');
             end
 
             % LINKS
-            if ~isempty(obj.info.Links)
-                linkNames = string({obj.info.Links.Name});
-            else
-                linkNames = [];
-            end
-            obj.Parent = obj.loadLink(linkNames, 'Parent');
+            obj.Parent = obj.loadLink('Parent');
 
             % ATTRIBUTES
-            if ~isempty(obj.info.Attributes)
-                attributeNames = string({obj.info.Attributes.Name});
-            else
-                attributeNames = [];
-            end
-
             % Special attributes (universal ones mapping to properties)
             specialAttributes = ["UUID", "description", "Class", "EntityType"];
-            obj.label = obj.loadAttribute(attributeNames, 'label');
-            obj.UUID = obj.loadAttribute(attributeNames, 'UUID');
-            obj.entityType = obj.loadAttribute(attributeNames, 'EntityType');
-            obj.entityClassName = obj.loadAttribute(attributeNames, 'Class');
+            obj.label = obj.loadAttribute('label');
+            obj.UUID = obj.loadAttribute('UUID');
+            obj.entityType = obj.loadAttribute('EntityType');
+            obj.entityClassName = obj.loadAttribute('Class');
 
             % Optional special attributes which may not be present
-            obj.description = obj.loadAttribute(attributeNames, 'description');
-            obj.Name = obj.loadAttribute(attributeNames, 'Name');
+            obj.description = obj.loadAttribute('description');
+            obj.Name = obj.loadAttribute('Name');
 
             % Parse the remaining attributes
-            for i = 1:numel(attributeNames)
-                if ~ismember(attributeNames(i), specialAttributes)
-                    obj.parameters(char(attributeNames(i))) = ...
-                        h5readatt(obj.hdfName, obj.hdfPath, attributeNames(i));
+            for i = 1:numel(obj.attNames)
+                if ~ismember(obj.attNames(i), specialAttributes)
+                    obj.parameters(char(obj.attNames(i))) = ...
+                        h5readatt(obj.hdfName, obj.hdfPath, obj.attNames(i));
                 end
             end
         end
@@ -210,50 +273,84 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Loading methods
     methods (Access = protected)
-        function a = loadAttribute(obj, attNames, name)
-            % LOADLINK
+        function loadInfo(obj)
+            % LOADINFO
+            %
+            % Description:
+            %   Load h5info struct and update props accordingly
+            %
+            % Syntax:
+            %   loadInfo(obj)
+            %
+            % Notes:
+            %   Call whenever a change to the underlying HDF5 file is made
+            % -------------------------------------------------------------
+            info = h5info(obj.hdfName, obj.hdfPath);
+            
+            if ~isempty(info.Datasets)
+                obj.dsetNames = string({info.Datasets.Name});
+            else
+                obj.dsetNames = [];
+            end
+
+            if ~isempty(info.Attributes)
+                obj.attNames = string({info.Attributes.Name});
+            else
+                obj.attNames = [];
+            end
+            
+            if ~isempty(info.Links)
+                obj.linkNames = string({info.Links.Name});
+            else
+                obj.linkNames = [];
+            end
+        end
+
+        function a = loadAttribute(obj, name)
+            % LOADATTRIBUTE
             %
             % Description:
             %   Check if an attribute is present and if so, read it
             %
             % Syntax:
-            %   d = loadLink(obj, linkNames, name)
+            %   d = loadAttribute(obj, name)
             % -------------------------------------------------------------
-            if isempty(attNames) || ~ismember(name, attNames)
+            if ~obj.ismember(name, obj.attNames)
                 a = [];
                 return
             end
             a = h5readatt(obj.hdfName, obj.hdfPath, name);
         end
 
-        function e = loadLink(obj, linkNames, name)
+        function e = loadLink(obj, name)
             % LOADLINK
             %
             % Description:
             %   Check if a link is present and if so, read it
             %
             % Syntax:
-            %   d = loadLink(obj, linkNames, name)
+            %   d = loadLink(obj, name)
             % -------------------------------------------------------------
-            if isempty(linkNames) || ~ismember(name, linkNames)
+            if ~obj.ismember(name, obj.linkNames)
                 e = [];
                 return
             end
-            idx = find(linkNames == name);
-            linkPath = obj.info.Links(idx).Value{1};
+            idx = find(obj.linkNames == name);
+            info = h5info(obj.hdfName, obj.hdfPath);
+            linkPath = info.Links(idx).Value{1};
             e = obj.factory.create(linkPath);
         end
 
-        function d = loadDataset(obj, dsetNames, name, varargin)
+        function d = loadDataset(obj, name, varargin)
             % LOADDATASET
             %
             % Description:
             %   Check if a dataset is present and if so, read it
             %
             % Syntax:
-            %   d = loadDataset(obj, dsetNames, name, varargin)
+            %   d = loadDataset(obj, name, varargin)
             % -------------------------------------------------------------
-            if isempty(dsetNames) && ~ismember(name, dsetNames)
+            if ~obj.ismember(name, obj.dsetNames)
                 d = [];
                 return
             end
@@ -276,7 +373,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Dynamic property assignment methods
     methods (Access = protected)
-        function setDatasetsToDynProps(obj, datasetNames)
+        function setDatasetsToDynProps(obj)
             % SETDATASETSTODYNPROPS
             %
             % Description:
@@ -285,30 +382,21 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %
             % Syntax:
             %   setDatasetsToDynProps(obj)
-            %   setDatasetsToDynProps(obj, dsetNames)
             % -------------------------------------------------------------
-            if nargin < 2
-                if isempty(obj.info.Datasets)
-                    return
-                else
-                    datasetNames = string({obj.info.Datasets.Name});
-                end
-            end
-
-            if isempty(datasetNames)
+            if isempty(obj.dsetNames)
                 return
             end
 
-            for i = 1:numel(datasetNames)
-                if ~isprop(obj, datasetNames(i))
-                    obj.addprop(datasetNames(i));
-                    obj.(datasetNames(i)) = aod.h5.readDatasetByType(...
-                        obj.hdfName, obj.hdfPath, char(datasetNames(i)));
+            for i = 1:numel(obj.dsetNames)
+                if ~isprop(obj, obj.dsetNames(i))
+                    obj.addprop(obj.dsetNames(i));
+                    obj.(obj.dsetNames(i)) = aod.h5.readDatasetByType(...
+                        obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                 end
             end
         end
 
-        function setLinksToDynProps(obj, linkNames)
+        function setLinksToDynProps(obj)
             % SETLINKSTODYNPROPS
             %
             % Description:
@@ -317,24 +405,35 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %
             % Syntax:
             %   setLinksToDynProps(obj)
-            %   setLinksToDynProps(obj, dsetNames)
             % -------------------------------------------------------------
-            if nargin < 2
-                if isempty(obj.info.Links)
-                    return
-                else
-                    linkNames = string({obj.info.Links.Name});
-                end
-            end
 
-            if isempty(linkNames)
+            if isempty(obj.linkNames)
                 return
             end
 
-            for i = 1:numel(linkNames)
-                if ~isprop(obj, linkNames(i))
-                    obj.(linkNames(i)) = obj.loadLink(linkNames, linkNames(i));
+            for i = 1:numel(obj.linkNames)
+                if ~isprop(obj, obj.linkNames(i))
+                    obj.(obj.linkNames(i)) = obj.loadLink(obj.linkNames(i));
                 end
+            end
+        end
+    end
+
+    methods (Static)
+        function tf = ismember(a, b)
+            % ISMEMBER
+            %
+            % Description:
+            %   Wrapper for MATLAB's ismember that returns false if the
+            %   list to search is empty, instead of an error
+            % 
+            % Syntax:
+            %   tf = ismember(obj)
+            % -------------------------------------------------------------
+            if isempty(b)
+                tf = false;
+            else
+                tf = ismember(a, b);
             end
         end
     end

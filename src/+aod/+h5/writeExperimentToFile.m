@@ -22,11 +22,13 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
     if ~isempty(obj.Systems)
         for i = 1:numel(obj.Systems)
             aod.h5.writeEntity(hdfName, obj.Systems(i));
-            if isempty(obj.Systems(i).Channels)
+            if ~isempty(obj.Systems(i).Channels)
                 for j = 1:numel(obj.Systems(i).Channels)
                     aod.h5.writeEntity(hdfName, obj.Systems(i).Channels(j));
-                    for k = 1:numel(obj.Systems(i).Channels(j).Devices)
-                        aod.h5.writeEntity(hdfName, obj.Systems(i).Channels(j).Devices(k));
+                    if ~isempty(obj.Systems(i).Channels(j))
+                        for k = 1:numel(obj.Systems(i).Channels(j).Devices)
+                            aod.h5.writeEntity(hdfName, obj.Systems(i).Channels(j).Devices(k));
+                        end
                     end
                 end
             end

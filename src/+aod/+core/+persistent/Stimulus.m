@@ -12,12 +12,12 @@ classdef Stimulus < aod.core.persistent.Entity & dynamicprops
     
     methods (Access = protected)
         function populate(obj)
-            [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
+            populate@aod.core.persistent.Entity(obj);
 
-            obj.setDatasetsToDynProps(dsetNames);
+            obj.setDatasetsToDynProps();
 
-            obj.Calibration = obj.loadLink(linkNames, "Calibration");
-            obj.setLinksToDynProps(linkNames);
+            obj.Calibration = obj.loadLink("Calibration");
+            obj.setLinksToDynProps();
         end
     end
 end 

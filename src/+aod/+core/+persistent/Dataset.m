@@ -1,11 +1,7 @@
-classdef Calibration < aod.core.persistent.Entity & dynamicprops
-
-    properties (SetAccess = private)
-        calibrationDate(1,1)                    datetime 
-    end
+classdef Dataset < aod.core.persistent.Dataset & dynamicprops
 
     methods
-        function obj = Calibration(hdfName, hdfPath, factory)
+        function obj = Device(hdfName, hdfPath, factory)
             obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
         end
     end
@@ -14,9 +10,7 @@ classdef Calibration < aod.core.persistent.Entity & dynamicprops
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
 
-            obj.calibrationDate = obj.loadDataset('calibrationDate');
             obj.setDatasetsToDynProps();
-            
             obj.setLinksToDynProps();
         end
     end

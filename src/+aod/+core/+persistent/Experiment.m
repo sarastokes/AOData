@@ -29,14 +29,14 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
 
     methods (Access = protected)
         function populate(obj)
-            [dsetNames, linkNames] = populate@aod.core.persistent.Entity(obj);
+            populate@aod.core.persistent.Entity(obj);
  
-            obj.experimentDate = obj.loadDataset(dsetNames, 'experimentDate');
-            obj.homeDirectory = obj.loadDataset(dsetNames, 'homeDirectory');
-            obj.epochIDs = obj.loadDataset(dsetNames, 'epochIDs');
-            obj.setDatasetsToDynProps(dsetNames);
+            obj.experimentDate = obj.loadDataset('experimentDate');
+            obj.homeDirectory = obj.loadDataset('homeDirectory');
+            obj.epochIDs = obj.loadDataset('epochIDs');
+            obj.setDatasetsToDynProps();
 
-            obj.setLinksToDynProps(linkNames);
+            obj.setLinksToDynProps();
 
             obj.Analyses = obj.loadContainer('Analyses');
             obj.Calibrations = obj.loadContainer('Calibrations');

@@ -39,20 +39,26 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             assert(isSubclass(channel, 'aod.core.Channel'),...
                 'Invalid type: must be a subclass of aod.core.Channel');
+
             channel.setParent(obj);
             obj.Channels = cat(1, obj.Channels, channel);
         end
 
         function removeChannel(obj, ID)
-            if ischar(ID)
-                ID = find(strcmp(obj.Channels.Name, ID));
-                if isempty(ID)
-                    error("removeChannel:NameDoesNotExist",...
-                        "No channel found named %s", ID);
-                end
-            elseif isnumeric(ID)
-                assert(ID <= numel(obj.Channels), 'Invalid Channel number');
+            % REMOVECHANNEL
+            %
+            % Description:
+            %   Remove the specfied channel
+            %
+            % Syntax:
+            %   removeChannel(obj, ID)
+            % -------------------------------------------------------------
+            if isempty(obj.Channels)
+                error("removeChannel:NoChannelsPresent",...
+                    "Cannot remove channel as no channels are present");
             end
+            assert(ID <= numel(obj.Channels),... 
+                'Invalid ID %u, must be between 1-%u', numel(obj.Channels));
             obj.Channels(ID) = [];
         end
         
