@@ -27,7 +27,6 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
         data = h5read(hdfName, fullPath);
     end
 
-
     switch className 
         case 'datetime'
             out = datetime(data, 'Format',... 

@@ -458,6 +458,7 @@ classdef (Abstract) Entity < handle
                 return
             end
 
+            % Remove homeDirectory from entity files, if exists
             if ~isempty(obj.files)
                 k = obj.files.keys;
                 for i = 1:numel(k)
@@ -465,6 +466,8 @@ classdef (Abstract) Entity < handle
                 end
             end
 
+            % Identify properties that will be written as links and check 
+            % whether the linked entity exists in the experiment
             mc = metaclass(obj);
             propList = string({mc.PropertyList.Name});
             propList = setdiff(propList, aod.h5.getSpecialProps());
@@ -482,7 +485,7 @@ classdef (Abstract) Entity < handle
                     matches = findByUUID(propType.collectAll(h), propValue.UUID);
                     if isempty(matches)
                         warning("Entity:SyncWarning",...
-                            "prop %s (%s) does not match any existing entities in experiment",...
+                            "prop %s (%s) does not match existing entities in experiment",...
                             propList(i), propType);
                     end
                 end

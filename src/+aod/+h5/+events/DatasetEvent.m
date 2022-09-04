@@ -26,8 +26,8 @@ classdef (ConstructOnLoad) DatasetEvent < event.EventData
             end
 
             obj.Name = name;
-            obj.NewValue = value;
-            obj.OldValue = value;
+            obj.NewValue = newValue;
+            obj.OldValue = oldValue;
         end
     end
 end

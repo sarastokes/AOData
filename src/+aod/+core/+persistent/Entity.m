@@ -39,9 +39,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     end
 
     events 
-        ChangedFile
-        ChangedDataset
-        ChangedAttribute
+        FileChanged
+        DatasetChanged
+        AttributeChanged
     end
 
     methods
@@ -107,7 +107,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue,...
                     obj.(dsetName));
             end
-            notify(obj, 'ChangedDataset', evtData);
+            notify(obj, 'DatasetChanged', evtData);
 
             if newDset
                 obj.addprop(dsetName)
@@ -133,7 +133,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             evtData = aod.h5.events.DatasetEvent(dsetName);
-            notify(obj, 'ChangedDataset', evtData);
+            notify(obj, 'DatasetChanged', evtData);
 
             p = findprop(obj, dsetName);
             delete(p);
@@ -158,7 +158,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 paramName           char
             end
 
-            tf = obj.ismember(paramName, string(obj.parameters.keys));
+            if isscalar(obj)
+                tf = isKey(obj.parameters, paramName);
+            else
+                tf = arrayfun(@(x) isKey(x.parameters, paramName), obj);
+            end
         end
 
         function out = getParam(obj, paramName, errorType)
@@ -176,22 +180,33 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 errorType = ErrorTypes.WARNING;
             end
 
-            if ~obj.hasParam(paramName)
-                switch errorType 
-                    case ErrorTypes.ERROR
-                        error("getParam:ParamNotFound",...
-                            "Parameter %s not present", paramName);
-                    case ErrorTypes.WARNING
-                        warning("getParam:ParamNotFound",...
-                            "Parameter %s not present", paramName);
-                        out = [];
-                        return
-                    case ErrorTypes.NONE
-                        out = [];
-                        return
+            if isscalar(obj)
+                if ~obj.hasParam(paramName)
+                    switch errorType 
+                        case ErrorTypes.ERROR
+                            error("getParam:ParamNotFound",...
+                                "Parameter %s not present", paramName);
+                        case ErrorTypes.WARNING
+                            warning("getParam:ParamNotFound",...
+                                "Parameter %s not present", paramName);
+                            out = [];
+                            return
+                        case ErrorTypes.NONE
+                            out = [];
+                            return
+                    end
+                else
+                    out = obj.parameters(paramName);
                 end
-            else
-                out = obj.parameters(paramName);
+                return
+            end
+            out = [];
+            for i = 1:numel(obj)
+                if ~obj(i).hasParam(paramName)
+                    out = cat(1, out, missing);
+                else
+                    out = cat(1, out, obj(i).parameters(paramName));
+                end
             end
         end
 
@@ -209,15 +224,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 paramName           char
                 paramValue
             end
-
-            if ismember(paramName, aod.h5.getSystemAttributes())
-                warning("setParam:SystemAttribute",...
-                    "Attribute not set, member of uneditable system attributes");
+            
+            if ~isscalar(obj)
+                arrayfun(@(x) x.setParam(paramName, paramValue), obj);
                 return
             end
 
-            evtData = aod.h5.events.AttributeEvent(obj.hdfPath, paramName, paramValue);
-            notify(obj, 'ChangedAttribute', evtData);
+            evtData = aod.h5.events.AttributeEvent(paramName, paramValue);
+            notify(obj, 'AttributeChanged', evtData);
 
             obj.parameters(paramName) = paramValue;
         end
@@ -249,7 +263,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             evtData = aod.h5.events.AttributeEvent(obj.hdfPath, paramName);
-            notify(obj, 'ChangedAttribute', evtData);
+            notify(obj, 'AttributeChanged', evtData);
 
             remove(obj.parameters, paramName);
 
@@ -265,7 +279,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 fileName            char
             end
 
-            tf = obj.ismember(fileName, string(obj.files.keys));
+            if isscalar(obj)
+                tf = isKey(obj.files, fileName);
+            else
+                tf = arrayfun(@(x) isKey(x.files, fileName), obj);
+            end
         end
 
         function out = getFile(obj, fileName, errorType)
@@ -296,6 +314,32 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
         end
 
+        function setFile(obj, fileName, fileValue)
+            % SETFILE
+            %
+            % Description:
+            %   Add new file or change value of existing file
+            %
+            % Syntax:
+            %   setFile(obj, fileName, fileValue)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                fileName            char
+                fileValue 
+            end
+            
+            if ~isscalar(obj)
+                arrayfun(@(x) x.setFile(fileName, fileValue), obj);
+                return
+            end
+
+            evtData = aod.h5.events.FileEvent(fileName, fileValue);
+            notify(obj, 'FileChanged', evtData);
+
+            obj.files(fileName) = fileValue;
+        end
+
         function removeFile(obj, fileName)
             % REMOVEFILE
             %
@@ -317,7 +361,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             evtData = aod.h5.events.FileEvent(obj.hdfPath, fileName);
-            notify(obj, 'ChangedFile', evtData);
+            notify(obj, 'FileChanged', evtData);
 
             remove(obj.files, fileName);
 
@@ -518,6 +562,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     end
 
     methods (Static)
+        function tf = isPersistent(entity)
+            if isSubclass(entity, 'aod.core.persistent.Entity')
+                tf = true;
+            else
+                tf = false;
+            end
+        end
+        
         function tf = ismember(a, b)
             % ISMEMBER
             %

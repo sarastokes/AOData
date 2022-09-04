@@ -23,7 +23,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
         end
 
         function value = get.numEpochs(obj)
-            value = max(size(obj.Epochs));
+            value = numel(obj.epochIDs);
         end
     end
 
@@ -44,7 +44,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
 
             evtData = aod.h5.events.DatasetEvent('homeDirectory',...
                 homeDirectory, obj.homeDirectory);
-            notify(obj, 'DatasetChanged', evtData);
+            notify(obj, 'ChangedDataset', evtData);
 
             obj.homeDirectory = homeDirectory;
         end

@@ -38,7 +38,6 @@ classdef EntityTypes
         STIMULUS 
         REGISTRATION 
         RESPONSE
-        TIMING
         ANALYSIS 
     end
 
@@ -58,17 +57,15 @@ classdef EntityTypes
                 case EntityTypes.EXPERIMENT
                     parentTypes = {'none'};
                 case EntityTypes.SOURCE
-                    parentTypes = {'aod.core.Experiment', 'aod.core.Source'};
+                    parentTypes = {'aod.core.Experiment', 'aod.core.Source', 'aod.core.persistent.Experiment', 'aod.core.persistent.Source'};
                 case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.REGION, EntityTypes.CALIBRATION}
-                    parentTypes = {'aod.core.Experiment'};
+                    parentTypes = {'aod.core.Experiment', 'aod.core.persistent.Experiment'};
                 case EntityTypes.CHANNEL 
-                    parentTypes = {'aod.core.System'};
+                    parentTypes = {'aod.core.System', 'aod.core.persistent.System'};
                 case EntityTypes.DEVICE
-                    parentTypes = {'aod.core.Channel'};
+                    parentTypes = {'aod.core.Channel', 'aod.core.persistent.Channel'};
                 case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE, EntityTypes.DATASET}
-                    parentTypes = {'aod.core.Epoch'};
-                case EntityTypes.TIMING
-                    parentTypes = {'aod.core.Epoch', 'aod.core.Response'};
+                    parentTypes = {'aod.core.Epoch', 'aod.core.persistent.Epoch'};
             end
         end
 
@@ -374,7 +371,8 @@ classdef EntityTypes
             % GET
             %
             % Description:
-            %   Returns the entity type of any aod.core.Entity subclass
+            %   Returns the entity type of any subclass of aod.core.Entity
+            %   or aod.core.persistent.Entity
             %
             % Syntax:
             %   out = get(obj)
@@ -385,34 +383,32 @@ classdef EntityTypes
 
             import aod.core.EntityTypes 
 
-            if isSubclass(obj, 'aod.core.Experiment')
+            if isSubclass(obj, {'aod.core.Experiment', 'aod.core.persistent.Experiment'})
                 out = EntityTypes.EXPERIMENT;
-            elseif isSubclass(obj, 'aod.core.Source')
+            elseif isSubclass(obj, {'aod.core.Source', 'aod.core.persistent.Source'})
                 out = EntityTypes.SOURCE;
-            elseif isSubclass(obj, 'aod.core.Calibration')
+            elseif isSubclass(obj, {'aod.core.Calibration', 'aod.core.persistent.Calibration'})
                 out = EntityTypes.CALIBRATION;
-            elseif isSubclass(obj, 'aod.core.System')
+            elseif isSubclass(obj, {'aod.core.System', 'aod.core.persistent.System'})
                 out = EntityTypes.SYSTEM;
-            elseif isSubclass(obj, 'aod.core.Channel')
+            elseif isSubclass(obj, {'aod.core.Channel', 'aod.core.persistent.Channel'})
                 out = EntityTypes.CHANNEL;
-            elseif isSubclass(obj, 'aod.core.Device')
+            elseif isSubclass(obj, {'aod.core.Device', 'aod.core.persistent.Device'})
                 out = EntityTypes.DEVICE;
-            elseif isSubclass(obj, 'aod.core.Epoch')
+            elseif isSubclass(obj, {'aod.core.Epoch', 'aod.core.persistent.Epoch'})
                 out = EntityTypes.EPOCH;
-            elseif isSubclass(obj, 'aod.core.Dataset')
+            elseif isSubclass(obj, {'aod.core.Dataset', 'aod.core.persistent.Dataset'})
                 out = EntityTypes.DATASET;
-            elseif isSubclass(obj, 'aod.core.Registration')
+            elseif isSubclass(obj, {'aod.core.Registration', 'aod.core.persistent.Registration'})
                 out = EntityTypes.REGISTRATION;
-            elseif isSubclass(obj, 'aod.core.Stimulus')
+            elseif isSubclass(obj, {'aod.core.Stimulus', 'aod.core.persistent.Stimulus'})
                 out = EntityTypes.STIMULUS;
-            elseif isSubclass(obj, 'aod.core.Response')
+            elseif isSubclass(obj, {'aod.core.Response', 'aod.core.persistent.Response'})
                 out = EntityTypes.RESPONSE;
-            elseif isSubclass(obj, 'aod.core.Analysis')
+            elseif isSubclass(obj, {'aod.core.Analysis', 'aod.core.persistent.Analysis'})
                 out = EntityTypes.ANALYSIS;
-            elseif isSubclass(obj, 'aod.core.Region')
+            elseif isSubclass(obj, {'aod.core.Region', 'aod.core.persistent.Region'})
                 out = EntityTypes.REGION;
-            elseif isSubclass(obj, 'aod.core.Timing')
-                out = EntityTypes.TIMING;
             else
                 error('Unrecognized entity type: %s', class(obj));
             end
@@ -464,8 +460,6 @@ classdef EntityTypes
                     obj = EntityTypes.STIMULUS;
                 case {'analysis', 'analyses'}
                     obj = EntityTypes.ANALYSIS;
-                case {'timing', 'time'}
-                    obj = EntityTypes.TIMING;
             end
         end
     end

@@ -18,11 +18,11 @@ classdef Persistor < handle
         function bind(obj, entity)
             obj.UUIDs = cat(1, obj.UUIDs, string(entity.UUID));
             obj.attributeListeners = cat(1, obj.attributeListeners,...
-                addlistener(entity, 'ChangedAttribute', @obj.onAttChanged));
+                addlistener(entity, 'AttributeChanged', @obj.onAttChanged));
             obj.datasetListeners = cat(1, obj.datasetListeners,...
-                addlistener(entity, 'ChangedDataset', @obj.onDatasetChanged));
+                addlistener(entity, 'DatasetChanged', @obj.onDatasetChanged));
             obj.fileListeners = cat(1, obj.fileListeners,...
-                addlistener(entity, 'ChangedFile', @obj.onFileChanged));
+                addlistener(entity, 'FileChanged', @obj.onFileChanged));
         end
 
         function unbind(obj)
@@ -56,18 +56,21 @@ classdef Persistor < handle
             %
             % Description:
             %   Processes a change to a dataset
+            %
+            % Syntax:
+            %   onDatasetChanged(obj, src, evt)
             % -------------------------------------------------------------
-            if isempty(evt.Value)
-                aod.h5.deleteObject(obj.hdfName, src.hdfPath, evt.Name);
+            fullPath = aod.h5.HDF5.buildPath(src.hdfPath, evt.Name);
+            if isempty(evt.NewValue)
+                aod.h5.deleteObject(obj.hdfName, fullPath, evt.Name);
             else
-                info = h5info(src.hdfPath);
-                matClass = h5readatt(obj.hdfName, src.hdfPath, 'Class');
+                matClass = h5readatt(obj.hdfName, fullPath, 'Class');
                 if ismember(matClass, ["string", "char", "datetime"])
                     aod.h5.writeAttributeByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
                     return
                 end
                 if ~isequal(size(evt.NewValue), size(evt.OldValue))
-                    aod.h5.deleteObject(obj.hdfName, src.hdfPath, evt.Name);
+                    aod.h5.deleteObject(obj.hdfName, fullPath, evt.Name);
                 end 
                 aod.h5.writeDatasetByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
             end
