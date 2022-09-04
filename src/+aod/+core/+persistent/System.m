@@ -1,7 +1,7 @@
 classdef System < aod.core.persistent.Entity & dynamicprops
 
     properties
-        Channels 
+        ChannelsContainer
     end
 
     methods 
@@ -16,7 +16,20 @@ classdef System < aod.core.persistent.Entity & dynamicprops
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
-            obj.Channels = obj.loadContainer('Channels');
+            obj.ChannelsContainer = obj.loadContainer('Channels');
+        end
+    end
+
+    % Container abstraction methods
+    methods
+        function out = Channels(obj, idx)
+            if nargin < 2
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj.ChannelsContainer(idx));
+            end
         end
     end
 end

@@ -1,4 +1,4 @@
-classdef Epoch < aod.core.persistent.Entity & dynamicprops 
+classdef Epoch < aod.core.persistent.Entity & dynamicprops
 
     properties (SetAccess = protected)
         ID(1,1)
@@ -7,10 +7,10 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
         Source 
         System 
 
-        Datasets
-        Registrations
-        Responses
-        Stimuli
+        DatasetsContainer
+        RegistrationsContainer
+        ResponsesContainer
+        StimuliContainer
         Timing
     end
 
@@ -20,7 +20,7 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
             
@@ -36,10 +36,53 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
             obj.setLinksToDynProps();
 
             % CONTAINERS
-            obj.Datasets = obj.loadContainer('Datasets');
-            obj.Registrations = obj.loadContainer('Registrations');
-            obj.Responses = obj.loadContainer('Responses');
-            obj.Stimuli = obj.loadContainer('Stimuli');
+            obj.DatasetsContainer = obj.loadContainer('Datasets');
+            obj.RegistrationsContainer = obj.loadContainer('Registrations');
+            obj.ResponsesContainer = obj.loadContainer('Responses');
+            obj.StimuliContainer = obj.loadContainer('Stimuli');
+        end
+    end
+    
+    % Container abstraction methods
+    methods (Sealed)
+        function out = Datasets(obj, idx)
+            if nargin < 2 
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj(i).DatasetsContainer(idx));
+            end
+        end
+
+        function out = Registrations(obj, idx)
+            if nargin < 2
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj(i).RegistrationsContainer(idx));
+            end
+        end
+
+        function out = Responses(obj, idx)
+            if nargin < 2
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj(i).ResponsesContainer(idx));
+            end
+        end
+
+        function out = Stimuli(obj, idx)
+            if nargin < 2
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj(i).StimuliContainer(idx));
+            end
         end
     end
 end 

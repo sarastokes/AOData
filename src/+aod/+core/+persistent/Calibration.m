@@ -20,4 +20,10 @@ classdef Calibration < aod.core.persistent.Entity & dynamicprops
             obj.setLinksToDynProps();
         end
     end
+
+    methods (Static)
+        function obj = empty()
+            obj = aod.core.persistent.Calibration([], [], []);
+        end
+    end
 end

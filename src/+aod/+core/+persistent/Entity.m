@@ -39,8 +39,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     end
 
     events 
-        ChangedAttribute
+        ChangedFile
         ChangedDataset
+        ChangedAttribute
     end
 
     methods
@@ -54,7 +55,36 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.parameters = aod.util.Parameters();
 
             % Create entity from file
-            obj.populate();
+            if ~isempty(obj.hdfName)
+                obj.populate();
+            end
+        end
+    end
+
+    % Navigation methods
+    methods
+        function h = ancestor(obj, entityType)
+            % ANCESTOR
+            %
+            % Description:
+            %   Recursively search Parent for entity matching entityType
+            %
+            % Syntax:
+            %   h = ancestor(obj, entityType)
+            %
+            % Examples:
+            %   h = obj.ancestor(aod.core.EntityTypes.EXPERIMENT)
+            %   h = obj.ancestor('experiment')
+            % -------------------------------------------------------------
+            entityType = aod.core.EntityTypes.get(entityType);
+
+            h = obj;
+            while h.EntityType ~= entityType
+                h = h.Parent;
+                if isempty(h)
+                    break
+                end
+            end
         end
     end
 
@@ -131,7 +161,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             tf = obj.ismember(paramName, string(obj.parameters.keys));
         end
 
-        function out = getParam(obj, paramName, errorLevel)
+        function out = getParam(obj, paramName, errorType)
             % GETPARAM
             %
             % Description:
@@ -227,6 +257,74 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
     end
 
+    % File methods
+    methods
+        function tf = hasFile(obj, fileName)
+            arguments
+                obj
+                fileName            char
+            end
+
+            tf = obj.ismember(fileName, string(obj.files.keys));
+        end
+
+        function out = getFile(obj, fileName, errorType)
+            arguments
+                obj
+                fileName            char
+                errorType           = aod.util.ErrorTypes.WARNING
+            end
+            
+            import aod.util.ErrorTypes
+
+            if ~obj.hasFile(fileName)
+                switch errorType 
+                    case ErrorTypes.ERROR
+                        error("getFile:FileNotFound",...
+                            "File %s not present", fileName);
+                    case ErrorTypes.WARNING
+                        warning("getFile:FileNotFound",...
+                            "File %s not present", fileName);
+                        out = [];
+                        return
+                    case ErrorTypes.NONE
+                        out = [];
+                        return
+                end
+            else
+                out = obj.files(fileName);
+            end
+        end
+
+        function removeFile(obj, fileName)
+            % REMOVEFILE
+            %
+            % Description:
+            %   Remove a file from entity's file directory
+            %
+            % Syntax:
+            %   removeFile(obj, fileName)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                fileName           char
+            end
+
+            if ~obj.hasFile(fileName)
+                warning("removeFile:FileNotFound",...
+                    "File %s not found in files property!", fileName);
+                return
+            end
+
+            evtData = aod.h5.events.FileEvent(obj.hdfPath, fileName);
+            notify(obj, 'ChangedFile', evtData);
+
+            remove(obj.files, fileName);
+
+            obj.loadInfo();
+        end
+    end
+
     % Initialization
     methods (Access = protected)
         function populate(obj)
@@ -254,7 +352,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             specialAttributes = ["UUID", "description", "Class", "EntityType"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
-            obj.entityType = obj.loadAttribute('EntityType');
+            obj.entityType = aod.core.EntityTypes.init(obj.loadAttribute('EntityType'));
             obj.entityClassName = obj.loadAttribute('Class');
 
             % Optional special attributes which may not be present
@@ -448,6 +546,23 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 header = sprintf('%s (%s, %s)\n',... 
                     headerStr, obj.label, char(obj.entityClassName));
             end
+        end 
+
+        function propgrp = getPropertyGroups(obj)
+            propgrp = getPropertyGroups@matlab.mixin.CustomDisplay(obj);
+            if ~isscalar(obj)
+                return
+            end
+
+            containerNames = obj.entityType.childContainers();
+            if isempty(containerNames)
+                return
+            end
+            for i = 1:numel(containerNames)
+                iName = containerNames{i};
+                propgrp.PropertyList.(iName) = propgrp.PropertyList.([iName, 'Container']);
+                propgrp.PropertyList = rmfield(propgrp.PropertyList, [iName, 'Container']);
+            end  % toc = 2.9 ms
         end
     end
 end 

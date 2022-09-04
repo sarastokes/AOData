@@ -1,5 +1,5 @@
 classdef (ConstructOnLoad) AttributeEvent < event.EventData
-% PARAMETEREVENT
+% ATTRIBUTEEVENT
 %
 % Description:
 %   An event triggered when an HDF5 dataset is added/changed/removed

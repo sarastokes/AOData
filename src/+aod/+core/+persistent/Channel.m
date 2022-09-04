@@ -1,7 +1,7 @@
 classdef Channel < aod.core.persistent.Entity & dynamicprops
 
     properties (SetAccess = protected)
-        Devices
+        DevicesContainer
     end
 
     methods
@@ -16,7 +16,20 @@ classdef Channel < aod.core.persistent.Entity & dynamicprops
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
-            obj.Devices = obj.loadContainer('Devices');
+            obj.DevicesContainer = obj.loadContainer('Devices');
+        end
+    end
+
+    % Container abstraction methods
+    methods (Sealed)
+        function obj = Devices(obj, idx)
+            if nargin < 2
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj(i).DevicesContainer(idx));
+            end
         end
     end
 end 

@@ -1,5 +1,19 @@
 classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
-
+% ENTITYCONTAINER
+%
+% Description:
+%   A container for entities that enables lazy loading (entity in HDF5
+%   file is only read when requested, then cached in entityFactory)
+%
+% Parents:
+%   handle, matlab.mixin.indexing.RedefinesParam
+%
+% Constructor:
+%   obj = EntityContainer(hdfPath, entityFactory)
+%
+% Notes:
+%   EntityContainer(0) returns all entities
+% -------------------------------------------------------------------------
     properties (Hidden, Dependent)
         contents
     end
@@ -57,9 +71,10 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 
     methods (Access = protected)
         function entities = parenReference(obj, indexOp)
+            assignin('base', 'indexOp', indexOp)
             if isempty(obj.memberPaths)
-                error("EntityContainer:MemberPathsEmpty",...
-                    "There are no member paths to return");
+                entities = [];
+                return
             end
 
             if numel(indexOp.Indices) > 2
@@ -67,7 +82,13 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
                     "The number of dimensions should be 1-2");
             end
 
-            pathIdx = indexOp.Indices{1};
+            if isempty(indexOp.Indices) || ...
+                    all(ischar(indexOp.Indices{1}) & strcmp(indexOp.Indices{1}, ':'))...
+                    || all(isnumeric(indexOp.Indices{1}) & indexOp.Indices{1} == 0)
+                pathIdx = 1:numel(obj.memberPaths);
+            else
+                pathIdx = indexOp.Indices{1};
+            end
             entities = [];
             for i = 1:numel(pathIdx)
                 entities = cat(1, entities, obj.entityFactory.create(obj.memberPaths(pathIdx(i))));
@@ -75,10 +96,15 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
         end
 
         function n = parenListLength(obj, indexOp, indexContext)
-            assignin('base', 'indexingContext', indexContext);
             assignin('base', 'indexOp', indexOp);
-            warning('Responses/parenListLength triggered!')
-            n = numel(obj.memberPaths);%listLength(size(obj), indexOp, indexContext);
+            assignin('base', 'indexContext', indexContext);
+            %if numel(indexOp) == 1 & strcmp(indexOp.Type, strcmp)
+            n = numel(obj.memberPaths(indexOp(1).Indices{1}));
+            if numel(indexOp) == 1
+                return
+            end
+            if strcmp(indexOp(2).Type, 'Dot')
+            end
         end
 
         function obj = parenAssign(~, ~, ~)

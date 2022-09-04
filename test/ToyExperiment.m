@@ -56,6 +56,11 @@ function experiment = ToyExperiment(writeToHDF)
     response2.setData(2:2:8);
     epoch.addResponse(response2);
 
+    stim = aod.builtin.stimuli.ImagingLight('Mustang', 22, 'Normalized');
+    epoch.addStimulus(stim);
+
+    experiment.addEpoch(aod.core.Epoch(1, 'Source', source.Sources(1).Sources(1)));
+
     if writeToHDF
         aod.h5.writeExperimentToFile('test.h5', experiment, true);
     end

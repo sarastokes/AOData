@@ -303,9 +303,13 @@ classdef HDF5 < handle
             HDF5.makeTextDataset(fileName, pathName, dsetName, 'struct');
             
             f = fieldnames(data);
+            columnClasses = [];
             for i = 1:numel(f)
                 HDF5.writeatts(fileName, fullPath, f{i}, HDF5.data2att(data.(f{i})));
+                columnClasses = [columnClasses, '; ', class(data.(f{i}))];
             end
+            columnClasses = columnClasses(3:end);
+            HDF5.writeatts(fileName, filePath, 'ColumnClass', columnClasses);
         end
 
         function makeCompoundDataset(fileName, pathName, dsetName, data)
@@ -516,8 +520,6 @@ classdef HDF5 < handle
                 out = datestr(data);
             elseif isstring(data) && numel(data) == 1
                 out = char(data);
-            % elseif isSubclass(data, 'aod.core.Entity')
-            %     out = data.UUID;
             else
                 out = data;
             end

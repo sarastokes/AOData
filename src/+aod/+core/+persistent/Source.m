@@ -1,7 +1,7 @@
 classdef Source < aod.core.persistent.Entity & dynamicprops
 
     properties (SetAccess = protected)
-        Sources 
+        SourcesContainer
     end
 
     methods
@@ -16,7 +16,20 @@ classdef Source < aod.core.persistent.Entity & dynamicprops
             
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();           
-            obj.Sources = obj.loadContainer('Sources');
+            obj.SourcesContainer = obj.loadContainer('Sources');
+        end
+    end
+
+    % Container abstraction methods
+    methods (Sealed)
+        function out = Sources(obj, idx)
+            if nargin < 2
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj(i).SourcesContainer(idx));
+            end
         end
     end
 end 

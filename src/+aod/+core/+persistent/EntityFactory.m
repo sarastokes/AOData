@@ -2,7 +2,8 @@ classdef EntityFactory < handle
 % ENTITYFACTORY
 %
 % Description:
-%   A factory for creating persistent entities
+%   A factory for creating entities from an HDF5 file and caching the 
+%   for faster interaction
 %
 % Constructor:
 %   obj = EntityFactory(hdfName)

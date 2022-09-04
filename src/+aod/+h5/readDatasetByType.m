@@ -33,6 +33,17 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
             out = datetime(data, 'Format',... 
                 h5readatt(hdfName, fullPath, 'Format'));
         case {'table', 'timetable'}
+            if ischar('data') && strcmp(data, 'struct')
+                info = h5info(hdfName, fullPath);
+                S = struct();
+                for i = 1:numel(info.Attributes)
+                    if ~ismember(info.Attributes(i).Name, ["Class", "ColumnClass"])
+                        S.(info.Attributes(i).Name) = info.Attributes(i).Value;
+                    end
+                end
+                out = struct2table(S);
+                return
+            end
             out = struct2table(data);
             colClasses = h5readatt(hdfName, fullPath, 'ColumnClass');
             % TODO: This seems too hard, am I missing something here
@@ -55,7 +66,7 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
             out = seconds(data);
         case 'enum'
             enumClass = h5readatt(hdfName, fullPath, 'EnumClass');
-            eval(sprintf('out = %s.%s', enumClass, data));
+            eval(sprintf('out = %s.%s;', enumClass, data));
         case 'affine2d'
             out = affine2d(data);
         otherwise

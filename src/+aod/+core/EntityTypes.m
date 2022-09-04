@@ -239,6 +239,18 @@ classdef EntityTypes
                     out = [];
             end
         end
+
+        function out = getCoreClassName(obj)
+            % GETCORECLASSNAME
+            %
+            % Description:
+            %   Returns the core class name of entityType (aod.core.X)
+            %
+            % Syntax:
+            %   out = getCoreClassName(obj)
+            % -------------------------------------------------------------
+            out = ['aod.core.', captialize(char(obj))];
+        end
     end
 
     % HDF5 methods
@@ -339,7 +351,9 @@ classdef EntityTypes
             % -------------------------------------------------------------
             import aod.core.EntityTypes
 
-            obj = aod.core.EntityTypes.get(entity);
+            if ~isa(entity, 'aod.core.EntityTypes')
+                obj = aod.core.EntityTypes.get(entity);
+            end
 
             switch obj
                 case EntityTypes.EXPERIMENT
@@ -405,6 +419,18 @@ classdef EntityTypes
         end
 
         function obj = init(entityName)
+            % INIT
+            %
+            % Description:
+            %   Initialize from entity name as text
+            %
+            % Syntax:
+            %   obj = aod.core.EntityTypes.init(entityName)
+            %
+            % Notes:
+            %   For compatibility, if a aod.core.EntityTypes is passed as
+            %   input, it will be returned without error
+            % -------------------------------------------------------------
             if isa(entityName, 'aod.core.EntityTypes')
                 obj = entityName;
                 return
