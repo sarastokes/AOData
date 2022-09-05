@@ -10,6 +10,26 @@ classdef Source < aod.core.persistent.Entity & dynamicprops
         end
     end
 
+    methods
+        function obj = addSource(obj, source)
+            % ADDSOURCE
+            % 
+            % Description:
+            %   Add a Source to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addAnalysis(obj, source)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                source
+            end
+
+            source.setParent(obj);
+            obj.addEntity(source);
+        end
+    end
+
     methods (Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);

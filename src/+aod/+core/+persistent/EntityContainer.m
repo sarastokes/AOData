@@ -14,6 +14,7 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 % Notes:
 %   EntityContainer(0) returns all entities
 % -------------------------------------------------------------------------
+
     properties (Hidden, Dependent)
         contents
     end
@@ -40,6 +41,13 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
             for i = 1:numel(obj.memberPaths)
                 value = cat(1, value, obj.entityFactory.create(obj.memberPaths(i)));
             end
+        end
+    end
+
+    methods (Access = ?aod.core.persistent.Persistor)
+        function refresh(obj)
+            obj.memberPaths = [];
+            obj.populateContents();
         end
     end
 
@@ -91,20 +99,13 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
             end
             entities = [];
             for i = 1:numel(pathIdx)
-                entities = cat(1, entities, obj.entityFactory.create(obj.memberPaths(pathIdx(i))));
+                entities = cat(1, entities,... 
+                    obj.entityFactory.create(obj.memberPaths(pathIdx(i))));
             end
         end
 
         function n = parenListLength(obj, indexOp, indexContext)
-            assignin('base', 'indexOp', indexOp);
-            assignin('base', 'indexContext', indexContext);
-            %if numel(indexOp) == 1 & strcmp(indexOp.Type, strcmp)
             n = numel(obj.memberPaths(indexOp(1).Indices{1}));
-            if numel(indexOp) == 1
-                return
-            end
-            if strcmp(indexOp(2).Type, 'Dot')
-            end
         end
 
         function obj = parenAssign(~, ~, ~)

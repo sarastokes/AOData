@@ -3,6 +3,7 @@ classdef ErrorTypes
     enumeration
         ERROR
         WARNING 
+        MISSING
         NONE 
     end
 
@@ -20,6 +21,8 @@ classdef ErrorTypes
                     obj = aod.util.ErrorTypes.ERROR;
                 case 'warning'
                     obj = aod.util.ErrorTypes.WARNING;
+                case 'missing'
+                    obj = aod.util.ErrorTypes.MISSING;
                 case 'none'
                     obj = aod.util.ErrorTypes.NONE;
                 otherwise

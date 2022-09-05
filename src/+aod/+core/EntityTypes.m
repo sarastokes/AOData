@@ -113,6 +113,13 @@ classdef EntityTypes
             end
         end
 
+        function out = persistentParentContainer(obj)
+            out = obj.parentContainer();
+            if ~isempty(out)
+                out = [out, 'Container'];
+            end
+        end
+
         function out = childContainers(obj)
             % CONTAINERS
             %
@@ -298,8 +305,6 @@ classdef EntityTypes
                     hdfPath = [parentPath, '/Stimuli/', groupName];
                 case EntityTypes.RESPONSE
                     hdfPath = [parentPath, '/Responses/', groupName];
-                case EntityTypes.TIMING
-                    hdfPath = [parentPath, '/Timing/'];
                 case EntityTypes.ANALYSIS
                     hdfPath = [parentPath, '/Analyses/', groupName];
             end

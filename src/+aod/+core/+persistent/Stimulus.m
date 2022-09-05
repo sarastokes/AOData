@@ -1,6 +1,6 @@
 classdef Stimulus < aod.core.persistent.Entity & dynamicprops
 
-    properties
+    properties (SetAccess = protected)
         Calibration
     end
 

@@ -24,6 +24,8 @@ classdef EntityFactory < handle
             obj.hdfName = hdfName;
             obj.entityManager = aod.h5.EntityManager(hdfName);
             obj.persistor = aod.core.persistent.Persistor(hdfName);
+            addlistener(obj.persistor, 'EntityChanged', @obj.onEntityChanged);
+
             obj.cache = containers.Map();
         end
 
@@ -33,7 +35,6 @@ classdef EntityFactory < handle
 
         function clearCache(obj)
             obj.cache = aod.util.Parameters();
-            obj.persistor.unbind();
         end
 
         function e = create(obj, hdfPath)
@@ -78,6 +79,15 @@ classdef EntityFactory < handle
             end
             obj.persistor.bind(e);
             obj.cache(uuid) = e;
+        end
+    end
+
+    methods (Access = private)
+        function onEntityChanged(obj, ~, evt)
+            obj.entityManager.collect();
+            if strcmp(evt.Action, 'Remove')
+                remove(obj.cache, evt.UUID);
+            end
         end
     end
 

@@ -119,9 +119,6 @@ function writeEntity(hdfName, obj)
         if isempty(prop)
             continue
         end
-        if strcmp(prop, 'Parent')
-            disp('Yeah parent property is sneaking thru')
-        end
         % Write links to other entities
         if isSubclass(class(prop), 'aod.core.Entity')
             parentPath = getParentPath(EM.Table, prop.UUID);
@@ -139,18 +136,6 @@ end
 function parentPath = getParentPath(EMT, parentUUID)
     isEntityInFile(EMT, parentUUID);
     parentPath = char(EMT{EMT.UUID == parentUUID, 'Path'});
-end
-
-function tf = doesEntityExist(entity)
-    if isempty(entity)
-        if nargout == 0
-            error('Entity does not exist');
-        else
-            tf = false;
-        end
-    else
-        tf = true;
-    end
 end
 
 function tf = isEntityInFile(EMT, UUID)

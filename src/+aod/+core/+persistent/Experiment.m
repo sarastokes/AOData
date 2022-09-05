@@ -42,11 +42,131 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
                 homeDirectory           string
             end
 
-            evtData = aod.h5.events.DatasetEvent('homeDirectory',...
+            evtData = aod.core.persistent.events.DatasetEvent('homeDirectory',...
                 homeDirectory, obj.homeDirectory);
             notify(obj, 'ChangedDataset', evtData);
 
             obj.homeDirectory = homeDirectory;
+        end
+    end
+
+    methods
+        function addAnalysis(obj, analysis)
+            % ADDANALYSIS
+            % 
+            % Description:
+            %   Add an Analysis to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addAnalysis(obj, analysis)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                analysis        {mustBeA(analysis, 'aod.core.Analysis')}
+            end
+
+            analysis.setParent(obj);
+            obj.addEntity(analysis);
+        end
+
+        function addCalibration(obj, calibration)
+            % ADDCALIBRATION
+            %
+            % Description:
+            %   Add a Calibration to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addCalibration(obj, calibration)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                calibration     {mustBeA(calibration, 'aod.core.Calibration')}
+            end
+
+            calibration.setParent(obj);
+            obj.addEntity(calibration);
+        end
+
+        function addEpoch(obj, epoch)
+            % ADDEPOCH
+            %
+            % Description:
+            %   Add an Epoch to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addEpoch(obj, epoch)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                epoch           {mustBeA(epoch, 'aod.core.Epoch')}
+            end
+
+            epoch.setParent(obj);
+            obj.addEntity(epoch);
+        end
+
+        function addRegion(obj, region)
+            % ADDREGION
+            %
+            % Description:
+            %   Add a Region to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addRegion(obj, region)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                region          {mustBeA(region, 'aod.core.Region')}
+            end
+
+            region.setParent(obj);
+            obj.addEntity(region);
+        end
+
+        function addSource(obj, source)
+            % ADDSOURCE
+            %
+            % Description:
+            %   Add a Source to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addSource(obj, source)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                source              {mustBeA(source, 'aod.core.Source')}
+            end
+
+            source.setParent(obj);
+            obj.addEntity(source);
+        end
+
+        function addSystem(obj, system)
+            % ADDSYSTEM
+            %
+            % Description:
+            %   Add a System to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addSystem(obj, system)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                system      {mustBeA(system, 'aod.core.System')}
+            end
+            
+            system.setParent(obj);
+            obj.addEntity(system);
+        end
+
+        function deleteEntity(obj) %#ok<MANU> 
+            % DELETEENTITY
+            %
+            % Notes:
+            %   Overloaded deleteEntity in aod.core.persistent.Entity
+            % -------------------------------------------------------------
+            error("deleteEntity:AreYouSure",...
+                "Deleting the HDF5 file is better than deleting Experiment");
         end
     end
 

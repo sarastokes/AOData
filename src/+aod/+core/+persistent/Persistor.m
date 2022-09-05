@@ -2,10 +2,11 @@ classdef Persistor < handle
 
     properties (Access = private)
         hdfName
-        attributeListeners
-        datasetListeners
-        fileListeners
         UUIDs
+    end
+
+    events
+        EntityChanged
     end
 
     methods
@@ -17,19 +18,11 @@ classdef Persistor < handle
     methods
         function bind(obj, entity)
             obj.UUIDs = cat(1, obj.UUIDs, string(entity.UUID));
-            obj.attributeListeners = cat(1, obj.attributeListeners,...
-                addlistener(entity, 'AttributeChanged', @obj.onAttChanged));
-            obj.datasetListeners = cat(1, obj.datasetListeners,...
-                addlistener(entity, 'DatasetChanged', @obj.onDatasetChanged));
-            obj.fileListeners = cat(1, obj.fileListeners,...
-                addlistener(entity, 'FileChanged', @obj.onFileChanged));
-        end
-
-        function unbind(obj)
-            % TODO not sure this is sufficient
-            obj.attributeListeners = [];
-            obj.datasetListeners = [];
-            obj.fileListeners = [];
+            addlistener(entity, 'AttributeChanged', @obj.onAttChanged);
+            addlistener(entity, 'DatasetChanged', @obj.onDatasetChanged);
+            addlistener(entity, 'GroupChanged', @obj.onGroupChanged);
+            addlistener(entity, 'LinkChanged', @obj.onLinkChanged);
+            addlistener(entity, 'FileChanged', @obj.onFileChanged);
         end
     end
 
@@ -49,6 +42,35 @@ classdef Persistor < handle
             else % Add/change attribute
                 aod.h5.writeAttributeByType(obj.hdfName, src.hdfPath, evt.Name, evt.Value);
             end
+        end
+
+        function onGroupChanged(obj, src, evt)
+            % ONGROUPCHANGED
+            %
+            % Description:
+            %   Process a change to an entity's group
+            %
+            % Syntax:
+            %   onGroupChanged(obj, src, evt)
+            % -------------------------------------------------------------
+
+            % Get entity information prior to changes
+            parent = evt.Entity.Parent;
+            uuid = evt.Entity.UUID;
+            containerName = evt.Entity.entityType.persistentParentContainer();
+
+            % Write/delete the entity
+            if strcmp(evt.Action, 'Add')
+                aod.h5.writeEntity(obj.hdfName, evt.Entity);
+            elseif strcmp(evt.Action, 'Remove')
+                aod.h5.HDF5.deleteObject(obj.hdfName, char(src.hdfPath));
+            end
+
+            evtData = aod.core.persistent.events.EntityEvent(uuid, evt.Action);
+            notify(obj, 'EntityChanged', evtData);
+
+            % Refresh the associated EntityContainer
+            parent.(containerName).refresh();
         end
 
         function onDatasetChanged(obj, src, evt)
@@ -76,7 +98,7 @@ classdef Persistor < handle
             end
         end
 
-        function onFileChanged(obj, src, evt)
+        function onFileChanged(obj, ~, evt)
             % ONFILECHANGED
             %
             % Description:

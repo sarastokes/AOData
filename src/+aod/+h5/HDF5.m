@@ -643,6 +643,9 @@ classdef HDF5 < handle
             % Syntax:
             %   parentPath = getPathParent(pathName)
             % -------------------------------------------------------------
+            arguments
+                pathName            char
+            end
 
             idx = strfind(pathName, '/');
             if numel(idx) == 1 && idx == 1

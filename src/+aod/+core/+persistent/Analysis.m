@@ -1,7 +1,7 @@
 classdef Analysis < aod.core.persistent.Entity & dynamicprops
 
     properties (SetAccess = protected)
-        analysisDate                    datestr
+        analysisDate                    
     end
 
     methods

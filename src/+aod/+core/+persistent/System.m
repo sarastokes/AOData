@@ -1,12 +1,32 @@
 classdef System < aod.core.persistent.Entity & dynamicprops
 
-    properties
+    properties (SetAccess = protected)
         ChannelsContainer
     end
 
     methods 
         function obj = System(hdfName, hdfPath, factory)
             obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
+        end
+    end
+
+    methods
+        function addChannel(obj, channel)
+            % ADDCHANNEL
+            % 
+            % Description:
+            %   Add an Analysis to the Experiment and the HDF5 file
+            %
+            % Syntax:
+            %   addChannel(obj, channel)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                channel             {mustBeA(channel, 'aod.core.Channel')}
+            end
+
+            channel.setParent(obj);
+            obj.addEntity(channel);
         end
     end
 

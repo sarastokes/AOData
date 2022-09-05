@@ -20,6 +20,81 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
         end
     end
 
+    % Addition methods
+    methods
+        function addDataset(obj, dataset)
+            % ADDDATASET
+            %
+            % Description:
+            %   Add a Dataset to the Epoch and HDF5 file
+            %
+            % Syntax:
+            %   addDataset(obj, dataset)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                dataset        {mustBeA(dataset, 'aod.core.Dataset')}
+            end
+
+            dataset.addParent(obj);
+            obj.addEntity(dataset);
+        end
+
+        function addRegistration(obj, registration)
+            % ADDREGISTRATION
+            %
+            % Description:
+            %   Add a Registration to the Epoch and HDF5 file
+            %
+            % Syntax:
+            %   addRegistration(obj, registration)
+            % -------------------------------------------------------------
+            arguments
+                obj 
+                registration    {mustBeA(registration, 'aod.core.Registration')}
+            end
+
+            registration.addParent(obj);
+            obj.addEntity(registration);
+        end
+
+        function addResponse(obj, response)
+            % ADDRESPONSE
+            %
+            % Description:
+            %   Add a Response to the Epoch and HDF5 file
+            %
+            % Syntax:
+            %   addResponse(obj, response)
+            % -------------------------------------------------------------
+            arguments
+                obj 
+                response        {mustBeA(response, 'aod.core.Response')}
+            end
+
+            response.addParent(obj);
+            obj.addEntity(response);
+        end
+
+        function addStimuli(obj, stimulus)
+            % ADDSTIMULI
+            %
+            % Description:
+            %   Add a Stimulus to the Epoch and HDF5 file
+            %
+            % Syntax:
+            %   addStimuli(obj, stimulus)
+            % -------------------------------------------------------------
+            arguments
+                obj 
+                stimulus        {mustBeA(stimulus, 'aod.core.Stimulus')}
+            end
+
+            stimulus.addParent(obj);
+            obj.addEntity(stimulus);
+        end
+    end
+
     methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);

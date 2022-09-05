@@ -1,7 +1,7 @@
-classdef Dataset < aod.core.persistent.Dataset & dynamicprops
+classdef Dataset < aod.core.persistent.Entity & dynamicprops
 
     methods
-        function obj = Device(hdfName, hdfPath, factory)
+        function obj = Dataset(hdfName, hdfPath, factory)
             obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
         end
     end

@@ -20,7 +20,11 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
             return
         end
         for i = 1:numel(info.Attributes)
-            out(info.Attributes(i).Name) = info.Attributes(i).Value;
+            iValue = info.Attributes(i).Value;
+            if ischar(iValue)
+                iValue = string(iValue);
+            end
+            out(info.Attributes(i).Name) = iValue;
         end
         return
     else

@@ -40,6 +40,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     events 
         FileChanged
+        LinkChanged
+        GroupChanged
         DatasetChanged
         AttributeChanged
     end
@@ -90,31 +92,73 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Dataset methods
     methods
-        function addDataset(obj, dsetName, dsetValue)
+        function addProperty(obj, propName, propValue)
             % ADDDATASET
             %
             % Description:
-            %   Add a new dataset to the entity
+            %   Add a new property (dataset/link) to the entity
             %
             % Syntax:
             %   addDataset(obj, dsetName, dsetValue)
             % -------------------------------------------------------------
+            arguments
+                obj
+                propName            char
+                propValue           = []
+            end
+
+            [isEntity, isPersisted] = obj.isEntity(entity);
+            if isEntity
+                if isPersisted
+                    obj.setLink(propName, entity, propValue);
+                else
+                    warning("AddProperty:UnpersistedLink",...
+                        "Links can only be written to persisted entities");
+                end
+            else
+                obj.setDataset(propName, entity, propValue);
+            end
+        end
+
+        function setLink(obj, linkName, linkValue)
+            arguments
+                obj
+                linkName            char
+                linkValue           = []
+            end
+
+            evtData = aod.core.persistent.events.LinkEvent(linkName, linkValue);
+            notify(obj, 'LinkChanged', evtData);
+
+            if ~ismember(linkName, linkValue)
+                obj.addprop(linkName);
+                obj.loadInfo();
+            end
+            obj.(linkName) = obj.loadLink(linkName);
+        end
+
+        function setDataset(obj, dsetName, dsetValue)
+            arguments
+                obj
+                dsetName            char
+                dsetValue           = []
+            end
 
             newDset = ~obj.ismember(dsetName, string({obj.dsetNames}));
             if newDset
-                evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue);
+                evtData = aod.core.persistent.events.DatasetEvent(dsetName, dsetValue);
             else
-                evtData = aod.h5.events.DatasetEvent(dsetName, dsetValue,...
+                evtData = aod.core.persistent.events.DatasetEvent(dsetName, dsetValue,...
                     obj.(dsetName));
             end
             notify(obj, 'DatasetChanged', evtData);
 
             if newDset
-                obj.addprop(dsetName)
+                obj.addprop(dsetName);
+                obj.loadInfo();
             end
             obj.(dsetName) = dsetValue;
 
-            obj.loadInfo();
         end
 
         function removeDataset(obj, dsetName)
@@ -132,13 +176,26 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     "Dataset %s not found", dsetName);
             end
 
-            evtData = aod.h5.events.DatasetEvent(dsetName);
+            evtData = aod.core.persistent.events.DatasetEvent(dsetName);
             notify(obj, 'DatasetChanged', evtData);
 
             p = findprop(obj, dsetName);
             delete(p);
 
             obj.loadInfo();
+        end
+
+        function deleteEntity(obj)
+            % DELETEENTITY
+            %
+            % Description:
+            %   Delete the entity
+            %
+            % Syntax:
+            %   deleteEntity(obj)
+            % -------------------------------------------------------------
+            evtData = aod.core.persistent.events.GroupEvent(obj, 'Remove');
+            notify(obj, 'GroupChanged', evtData);
         end
     end
 
@@ -174,10 +231,21 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % Syntax:
             %   out = getParam(obj, paramName)
             %   out = getParam(obj, paramName, errorType)
+            %
+            % Notes:
+            %   Error type defaults to WARNING for scalar operations and is
+            %   restricted to MISSING for nonscalar operations.
             % -------------------------------------------------------------
             import aod.util.ErrorTypes
             if nargin < 3
                 errorType = ErrorTypes.WARNING;
+            end
+            
+            if ~isscalar(obj)
+                out = arrayfun(@(x) getParam(x, paramName, ErrorTypes.MISSING),...
+                    obj, 'UniformOutput', false);
+                out = vertcat(out{:});
+                return
             end
 
             if isscalar(obj)
@@ -191,6 +259,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                                 "Parameter %s not present", paramName);
                             out = [];
                             return
+                        case ErrorTypes.MISSING
+                            out = missing;
+                            return
                         case ErrorTypes.NONE
                             out = [];
                             return
@@ -199,14 +270,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     out = obj.parameters(paramName);
                 end
                 return
-            end
-            out = [];
-            for i = 1:numel(obj)
-                if ~obj(i).hasParam(paramName)
-                    out = cat(1, out, missing);
-                else
-                    out = cat(1, out, obj(i).parameters(paramName));
-                end
             end
         end
 
@@ -230,7 +293,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.h5.events.AttributeEvent(paramName, paramValue);
+            evtData = aod.core.persistent.events.AttributeEvent(paramName, paramValue);
             notify(obj, 'AttributeChanged', evtData);
 
             obj.parameters(paramName) = paramValue;
@@ -262,7 +325,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.h5.events.AttributeEvent(obj.hdfPath, paramName);
+            evtData = aod.core.persistent.events.AttributeEvent(obj.hdfPath, paramName);
             notify(obj, 'AttributeChanged', evtData);
 
             remove(obj.parameters, paramName);
@@ -274,6 +337,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % File methods
     methods
         function tf = hasFile(obj, fileName)
+            % HASFILE
+            %
+            % Description
+            %
+            % Syntax:
+            %   tf = hasFile(obj, fileName)
+            %
+            % -------------------------------------------------------------
             arguments
                 obj
                 fileName            char
@@ -287,6 +358,18 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function out = getFile(obj, fileName, errorType)
+            % GETFILE
+            %
+            % Description:
+            %   Get file by name
+            %
+            % Syntax:
+            %   out = getFile(obj, fileName, errorType)
+            %
+            % Notes:
+            %   Error type defaults to WARNING for scalar operations and is
+            %   restricted to MISSING for nonscalar operations.
+            % -------------------------------------------------------------
             arguments
                 obj
                 fileName            char
@@ -294,6 +377,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
             
             import aod.util.ErrorTypes
+
+            if ~isscalar(obj)
+                out = arrayfun(@(x) getFile(x, fileName, ErrorTypes.MISSING),...
+                    obj, 'UniformOutput', false);
+                out = vertcat(out{:});
+                return
+            end
 
             if ~obj.hasFile(fileName)
                 switch errorType 
@@ -304,6 +394,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                         warning("getFile:FileNotFound",...
                             "File %s not present", fileName);
                         out = [];
+                        return
+                    case ErrorTypes.MISSING
+                        out = missing;
                         return
                     case ErrorTypes.NONE
                         out = [];
@@ -334,7 +427,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.h5.events.FileEvent(fileName, fileValue);
+            evtData = aod.core.persistent.events.FileEvent(fileName, fileValue);
             notify(obj, 'FileChanged', evtData);
 
             obj.files(fileName) = fileValue;
@@ -354,13 +447,18 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 fileName           char
             end
 
+            if ~isscalar(obj)
+                arrayfun(@(x) removeFile(x, fileName), obj);
+                return
+            end
+
             if ~obj.hasFile(fileName)
                 warning("removeFile:FileNotFound",...
                     "File %s not found in files property!", fileName);
                 return
             end
 
-            evtData = aod.h5.events.FileEvent(obj.hdfPath, fileName);
+            evtData = aod.core.persistent.events.FileEvent(obj.hdfPath, fileName);
             notify(obj, 'FileChanged', evtData);
 
             remove(obj.files, fileName);
@@ -369,7 +467,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
     end
 
-    % Initialization
+    % Initialization and creation
     methods (Access = protected)
         function populate(obj)
             % POPULATE
@@ -410,6 +508,19 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                         h5readatt(obj.hdfName, obj.hdfPath, obj.attNames(i));
                 end
             end
+        end
+
+        function addEntity(obj, entity)
+            % ADDENTITY
+            %
+            % Description:
+            %   Add a new entity to the persistent hierarchy
+            %
+            % Syntax:
+            %   addEntity(obj, entity)
+            % -------------------------------------------------------------
+            evtData = aod.core.persistent.events.GroupEvent(entity, 'Add');
+            notify(obj, 'GroupChanged', evtData);
         end
     end
 
@@ -562,11 +673,25 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     end
 
     methods (Static)
-        function tf = isPersistent(entity)
+        function [tf, persisted] = isEntity(entity)
+            % ISENTITY
+            %
+            % Description:
+            %   Returns whether input is an AOData entity and if so, 
+            %   whether the entity is persisted or not
+            %
+            % Syntax:
+            %   [tf, persisted] = isEntity(entity)
+            % -------------------------------------------------------------
             if isSubclass(entity, 'aod.core.persistent.Entity')
                 tf = true;
+                persisted = true;
+            elseif isSubclass(entity, 'aod.core.Entity')
+                tf = true;
+                persisted = false;
             else
                 tf = false;
+                persisted = [];
             end
         end
         

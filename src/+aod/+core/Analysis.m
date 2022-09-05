@@ -20,7 +20,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
     methods
         function obj = Analysis(name, analysisDate)
             obj = obj@aod.core.Entity(name);
-            if nargin > 2
+            if nargin > 1
                 obj.setAnalysisDate(analysisDate);
             end
         end

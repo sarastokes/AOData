@@ -10,6 +10,26 @@ classdef Channel < aod.core.persistent.Entity & dynamicprops
         end
     end
 
+    methods
+        function addDevice(obj, device)
+            % ADDDEVICE
+            %
+            % Description:
+            %   Add a Device to the Channel and the HDF5 file
+            %
+            % Syntax:
+            %   addDevice(obj, device)
+            % -------------------------------------------------------------
+            arguments
+                obj 
+                device          {mustBeA(device, 'aod.core.Device')}
+            end
+
+            device.setParent(obj);
+            obj.addEntity(device);
+        end
+    end
+
     methods (Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);

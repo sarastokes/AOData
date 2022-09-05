@@ -25,7 +25,7 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
     containerProps = entityType.childContainers();
     
     alwaysPersistedProps = ["notes", "Parent", "files"];
-    alwaysAttributeProps = ["UUID", "Name", "label", "description", "parameters"];
+    alwaysAttributeProps = ["UUID", "Name", "label", "description", "parameters", "entityType"];
     alwaysAbandonedProps = ["allowableParentTypes", "Reader"];
     persistedProps = [];
     attributeProps = [];
