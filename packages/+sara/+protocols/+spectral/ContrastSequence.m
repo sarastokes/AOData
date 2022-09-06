@@ -79,12 +79,13 @@ classdef ContrastSequence < sara.protocols.SpectralProtocol
             fName = 'contrast_seq_';
             for i = 1:numel(obj.contrast)
                 if obj.contrast(i) > 0
-                    fName = sprintf('%su%u_', fName, abs(100*obj.contrast(i)));
+                    fName = sprintf('%su%u_', fName, round(abs(100*obj.contrast(i))));
                 else
-                    fName = sprintf('%sd%u_', fName, abs(100*obj.contrast(i)));               
+                    fName = sprintf('%sd%u_', fName, round(abs(100*obj.contrast(i))));               
                 end
             end
-            fName = [fName, sprintf('%up_%us_%ut', 100*obj.baseIntensity, obj.stepTime, obj.totalTime)];
+            fName = [fName, sprintf('%up_%us_%ut',... 
+                round(100*obj.baseIntensity), obj.stepTime, obj.totalTime)];
         end
     end
 

@@ -56,7 +56,7 @@ classdef Baseline < sara.protocols.SpectralProtocol
         end
 
         function fName = getFileName(obj)
-            fName = sprintf('baseline_%up_%ut', 100*obj.baseIntensity, obj.totalTime);
+            fName = sprintf('baseline_%up_%ut', round(100*obj.baseIntensity), obj.totalTime);
         end
     end
 

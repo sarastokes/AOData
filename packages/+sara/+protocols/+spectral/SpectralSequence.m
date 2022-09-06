@@ -12,7 +12,8 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
 % 
 % Properties:
 %   sequence                    LED sequence (e.g. 'RGW', 'BYW')
-%   pulseTime                   Time of each pulse in spectral series
+%   stepTime                    Time of each pulse in spectral series
+%   intensity                   Intensity of individual pulses (0-1)
 % Inherited properties:
 %   preTime
 %   stimTime                    Time for each pulse (pulse + baseline)
@@ -22,16 +23,17 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
 %
 % Derived properties:
 %   interpulseTime              Time b/w pulses (stimTime-pulseTime)
-%   numPulses                   Number of letters in sequence
+%   numSteps                    Number of letters in sequence
 % -------------------------------------------------------------------------
 
     properties
         sequence
-        pulseTime
+        stepTime
+        intensity
     end
 
-    properties (SetAccess = protected)
-        numPulses
+    properties% (SetAccess = protected)
+        numSteps
         interpulseTime 
     end
 
@@ -40,35 +42,34 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
             obj = obj@sara.protocols.SpectralProtocol(...
                 calibration, varargin{:});
             
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
+            ip = aod.util.InputParser();
             addParameter(ip, 'Intensity', 0.75, @isnumeric);
             addParameter(ip, 'Sequence', 'RGW', @ischar);
-            addParameter(ip, 'PulseTime', 5, @isnumeric);
+            addParameter(ip, 'StepTime', 5, @isnumeric);
             parse(ip, varargin{:});
 
             obj.sequence = ip.Results.Sequence;
-            obj.pulseTime = ip.Results.PulseTime;
+            obj.stepTime = ip.Results.StepTime;
+            obj.intensity = ip.Results.Intensity;
 
             % Override default parameters
             obj.spectralClass = sara.SpectralTypes.Generic;
 
             % Derived properties
-            obj.numPulses = numel(obj.sequence);
-            obj.interpulseTime = obj.stimTime - obj.pulseTime;
+            obj.numSteps = numel(obj.sequence);
+            obj.interpulseTime = obj.stimTime - obj.stepTime;
         end
     end
 
     methods 
         function stim = generate(obj)
-            stim = zeros(1, obj.totalPoints);
+            stim = obj.baseIntensity + zeros(1, obj.totalPoints);
             prePts = obj.sec2pts(obj.preTime);
             stimPts = obj.sec2pts(obj.stimTime);
-            pulsePts = obj.sec2pts(obj.pulseTime);
+            stepPts = obj.sec2pts(obj.stepTime);
 
-            for i = 1:obj.numPulses
-                stim(prePts+((i-1)*stimPts)+1 : prePts+((i-1)*stimPts)+pulsePts) = ...
+            for i = 1:obj.numSteps
+                stim(prePts+((i-1)*stimPts)+1 : prePts+((i-1)*stimPts)+stepPts) = ...
                     obj.amplitude + obj.baseIntensity;
             end
         end
@@ -76,35 +77,36 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
         function ledValues = mapToStimulator(obj)
             stim = obj.generate();
             ups = getModulationTimes(stim);
-            bkgdPowers = obj.calibration.stimPowers.Background;
+            bkgdPowers = obj.Calibration.stimPowers.Background;
+            maxPowers = obj.Calibration.ledMaxPowers;
 
             spectralClasses = [];
-            for i = 1:obj.numPulses
+            for i = 1:obj.numSteps
                 spectralClasses = cat(1, spectralClasses,...
                     sara.SpectralTypes.init(obj.sequence(i)));
             end
 
-            ledValues = obj.baseIntensity * repmat(bkgdPowers', [1 numel(stim)]);
-            for i = 1:obj.numPulses
+            ledValues = obj.baseIntensity * repmat(bkgdPowers, [1 numel(stim)]);
+            for i = 1:obj.numSteps
                 ledTargets = find(spectralClasses(i).whichLEDs());
                 for j = 1:numel(ledTargets)
                     ledValues(ledTargets(j), window2idx(ups(i,:))) = ...
-                        obj.contrast * 2*bkgdPowers(j);
+                        obj.intensity * bkgdPowers(ledTargets(j));
                 end
             end
         end
 
         function fName = getFileName(obj)
             fName = sprintf('%s_seq_%us_%um_%up_%ut',...
-                lower(obj.sequence), obj.pulseTime, 100*obj.contrast,...
-                100*obj.baseIntensity, obj.totalTime);
+                lower(obj.sequence), obj.stepTime, round(100*obj.intensity),...
+                round(100*obj.baseIntensity), obj.totalTime);
         end
 
     end
 
     methods (Access = protected)
         function value = calculateTotalTime(obj)
-            value = obj.preTime + (obj.numPulses*obj.stimTime) + obj.tailTime;
+            value = obj.preTime + (obj.numSteps*obj.stimTime) + obj.tailTime;
         end
 
         function value = calculateAmplitude(obj)

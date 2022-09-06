@@ -9,9 +9,6 @@ classdef Experiment < aod.core.Experiment
 %   loadSiftTransforms(obj, fName)
 %   clearSiftTransforms(obj)
 % -------------------------------------------------------------------------
-    properties (SetAccess = protected)
-        sampleRate = 25  % Hz
-    end
     
     properties (Hidden, Transient, Access = protected)
         cachedVideo

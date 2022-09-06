@@ -70,10 +70,10 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
         end
 
         function value = get.ledMeans(obj)
-            if isempty(obj.calibration)
+            if isempty(obj.Calibration)
                 value = [];
             else
-                value = obj.calibration.stimPowers.Background;
+                value = obj.Calibration.stimPowers.Background;
             end
         end       
 
@@ -87,11 +87,11 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             % Syntax:
             %   ledValues = mapToStimulator(obj)
             % -------------------------------------------------------------
-            assert(isa(obj.calibration, 'sara.calibrations.MaxwellianView'),...
+            assert(isa(obj.Calibration, 'sara.calibrations.MaxwellianView'),...
                 'SpectralProtocol/mapToStimulator: requires MaxwellianView calibration');
                 
             stim = obj.generate();
-            bkgdPowers = 2 * obj.calibration.stimPowers.Background;
+            bkgdPowers = 2 * obj.Calibration.stimPowers.Background;
             if ~isrow(bkgdPowers)
                 bkgdPowers = bkgdPowers';
             end
@@ -111,7 +111,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             elseif obj.spectralClass == SpectralTypes.Luminance
                 ledValues = stim .* (bkgdPowers');
             elseif obj.spectralClass.isConeIsolating
-                ledValues = obj.calibration.calcStimulus(obj.spectralClass, stim);
+                ledValues = obj.Calibration.calcStimulus(obj.spectralClass, stim);
             end
         end
 

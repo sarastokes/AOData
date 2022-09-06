@@ -37,7 +37,14 @@ classdef MaxwellianView < aod.core.Calibration
             dPower = obj.stimPowers.(whichStim)';
             bkgdPower = obj.stimPowers.Background';
 
-            stim = (dPower .* ((1/baseStim(1)) * (baseStim-baseStim(1))) + bkgdPower);
+            try
+                stim = (dPower .* ((1/baseStim(1)) * (baseStim-baseStim(1))) + bkgdPower);
+            catch
+                stim = zeros(3, numel(baseStim));
+                for i = 1:3
+                    stim(i,:) = (dPower(i) .* ((1/baseStim(1)) * (baseStim-baseStim(1))) + bkgdPower(i));
+                end
+            end
         end
     end
 

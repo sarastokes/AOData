@@ -53,10 +53,10 @@ classdef Step < sara.protocols.spectral.Pulse
         function fName = getFileName(obj)
             if obj.baseIntensity == 0
                 fName = sprintf('%s_lights_on_%up_%ut',...
-                    char(obj.spectralClass), 100*obj.contrast, obj.totalTime);
+                    char(obj.spectralClass), round(100*obj.contrast), obj.totalTime);
             else
                 fName = sprintf('%s_lights_off_%up_%ut',...
-                    char(obj.spectralClass), 100*obj.baseIntensity, obj.totalTime);
+                    char(obj.spectralClass), round(100*obj.baseIntensity), obj.totalTime);
             end
             fName = lower(fName);
         end
