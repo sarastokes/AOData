@@ -137,7 +137,17 @@ classdef SpectralProtocolFactory < aod.util.Factory
                 sequenceType = extractCrop(fileName, lettersPattern(), '_seq');
 
                 if contains(sequenceType, 'intensity')
-                    error('SpectralProtocolFactory: IntensitySeries not yet implemented!');
+                    spectralClass = extractCrop(fileName, lettersPattern(), '_intensity');
+                    spectralClass = sara.SpectralTypes.init(spectralClass);
+
+                    intensities = extractCrop(fileName, digitsPattern(), 'i_');
+                    intensities = cellfun(@str2double, out);
+
+                    stepTime = str2double(extractCrop(fileName, digitsPattern(), 's_'));
+                    protocol = IntensitySequence(obj.calibration,...
+                        'PreTime', 20, 'StepTime', stepTime, 'TailTime', x,...
+                        'Intensity', intensities, 'BaseIntensity', baseIntensity,...
+                        'SpectralClass', spectralClass);
                 end
                 protocol = SpectralSequence(obj.calibration,...
                     'PreTime', 20, 'StimTime', 60, 'PulseTime', 5,...

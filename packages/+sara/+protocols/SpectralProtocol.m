@@ -124,8 +124,12 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             if nargin < 2
                 fName = obj.getFileName();
             end
+
+            dateText = ['_', datestr(now, 'ddmmmyyyy')];
             if ~endsWith(fName, '.txt')
-                fName = [fName, '.txt'];
+                fName = [fName, dateText, '.txt'];
+            else
+                fName = [fName(1:end-4), dateText, '.txt'];
             end
             ledValues = obj.mapToStimulator();
             makeLEDStimulusFile(fName, ledValues);

@@ -30,7 +30,7 @@ classdef Pulse < sara.protocols.SpectralProtocol
 
             prePts = obj.sec2pts(obj.preTime);
             stimPts = obj.sec2pts(obj.stimTime);
-            stim(prePts+1:stimPts) = obj.amplitude + obj.baseIntensity;
+            stim(prePts+1:prePts+stimPts) = obj.amplitude + obj.baseIntensity;
         end
 
         function ledValues = mapToStimulator(obj)
@@ -40,13 +40,14 @@ classdef Pulse < sara.protocols.SpectralProtocol
         function fName = getFileName(obj)
             [a, b] = parseModulation(obj.baseIntensity, obj.contrast);
             if obj.baseIntensity == 0
-                magVal = obj.amplitude;
+                magVal = sprintf('%ui', round(100*obj.amplitude));
             else
-                magVal = obj.contrast;
+                magVal = sprintf('%uc', round(100*obj.contrast));
             end
-            fName = [sprintf('%s_%s_%s_%up_%us_%ut',...
+            fName = [sprintf('%s_%s_%s_%s_%up_%us_%ut',...
                 lower(char(obj.spectralClass)), a, b,... 
-                abs(100*magVal), obj.stimTime, obj.totalTime)];
+                magVal, round(100*obj.baseIntensity),... 
+                obj.stimTime, obj.totalTime)];
         end
         
         function ledPlot(obj)
