@@ -19,6 +19,12 @@ classdef ClassRepository < handle
 
     methods 
         function obj = ClassRepository(path)
+            if nargin < 1
+                path = obj.getPathPreferences();
+                if isempty(path)
+                    return
+               end
+            end
             obj.setSearchPath(path);
         end
 
@@ -48,6 +54,16 @@ classdef ClassRepository < handle
     end
 
     methods (Access = private)
+        function searchPaths = getPathPreferences(obj)
+            if ~ispref('AOData', 'SearchPaths')
+                searchPaths = [];
+                warning('getPathPreferences:SearchPathsNotSet',...
+                    'Use SearchPathApp to set search paths');
+                return
+            end
+            searchPaths = getpref('AOData', 'SearchPaths');
+        end
+
         function loadAll(obj)
             obj.classMap = containers.Map();
         

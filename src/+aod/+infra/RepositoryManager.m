@@ -73,7 +73,7 @@ classdef RepositoryManager < handle
                     "%s not found", packagePath);
             else
                 obj.userPackages(idx) = [];
-                setpref('AODTools', 'UserPackages', obj.userPackages);
+                setpref('AOData', 'UserPackages', obj.userPackages);
             end
         end
     end
@@ -106,13 +106,13 @@ classdef RepositoryManager < handle
         end
 
         function findPackages(obj)
-            S = getpref('AODTools');
+            S = getpref('AOData');
             if isempty(S)
                 obj.addBasePackage();
                 if ~isempty(obj.userPackages)
                     obj.setUserPackages();
                 else
-                    setpref('AODTools', 'UserPackages', string.empty());
+                    setpref('AOData', 'UserPackages', string.empty());
                 end
                 return
             end
@@ -121,13 +121,13 @@ classdef RepositoryManager < handle
             if ~ismember(f, 'BasePackage')
                 obj.addBasePackage();
             else
-                obj.basePackage = getpref('AODTools', 'BasePackage');
+                obj.basePackage = getpref('AOData', 'BasePackage');
             end
         end
 
         function addBasePackage(obj)
             warning("PackageManager:AddingBasePackage",...
-                'Setting AODTools/BasePackage user preference');
+                'Setting AOData/BasePackage user preference');
             obj.setBasePackage(obj.AOD_PATH);
         end
 
@@ -144,12 +144,12 @@ classdef RepositoryManager < handle
                 aodPath         {mustBeFolder}
             end
 
-            setpref('AODTools', 'BasePackage', aodPath);
+            setpref('AOData', 'BasePackage', aodPath);
             obj.basePackage = aodPath;
         end
 
         function setUserPackages(obj)
-            setpref('AODTools', 'UserPackages', obj.userPackages);
+            setpref('AOData', 'UserPackages', obj.userPackages);
         end
     end
 
