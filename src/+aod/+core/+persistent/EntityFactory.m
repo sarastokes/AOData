@@ -39,6 +39,10 @@ classdef EntityFactory < handle
 
         function e = create(obj, hdfPath)
             T = table(obj.entityManager);
+            if ~ismember(hdfPath, T.Path)
+                error("create:InvalidPath",...
+                    'HDF path was invalid: %s', hdfPath);
+            end
             uuid = T{T.Path == hdfPath, 'UUID'};
             if obj.cache.isKey(uuid)
                 e = obj.cache(uuid);

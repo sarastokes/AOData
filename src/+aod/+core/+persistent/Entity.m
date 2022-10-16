@@ -5,7 +5,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   Parent class for all persistent entities read from an HDF5 file
 %
 % Constructor:
-%   obj = Entity(hdfName, hdfPath)
 %   obj = Entity(hdfName, hdfPath, entityFactory)
 % -------------------------------------------------------------------------
 
@@ -18,6 +17,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     properties (SetAccess = private)
         Parent                  % aod.core.persistent.Entity
         UUID                    string
+    end
+
+    properties (Dependent)
+        readOnly
     end
 
     properties (Hidden, SetAccess = private)
@@ -36,6 +39,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
         % Persistence properties
         factory
+    end
+
+    properties (Access = private)
+        isInitializing
     end
 
     events 
@@ -57,9 +64,24 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.parameters = aod.util.Parameters();
 
             % Create entity from file
+            obj.isInitializing = true;
             if ~isempty(obj.hdfName)
                 obj.populate();
             end
+            obj.isInitializing = false;
+        end
+
+        function value = get.readOnly(obj)
+            value = obj.factory.persistor.readOnly;
+        end
+
+        function setReadOnlyMode(obj, tf)
+            arguments
+                obj
+                tf              logical = false
+            end
+            
+            obj.readOnly = tf;
         end
     end
 
@@ -88,6 +110,35 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 end
             end
         end
+
+        function e = getByPath(obj, hdfPath)
+            % GETBYPATH
+            %
+            % Description:
+            %   Return any entity within the persistent hierarchy 
+            %
+            % Syntax:
+            %   e = getByPath(obj, hdfPath)
+            %
+            % Notes:
+            %   Returns empty with a warning if hdfPath not found
+            % -------------------------------------------------------------
+            arguments
+                obj
+                hdfPath     char 
+            end
+
+            try
+                e = obj.factory.create(hdfPath);
+            catch ME
+                if strcmp(ME.id, 'create:InvalidPath')
+                    warning('getByPath:InvalidHdfPath');
+                    e = [];
+                else
+                    rethrow(ME);
+                end
+            end
+        end
     end
 
     % Dataset methods
@@ -100,19 +151,23 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %
             % Syntax:
             %   addDataset(obj, dsetName, dsetValue)
+            %
+            % TODO: Add standard attributes
             % -------------------------------------------------------------
             arguments
                 obj
                 propName            char
-                propValue           = []
+                propValue           
             end
 
-            [isEntity, isPersisted] = obj.isEntity(entity);
+            obj.checkReadOnlyMode();
+
+            [isEntity, isPersisted] = aod.util.isEntity(entity);
             if isEntity
                 if isPersisted
                     obj.setLink(propName, entity, propValue);
                 else
-                    warning("AddProperty:UnpersistedLink",...
+                    error("AddProperty:UnpersistedLink",...
                         "Links can only be written to persisted entities");
                 end
             else
@@ -120,68 +175,34 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
         end
 
-        function setLink(obj, linkName, linkValue)
-            arguments
-                obj
-                linkName            char
-                linkValue           = []
-            end
-
-            evtData = aod.core.persistent.events.LinkEvent(linkName, linkValue);
-            notify(obj, 'LinkChanged', evtData);
-
-            if ~ismember(linkName, linkValue)
-                obj.addprop(linkName);
-                obj.loadInfo();
-            end
-            obj.(linkName) = obj.loadLink(linkName);
-        end
-
-        function setDataset(obj, dsetName, dsetValue)
-            arguments
-                obj
-                dsetName            char
-                dsetValue           = []
-            end
-
-            newDset = ~obj.ismember(dsetName, string({obj.dsetNames}));
-            if newDset
-                evtData = aod.core.persistent.events.DatasetEvent(dsetName, dsetValue);
-            else
-                evtData = aod.core.persistent.events.DatasetEvent(dsetName, dsetValue,...
-                    obj.(dsetName));
-            end
-            notify(obj, 'DatasetChanged', evtData);
-
-            if newDset
-                obj.addprop(dsetName);
-                obj.loadInfo();
-            end
-            obj.(dsetName) = dsetValue;
-
-        end
-
-        function removeDataset(obj, dsetName)
-            % REMOVEDATASET
+        function removeProperty(obj, propName)
+            % REMOVEPROPERTY
             %
             % Description:
-            %   Remove a dataset from the entity
+            %   Remove a dataset/link from the entity
             %
             % Syntax:
-            %   removeDataset(obj, dsetName)
+            %   remove(obj, dsetName)
             % -------------------------------------------------------------
+            obj.checkReadOnlyMode();
 
-            if ~obj.ismember(dsetName, string({obj.dsetNames}))
-                error("removeDataset:DatasetDoesNotExist",...
-                    "Dataset %s not found", dsetName);
+            p = obj.findprop(propName);
+            if isa(p, 'meta.property')
+                error('removeProperty:FixedProperty',...
+                    'Only dynamic properties can be removed');
             end
 
-            evtData = aod.core.persistent.events.DatasetEvent(dsetName);
-            notify(obj, 'DatasetChanged', evtData);
+            if ismember(propName, obj.dsetNames)
+                obj.setDataset(propName, []);
+            elseif ismember(propName, obj.linkNames)
+                obj.setLink(propName, []);
+            else
+                error("removeProperty:PropertyDoesNotExist",...
+                    "No link/dataset matches %s", propName);
+            end
 
-            p = findprop(obj, dsetName);
+            p = findprop(obj, propName);
             delete(p);
-
             obj.loadInfo();
         end
 
@@ -194,8 +215,20 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % Syntax:
             %   deleteEntity(obj)
             % -------------------------------------------------------------
+            obj.checkReadOnlyMode();
             evtData = aod.core.persistent.events.GroupEvent(obj, 'Remove');
             notify(obj, 'GroupChanged', evtData);
+        end
+    end
+
+    % Special property methods
+    methods
+        function setName(obj, entityName)
+            arguments
+                obj
+                entityName          char        = ''
+            end
+            obj.Name = entityName;
         end
     end
 
@@ -248,28 +281,23 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            if isscalar(obj)
-                if ~obj.hasParam(paramName)
-                    switch errorType 
-                        case ErrorTypes.ERROR
-                            error("getParam:ParamNotFound",...
-                                "Parameter %s not present", paramName);
-                        case ErrorTypes.WARNING
-                            warning("getParam:ParamNotFound",...
-                                "Parameter %s not present", paramName);
-                            out = [];
-                            return
-                        case ErrorTypes.MISSING
-                            out = missing;
-                            return
-                        case ErrorTypes.NONE
-                            out = [];
-                            return
-                    end
-                else
-                    out = obj.parameters(paramName);
+            if ~obj.hasParam(paramName)
+                switch errorType 
+                    case ErrorTypes.ERROR
+                        error("getParam:ParamNotFound",...
+                            "Parameter %s not present", paramName);
+                    case ErrorTypes.WARNING
+                        warning("getParam:ParamNotFound",...
+                            "Parameter %s not present", paramName);
+                        out = [];
+                    case ErrorTypes.MISSING
+                        out = missing;
+                    case ErrorTypes.NONE
+                        out = [];
                 end
                 return
+            else
+                out = obj.parameters(paramName);
             end
         end
 
@@ -287,6 +315,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 paramName           char
                 paramValue
             end
+
+            obj.checkReadOnlyMode();
             
             if ~isscalar(obj)
                 arrayfun(@(x) x.setParam(paramName, paramValue), obj);
@@ -311,6 +341,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             arguments
                 obj
                 paramName           char
+            end
+
+            obj.checkReadOnlyMode();
+
+            if ~isscalar(obj)
+                arrayfun(@(x) removeParam(x, fileName), obj);
+                return
             end
 
             if ismember(paramName, aod.h5.getSystemAttributes())
@@ -339,11 +376,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         function tf = hasFile(obj, fileName)
             % HASFILE
             %
-            % Description
+            % Description:
+            %   Check whether entity has a file
             %
             % Syntax:
             %   tf = hasFile(obj, fileName)
-            %
             % -------------------------------------------------------------
             arguments
                 obj
@@ -394,14 +431,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                         warning("getFile:FileNotFound",...
                             "File %s not present", fileName);
                         out = [];
-                        return
                     case ErrorTypes.MISSING
                         out = missing;
-                        return
                     case ErrorTypes.NONE
                         out = [];
-                        return
                 end
+                return
             else
                 out = obj.files(fileName);
             end
@@ -421,6 +456,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 fileName            char
                 fileValue 
             end
+
+            obj.checkReadOnlyMode();
             
             if ~isscalar(obj)
                 arrayfun(@(x) x.setFile(fileName, fileValue), obj);
@@ -446,6 +483,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 obj
                 fileName           char
             end
+
+            obj.checkReadOnlyMode();
 
             if ~isscalar(obj)
                 arrayfun(@(x) removeFile(x, fileName), obj);
@@ -521,6 +560,21 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             evtData = aod.core.persistent.events.GroupEvent(entity, 'Add');
             notify(obj, 'GroupChanged', evtData);
+        end
+
+        function checkReadOnlyMode(obj)
+            % CHECKREADONLYMODE
+            %
+            % Description:
+            %   Throws error if persistent hierarchy is in read only mode
+            %
+            % Syntax:
+            %   checkReadOnlyMode(obj)
+            % -------------------------------------------------------------
+            if obj(1).readOnly 
+                error("Entity:ReadOnlyModeEnabled",...
+                    "Disable read only mode before making changes");
+            end
         end
     end
 
@@ -624,8 +678,46 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
     end
 
-    % Dynamic property assignment methods
+    % Dynamic property methods
     methods (Access = protected)
+        function p = createDynProp(obj, propName, propType, propValue)
+            % CREATEDYNPROP
+            % 
+            % Description:
+            %   Add a dynamic property related to an HDF5 link/dataset
+            %
+            % Syntax:
+            %   p = createDynProp(obj, propName, propType)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                propName            char
+                propType            {mustBeMember(propType, {'Link', 'Dataset'})}
+                propValue           = []'
+            end
+
+            p = obj.addprop(propName);
+            switch propType
+                case 'Link'
+                    obj.setLink(propName, propValue)
+                case 'Dataset'
+                    p.SetMethod = @obj.setDataset;
+            end
+        end
+
+        function deleteDynProp(obj, propName)
+            % DELETEDYNPROP
+            %
+            % Description:
+            %   Delete a dynamic property from entity and in HDF5 file
+            %
+            % Syntax:
+            %   deleteDynProp(obj, propName)
+            % -------------------------------------------------------------
+            p = findprop(obj, propName);
+            delete(p);
+        end
+
         function setDatasetsToDynProps(obj)
             % SETDATASETSTODYNPROPS
             %
@@ -642,9 +734,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             for i = 1:numel(obj.dsetNames)
                 if ~isprop(obj, obj.dsetNames(i))
-                    obj.addprop(obj.dsetNames(i));
-                    obj.(obj.dsetNames(i)) = aod.h5.readDatasetByType(...
+                    p = obj.addprop(obj.dsetNames(i));
+                    p.Description = 'Dataset';
+                    dsetValue = aod.h5.readDatasetByType(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
+                    obj.(obj.dsetNames(i)) = dsetValue;
                 end
             end
         end
@@ -659,42 +753,76 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % Syntax:
             %   setLinksToDynProps(obj)
             % -------------------------------------------------------------
-
             if isempty(obj.linkNames)
                 return
             end
 
             for i = 1:numel(obj.linkNames)
                 if ~isprop(obj, obj.linkNames(i))
-                    obj.(obj.linkNames(i)) = obj.loadLink(obj.linkNames(i));
+                    p = obj.addprop(obj.linkNames(i));
+                    p.Description = 'Link';
+                    linkValue = obj.loadLink(obj.linkNames(i));
+                    obj.(obj.linkNames(i)) = linkValue;
                 end
             end
         end
     end
 
-    methods (Static)
-        function [tf, persisted] = isEntity(entity)
-            % ISENTITY
-            %
-            % Description:
-            %   Returns whether input is an AOData entity and if so, 
-            %   whether the entity is persisted or not
-            %
-            % Syntax:
-            %   [tf, persisted] = isEntity(entity)
-            % -------------------------------------------------------------
-            if isSubclass(entity, 'aod.core.persistent.Entity')
-                tf = true;
-                persisted = true;
-            elseif isSubclass(entity, 'aod.core.Entity')
-                tf = true;
-                persisted = false;
-            else
-                tf = false;
-                persisted = [];
+    % HDF5 edit methods
+    methods (Access = protected)
+        function setLink(obj, linkName, linkValue)
+            arguments
+                obj
+                linkName            char
+                linkValue           = []
             end
+
+            evtData = aod.core.persistent.events.LinkEvent(linkName, linkValue);
+            notify(obj, 'LinkChanged', evtData);
+
+            if ~ismember(linkName, obj.linkNames)
+                %obj.createDynProp(linkName, 'Link');
+                h = obj.addprop(linkName);
+                h.Description = 'Link';
+            end
+            if isempty(linkValue)
+                obj.deleteDynProp(linkName);
+            else
+                obj.(linkName) = obj.loadLink(linkName);
+            end
+            obj.loadInfo()
         end
-        
+
+        function setDataset(obj, dsetName, dsetValue)
+            arguments
+                obj
+                dsetName            char        = ''
+                dsetValue                       = []
+            end
+
+            newDset = ~obj.ismember(dsetName, obj.dsetNames);
+            if newDset
+                evtData = aod.core.persistent.events.DatasetEvent(dsetName, dsetValue);
+            else
+                evtData = aod.core.persistent.events.DatasetEvent(...
+                    dsetName, dsetValue, obj.(dsetName));
+            end
+            notify(obj, 'DatasetChanged', evtData);
+
+            if newDset
+                %obj.createDynProp(dsetName, 'Dataset');
+                obj.addprop(dsetName);
+            end
+            if isempty(dsetValue)
+                obj.deleteDynProp(dsetName);
+            else
+                obj.(dsetName) = dsetValue;
+            end
+            obj.loadInfo();
+        end
+    end
+
+    methods (Static)
         function tf = ismember(a, b)
             % ISMEMBER
             %

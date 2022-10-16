@@ -16,7 +16,7 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 % -------------------------------------------------------------------------
 
     properties (Hidden, Dependent)
-        contents
+        contents            % All child entities
     end
 
     properties (SetAccess = private)
@@ -42,7 +42,6 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
                 value = cat(1, value, obj.entityFactory.create(obj.memberPaths(i)));
             end
         end
-    end
 
     methods (Access = ?aod.core.persistent.Persistor)
         function refresh(obj)
@@ -104,7 +103,7 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
             end
         end
 
-        function n = parenListLength(obj, indexOp, indexContext)
+        function n = parenListLength(obj, indexOp, ~)
             n = numel(obj.memberPaths(indexOp(1).Indices{1}));
         end
 

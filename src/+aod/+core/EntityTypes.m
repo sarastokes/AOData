@@ -120,7 +120,7 @@ classdef EntityTypes
             end
         end
 
-        function out = childContainers(obj)
+        function out = childContainers(obj, fullVariableName)
             % CONTAINERS
             %
             % Description:
@@ -132,6 +132,11 @@ classdef EntityTypes
             % Example:
             %   For SYSTEM, childContainers returns 'Channels'
             % -------------------------------------------------------------
+            arguments
+                obj
+                fullVariableName        logical = false
+            end
+
             import aod.core.EntityTypes
 
             switch obj
@@ -147,6 +152,12 @@ classdef EntityTypes
                     out = {'Devices'};
                 otherwise
                     out = [];
+            end
+
+            if fullVariableName && ~isempty(out)
+                for i = 1:numel(out)
+                    out{i} = [out{i}, 'Container'];
+                end
             end
         end
     end
@@ -439,8 +450,7 @@ classdef EntityTypes
             
             import aod.core.EntityTypes;
 
-            entityName = lower(entityName);
-            switch entityName
+            switch lower(entityName)
                 case {'experiment', 'exp'}
                     obj = EntityTypes.EXPERIMENT;
                 case {'source', 'sources', 'src'}
@@ -465,6 +475,58 @@ classdef EntityTypes
                     obj = EntityTypes.STIMULUS;
                 case {'analysis', 'analyses'}
                     obj = EntityTypes.ANALYSIS;
+                otherwise
+                    obj = [];
+            end
+        end
+
+        function obj = fromClassName(obj, className)
+            if isstring(className)
+                className = char(className);
+            end
+            if ~ischar(className)
+                className = class(className);
+            end
+
+            if ~isSubclass(className, {'aod.core.Entity', 'aod.core.Experiment'})
+                error("EntityTypes/fromClassName",...
+                    "%s is not an subclass of aod.core.Entity or aod.core.persistent.Entity");
+            end
+            
+            if isSubclass(x, 'aod.core.persistent.Entity')
+                obj = x.entityType;
+                return
+            end
+
+            import aod.core.EntityTypes;
+            if isSubclass(x, 'aod.core.Entity')
+                if isSubclass(x, 'aod.core.Experiment')
+                    obj = EntityTypes.EXPERIMENT;
+                elseif isSubclass(x, 'aod.core.Epoch')
+                    obj = EntityTypes.EPOCH;
+                elseif isSubclass(x, 'aod.core.Source')
+                    obj = EntityTypes.SOURCE;
+                elseif isSubclass(x, 'aod.core.Calibration')
+                    obj = EntityTypes.CALIBRATION;
+                elseif isSubclass(x, 'aod.core.Region')
+                    obj = EntityTypes.REGION;
+                elseif isSubclass(x, 'aod.core.System')
+                    obj = EntityTypes.SYSTEM;
+                elseif isSubclass(x, 'aod.core.Channel')
+                    obj = EntityTypes.CHANNEL;
+                elseif isSubclass(x, 'aod.core.Device')
+                    obj = EntityTypes.DEVICE;
+                elseif isSubclass(x, 'aod.core.Analysis')
+                    obj = EntityTypes.ANALYSIS;
+                elseif isSubclass(x, 'aod.core.Registration')
+                    obj = EntityTypes.REGISTRATION;
+                elseif isSubclass(x, 'aod.core.Stimulus')
+                    obj = EntityTypes.STIMULUS;
+                elseif isSubclass(x, 'aod.core.Dataset')
+                    obj = EntityTypes.DATASET;
+                elseif isSubclass(x, 'aod.core.Response')
+                    obj = EntityTypes.RESPONSE;
+                end
             end
         end
     end

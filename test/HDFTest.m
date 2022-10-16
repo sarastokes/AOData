@@ -1,7 +1,7 @@
 classdef HDFTest < matlab.unittest.TestCase
 
     properties
-        HDF_FILE = fullfile(getpref('AODTools', 'BasePackage'), 'test\\test.h5');
+        HDF_FILE = fullfile(getpref('AOData', 'BasePackage'), 'test\\test.h5');
     end
 
     methods (TestClassSetup)

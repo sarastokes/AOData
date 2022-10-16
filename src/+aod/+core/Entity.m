@@ -50,9 +50,6 @@ classdef (Abstract) Entity < handle
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
-%
-% Static methods:
-%   tf = isEntity(entity)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

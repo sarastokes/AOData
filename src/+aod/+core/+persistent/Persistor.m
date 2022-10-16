@@ -1,5 +1,9 @@
 classdef Persistor < handle
 
+    properties (SetAccess = private)
+        readOnly        logical
+    end
+
     properties (Access = private)
         hdfName
         UUIDs
@@ -12,6 +16,15 @@ classdef Persistor < handle
     methods
         function obj = Persistor(hdfName)
             obj.hdfName = hdfName;
+            obj.readOnly = true;
+        end
+        
+        function setReadOnly(obj, value)
+            arguments
+                obj
+                value           logical = true
+            end
+            obj.readOnly = value;
         end
     end
 
@@ -41,6 +54,21 @@ classdef Persistor < handle
                 aod.h5.HDF5.deleteAttribute(obj.hdfName, src.hdfPath, evt.Name);
             else % Add/change attribute
                 aod.h5.writeAttributeByType(obj.hdfName, src.hdfPath, evt.Name, evt.Value);
+            end
+        end
+
+        function onLinkChanged(obj, src, evt)
+            % ONLINKCHANGED
+            %
+            % Description:
+            %   Process a link change
+            %
+            % Syntax:
+            %   onLinkChanged(obj, src, evt)
+            % -------------------------------------------------------------
+            if isempty(evt.Value)
+                % Link removed
+                aod.h5.HDF5.deleteObject(obj.hdfName, char(src.hdfPath));
             end
         end
 

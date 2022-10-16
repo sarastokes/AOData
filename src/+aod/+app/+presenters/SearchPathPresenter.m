@@ -27,11 +27,6 @@ classdef SearchPathPresenter < appbox.Presenter
             obj.isChanged = false;
             obj.go();
         end
-
-        function v = getView(obj)
-            v = obj.view;
-        end
-        
     end
 
     methods (Access = protected)
@@ -123,7 +118,6 @@ classdef SearchPathPresenter < appbox.Presenter
         end
 
         function onViewSelectedCancel(obj, ~, ~)
-            disp('Received')
             obj.stop();
         end
 

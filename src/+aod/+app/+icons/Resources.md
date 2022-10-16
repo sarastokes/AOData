@@ -19,6 +19,11 @@ A list of the sources for various resources
 - [Data Icon](https://freeicons.io/office-and-workstation-icons-5/grid-icon-18893#)
 - [Film Icon](https://freeicons.io/icon-list/office-and-workstation-icons-5)
 - [Time Icon](https://freeicons.io/office-and-workstation-icons-3/calendar-icon-18743#)
+- System Icon by <a href="https://freeicons.io/profile/122327">Ginkaewicons</a> on <a href="https://freeicons.io">freeicons.io</a>
+- Category Icon by <a href="https://freeicons.io/profile/5790">ColourCreatype</a> on <a href="https://freeicons.io">freeicons.io</a>
+- Timetable Icon by <a href="https://freeicons.io/profile/101755">Notachai Plukjaisuea</a> on <a href="https://freeicons.io">freeicons.io</a>
+                                
+                                
 
 Workspace Icons: 
 [3](https://freeicons.io/icon-list/office-and-workstation-icons-3)

@@ -9,7 +9,7 @@ function e = loadExperiment(hdfName, entityFactory)
     %   e = loadExperiment(hdfName, entityFactory)
     % --------------------------------------------------------------------
 
-    if nargin < 2
+    if nargin < 2 || isempty(entityFactory)
         EF = aod.core.persistent.EntityFactory(hdfName);
     else
         EF = entityFactory;

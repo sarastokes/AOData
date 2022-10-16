@@ -36,6 +36,7 @@ Each class is generic and meant to be subclassed and tailored to specific imagin
 (Currently, these may only be necessary for packages)
 - [JSONLab 2.0](https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab-a-toolbox-to-encode-decode-json-files?s_tid=ta_fx_results)
 - [ReadImageJROI](https://github.com/DylanMuir/ReadImageJROI)
+- [appbox](https://github.com/cafarm/appbox)
 - Other misc 3rd party functions are found in `\lib`
 
 ### Optional toolboxes:

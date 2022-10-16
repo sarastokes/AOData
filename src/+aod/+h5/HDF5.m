@@ -16,10 +16,12 @@ classdef HDF5 < handle
 %   makeEnumDataset(fileName, pathName, dsetName, data)
 %   makeTextDataset(fileName, pathName, dsetName, txt)
 %   makeDateDataset(fileName, pathName, data)
+%   makeStructDataset(fileName, pathName, dsetName, data)
 %   makeCompoundDataset(fileName, pathName, dsetName, data)
 %   makeStringDataset(fileName, pathName, dsetName, data)
 %
 %   deleteObject(fileName, pathName, name)
+%   deleteAttribute(fileName, pathName, name)
 %   writeatts(fileName, pathName, varargin)
 %   createLink(fileName, targetPath, linkPath, linkName)
 %
@@ -32,6 +34,7 @@ classdef HDF5 < handle
 %   17Jan2022 - SSP
 %   08Jun2022 - SSP - Additions to ao-data-tools
 %   22Aug2022 - SSP - Dataset ID no longer return option for make methods
+%   04Sep2022 - SSP - Stricter type checking for char inputs
 % -------------------------------------------------------------------------
 
     properties (Hidden, Constant)
@@ -51,10 +54,12 @@ classdef HDF5 < handle
             % Optional inputs:
             %   overwrite           logical, default = false
             % -------------------------------------------------------------
-            assert(endsWith(fileName, '.h5'), 'File name must end with .h5');
-            if nargin < 2
-                overwrite = false;
+            arguments
+                fileName            {mustBeFile(fileName)}
+                overwrite           logical                     = false
             end
+
+            assert(endsWith(fileName, '.h5'), 'File name must end with .h5');
 
             if exist(fileName, 'file')
                 if overwrite
@@ -85,8 +90,9 @@ classdef HDF5 < handle
             % Optional inputs:
             %   readOnly        logical, default = false
             % -------------------------------------------------------------
-            if nargin < 2
-                readOnly = false;
+            arguments
+                fileName            {mustBeFile(fileName)}
+                readOnly            logical = true
             end
 
             if readOnly
@@ -108,7 +114,10 @@ classdef HDF5 < handle
             % Inputs:
             %   varargin        New group name(s)
             % -------------------------------------------------------------
-            
+            if isstring(pathName)
+                pathName = char(pathName);
+            end
+
             fileID = aod.h5.HDF5.openFile(fileName);
             fileIDx = onCleanup(@()H5F.close(fileID));
             for i = 1:numel(varargin)
@@ -168,21 +177,26 @@ classdef HDF5 < handle
             % Syntax:
             %   makeMatrixDataset(hdfFile, pathName, dsetName, data)
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                dsetName            char 
+                data                {mustBeNumeric(data)}
+            end
+
             fullPath = aod.h5.HDF5.buildPath(pathName, dsetName);
 
             try
                 h5create(fileName, fullPath, size(data), 'Datatype', class(data));
             catch ME
-                if strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
-                    % warning('Dataset %s already existed', fullPath);
-                else
+                if ~strcmp(ME.identifier, 'MATLAB:imagesci:h5create:datasetAlreadyExists')
                     rethrow(ME);
                 end
             end                    
             h5write(fileName, fullPath, data);
         end
 
-        function makeEnumDataset(hdfName, pathName, dsetName, value)
+        function makeEnumDataset(fileName, pathName, dsetName, value)
             % MAKEENUMDATASET
             %
             % Description:
@@ -191,11 +205,15 @@ classdef HDF5 < handle
             % Syntax:
             %   makeEnumDataset(hdfName, pathName, dsetName, val)
             % -------------------------------------------------------------
-            if isstring(dsetName)
-                dsetName = char(dsetName);
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                dsetName            char 
+                value                
             end
-            aod.h5.HDF5.makeTextDataset(hdfName, pathName, dsetName, char(value));
-            aod.h5.HDF5.writeatts(hdfName, [pathName, '/', dsetName],... 
+
+            aod.h5.HDF5.makeTextDataset(fileName, pathName, dsetName, char(value));
+            aod.h5.HDF5.writeatts(fileName, [pathName, '/', dsetName],... 
                 'Class', 'enum', 'EnumClass', class(value));
         end
 
@@ -208,9 +226,13 @@ classdef HDF5 < handle
             % Syntax:
             %   makeTextDataset(fileName, pathName, dsetName, txt)
             % -------------------------------------------------------------
-            if isstring(dsetName)
-                dsetName = char(dsetName);
+            arguments
+                hdfIn            
+                pathName            char
+                dsetName            char 
+                txt
             end
+
             if isa(hdfIn, 'H5ML.id')
                 fileID = hdfIn;
             else
@@ -263,6 +285,13 @@ classdef HDF5 < handle
             % Syntax:
             %   makeStringDataset(fileName, pathName, dsetName, data)
             % ------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                dsetName            char 
+                data                string
+            end
+
             fullPath = aod.h5.HDF5.buildPath(pathName, dsetName);
             if ~aod.h5.HDF5.exists(fileName, fullPath)
                 h5create(fileName, fullPath, size(data),...
@@ -281,8 +310,14 @@ classdef HDF5 < handle
             % Syntax:
             %   makeDateDataset(fileName, pathName, data)
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                dsetName            char 
+                data                datetime
+            end
+
             import aod.h5.HDF5
-            assert(isdatetime(data), 'makeDateDataset: data must be datetime');
 
             HDF5.makeTextDataset(fileName, pathName, dsetName, datestr(data));
             HDF5.writeatts(fileName, HDF5.buildPath(pathName, dsetName),...
@@ -291,7 +326,20 @@ classdef HDF5 < handle
 
         function makeStructDataset(fileName, pathName, dsetName, data)
             % MAKESTRUCTDATASET
+            %
+            % Description:
+            %    Hack to write struct/table when makeCompoundDataset fails
+            %
+            % Syntax:
+            %   makeStructDataset(fileName, pathName, dsetName, data)
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                dsetName            char 
+                data
+            end
+
             import aod.h5.HDF5
 
             fullPath = HDF5.buildPath(pathName, dsetName);
@@ -321,6 +369,13 @@ classdef HDF5 < handle
             % Syntax:
             %   makeCompoundDataset(fileName, pathName, table);
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char 
+                dsetName            char 
+                data 
+            end
+
             import aod.h5.HDF5
 
             fullPath = HDF5.buildPath(pathName, dsetName);
@@ -419,6 +474,12 @@ classdef HDF5 < handle
             % Syntax:
             %   deleteAttribute(fileName, pathName, name)
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                name                char
+            end
+
             fileID = aod.h5.HDF5.openFile(fileName);
             fileIDx = onCleanup(@()H5F.close(fileID));
 
@@ -437,6 +498,12 @@ classdef HDF5 < handle
             % Syntax:
             %   aod.h5.HDF5.deleteObject(fileID, pathName, name);
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                name                char
+            end
+
             if nargin == 2
                 name = aod.h5.HDF5.getPathEnd(pathName);
                 pathName = aod.h5.HDF5.getPathParent(pathName);
@@ -464,6 +531,10 @@ classdef HDF5 < handle
             % varargin may be a containers.Map of attributes or a list of
             % attributes specified as key, value
             % -------------------------------------------------------------
+            if isstring(pathName)
+                pathName = char(pathName);
+            end
+
             if isSubclass(varargin{1}, 'containers.Map')
                 attMap = varargin{1};
             else
@@ -496,6 +567,13 @@ classdef HDF5 < handle
             % Syntax:
             %   createLink(fileName, targetPath, linkPath, linkName)
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                targetPath          char
+                linkPath            char
+                linkName            char
+            end
+
             import aod.h5.HDF5
             if HDF5.exists(fileName, HDF5.buildPath(linkPath, linkName))
                 warning('LinkExists: Skipped existing link at %s', linkPath);
@@ -563,6 +641,11 @@ classdef HDF5 < handle
             % Inputs:
             %   fileName        char H5 file name OR H5ML.id
             % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+            end
+
             if isa(fileName, 'H5ML.id')
                 tf = H5L.exists(fileName, pathName, 'H5P_DEFAULT');
             else
@@ -581,8 +664,9 @@ classdef HDF5 < handle
         end
 
         function x = getGroupNames(fileName, pathName)
-            if nargin == 1
-                pathName = '\';
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char = '\'
             end
             
             S = h5info(fileName, pathName);
@@ -590,8 +674,9 @@ classdef HDF5 < handle
         end
         
         function x = getDatasetNames(fileName, pathName)
-            if nargin == 1
-                pathName = '\';
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char = '\'
             end
 
             S = h5info(fileName, pathName);
@@ -599,6 +684,11 @@ classdef HDF5 < handle
         end
 
         function [x, S] = getAttributeNames(fileName, pathName)
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char = '\'
+            end
+
             if nargin == 1
                 pathName = '\';
             end
@@ -664,6 +754,10 @@ classdef HDF5 < handle
             % Syntax:
             %   parentPath = getPathParent(pathName)
             % -------------------------------------------------------------
+            arguments
+                pathName            char
+            end
+
             idx = strfind(pathName, '/');
             lastName = pathName(idx(end)+1:end);
         end

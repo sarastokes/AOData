@@ -61,6 +61,8 @@ function experiment = ToyExperiment(writeToHDF)
 
     experiment.addEpoch(aod.core.Epoch(2, 'Source', source.Sources(1).Sources(1)));
 
+    experiment.addAnalysis(aod.core.Analysis('TestAnalysis', '20220904'));
+
     if writeToHDF
         aod.h5.writeExperimentToFile('test.h5', experiment, true);
     end

@@ -21,7 +21,7 @@ classdef IsoluminanceBoost < sara.protocols.spectral.Steps
 
     methods 
         function obj = IsoluminanceBoost(calibration, varargin)
-            obj = obj@sara.protocols.Steps(...
+            obj = obj@sara.protocols.spectral.Steps(...
                 calibration, varargin{:});
 
             ip = inputParser();
