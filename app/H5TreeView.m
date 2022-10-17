@@ -1,4 +1,12 @@
 classdef H5TreeView < handle
+% H5TREEVIEW
+%
+% Description:
+%   Read-only interface for exploring AOData HDF5 files
+%
+% Constructor:
+%   obj = H5TreeView(hdfFile)
+% -------------------------------------------------------------------------
 
     properties (Access = private)
         hdfFile
@@ -39,7 +47,6 @@ classdef H5TreeView < handle
     methods (Access = private)
 
         function onKeyPress(obj, ~, evt)
-
             switch evt.Character
                 case 'c'
                     node = obj.Tree.SelectedNodes;
@@ -52,7 +59,6 @@ classdef H5TreeView < handle
         end
         
         function onNodeSelected(obj, src, ~)
-            % assignin('base', 'src', src);
             obj.resetDisplay();
             node = src.SelectedNodes;
             if isempty(node.NodeData)
@@ -64,7 +70,7 @@ classdef H5TreeView < handle
             end
 
             nodeType = aod.app.TreeNodeTypes.init(node.Tag);
-            if nodeType == aod.app.TreeNodeTypes.GROUP || nodeType == ao.ui.TreeNodeTypes.GENERIC
+            if nodeType == aod.app.TreeNodeTypes.GROUP || nodeType == aod.app.TreeNodeTypes.GENERIC
                 return
             end
             if nodeType.isText()
@@ -123,7 +129,7 @@ classdef H5TreeView < handle
                 return;
             end
             for i = 1:numel(S.Datasets)
-                dataObj = ao.io.H5DatasetPointer(obj.hdfFile, [groupName, '/', S.Datasets(i).Name]);
+                dataObj = aod.h5.H5DatasetPointer(obj.hdfFile, [groupName, '/', S.Datasets(i).Name]);
                 nodeParams = obj.attributes2map(S.Datasets(i).Attributes);
                 iNode = uitreenode(parentNode,...
                     'Text', S.Datasets(i).Name,...

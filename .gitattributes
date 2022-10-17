@@ -1,3 +1,7 @@
+%% Files will always have CRLF line endings on checkout
+*.sln text eol=crlf
+
+## MATLAB files
 *.fig binary
 *.mat binary
 *.mdl binary diff merge=mlAutoMerge
