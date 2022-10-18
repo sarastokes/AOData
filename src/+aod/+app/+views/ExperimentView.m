@@ -85,103 +85,75 @@ classdef ExperimentView < aod.app.UIView
             node = obj.Tree.SelectedNodes;
         end
 
+        function selectNode(obj, node)
+            obj.Tree.SelectedNodes = node;
+            notify(obj, 'NodeSelected');
+        end
+
+        function node = path2node(obj, hdfPath)
+            node = findobj(obj.Tree, 'Tag', hdfPath);
+        end
+
+        function showNode(obj, node)
+            scroll(obj.Tree, node);
+        end
+    end
+
+    % Node-specific display methods
+    methods 
+        function setDataDisplayPanel(obj, displayType, data)
+            switch displayType
+                case 'Text'
+                    obj.setTextPanelView(data);
+                case 'Table'
+                    obj.setTablePanelView(data);
+            end
+        end
+
         function setAttributeTable(obj, data)
             % SETATTRIBUTETABLE
             %
             % Description:
             %   Add attributes (as container.Map) to the attribute table
             % -------------------------------------------------------------
-            disp('hey')
             obj.Attributes.ColumnName = {'Attribute', 'Value'};
             if nargin > 1
                 obj.Attributes.Data = data;
-                rowIdx = find(cellfun(@(x) ismember(x, {'UUID', 'label', 'entityType', 'Class'}), data{:, 1}));
+                systemAttributes = {'UUID', 'label', 'entityType', 'Class', 'Format'};
+                rowIdx = find(cellfun(@(x) ismember(x, systemAttributes), data{:, 1}));
                 addStyle(obj.Attributes, obj.SYSTEM_STYLE, 'Row', rowIdx);
             end
         end
-    end
 
-    % Panel display methods
-    methods 
         function setLinkPanelView(obj, linkValue)
             obj.LinkPanel.Visible = 'on';
             obj.LinkPanelText.Value = linkValue;
+        end
+
+        function setTextPanelView(obj, txt)
+            obj.TextPanel.Visible = 'on';
+            obj.TextPanel.Value = txt;
+        end
+
+        function setTablePanelView(obj, data)
+            obj.TablePanel.Visible = 'on';
+            if istable(data)
+                obj.TablePanel.Data = data.Data;
+                obj.TablePanel.ColumnNames = data.Data.Properties.VariableNames;
+            else
+                obj.TablePanel.Data = data;
+            end
         end
     end
 
     % New node methods
     methods 
-        function g = populateEntityNode(obj, hdfPath, parentNode)
-            % POPULATEENTITYNODE
-            %
-            % Description:
-            %   Create a new node representing an HDF group for an entity
-            % -------------------------------------------------------------
-            if nargin < 3
-                parentPath = aod.h5.HDF5.getPathParent(hdfPath);
-                if parentPath == "/"
-                    parentNode = obj.Tree;
-                else
-                    parentNode = findobj(obj.figureHandle, "Tag", parentPath);
-                end
-            end
-            assignin('base','parentNode',parentNode);
-            nodeData = struct('LoadState', aod.app.GroupLoadState.NAME,...
-                'NodeType', 'Entity', 'Attributes', containers.Map());
-            g = uitreenode(parentNode,...
-                'Text', aod.h5.HDF5.getPathEnd(hdfPath),...
-                'Icon', [obj.ICON_DIR, 'folder.png'],...
-                'NodeData', nodeData,...
-                'Tag', hdfPath);
-            assignin('base','g',g);
-            % Include so expand option is available for later loading
-            uitreenode(g,...
-                'Text', 'Placeholder');
-            %obj.addContextMenu(g);
-        end
-
-        function populateContainerNode(obj, hdfPath, parentNode)
-            % POPULATECONTAINERNODE
-            %
-            % Description:
-            %   Create a new node representing an HDF group representing an
-            %   entity container
-            % -------------------------------------------------------------
-            if nargin < 3
-                parentNode = findobj(obj.figureHandle, "Tag",...
-                    aod.h5.HDF5.getPathParent(hdfPath));
-            elseif ~isa(parentNode, 'matlab.ui.container.TreeNode')
-                parentNode = findobj(obj.figureHandle, "Tag", parentNode);
-            end
-            nodeData = struct('NodeType', 'Container',...
-                'LoadState', aod.app.GroupLoadState.NAME,...
-                'Attributes', containers.Map());
-            g = uitreenode(parentNode,...
-                'Text', aod.h5.HDF5.getPathEnd(hdfPath),...
-                'Icon', obj.containerIcon,...
-                'NodeData', nodeData,...
-                'Tag', hdfPath);
-            addStyle(obj.Tree, obj.CONTAINER_STYLE, "Node", g);
-            %obj.addContextMenu(g);
-        end
-
         function g = makeEntityNode(obj, parent, nodeName, hdfPath, data)
             g = uitreenode(parent,...
                 'Text', nodeName,...
                 'Icon', [obj.ICON_DIR, 'folder.png'],...
                 'Tag', hdfPath,...
                 'NodeData', data);
-        end
-
-        function makePlaceholderNode(obj, parent) %#ok<INUSD> 
-            uitreenode(parent,...
-                'Text', 'Placeholder');
-        end
-
-        function node = formatContainerNode(obj, node)
-            node.Icon = im2uint8(lighten(im2double(...
-                imread([obj.ICON_DIR, 'folder.png'])), 0.45));
-            addStyle(obj.Tree, obj.CONTAINER_STYLE, "node", node);
         end
 
         function g = makeDatasetNode(obj, parent, dsetName, hdfPath, data) %#ok<INUSD> 
@@ -192,20 +164,32 @@ classdef ExperimentView < aod.app.UIView
                 'NodeData', data);
         end
 
-        function makeLinkNode(obj, parentNode, linkName, linkValue)
+        function makeLinkNode(obj, parentNode, linkName, hdfPath, linkValue)
             % MAKELINKNODE
             %
             % Description:
             %   Create a new node representing an HDF link
             % -------------------------------------------------------------
-            linkData = struct('NodeType', 'link', 'LinkPath', linkValue);
+            linkData = struct('NodeType', 'link', 'LinkPath', linkValue,...
+                'H5Node', aod.app.H5NodeTypes.LINK,...
+                'AONode', aod.app.AONodeTypes.LINK);
             
             g = uitreenode(parentNode,...
                 'Text', linkName,...
                 'Icon', [obj.ICON_DIR, 'link.png'],...
-                'Tag', aod.h5.HDF5.buildPath(parentNode.Tag, linkName),...
+                'Tag', hdfPath,...
                 'NodeData', linkData);
             obj.addContextMenu(g);
+        end
+
+        function makePlaceholderNode(obj, parent) %#ok<INUSD> 
+            uitreenode(parent,...
+                'Text', 'Placeholder');
+        end
+
+        function node = formatContainerNode(obj, node)
+            node.Icon = aod.app.AONodeTypes.CONTAINER.getIconPath();
+            addStyle(obj.Tree, obj.CONTAINER_STYLE, "node", node);
         end
 
         function addContextMenu(obj, node)
@@ -215,19 +199,6 @@ classdef ExperimentView < aod.app.UIView
             %   Adds context menu to the node
             % -------------------------------------------------------------
             node.ContextMenu = obj.ContextMenu;
-        end
-    end
-
-    % Callback methods
-    methods
-        function onNodeExpanded(obj, ~, evt)
-            % ONNODEEXPANDED
-            %   
-            % Description:
-            %   Make private node information accessible outside the view
-            % -------------------------------------------------------------
-            obj.expandedNode = evt.Node;
-            notify(obj, 'NodeExpanded');
         end
     end
 

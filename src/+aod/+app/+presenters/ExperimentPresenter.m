@@ -65,25 +65,6 @@ classdef ExperimentPresenter < appbox.Presenter
             end
         end
 
-        function willStop(obj)
-            obj.view.reportDeletedNode = false;
-        end
-
-        function oldCode(obj)
-            % Populate just the group names
-            groupNames = aod.h5.HDF5.collectGroups(obj.Experiment.hdfName);
-            assignin('base', 'groupNames', groupNames);
-            obj.view.populateEntityNode(groupNames(1), obj.view.Tree);
-            for i = 2:numel(groupNames)
-                if ismember(aod.h5.HDF5.getPathEnd(groupNames(i)),... 
-                        aod.core.EntityTypes.allContainerNames())
-                    obj.view.populateContainerNode(groupNames(i));
-                else
-                    obj.view.populateEntityNode(groupNames(i));
-                end
-            end
-        end
-
         function bind(obj)
             bind@appbox.Presenter(obj);
 
@@ -100,17 +81,23 @@ classdef ExperimentPresenter < appbox.Presenter
 
     methods 
         function parseGroup(obj, group, parentNode)
+            % PARSEGROUP
+            %
+            % Description:
+            %   Create group node and recursively call for all subgroups
+            % -------------------------------------------------------------
             nodeParams = obj.attributes2map(group.Attributes);
             if nodeParams.isKey('Class') && strcmpi(nodeParams('Class'), 'container')
-                nodeType = 'container';
+                nodeType = aod.app.AONodeTypes.CONTAINER;
             else
-                nodeType = 'entity';
+                nodeType = aod.app.AONodeTypes.ENTITY;
             end
-            S = struct('Attributes', nodeParams, 'NodeType', nodeType, ...
+            S = struct('Attributes', nodeParams, 'AONode', nodeType, ...
+                'H5Node', aod.app.H5NodeTypes.GROUP,...
                 'LoadState', aod.app.GroupLoadState.ATTRIBUTES);
             g = obj.view.makeEntityNode(parentNode, ...
                 obj.getGroupName(group.Name), group.Name, S);
-            if strcmp(nodeType, 'container')
+            if nodeType == aod.app.AONodeTypes.CONTAINER
                 obj.view.formatContainerNode(g);
             else
                 obj.view.makePlaceholderNode(g);
@@ -127,17 +114,17 @@ classdef ExperimentPresenter < appbox.Presenter
 
         function processEntityDatasets(obj, parentNode, entity)
             % PROCESSENTITYDATASETS
+            % 
+            % Description:
+            %   Create nodes for all datasets within an entity
+            % -------------------------------------------------------------
             if isempty(entity.dsetNames) && isempty(entity.files)
                 return
             end
             dsetNames = entity.dsetNames;
-            if ~isempty(entity.files)
-                dsetNames = cat(2, dsetNames, "files");
-            end
             for i = 1:numel(dsetNames)
-                info = h5info(obj.Experiment.hdfName,...
-                    aod.h5.HDF5.buildPath(parentNode.Tag, dsetNames(i)));
-                assignin('base', 'info', info);
+                dsetPath = aod.h5.HDF5.buildPath(parentNode.Tag, dsetNames(i));
+                info = h5info(obj.Experiment.hdfName, dsetPath);
                 nodeData = struct(...
                     'H5Node', aod.app.H5NodeTypes.DATASET,...
                     'EntityPath', parentNode.Tag,...
@@ -147,12 +134,16 @@ classdef ExperimentPresenter < appbox.Presenter
                     nodeData.AONode = aod.app.AONodeTypes.FILES;
                 end
                 g = obj.view.makeDatasetNode(parentNode, dsetNames(i),...
-                    parentNode.Tag, nodeData);
+                    dsetPath, nodeData);
             end
         end
 
         function processEntityLinks(obj, parentNode, entity)
             % PROCESSENTITYLINKS
+            %
+            % Description:
+            %   Create nodes for all links within an entity
+            % -------------------------------------------------------------
             if isempty(entity.linkNames)
                 return
             end
@@ -160,6 +151,7 @@ classdef ExperimentPresenter < appbox.Presenter
                 linkedEntity = entity.(entity.linkNames(i));
 
                 obj.view.makeLinkNode(parentNode, entity.linkNames(i),...
+                    aod.h5.HDF5.buildPath(parentNode.Tag, entity.linkNames(i)),...
                     linkedEntity.hdfPath);
             end
         end
@@ -167,27 +159,10 @@ classdef ExperimentPresenter < appbox.Presenter
 
     % Callbacks
     methods (Access = private)
-        function onViewDoubleClickedNode(obj, src, evt)
-            assignin('base', 'src', src);
-            assignin('base', 'evt', evt);
-            node = evt.InteractionInformation.Node;
-            if ~isempty(node)
-                open(obj.view.ContextMenu, src.CurrentPoint(1), src.CurrentPoint(2));
-            end
-        end
-
         function onViewSelectedNode(obj, ~, ~)
             obj.view.resetDisplay();
             node = obj.view.getSelectedNode();
-            assignin('base', 'node', node);
 
-            % if isfield(node.NodeData, 'Attributes') %&& ~node.NodeData.LoadState.hasAttributes()
-            %    info = h5info(obj.Experiment.hdfName, node.Tag);
-            %    nodeParams = obj.attributes2map(info.Attributes);
-            %    node.NodeData.Attributes = nodeParams;
-            %    node.NodeData.LoadState = aod.app.GroupLoadState.ATTRIBUTES;
-            % end
-            
             if isfield(node.NodeData, 'Attributes') && ~isempty(node.NodeData.Attributes)
                 k = node.NodeData.Attributes.keys;
                 v = node.NodeData.Attributes.values;
@@ -195,6 +170,20 @@ classdef ExperimentPresenter < appbox.Presenter
                 obj.view.setAttributeTable(data);
             else
                 obj.view.setAttributeTable();
+            end
+
+            switch node.NodeData.H5Node
+                case aod.app.H5NodeTypes.LINK
+                    obj.view.setLinkPanelView(node.NodeData.LinkPath);
+                case aod.app.H5NodeTypes.DATASET
+                    displayType = node.NodeData.AONode.getDisplayType();
+                    if isempty(displayType)
+                        return
+                    end
+                    entity = obj.Experiment.getByPath(node.Parent.Tag);
+                    data = entity.(node.Text);
+                    [displayType, data] = node.NodeData.AONode.displayInfo(data);
+                    obj.view.setDataDisplayPanel(displayType, data);
             end
         end
 
@@ -204,43 +193,49 @@ classdef ExperimentPresenter < appbox.Presenter
             % Description:
             %   When node is expanded, make sure everything is loaded in
             % -------------------------------------------------------------
-            assignin('base', 'evt', evt);
             node = evt.data.Node;
 
-            switch lower(node.NodeData.NodeType)
-                case 'entity'
-                    if node.NodeData.LoadState == aod.app.GroupLoadState.CONTENTS
-                        return
-                    end
-                    % Delete the placeholder node
-                    idx = find(arrayfun(@(x) isequal(x.Text, 'Placeholder'),...
-                        node.Children));
-                    if ~isempty(idx)
-                        delete(node.Children(idx));
-                    end
-                    obj.view.update();
-
-                    entity = obj.Experiment.getByPath(node.Tag);
-                    obj.processEntityDatasets(node, entity);
-                    obj.processEntityLinks(node, entity);
-                    node.NodeData.LoadState = aod.app.GroupLoadState.CONTENTS;
-                case 'dataset'
-                    % TODO: Dataset parsing
-                case 'link'
-                    e = obj.node2entity(node);
-                    obj.view.setLinkPanelView(e.(node.Text));
+            % Only entity nodes require further loading
+            if node.NodeData.AONode ~= aod.app.AONodeTypes.ENTITY
+                return
             end
+
+            % Check to see whether the entity node is already loaded
+            if node.NodeData.LoadState == aod.app.GroupLoadState.CONTENTS
+                return
+            end
+
+            % Delete the placeholder node
+            idx = find(arrayfun(@(x) isequal(x.Text, 'Placeholder'),...
+                node.Children));
+            if ~isempty(idx)
+                delete(node.Children(idx));
+            end
+            obj.view.update();
+
+            % Load links and datasets
+            entity = obj.Experiment.getByPath(node.Tag);
+            obj.processEntityDatasets(node, entity);
+            obj.processEntityLinks(node, entity);
+            node.NodeData.LoadState = aod.app.GroupLoadState.CONTENTS;
         end
 
         function onViewFollowedLink(obj, ~, ~)
-            if obj.DEBUG
-                return
+            node = obj.view.getSelectedNode;
+            newNode = obj.view.path2node(node.NodeData.LinkPath);
+            assignin('base','newNode', newNode);
+            if ~isempty(newNode)
+                obj.view.showNode(newNode);
+                obj.view.selectNode(newNode);
             end
         end
 
         function onViewCopyHdfAddress(obj, ~, ~)
             node = obj.view.getSelectedNode();
-            hdfPath = node.NodeData.hdfPath;
+            hdfPath = node.Tag;
+            if node.NodeData.H5Node ~= aod.app.H5NodeTypes.GROUP
+                hdfPath = aod.h5.HDF5.buildPath(hdfPath, node.Text);
+            end
             clipboard('copy', hdfPath);
         end
 
@@ -252,7 +247,6 @@ classdef ExperimentPresenter < appbox.Presenter
         end
         
         function onViewKeyPress(obj, ~, evt)
-            assignin('base', 'evt', evt);
             switch evt.data.Key
                 case 'c'
                     node = obj.view.getSelectedNode();
