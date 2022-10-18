@@ -40,6 +40,58 @@ classdef AONodeTypes
     end
     
     methods 
+        function [displayType, data] = displayInfo(obj, data)
+            displayType = obj.getDisplayType();
+            data = obj.processDataForDisplay(data);
+            if obj == aod.app.AONodeTypes.NUMERIC && ischar(data)
+                displayType = 'Text';
+            end
+        end
+
+        function out = processDataForDisplay(obj, data)
+            if nargin < 2
+                out = [];
+                return;
+            end
+
+            import aod.app.AONodeTypes;
+
+            switch obj
+                case AONodeTypes.DATETIME
+                    out = datestr(data); %#ok<DATST> 
+                case AONodeTypes.ENUM
+                    out = char(data);
+                case AONodeTypes.TRANSFORM
+                    out = data.T;
+                case AONodeTypes.NUMERIC
+                    if ~ismatrix(data)
+                        out = sprintf('Data size = %u', size(data,1));
+                        for i = 2:ndims(data)
+                            out = [out, sprintf('x %u', size(data,i))]; %#ok<AGROW> 
+                        end
+                    else
+                        out = data;
+                    end
+                otherwise
+                    out = [];
+            end
+        end
+
+        function out = getDisplayType(obj)
+            import aod.app.AONodeTypes;
+
+            switch obj
+                case {AONodeTypes.TEXT, AONodeTypes.DATETIME, AONodeTypes.ENUM}
+                    out = 'Text';
+                case {AONodeTypes.TABLE, AONodeTypes.TIMETABLE}
+                    out = 'Table';
+                case {AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM}
+                    out = 'Table';
+                otherwise
+                    out = [];
+            end
+        end
+
         function out = getIconPath(obj)
             import aod.app.AONodeTypes;
 
