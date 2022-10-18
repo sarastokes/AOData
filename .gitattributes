@@ -1,4 +1,4 @@
-%% Files will always have CRLF line endings on checkout
+## Files will always have CRLF line endings on checkout
 *.sln text eol=crlf
 
 ## MATLAB files

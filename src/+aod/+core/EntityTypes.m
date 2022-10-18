@@ -383,6 +383,19 @@ classdef EntityTypes
             end
         end
 
+        function out = allContainerNames(obj)
+            % GETALLCONTAINERS
+            %
+            %
+            % Syntax:
+            %   out = getAllContainers(obj)
+            %
+            % -------------------------------------------------------------
+            out = ["Sources", "Calibrations", "Regions", "Datasets",...
+                "Epochs", "Registrations", "Stimuli", "Systems", "Channels",...
+                "Devices", "Responses", "Analyses"];
+        end
+
         function out = get(obj)
             % GET
             %

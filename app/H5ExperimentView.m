@@ -1,11 +1,11 @@
-classdef H5TreeView < handle
-% H5TREEVIEW
+classdef H5ExperimentView < handle
+% H5EXPERIMENTVIEW
 %
 % Description:
 %   Read-only interface for exploring AOData HDF5 files
 %
 % Constructor:
-%   obj = H5TreeView(hdfFile)
+%   obj = H5ExperimentView(hdfFile)
 % -------------------------------------------------------------------------
 
     properties (Access = private)
@@ -27,7 +27,7 @@ classdef H5TreeView < handle
     end
     
     methods
-        function obj = H5TreeView(hdfFile)
+        function obj = H5ExperimentView(hdfFile)
             obj.hdfFile = hdfFile;
 
             obj.createUi();
@@ -136,7 +136,9 @@ classdef H5TreeView < handle
                     'Icon', [obj.ICON_DIR, 'data.png'],...
                     'NodeData', nodeParams,...
                     'UserData', dataObj);
-                if isKey(nodeParams, 'Class')
+                if contains(iNode.Text, 'files')
+                    iNode.Icon = [obj.ICON_DIR, 'filecabinet.png'];
+                elseif isKey(nodeParams, 'Class')
                     nodeClass = nodeParams('Class');
 
                     switch lower(nodeClass)
@@ -152,7 +154,9 @@ classdef H5TreeView < handle
                             iNode.Icon = [obj.ICON_DIR, 'document.png'];
                         case 'externalfile'
                             iNode.Icon = [obj.ICON_DIR, 'export.png'];
-                        case {'table', 'timeseries'}
+                        case 'enum'
+                            iNode.Icon = [obj.ICON_DIR, 'list.png'];
+                        case {'table', 'timeseries', 'timetable'}
                             iNode.Icon = [obj.ICON_DIR, 'table.png'];
                         otherwise
                             iNode.Icon = [obj.ICON_DIR, 'data.png'];

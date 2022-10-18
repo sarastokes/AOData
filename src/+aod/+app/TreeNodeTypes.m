@@ -15,6 +15,8 @@ classdef TreeNodeTypes
 
         TABLE
 
+        ENUM
+
         IMAGE    
         MASK
         VIDEO
@@ -137,6 +139,8 @@ classdef TreeNodeTypes
                     obj = TreeNodeTypes.SCALAR;
                 case 'video'
                     obj = TreeNodeTypes.VIDEO;
+                case 'enum'
+                    obj = TreeNodeTypes.ENUM;
                 case 'externalfile'
                     obj = TreeNodeTypes.EXTERNALFILE;
                 case {'table', 'timetable'}

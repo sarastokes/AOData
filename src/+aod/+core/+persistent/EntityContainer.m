@@ -42,7 +42,8 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
                 value = cat(1, value, obj.entityFactory.create(obj.memberPaths(i)));
             end
         end
-
+    end
+    
     methods (Access = ?aod.core.persistent.Persistor)
         function refresh(obj)
             obj.memberPaths = [];

@@ -11,6 +11,7 @@ classdef HDF5 < handle
 %
 %   createGroups(fileName, pathName, varargin)
 %   createGroup(locID, groupName, varargin)
+%   groupNames = collectGroups(fileName)
 %
 %   makeMatrixDataset(fileName, pathName, dsetName, data)
 %   makeEnumDataset(fileName, pathName, dsetName, data)
@@ -76,9 +77,7 @@ classdef HDF5 < handle
             end
             fprintf('Created HDF5 file: %s\n', fileName);
         end
-    end
 
-    methods (Static)
         function fileID = openFile(fileName, readOnly)
             % OPENFILE
             %
@@ -91,8 +90,8 @@ classdef HDF5 < handle
             %   readOnly        logical, default = false
             % -------------------------------------------------------------
             arguments
-                fileName            {mustBeFile(fileName)}
-                readOnly            logical = true
+                fileName {mustBeFile(fileName)}
+                readOnly logical = true
             end
 
             if readOnly
@@ -100,8 +99,12 @@ classdef HDF5 < handle
             else
                 fileID = H5F.open(fileName, 'H5F_ACC_RDWR', 'H5P_DEFAULT');
             end
-        end
 
+        end
+    end
+
+    % Group methods
+    methods (Static)
         function createGroups(fileName, pathName, varargin)
             % CREATEGROUP
             % 
@@ -168,6 +171,36 @@ classdef HDF5 < handle
             end
         end
 
+        function groupNames = collectGroups(hdfName)
+            % COLLECTGROUPS
+            %
+            % Description:
+            %   Collect all the group names in an HDF file or subfilee
+            %
+            % Syntax:
+            %   groupNames = collectGroups(hdfName)
+            %
+            % Inputs:
+            %   hdfName         either file name or H5ML.id
+            %
+            % See also:
+            %   groupVisitFcn
+            % -------------------------------------------------------------
+            if ~isa(hdfName, 'H5ML.id')
+                rootID = aod.h5.HDF5.openFile(hdfName, true);
+                rootIDx = onCleanup(@()H5F.close(rootID));
+            else
+                rootID = hdfName;
+            end
+
+            groupNames = string.empty();
+            [~, groupNames] = H5O.visit(rootID, 'H5_INDEX_NAME',... 
+                'H5_ITER_NATIVE', @groupVisitFcn, groupNames);
+        end
+    end
+
+    % Dataset methods
+    methods (Static)   
         function makeMatrixDataset(fileName, pathName, dsetName, data)
             % MAKEMATRIXDATASET
             % 
@@ -464,6 +497,46 @@ classdef HDF5 < handle
             HDF5.writeatts(fileName, fullPath, 'Class', dataClass,...
                 'ColumnClass', columnClass);
         end
+    end
+
+    % Attribute methods
+    methods (Static)
+        function names = getAttributeNames(hdfName, pathName)
+            % GETALLATTRIBUTENAMES
+            %
+            % Description:
+            %   Return all attribute names (faster than getAttributeNames)
+            %
+            % Syntax:
+            %   names = getAllAttributeNames(hdfName, pathName)
+            % -------------------------------------------------------------
+            arguments
+                hdfName            {mustBeFile(hdfName)} 
+                pathName            char = '\'
+            end
+
+            fileID = H5F.open(hdfName);
+            fileIDx = onCleanup(@()H5F.close(fileID));
+            groupID = H5G.open(fileID, pathName);
+            groupIDx = onCleanup(@()H5G.close(groupID));
+
+            names = string.empty();
+            [~, ~, names] = H5A.iterate(groupID, 'H5_INDEX_NAME',...
+                'H5_ITER_NATIVE', 0, @attributeIterateFcn, names);
+        end
+
+        function [x, S] = getAttributeNamesFull(fileName, pathName)
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char = '\'
+            end
+
+            if nargin == 1
+                pathName = '\';
+            end
+            S = h5info(fileName, pathName);
+            x = arrayfun(@(x) string(x.Name), S.Attributes);
+        end
 
         function deleteAttribute(fileName, pathName, name)
             % DELETEATTRIBUTE
@@ -489,36 +562,6 @@ classdef HDF5 < handle
             H5A.delete(groupID, name);
         end
         
-        function deleteObject(fileName, pathName, name)
-            % DELETEOBJECT
-            %
-            % Description:
-            %   Delete a group or dataset
-            %
-            % Syntax:
-            %   aod.h5.HDF5.deleteObject(fileID, pathName, name);
-            % -------------------------------------------------------------
-            arguments
-                fileName            {mustBeFile(fileName)} 
-                pathName            char
-                name                char
-            end
-
-            if nargin == 2
-                name = aod.h5.HDF5.getPathEnd(pathName);
-                pathName = aod.h5.HDF5.getPathParent(pathName);
-            end
-            fileID = aod.h5.HDF5.openFile(fileName);
-            fileIDx = onCleanup(@()H5F.close(fileID));
-            if pathName == '/'
-                parentID = fileID;
-            else
-                parentID = H5G.open(fileID, pathName);
-                parentIDx = onCleanup(@()H5G.close(parentID));
-            end
-            H5L.delete(parentID, name, 'H5P_DEFAULT');
-        end
-
         function writeatts(fileName, pathName, varargin)
             % WRITEATTS
             % 
@@ -557,7 +600,10 @@ classdef HDF5 < handle
                     aod.h5.HDF5.data2att(attValue));
             end
         end
+    end
 
+    % Link methods
+    methods (Static)
         function createLink(fileName, targetPath, linkPath, linkName)
             % CREATELINK 
             %
@@ -587,6 +633,36 @@ classdef HDF5 < handle
 
             H5L.create_soft(targetPath, linkID, linkName, 'H5P_DEFAULT', 'H5P_DEFAULT');
         end
+
+        function deleteObject(fileName, pathName, name)
+            % DELETEOBJECT
+            %
+            % Description:
+            %   Delete a group or dataset
+            %
+            % Syntax:
+            %   aod.h5.HDF5.deleteObject(fileID, pathName, name);
+            % -------------------------------------------------------------
+            arguments
+                fileName            {mustBeFile(fileName)} 
+                pathName            char
+                name                char
+            end
+
+            if nargin == 2
+                name = aod.h5.HDF5.getPathEnd(pathName);
+                pathName = aod.h5.HDF5.getPathParent(pathName);
+            end
+            fileID = aod.h5.HDF5.openFile(fileName);
+            fileIDx = onCleanup(@()H5F.close(fileID));
+            if pathName == '/'
+                parentID = fileID;
+            else
+                parentID = H5G.open(fileID, pathName);
+                parentIDx = onCleanup(@()H5G.close(parentID));
+            end
+            H5L.delete(parentID, name, 'H5P_DEFAULT');
+        end
     end
 
     % Data type methods
@@ -595,7 +671,7 @@ classdef HDF5 < handle
             if islogical(data)
                 out = int32(data);
             elseif isdatetime(data)
-                out = datestr(data);
+                out = datestr(data); %#ok<*DATST> 
             elseif isstring(data) && numel(data) == 1
                 out = char(data);
             else
@@ -682,19 +758,6 @@ classdef HDF5 < handle
             S = h5info(fileName, pathName);
             x = arrayfun(@(x) string(x.Name), S.Datasets);
         end
-
-        function [x, S] = getAttributeNames(fileName, pathName)
-            arguments
-                fileName            {mustBeFile(fileName)} 
-                pathName            char = '\'
-            end
-
-            if nargin == 1
-                pathName = '\';
-            end
-            S = h5info(fileName, pathName);
-            x = arrayfun(@(x) string(x.Name), S.Attributes);
-        end
     end
 
     % Utility methods
@@ -715,7 +778,7 @@ classdef HDF5 < handle
             % -------------------------------------------------------------
             path = [];
             for i = 1:nargin
-                path = [path, '/', char(varargin{i})];  %#ok
+                path = [path, '/', char(varargin{i})]; 
             end
 
             % Make sure leading / isn't duplicated

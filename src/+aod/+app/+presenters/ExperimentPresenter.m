@@ -39,18 +39,47 @@ classdef ExperimentPresenter < appbox.Presenter
             obj.go();
         end
 
-        function v = getView(obj)
+        function v = getFigure(obj)
             % For development, remove later
+            v = obj.view.getFigure();
+        end
+
+        function v = getView(obj)
             v = obj.view;
+        end
+
+        function e = node2entity(obj, node)
+            e = obj.Experiment.getByPath(node.Tag);
         end
     end
 
     methods (Access = protected)
         function willGo(obj)
+            % Set the title
+            obj.view.setTitle(obj.Experiment.label);
             S = h5info(obj.Experiment.hdfName);
             if ~isempty(S.Groups)
                 for i = 1:numel(S.Groups)
                     obj.parseGroup(S.Groups(i), obj.view.Tree);
+                end
+            end
+        end
+
+        function willStop(obj)
+            obj.view.reportDeletedNode = false;
+        end
+
+        function oldCode(obj)
+            % Populate just the group names
+            groupNames = aod.h5.HDF5.collectGroups(obj.Experiment.hdfName);
+            assignin('base', 'groupNames', groupNames);
+            obj.view.populateEntityNode(groupNames(1), obj.view.Tree);
+            for i = 2:numel(groupNames)
+                if ismember(aod.h5.HDF5.getPathEnd(groupNames(i)),... 
+                        aod.core.EntityTypes.allContainerNames())
+                    obj.view.populateContainerNode(groupNames(i));
+                else
+                    obj.view.populateEntityNode(groupNames(i));
                 end
             end
         end
@@ -62,6 +91,8 @@ classdef ExperimentPresenter < appbox.Presenter
             obj.addListener(v, 'KeyPress', @obj.onViewKeyPress);
             obj.addListener(v, 'NodeSelected', @obj.onViewSelectedNode);
             obj.addListener(v, 'NodeExpanded', @obj.onViewExpandedNode);
+            obj.addListener(v, 'NodeDoubleClicked', @obj.onViewDoubleClickedNode);
+            obj.addListener(v, 'LinkFollowed', @obj.onViewFollowedLink);
             obj.addListener(v, 'SendNodeToBase', @obj.onViewSendNodeToBase);
             obj.addListener(v, 'CopyHdfAddress', @obj.onViewCopyHdfAddress);
         end
@@ -75,15 +106,14 @@ classdef ExperimentPresenter < appbox.Presenter
             else
                 nodeType = 'entity';
             end
-            S = struct('Attributes', nodeParams, 'HdfPath', group.Name,...
-                'NodeType', nodeType);
-            g = uitreenode(parentNode, ...
-                'Text', obj.getGroupName(group.Name),...
-                'Icon', [obj.ICON_DIR, 'folder.png'],...
-                'NodeData', S);
+            S = struct('Attributes', nodeParams, 'NodeType', nodeType, ...
+                'LoadState', aod.app.GroupLoadState.ATTRIBUTES);
+            g = obj.view.makeEntityNode(parentNode, ...
+                obj.getGroupName(group.Name), group.Name, S);
             if strcmp(nodeType, 'container')
-                g.Icon = im2uint8(lighten(im2double(imread([obj.ICON_DIR, 'folder.png'])), 0.45));
-                addStyle(obj.view.Tree, obj.CONTAINER_STYLE, "node", g);
+                obj.view.formatContainerNode(g);
+            else
+                obj.view.makePlaceholderNode(g);
             end
 
             S = h5info(obj.Experiment.hdfName, group.Name);
@@ -95,45 +125,116 @@ classdef ExperimentPresenter < appbox.Presenter
             end
         end
 
-        function nodeData = populateNewNodeInfo(obj, hdfPath)
-            if endsWith(hdfPath, 'Container')
-                nodeType = 'Container';
-                % Load attributes here
-            else
-                entity = obj.Experiment.factory.create(hdfPath);
-                nodeType = 'Entity'; %entity.entityType;
+        function processEntityDatasets(obj, parentNode, entity)
+            % PROCESSENTITYDATASETS
+            if isempty(entity.dsetNames) && isempty(entity.files)
+                return
             end
-            nodeData = struct('NodeType', nodeType, 'HdfPath', hdfPath);
+            dsetNames = entity.dsetNames;
+            if ~isempty(entity.files)
+                dsetNames = cat(2, dsetNames, "files");
+            end
+            for i = 1:numel(dsetNames)
+                info = h5info(obj.Experiment.hdfName,...
+                    aod.h5.HDF5.buildPath(parentNode.Tag, dsetNames(i)));
+                assignin('base', 'info', info);
+                nodeData = struct(...
+                    'H5Node', aod.app.H5NodeTypes.DATASET,...
+                    'EntityPath', parentNode.Tag,...
+                    'AONode', aod.app.AONodeTypes.get(class(entity.(dsetNames(i)))),...
+                    'Attributes', obj.attributes2map(info.Attributes));
+                if dsetNames(i) == "files"
+                    nodeData.AONode = aod.app.AONodeTypes.FILES;
+                end
+                g = obj.view.makeDatasetNode(parentNode, dsetNames(i),...
+                    parentNode.Tag, nodeData);
+            end
         end
 
-        function nodeData = populateContainerInfo(obj, hdfPath)
-            nodeData = struct('NodeType', 'Container', 'HdfPath', hdfPath);
+        function processEntityLinks(obj, parentNode, entity)
+            % PROCESSENTITYLINKS
+            if isempty(entity.linkNames)
+                return
+            end
+            for i = 1:numel(entity.linkNames)
+                linkedEntity = entity.(entity.linkNames(i));
+
+                obj.view.makeLinkNode(parentNode, entity.linkNames(i),...
+                    linkedEntity.hdfPath);
+            end
         end
     end
 
     % Callbacks
     methods (Access = private)
+        function onViewDoubleClickedNode(obj, src, evt)
+            assignin('base', 'src', src);
+            assignin('base', 'evt', evt);
+            node = evt.InteractionInformation.Node;
+            if ~isempty(node)
+                open(obj.view.ContextMenu, src.CurrentPoint(1), src.CurrentPoint(2));
+            end
+        end
+
         function onViewSelectedNode(obj, ~, ~)
             obj.view.resetDisplay();
             node = obj.view.getSelectedNode();
             assignin('base', 'node', node);
+
+            % if isfield(node.NodeData, 'Attributes') %&& ~node.NodeData.LoadState.hasAttributes()
+            %    info = h5info(obj.Experiment.hdfName, node.Tag);
+            %    nodeParams = obj.attributes2map(info.Attributes);
+            %    node.NodeData.Attributes = nodeParams;
+            %    node.NodeData.LoadState = aod.app.GroupLoadState.ATTRIBUTES;
+            % end
             
-            if ~isempty(node.NodeData.Attributes)
+            if isfield(node.NodeData, 'Attributes') && ~isempty(node.NodeData.Attributes)
                 k = node.NodeData.Attributes.keys;
                 v = node.NodeData.Attributes.values;
                 data = table(k', v');
                 obj.view.setAttributeTable(data);
+            else
+                obj.view.setAttributeTable();
             end
         end
 
-        function onViewExpandedNode(obj, ~, ~)
-            if obj.DEBUG 
-                return
+        function onViewExpandedNode(obj, ~, evt)
+            % ONVIEWEXPANDEDNODE
+            %
+            % Description:
+            %   When node is expanded, make sure everything is loaded in
+            % -------------------------------------------------------------
+            assignin('base', 'evt', evt);
+            node = evt.data.Node;
+
+            switch lower(node.NodeData.NodeType)
+                case 'entity'
+                    if node.NodeData.LoadState == aod.app.GroupLoadState.CONTENTS
+                        return
+                    end
+                    % Delete the placeholder node
+                    idx = find(arrayfun(@(x) isequal(x.Text, 'Placeholder'),...
+                        node.Children));
+                    if ~isempty(idx)
+                        delete(node.Children(idx));
+                    end
+                    obj.view.update();
+
+                    entity = obj.Experiment.getByPath(node.Tag);
+                    obj.processEntityDatasets(node, entity);
+                    obj.processEntityLinks(node, entity);
+                    node.NodeData.LoadState = aod.app.GroupLoadState.CONTENTS;
+                case 'dataset'
+                    % TODO: Dataset parsing
+                case 'link'
+                    e = obj.node2entity(node);
+                    obj.view.setLinkPanelView(e.(node.Text));
             end
-            node = obj.view.getSelectedNode();
-            % Check to see whether node is container or not
-            if strcmp(node.nodeData.nodeType, 'Container')
-                entity = obj.getParentPath(node.NodeData.hdfPath);
+        end
+
+        function onViewFollowedLink(obj, ~, ~)
+            if obj.DEBUG
+                return
             end
         end
 
@@ -151,14 +252,19 @@ classdef ExperimentPresenter < appbox.Presenter
         end
         
         function onViewKeyPress(obj, ~, evt)
-            switch evt.Character
+            assignin('base', 'evt', evt);
+            switch evt.data.Key
                 case 'c'
                     node = obj.view.getSelectedNode();
-                    node.collapse();
+                    if ~isempty(node)
+                        node.collapse();
+                    end
                 case 'x'
                     node = obj.view.getSelectedNode();
                     node.collapse();
-                    node.Parent.collapse();
+                    if ~isempty(node)
+                        node.Parent.collapse();
+                    end
             end
         end
     end

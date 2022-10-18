@@ -131,8 +131,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             try
                 e = obj.factory.create(hdfPath);
             catch ME
-                if strcmp(ME.id, 'create:InvalidPath')
-                    warning('getByPath:InvalidHdfPath');
+                if strcmp(ME.identifier, 'create:InvalidPath')
+                    warning('getByPath:InvalidHdfPath',...
+                        'HDF path not found: %s', hdfPath);
                     e = [];
                 else
                     rethrow(ME);
