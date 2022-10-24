@@ -40,7 +40,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
                 try
                     analysisDate = datetime(analysisDate, 'Format', 'yyyyMMdd');
                 catch ME 
-                    if strcmp(ME.id, 'MATLAB:datestr:ConvertToDateNumber')
+                    if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
                         error("setAnalysisDate:FailedDatetimeConversion",...
                             "Failed to set analysisDate, use format yyyyMMdd");
                     else

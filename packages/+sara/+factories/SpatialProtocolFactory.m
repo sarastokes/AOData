@@ -43,6 +43,23 @@ classdef SpatialProtocolFactory < aod.util.Factory
                 return
             end
 
+            % bar_intensity_10s_50c_29_of_32
+            if contains(fileName, 'bar_intensity_')
+                [barID, numBars] = obj.extractBarParameters(fileName);
+                stimTime = extractFlaggedNumber(fileName, 's_');
+                [cnst, tf] = extractFlaggedNumber(fileName, 'c_');
+                if ~tf
+                    cnst = 1;
+                end
+                [totalTime, tf] = extractFlaggedNumber(fileName, 't_');
+
+                protocol = PulseBar(obj.calibration,...
+                    'PreTime', 20, 'StimTime', stimTime, 'TailTime', totalTime-20-stimTime,...
+                    'BaseIntensity', 0, 'Contrast', cnst,...
+                    'BarID', barID, 'NumBars', numBars, 'Orientation', 'vertical');
+                return
+            end
+
             % SpacedOutIntBars
             if startsWith(fileName, 'spaced')
                 
@@ -97,14 +114,26 @@ classdef SpatialProtocolFactory < aod.util.Factory
 
             % Intensity increments (full-field)
             if contains(fileName, 'zero_mean_increment_')
-                stimTime = char(extract(fileName, digitsPattern + 's'));
-                stimTime = str2double(stimTime(1:end-1));
+                stimTime = extractFlaggedNumber(fileName, 's_');
+
+                [totalTime, tf] = extractFlaggedNumber(fileName, 't_');
+                if isempty(totalTime)
+                    totalTime = 80;
+                end
+                
+                [cnst, tf] = extractFlaggedNumber(fileName, 'c_');
+                if isempty(cnst)
+                    cnst = 1;
+                else
+                    cnst = cnst / 100;
+                end
 
                 protocol = Pulse(obj.calibration,...
                     'PreTime', 20, 'StimTime', stimTime, 'TailTime', 60-stimTime,...
-                    'BaseIntensity', 0, 'Contrast', 1);
+                    'BaseIntensity', 0, 'Contrast', cnst);
                 return
             end
+            % zero_mean_increment_50c_10s
 
             % Contrast decrements
             if contains(fileName, {'temporal_contrast_dec', 'temporal_contrast_inc'})...

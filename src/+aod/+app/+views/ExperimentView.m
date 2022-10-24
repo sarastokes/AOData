@@ -137,12 +137,19 @@ classdef ExperimentView < aod.app.UIView
 
         function setTablePanelView(obj, data)
             obj.TablePanel.Visible = 'on';
-            if istable(data)
-                obj.TablePanel.Data = data.Data;
-                obj.TablePanel.ColumnNames = data.Data.Properties.VariableNames;
+            obj.TablePanel.Data = data;
+            if isnumeric(obj.TablePanel.Data)
+                set(obj.TablePanel, "RowName", "numbered", ...
+                    "ColumnName", "numbered");
             else
-                obj.TablePanel.Data = data;
+                set(obj.TablePanel, "RowName", data.Properties.RowNames,...
+                    "ColumnName", data.Properties.VariableNames);
             end
+        end
+
+        function setAxesPanelView(obj)
+            obj.AxesPanel.Visible = 'on';
+            obj.AxesPanel.Toolbar.Visible = 'on';
         end
     end
 
@@ -176,7 +183,7 @@ classdef ExperimentView < aod.app.UIView
             
             g = uitreenode(parentNode,...
                 'Text', linkName,...
-                'Icon', [obj.ICON_DIR, 'link.png'],...
+                'Icon', [obj.ICON_DIR, 'chain.png'],...
                 'Tag', hdfPath,...
                 'NodeData', linkData);
             obj.addContextMenu(g);
@@ -237,6 +244,7 @@ classdef ExperimentView < aod.app.UIView
             obj.Attributes.Layout.Row = 2;
 
             obj.AxesPanel = uiaxes(mainLayout, 'Visible', 'off');
+            obj.AxesPanel.Toolbar.Visible = 'off';
             obj.AxesPanel.Layout.Column = 2;
             obj.AxesPanel.Layout.Row = 1;
     
@@ -247,7 +255,8 @@ classdef ExperimentView < aod.app.UIView
             obj.TextPanel.Layout.Row = 1;
 
             obj.TablePanel = uitable(mainLayout,...
-                'Visible', 'off');
+                "FontSize", 12, "Visible", "off");
+            addStyle(obj.TablePanel, uistyle("HorizontalAlignment", "center"));
             obj.TablePanel.Layout.Column = 2;
             obj.TablePanel.Layout.Row = 1;
 

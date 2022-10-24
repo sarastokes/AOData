@@ -49,7 +49,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
                 try
                     regDate = datetime(regDate, 'Format', 'yyyyMMdd');
                 catch ME 
-                    if strcmp(ME.id, 'MATLAB:datestr:ConvertToDateNumber')
+                    if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
                         error("setRegistrationDate:FailedDatetimeConversion",...
                             "Failed to convert to datetime, use format yyyyMMdd");
                     else

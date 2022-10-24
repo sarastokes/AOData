@@ -31,7 +31,10 @@ classdef AONodeTypes
         MAP 
         ENUM 
         TRANSFORM
+
+        % System types
         FILES
+        NOTES
     end
 
     properties (Hidden, Constant)
@@ -73,7 +76,7 @@ classdef AONodeTypes
                         out = data;
                     end
                 otherwise
-                    out = [];
+                    out = data;
             end
         end
 
@@ -99,15 +102,17 @@ classdef AONodeTypes
                 case AONodeTypes.ENTITY 
                     out = 'folder.png';
                 case AONodeTypes.CONTAINER
-                    out = 'folder_container.png';
+                    out = 'container.png';
                 case {AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM}
                     out = 'data.png';
                 case AONodeTypes.LINK
-                    out = 'link.png';
+                    out = 'chain.png';
                 case AONodeTypes.TEXT 
-                    out = 'document.png';
+                    out = 'text.png';
                 case AONodeTypes.FILES 
                     out = 'filecabinet.png';
+                case AONodeTypes.NOTES
+                    out = 'notepad.png';
                 case AONodeTypes.DATETIME 
                     out = 'time.png';
                 case {AONodeTypes.TABLE, AONodeTypes.TIMETABLE}
@@ -124,6 +129,16 @@ classdef AONodeTypes
     end
 
     methods (Static)
+        function obj = getFromData(data)
+            import aod.app.AONodeTypes
+
+            if isenum(data)
+                obj = AONodeTypes.ENUM;
+            else
+                obj = AONodeTypes.get(class(data));
+            end
+        end
+
         function obj = get(nodeName)
             if isa(nodeName, 'aod.app.AONodeTypes')
                 obj = nodeName;
@@ -159,6 +174,10 @@ classdef AONodeTypes
                     obj = AONodeTypes.FILES;
                 case 'affine2d'
                     obj = AONodeTypes.TRANSFORM;
+                case 'files'
+                    obj = AONodeTypes.FILES;
+                case 'notes'
+                    obj = AONodeTypes.NOTES;
                 otherwise
                     warning('AONodeTypes_get:UnrecognizedInput',...
                         'Node name %s was not recognized', nodeName);

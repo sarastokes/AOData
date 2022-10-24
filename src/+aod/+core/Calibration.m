@@ -65,7 +65,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                 try
                     calDate = datetime(calDate, 'Format', 'yyyyMMdd');
                 catch ME 
-                    if strcmp(ME.id, 'MATLAB:datestr:ConvertToDateNumber')
+                    if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
                         error("setCalibrationDate:FailedDatetimeConversion",...
                             "Failed to convert to datetime, use format yyyyMMdd");
                     else

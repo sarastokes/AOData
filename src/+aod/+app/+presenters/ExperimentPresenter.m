@@ -30,6 +30,16 @@ classdef ExperimentPresenter < appbox.Presenter
             end
             obj = obj@appbox.Presenter(view);
 
+            if nargin < 1
+                experiment = obj.view.showGetFile('Chose an AOData H5 file', '*.h5');
+                if isempty(experiment)
+                    warning("ExperimentPresenter:NoExperiment",...
+                        "No experiment provided, cancelling app");
+                    obj.view.close();
+                    return
+                end
+            end
+
             if isSubclass(experiment, 'aod.core.persistent.Experiment')
                 obj.Experiment = experiment;
             else
@@ -128,10 +138,12 @@ classdef ExperimentPresenter < appbox.Presenter
                 nodeData = struct(...
                     'H5Node', aod.app.H5NodeTypes.DATASET,...
                     'EntityPath', parentNode.Tag,...
-                    'AONode', aod.app.AONodeTypes.get(class(entity.(dsetNames(i)))),...
+                    'AONode', aod.app.AONodeTypes.getFromData(entity.(dsetNames(i))),...
                     'Attributes', obj.attributes2map(info.Attributes));
                 if dsetNames(i) == "files"
                     nodeData.AONode = aod.app.AONodeTypes.FILES;
+                elseif dsetNames(i) == "notes"
+                    nodeData.AONode = aod.app.AONodeTypes.NOTES;
                 end
                 g = obj.view.makeDatasetNode(parentNode, dsetNames(i),...
                     dsetPath, nodeData);

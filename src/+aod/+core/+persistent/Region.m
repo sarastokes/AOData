@@ -7,7 +7,7 @@ classdef Region < aod.core.persistent.Entity & dynamicprops
 
     methods 
         function obj = Region(hdfFile, hdfPath, factory)
-            obj = obj@aod.core.persistent.Region(hdfFile, hdfPath, factory);
+            obj = obj@aod.core.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end
 
