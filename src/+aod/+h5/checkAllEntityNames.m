@@ -1,7 +1,7 @@
 function checkAllEntityNames(obj)
 
     checkGroupNames(obj.Calibrations)
-    checkGroupNames(obj.Regions);
+    checkGroupNames(obj.Segmentations);
     checkGroupNames(obj.Analyses);
     checkGroupNames(obj.Epochs);
     checkGroupNames(obj.Systems);

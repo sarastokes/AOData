@@ -52,7 +52,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Source                      = aod.core.Source.empty()
         System                      = aod.core.System.empty()
-        Region                      = aod.core.Region.empty()
+        Segmentation                = aod.core.Segmentation.empty()
     end
     
     methods 
@@ -100,8 +100,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Additional key/value inputs are sent to response constructor
             % -------------------------------------------------------------
 
-            if isempty(obj.Parent.Region)
-                error('Experiment must contain Regions');
+            % TODO: Update
+            if isempty(obj.Parent.Segmentations)
+                error('Experiment must contain Segmentations');
             end
             resp = getByClass(obj.Responses, responseClassName);
             if isempty(resp)

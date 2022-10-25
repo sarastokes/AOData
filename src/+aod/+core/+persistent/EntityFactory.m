@@ -65,8 +65,8 @@ classdef EntityFactory < handle
                     e = aod.core.persistent.Device(obj.hdfName, hdfPath, obj);
                 case "CALIBRATION"
                     e = aod.core.persistent.Calibration(obj.hdfName, hdfPath, obj);
-                case "REGION"
-                    e = aod.core.persistent.Region(obj.hdfName, hdfPath, obj);
+                case "SEGMENTATION"
+                    e = aod.core.persistent.Segmentation(obj.hdfName, hdfPath, obj);
                 case "EPOCH"
                     e = aod.core.persistent.Epoch(obj.hdfName, hdfPath, obj);
                 case "RESPONSE"

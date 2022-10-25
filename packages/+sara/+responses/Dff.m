@@ -2,7 +2,7 @@ classdef Dff < aod.builtin.responses.RegionResponse
 % DFF
 %
 % Description:
-%   Computes a deltaF/F response for each region
+%   Computes a deltaF/F response for each ROI
 %
 % Parent:
 %   aod.builtin.responses.RegionResponse

@@ -1,13 +1,13 @@
-classdef Region < aod.core.Entity & matlab.mixin.Heterogeneous
-% REGIONS
+classdef Segmentation < aod.core.Entity & matlab.mixin.Heterogeneous
+% SEGMENTATION
 %
 % Description:
 %   Spatial regions within acquired data. Could be ROIs in a physiology 
 %   experiment, coordinates of structures of interest, etc.
 %
 % Constructor:
-%   obj = Region(name, varargin)
-%   obj = Region(name, data, varargin)
+%   obj = Segmentation(name, varargin)
+%   obj = Segmentation(name, data, varargin)
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
@@ -29,7 +29,7 @@ classdef Region < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Region(name, varargin)
+        function obj = Segmentation(name, varargin)
             obj = obj@aod.core.Entity(name);
 
             ip = aod.util.InputParser();

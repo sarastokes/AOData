@@ -1,4 +1,4 @@
-classdef Region < aod.core.persistent.Entity & dynamicprops 
+classdef Segmentation < aod.core.persistent.Entity & dynamicprops 
 
     properties (SetAccess = protected)
         Data 
@@ -6,7 +6,7 @@ classdef Region < aod.core.persistent.Entity & dynamicprops
     end
 
     methods 
-        function obj = Region(hdfFile, hdfPath, factory)
+        function obj = Segmentation(hdfFile, hdfPath, factory)
             obj = obj@aod.core.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end

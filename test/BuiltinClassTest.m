@@ -62,9 +62,9 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj.addSource(obj2);
         end
 
-        % REGIONS ---------------------------------------------------------
+        % SEGMENTATIONS ---------------------------------------------------
         function testRois(testCase)
-            obj = aod.builtin.regions.Rois('851_OSR_20220823',...
+            obj = aod.builtin.segmentations.Rois('851_OSR_20220823',...
                 randn(360, 242), 'Size', [360, 242]);
         end
     end

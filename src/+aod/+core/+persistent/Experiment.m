@@ -8,7 +8,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
         AnalysesContainer         
         EpochsContainer        
         SourcesContainer                 
-        RegionsContainer                 
+        SegmentationsContainer                 
         CalibrationsContainer            
         SystemsContainer                 
     end
@@ -105,22 +105,22 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
             obj.addEntity(epoch);
         end
 
-        function addRegion(obj, region)
-            % ADDREGION
+        function addSegmentation(obj, segmentation)
+            % ADDSEGMENTATION
             %
             % Description:
-            %   Add a Region to the Experiment and the HDF5 file
+            %   Add a Segmentation to the Experiment and the HDF5 file
             %
             % Syntax:
-            %   addRegion(obj, region)
+            %   addSegmentation(obj, segmentation)
             % -------------------------------------------------------------
             arguments
                 obj
-                region          {mustBeA(region, 'aod.core.Region')}
+                segmentation    {mustBeA(segmentation, 'aod.core.Segmentation')}
             end
 
-            region.setParent(obj);
-            obj.addEntity(region);
+            segmentation.setParent(obj);
+            obj.addEntity(segmentation);
         end
 
         function addSource(obj, source)
@@ -184,7 +184,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
             obj.AnalysesContainer = obj.loadContainer('Analyses');
             obj.CalibrationsContainer = obj.loadContainer('Calibrations');
             obj.EpochsContainer = obj.loadContainer('Epochs');
-            obj.RegionsContainer = obj.loadContainer('Regions');
+            obj.SegmentationsContainer = obj.loadContainer('Segmentations');
             obj.SourcesContainer = obj.loadContainer('Sources');
             obj.SystemsContainer = obj.loadContainer('Systems');
         end
@@ -222,13 +222,13 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
             end
         end
 
-        function out = Regions(obj, idx)
+        function out = Segmentations(obj, idx)
             if nargin < 2
                 idx = 0;
             end
             out = [];
             for i = 1:numel(obj)
-                out = cat(1, out, obj(i).RegionsContainer(idx));
+                out = cat(1, out, obj(i).SegmentationsContainer(idx));
             end
         end
 

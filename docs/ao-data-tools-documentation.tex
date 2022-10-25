@@ -243,7 +243,7 @@ addpath(genpath('yourfilepath/ao-data-tools'))
 			\end{itemize}
 		\end{itemize}
 		\item Calibration
-		\item Region
+		\item Segmentation
 		\item Epoch
 		\begin{itemize}
 			\item Registration
@@ -371,7 +371,7 @@ clear import
 						[Data, file]
 					]
 				]
-				[\textit{Regions}]
+				[\textit{Segmentations}]
 				[\textit{Epochs}
 					[Epoch
 						[\textit{Registrations}
@@ -544,7 +544,7 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 			\item \aodprop{Analyses} - container for all Analyses within the Experiment
 			\item \aodprop{Epochs} - container for all Epochs within the Experiment
 			\item \aodprop{Sources} - container for all Sources within the Experiment
-			\item \aodprop{Regions} - container for all Regions within the Experiment
+			\item \aodprop{Segmentations} - container for all Segmentations within the Experiment
 			\item \aodprop{Calibrations} - container for all Calibrations within the Experiment
 			\item \aodprop{Systems} - container for all Systems within the Experiment
 		\end{itemize}		
@@ -574,9 +574,9 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 			\item \aodfcn{removeCalibration(obj, ID)}
 			\item \aodfcn{clearCalibrations(obj)}\\
 			%
-			\item \aodfcn{addRegion(obj, region)}
-			\item \aodfcn{removeRegion(obj, ID)}
-			\item \aodfcn{clearRegions(obj)}\\
+			\item \aodfcn{addSegmentation(obj, segmentation)}
+			\item \aodfcn{removeSegmentation(obj, ID)}
+			\item \aodfcn{clearSegmentation(obj)}\\
 			%
 			\item \aodfcn{addSource(obj, source)}
 			\item \aodfcn{removeSource(obj, ID)}
@@ -727,12 +727,12 @@ obj = aod.core.Device(name, 'Model', value, 'Manufacturer', value);
 			\item \aodclass{aod.builtin.devices.PMT}
 		\end{itemize}
 	
-	\subsection{aod.core.Region \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
+	\subsection{aod.core.Segmentation \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
 		\noindent Spatial regions within your acquired data. These could be ROIs in a physiology experiment, coordinates of labeled cells in anatomical imaging or a subregion of the field of view that omits the zeroed pixels after registration.  
 	
 		\begin{lstlisting}[language=matlab]
-obj = aod.core.Region()		
-obj = aod.core.Region(data)
+obj = aod.core.Segmentation()		
+obj = aod.core.Segmentation(data)
 		\end{lstlisting}
 		\docheader{Properties:}
 		\begin{itemize}
@@ -750,7 +750,7 @@ obj = aod.core.Region(data)
 		\end{itemize}
 		\docheader{Examples:}
 		\begin{itemize}
-			\item \aodclass{aod.builtin.regions.Rois}
+			\item \aodclass{aod.builtin.segmentations.Rois}
 		\end{itemize}
 
 	\subsection{aod.core.Epoch \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
@@ -872,7 +872,7 @@ obj = aod.core.Response(name)
 		\noindent Keep in mind that you can set the \aodprop{Parent} prior to adding the response to an Epoch. This is often needed for initializing a Response, as information from the parent Epoch might be required. All of the examples above take this approach and can be used as reference.
 		
 		\subsubsection{aod.core.responses.RegionResponse \myparent{aod.core.Response}}
-			\noindent A Response associated with an instance of \aodclass{aod.core.Region}.
+			\noindent A Response associated with an instance of \aodclass{aod.core.Segmentation}.
 			\begin{lstlisting}[language=matlab]
 obj = aod.core.responses.RegionResponse(parent, varargin)
 			\end{lstlisting}
@@ -1024,7 +1024,7 @@ obj = aod.core.Protocol(calibration, varargin)
 	\begin{lstlisting}[language=matlab]
 experiment = loadExperiment(hdfName);
 	\end{lstlisting}
-	The organization mirrors that of the core classes used to build an HDF5 file (Experiment contains Analyses Calibrations Epochs Regions Sources and Systems... Systems contain Channels and Channels contain Devices, etc). Each entity has a \aodprop{parameters} property containing all the parameters specified when building the experiment. Entities will have the same properties defined in the core classes and custom subclasses. All you need to worry about is navigating through the experiment to find the information you need.
+	The organization mirrors that of the core classes used to build an HDF5 file (Experiment contains Analyses, Calibrations, Epochs, Segmenations, Sources and Systems... Systems contain Channels and Channels contain Devices, etc). Each entity has a \aodprop{parameters} property containing all the parameters specified when building the experiment. Entities will have the same properties defined in the core classes and custom subclasses. All you need to worry about is navigating through the experiment to find the information you need.
 	\begin{lstlisting}[language=matlab]
 % Get all the calibrations
 calibrations = experiment.Calibrations
@@ -1060,7 +1060,7 @@ experiment.Epochs(1:5).Responses
 				[\textit{Sources} - container all Sources within the Experiment]
 				[\textit{Systems} - container for all Systems within the Experiment]
 				[\textit{Calibrations} - container for all Calibrations within the Experiment]
-				[\textit{Regions} - container for all Regions within the Experiment]
+				[\textit{Segmentations} - container for all Segmentations within the Experiment]
 				[\textit{Epochs} - container for all Epochs within the Experiment]
 				[\textit{Analyses} - container for all Analyses within the Experiment]
 			]

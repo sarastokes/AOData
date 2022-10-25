@@ -52,10 +52,10 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
         end
     end
     
-    % Write regions
-    if ~isempty(obj.Regions)
-        for i = 1:numel(obj.Regions)
-            aod.h5.writeEntity(hdfName, obj.Regions(i));
+    % Write segmentations
+    if ~isempty(obj.Segmentations)
+        for i = 1:numel(obj.Segmentations)
+            aod.h5.writeEntity(hdfName, obj.Segmentations(i));
         end
     end
     

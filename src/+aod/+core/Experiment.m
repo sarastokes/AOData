@@ -10,7 +10,7 @@ classdef Experiment < aod.core.Entity
 % Properties:
 %   Epochs                      Container for Epochs
 %   Source                      Container experiment's for Sources
-%   Regions                     Container for experiment's Regions
+%   Segmentations               Container for experiment's Segmentations
 %   Calibrations                Container for experiment's Calibrations
 %   Systems                     Container for experiment's Systems
 %   homeDirectory               File path for experiment files 
@@ -32,7 +32,7 @@ classdef Experiment < aod.core.Entity
 %   addAnalysis(obj, analysis)
 %   addCalibration(obj, calibration)
 %   addEpoch(obj, epoch)
-%   addRegion(obj, region)
+%   addSegmentation(obj, segmentation)
 %   addSystem(obj, system)
 %
 %   clearEpochDatasets(obj, epochIDs)
@@ -48,7 +48,7 @@ classdef Experiment < aod.core.Entity
         Analyses                aod.core.Analysis
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
-        Regions                 aod.core.Region
+        Segmentation           aod.core.Segmentation
         Calibrations            aod.core.Calibration
         Systems                 aod.core.System
 
@@ -113,7 +113,7 @@ classdef Experiment < aod.core.Entity
             %   add(obj, entity)
             %
             % Notes: Only entities contained by  experiment can be added:
-            %   Analysis, Epoch, Calibration, Region, Source, System
+            %   Analysis, Epoch, Calibration, Segmentation, Source, System
             % ------------------------------------------------------------- 
             import aod.core.EntityTypes
             entityType = EntityTypes.get(entity);
@@ -127,9 +127,9 @@ classdef Experiment < aod.core.Entity
                     obj.Calibrations = cat(1, obj.Calibrations, entity);
                 case Entity.EPOCH
                     obj.addEpoch(entity);
-                case Entity.REGION
+                case Entity.SEGMENTATION
                     entity.setParent(obj);
-                    obj.Region = cat(1, obj.Region, entity);
+                    obj.Segmentation = cat(1, obj.Segmentation, entity);
                 case Entity.SYSTEM 
                     entity.setParent(obj);
                     obj.Systems = cat(1, obj.Systems, entity);
@@ -137,7 +137,7 @@ classdef Experiment < aod.core.Entity
                     obj.addSource(entity);
                 otherwise
                     error("Experiment:AddedInvalidEntity",...
-                        "Entity must be Analysis, Calibration, Region, Source or System");
+                        "Entity must be Analysis, Calibration, Segmentation, Source or System");
             end
         end
 
@@ -196,13 +196,13 @@ classdef Experiment < aod.core.Entity
             cal = getByClass(obj.Calibrations, className);
         end
 
-        function region = getRegion(obj, className)
-            % GETREGION
+        function segmentation = getSegmentation(obj, className)
+            % GETSEGMENTATION
             %
             % Syntax:
-            %   region = obj.getRegion(className)
+            %   segmentation = obj.getSegmentation(className)
             % -------------------------------------------------------------
-            region = getByClass(obj.Regions, className);
+            segmentation = getByClass(obj.Segmentations, className);
         end
 
         function data = getResponse(obj, epochIDs, className, varargin)
@@ -234,49 +234,49 @@ classdef Experiment < aod.core.Entity
         end
     end
 
-    % Region methods
+    % Segmentation methods
     methods
-        function addRegion(obj, region)
-            % REMOVEREGIONS
+        function addSegmentation(obj, segmentation)
+            % ADDSEGMENTATION
             %
             % Description:
-            %   Add aod.core.Region entity to the Experiment
+            %   Add aod.core.Segmentation entity to the Experiment
             %
             % Syntax:
-            %   addRegion(obj, region)
+            %   addSegmentation(obj, segmentation)
             % -------------------------------------------------------------
-            assert(isSubclass(region, 'aod.core.Region'),... 
-                'Input must be subclass of aod.core.Region');
+            assert(isSubclass(segmentation, 'aod.core.Segmentation'),... 
+                'Input must be subclass of aod.core.Segmentation');
 
-            region.setParent(obj);
-            obj.Regions = cat(1, obj.Regions, region);
+            segmentation.setParent(obj);
+            obj.Segmentations = cat(1, obj.Segmentations, segmentation);
         end
 
 
-        function removeRegion(obj, ID)
-            % REMOVEREGIONS
+        function removeSegmentation(obj, ID)
+            % REMOVESEGMENTATION
             %
             % Description:
-            %   
+            %   Remove one or more segmentations by ID 
             %
             % Syntax:
-            %   removeRegion(obj, ID)
+            %   removeSegmentation(obj, ID)
             % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Regions),...
-                'ID %u invalid, must be between 1-%u', ID, numel(obj.Regions));
-            obj.Regions(ID) = [];
+            assert(ID > 0 & ID < numel(obj.Segmentations),...
+                'ID %u invalid, must be between 1-%u', ID, numel(obj.Segmentations));
+            obj.Segmentations(ID) = [];
         end
 
-        function clearRegions(obj)
-            % CLEARREGIONS
+        function clearSegmentations(obj)
+            % CLEARSEGMENTATIONS
             %
             % Description:
-            %   Clear all regions in the experiment
+            %   Clear all segmentations in the experiment
             %
             % Syntax:
-            %   obj.clearRegions()
+            %   obj.clearSegmentations()
             % -------------------------------------------------------------
-            obj.Regions = aod.core.Region.empty();
+            obj.Segmentations = aod.core.Segmentations.empty();
         end
     end
 

@@ -1,11 +1,11 @@
-classdef Rois < aod.core.Region
+classdef Rois < aod.core.Segmentation
 % ROIS
 % 
 % Description:
 %   ROIs in physiology experiment
 % 
 % Parent:
-%   aod.core.Region
+%   aod.core.Segmentation
 %
 % Constructor:
 %   obj = Rois(name, rois)
@@ -53,7 +53,7 @@ classdef Rois < aod.core.Region
 
     methods
         function obj = Rois(name, rois, varargin)
-            obj@aod.core.Region(name, varargin{:});
+            obj@aod.core.Segmentation(name, varargin{:});
 
             ip = aod.util.InputParser();
             addParameter(ip, 'Size', [], @isnumeric);
