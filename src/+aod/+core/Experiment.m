@@ -48,7 +48,7 @@ classdef Experiment < aod.core.Entity
         Analyses                aod.core.Analysis
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
-        Segmentation           aod.core.Segmentation
+        Segmentations           aod.core.Segmentation
         Calibrations            aod.core.Calibration
         Systems                 aod.core.System
 
@@ -129,7 +129,7 @@ classdef Experiment < aod.core.Entity
                     obj.addEpoch(entity);
                 case Entity.SEGMENTATION
                     entity.setParent(obj);
-                    obj.Segmentation = cat(1, obj.Segmentation, entity);
+                    obj.Segmentations = cat(1, obj.Segmentations, entity);
                 case Entity.SYSTEM 
                     entity.setParent(obj);
                     obj.Systems = cat(1, obj.Systems, entity);
@@ -276,7 +276,7 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   obj.clearSegmentations()
             % -------------------------------------------------------------
-            obj.Segmentations = aod.core.Segmentations.empty();
+            obj.Segmentations = aod.core.Segmentation.empty();
         end
     end
 

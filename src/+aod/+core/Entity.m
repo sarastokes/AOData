@@ -224,7 +224,7 @@ classdef (Abstract) Entity < handle
             if nargin < 3
                 errorType = ErrorTypes.ERROR;
             else
-                errorType = ErrorTypes.init(errorType);
+                errorType = ErrorTypes.init(errorTypes);
             end
 
             if obj.hasParam(paramName)
@@ -467,7 +467,12 @@ classdef (Abstract) Entity < handle
             % whether the linked entity exists in the experiment
             mc = metaclass(obj);
             propList = string({mc.PropertyList.Name});
+            % Remove private properties
+            idx = arrayfun(@(x) strcmp(x.GetAccess, 'public'), mc.PropertyList);
+            propList = propList(idx);
+            % Remove system properties
             propList = setdiff(propList, aod.h5.getSpecialProps());
+            % Remove containers
             if ~isempty(obj.entityType.childContainers())
                 propList = setdiff(propList, obj.entityType.childContainers());
             end

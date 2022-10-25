@@ -24,8 +24,13 @@ classdef EpochFactory < aod.util.Factory
 
             % Get the epoch timing
             if ep.hasFile('FrameTable')
-                reader = aod.builtin.readers.FrameTableReader(...
-                    ep.getExptFile('FrameTable'));
+                if epochType == sara.EpochTypes.SPATIAL
+                    reader = sara.readers.SpatialFrameTableReader(...
+                        ep.getExptFile('FrameTable'));
+                else
+                    reader = aod.builtin.readers.FrameTableReader(...
+                        ep.getExptFile('FrameTable'));
+                end
                 ep.setTiming(reader.read());
             end
 

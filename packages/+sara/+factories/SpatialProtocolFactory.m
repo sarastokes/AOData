@@ -18,7 +18,7 @@ classdef SpatialProtocolFactory < aod.util.Factory
     methods
         function obj = SpatialProtocolFactory(calibration)
             if nargin < 1 || isempty(calibration)
-                calibration = aod.core.calibrations.Empty();
+                calibration = aod.core.Calibration.empty();
             end
             assert(isSubclass(calibration, 'aod.core.Calibration'),...
                 'Initial input must be a aod.core.Calibration subclass');
@@ -50,8 +50,13 @@ classdef SpatialProtocolFactory < aod.util.Factory
                 [cnst, tf] = extractFlaggedNumber(fileName, 'c_');
                 if ~tf
                     cnst = 1;
+                else
+                    cnst = cnst / 100;
                 end
                 [totalTime, tf] = extractFlaggedNumber(fileName, 't_');
+                if ~tf
+                    totalTime = 80;
+                end
 
                 protocol = PulseBar(obj.calibration,...
                     'PreTime', 20, 'StimTime', stimTime, 'TailTime', totalTime-20-stimTime,...
@@ -114,26 +119,25 @@ classdef SpatialProtocolFactory < aod.util.Factory
 
             % Intensity increments (full-field)
             if contains(fileName, 'zero_mean_increment_')
-                stimTime = extractFlaggedNumber(fileName, 's_');
+                stimTime = extractFlaggedNumber(fileName, 's');
 
-                [totalTime, tf] = extractFlaggedNumber(fileName, 't_');
-                if isempty(totalTime)
+                [totalTime, tf] = extractFlaggedNumber(fileName, 't');
+                if ~tf
                     totalTime = 80;
                 end
                 
                 [cnst, tf] = extractFlaggedNumber(fileName, 'c_');
-                if isempty(cnst)
+                if ~tf
                     cnst = 1;
                 else
                     cnst = cnst / 100;
                 end
 
                 protocol = Pulse(obj.calibration,...
-                    'PreTime', 20, 'StimTime', stimTime, 'TailTime', 60-stimTime,...
+                    'PreTime', 20, 'StimTime', stimTime, 'TailTime', totalTime-stimTime,...
                     'BaseIntensity', 0, 'Contrast', cnst);
                 return
             end
-            % zero_mean_increment_50c_10s
 
             % Contrast decrements
             if contains(fileName, {'temporal_contrast_dec', 'temporal_contrast_inc'})...

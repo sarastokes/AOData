@@ -37,7 +37,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
                 laserLine = 561;
             end
             if nargin < 2
-                calibrationDate = '20210801';
+                calibrationDate = '20210810';
             end
             obj = obj@aod.core.Calibration([], calibrationDate);
             obj.laserLine = laserLine;
@@ -49,7 +49,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
             dataDir = fullfile(fileparts(fileparts(mfilename("fullpath"))), '+resources');
             fileName = fullfile(dataDir, 'TopticaNonlinearity20200810.txt');
             data = dlmread(fileName); %#ok<DLMRD> 
-            obj.setFile('NonlinearityFile', calibrationFile);
+            obj.setFile('NonlinearityFile', fileName);
 
             obj.Data = table(data(:,1), data(:,2),...
                 'VariableNames', {'Value', 'Power'});

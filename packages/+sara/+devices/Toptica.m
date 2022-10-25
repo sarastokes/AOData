@@ -15,17 +15,13 @@ classdef Toptica < aod.builtin.devices.LightSource
         laserLines
     end
 
-    properties (Dependent)
-        Calibrations
-    end
-
     methods
         function obj = Toptica(laserLine, varargin)
             obj = obj@aod.builtin.devices.LightSource(laserLine,...
                 'Manufacturer', 'Toptica', 'Model', 'iChrome MLE',...
                 varargin{:});
-            assert(ismember(laserLine, obj.LASER_LINES), 'Invalid laser line');
-            ip = inputParser();
+
+            ip = aod.util.InputParser();
             addParameter(ip, 'HunterLab', true, @islogical);
             parse(ip, varargin{:});
 
@@ -37,12 +33,9 @@ classdef Toptica < aod.builtin.devices.LightSource
                 obj.laserLines = [480, 515, 561, 640];
                 obj.assignUUID("e07a1753-07e4-420f-bbb5-5d27eb35e573");
             end
-        end
-        
-        function value = get.Calibrations(obj)
-            parent = obj.ancestor('aod.core.Experiment');
-            value = cat(1,...
-                parent.getCalibration('sara.calibrations.TopticaPower'));
+            %assert(ismember(laserLine, obj.laserLines), 'Invalid laser line');
+            
+            obj.calibrationNames = 'sara.calibrations.TopticaPower';
         end
     end
 end

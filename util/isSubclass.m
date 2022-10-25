@@ -28,7 +28,7 @@ function tf = isSubclass(x, className)
             tf = true;
             return
         end
-        if ismember(className(i), superclasses(x))
+        if ismember(className(i), superclasses(class(x)))
             tf = true;
             return
         end

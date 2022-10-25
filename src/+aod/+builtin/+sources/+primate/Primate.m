@@ -30,13 +30,13 @@ classdef Primate < aod.core.sources.Subject
             parse(ip, varargin{:});
 
             if istext(ip.Results.DateOfBirth)
-                obj.setParam('DateOfBirth') = getDateYMD(ip.Results.DateOfBirth);
+                obj.setParam('DateOfBirth', getDateYMD(ip.Results.DateOfBirth));
             else
-                obj.setParam('DateOfBirth') = ip.Results.DateOfBirth;
+                obj.setParam('DateOfBirth', ip.Results.DateOfBirth);
             end
 
             if ~isempty(ip.Results.DateOfBirth)
-                obj.setParam('Age') = round(years(datetime('now') - obj.getParam('DateOfBirth')),1);
+                obj.setParam('Age', round(years(datetime('now') - obj.getParam('DateOfBirth')),1));
             end
         end
 

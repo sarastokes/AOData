@@ -77,7 +77,7 @@ classdef EpochFileManager < aod.util.FileManager
             % - There are 0 or 2 reference images which are bmp
             % - The bmp files starting with reference aren't epoch-specific
             bmpFiles = epochFiles(contains(epochFiles, '.bmp') &...
-                ~startsWith(epochFiles, 'reference'));
+                ~contains(epochFiles, 'reference'));
             if ~isempty(bmpFiles)
                 idx = contains(bmpFiles, '_linear');
                 ep.setFile('RefImageLinear', bmpFiles(idx));
