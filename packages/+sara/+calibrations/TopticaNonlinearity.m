@@ -47,7 +47,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
 
         function loadCalibration(obj)
             dataDir = fullfile(fileparts(fileparts(mfilename("fullpath"))), '+resources');
-            fileName = fullfile(dataDir, 'TopticaNonlinearity2pctPWR.txt');
+            fileName = fullfile(dataDir, 'TopticaNonlinearity20200810.txt');
             data = dlmread(fileName); %#ok<DLMRD> 
             obj.setFile('NonlinearityFile', calibrationFile);
 
