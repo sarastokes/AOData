@@ -120,7 +120,7 @@ function writeEntity(hdfName, obj)
             continue
         end
         % Write links to other entities
-        if isSubclass(class(prop), 'aod.core.Entity')
+        if isSubclass(prop, 'aod.core.Entity')
             parentPath = getParentPath(EM.Table, prop.UUID);
             HDF5.createLink(hdfName, parentPath, hdfPath, persistedProps(i));
             continue

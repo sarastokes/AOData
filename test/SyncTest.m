@@ -24,7 +24,7 @@ classdef SyncTest < matlab.unittest.TestCase
         function testEpochSync(testCase)
             ep1 = aod.core.Epoch(1);
             ep1.setSource(testCase.Experiment.Sources(1).Sources);
-            ep1.setSystem(testCase.Experiment.System(1));
+            ep1.setSystem(testCase.Experiment.Systems(1));
 
             ep2 = aod.core.Epoch(1);
             

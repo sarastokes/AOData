@@ -89,8 +89,8 @@ classdef PowerMeasurement < aod.core.Calibration
                 value = value';
             end
             for i = 1:size(setting, 1)
-                obj.Setting = cat(1, obj.Setting, setting);
-                obj.Value = cat(1, obj.Value, value);
+                obj.Setting = cat(1, obj.Setting, setting(i));
+                obj.Value = cat(1, obj.Value, value(i));
             end
             obj.measurements = obj.table();
         end

@@ -56,7 +56,7 @@ classdef HDF5 < handle
             %   overwrite           logical, default = false
             % -------------------------------------------------------------
             arguments
-                fileName            {mustBeFile(fileName)}
+                fileName            
                 overwrite           logical                     = false
             end
 
@@ -87,7 +87,7 @@ classdef HDF5 < handle
             % Inputs:
             %   fileName        char, HDF5 file name
             % Optional inputs:
-            %   readOnly        logical, default = false
+            %   readOnly        logical, default = true
             % -------------------------------------------------------------
             arguments
                 fileName {mustBeFile(fileName)}
@@ -121,7 +121,7 @@ classdef HDF5 < handle
                 pathName = char(pathName);
             end
 
-            fileID = aod.h5.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName, false);
             fileIDx = onCleanup(@()H5F.close(fileID));
             for i = 1:numel(varargin)
                 try
@@ -152,12 +152,10 @@ classdef HDF5 < handle
             %   If no output argument is specified, the group is closed
             %   Continues on if group already exists
             % -------------------------------------------------------------
-
-            if ischar(locID) && endsWith(locID, 'h5')
-                locID = aod.h5.HDF5.openFile(locID);
-            end
-
             if ~aod.h5.HDF5.exists(locID, groupName)   
+                if ischar(locID) && endsWith(locID, 'h5')
+                    locID = aod.h5.HDF5.openFile(locID, false);
+                end
                 groupID = H5G.create(locID, groupName, aod.h5.HDF5.NEW_GROUP_PROPS);
                 if nargout == 0            
                     groupIDx = onCleanup(@()H5G.close(groupID));
@@ -269,7 +267,7 @@ classdef HDF5 < handle
             if isa(hdfIn, 'H5ML.id')
                 fileID = hdfIn;
             else
-                fileID = aod.h5.HDF5.openFile(hdfIn);
+                fileID = aod.h5.HDF5.openFile(hdfIn, false);
                 fileIDx = onCleanup(@()H5F.close(fileID));
             end
                 
@@ -447,7 +445,7 @@ classdef HDF5 < handle
                 nDims = max(@numel, data);
             end
 
-            fileID = aod.h5.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName, false);
             fileIDx = onCleanup(@()H5F.close(fileID));
         
             names = fieldnames(data);
@@ -484,7 +482,7 @@ classdef HDF5 < handle
         
             spaceID = H5S.create_simple(1, nDims, []);
             spaceIDx = onCleanup(@()H5S.close(spaceID));
-            if aod.h5.HDF5.exists(fileName, fullPath)
+            if aod.h5.HDF5.exists(fileID, fullPath)
                 warning('found and replaced %s', fullPath);
                 HDF5.deleteObject(fileName, fullPath);
             end
@@ -625,7 +623,7 @@ classdef HDF5 < handle
                 warning('LinkExists: Skipped existing link at %s', linkPath);
                 return
             end
-            fileID = HDF5.openFile(fileName);
+            fileID = HDF5.openFile(fileName, false);
             fileIDx = onCleanup(@()H5F.close(fileID));
 
             linkID = H5G.open(fileID, linkPath);
@@ -653,7 +651,7 @@ classdef HDF5 < handle
                 name = aod.h5.HDF5.getPathEnd(pathName);
                 pathName = aod.h5.HDF5.getPathParent(pathName);
             end
-            fileID = aod.h5.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName, false);
             fileIDx = onCleanup(@()H5F.close(fileID));
             if pathName == '/'
                 parentID = fileID;
@@ -667,7 +665,12 @@ classdef HDF5 < handle
 
     % Data type methods
     methods (Static)
-        function out = data2att(data)
+        function out = data2att(varargin)
+            if nargin == 1
+                data = varargin{1};
+            else
+                data = vertcat(varargin{:});
+            end
             if islogical(data)
                 out = int32(data);
             elseif isdatetime(data)
@@ -718,14 +721,14 @@ classdef HDF5 < handle
             %   fileName        char H5 file name OR H5ML.id
             % -------------------------------------------------------------
             arguments
-                fileName            {mustBeFile(fileName)} 
+                fileName            
                 pathName            char
             end
 
             if isa(fileName, 'H5ML.id')
                 tf = H5L.exists(fileName, pathName, 'H5P_DEFAULT');
             else
-                fileID = aod.h5.HDF5.openFile(fileName);
+                fileID = aod.h5.HDF5.openFile(fileName, false);
                 fileIDx = onCleanup(@()H5F.close(fileID));
                 try
                     tf = H5L.exists(fileID, pathName, 'H5P_DEFAULT');
