@@ -76,9 +76,20 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function setReadOnlyMode(obj, tf)
+            % SETREADONLYMODE
+            %
+            % Description:
+            %   Toggle read-only mode on and off
+            %
+            % Syntax:
+            %   setReadOnlyMode(obj, tf)
+            %
+            % Inputs:
+            %   tf          read only status (default = true)
+            % -------------------------------------------------------------
             arguments
                 obj
-                tf              logical = false
+                tf              logical = true
             end
             
             obj.readOnly = tf;
@@ -230,6 +241,17 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 entityName          char        = ''
             end
             obj.Name = entityName;
+        end
+
+        function setDescription(obj, txt)
+            arguments
+                obj
+                txt     char = []
+            end
+            
+            obj.checkReadOnlyMode();
+
+            
         end
     end
 
