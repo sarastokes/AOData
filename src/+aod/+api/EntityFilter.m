@@ -1,18 +1,23 @@
-classdef EntityFilter < handle 
+classdef EntityFilter < aod.api.FilterQuery
 
-    properties
-        entityType
+    properties (SetAccess = private)
+        entityName 
     end
 
     methods 
-        function obj = EntityFilter(entityType)
-            if ischar(entityType)
-                entityType = string(entityType);
-            end
+        function obj = EntityFilter(hdfName, entityName)
+            assert(ismember(string(entityName), enumStr('aod.core.EntityTypes')));
+            obj@aod.api.FilterQuery(hdfName);
+        end
 
-            obj.entityType = [];
-            for i = 1:numel(entityType)
-                obj.entityType = cat(1, obj.entityType, aod.core.EntityTypes.init(entityType);
+        function applyFilter(obj)
+            % Select groups that match the entity
+            for i = 1:numel(obj.allGroupNames)
+                if obj.filterIdx(i)
+                    entityType = h5readatt(obj.hdfName,...
+                        obj.allGroupNames(i), 'EntityType');
+                    obj.filterIdx(i) = strcmpi(entityType, obj.entityName);
+                end
             end
         end
     end

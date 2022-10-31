@@ -2,11 +2,12 @@ classdef QueryView < aod.app.UIView
 
     events
         GroupsChanged
-        FilterSelected
+        FilterTypeSelected
         FilterAdded 
         FilterRemoved
         ClassFilterChosen
         EntityFilterChosen
+        ReturnTypeSelected
         QueryReset
         GroupSelected
     end
@@ -45,6 +46,16 @@ classdef QueryView < aod.app.UIView
         function displayEntity(obj, entity)
             set(obj.groupText, 'Value',...
                 {'Attributes:'; ''; 'Datasets:'});
+        end
+    end
+
+    methods
+        function value = getFilterCount(obj)
+            value = getGridSize(obj.filterGrid, 1);
+        end
+
+        function value = getSearchCount(obj)
+            value = getGridSize(obj.searchGrid, 1);
         end
     end
 
@@ -91,18 +102,12 @@ classdef QueryView < aod.app.UIView
             h.Layout.Column = rc(2);
         end
 
-        function createEditField(obj, parent, rc, varargin)
+        function createEditField(obj, parent, rc, items, eventName, varargin)
             h = uieditfield(parent, ...
                 'ValueChangedFcn', @(h,d) notify(obj, 'FilterEdited', appbox.EventData(d)),... 
                 varargin{:});
             h.Layout.Row = rc(1);
             h.Layout.Column = rc(2);
         end
-
-        %function addFilterRow(obj, parent, rowID)
-        %    h = uidropdown(parent, "Items", obj.FILTER_TYPES,...
-        %        "ValueChangedFcn", @(h,d)notify(obj, 'FilterSelected', appbox.EventData(d)));
-        %    h.Layout.Row = rowID; h.Layout.Column = 1;
-        %end
     end
 end 

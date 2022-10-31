@@ -1,4 +1,15 @@
 classdef QueryPresenter < appbox.Presenter 
+% QUERYPRESENTER
+%
+% Parent:
+%   appbox.Presenter
+%
+% Constructor:
+%   obj = QueryPresenter(experiment, view)
+%
+% See also:
+%   QueryView
+% -------------------------------------------------------------------------
 
     properties
         Experiment 
@@ -14,6 +25,7 @@ classdef QueryPresenter < appbox.Presenter
 
     properties (Hidden, Constant)
         FILTER_TYPES = ["", "Entity", "Class", "Parameter", "Property"];
+        RETURN_TYPES = ["", "Entity", "Parameter", "Property"];
     end
 
     methods
@@ -67,21 +79,24 @@ classdef QueryPresenter < appbox.Presenter
             obj.view.setGroupCount(numel(obj.allGroupNames), numel(obj.groupNames));
             obj.allClassNames = obj.populateClasses();
 
+            % Initialize the dropdown menus
             obj.view.createDropdown(obj.view.filterGrid, [2 1],...
-                obj.FILTER_TYPES, 'FilterSelected');
-            
+                obj.FILTER_TYPES, 'FilterTypeSelected');
+            obj.view.createDropdown(obj.view.searchGrid, [2 1],...
+                obj.RETURN_TYPES, 'ReturnTypeSelected');
         end
 
         function bind(obj)
             bind@appbox.Presenter(obj);
 
             v = obj.view;
-            obj.addListener(v, 'FilterSelected', @obj.onViewSelectedFilter);
+            obj.addListener(v, 'FilterTypeSelected', @obj.onViewSelectedFilter);
             obj.addListener(v, 'FilterAdded', @obj.onViewAddedFilter);
             obj.addListener(v, 'FilterRemoved', @obj.onViewRemovedFilter);
             obj.addListener(v, 'EntityFilterChosen', @obj.onViewEntityFilterChosen);
             obj.addListener(v, 'ClassFilterChosen', @obj.onViewClassFilterChosen);
 
+            obj.addListener(v, 'ReturnTypeSelected', @obj.onViewReturnTypeSelected);
             obj.addListener(v, 'QueryReset', @obj.onViewResetQuery);
             obj.addListener(v, 'GroupsChanged', @obj.onViewChangedGroups);
             obj.addListener(v, 'GroupSelected', @obj.onViewSelectedGroup);
@@ -116,7 +131,7 @@ classdef QueryPresenter < appbox.Presenter
             for i = 1:numel(obj.allGroupNames)
                 if obj.filterIdx(i)
                     entityType = h5readatt(obj.Experiment.hdfName,...
-                    obj.allGroupNames(i), 'EntityType');
+                        obj.allGroupNames(i), 'EntityType');
                     obj.filterIdx(i) = strcmpi(entityType, evt.data.Value);
                 end
             end
@@ -126,6 +141,25 @@ classdef QueryPresenter < appbox.Presenter
 
         function onViewClassFilterChosen(obj, ~, evt)
             % Select groups that match the class
+            for i = 1:numel(obj.allClassNames)
+                if obj.filterIdx(i)
+                    obj.filterIdx(i) = strcmpi(evt.data.Value, obj.allClassNames(i));
+                end
+            end
+            obj.view.setGroupNames(obj.groupNames);
+            obj.view.setGroupCount(numel(obj.groupNames), numel(obj.allGroupNames));
+        end
+
+        function onViewReturnTypeSelected(obj, ~, evt)
+            if evt.data.Value == ""
+                return
+            end
+
+            newLocation = [evt.data.Source.Layout.Row, 2];
+            if evt.data.Value == "Parameter"
+                obj.view.createEditField(obj.searchGrid, newLocation,...
+                    'ValueChangedFcn', @(h,d) notify(obj, 'ParameterDefined', appbox.EventData(d)));
+            end
         end
 
         function onViewAddedFilter(obj, ~, ~)
@@ -172,7 +206,7 @@ classdef QueryPresenter < appbox.Presenter
                         'EntityFilterChosen');
                 case "Class"
                     obj.view.createDropdown(evt.data.Source.Parent, newLocation,...
-                        ["", unique(obj.classNames)],...
+                        [""; unique(obj.classNames)],...
                         'ClassFilterChosen');
             end
         end
