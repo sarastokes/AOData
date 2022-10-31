@@ -22,8 +22,12 @@ classdef HDF5 < handle
 %   makeStringDataset(fileName, pathName, dsetName, data)
 %
 %   deleteObject(fileName, pathName, name)
+%
+%   tf = hasAttribute(fileName, pathName, paramName)
+%   names = getAttributeNames(fileName, pathName)
 %   deleteAttribute(fileName, pathName, name)
 %   writeatts(fileName, pathName, varargin)
+%
 %   createLink(fileName, targetPath, linkPath, linkName)
 %
 %   tf = exists(fileName, pathName)
@@ -499,6 +503,25 @@ classdef HDF5 < handle
 
     % Attribute methods
     methods (Static)
+        function tf = hasAttribute(hdfName, pathName, paramName)
+            % HASATTRIBUTENAME
+            %
+            % Description:
+            %   Determine whether a specific attribute is present
+            %
+            % Syntax:
+            %   tf = hasAttribute(hdfName, pathName, paramName)
+            % -------------------------------------------------------------
+            arguments
+                hdfName             {mustBeFile(hdfName)}
+                pathName            char
+                paramName           string
+            end
+            
+            attNames = aod.h5.getAttributeNames(hdfName, pathName);
+            tf = ismember(paramName, attNames);
+        end
+
         function names = getAttributeNames(hdfName, pathName)
             % GETALLATTRIBUTENAMES
             %

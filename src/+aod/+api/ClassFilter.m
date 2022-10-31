@@ -1,20 +1,35 @@
 classdef ClassFilter < aod.api.FilterQuery 
+% CLASSFILTER
+%
+% Description:
+%   Filter entities in an AOData HDF5 file based on MATLAB class
+%
+% Parent:
+%   aod.api.FilterQuery
+%
+% Constructor:
+%   obj = ClassFilter(hdfName, className)
+%
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         className
     end
     
-    properties (Access = protected)
+    properties (SetAccess = protected)
         allClassNames
     end
 
     methods
         function obj = ClassFilter(hdfName, className)
             obj = obj@aod.api.FilterQuery(hdfName);
-            obj.className = className;
 
             obj.collectClassNames();
-            obj.applyFilter();
+
+            if nargin > 1 && ~isempty(className)
+                obj.className = className;
+                obj.applyFilter();
+            end
         end
 
         function applyFilter(obj)
@@ -29,10 +44,18 @@ classdef ClassFilter < aod.api.FilterQuery
     methods (Access = private)
         function collectClassNames(obj)
             classNames = repmat("", [numel(obj.allGroupNames), 1]);
-            for i = 1:numel(obj.groupNames)
+            for i = 1:numel(obj.allGroupNames)
                 classNames(i) = h5readatt(obj.hdfName,...
                     obj.allGroupNames(i), 'Class');
             end
+            obj.allClassNames = classNames;
+        end
+    end
+
+    methods (Static)
+        function names = summarize(hdfName)
+            obj = aod.api.ClassFilter(hdfName);
+            names = unique(obj.allClassNames);
         end
     end
 end 
