@@ -518,7 +518,7 @@ classdef HDF5 < handle
                 paramName           string
             end
             
-            attNames = aod.h5.getAttributeNames(hdfName, pathName);
+            attNames = aod.h5.HDF5.getAttributeNames(hdfName, pathName);
             tf = ismember(paramName, attNames);
         end
 

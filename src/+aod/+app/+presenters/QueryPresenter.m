@@ -80,9 +80,11 @@ classdef QueryPresenter < appbox.Presenter
             obj.allClassNames = obj.populateClasses();
 
             % Initialize the dropdown menus
-            obj.view.createDropdown(obj.view.filterGrid, [2 1],...
+            obj.view.createDropdown(obj.view.filterGrid, [2 2],...
                 obj.FILTER_TYPES, 'FilterTypeSelected');
-            obj.view.createDropdown(obj.view.searchGrid, [2 1],...
+            obj.view.removeFilterButton(obj.view.filterGrid, [2, 1]);
+            obj.view.addFilterButton(obj.view.filterGrid, [3, 1])
+            obj.view.createDropdown(obj.view.searchGrid, [2 2],...
                 obj.RETURN_TYPES, 'ReturnTypeSelected');
         end
 
@@ -91,10 +93,12 @@ classdef QueryPresenter < appbox.Presenter
 
             v = obj.view;
             obj.addListener(v, 'FilterTypeSelected', @obj.onViewSelectedFilter);
-            obj.addListener(v, 'FilterAdded', @obj.onViewAddedFilter);
-            obj.addListener(v, 'FilterRemoved', @obj.onViewRemovedFilter);
             obj.addListener(v, 'EntityFilterChosen', @obj.onViewEntityFilterChosen);
             obj.addListener(v, 'ClassFilterChosen', @obj.onViewClassFilterChosen);
+            obj.addListener(v, 'ParameterNameSet', @obj.onViewParameterNameSet);
+            obj.addListener(v, 'ParameterValueSet', @obj.onView.ParameterValueSet);
+            obj.addListener(v, 'FilterRemoved', @obj.onViewFilterRemoved);
+            obj.addListener(v, 'FilterAdded', @obj.onViewFilterAdded);
 
             obj.addListener(v, 'ReturnTypeSelected', @obj.onViewReturnTypeSelected);
             obj.addListener(v, 'QueryReset', @obj.onViewResetQuery);
@@ -108,20 +112,23 @@ classdef QueryPresenter < appbox.Presenter
         function onViewChangedGroups(obj, ~, ~)
             obj.view.setGroupCount(...
                 numel(obj.groupNames), numel(obj.allGroupNames));
+            obj.view.resetGroupView();
         end
 
         function onViewSelectedGroup(obj, ~, evt)
+            obj.view.resetGroupView();
             entity = obj.Experiment.getByPath(evt.data.Value);
             obj.view.displayEntity(entity);
+            obj.view.displayAttributes(entity);
         end
 
         function onViewSelectedFilter(obj, ~, evt)
             if evt.data.Value == ""
                 return
             end
-            if evt.data.Source.Layout.Column == 1
+            if evt.data.Source.Layout.Column == 2
                 obj.parseFilterLevel1(evt);
-            elseif evt.data.Source.Layout.Column == 2
+            elseif evt.data.Source.Layout.Column == 3
                 obj.parseFilterLevel2(evt);
             end
         end
@@ -150,22 +157,47 @@ classdef QueryPresenter < appbox.Presenter
             obj.view.setGroupCount(numel(obj.groupNames), numel(obj.allGroupNames));
         end
 
+        function onViewFilterRemoved(obj, ~, evt)
+            parentHandle = evt.data.Source.Parent;
+            layout = evt.data.Source.Layout;
+            delete(evt.data.Source);
+
+            obj.view.addFilterButton(parentHandle, layout);
+            % Delete other UI components in the row, if they exist
+        end
+
+        function onViewFilterAdded(obj, ~, evt)
+            parentHandle = evt.data.Source.Parent;
+            layout = evt.data.Source.Layout;
+            delete(evt.data.Source);
+
+            obj.view.addFilterButton(parentHandle, [layout.Row + 1, 1])
+            obj.view.createDropdown(parentHandle, ...
+                [layout.Row, layout.Column + 1], ...
+                obj.FILTER_TYPES, 'FilterTypeSelected');
+            obj.view.removeFilterButton(parentHandle, layout);
+        end
+
         function onViewReturnTypeSelected(obj, ~, evt)
             if evt.data.Value == ""
                 return
             end
 
-            newLocation = [evt.data.Source.Layout.Row, 2];
-            if evt.data.Value == "Parameter"
-                obj.view.createEditField(obj.searchGrid, newLocation,...
-                    'ValueChangedFcn', @(h,d) notify(obj, 'ParameterDefined', appbox.EventData(d)));
-            end
+            %newLocation = [evt.data.Source.Layout.Row, 2];
         end
 
-        function onViewAddedFilter(obj, ~, ~)
+        function onViewParameterNameSet(obj, ~, evt)
+            filterObj = aod.api.ParameterFilter(obj.Experiment.hdfName, evt.data.Value);
+            obj.filterIdx = filterObj.filterIdx;
+            obj.view.setGroupNames(obj.groupNames);
+            obj.view.setGroupCount(numel(obj.groupNames), numel(obj.allGroupNames));
+
+            obj.view.createEditField(evt.data.Source.Parent,... 
+                [evt.data.Source.Layout.Row, evt.data.Source.Layout.Column+1], 'ParameterValueSet');
         end
 
-        function onViewRemovedFilter(obj, ~, ~)
+        function onViewParameterValueSet(obj, ~, evt)
+        
         end
 
         function onViewResetQuery(obj, ~, ~)
@@ -195,10 +227,23 @@ classdef QueryPresenter < appbox.Presenter
     % Parsing methods
     methods (Access = private)
         function parseFilterLevel2(obj, evt)
+            if ismember(evt.data.Value, ["Entity", "Class"])
+                return
+            end
+
+            newLocation = [evt.data.Source.Layout.Row,...
+                evt.data.Source.Layout.Column + 1];
+
+            if evt.data.Value == "Parameter"
+                obj.view.createEditField(evt.data.Source.Parent,...
+                    newLocation, 'ParameterValueSet');
+            end
+
         end
 
         function parseFilterLevel1(obj, evt)
-            newLocation = [evt.data.Source.Layout.Row, 2];
+            newLocation = [evt.data.Source.Layout.Row,...
+                evt.data.Source.Layout.Column + 1];
             switch evt.data.Value
                 case "Entity"
                     obj.view.createDropdown(evt.data.Source.Parent, newLocation,... 
@@ -208,6 +253,9 @@ classdef QueryPresenter < appbox.Presenter
                     obj.view.createDropdown(evt.data.Source.Parent, newLocation,...
                         [""; unique(obj.classNames)],...
                         'ClassFilterChosen');
+                case "Parameter"
+                    obj.view.createEditField(evt.data.Source.Parent,...
+                        newLocation, 'ParameterNameSet');
             end
         end
     end

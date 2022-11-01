@@ -388,6 +388,31 @@ classdef Experiment < aod.core.Entity
             end
         end
 
+        function system = getSystem(obj, systemName)
+            % GETSYSTEM
+            %
+            % Description:
+            %   Get a specific system by name (searches name then label)
+            %
+            % Syntax:
+            %   system = getSystem(obj, systemName)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                systemName      string
+            end
+
+            if isempty(obj.Systems)
+                system = [];
+                return 
+            end
+
+            idx = find(matches(names, systemName, "IgnoreCase", true));
+            if ~isempty(idx)
+                system = obj.Systems(idx);
+            end
+        end
+
         function removeSystem(obj, ID)
             % REMOVESYSTEM
             %

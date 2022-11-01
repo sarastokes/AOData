@@ -57,23 +57,25 @@ classdef SubjectFactory < aod.util.Factory
                 'whichEye must be either OD or OS!');
             
             nhpProps = {'PupilSize', obj.DEFAULT_PUPIL_SIZE};
+
+            subjectLoc = [];
                     
             switch ID
                 case 838
-                    subject = aod.builtin.sources.primate.Primate(...
+                    animal = aod.builtin.sources.primate.Primate(...
                         'MC00838',...
                         'Species', 'macaca fascicularis',...
                         'Sex', 'female',...
                         'DateOfBirth', datetime('20130622', 'Format', 'yyyyMMdd'),...
                         'Demographics', 'GCaMP6s');
-                    subject.assignUUID("8a496cec-5034-4021-98da-22936bc164cb");
+                    animal.assignUUID("8a496cec-5034-4021-98da-22936bc164cb");
 
                     % Add the eye
                     if strcmp(whichEye, 'OD')
                         subjectEye = aod.builtin.sources.primate.Eye('OD',...
                             'AxialLength', 16.56, nhpProps{:});
                         subjectEye.assignUUID("bc7aea0b-ada1-42c1-8f45-695dfb664861");
-                        subject.addSource(subjectEye);
+                        animal.addSource(subjectEye);
                         
                         % Add location, if standardized
                         ID = find(obj.PHYSIOLOGY_LOCATIONS == location);
@@ -89,11 +91,11 @@ classdef SubjectFactory < aod.util.Factory
                         end
                     end
                 case 848
-                    subject = aod.builtin.sources.primate.Primate('MC00848',...
+                    animal = aod.builtin.sources.primate.Primate('MC00848',...
                         'Species', 'macaca fascicularis',...
                         'Sex', 'male',...
                         'Demographics', 'rhodamine');
-                    subject.assignUUID("749633e9-4dec-4a1b-833a-dbb9cfb66096");
+                    animal.assignUUID("749633e9-4dec-4a1b-833a-dbb9cfb66096");
 
                     % Add the eye
                     if strcmp(whichEye, 'OD')
@@ -105,20 +107,20 @@ classdef SubjectFactory < aod.util.Factory
                             'AxialLength', 18.59, nhpProps{:});
                         subjectEye.assignUUID("d305a3ba-4bb0-479a-9538-be2c18b65a2a");
                     end
-                    subject.addSource(subjectEye);
+                    animal.addSource(subjectEye);
                 case 851
-                    subject = aod.builtin.sources.primate.Primate('MC00851',...
+                    animal = aod.builtin.sources.primate.Primate('MC00851',...
                         'Species', 'macaca fasciularis',...
                         'Sex', 'male',...
                         'Demographics', 'GCaMP6s, rhodamine');
-                    subject.assignUUID("d89b9d19-10fd-4eff-bbfa-6d76a5864f0b");
+                    animal.assignUUID("d89b9d19-10fd-4eff-bbfa-6d76a5864f0b");
 
                     % Add the eye
                     if strcmp(whichEye, 'OD')
                         subjectEye = aod.builtin.sources.primate.Eye('OD',...
                             'AxialLength', 16.88, nhpProps{:});
                         subjectEye.assignUUID("5c6327dd-52b5-4832-88f4-a3e3977258e9")
-                        subject.addSource(subjectEye);
+                        animal.addSource(subjectEye);
 
                         % Add location, if standardized
                         ID = find(obj.PHYSIOLOGY_LOCATIONS == location);
@@ -137,7 +139,7 @@ classdef SubjectFactory < aod.util.Factory
                             'AxialLength', 16.97, nhpProps{:});
                         subjectEye.setParam('ContactLens', '12.2mm/5.8mm/plano');
                         subjectEye.assignUUID("5e8118e0-a165-4c4f-a261-47fb31e9059c");
-                        subject.addSource(subjectEye);
+                        animal.addSource(subjectEye);
                         
                         % Add location, if standardized
                         ID = find(obj.PHYSIOLOGY_LOCATIONS == location);
@@ -154,6 +156,13 @@ classdef SubjectFactory < aod.util.Factory
                     end
                 otherwise
                     error('Unrecognized ID %u', ID);
+            end
+            
+            % Return the most specific source 
+            if isempty(subjectLoc)
+                subject = subjectEye;
+            else
+                subject = subjectLoc;
             end
         end
     end

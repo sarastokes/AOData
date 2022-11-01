@@ -66,9 +66,14 @@ classdef TemporalModulation < sara.protocols.SpectralProtocol
             else
                 contrastTxt = '';
             end
-            fName = sprintf('%s_%s_%uhz_%s%up_%ut',...
+
+            
+            tempFreq = num2str(obj.temporalFrequency);
+            tempFreq = strrep(tempFreq, '.', 'p');
+            
+            fName = sprintf('%s_%s_%shz_%s%up_%ut',...
                 lower(char(obj.spectralClass)), obj.modulationClass,... 
-                obj.temporalFrequency, contrastTxt,... 
+                tempFreq, contrastTxt,... 
                 100*obj.baseIntensity, obj.totalTime);
         end
         
