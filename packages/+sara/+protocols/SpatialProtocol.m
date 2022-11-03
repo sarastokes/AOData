@@ -69,16 +69,16 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             % Syntax:
             %   stim = mapToStimulator(obj)
             % -------------------------------------------------------------
-            assert(isSubclass(obj.calibration, 'sara.calibrations.TopticaNonlinearity'),...
+            assert(isSubclass(obj.Calibration, 'sara.calibrations.TopticaNonlinearity'),...
                 'SpatialProtocol/mapToStimulator: requires TopticaNonlinearity calibration');
 
             stim = obj.generate();
-            lookupFit = fit(obj.calibration.Data.Value, obj.calibration.Data.Power,...
+            lookupFit = fit(obj.Calibration.Data.Value, obj.Calibration.Data.Power,...
                 'cubicinterp');
             lookupTable = lookupFit(0:255);
 
-            powerRange = max(obj.calibration.Data.Power) - min(obj.calibration.Data.Power);
-            powerStim = powerRange * stim + min(obj.calibration.Data.Power);
+            powerRange = max(obj.Calibration.Data.Power) - min(obj.Calibration.Data.Power);
+            powerStim = powerRange * stim + min(obj.Calibration.Data.Power);
 
             [x, y, t] = size(powerStim);
             powerStim = powerStim(:);
@@ -94,10 +94,10 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
                 for i = 1:numel(powerStim)
                     stim(i) = findclosest(lookupTable, powerStim(i));
                 end
-
-                stim = uint8(stim - 1);
-                stim = reshape(stim, [x y t]);
             end
+
+            stim = uint8(stim - 1);
+            stim = reshape(stim, [x y t]);
 
             % Rotate counter-clockwise (1P system applies clockwise rotation)
             stim = rot90(stim);

@@ -14,6 +14,7 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
 %   sequence                    LED sequence (e.g. 'RGW', 'BYW')
 %   stepTime                    Time of each pulse in spectral series
 %   intensity                   Intensity of individual pulses (0-1)
+%   lumNorm                     normalize LED modulations to white point
 % Inherited properties:
 %   preTime
 %   stimTime                    Time for each pulse (pulse + baseline)
@@ -28,8 +29,9 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
 
     properties
         sequence
-        stepTime
+        stepTime        double = 5
         intensity
+        lumNorm         logical = true
     end
 
     properties% (SetAccess = protected)
@@ -46,11 +48,13 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
             addParameter(ip, 'Intensity', 0.75, @isnumeric);
             addParameter(ip, 'Sequence', 'RGW', @ischar);
             addParameter(ip, 'StepTime', 5, @isnumeric);
+            addParameter(ip, 'Norm', true, @islogical);
             parse(ip, varargin{:});
 
             obj.sequence = ip.Results.Sequence;
             obj.stepTime = ip.Results.StepTime;
             obj.intensity = ip.Results.Intensity;
+            obj.lumNorm = ip.Results.Norm;
 
             % Override default parameters
             obj.spectralClass = sara.SpectralTypes.Generic;
@@ -77,8 +81,11 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
         function ledValues = mapToStimulator(obj)
             stim = obj.generate();
             ups = getModulationTimes(stim);
-            bkgdPowers = obj.Calibration.stimPowers.Background;
-            maxPowers = obj.Calibration.ledMaxPowers;
+            if obj.lumNorm
+                bkgdPowers = obj.Calibration.stimPowers.Background;
+            else
+                bkgdPowers = obj.Calibration.ledMaxPowers' / 2;
+            end
 
             spectralClasses = [];
             for i = 1:obj.numSteps
@@ -97,9 +104,14 @@ classdef SpectralSequence < sara.protocols.SpectralProtocol
         end
 
         function fName = getFileName(obj)
-            fName = sprintf('%s_seq_%us_%um_%up_%ut',...
+            if obj.lumNorm
+                lumTxt = '';
+            else
+                lumTxt = '_raw';
+            end
+            fName = sprintf('%s_seq_%us_%um%s_%up_%ut',...
                 lower(obj.sequence), obj.stepTime, round(100*obj.intensity),...
-                round(100*obj.baseIntensity), obj.totalTime);
+                lumTxt, round(100*obj.baseIntensity), obj.totalTime);
         end
 
     end

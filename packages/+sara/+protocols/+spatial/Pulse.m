@@ -24,8 +24,11 @@ classdef Pulse < sara.protocols.SpatialProtocol
         end
 
         function stim = generate(obj)
-            stim = obj.baseIntensity + zeros(obj.canvasSize(1), obj.canvasSize(2), obj.totalFrames);
-            stim(:, :, obj.preFrames+1:obj.preFrames+obj.stimFrames) = obj.amplitude;
+            stim = obj.baseIntensity + zeros(obj.canvasSize(1), obj.canvasSize(2), obj.totalSamples);
+            
+            preFrames = obj.sec2samples(obj.preTime);
+            stimFrames = obj.sec2samples(obj.stimTime);
+            stim(:, :, preFrames+1:preFrames+stimFrames) = obj.amplitude;
         end
 
         function fName = getFileName(obj)           
