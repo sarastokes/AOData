@@ -10,6 +10,7 @@ classdef ClassRepository < handle
 % History:
 %   06Nov2021 - SSP - Adapted from Symphony's ClassRepository
 %   04Dec2021 - SSP - Added superclass list method
+%   15Nov2022 - SSP - String return from get()
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -31,8 +32,8 @@ classdef ClassRepository < handle
         function setSearchPath(obj, path)
             dirs = strsplit(path, ';');
             for i = 1:numel(dirs)
-                if exist(dirs{i})
-                    [~, ~, p] = packageName(dirs{i});
+                if isfolder(dirs{i})
+                    [~, ~, p] = appbox.packageName(dirs{i});
                     addpath(p);
                 end
             end
@@ -43,8 +44,9 @@ classdef ClassRepository < handle
         function cn = get(obj, superclass)
             if obj.classMap.isKey(superclass)
                 cn = obj.classMap(superclass);
+                cn = string(cn');
             else
-                cn = {};
+                cn = string.empty();
             end
         end
 
@@ -74,7 +76,7 @@ classdef ClassRepository < handle
         end
 
         function loadDirectory(obj, path)
-            package = packageName(path);
+            package = appbox.packageName(path);
             if ~isempty(package)
                 package = [package '.'];
             end

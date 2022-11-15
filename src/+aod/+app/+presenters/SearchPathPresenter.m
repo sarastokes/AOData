@@ -58,9 +58,9 @@ classdef SearchPathPresenter < appbox.Presenter
             if isempty(path)
                 return
             end
-            dirs = strsplit(path, ';');
-            for i = 1:numel(dirs)
-                obj.view.addSearchPath(dirs{i});
+            % dirs = strsplit(path, ';');
+            for i = 1:numel(path)
+                obj.view.addSearchPath(path(i));
             end
         end
     end
@@ -99,14 +99,11 @@ classdef SearchPathPresenter < appbox.Presenter
             try
                 paths = obj.view.getSearchPaths();
                 if isempty(paths)
-                    setPref('AOData', 'SearchPaths', {});
+                    setPref('AOData', 'SearchPaths', []);
                 else
-                    pathList = '';
+                    pathList = string.empty();
                     for i = 1:numel(paths)
-                        pathList = [pathList, paths{i}]; %#ok<AGROW> 
-                        if i < numel(paths)
-                            pathList = [pathList, ';']; %#ok<AGROW> 
-                        end
+                        pathList = cat(1, pathList, paths(i));
                     end
                     setpref('AOData', 'SearchPaths', pathList);
                 end

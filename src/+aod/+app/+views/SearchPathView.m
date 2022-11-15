@@ -1,4 +1,12 @@
 classdef SearchPathView < aod.app.UIView
+% SEARCHPATHVIEW
+%
+% Parent:
+%   aod.app.UIView
+%
+% See also:
+%   aod.app.presenters.SearchPathPresenter
+% -------------------------------------------------------------------------
 
     events
         AddSearchPath
