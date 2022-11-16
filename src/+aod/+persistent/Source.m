@@ -1,4 +1,4 @@
-classdef Source < aod.core.persistent.Entity ...
+classdef Source < aod.persistent.Entity ...
         & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
@@ -7,7 +7,7 @@ classdef Source < aod.core.persistent.Entity ...
 
     methods
         function obj = Source(hdfFile, hdfName, factory)
-            obj = obj@aod.core.persistent.Entity(hdfFile, hdfName, factory);
+            obj = obj@aod.persistent.Entity(hdfFile, hdfName, factory);
         end
     end
 
@@ -33,7 +33,7 @@ classdef Source < aod.core.persistent.Entity ...
 
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
             
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();           

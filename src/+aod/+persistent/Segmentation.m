@@ -1,4 +1,4 @@
-classdef Segmentation < aod.core.persistent.Entity ...
+classdef Segmentation < aod.persistent.Entity ...
         & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
@@ -8,7 +8,7 @@ classdef Segmentation < aod.core.persistent.Entity ...
 
     methods 
         function obj = Segmentation(hdfFile, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfFile, hdfPath, factory);
+            obj = obj@aod.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end
 
@@ -24,7 +24,7 @@ classdef Segmentation < aod.core.persistent.Entity ...
             % -------------------------------------------------------------
             obj.Data = data;
 
-            evtData = aod.core.persistent.events.DatasetEvent('Data',...
+            evtData = aod.persistent.events.DatasetEvent('Data',...
                 data, obj.Data);
             notify(obj, 'DatasetChanged', evtData);
         end
@@ -32,7 +32,7 @@ classdef Segmentation < aod.core.persistent.Entity ...
 
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
 
             % DATASETS
             obj.Data = obj.loadDataset("Data");
@@ -45,7 +45,7 @@ classdef Segmentation < aod.core.persistent.Entity ...
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.core.persistent.Segmentation([], [], []);
+            obj = aod.persistent.Segmentation([], [], []);
         end
     end
 end

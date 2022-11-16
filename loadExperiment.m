@@ -15,7 +15,7 @@ function e = loadExperiment(hdfName, entityFactory)
     fullHdfFile = fullfile(W.path, [hdfName, ext]);
 
     if nargin < 2 || isempty(entityFactory)
-        EF = aod.core.persistent.EntityFactory(fullHdfFile);
+        EF = aod.persistent.EntityFactory(fullHdfFile);
     else
         EF = entityFactory;
     end

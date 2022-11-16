@@ -108,7 +108,7 @@ classdef Persistor < handle
                 h5writeatt(obj.hdfName, hdfPath, 'UUID', uuid);
             end
 
-            evtData = aod.core.persistent.events.EntityEvent(uuid, evt.Action);
+            evtData = aod.persistent.events.EntityEvent(uuid, evt.Action);
             notify(obj, 'EntityChanged', evtData);
 
             % Refresh the associated EntityContainer

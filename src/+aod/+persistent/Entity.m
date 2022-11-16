@@ -15,7 +15,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     end
 
     properties (SetAccess = private)
-        Parent                  % aod.core.persistent.Entity
+        Parent                  % aod.persistent.Entity
         UUID                    string
     end
 
@@ -173,7 +173,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 newEntity       {mustBeA(newEntity, 'aod.core.Entity')}
             end
             
-            evtData = aod.core.persistent.events.GroupEvent(newEntity, 'Replace', obj);
+            evtData = aod.persistent.events.GroupEvent(newEntity, 'Replace', obj);
             notify(obj, 'GroupChanged', evtData);
         end
     end
@@ -357,7 +357,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.core.persistent.events.AttributeEvent(paramName, paramValue);
+            evtData = aod.persistent.events.AttributeEvent(paramName, paramValue);
             notify(obj, 'AttributeChanged', evtData);
 
             obj.parameters(paramName) = paramValue;
@@ -396,7 +396,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.core.persistent.events.AttributeEvent(obj.hdfPath, paramName);
+            evtData = aod.persistent.events.AttributeEvent(obj.hdfPath, paramName);
             notify(obj, 'AttributeChanged', evtData);
 
             remove(obj.parameters, paramName);
@@ -515,7 +515,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.core.persistent.events.FileEvent(fileName, fileValue);
+            evtData = aod.persistent.events.FileEvent(fileName, fileValue);
             notify(obj, 'FileChanged', evtData);
 
             obj.files(fileName) = fileValue;
@@ -548,7 +548,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.core.persistent.events.FileEvent(obj.hdfPath, fileName);
+            evtData = aod.persistent.events.FileEvent(obj.hdfPath, fileName);
             notify(obj, 'FileChanged', evtData);
 
             remove(obj.files, fileName);
@@ -609,7 +609,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % Syntax:
             %   addEntity(obj, entity)
             % -------------------------------------------------------------
-            evtData = aod.core.persistent.events.GroupEvent(entity, 'Add');
+            evtData = aod.persistent.events.GroupEvent(entity, 'Add');
             notify(obj, 'GroupChanged', evtData);
         end
     end
@@ -625,7 +625,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   deleteEntity(obj)
             % -------------------------------------------------------------
             obj.checkReadOnlyMode();
-            evtData = aod.core.persistent.events.GroupEvent(obj, 'Remove');
+            evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
             notify(obj, 'GroupChanged', evtData);
         end
 
@@ -740,7 +740,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % Syntax:
             %   c = loadContainer(obj, containerName)
             % -------------------------------------------------------------
-            c = aod.core.persistent.EntityContainer(...
+            c = aod.persistent.EntityContainer(...
                 aod.h5.HDF5.buildPath(obj.hdfPath, containerName), obj.factory);
         end
     end
@@ -844,7 +844,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 linkValue           = []
             end
 
-            evtData = aod.core.persistent.events.LinkEvent(linkName, linkValue);
+            evtData = aod.persistent.events.LinkEvent(linkName, linkValue);
             notify(obj, 'LinkChanged', evtData);
 
             if ~ismember(linkName, obj.linkNames)
@@ -869,9 +869,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             newDset = ~obj.ismember(dsetName, obj.dsetNames);
             if newDset
-                evtData = aod.core.persistent.events.DatasetEvent(dsetName, dsetValue);
+                evtData = aod.persistent.events.DatasetEvent(dsetName, dsetValue);
             else
-                evtData = aod.core.persistent.events.DatasetEvent(...
+                evtData = aod.persistent.events.DatasetEvent(...
                     dsetName, dsetValue, obj.(dsetName));
             end
             notify(obj, 'DatasetChanged', evtData);

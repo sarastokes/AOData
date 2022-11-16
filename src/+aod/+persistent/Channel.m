@@ -1,4 +1,4 @@
-classdef Channel < aod.core.persistent.Entity ...
+classdef Channel < aod.core.Entity ...
         & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
@@ -7,7 +7,7 @@ classdef Channel < aod.core.persistent.Entity ...
 
     methods
         function obj = Channel(hdfName, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
+            obj = obj@aod.persistent.Entity(hdfName, hdfPath, factory);
         end
     end
 
@@ -33,7 +33,7 @@ classdef Channel < aod.core.persistent.Entity ...
 
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
@@ -57,7 +57,7 @@ classdef Channel < aod.core.persistent.Entity ...
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.core.persistent.Channel([], [], []);
+            obj = aod.persistent.Channel([], [], []);
         end
     end
 end 

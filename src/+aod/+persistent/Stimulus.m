@@ -1,4 +1,4 @@
-classdef Stimulus < aod.core.persistent.Entity ...
+classdef Stimulus < aod.persistent.Entity ...
         & matlab.mixin.Heterogenous & dynamicprops
 
     properties (SetAccess = protected)
@@ -7,13 +7,13 @@ classdef Stimulus < aod.core.persistent.Entity ...
 
     methods
         function obj = Stimulus(hdfFile, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfFile, hdfPath, factory);
+            obj = obj@aod.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end
     
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
 
             obj.setDatasetsToDynProps();
 
@@ -25,7 +25,7 @@ classdef Stimulus < aod.core.persistent.Entity ...
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.core.persistent.Stimulus([], [], []);
+            obj = aod.persistent.Stimulus([], [], []);
         end
     end
 end 

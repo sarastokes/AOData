@@ -1,4 +1,4 @@
-classdef Epoch < aod.core.persistent.Entity ...
+classdef Epoch < aod.persistent.Entity ...
         & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
@@ -17,7 +17,7 @@ classdef Epoch < aod.core.persistent.Entity ...
 
     methods
         function obj = Epoch(hdfFile, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfFile, hdfPath, factory);
+            obj = obj@aod.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end
 
@@ -98,7 +98,7 @@ classdef Epoch < aod.core.persistent.Entity ...
 
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
             
             % DATASETS
             obj.ID = obj.loadDataset("ID");
@@ -170,7 +170,7 @@ classdef Epoch < aod.core.persistent.Entity ...
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.core.persistent.Channel([], [], []);
+            obj = aod.persistent.Channel([], [], []);
         end
     end
 end 

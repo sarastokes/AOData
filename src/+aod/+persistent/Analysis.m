@@ -1,4 +1,4 @@
-classdef Analysis < aod.core.persistent.Entity ...
+classdef Analysis < aod.persistent.Entity ...
     matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
@@ -7,13 +7,13 @@ classdef Analysis < aod.core.persistent.Entity ...
 
     methods
         function obj = Analysis(hdfFile, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfFile, hdfPath, factory);
+            obj = obj@aod.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end
 
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
 
             obj.analysisDate = obj.loadDataset("analysisDate");
             obj.setDatasetsToDynProps();
@@ -25,7 +25,7 @@ classdef Analysis < aod.core.persistent.Entity ...
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.core.persistent.Analysis([], [], []);
+            obj = aod.persistent.Analysis([], [], []);
         end
     end
 end 

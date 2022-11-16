@@ -23,7 +23,7 @@ classdef EntityFactory < handle
         function obj = EntityFactory(hdfName)
             obj.hdfName = hdfName;
             obj.entityManager = aod.h5.EntityManager(hdfName);
-            obj.persistor = aod.core.persistent.Persistor(hdfName);
+            obj.persistor = aod.persistent.Persistor(hdfName);
             addlistener(obj.persistor, 'EntityChanged', @obj.onEntityChanged);
 
             obj.cache = containers.Map();
@@ -71,7 +71,7 @@ classdef EntityFactory < handle
 
     methods (Static)
         function experiment = init(hdfName)
-            obj = aod.core.persistent.EntityFactory(hdfName);
+            obj = aod.persistent.EntityFactory(hdfName);
             experiment = obj.getExperiment();
         end
     end

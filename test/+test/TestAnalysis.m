@@ -13,7 +13,7 @@ classdef TestAnalysis < aod.core.Analysis
         end
 
         function setSource(obj, source)
-            assert(isSubclass(source, {'aod.core.Source', 'aod.core.persistent.Source'}),...
+            assert(isSubclass(source, {'aod.core.Source', 'aod.persistent.Source'}),...
                 'Input must be a Source subclass');
             obj.Source = source;
         end

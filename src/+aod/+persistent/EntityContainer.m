@@ -50,7 +50,7 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
         end
     end
     
-    methods (Access = ?aod.core.persistent.Persistor)
+    methods (Access = ?aod.persistent.Persistor)
         function refresh(obj)
             obj.memberPaths = [];
             obj.populateContents();

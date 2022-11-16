@@ -20,9 +20,9 @@ classdef (ConstructOnLoad) GroupEvent < event.EventData
     methods
         function obj = GroupEvent(entity, action, oldEntity)
             arguments
-                entity      {mustBeA(entity, {'aod.core.Entity', 'aod.core.persistent.Entity'})}
+                entity      {mustBeA(entity, {'aod.core.Entity', 'aod.persistent.Entity'})}
                 action      {mustBeMember(action, {'Add', 'Remove', 'Replace'})}
-                oldEntity   {mustBeA(oldEntity, 'aod.core.persistent.Entity')} = []
+                oldEntity   {mustBeA(oldEntity, 'aod.persistent.Entity')} = []
             end
             
             obj.Entity = entity;

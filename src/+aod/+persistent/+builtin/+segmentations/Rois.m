@@ -1,8 +1,8 @@
-classdef Rois < aod.core.persistent.Segmentation
+classdef Rois < aod.persistent.Segmentation
 
     methods
         function obj = Rois(varargin)
-            obj = obj@aod.core.persistent.Segmentation(varargin{:});
+            obj = obj@aod.persistent.Segmentation(varargin{:});
         end
     end
 end 

@@ -1,4 +1,4 @@
-classdef Response < aod.core.persistent.Entity ...
+classdef Response < aod.persistent.Entity ...
         & matlab.mixin.Heterogeneous & dynamicprops
 
     properties
@@ -8,13 +8,13 @@ classdef Response < aod.core.persistent.Entity ...
 
     methods 
         function obj = Response(hdfFile, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfFile, hdfPath, factory);
+            obj = obj@aod.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end
 
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
 
             % Special handling of Timing w/ implicit inheritance from Epoch
             info = h5info(obj.hdfName, obj.hdfPath);
@@ -34,7 +34,7 @@ classdef Response < aod.core.persistent.Entity ...
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.core.persistent.Response([], [], []);
+            obj = aod.persistent.Response([], [], []);
         end
     end
 end 

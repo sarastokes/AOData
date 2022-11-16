@@ -8,7 +8,7 @@ function [tf, persisted] = isEntity(entity)
     % Syntax:
     %   [tf, persisted] = isEntity(entity)
     % ---------------------------------------------------------------------
-    if isSubclass(entity, 'aod.core.persistent.Entity')
+    if isSubclass(entity, 'aod.persistent.Entity')
         tf = true;
         persisted = true;
     elseif isSubclass(entity, 'aod.core.Entity')

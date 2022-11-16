@@ -533,7 +533,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods (Sealed, Access = {?aod.core.Entity, ?aod.core.persistent.Entity})
+    methods (Sealed, Access = {?aod.core.Entity, ?aod.persistent.Entity})
         function setParent(obj, parent)
             % SETPARENT
             %   

@@ -1,4 +1,4 @@
-classdef Experiment < aod.core.persistent.Entity & dynamicprops
+classdef Experiment < aod.persistent.Entity & dynamicprops
 
     properties (SetAccess = protected)
         homeDirectory           char
@@ -19,7 +19,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
 
     methods
         function obj = Experiment(hdfName, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
+            obj = obj@aod.persistent.Entity(hdfName, hdfPath, factory);
         end
 
         function value = get.numEpochs(obj)
@@ -42,7 +42,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
                 homeDirectory           string
             end
 
-            evtData = aod.core.persistent.events.DatasetEvent(...
+            evtData = aod.persistent.events.DatasetEvent(...
                 'homeDirectory', homeDirectory, obj.homeDirectory);
             notify(obj, 'DatasetChanged', evtData);
 
@@ -162,7 +162,7 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
 
     methods (Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
  
             obj.experimentDate = obj.loadDataset('experimentDate');
             obj.homeDirectory = obj.loadDataset('homeDirectory');

@@ -50,7 +50,7 @@ classdef RegionResponse < aod.core.Response
             % Syntax:
             %   setSegmentation(obj, segmentation)
             % -------------------------------------------------------------
-            assert(isSubclass(segmentation, {'aod.core.Segmentation', 'aod.core.persistent.Segmentation'}),...
+            assert(isSubclass(segmentation, {'aod.core.Segmentation', 'aod.persistent.Segmentation'}),...
                 'Input must be subclass of aod.core.Segmentation');
             obj.Segmentation = segmentation;
         end

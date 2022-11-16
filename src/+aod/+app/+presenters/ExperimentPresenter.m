@@ -40,7 +40,7 @@ classdef ExperimentPresenter < appbox.Presenter
                 end
             end
 
-            if isSubclass(experiment, 'aod.core.persistent.Experiment')
+            if isSubclass(experiment, 'aod.persistent.Experiment')
                 obj.Experiment = experiment;
             else
                 obj.Experiment = loadExperiment(experiment);

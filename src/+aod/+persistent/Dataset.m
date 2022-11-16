@@ -1,25 +1,25 @@
-classdef Device < aod.core.persistent.Entity ...
+classdef Dataset < aod.persistent.Entity ...
         & matlab.mixin.Heterogeneous & dynamicprops
 
     methods
-        function obj = Device(hdfName, hdfPath, factory)
-            obj = obj@aod.core.persistent.Entity(hdfName, hdfPath, factory);
+        function obj = Dataset(hdfName, hdfPath, factory)
+            obj = obj@aod.persistent.Entity(hdfName, hdfPath, factory);
         end
     end
 
     methods (Sealed, Access = protected)
         function populate(obj)
-            populate@aod.core.persistent.Entity(obj);
+            populate@aod.persistent.Entity(obj);
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
         end
     end
-    
+
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.core.persistent.Device([], [], []);
+            obj = aod.persistent.Dataset([], [], []);
         end
     end
 end

@@ -1038,7 +1038,7 @@ experiment.Epochs(2).parameters
 % Get the responses for the first 5 epochs
 experiment.Epochs(1:5).Responses 
 	\end{lstlisting}
-	How does this work? The long story short is that there are dedicated ``persistent'' versions of each core class specifically for reading information back from an HDF5 file (e.g. for \aodclass{aod.core.Epoch} there is a corresponding \aodclass{aod.core.persistent.Epoch}). These classes ensure the core components of AOData maintain their structure and relationships. Beyond that, any additional datasets found in an entity's group within the HDF5 file are added as dynamic properties (also known instance properties) using the \matclass{dynamicprops} superclass.   
+	How does this work? The long story short is that there are dedicated ``persistent'' versions of each core class specifically for reading information back from an HDF5 file (e.g. for \aodclass{aod.core.Epoch} there is a corresponding \aodclass{aod.persistent.Epoch}). These classes ensure the core components of AOData maintain their structure and relationships. Beyond that, any additional datasets found in an entity's group within the HDF5 file are added as dynamic properties (also known instance properties) using the \matclass{dynamicprops} superclass.   
 	
 	Reading the HDF5 files is fast to begin with and made faster by ``lazy loading'' which basically means that entities are not read from the HDF5 file until requested. Once requested, they are added to a cache so they only need to be read in once. This all happens behind the scenes.
 	
