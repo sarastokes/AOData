@@ -13,6 +13,12 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
         overwriteFlag           logical = false
     end
 
+    if isfile(hdfName) && ~overwriteFlag
+        error('writeExperimentToFile:FileExists',...
+            'File %s exists, set overwriteFlag to true to rewrite', hdfName);
+    end
+    
+    % Create the file
     aod.h5.HDF5.createFile(hdfName, overwriteFlag);
     
     % Write the experiment first

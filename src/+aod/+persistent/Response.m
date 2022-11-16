@@ -1,5 +1,20 @@
-classdef Response < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Response < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% RESPONSE
+%
+% Description:
+%   Represents a persisted Response in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Response(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Response
+% -------------------------------------------------------------------------
 
     properties
         Data
@@ -32,7 +47,7 @@ classdef Response < aod.persistent.Entity ...
     end
 
     % Heterogeneous methods
-    methods (Sealed, Static)
+    methods (Static, Sealed)
         function obj = empty()
             obj = aod.persistent.Response([], [], []);
         end

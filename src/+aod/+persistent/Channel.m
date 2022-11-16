@@ -1,5 +1,4 @@
-classdef Channel < aod.core.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
         DevicesContainer

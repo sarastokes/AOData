@@ -1,5 +1,20 @@
-classdef Epoch < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% EPOCH
+%
+% Description:
+%   Represents a persisted Epoch in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Epoch(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Epoch
+% -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         ID(1,1)
@@ -170,7 +185,7 @@ classdef Epoch < aod.persistent.Entity ...
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.persistent.Channel([], [], []);
+            obj = aod.persistent.Epoch([], [], []);
         end
     end
 end 

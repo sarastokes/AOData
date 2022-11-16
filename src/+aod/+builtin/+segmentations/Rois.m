@@ -9,10 +9,12 @@ classdef Rois < aod.core.Segmentation
 %
 % Constructor:
 %   obj = Rois(name, rois)
-%   obj = Rois(name, rois, 'Size', value)
+%   obj = Rois(name, rois, 'Size', value, 'Source', source)
 %
 % Optional Parameters:
 %   Size            % needed for loading ImageJRois, otherwise calculated
+% Optional Parameters (inherited from aod.core.Segmentation):
+%   Source          aod.core.Source
 %
 % Derived Parameters (automatically calculated from Data):
 %   Count
@@ -22,6 +24,7 @@ classdef Rois < aod.core.Segmentation
 %   load(obj)
 %   reload(obj)
 %   setImage(obj, im)
+%
 %   ID = parseRoi(obj, ID)
 %   roiID = uid2roi(obj, UID)
 %   uid = roi2uid(obj, roiID)

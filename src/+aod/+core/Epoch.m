@@ -72,6 +72,48 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     % Access methods
     methods (Sealed)
+        function dset = getDataset(obj, datasetClassName)
+            % GETDATASET
+            %
+            % Syntax:
+            %   dset = getDataset(obj, datasetClassName)
+            %
+            % Inputs:
+            %   dsetClassName       char, class of dataset to retrieve
+            % Ouputs:
+            %   dset                aod.core.Dataset or subclass
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                dset = [];
+                for i = 1:numel(obj)
+                    dset = cat(1, dset, obj(i).getDataset(datasetClassName));
+                end
+                return
+            end
+            dset = getByClass(obj.Datasets, char(datasetClassName));
+        end
+
+        function reg = getRegistration(obj, regClassName)
+            % GETREGISTRATION
+            %
+            % Syntax:
+            %   dset = getRegistration(obj, regClassName)
+            %
+            % Inputs:
+            %   regClassName        char, class of dataset to retrieve
+            % Ouputs:
+            %   reg                 aod.core.Registration or subclass
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                reg = [];
+                for i = 1:numel(obj)
+                    reg = cat(1, reg, obj(i).getRegistration(regClassName));
+                end
+                return
+            end
+            reg = getByClass(obj.Registrations, char(regClassName));
+        end
+
         function stim = getStimulus(obj, stimClassName)
             % GETSTIMULUS
             %
@@ -83,6 +125,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Ouputs:
             %   stim                aod.core.Stimulus or subclass
             % ----------------------------------------------------------
+            if ~isscalar(obj)
+                stim = [];
+                for i = 1:numel(obj)
+                    stim = cat(1, stim, obj(i).getStimulus(stimClassName));
+                end
+                return
+            end
             stim = getByClass(obj.Stimuli, char(stimClassName));
         end
       
@@ -99,7 +148,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   keep                 Add to Epoch (default = false)
             % Additional key/value inputs are sent to response constructor
             % -------------------------------------------------------------
-
+            if ~isscalar(obj)
+                resp = [];
+                for i = 1:numel(obj)
+                    resp = cat(1, resp, obj(i).getResponse(stimClassName, varargin{:}));
+                end
+                return
+            end
             % TODO: Update
             if isempty(obj.Parent.Segmentations)
                 error('Experiment must contain Segmentations');

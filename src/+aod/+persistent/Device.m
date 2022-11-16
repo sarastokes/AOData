@@ -1,5 +1,20 @@
-classdef Device < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Device < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% DEVICE
+%
+% Description:
+%   Represents a persisted Device in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Device(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Device
+% -------------------------------------------------------------------------
 
     methods
         function obj = Device(hdfName, hdfPath, factory)
@@ -17,7 +32,7 @@ classdef Device < aod.persistent.Entity ...
     end
     
     % Heterogeneous methods
-    methods (Sealed, Static)
+    methods (Static, Sealed)
         function obj = empty()
             obj = aod.persistent.Device([], [], []);
         end

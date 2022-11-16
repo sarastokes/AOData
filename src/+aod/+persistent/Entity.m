@@ -6,12 +6,42 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %
 % Constructor:
 %   obj = Entity(hdfName, hdfPath, entityFactory)
+%
+% Public Methods:
+%   setReadOnlyMode(obj, tf)
+%   h = ancestor(obj, entityType)
+%   e = getByPath(obj, hdfPath)
+%
+%   setDescription(obj, txt)
+%   setName(obj, txt)
+%
+%   addProperty(obj, propName, propValue)
+%   removeProperty(obj, propName)
+%
+%   tf = hasParam(obj, paramName)
+%   out = getParam(obj, paramName)
+%   setParam(obj, paramName, paramValue)
+%   removeParam(obj, paramName)
+%
+%   tf = hasFile(obj, fileKey)
+%   out = getFile(obj, fileKey)
+%   out = getExptFile(obj, fileKey)
+%   setFile(obj, fileKey, fileValue)
+%   removeFile(obj, fileKey)
+%   
+% Events:
+%   FileChanged
+%   LinkChanged
+%   GroupChanged
+%   DatasetChanged
+%   AttributeChanged
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         parameters              % aod.util.Parameters
         files                   % aod.util.Parameters
         description             string
+        notes
     end
 
     properties (SetAccess = private)
@@ -38,7 +68,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         attNames
 
         % Persistence properties
-        factory
+        factory                 % aod.persistent.EntityFactory
     end
 
     properties (Access = private)
@@ -252,6 +282,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 obj
                 entityName          char        = ''
             end
+            obj.checkReadOnlyMode();
+            obj.setDataset('Name', obj, entityName);
             obj.Name = entityName;
         end
 
@@ -262,6 +294,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
             
             obj.checkReadOnlyMode();
+            obj.setDataset('description', obj, txt);
             obj.description = txt;
         end
     end
@@ -380,7 +413,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.checkReadOnlyMode();
 
             if ~isscalar(obj)
-                arrayfun(@(x) removeParam(x, fileName), obj);
+                arrayfun(@(x) removeParam(x, paramName), obj);
                 return
             end
 
@@ -407,35 +440,35 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % File methods
     methods (Sealed)
-        function tf = hasFile(obj, fileName)
+        function tf = hasFile(obj, fileKey)
             % HASFILE
             %
             % Description:
             %   Check whether entity has a file
             %
             % Syntax:
-            %   tf = hasFile(obj, fileName)
+            %   tf = hasFile(obj, fileKey)
             % -------------------------------------------------------------
             arguments
                 obj
-                fileName            char
+                fileKey             char
             end
 
             if isscalar(obj)
-                tf = isKey(obj.files, fileName);
+                tf = isKey(obj.files, fileKey);
             else
-                tf = arrayfun(@(x) isKey(x.files, fileName), obj);
+                tf = arrayfun(@(x) isKey(x.files, fileKey), obj);
             end
         end
 
-        function out = getFile(obj, fileName, errorType)
+        function out = getFile(obj, fileKey, errorType)
             % GETFILE
             %
             % Description:
             %   Get file by name
             %
             % Syntax:
-            %   out = getFile(obj, fileName, errorType)
+            %   out = getFile(obj, fileKey, errorType)
             %
             % Notes:
             %   Error type defaults to WARNING for scalar operations and is
@@ -443,27 +476,27 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                fileName            char
+                fileKey             char
                 errorType           = aod.util.ErrorTypes.WARNING
             end
             
             import aod.util.ErrorTypes
 
             if ~isscalar(obj)
-                out = arrayfun(@(x) getFile(x, fileName, ErrorTypes.MISSING),...
+                out = arrayfun(@(x) getFile(x, fileKey, ErrorTypes.MISSING),...
                     obj, 'UniformOutput', false);
                 out = vertcat(out{:});
                 return
             end
 
-            if ~obj.hasFile(fileName)
+            if ~obj.hasFile(fileKey)
                 switch errorType 
                     case ErrorTypes.ERROR
                         error("getFile:FileNotFound",...
-                            "File %s not present", fileName);
+                            "File %s not present", fileKey);
                     case ErrorTypes.WARNING
                         warning("getFile:FileNotFound",...
-                            "File %s not present", fileName);
+                            "File %s not present", fileKey);
                         out = [];
                     case ErrorTypes.MISSING
                         out = missing;
@@ -472,22 +505,35 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 end
                 return
             else
-                out = obj.files(fileName);
+                out = obj.files(fileKey);
             end
         end
 
-        function out = getExptFile(obj, fileName, varargin)
+        function out = getExptFile(obj, fileKey, errorType)
             % GETEXPTFILE
             %
             % Description:
             %   Return file name with home directory appended
             %
             % Syntax:
-            %   out = getExptFile(obj, fileName, errorType)
+            %   out = getExptFile(obj, fileKey, errorType)
             %
             % See getFile() for information on inputs
             % -------------------------------------------------------------
-            out = obj.getFile(fileName, varargin{:});
+            arguments
+                obj
+                fileKey             char
+                errorType           = aod.util.ErrorTypes.WARNING
+            end
+
+            if ~isscalar(obj)
+                out = arrayfun(@(x) getExptFile(x, fileKey, ErrorTypes.MISSING),...
+                    obj, 'UniformOutput', false);
+                out = vertcat(out{:});
+                return
+            end
+
+            out = obj.getFile(fileKey, errorType);
             
             h = obj.ancestor('Experiment');
             out = fullfile(h.homeDirectory, out);
@@ -521,37 +567,37 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.files(fileName) = fileValue;
         end
 
-        function removeFile(obj, fileName)
+        function removeFile(obj, fileKey)
             % REMOVEFILE
             %
             % Description:
             %   Remove a file from entity's file directory
             %
             % Syntax:
-            %   removeFile(obj, fileName)
+            %   removeFile(obj, fileKey)
             % -------------------------------------------------------------
             arguments
                 obj
-                fileName           char
+                fileKey             char
             end
 
             obj.checkReadOnlyMode();
 
             if ~isscalar(obj)
-                arrayfun(@(x) removeFile(x, fileName), obj);
+                arrayfun(@(x) removeFile(x, fileKey), obj);
                 return
             end
 
-            if ~obj.hasFile(fileName)
+            if ~obj.hasFile(fileKey)
                 warning("removeFile:FileNotFound",...
-                    "File %s not found in files property!", fileName);
+                    "File %s not found in files property!", fileKey);
                 return
             end
 
-            evtData = aod.persistent.events.FileEvent(obj.hdfPath, fileName);
+            evtData = aod.persistent.events.FileEvent(obj.hdfPath, fileKey);
             notify(obj, 'FileChanged', evtData);
 
-            remove(obj.files, fileName);
+            remove(obj.files, fileKey);
 
             obj.loadInfo();
         end
@@ -575,21 +621,20 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             if obj.ismember('files', obj.dsetNames)
                 obj.files = obj.loadDataset('files', 'aod.util.Parameters');
             end
+            obj.description = obj.loadDataset('description');
+            obj.notes = obj.loadDataset('notes');
+            obj.Name = obj.loadDataset('Name');
 
             % LINKS
             obj.Parent = obj.loadLink('Parent');
 
             % ATTRIBUTES
-            % Special attributes (universal ones mapping to properties)
+            % Universial attributes that map to properties, not parameters
             specialAttributes = ["UUID", "description", "Class", "EntityType"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.core.EntityTypes.init(obj.loadAttribute('EntityType'));
             obj.entityClassName = obj.loadAttribute('Class');
-
-            % Optional special attributes which may not be present
-            obj.description = obj.loadAttribute('description');
-            obj.Name = obj.loadAttribute('Name');
 
             % Parse the remaining attributes
             for i = 1:numel(obj.attNames)

@@ -5,11 +5,19 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
 %   Check which properties will be persisted and which will not
 %
 % Syntax:
-%   getPersistedProps(obj, verbose)
+%   [persisted, attribute, abandoned] = getPersistedProps(obj, verbose)
 %
 % Input:
 %   obj             aod.core.Entity
 %   verbose         logical (default = false)
+%
+% Output:
+%   persistedProps      string
+%       Names of properties that are written as datasets within the entity
+%   attributeProps      string
+%       Names of properties that written as entity attributes
+%   abandonedProps      string
+%       Names of properties that are not written 
 %
 % History:
 %   08Jun2022 - SSP
@@ -24,8 +32,8 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
     entityType = aod.core.EntityTypes.get(obj);
     containerProps = entityType.childContainers();
     
-    alwaysPersistedProps = ["notes", "Parent", "files"];
-    alwaysAttributeProps = ["UUID", "Name", "label", "description", "parameters", "entityType"];
+    alwaysPersistedProps = ["notes", "Parent", "files", "description"];
+    alwaysAttributeProps = ["UUID", "Name", "label", "parameters", "entityType"];
     alwaysAbandonedProps = ["allowableParentTypes", "Reader"];
     persistedProps = [];
     attributeProps = [];

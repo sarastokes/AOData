@@ -17,6 +17,7 @@
 % Monospaced font options
 \usepackage[T1]{fontenc}
 \usepackage[scaled]{beramono}
+\usepackage{fontawesome}
 %\usepackage{inconsolata}
 
 % Math support
@@ -84,7 +85,7 @@
 }
 \lstset{style=mystyle}
 
-% File directories
+% Forest
 \usepackage[edges]{forest}
 \definecolor{folderbg}{RGB}{124,166,198}
 \definecolor{folderborder}{RGB}{110,144,169}
@@ -133,6 +134,45 @@ pic me set={directory}{folder},
 pic me set={file}{file},
 }
 
+
+% Tikz
+\usepackage{tikz}
+\usepackage{tkz-orm}
+\usetikzlibrary{positioning,shapes,shadows,arrows}
+
+% Tikz custom commands
+\newcommand{\FTfile}{}
+\def\FTfile(#1,#2){%
+	node(tmp){}(#1|-tmp)++(0.6em,0)
+	node(tmp)[anchor=west,black]{\tt #2}(#1)|-(tmp.west)++(0,-1.2em) 
+}
+\newcommand{\FTOdir}{}
+\def\FTOdir(#1,#2,#3){%
+	\FTfile(#1,{{\color{blue!80!black!20}\faFolderOpen}\hspace{0.2em}#3})
+	(tmp.west)++(0.8em,-0.4em)node(#2){}
+	(tmp.west)++(1.5em,0)++(0,-1.3em) 
+}
+\newcommand{\FTdir}{}
+\def\FTdir(#1,#2,#3){%
+	\FTfile(#1,{{\color{blue!80!black!20}\faFolder}\hspace{0.2em}#3})
+	(tmp.west)++(0.8em,-0.4em)node(#2){}
+	(tmp.west)++(1.5em,0)++(0,-1.3em) 
+}
+\newcommand{\FTcontainer}{}
+\def\FTcontainer(#1,#2,#3){%
+	\FTfile(#1,{{\color{blue!80!black!20}\faFolder}\hspace{0.2em}\textcolor{gray}{\textit{#3}}})
+	(tmp.west)++(0.8em,-0.4em)node(#2){}
+	(tmp.west)++(1.5em,0)++(0,-1.3em) 
+}
+\newcommand{\FTOcontainer}{}
+\def\FTOcontainer(#1,#2,#3){%
+	\FTfile(#1,{{\color{blue!80!black!20}\faFolderOpen}\hspace{0.2em}\textcolor{gray}{\textit{#3}}})
+	(tmp.west)++(0.8em,-0.4em)node(#2){}
+	(tmp.west)++(1.5em,0)++(0,-1.3em) 
+}
+\newcommand{\FTroot}{}
+\def\FTroot{tmp.west}
+
 % Custom commands
 \newcommand{\comm}[1]{}
 \newcommand\myurl[1]{\textcolor{blue}{\underline{#1}}}
@@ -151,7 +191,7 @@ pic me set={file}{file},
 	\begin{center}
 		{\LARGE\textbf{AOData Documentation}}
 		\\\vspace{1.5ex}
-		{\large Sara Patterson - August 30, 2022}
+		{\large Sara Patterson - November 16, 2022}
 	\end{center}
 	
 	\tableofcontents
@@ -263,17 +303,15 @@ addpath(genpath('yourfilepath/ao-data-tools'))
 	
 	\subsection{Packages}
 		Folders beginning with a plus sign are interpreted as \textbf{packages}. So to call Device in the file structure below, you need to use \aodclass{aod.core.Device}, not \aodclass{Device}. \\$\quad$\vspace{-2ex}\\
-		
-	\begin{forest}
-		pic dir tree,
-		pic root,
-		for tree={directory, inner ysep=1.3pt},
-		[+aod
-			[+core
-				[Device.m, file]
-			]
-		]
-	\end{forest}
+	
+	\begin{tikzpicture}[scale=0.95]
+		\draw[color=black!60!white]
+		\FTOdir(\FTroot,root,+aod){       
+			\FTOdir(root,devices,+device){   
+				\FTfile(devices,Device.m)
+			}
+		};
+	\end{tikzpicture}
 	
 		\noindent Why not just use regular file folders? Using packages reduces conflicts and increases code clarity. An example: Say I make an object for the Toptica in the 1P system that inherits from \aodclass{aod.core.Device}. I could name it \aodclass{Toptica} or  \aodclass{sara.devices.Toptica}. The first option might work in the short-term. However, Jennifer Hunter's lab has a Toptica too and they might have their own \aodclass{Toptica} class. Most of us only use one system so that could be fine. Except that we borrowed Jennifer's Toptica so now I need a second Toptica class (it's worth keeping them separate as Jennifer's has one less laser line and higher max powers for the other lines). If they have their own package, I just need that and then I don't have to write any code at all! If they don't, I could make the class and call it either \aodclass{TopticaTwo} or \aodclass{hunterlab.devices.Device}. The second option is clearer and specifies exactly  which Toptica is being used used (I \textit{might} remember which Toptica is \aodclass{TopticaTwo}, but no one else will know). It may even help us remember to return Jennifer's Toptica when we're done.
 
@@ -349,42 +387,6 @@ clear import
 			There are a number of nice options if you're comfortable with Python, such as \href{https://github.com/ganymede42/h5pyViewer}{\myurl{h5pyViewer}} and \href{https://vitables.org}{\myurl{ViTables}}. Regardless of the language you intend to use, I recommend first looking through the files with \aodclass{H5TreeView} because it's designed to facilitate understanding the AOData framework.
 			\\$\quad$\\
 			\noindent Understanding how AOData writes experiment data to an HDF5 file is described in \myurl{\ref{section:HDF5_Details}} on ``HDF5 File Details''. Groups are shown with folders and datasets are shown with files. Groups that are containers for multiple entities are italicized, the other groups correspond to entities. Checking out the example file will make this clearer.
-			\comm{\begin{forest}
-				pic dir tree,
-				pic root,
-				for tree={directory,},
-				[Experiment
-				[\textit{Sources}
-					[Subject]
-				]
-				[\textit{Systems}
-				[SystemOne
-					[\textit{Channels}
-						[ChannelOne
-						[\textit{Devices}
-						]
-						]
-					]
-				]]
-				[\textit{Calibrations}
-					[PowerMeasurementOne
-						[Data, file]
-					]
-				]
-				[\textit{Segmentations}]
-				[\textit{Epochs}
-					[Epoch
-						[\textit{Registrations}
-						[StripRegistration
-							[Data, file]
-						]
-						]
-						[\textit{Stimuli}]
-						[\textit{Responses}]
-					]
-				]
-				]
-			\end{forest}}
 	\subsection{Advanced MATLAB Concepts}
 		\noindent This section has information on a few MATLAB-specific topics (other languages probably have similar things using different names) that aren't routinely covered in the introductory documentation but are critical to how AOData operates. \textit{You don't need to read and understand this prior to using AOData!} You may never need to deal with these directly; after all, the whole point of abstraction in the OOP section is that complicated behind the scenes code is handled and kept hidden from end-users. At some point though as you work with AOData, you might have questions about these topics and can circle back to the information below:
 	\subsubsection{Handle vs. Value Classes}\label{subsubsection:HandleValue}
@@ -1067,71 +1069,59 @@ experiment.Epochs(1:5).Responses
 		\label{subsection:EntityLocationsInHDF5}
 		\noindent Each entity type lives in a specific part of the HDF5 folder. The \aodclass{aod.core.Experiment} group is written in the root group. Virtually all other entities are found within container groups which are created by default for the entities below. For example, when you add the Experiment to an HDF5 file, 5 default container groups are created within the Experiment group. When you add calibrations to the Experiment, each is a new group within \texttt{/Experiment/Calibrations}. \\
 		
-		\begin{forest}
-			pic dir tree,
-			pic root,
-			for tree={directory, inner ysep=1.3},
-			[Experiment
-				[\textit{Sources} - container all Sources within the Experiment]
-				[\textit{Systems} - container for all Systems within the Experiment]
-				[\textit{Calibrations} - container for all Calibrations within the Experiment]
-				[\textit{Segmentations} - container for all Segmentations within the Experiment]
-				[\textit{Epochs} - container for all Epochs within the Experiment]
-				[\textit{Analyses} - container for all Analyses within the Experiment]
-			]
-		\end{forest}
+		\begin{tikzpicture}[scale=0.95]
+			\draw[color=black!60!white]
+			\FTOdir(\FTroot,root,Experiment){       
+				\FTdir(root,Sources,Sources - container for all Sources within the Experiment){}     
+				\FTdir(root,Systems,Systems - container for all Systems within the Experiment){}     
+				\FTdir(root,Calibrations,Calibrations - container for all Calibrations within the Experiment){}
+				\FTdir(root,Epochs,Epochs - container for all Epochs within the Experiment){}     
+				\FTdir(root,Segmentations,Segmentations - container for all Segmentations within the Experiment){}  
+				\FTdir(root,Analyses,Analyses - container for all Analyses within the Experiment){}        
+			};
+		\end{tikzpicture}
 		\\$\quad$\\
-		\noindent When you add an Epoch to the Experiment, four default container groups are created
-		
-		\begin{forest}
-			pic dir tree, 
-			pic root,
-			for tree={directory, inner ysep=1.3}
-			[Experiment
-				[\textit{Epochs} - container for all Epochs within the Experiment
-					[EpochOne
-						[\textit{Registrations} - container for all Registrations within the Epoch]
-						[\textit{Responses} - container for all Responses within the Epoch]
-						[\textit{Stimuli} - container for all Stimuli within the Epoch]
-						[\textit{Datasets} - container for all Datasets within the Epoch]
-					]
-				]
-			]
-		\end{forest}
-		\\$\quad$\\
-		For each System added to the Experiment, one default container group is created for Channels. For each Channel added to a System, one default container is created for Devices.
-				
-		\begin{forest}
-		pic dir tree, 
-		pic root,
-		for tree={directory, inner ysep=1.3}
-		[Experiment
-			[\textit{Systems} - container for all Systems within the Experiment
-				[SystemOne
-					[\textit{Channels} - container for all Channels within the System
-						[ChannelOne
-							[\textit{Devices} - container for all Devices witin the Channel]
-						]
-					]
-				]
-			]
-		]
-		\end{forest}
-	\\$\quad$\\
-	\noindent Finally, sources are \textit{nestable} and can contain other sources. Accordingly, each Source will have a Sources container. This allows you to specify Sources at whatever level of detail you want. For an example of how this could work, see the Source hierarchy detailed in \myurl{\ref{subsection:aod.core.Source}}
+		\noindent When you add an Epoch to the Experiment, four default container groups are created\\
 	
-	\begin{forest}
-		pic dir tree, 
-		pic root,
-		for tree={directory, inner ysep=1.3}
-		[Experiment
-			[\textit{Sources} - container for all top-level Sources within the Experiment
-				[SourceOne
-					[\textit{Sources} - container for all Sources within the Source]
-				]
-			]
-		]
-	\end{forest}
+		\begin{tikzpicture}[scale=0.95]
+			\draw[color=black!60!white]
+			\FTOdir(\FTroot,root,Epochs){       
+				\FTdir(root,Datasets,Datasets - container for all Datasets within the Epoch){}
+				\FTdir(root,Registrations,Registrations - container for all Registrations within the Epoch){}     
+				\FTdir(root,Responses,Responses - container for all Responses within the Epoch){}     
+				\FTdir(root,Stimuli,Stimuli - container for all Stimuli within the Epoch){}
+			};
+		\end{tikzpicture}
+		\\$\quad$\\
+		For each System added to the Experiment, one default container group is created for Channels. For each Channel added to a System, one default container is created for Devices.\\
+		
+		\begin{tikzpicture}[scale=0.95]
+			\draw[color=black!60!white]
+			\FTOdir(\FTroot,root,Experiment){       
+				\FTOcontainer(root,Systems,Systems){
+					\FTOdir(Systems,System1,System1){
+						\FTOcontainer(System1,Channels,Channels){
+							\FTOdir(Channels,Channel1,Channel1){
+								\FTcontainer(Channel1,Devices,Devices){}
+							}
+						}
+					}
+				}
+			};
+		\end{tikzpicture}
+		\\$\quad$\\
+		\noindent Finally, sources are \textit{nestable} and can contain other sources. Accordingly, each Source will have a Sources container. This allows you to specify Sources at whatever level of detail you want. For an example of how this could work, see the Source hierarchy detailed in \myurl{\ref{subsection:aod.core.Source}}\\
+		
+	\begin{tikzpicture}[scale=0.95]
+		\draw[color=black!60!white]
+		\FTOdir(\FTroot,root,Experiment){        
+			\FTOcontainer(root,Sources,Sources - container for all top-level Sources within the Experiment){
+				\FTOdir(Sources,Source1,Source1){
+					\FTcontainer(Source1,SourcesA,Sources - container for all Sources within the Source){}
+				}
+			}
+		};
+	\end{tikzpicture}
 
 	\subsection{Naming Entities for HDF5 Files}
 		\label{subsection:NamingEntitiesForHDF5}
@@ -1427,7 +1417,7 @@ end
 	\noindent 
 	You might notice a this protocol used few functions and properties that weren't defined. These are inherited from \aodclass{aod.core.Protocol}. For example, several methods are defined for converting between seconds and samples (\aodfcn{obj.sec2samples(sec)}, \aodfcn{obj.samples2sec(samples)}) which use the value you set for \aodprop{sampleRate}. To convert between seconds and the stimulator's timing, there's \aodfcn{obj.sec2pts(sec)} and \aodfcn{obj.pts2sec(pts)} which use your value for \aodprop{stimRate}. There's also a property \aodprop{totalTime} which calls the function \aodfcn{calculateTotalTime()}. See the \aodclass{aod.core.Protocol} code for more.	
 
-\section{Miscellaneous}
+\section{Miscellaneous FAQs}
 	\label{section:Misc}
 	\noindent\textbf{What to do when a constructor needs information from the parent entity}\\
 	Supply the parent entity as an input to the constructor and assign it within the constructor with \aodfcn{setParent()}. See \aodclass{aod.builtin.registrations.StripRegistration} or \aodclass{aod.builtin.responses.RegionResponse} for an example.

@@ -66,16 +66,22 @@ classdef HDF5 < handle
 
             assert(endsWith(fileName, '.h5'), 'File name must end with .h5');
 
-            if exist(fileName, 'file')
-                if overwrite
-                    delete(fileName);
-                else
-                    error("createFile:FileExists",...
-                        "File already exists, set overwrite=true to recreate");
+            if overwrite
+                fileID = H5F.create(fileName, 'H5F_ACC_TRUNC',...
+                    H5P.create('H5P_FILE_CREATE'), H5P.create('H5P_FILE_ACCESS'));
+            else
+                try
+                    fileID = H5F.create(fileName);
+                catch ME
+                    if strcmp(ME.identifier, 'MATLAB:imagesci:hdf5io:resourceAlreadyExists')
+                        error("createFile:FileExists",...
+                            "File already exists, set overwrite=true to recreate");
+                    else
+                        rethrow(ME);
+                    end
                 end
             end
 
-            fileID = H5F.create(fileName);
             if nargout == 0
                 fileIDx = onCleanup(@()H5F.close(fileID));
             end

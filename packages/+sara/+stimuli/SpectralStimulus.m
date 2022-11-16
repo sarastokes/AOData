@@ -23,6 +23,7 @@ classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
     methods
         function obj = SpectralStimulus(protocol)
             obj = obj@aod.builtin.stimuli.VisualStimulus(protocol);
+            
         end
 
         function setFrameRate(obj, frameRate)

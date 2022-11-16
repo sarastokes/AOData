@@ -1,4 +1,20 @@
 classdef Experiment < aod.persistent.Entity & dynamicprops
+% EXPERIMENT
+%
+% Description:
+%   Represents a persisted Experiment in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Experiment(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Experiment
+% -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         homeDirectory           char

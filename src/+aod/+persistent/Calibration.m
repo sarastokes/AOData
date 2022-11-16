@@ -1,5 +1,21 @@
-classdef Calibration < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Calibration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% CALIBRATION
+%
+% Description:
+%   Represents a persisted Calibration in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Calibration(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Calibration
+% -------------------------------------------------------------------------
+
 
     properties (SetAccess = private)
         calibrationDate(1,1)                    datetime 

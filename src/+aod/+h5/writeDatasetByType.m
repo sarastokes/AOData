@@ -31,17 +31,22 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
     end
 
     if isstruct(data) || istable(data)
-        %try
+        HDF5.makeCompoundDataset(fileName, pathName, dsetName, data);
+        HDF5.writeatts(fileName, fullPath, 'Class', class(data));
+        return
+    end
+
+    if isstruct(data)
+        try 
             HDF5.makeCompoundDataset(fileName, pathName, dsetName, data);
             HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-        %catch
-            % Delete dataset created while attempting compound type
-        %    if aod.h5.HDF5.exists(fileName, fullPath)
-        %        HDF5.deleteObject(fileName, fullPath);
-        %    end
-        %    HDF5.makeStructDataset(fileName, pathName, dsetName, data);
-        %    HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-        %end
+        catch
+            if aod.h5.HDF5.exists(fileName, fullPath)
+                HDF5.deleteObject(fileName, fullPath);
+            end
+            HDF5.makeStructDataset(fileName, pathName, dsetName, data);
+            HDF5.writeatts(fileName, fullPath, 'Class', class(data));
+        end
         return
     end
 

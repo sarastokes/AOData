@@ -68,7 +68,7 @@ classdef Experiment < aod.core.Entity
 
             ip = aod.util.InputParser();
             addParameter(ip, 'Administrator', '', @ischar);
-            addParameter(ip, 'System', '', @ischar);
+            addParameter(ip, 'Laboratory', '', @ischar);
             parse(ip, varargin{:});
             obj.setParam(ip.Results);
 
@@ -303,10 +303,12 @@ classdef Experiment < aod.core.Entity
                 % Set the parent of the top-level source
                 if isempty(h)
                     source.setParent(obj);
-                else
+                    obj.Sources = cat(1, obj.Sources, source);
+                else % Source has parents
+                    % TODO: Recognize existing parents
                     h(1).setParent(obj);
+                    obj.Sources = cat(1, obj.Sources, h(1));
                 end
-                obj.Sources = cat(1, obj.Sources, source);
             end
         end
 
@@ -333,7 +335,7 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   clearSources(obj)
             % -------------------------------------------------------------
-            obj.Sources = aod.core.Sources.empty();
+            obj.Sources = aod.core.Source.empty();
         end
         
 

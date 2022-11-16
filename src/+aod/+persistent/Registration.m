@@ -1,5 +1,21 @@
-classdef Registration < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops 
+classdef Registration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops 
+% REGISTRATION
+%
+% Description:
+%   Represents a persisted Registration in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Registration(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Registration
+% -------------------------------------------------------------------------
+
 
     properties (SetAccess = protected)
         registrationDate

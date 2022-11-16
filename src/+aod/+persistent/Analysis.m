@@ -1,5 +1,4 @@
-classdef Analysis < aod.persistent.Entity ...
-    matlab.mixin.Heterogeneous & dynamicprops
+classdef Analysis < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
         analysisDate                    

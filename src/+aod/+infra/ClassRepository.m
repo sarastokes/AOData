@@ -23,6 +23,8 @@ classdef ClassRepository < handle
             if nargin < 1
                 path = obj.getPathPreferences();
                 if isempty(path)
+                    warning('ClassRepository:NoClassPaths',...
+                        'Set class paths using SearchPathApp');
                     return
                end
             end
@@ -30,10 +32,12 @@ classdef ClassRepository < handle
         end
 
         function setSearchPath(obj, path)
-            dirs = strsplit(path, ';');
-            for i = 1:numel(dirs)
-                if isfolder(dirs{i})
-                    [~, ~, p] = appbox.packageName(dirs{i});
+            if ~isstring(path)
+                path = string(path);
+            end
+            for i = 1:numel(path)
+                if isfolder(path(i))
+                    [~, ~, p] = appbox.packageName(path(i));
                     addpath(p);
                 end
             end
@@ -68,10 +72,10 @@ classdef ClassRepository < handle
 
         function loadAll(obj)
             obj.classMap = containers.Map();
-        
-            dirs = strsplit(obj.searchPath, ';');
-            for i = 1:numel(dirs)
-                obj.loadDirectory(dirs{i});
+
+            paths = string(obj.searchPath);
+            for i = 1:numel(paths)
+                obj.loadDirectory(paths(i));
             end
         end
 

@@ -22,6 +22,7 @@ function writeEntity(hdfName, obj)
         HDF5.writeatts(hdfName, '/Experiment', 'Class', class(obj));
     end
 
+    % Determine which properties will be persisted
     persistedProps = aod.h5.getPersistedProperties(obj);
     % Extract out independently set properties
     specialProps = aod.h5.getSpecialProps();
@@ -32,7 +33,7 @@ function writeEntity(hdfName, obj)
         persistedProps = setdiff(persistedProps, containers);
     end
 
-    % Collect UUIDs of entities within the HDF5 file
+    % Collect UUIDs of entities within the HDF5 file to locate "Parent"
     if entityType ~= EntityTypes.EXPERIMENT
         EM = aod.h5.EntityManager(hdfName);
         EM.collect();
@@ -78,21 +79,19 @@ function writeEntity(hdfName, obj)
     end 
 
     % Write names, if exist
+    HDF5.writeatts(hdfName, hdfPath, 'label', obj.label);
     if ~isempty(obj.Name)
-        HDF5.writeatts(hdfName, hdfPath, 'Name', obj.Name);
-    end
-    if ~isempty(obj.label)
-        HDF5.writeatts(hdfName, hdfPath, 'label', obj.label);
+        aod.h5.writeDatasetByType(hdfName, hdfPath, 'Name', obj.Name);
     end
 
     % Write description, if exists
     if ~isempty(obj.description)
-        HDF5.writeatts(hdfName, hdfPath, 'Description', obj.description);
+        aod.h5.writeDatasetByType(hdfName, hdfPath, 'description', obj.description);
     end
 
     % Write note(s), if necessary
     if ~isempty(obj.notes)
-        HDF5.writeatts(hdfName, hdfPath, 'Notes', obj.notes);
+       aod.h5.writeDatasetByType(hdfName, hdfPath, 'notes', obj.notes);
     end
 
     % Write parameters, if necessary
@@ -107,6 +106,7 @@ function writeEntity(hdfName, obj)
         aod.h5.writeParameters(hdfName, [hdfPath, '/files'], obj.files);
     end
 
+    % Handle git repository links
     if isprop(obj, 'Code') && ~isempty(obj.Code)
         HDF5.makeTextDataset(hdfName, hdfPath, 'Code',... 
             'Attributes contain git hashes of all registered repositories');

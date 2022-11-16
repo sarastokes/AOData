@@ -22,6 +22,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
 %   was made at 2% on the Toptica and checked in Nov 2021 with other
 %   Toptica output levels.
 % -------------------------------------------------------------------------
+
     properties (SetAccess = protected)
         Data 
         laserLine

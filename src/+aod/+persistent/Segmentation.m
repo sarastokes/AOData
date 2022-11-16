@@ -1,5 +1,21 @@
-classdef Segmentation < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Segmentation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% SEGMENTATION
+%
+% Description:
+%   Represents a persisted Segmentation in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Segmentation(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Segmentation
+% -------------------------------------------------------------------------
+
 
     properties (SetAccess = protected)
         Data 

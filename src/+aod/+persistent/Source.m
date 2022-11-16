@@ -1,5 +1,20 @@
-classdef Source < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% SOURCE
+%
+% Description:
+%   Represents a persisted Source in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Source(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Source
+% -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         SourcesContainer
@@ -51,6 +66,13 @@ classdef Source < aod.persistent.Entity ...
             for i = 1:numel(obj)
                 out = cat(1, out, obj(i).SourcesContainer(idx));
             end
+        end
+    end
+    
+    % Heterogeneous methods
+    methods (Sealed, Static)
+        function obj = empty()
+            obj = aod.persistent.Source([], [], []);
         end
     end
 end 

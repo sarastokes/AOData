@@ -6,6 +6,9 @@ function experiment = ToyExperiment(writeToHDF)
     %
     % Syntax:
     %   experiment = ToyExperiment(writeToHDF)
+    %
+    % Notes:
+    %   HDF file will write to current directory
     % ---------------------------------------------------------------------
 
     if nargin < 1
@@ -13,7 +16,12 @@ function experiment = ToyExperiment(writeToHDF)
     end
 
     experiment = aod.core.Experiment('Tester', cd, '20220823',...
-        'Administrator', 'Sara Patterson');
+        'Administrator', 'Sara Patterson',...
+        'Laboratory', 'Primate-1P');
+
+    experiment.setDescription('This is a test experiment');
+    experiment.addNote('This is the first note');
+    experiment.addNote('This is the second note');
 
     source = sara.factories.SubjectFactory.create(851, 'OS', 'Right');
     experiment.addSource(source);
@@ -34,15 +42,11 @@ function experiment = ToyExperiment(writeToHDF)
     calibration.addMeasurement(24:26, 16:18);
     experiment.addCalibration(calibration);
 
-    epoch = aod.core.Epoch(1, 'Source', source.Sources(1).Sources(1), 'System', system);
+    epoch = aod.core.Epoch(1, 'Source', source, 'System', system);
     epoch.setFile('PresyncFile', fullfile(cd, 'PresyncFile.txt'));
     experiment.addEpoch(epoch);
     epoch.setTiming(1:5);
     epoch.setFile('PostSyncFile', fullfile(cd, 'PostSyncFile.txt'));
-
-    experiment.addNote('This is the first note');
-    experiment.addNote('This is the second note');
-    experiment.setDescription('This is a test experiment');
 
     reg = aod.builtin.registrations.RigidRegistration('SIFT', '20220823', eye(3));
     epoch.addRegistration(reg);
@@ -59,7 +63,7 @@ function experiment = ToyExperiment(writeToHDF)
     stim = aod.builtin.stimuli.ImagingLight('Mustang', 22, 'Normalized');
     epoch.addStimulus(stim);
 
-    experiment.addEpoch(aod.core.Epoch(2, 'Source', source.Sources(1).Sources(1)));
+    experiment.addEpoch(aod.core.Epoch(2, 'Source', source));
 
     experiment.addAnalysis(aod.core.Analysis('TestAnalysis', '20220904'));
 

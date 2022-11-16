@@ -1,5 +1,20 @@
-classdef Dataset < aod.persistent.Entity ...
-        & matlab.mixin.Heterogeneous & dynamicprops
+classdef Dataset < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% DATASET
+%
+% Description:
+%   Represents a persisted Dataset in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity
+%   matlab.mixin.Heterogeneous
+%   dynamicprops
+%
+% Constructor:
+%   obj = Dataset(hdfFile, hdfPath, factory)
+%
+% See also:
+%   aod.core.Dataset
+% -------------------------------------------------------------------------
 
     methods
         function obj = Dataset(hdfName, hdfPath, factory)
@@ -17,7 +32,7 @@ classdef Dataset < aod.persistent.Entity ...
     end
 
     % Heterogeneous methods
-    methods (Sealed, Static)
+    methods (Static, Sealed)
         function obj = empty()
             obj = aod.persistent.Dataset([], [], []);
         end
