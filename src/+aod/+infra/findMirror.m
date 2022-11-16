@@ -2,7 +2,7 @@ function mirrorClass = findMirror(entityType, entityClass)
     % FINDMIRROR
     %
     % Description:
-    %   Check if custom core class is mirrored in the persistent interface
+    %   Determines how core class is mirrored in the persistent interface
     %
     % Syntax:
     %   mirrorClass = findMirror(entityType, entityClass)
@@ -12,8 +12,8 @@ function mirrorClass = findMirror(entityType, entityClass)
     % ---------------------------------------------------------------------
     
     arguments
-        entityType
-        entityClass
+        entityType          {mustBeA(entityType, 'aod.core.EntityTypes')}
+        entityClass         string 
     end
 
     persistentClass = entityType.getPersistentClassName();
@@ -43,7 +43,7 @@ function mirrorClass = findMirror(entityType, entityClass)
     for i = 1:numel(x)
         idx = find(contains(mirroredClasses, x(i)));
         if ~isempty(idx)
-            mirrorClass = idx;
+            mirrorClass = customClassNames(idx);
             return
         end
     end

@@ -98,9 +98,9 @@ classdef Rois < aod.core.Segmentation
             else
                 roiFileName = char(rois);
                 if endsWith(roiFileName, 'zip')
-                    obj.Reader = ao.builtin.readers.ImageJRoiReader(roiFileName, imSize);
+                    obj.Reader = aod.builtin.readers.ImageJRoiReader(roiFileName, imSize);
                 elseif endsWith(roiFileName, 'csv')
-                    obj.Reader = ao.builtin.readers.CsvReader(roiFileName);
+                    obj.Reader = aod.util.readers.CsvReader(roiFileName);
                 end
                 obj.setMap(obj.Reader.read());
             end
@@ -242,29 +242,6 @@ classdef Rois < aod.core.Segmentation
         end
     end
 
-    % Convenience analysis methods
-    methods
-        function xy = getCentroids(obj, ID)
-            % GETCENTROIDS
-            %
-            % Description:
-            %   Get the centroids of all rois (default) or specific roi(s)
-            %
-            % Syntax:
-            %   xy = obj.getCentroids(ID)
-            %
-            % Optional inputs:
-            %   ID          numeric
-            %       Specific roi ID(s), otherwise returns all rois
-            % -------------------------------------------------------------
-            S = regionprops("table", obj.Data, "Centroid");
-            xy = S.Centroid;
-            if nargin == 2
-                xy = xy(ID,:);
-            end
-        end
-    end
-
     methods (Access = protected)
         function setMetadata(obj)
             if isempty(obj.Data)
@@ -305,7 +282,7 @@ classdef Rois < aod.core.Segmentation
             % Syntax:
             %   setMap(obj, data);
             % -------------------------------------------------------------
-            obj.setData(map);
+            obj.setData(double(map));
 
             IDs = unique(obj.Data);
             IDs(obj.roiIDs == 0) = [];

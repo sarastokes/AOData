@@ -34,7 +34,8 @@ classdef Segmentation < aod.core.Entity & matlab.mixin.Heterogeneous
 
             ip = aod.util.InputParser();
             addOptional(ip, 'Data', []);
-            addParameter(ip, 'Source', [], @(x) isSubclass(x, 'aod.core.Source'));
+            addParameter(ip, 'Source', [],... 
+                @(x) isSubclass(x, {'aod.core.Source', 'aod.core.persistent.Source'}));
             parse(ip, varargin{:});
 
             obj.setData(ip.Results.Data);
@@ -52,7 +53,8 @@ classdef Segmentation < aod.core.Entity & matlab.mixin.Heterogeneous
             if isempty(source)
                 obj.Source = aod.core.Source.empty();
             else
-                assert(isSubclass(source, 'aod.core.Source'), 'Must be a subclass of source');
+                assert(isSubclass(source, {'aod.core.Source', 'aod.core.persistent.Source'}),... 
+                    'Must be a subclass of source');
                 obj.Source = source;
             end
         end
@@ -66,7 +68,7 @@ classdef Segmentation < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   obj.setData(data);
             % -------------------------------------------------------------
-            if isempty(obj.Data)
+            if nargin < 2 || isempty(data)
                 obj.Data = [];
             else
                 obj.Data = data;

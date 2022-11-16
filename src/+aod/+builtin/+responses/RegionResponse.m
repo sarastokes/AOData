@@ -2,7 +2,7 @@ classdef RegionResponse < aod.core.Response
 % REGIONRESPONSE
 %
 % Description:
-%   The average response with each ROI
+%   The average response with each region of a segmentation
 %
 % Parent:
 %   aod.core.Response
@@ -18,6 +18,7 @@ classdef RegionResponse < aod.core.Response
 %
 % Methods:
 %   setSegmentation(obj, segmentation)
+%   signals = getData(obj, ID)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -35,7 +36,8 @@ classdef RegionResponse < aod.core.Response
             obj.setSegmentation(segmentation);
 
             obj.load(varargin{:});
-            % Listen for changes to ROIs and flag for update
+
+            % Listen for changes to regions and flag for update
             obj.listeners = addlistener(obj.Segmentation,... 
                 'UpdatedRois', @obj.onUpdatedRois);
         end
@@ -43,12 +45,17 @@ classdef RegionResponse < aod.core.Response
 
     methods
         function setSegmentation(obj, segmentation)
-            assert(isSubclass(segmentation, 'aod.core.Segmentation'),...
+            % SETSEGMENTATION
+            %
+            % Syntax:
+            %   setSegmentation(obj, segmentation)
+            % -------------------------------------------------------------
+            assert(isSubclass(segmentation, {'aod.core.Segmentation', 'aod.core.persistent.Segmentation'}),...
                 'Input must be subclass of aod.core.Segmentation');
             obj.Segmentation = segmentation;
         end
 
-        function signals = getData(obj, IDs) 
+        function signals = getData(obj, IDs, timePoints) 
             % GETDATA
             %
             % Description:
@@ -69,6 +76,12 @@ classdef RegionResponse < aod.core.Response
             signals = obj.Data.Signals;
             if nargin == 2
                 signals = signals(:, IDs);
+            elseif nargin == 3
+                if isempty(IDs)
+                    signals = signals(timePoints, :);
+                else
+                    signals = signals(timePoints, IDs);
+                end
             end
         end
 
@@ -77,9 +90,13 @@ classdef RegionResponse < aod.core.Response
             %
             % Description:
             %   Get the average response over all pixels in ROI
+            %
+            % Syntax:
+            %   load(obj)
             % -------------------------------------------------------------
-            roiMask = double(obj.Segmentation.Map);
-            sampleRate = obj.Experiment.sampleRate;
+            roiMask = double(obj.Segmentation.Data);
+            h = obj.ancestor(aod.core.EntityTypes.EXPERIMENT);
+            sampleRate = h.sampleRate;
             imStack = obj.Parent.getStack();
             roiList = obj.Segmentation.roiIDs;
         
@@ -123,12 +140,14 @@ classdef RegionResponse < aod.core.Response
         end
     end
 
+    % Overloaded methods
     methods (Access = protected)
         function value = getLabel(obj)
             value = sprintf('Epoch%u_Responses', obj.Parent.ID);
         end
     end
 
+    % Event callbacks
     methods (Access = private)
         function onUpdatedRois(obj, ~, ~)
             obj.load();

@@ -43,6 +43,10 @@ classdef Epoch < aod.core.Epoch
         transform           % aod.builtin.registrations.RigidRegistration
     end
 
+    properties (Hidden, Transient)
+        cachedData
+    end
+
     methods
         function obj = Epoch(ID, epochType, varargin)
             obj@aod.core.Epoch(ID, varargin{:});
@@ -79,8 +83,8 @@ classdef Epoch < aod.core.Epoch
             end
 
             [~, fileName, ~] = fileparts(obj.getCoreVideoName);
-            if ~isempty(obj.cachedVideo)
-                imStack = obj.cachedVideo;
+            if ~isempty(obj.cachedData)
+                imStack = obj.cachedData;
                 fprintf('Loaded %s from cache\n', fileName);
                 return;
             end
@@ -96,8 +100,9 @@ classdef Epoch < aod.core.Epoch
                 imStack = obj.transform.apply(imStack);
                 fprintf('Applying transform...');
             end
+            
             if cacheFlag
-                obj.cachedVideo = imStack;
+                obj.cachedData = imStack;
             end
 
             fprintf('Done\n');
