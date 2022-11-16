@@ -1,4 +1,5 @@
-classdef Analysis < aod.core.persistent.Entity & dynamicprops
+classdef Analysis < aod.core.persistent.Entity ...
+    matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
         analysisDate                    
@@ -10,7 +11,7 @@ classdef Analysis < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
 
@@ -19,5 +20,12 @@ classdef Analysis < aod.core.persistent.Entity & dynamicprops
             
             obj.setLinksToDynProps();
         end 
+    end
+    
+    % Heterogeneous methods
+    methods (Sealed, Static)
+        function obj = empty()
+            obj = aod.core.persistent.Analysis([], [], []);
+        end
     end
 end 

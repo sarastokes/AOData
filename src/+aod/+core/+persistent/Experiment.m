@@ -42,9 +42,9 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
                 homeDirectory           string
             end
 
-            evtData = aod.core.persistent.events.DatasetEvent('homeDirectory',...
-                homeDirectory, obj.homeDirectory);
-            notify(obj, 'ChangedDataset', evtData);
+            evtData = aod.core.persistent.events.DatasetEvent(...
+                'homeDirectory', homeDirectory, obj.homeDirectory);
+            notify(obj, 'DatasetChanged', evtData);
 
             obj.homeDirectory = homeDirectory;
         end
@@ -158,16 +158,6 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
             system.setParent(obj);
             obj.addEntity(system);
         end
-
-        function deleteEntity(obj) %#ok<MANU> 
-            % DELETEENTITY
-            %
-            % Notes:
-            %   Overloaded deleteEntity in aod.core.persistent.Entity
-            % -------------------------------------------------------------
-            error("deleteEntity:AreYouSure",...
-                "Deleting the HDF5 file is better than deleting Experiment");
-        end
     end
 
     methods (Access = protected)
@@ -184,7 +174,11 @@ classdef Experiment < aod.core.persistent.Entity & dynamicprops
             obj.AnalysesContainer = obj.loadContainer('Analyses');
             obj.CalibrationsContainer = obj.loadContainer('Calibrations');
             obj.EpochsContainer = obj.loadContainer('Epochs');
-            obj.SegmentationsContainer = obj.loadContainer('Segmentations');
+            try
+                obj.SegmentationsContainer = obj.loadContainer('Segmentations');
+            catch
+                obj.SegmentationsContainer = obj.loadContainer('Regions');
+            end
             obj.SourcesContainer = obj.loadContainer('Sources');
             obj.SystemsContainer = obj.loadContainer('Systems');
         end

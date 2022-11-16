@@ -1,4 +1,5 @@
-classdef Calibration < aod.core.persistent.Entity & dynamicprops
+classdef Calibration < aod.core.persistent.Entity ...
+        & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = private)
         calibrationDate(1,1)                    datetime 
@@ -10,7 +11,7 @@ classdef Calibration < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
 
@@ -21,7 +22,8 @@ classdef Calibration < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Static)
+    % Heterogeneous methods
+    methods (Sealed, Static)
         function obj = empty()
             obj = aod.core.persistent.Calibration([], [], []);
         end

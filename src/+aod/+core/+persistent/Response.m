@@ -1,4 +1,5 @@
-classdef Response < aod.core.persistent.Entity & dynamicprops
+classdef Response < aod.core.persistent.Entity ...
+        & matlab.mixin.Heterogeneous & dynamicprops
 
     properties
         Data
@@ -11,7 +12,7 @@ classdef Response < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
 
@@ -27,6 +28,13 @@ classdef Response < aod.core.persistent.Entity & dynamicprops
             obj.setDatasetsToDynProps();
             
             obj.setLinksToDynProps();
+        end
+    end
+
+    % Heterogeneous methods
+    methods (Sealed, Static)
+        function obj = empty()
+            obj = aod.core.persistent.Response([], [], []);
         end
     end
 end 

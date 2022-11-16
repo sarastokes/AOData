@@ -1,4 +1,5 @@
-classdef Stimulus < aod.core.persistent.Entity & dynamicprops
+classdef Stimulus < aod.core.persistent.Entity ...
+        & matlab.mixin.Heterogenous & dynamicprops
 
     properties (SetAccess = protected)
         Calibration
@@ -10,7 +11,7 @@ classdef Stimulus < aod.core.persistent.Entity & dynamicprops
         end
     end
     
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
 
@@ -18,6 +19,13 @@ classdef Stimulus < aod.core.persistent.Entity & dynamicprops
 
             obj.Calibration = obj.loadLink("Calibration");
             obj.setLinksToDynProps();
+        end
+    end
+
+    % Heterogeneous methods
+    methods (Sealed, Static)
+        function obj = empty()
+            obj = aod.core.persistent.Stimulus([], [], []);
         end
     end
 end 

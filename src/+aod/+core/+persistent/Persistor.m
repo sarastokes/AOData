@@ -1,4 +1,12 @@
 classdef Persistor < handle
+% PERSISTOR
+%
+% Description:
+%   Serves as interface between AOData and an HDF5 file
+%
+% Constructor:
+%   obj = Persistor(hdfName)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         readOnly        logical
@@ -138,7 +146,7 @@ classdef Persistor < handle
             % Syntax:
             %   onFileChanged(obj, src, evt)
             % -------------------------------------------------------------
-            filePath = aod.h5.buildPath(obj.hdfPath, 'files');
+            filePath = aod.h5.HDF5.buildPath(evt.Source.hdfPath, 'files');
             if isempty(evt.Value)
                 % Remove file
                 aod.h5.HDF5.deleteAttribute(obj.hdfName, filePath, evt.Name);

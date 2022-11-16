@@ -1,4 +1,5 @@
-classdef System < aod.core.persistent.Entity & dynamicprops
+classdef System < aod.core.persistent.Entity ...
+        matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
         ChannelsContainer
@@ -10,7 +11,7 @@ classdef System < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods
+    methods (Sealed)
         function addChannel(obj, channel)
             % ADDCHANNEL
             % 
@@ -30,7 +31,7 @@ classdef System < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
 
@@ -41,7 +42,7 @@ classdef System < aod.core.persistent.Entity & dynamicprops
     end
 
     % Container abstraction methods
-    methods
+    methods (Sealed)
         function out = Channels(obj, idx)
             if nargin < 2
                 idx = 0;
@@ -50,6 +51,13 @@ classdef System < aod.core.persistent.Entity & dynamicprops
             for i = 1:numel(obj)
                 out = cat(1, out, obj.ChannelsContainer(idx));
             end
+        end
+    end
+
+    % Heterogeneous methods
+    methods (Sealed, Static)
+        function obj = empty()
+            obj = aod.core.persistent.System([], [], []);
         end
     end
 end

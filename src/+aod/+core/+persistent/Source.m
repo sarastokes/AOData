@@ -1,4 +1,5 @@
-classdef Source < aod.core.persistent.Entity & dynamicprops
+classdef Source < aod.core.persistent.Entity ...
+        & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
         SourcesContainer
@@ -10,7 +11,7 @@ classdef Source < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods
+    methods (Sealed)
         function obj = addSource(obj, source)
             % ADDSOURCE
             % 
@@ -30,7 +31,7 @@ classdef Source < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
             

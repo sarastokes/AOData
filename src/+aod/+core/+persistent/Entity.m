@@ -92,7 +92,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 tf              logical = true
             end
             
-            obj.readOnly = tf;
+            obj.factory.persistor.setReadOnly(tf);
         end
     end
 
@@ -111,10 +111,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   h = obj.ancestor(aod.core.EntityTypes.EXPERIMENT)
             %   h = obj.ancestor('experiment')
             % -------------------------------------------------------------
-            entityType = aod.core.EntityTypes.get(entityType);
+            try
+                entityType = aod.core.EntityTypes.get(entityType);
+            catch
+                entityType = aod.core.EntityTypes.init(entityType);
+            end
 
             h = obj;
-            while h.EntityType ~= entityType
+            while h.entityType ~= entityType
                 h = h.Parent;
                 if isempty(h)
                     break
@@ -150,6 +154,27 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     rethrow(ME);
                 end
             end
+        end
+    end
+
+    % Entity methods
+    methods
+        function replaceEntity(obj, newEntity)
+            % REPLACEENTITY
+            %
+            % Description:
+            %   Replace an entity
+            %
+            % Syntax:
+            %   replaceEntity(obj, newEntity)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                newEntity       {mustBeA(newEntity, 'aod.core.Entity')}
+            end
+            
+            evtData = aod.core.persistent.events.GroupEvent(newEntity, 'Replace', obj);
+            notify(obj, 'GroupChanged', evtData);
         end
     end
 
@@ -217,20 +242,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             delete(p);
             obj.loadInfo();
         end
-
-        function deleteEntity(obj)
-            % DELETEENTITY
-            %
-            % Description:
-            %   Delete the entity
-            %
-            % Syntax:
-            %   deleteEntity(obj)
-            % -------------------------------------------------------------
-            obj.checkReadOnlyMode();
-            evtData = aod.core.persistent.events.GroupEvent(obj, 'Remove');
-            notify(obj, 'GroupChanged', evtData);
-        end
+        
     end
 
     % Special property methods
@@ -250,13 +262,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
             
             obj.checkReadOnlyMode();
-
-            
+            obj.description = txt;
         end
     end
 
     % Parameter methods
-    methods
+    methods (Sealed)
         function tf = hasParam(obj, paramName)
             % HASPARAM
             %
@@ -395,7 +406,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     end
 
     % File methods
-    methods
+    methods (Sealed)
         function tf = hasFile(obj, fileName)
             % HASFILE
             %
@@ -463,6 +474,23 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             else
                 out = obj.files(fileName);
             end
+        end
+
+        function out = getExptFile(obj, fileName, varargin)
+            % GETEXPTFILE
+            %
+            % Description:
+            %   Return file name with home directory appended
+            %
+            % Syntax:
+            %   out = getExptFile(obj, fileName, errorType)
+            %
+            % See getFile() for information on inputs
+            % -------------------------------------------------------------
+            out = obj.getFile(fileName, varargin{:});
+            
+            h = obj.ancestor('Experiment');
+            out = fullfile(h.homeDirectory, out);
         end
 
         function setFile(obj, fileName, fileValue)
@@ -582,6 +610,22 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   addEntity(obj, entity)
             % -------------------------------------------------------------
             evtData = aod.core.persistent.events.GroupEvent(entity, 'Add');
+            notify(obj, 'GroupChanged', evtData);
+        end
+    end
+
+    methods (Access = protected)
+        function deleteEntity(obj)
+            % DELETEENTITY
+            %
+            % Description:
+            %   Delete the entity
+            %
+            % Syntax:
+            %   deleteEntity(obj)
+            % -------------------------------------------------------------
+            obj.checkReadOnlyMode();
+            evtData = aod.core.persistent.events.GroupEvent(obj, 'Remove');
             notify(obj, 'GroupChanged', evtData);
         end
 
@@ -833,7 +877,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             notify(obj, 'DatasetChanged', evtData);
 
             if newDset
-                %obj.createDynProp(dsetName, 'Dataset');
                 obj.addprop(dsetName);
             end
             if isempty(dsetValue)

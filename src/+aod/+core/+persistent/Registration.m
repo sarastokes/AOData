@@ -1,4 +1,5 @@
-classdef Registration < aod.core.persistent.Entity & dynamicprops
+classdef Registration < aod.core.persistent.Entity ...
+        & matlab.mixin.Heterogeneous & dynamicprops 
 
     properties (SetAccess = protected)
         registrationDate
@@ -10,7 +11,7 @@ classdef Registration < aod.core.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.core.persistent.Entity(obj);
 
@@ -18,6 +19,13 @@ classdef Registration < aod.core.persistent.Entity & dynamicprops
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
+        end
+    end
+
+    % Heterogeneous methods
+    methods (Sealed, Static)
+        function obj = empty()
+            obj = aod.core.persistent.Registration([], [], []);
         end
     end
 end

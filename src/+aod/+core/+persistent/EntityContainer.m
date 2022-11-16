@@ -43,6 +43,12 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
             end
         end
     end
+
+    methods
+        function out = getClassNames(obj)
+            out = cat(1, obj.contents.classNames);
+        end
+    end
     
     methods (Access = ?aod.core.persistent.Persistor)
         function refresh(obj)

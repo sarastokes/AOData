@@ -1,4 +1,5 @@
-classdef Epoch < aod.core.persistent.Entity & dynamicprops
+classdef Epoch < aod.core.persistent.Entity ...
+        & matlab.mixin.Heterogeneous & dynamicprops
 
     properties (SetAccess = protected)
         ID(1,1)
@@ -21,7 +22,7 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
     end
 
     % Addition methods
-    methods
+    methods (Sealed)
         function addDataset(obj, dataset)
             % ADDDATASET
             %
@@ -130,13 +131,18 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
             end
         end
 
-        function out = Registrations(obj, idx)
+        function out = Registrations(obj, idx, propName)
             if nargin < 2
                 idx = 0;
             end
             out = [];
             for i = 1:numel(obj)
                 out = cat(1, out, obj(i).RegistrationsContainer(idx));
+            end
+            if nargin > 2
+                if isscalar(out(1).(propName))
+                    out = cat(1, out.(propName));
+                end
             end
         end
 
@@ -158,6 +164,13 @@ classdef Epoch < aod.core.persistent.Entity & dynamicprops
             for i = 1:numel(obj)
                 out = cat(1, out, obj(i).StimuliContainer(idx));
             end
+        end
+    end
+
+    % Heterogeneous methods
+    methods (Sealed, Static)
+        function obj = empty()
+            obj = aod.core.persistent.Channel([], [], []);
         end
     end
 end 

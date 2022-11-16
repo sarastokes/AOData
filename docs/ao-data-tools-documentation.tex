@@ -1042,7 +1042,7 @@ experiment.Epochs(1:5).Responses
 	
 	Reading the HDF5 files is fast to begin with and made faster by ``lazy loading'' which basically means that entities are not read from the HDF5 file until requested. Once requested, they are added to a cache so they only need to be read in once. This all happens behind the scenes.
 	
-	\subsection{Editing Persisted Experiments}
+	\subsection{Modifying Persisted Experiments}
 	\noindent You can continue to edit your HDF5 file from the persistent interface. The same functions used to build the experiment in the core interface are still there, like \aodfcn{setParam(), removeParam()}. Changes made will immediately be reflected in the underlying HDF5 file. 
 	
 	\begin{itemize}
@@ -1053,6 +1053,11 @@ experiment.Epochs(1:5).Responses
 		\item \aodfcn{deleteEntity(obj)}\\
 		Delete an existing entity
 	\end{itemize}
+
+	\subsection{Customizing the Persistent Interface}
+	\noindent Data read in from an HDF5 file is meant to serve as the foundation for user-defined workflows. These can be custom scripts, functions or classes. Any function that takes an entity from the core framework can also accommodate the comparable entity from the persistent interface. 
+	
+	One optional tactic is to customize the persistent interface. For example,  
 
 \section{HDF5 File Details}
 	\label{section:HDF5_Details}
