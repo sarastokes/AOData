@@ -102,10 +102,19 @@ classdef (Abstract) Entity < handle
             %   h = obj.ancestor(className)
             % -------------------------------------------------------------
             h = obj;
-            while ~isSubclass(h, className)
-                h = h.Parent;
-                if isempty(h)
-                    break
+            if isa(className, 'aod.core.EntityTypes')
+                while h.entityType ~= className
+                    h = h.Parent;
+                    if isempty(h)
+                        break
+                    end
+                end
+            else
+                while ~isSubclass(h, className)
+                    h = h.Parent;
+                    if isempty(h)
+                        break
+                    end
                 end
             end
         end

@@ -83,15 +83,21 @@ classdef Persistor < handle
             % -------------------------------------------------------------
 
             % Get entity information prior to changes
-            parent = evt.Entity.Parent;
-            uuid = evt.Entity.UUID;
+            parent = evt.OldEntity.Parent;
+            uuid = evt.OldEntity.UUID;
             containerName = evt.Entity.entityType.persistentParentContainer();
+            hdfPath = char(src.hdfPath);
 
             % Write/delete the entity
             if strcmp(evt.Action, 'Add')
                 aod.h5.writeEntity(obj.hdfName, evt.Entity);
             elseif strcmp(evt.Action, 'Remove')
-                aod.h5.HDF5.deleteObject(obj.hdfName, char(src.hdfPath));
+                aod.h5.HDF5.deleteObject(obj.hdfName, hdfPath);
+            elseif strcmp(evt.Action, 'Replace')
+                aod.h5.HDF5.deleteObject(obj.hdfName, parent.hdfPath,...
+                    aod.h5.HDF5.getPathEnd(hdfPath));
+                aod.h5.writeEntity(obj.hdfName, evt.NewEntity);
+                h5writeatt(obj.hdfName, hdfPath, 'UUID', uuid);
             end
 
             evtData = aod.core.persistent.events.EntityEvent(uuid, evt.Action);
@@ -112,16 +118,13 @@ classdef Persistor < handle
             % -------------------------------------------------------------
             fullPath = aod.h5.HDF5.buildPath(src.hdfPath, evt.Name);
             if isempty(evt.NewValue)
+                % Dataset should be deleted
                 aod.h5.deleteObject(obj.hdfName, fullPath, evt.Name);
-            else
-                matClass = h5readatt(obj.hdfName, fullPath, 'Class');
-                if ismember(matClass, ["string", "char", "datetime"])
-                    aod.h5.writeAttributeByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
-                    return
-                end
-                if ~isequal(size(evt.NewValue), size(evt.OldValue))
-                    aod.h5.deleteObject(obj.hdfName, fullPath, evt.Name);
-                end 
+            elseif ~aod.h5.HDF5.exists(obj.hdfName, fullPath) 
+                % Dataset does not yet exist
+                aod.h5.writeDatasetByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
+            else  
+                % Dataset exists and should be overwritten
                 aod.h5.writeDatasetByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
             end
         end

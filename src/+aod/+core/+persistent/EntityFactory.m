@@ -49,38 +49,12 @@ classdef EntityFactory < handle
                 return
             end
 
-            entityType = obj.entityManager.entityMap(uuid);
-            switch entityType 
-                case "EXPERIMENT"
-                    e = aod.core.persistent.Experiment(obj.hdfName, hdfPath, obj);
-                case "ANALYSIS"
-                    e = aod.core.persistent.Analysis(obj.hdfName, hdfPath, obj);
-                case "SOURCE"
-                    e = aod.core.persistent.Source(obj.hdfName, hdfPath, obj);
-                case "SYSTEM"
-                    e = aod.core.persistent.System(obj.hdfName, hdfPath, obj);
-                case "CHANNEL"
-                    e = aod.core.persistent.Channel(obj.hdfName, hdfPath, obj);
-                case "DEVICE"
-                    e = aod.core.persistent.Device(obj.hdfName, hdfPath, obj);
-                case "CALIBRATION"
-                    e = aod.core.persistent.Calibration(obj.hdfName, hdfPath, obj);
-                case "SEGMENTATION"
-                    e = aod.core.persistent.Segmentation(obj.hdfName, hdfPath, obj);
-                case "EPOCH"
-                    e = aod.core.persistent.Epoch(obj.hdfName, hdfPath, obj);
-                case "RESPONSE"
-                    e = aod.core.persistent.Response(obj.hdfName, hdfPath, obj);
-                case "STIMULUS"
-                    e = aod.core.persistent.Stimulus(obj.hdfName, hdfPath, obj);
-                case 'REGISTRATION'
-                    e = aod.core.persistent.Registration(obj.hdfName, hdfPath, obj);
-                case 'DATASET'
-                    e = aod.core.persistent.Dataset(obj.hdfName, hdfPath, obj);
-                otherwise
-                    error("EntityFactory:UnrecognizedEntity",...
-                        "Did not recognize entity name: %s", entityType);
-            end
+            className = T{T.Path == hdfPath, 'Class'};
+            entityType = aod.core.EntityTypes.init(obj.entityManager.entityMap(uuid));
+
+            mirrorFcn = str2func(aod.infra.findMirror(entityType, className));
+            e = mirrorFcn(obj.hdfName, hdfPath, obj);
+
             obj.persistor.bind(e);
             obj.cache(uuid) = e;
         end

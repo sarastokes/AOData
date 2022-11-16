@@ -16,7 +16,7 @@ function writeAttributeByType(hdfName, hdfPath, name, value)
     end
 
     if isdatetime(value)
-        value = datestr(value);
+        value = datestr(value); %#ok<DATST> 
     end
 
     aod.h5.HDF5.writeatts(hdfName, hdfPath, name, value);

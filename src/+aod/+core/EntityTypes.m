@@ -264,7 +264,19 @@ classdef EntityTypes
             % Syntax:
             %   out = getCoreClassName(obj)
             % -------------------------------------------------------------
-            out = ['aod.core.', captialize(char(obj))];
+            out = ['aod.core.', appbox.capitalize(char(obj))];
+        end
+
+        function out = getPersistentClassName(obj)
+            % GETPERSISTENTCLASSNAME
+            %
+            % Description:
+            %   Returns the core class name of entityType (aod.core.X)
+            %
+            % Syntax:
+            %   out = getCoreClassName(obj)
+            % -------------------------------------------------------------
+            out = ['aod.core.persistent.', appbox.capitalize(char(obj))];
         end
     end
 
