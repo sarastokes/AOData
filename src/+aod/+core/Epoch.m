@@ -21,10 +21,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   System                          Link to System used during the epoch
 %
 % Public methods:
-%   addDataset(obj, dataset)
-%   addResponse(obj, response)
-%   addRegistration(obj, registration)
-%   addStimulus(obj, stim)
+%   add(obj, entity)
 %   clearDatasets(obj)
 %   clearRegistrations(obj)
 %   clearResponses(obj)
@@ -69,6 +66,42 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.setSystem(ip.Results.System);
         end
     end 
+
+    methods
+        function add(obj, entity)
+            % ADD 
+            %
+            % Description:
+            %   Add a new entity to the epoch
+            %
+            % Syntax:
+            %   add(obj, entity)
+            %
+            % Notes: Only entities contained by Epoch can be added:
+            %   Dataset, Response, Registration, Stimulus
+            % ------------------------------------------------------------- 
+            import aod.core.EntityTypes
+            entityType = EntityTypes.get(entity);
+
+            switch entityType
+                case EntityTypes.DATASET
+                    entity.setParent(obj);
+                    obj.Datasets = cat(1, obj.Datasets, entity);
+                case EntityTypes.REGISTRATION 
+                    entity.setParent(obj);
+                    obj.Registrations = cat(1, obj.Registrations, entity);
+                case EntityTypes.RESPONSE 
+                    entity.setParent(obj);
+                    obj.Responses = cat(1, obj.Responses, entity);
+                case EntityTypes.STIMULUS
+                    entity.setParent(obj);
+                    obj.Stimuli = cat(1, obj.Stimuli, entity);
+                otherwise
+                    error("Epoch:AddedInvalidEntity",...
+                        "Entity must be Dataset, Registration, Response or Stimulus");
+            end
+        end
+    end
 
     % Access methods
     methods (Sealed)
@@ -136,7 +169,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
       
         function resp = getResponse(obj, responseClassName, varargin)
-            % SETRESPONSE
+            % GETRESPONSE
             %
             % Syntax:
             %   resp = getResponse(obj, responseClassName, varargin)
@@ -168,6 +201,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
+    % Linked entity methods
     methods (Sealed)  
         function setSource(obj, source)
             % SETSOURCE
@@ -256,6 +290,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             assert(isSubclass(dataset, 'aod.core.Dataset'),...
                 'Must be a subclass of aod.core.Dataset');
+                
+            warning('addDataset:Deprecated', 'This function will be removed soon');
             dataset.setParent(obj);
             obj.Datasets = cat(1, obj.Datasets, dataset);
         end
@@ -303,6 +339,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             assert(isSubclass(reg, 'aod.core.Registration'),...
                 'addRegistration: input was not a subclass of aod.core.Registration');
 
+            warning('addRegistration:Deprecated', 'This function will be removed soon');
             reg.setParent(obj);
             obj.Registrations = cat(1, obj.Registrations, reg);
         end
@@ -347,7 +384,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 obj
                 resp(1,1)           {mustBeA(resp, 'aod.core.Response')}
             end
-
+            
+            warning('addResponse:Deprecated', 'This function will be removed soon');
             resp.setParent(obj);
             obj.Responses = cat(1, obj.Responses, resp);
         end
@@ -389,6 +427,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             assert(isSubclass(stim, 'aod.core.Stimulus'),... 
                 'stim must be subclass of aod.core.Stimulus');
 
+            warning('addStimulus:Deprecated', 'This function will be removed soon');
             stim.setParent(obj);
             obj.Stimuli = cat(1, obj.Stimuli, stim);
         end

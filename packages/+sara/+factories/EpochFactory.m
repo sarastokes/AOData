@@ -12,7 +12,7 @@ classdef EpochFactory < aod.util.Factory
             else
                 ep = sara.Epoch(epochID, epochType);
             end
-            EXPT.addEpoch(ep);
+            EXPT.add(ep);
 
             % Set source and system
             ep.setSource(source);
@@ -42,9 +42,9 @@ classdef EpochFactory < aod.util.Factory
             
             % Add stimuli defined in epoch parameters
             if epochType.isPhysiology()
-                if hasParam(ep, 'AOM1');
+                if hasParam(ep, 'AOM1')
                     stim = sara.stimuli.Mustang(ep.getParam('AOM1'));
-                    ep.addStimulus(stim);
+                    ep.add(stim);
                 end
             end
 
@@ -53,7 +53,7 @@ classdef EpochFactory < aod.util.Factory
                 reg = aod.builtin.registrations.StripRegistration();
                 reg.loadData(ep.getExptFile('RegMotion'));
                 reg.loadParameters(ep.getExptFile('RegParams'));
-                ep.addRegistration(reg);
+                ep.add(reg);
             end
 
             % Add stimuli, if necessary
@@ -64,13 +64,13 @@ classdef EpochFactory < aod.util.Factory
                 stim = sara.stimuli.SpectralStimulus(protocol);
                 stim.loadVoltages(ep.getExptFile('LedVoltages'));
                 stim.loadFrames(ep.getExptFile('FrameTable'));
-                ep.addStimulus(stim);
+                ep.add(stim);
             elseif epochType == sara.EpochTypes.SPATIAL
                 protocol = sara.factories.SpatialProtocolFactory.create(...
                     EXPT.getCalibration('sara.calibrations.TopticaNonlinearity'),...
                     ep.getParam('StimulusName'));
                 stim = sara.stimuli.SpatialStimulus(protocol);
-                ep.addStimulus(stim);
+                ep.add(stim);
             end
         end
     end
@@ -81,7 +81,7 @@ classdef EpochFactory < aod.util.Factory
                 reg = aod.builtin.registrations.StripRegistration();
                 reg.loadData(ep.getExptFile('RegMotion'));
                 reg.loadParameters(ep.getExptFile('RegParams'));
-                ep.addRegistration(reg);
+                ep.add(reg);
             end
         end
     end

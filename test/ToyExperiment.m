@@ -24,7 +24,7 @@ function experiment = ToyExperiment(writeToHDF)
     experiment.addNote('This is the second note');
 
     source = sara.factories.SubjectFactory.create(851, 'OS', 'Right');
-    experiment.addSource(source);
+    experiment.add(source);
 
     % Add the system(s)
     system = aod.core.System('SpectralPhysiology');
@@ -36,11 +36,11 @@ function experiment = ToyExperiment(writeToHDF)
         'ReflectanceImaging', system);
     [~, system] = sara.factories.ChannelFactory.create(...
         'WavefrontSensing', system);
-    experiment.addSystem(system);
+    experiment.add(system);
 
     calibration = sara.calibrations.MustangPower('20220823');
     calibration.addMeasurement(24:26, 16:18);
-    experiment.addCalibration(calibration);
+    experiment.add(calibration);
 
     epoch = aod.core.Epoch(1, 'Source', source, 'System', system);
     epoch.setFile('PresyncFile', fullfile(cd, 'PresyncFile.txt'));
@@ -49,23 +49,23 @@ function experiment = ToyExperiment(writeToHDF)
     epoch.setFile('PostSyncFile', fullfile(cd, 'PostSyncFile.txt'));
 
     reg = aod.builtin.registrations.RigidRegistration('SIFT', '20220823', eye(3));
-    epoch.addRegistration(reg);
+    epoch.add(reg);
 
     response1 = aod.core.Response('ResponseWithTiming');
     response1.setData(2:2:8);
     response1.setTiming(linspace(0.5, 2.5, 4));
-    epoch.addResponse(response1);
+    epoch.add(response1);
 
     response2 = aod.core.Response('ResponseWithoutTiming');
     response2.setData(2:2:8);
-    epoch.addResponse(response2);
+    epoch.add(response2);
 
     stim = aod.builtin.stimuli.ImagingLight('Mustang', 22, 'Normalized');
-    epoch.addStimulus(stim);
+    epoch.add(stim);
 
-    experiment.addEpoch(aod.core.Epoch(2, 'Source', source));
+    experiment.add(aod.core.Epoch(2, 'Source', source));
 
-    experiment.addAnalysis(aod.core.Analysis('TestAnalysis', '20220904'));
+    experiment.add(aod.core.Analysis('TestAnalysis', '20220904'));
 
     if writeToHDF
         aod.h5.writeExperimentToFile('test.h5', experiment, true);

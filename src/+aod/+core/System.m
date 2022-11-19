@@ -14,7 +14,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Channels
 %
 % Methods:
-%   addChannel(obj, channel)
+%   add(obj, channel)
 %   removeChannel(obj, ID)
 %   clearChannels(obj)
 %   assignUUID(obj, uuid)
@@ -31,11 +31,11 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
-        function addChannel(obj, channel)
-            % ADDCHANNEL
+        function add(obj, channel)
+            % ADD
             %
             % Syntax:
-            %   addChannel(obj, channel)
+            %   add(obj, channel)
             % -------------------------------------------------------------
             assert(isSubclass(channel, 'aod.core.Channel'),...
                 'Invalid type: must be a subclass of aod.core.Channel');

@@ -65,11 +65,30 @@ classdef Experiment < aod.core.Experiment
             end
         end
 
-        function addSiftTransforms(obj, tforms, epochIDs, regDate, refID, varargin)
-            % LOADSIFTTRANSFORMS
+        function addSimilarityTransforms(obj, regDate, fileName)
+            % ADDSIMILARITYTRANSFORMS
             %
             % Syntax:
-            %   loadTransforms(obj, tforms, epochIDs, varargin)
+            %   addSimilarityTransforms(obj, regDate, fileName)
+            %
+            % See also:
+            %   sara.readers.SimilarityTransformReader
+            %   sara.registrations.SimilarityRegistration
+            % -------------------------------------------------------------
+            TR = sara.readers.SimilarityTransformReader(fileName);
+            for i = 1:numel(TR.epochIDs)
+                reg = sara.registrations.SimilarityRegistration(...
+                    regDate, TR.transforms(i), TR.references(i), TR.qualities(i));
+                reg.setFile('Registration', TR.fullFile);
+                obj.Epochs(obj.id2index(TR.epochIDs(i))).add(reg);
+            end
+        end
+
+        function addSiftTransforms(obj, tforms, epochIDs, regDate, refID, varargin)
+            % ADDSIFTTRANSFORMS
+            %
+            % Syntax:
+            %   addSiftTransforms(obj, tforms, epochIDs, varargin)
             % -------------------------------------------------------------
             ip = aod.util.InputParser();
             addParameter(ip, 'WhichTforms', [], @isnumeric);
@@ -98,7 +117,7 @@ classdef Experiment < aod.core.Experiment
                 else
                     reg.setParam('WhichTforms', 1:numel(epochIDs));
                 end
-                obj.Epochs(obj.id2index(epochIDs(i))).addRegistration(reg);
+                obj.Epochs(obj.id2index(epochIDs(i))).add(reg);
             end
         end
     end

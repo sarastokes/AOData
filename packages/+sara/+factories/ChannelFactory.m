@@ -23,26 +23,26 @@ classdef ChannelFactory < aod.util.Factory
                 case 'ReflectanceImaging'
                     channel = aod.core.Channel('ReflectanceImaging',...
                         'DataFolder', 'Ref');
-                    channel.addDevice(aod.builtin.devices.LightSource( 796,...
+                    channel.add(aod.builtin.devices.LightSource( 796,...
                         'Manufacturer', 'SuperLum'));
                     if ~isempty(pinhole) && pinhole ~= 20
                         channel = obj.addPinhole(channel, pinhole);
                     else
-                        channel.addDevice(aod.builtin.devices.Pinhole(20,...
+                        channel.add(aod.builtin.devices.Pinhole(20,...
                             'Manufacturer', 'ThorLabs', 'Model', 'P20K'));
                     end
-                    channel.addDevice(aod.builtin.devices.PMT('ReflectancePMT'));
+                    channel.add(aod.builtin.devices.PMT('ReflectancePMT'));
                 case 'WavefrontSensing'
                     channel = aod.core.Channel('WavefrontSensing');
-                    channel.addDevice(aod.builtin.devices.LightSource(847,...
+                    channel.add(aod.builtin.devices.LightSource(847,...
                         'Manufacturer', 'QPhotonics'));
                 case 'MustangImaging'
                     channel = aod.core.Channel('MustangImaging');
                     channel.setDataFolder('Vis');
-                    channel.addDevice(aod.builtin.devices.LightSource(488,...
+                    channel.add(aod.builtin.devices.LightSource(488,...
                         'Manufacturer', 'Qioptiq'));
-                    channel.addDevice(aod.builtin.devices.BandpassFilter(520, 15));
-                    channel.addDevice(aod.builtin.devices.PMT('VisiblePMT',...
+                    channel.add(aod.builtin.devices.BandpassFilter(520, 15));
+                    channel.add(aod.builtin.devices.PMT('VisiblePMT',...
                         'Manufacturer', 'Hamamatsu', 'Model', 'H16722'));
                     if ~isempty(pinhole)
                         channel = obj.addPinhole(channel, pinhole);
@@ -50,8 +50,8 @@ classdef ChannelFactory < aod.util.Factory
                 case 'TopticaImaging'
                     channel = aod.core.Channel('TopticaImaging');
                     channel.setDataFolder('Vis');
-                    channel.addDevice(sara.devices.Toptica(topticaLine));
-                    channel.addDevice(aod.builtin.devices.PMT('VisiblePMT',...
+                    channel.add(sara.devices.Toptica(topticaLine));
+                    channel.add(aod.builtin.devices.PMT('VisiblePMT',...
                         'Manufacturer', 'Hamamatsu', 'Model', 'H16722'));
                     if ~isempty(filterName)
                         channel = obj.addFilter(channel, filterName);
@@ -63,29 +63,29 @@ classdef ChannelFactory < aod.util.Factory
                     end
                 case 'TopticaStimulation'
                     channel = aod.core.Channel('TopticaImaging');
-                    channel.addDevice(sara.devices.Toptica(topticaLine));                    
+                    channel.add(sara.devices.Toptica(topticaLine));                    
                 case 'MaxwellianView'
                     channel = aod.core.Channel('MaxwellianView');
                     % Add the LEDs
-                    channel.addDevice(aod.builtin.devices.LightSource(660,...
+                    channel.add(aod.builtin.devices.LightSource(660,...
                         'Manufacturer', 'ThorLabs', 'Model', 'M660L4'));
-                    channel.addDevice(aod.builtin.devices.LightSource(530,...
+                    channel.add(aod.builtin.devices.LightSource(530,...
                         'Manufacturer', 'ThorLabs', 'Model', 'M530L4'));
-                    channel.addDevice(aod.builtin.devices.LightSource(420,...
+                    channel.add(aod.builtin.devices.LightSource(420,...
                         'Manufacturer', 'ThorLabs', 'Model', 'M420L4'));
                     % Add the dichroic filters
                     ff470 = aod.builtin.devices.DichroicFilter(470, 'high',...
                         'Manufacturer', 'Semrock', 'Model', 'FF470-Di01');
                     ff470.setTransmission(sara.resources.getResource('FF470_Di01.txt'));
-                    channel.addDevice(ff470);
+                    channel.add(ff470);
                     ff562 = aod.builtin.devices.DichroicFilter(562, 'high',...
                         'Manufacturer', 'Semrock', 'Model', 'FF562_Di03');
                     ff562.setTransmission(sara.resources.getResource('FF562_Di03.txt'));
-                    channel.addDevice(ff562);
+                    channel.add(ff562);
                     ff649 = aod.builtin.devices.DichroicFilter(649, 'high',...
                         'Manufacturer', 'Semrock', 'Model', 'FF649-Di01');
                     ff649.setTransmission(sara.resources.getResource('FF649_Di01.txt'));
-                    channel.addDevice(ff649);
+                    channel.add(ff649);
                 otherwise
                     error('Unrecognized channel: %s', channelName);
             end
@@ -108,7 +108,7 @@ classdef ChannelFactory < aod.util.Factory
             channel = obj.get(channelName, varargin{:});
             if nargin > 1
                 assert(isSubclass(system, 'aod.core.System'));
-                system.addChannel(channel);
+                system.add(channel);
                 out = system;
             else
                 system = [];
@@ -118,7 +118,7 @@ classdef ChannelFactory < aod.util.Factory
         function channel = addPinhole(channel, pinhole)
             pinhole = aod.builtin.devices.Pinhole(pinhole,...
                 'Manufacturer', 'ThorLabs', 'Model', sprintf('P%uK', pinhole));
-            channel.addDevice(pinhole);
+            channel.add(pinhole);
         end
 
         function channel = addNDF(channel, attenuation)
@@ -126,7 +126,7 @@ classdef ChannelFactory < aod.util.Factory
                 'Manufacturer', 'ThorLabs', 'Model', sprintf('NE%uA-A', 10*attenuation));
             ndf.setTransmission(sara.resources.getResource(...
                 sprintf('NE%uA.txt', 10*attenuation)));
-            channel.addDevice(ndf);
+            channel.add(ndf);
         end
 
         function channel = addFilter(channel, filterName)
@@ -146,7 +146,7 @@ classdef ChannelFactory < aod.util.Factory
                 otherwise
                     warning('Filter not set. Unrecognized name: %s', filterName);
             end
-            channel.addDevice(filter);
+            channel.add(filter);
         end
     end
 end

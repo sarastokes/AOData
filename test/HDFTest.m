@@ -1,4 +1,12 @@
 classdef HDFTest < matlab.unittest.TestCase
+% HDFTEST
+%
+% Description:
+%   Tests MATLAB datatype to HDF5 I/O
+%
+% Parent:
+%    matlab.unittest.TestCase
+% -------------------------------------------------------------------------
 
     properties
         HDF_FILE = fullfile(getpref('AOData', 'BasePackage'), 'test\\test.h5');
@@ -6,7 +14,6 @@ classdef HDFTest < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            % testCase.HDF_FILE =  fullfile(fileparts(mfilename('fullpath')), 'tests\\test.h5');
             fileID = H5F.create(testCase.HDF_FILE);
             H5F.close(fileID);
         end
@@ -71,11 +78,27 @@ classdef HDFTest < matlab.unittest.TestCase
             testCase.verifyEqual(inputDuration, outputDuration);
         end
 
+
+        % Common MATLAB-specific data types
         function testAffine2d(testCase)
             inputAffine2d = affine2d(eye(3));
-            aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'Affine2d', inputAffine2d);
-            outputAffine2d = aod.h5.readDatasetByType(testCase.HDF_FILE, '/', 'Affine2d');
+            aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'affine2d', inputAffine2d);
+            outputAffine2d = aod.h5.readDatasetByType(testCase.HDF_FILE, '/', 'affine2d');
             testCase.verifyEqual(inputAffine2d, outputAffine2d);
+        end
+
+        function testSimtform2d(testCase)
+            inputTform = simtform2d(1, 1, eye(3));
+            aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'simtform2d', inputTform);
+            outputTform = aod.h5.readDatasetByType(testCase.HDF_FILE, '/', 'simtform2d');
+            testCase.verifyEqual(inputTform, outputTform);
+        end
+
+        function testImref2d(testCase)
+            inputRefObj = imref2d([242 360]);
+            aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'imref2d', inputRefObj);
+            outputRefObj = aod.h5.readDatasetByType(testCase.HDF_FILE, '/', 'imref2d');
+            testCase.verifyEqual(inputRefObj, outputRefObj);
         end
     end
 end 

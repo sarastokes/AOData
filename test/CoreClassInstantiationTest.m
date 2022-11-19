@@ -8,29 +8,30 @@ classdef CoreClassInstantiationTest < matlab.unittest.TestCase
         function methodSetup(testCase)
             testCase.Experiment = aod.core.Experiment(...
                 '851_20220823', cd, '20220823',...
-                'Administrator', 'Sara Patterson', 'System', '1P Primate');
+                'Administrator', 'Sara Patterson',... 
+                'Laboratory', '1P Primate');
         end
     end
 
     methods (Test)
         function testCalibration(testCase)
             obj = aod.core.Calibration('PowerMeasurement', '20220823');
-            testCase.Experiment.addCalibration(obj);
+            testCase.Experiment.add(obj);
         end
 
         function testSystem(testCase)
             obj = aod.core.System('SpectralPhysiology');
-            testCase.Experiment.addSystem(obj);
+            testCase.Experiment.add(obj);
             
-            obj.addChannel(aod.core.Channel('MustangImaging'));
-            obj.Channels(1).addDevice(aod.core.Device('PMT',...
+            obj.add(aod.core.Channel('MustangImaging'));
+            obj.Channels(1).add(aod.core.Device('PMT',...
                 'Manufacturer', 'A', 'Model', 'B'));
         end
 
         function testSource(testCase)
             source = aod.core.Source('Subject');
-            source.addSource(aod.core.Source('Eye'));
-            testCase.Experiment.addSource(source);
+            source.add(aod.core.Source('Eye'));
+            testCase.Experiment.add(source);
         end
 
         function testResponse(testCase)
@@ -48,7 +49,7 @@ classdef CoreClassInstantiationTest < matlab.unittest.TestCase
 
         function testAnalysis(testCase)
             obj = aod.core.Analysis('MyAnalysis', '20220825');
-            testCase.Experiment.addAnalysis(obj);
+            testCase.Experiment.add(obj);
         end
 
     end

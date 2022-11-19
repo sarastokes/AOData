@@ -2,10 +2,16 @@ classdef Experiment < aod.core.Entity
 % EXPERIMENT
 %
 % Description:
-%   Parent class for a single experiment
+%   A single experiment
 %
 % Constructor:
-%   obj = Experiment(expDate, source)
+%   obj = Experiment(name, experimentFolderPath, experimentDate)
+%   obj = Experiment(name, experimentFolderPath, experimentDate,...
+%       'Administrator', 'AdministratorName', 'Laboratory', 'LabName')
+%
+% Parameters:
+%   Adminstrator                Person(s) who conducted the experiment
+%   Laboratory                  Which lab the experiment occurred in
 %
 % Properties:
 %   Epochs                      Container for Epochs
@@ -22,19 +28,14 @@ classdef Experiment < aod.core.Entity
 % 
 % Public methods:
 %   setHomeDirectory(obj, filePath)
-%   id = id2epoch(obj, epochID)
-%   idx = id2index(obj, epochID)
+%   addAnalysis(obj, entity)
 %
 %   calibration = getCalibration(obj, className)
 %   data = getResponse(obj, epochIDs, className, varargin)
 %   imStack = getStacks(obj, epochIDs)
 %
-%   addAnalysis(obj, analysis)
-%   addCalibration(obj, calibration)
-%   addEpoch(obj, epoch)
-%   addSegmentation(obj, segmentation)
-%   addSystem(obj, system)
-%
+%   id = id2epoch(obj, epochID)
+%   idx = id2index(obj, epochID)
 %   clearEpochDatasets(obj, epochIDs)
 %   clearEpochRegistrations(obj, epochIDs)
 %   clearEpochResponses(obj, epochIDs)
@@ -74,7 +75,10 @@ classdef Experiment < aod.core.Entity
 
             obj.appendGitHashes();
         end
+    end
 
+    % Dependent set/get methods
+    methods
         function value = get.numEpochs(obj)
             value = numel(obj.Epochs);
         end
@@ -119,21 +123,21 @@ classdef Experiment < aod.core.Entity
             entityType = EntityTypes.get(entity);
 
             switch entityType 
-                case Entity.ANALYSIS
+                case EntityTypes.ANALYSIS
                     entity.setParent(obj);
                     obj.Analyses = cat(1, obj.Analyses, entity);
-                case Entity.CALIBRATION
+                case EntityTypes.CALIBRATION
                     entity.setParent(obj);
                     obj.Calibrations = cat(1, obj.Calibrations, entity);
-                case Entity.EPOCH
+                case EntityTypes.EPOCH
                     obj.addEpoch(entity);
-                case Entity.SEGMENTATION
+                case EntityTypes.SEGMENTATION
                     entity.setParent(obj);
                     obj.Segmentations = cat(1, obj.Segmentations, entity);
-                case Entity.SYSTEM 
+                case EntityTypes.SYSTEM 
                     entity.setParent(obj);
                     obj.Systems = cat(1, obj.Systems, entity);
-                case Entity.SOURCE 
+                case EntityTypes.SOURCE 
                     obj.addSource(entity);
                 otherwise
                     error("Experiment:AddedInvalidEntity",...
@@ -176,7 +180,7 @@ classdef Experiment < aod.core.Entity
             % ID2INDEX
             %
             % Description:
-            %   Returns index of in Epochs for a given epoch ID
+            %   Returns index of an epoch given an epoch ID
             %
             % Syntax:
             %   idx = id2index(obj, IDs)
@@ -293,7 +297,7 @@ classdef Experiment < aod.core.Entity
             %
             % Note:
             %   To add a new Source to an existing source, use the 
-            %   addSource function of the target parent aod.core.Source
+            %   add function of the target parent aod.core.Source
             % -------------------------------------------------------------
             assert(isSubclass(source, 'aod.core.Source'),...
                 'Must be a subclass of aod.core.Source');
@@ -384,6 +388,8 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             assert(isSubclass(system, 'aod.core.System'),...
                 'Must be a subclass of aod.core.System');
+            
+            warning('addSystem:Deprecated', 'This function will be removed soon');
             for i = 1:numel(system)
                 system(i).setParent(obj);
                 obj.Systems = cat(1, obj.Systems, system(i));
@@ -529,6 +535,7 @@ classdef Experiment < aod.core.Entity
             %   calibration             aod.core.Calibration subclass
             %       A calibration or array of calibrations
             % -------------------------------------------------------------
+            warning('addCalibration:Deprecated', 'This function will be removed soon')
             assert(isSubclass(calibration, 'aod.core.Calibration'),...
                 'addCalibration: Input must be subclass of aod.core.Calibration');
             
@@ -573,6 +580,7 @@ classdef Experiment < aod.core.Entity
             assert(isSubclass(analysis, 'aod.core.Analysis'),... 
             'Input must be subclass of aod.core.Analysis');
 
+            warning('addAnalysis:Deprecated', 'This function will be removed soon');
             analysis.setParent(obj);
             obj.Analyses = cat(1, obj.Analyses, analysis);
         end

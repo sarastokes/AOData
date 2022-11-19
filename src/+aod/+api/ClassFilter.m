@@ -2,7 +2,7 @@ classdef ClassFilter < aod.api.FilterQuery
 % CLASSFILTER
 %
 % Description:
-%   Filter entities in an AOData HDF5 file based on MATLAB class
+%   Filter entities in an AOData HDF5 file based on MATLAB class name
 %
 % Parent:
 %   aod.api.FilterQuery
@@ -10,6 +10,8 @@ classdef ClassFilter < aod.api.FilterQuery
 % Constructor:
 %   obj = ClassFilter(hdfName, className)
 %
+% Methods:
+%   applyFilter(obj)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -33,6 +35,14 @@ classdef ClassFilter < aod.api.FilterQuery
         end
 
         function applyFilter(obj)
+            % APPLYFILTER
+            %
+            % Description:
+            %   Apply the filter to all HDF5 groups representing entities
+            %
+            % Syntax:
+            %   applyFilter(obj)
+            % -------------------------------------------------------------
             for i = 1:numel(obj.allClassNames)
                 if obj.filterIdx(i)
                     obj.filterIdx(i) = strcmpi(obj.className, obj.allClassNames(i));

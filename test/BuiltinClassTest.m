@@ -59,7 +59,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj2 = aod.builtin.sources.primate.Eye('OS',...
                 'AxialLength', 16.56, 'ContactLens', '5.8mm/12.2mm/plano',...
                 'PupilSize', 6.7);
-            obj.addSource(obj2);
+            obj.add(obj2);
         end
 
         % SEGMENTATIONS ---------------------------------------------------

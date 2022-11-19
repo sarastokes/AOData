@@ -115,7 +115,16 @@ function writeEntity(hdfName, obj)
     
     % Write remaining properties as datasets
     for i = 1:numel(persistedProps)
-        prop = obj.(persistedProps(i));
+        try
+            prop = obj.(persistedProps(i));
+        catch ME
+            if strcmp(ME.identifier, 'MATLAB:class:GetProhibited')
+                warning('writeEntityToFile:NoGetAccess',...
+                    'Property %s could not be written, get access was not public', prop);
+            else
+                rethrow(ME);
+            end
+        end
         if isempty(prop)
             continue
         end

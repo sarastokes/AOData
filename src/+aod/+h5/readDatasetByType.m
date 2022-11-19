@@ -1,5 +1,10 @@
 function out = readDatasetByType(hdfName, groupPath, dsetName, className)
-
+% READDATASETBYTYPE
+%
+% Supported data types:
+%   datetime, char, numeric, logical, table, timetable, string, duration
+%   enum, affine2d, imref2d, simtform2d
+% -------------------------------------------------------------------------
     import aod.h5.HDF5
 
     fullPath = HDF5.buildPath(groupPath, dsetName);
@@ -72,6 +77,26 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
             eval(sprintf('out = %s.%s;', enumClass, data));
         case 'affine2d'
             out = affine2d(data);
+        case 'simtform2d'
+            T = h5readatt(hdfName, fullPath, 'Transformation');
+            S = h5readatt(hdfName, fullPath, 'Scale');
+            R = h5readatt(hdfName, fullPath, 'RotationAngle');
+            out = simtform2d(S, R, T);
+        case 'imref2d'
+            imageSize = h5readatt(hdfName, fullPath, 'ImageSize');
+            pixelExtentX = h5readatt(hdfName, fullPath, 'PixelExtentInWorldX');
+            pixelExtentY = h5readatt(hdfName, fullPath, 'PixelExtentInWorldY');
+            if pixelExtentX ~= 1 || pixelExtentY ~= 1
+                out = imref2d(imageSize, pixelExtentX, PixelExtentInWorldX);
+                return
+            end
+            xWorldLimits = h5readatt(hdfName, fullPath, 'XWorldLimits');
+            yWorldLimits = h5readatt(hdfName, fullPath, 'YWorldLimits');
+            if xWorldLimits ~= (imageSize(1)-0.5) || yWorldLimits ~= (imageSize(2) - 0.5)
+                out = imref2d(imageSize, xWorldLimits, yWorldLimits);
+                return
+            end
+            out = imref2d(imageSize);
         otherwise
             out = data;
     end

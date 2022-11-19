@@ -140,7 +140,7 @@ classdef HDF5 < handle
                     groupIDx = onCleanup(@()H5G.close(groupID));
                 catch ME
                     if contains(ME.message, 'name already exists')
-                        warning('aod.h5.HDF5:Group %s already exists, skipping', groupPath);
+                        % warning('aod.h5.HDF5:Group %s already exists, skipping', groupPath);
                     else
                         rethrow(ME);
                     end
@@ -471,7 +471,10 @@ classdef HDF5 < handle
         
             for i = 1:length(names)
                 val = data.(names{i});
-                if iscell(val) && ~isstring(val)
+                if isdatetime(val)
+                    data.(names{i}) = string(data.(names{i}));
+                    val = string(val);
+                elseif iscell(val) && ~isstring(val)
                     data.(names{i}) = [val{:}];
                     val = val{1};
                 elseif isstring(val) && numel(val) == 1
@@ -498,6 +501,12 @@ classdef HDF5 < handle
             end
             dsetID = H5D.create(fileID, fullPath, typeID, spaceID, 'H5P_DEFAULT');
             dsetIDx = onCleanup(@()H5D.close(dsetID));
+
+            for i = 1:numel(names)
+                if isdatetime(data.(names{i}))
+                    data.(names{i}) = cellstr(data.(names{i}));
+                end
+            end
 
             H5D.write(dsetID, typeID, spaceID, spaceID, 'H5P_DEFAULT', data);
 
@@ -649,7 +658,7 @@ classdef HDF5 < handle
 
             import aod.h5.HDF5
             if HDF5.exists(fileName, HDF5.buildPath(linkPath, linkName))
-                warning('LinkExists: Skipped existing link at %s', linkPath);
+                % warning('LinkExists: Skipped existing link at %s', linkPath);
                 return
             end
             fileID = HDF5.openFile(fileName, false);

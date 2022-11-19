@@ -191,6 +191,8 @@ classdef EntityTypes
                     out = expt.Systems;
                 case EntityTypes.SEGMENTATION 
                     out = expt.Segmentations;
+                case EntityTypes.CALIBRATION
+                    out = expt.Calibrations;
                 case EntityTypes.CHANNEL 
                     out = expt.getAllChannels();
                 case EntityTypes.DEVICE 

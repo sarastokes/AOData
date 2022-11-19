@@ -27,18 +27,18 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
     end
 
     methods (Sealed)
-        function obj = addSource(obj, source)
-            % ADDSOURCE
+        function obj = add(obj, entity)
+            % ADD
             % 
             % Description:
             %   Add a Source to the Experiment and the HDF5 file
             %
             % Syntax:
-            %   addAnalysis(obj, source)
+            %   add(obj, source)
             % -------------------------------------------------------------
             arguments
                 obj
-                source
+                source      {mustBeA(source, 'aod.core.Source')}
             end
 
             source.setParent(obj);

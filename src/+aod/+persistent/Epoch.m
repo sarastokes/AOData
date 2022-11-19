@@ -51,6 +51,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
                 obj
                 dataset        {mustBeA(dataset, 'aod.core.Dataset')}
             end
+            warning('addDataset:Deprecated', 'This function will be removed soon');
 
             dataset.addParent(obj);
             obj.addEntity(dataset);
@@ -69,6 +70,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
                 obj 
                 registration    {mustBeA(registration, 'aod.core.Registration')}
             end
+            warning('addRegistration:Deprecated', 'This function will be removed soon');
 
             registration.addParent(obj);
             obj.addEntity(registration);
@@ -87,6 +89,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
                 obj 
                 response        {mustBeA(response, 'aod.core.Response')}
             end
+            warning('addResponse:Deprecated', 'This function will be removed soon');
 
             response.addParent(obj);
             obj.addEntity(response);
@@ -105,6 +108,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
                 obj 
                 stimulus        {mustBeA(stimulus, 'aod.core.Stimulus')}
             end
+            warning('addStimulus:Deprecated', 'This function will be removed soon');
 
             stimulus.addParent(obj);
             obj.addEntity(stimulus);

@@ -69,14 +69,14 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             ID = parent.ID;
         end
 
-        function addSource(obj, subSource)
-            % ADDSOURCE
+        function add(obj, subSource)
+            % ADD
             %
             % Description:
             %   Add a sub-source to the current source
             %
             % Syntax:
-            %   addSource(obj, subSource)
+            %   add(obj, subSource)
             % -------------------------------------------------------------
             assert(isSubclass(obj, 'aod.core.Source'),... 
                 'Must be subclass of aod.core.Source');

@@ -11,14 +11,14 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
     end
 
     methods (Sealed)
-        function addDevice(obj, device)
-            % ADDDEVICE
+        function add(obj, device)
+            % ADD
             %
             % Description:
             %   Add a Device to the Channel and the HDF5 file
             %
             % Syntax:
-            %   addDevice(obj, device)
+            %   add(obj, device)
             % -------------------------------------------------------------
             arguments
                 obj 

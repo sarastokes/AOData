@@ -108,7 +108,7 @@ classdef SpatialProtocolFactory < aod.util.Factory
                 end
 
                 barSpeed = extractFlaggedNumber(fileName, 'v');
-                barSize = extractFlaggedNumber(filename, 'pix');
+                barSize = extractFlaggedNumber(fileName, 'pix');
 
                 protocol = MovingBarsFourDirections(obj.calibration,...
                     'PreTime', 20, 'StimTime', 20, 'BarSize', barSize,...

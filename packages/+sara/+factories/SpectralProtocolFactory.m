@@ -39,6 +39,12 @@ classdef SpectralProtocolFactory < aod.util.Factory
 
             % Determine totalTime
             totalTime = extractFlaggedNumber(fileName, 't');
+            
+            % Determine spectralClass
+            spectralClass = sara.SpectralTypes.match(fileName);
+            if isempty(spectralClass)
+                spectralClass = sara.SpectralTypes.Luminance;
+            end
 
             % Determine baseIntensity
             baseIntensity = extractFlaggedNumber(fileName, 'p_');
@@ -71,6 +77,22 @@ classdef SpectralProtocolFactory < aod.util.Factory
                 protocol = Step(obj.calibration,...
                     'PreTime', 20, 'StimTime', totalTime-20, 'TailTime', 0,...
                     'BaseIntensity', 0, 'Contrast', baseIntensity);
+                return
+            end
+
+            % Steps
+            if contains(fileName, 'square') && ~contains(fileName, 'hz')
+                contrast = extractFlaggedNumber(fileName, 'c_');
+                stepTime = extractFlaggedNumber(fileName, 's_');
+                numSteps = extractFlaggedNumber(fileName, 'n_');
+                if isempty(numSteps)
+                    numSteps = 5;
+                end
+                
+                protocol = Steps(obj.calibration,...
+                    'PreTime', 20, 'StepTime', stepTime, 'TailTime', 40,... 
+                    'NumSteps', numSteps, 'SpectralClass', spectralClass,...
+                    'BaseIntensity', baseIntensity, 'Contrast', contrast);
                 return
             end
 

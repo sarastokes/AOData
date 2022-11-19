@@ -17,7 +17,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Devices                     container for all devices in channel
 %
 % Methods:
-%   addDevice(obj, device)
+%   add(obj, device)
 %   removeDevice(obj, ID)
 %   clearDevices(obj)
 %   assignUUID(obj, uuid)
@@ -39,11 +39,14 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
-        function addDevice(obj, device)
-            % ADDDEVICE
+        function add(obj, device)
+            % ADD
+            %
+            % Description:
+            %   Add a Device to the Channel
             %
             % Syntax:
-            %   addDevice(obj, device)
+            %   add(obj, device)
             % -------------------------------------------------------------
             assert(isSubclass(device, 'aod.core.Device'),...
                 'Must be subclass of aod.core.Device');
@@ -54,6 +57,9 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
         function removeDevice(obj, deviceID)
             % REMOVEDEVICES
             %
+            % Description:
+            %   Remove a Device from the channel
+            %
             % Syntax:
             %   removeDevice(obj, deviceID)
             % -------------------------------------------------------------
@@ -63,6 +69,9 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
         
         function clearDevices(obj)
             % CLEARDEVICES
+            %
+            % Description:
+            %   Clear all Devices from the Channel
             %
             % Syntax:
             %   clearDevices(obj)

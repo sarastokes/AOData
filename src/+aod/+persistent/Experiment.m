@@ -67,112 +67,32 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
     end
 
     methods
-        function addAnalysis(obj, analysis)
-            % ADDANALYSIS
-            % 
-            % Description:
-            %   Add an Analysis to the Experiment and the HDF5 file
-            %
-            % Syntax:
-            %   addAnalysis(obj, analysis)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                analysis        {mustBeA(analysis, 'aod.core.Analysis')}
+        function add(obj, entity)
+            import aod.core.EntityTypes
+        
+            switch entity.entityType
+                case EntityTypes.ANALYSIS
+                    entity.setParent(obj);
+                    obj.addEntity(entity);
+                case EntityTypes.CALIBRATION
+                    entity.setParent(obj);
+                    obj.addEntity(entity);
+                case EntityTypes.EPOCH
+                    entity.setParent(obj);
+                    obj.addEntity(entity);
+                case EntityTypes.SEGMENTATION
+                    entity.setParent(obj);
+                    obj.addEntity(entity);
+                case EntityTypes.SOURCE
+                    entity.setParent(obj);
+                    obj.addEntity(entity);
+                case EntityTypes.SYSTEM
+                    entity.setParent(obj);
+                    obj.addEntity(entity);
+                otherwise
+                    error('Experiment_add:InvalidEntityType',...
+                        'Only Analysis, Calibration, Epoch, Segmentation, System and Source can be added to Experiment')
             end
-
-            analysis.setParent(obj);
-            obj.addEntity(analysis);
-        end
-
-        function addCalibration(obj, calibration)
-            % ADDCALIBRATION
-            %
-            % Description:
-            %   Add a Calibration to the Experiment and the HDF5 file
-            %
-            % Syntax:
-            %   addCalibration(obj, calibration)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                calibration     {mustBeA(calibration, 'aod.core.Calibration')}
-            end
-
-            calibration.setParent(obj);
-            obj.addEntity(calibration);
-        end
-
-        function addEpoch(obj, epoch)
-            % ADDEPOCH
-            %
-            % Description:
-            %   Add an Epoch to the Experiment and the HDF5 file
-            %
-            % Syntax:
-            %   addEpoch(obj, epoch)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                epoch           {mustBeA(epoch, 'aod.core.Epoch')}
-            end
-
-            epoch.setParent(obj);
-            obj.addEntity(epoch);
-        end
-
-        function addSegmentation(obj, segmentation)
-            % ADDSEGMENTATION
-            %
-            % Description:
-            %   Add a Segmentation to the Experiment and the HDF5 file
-            %
-            % Syntax:
-            %   addSegmentation(obj, segmentation)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                segmentation    {mustBeA(segmentation, 'aod.core.Segmentation')}
-            end
-
-            segmentation.setParent(obj);
-            obj.addEntity(segmentation);
-        end
-
-        function addSource(obj, source)
-            % ADDSOURCE
-            %
-            % Description:
-            %   Add a Source to the Experiment and the HDF5 file
-            %
-            % Syntax:
-            %   addSource(obj, source)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                source              {mustBeA(source, 'aod.core.Source')}
-            end
-
-            source.setParent(obj);
-            obj.addEntity(source);
-        end
-
-        function addSystem(obj, system)
-            % ADDSYSTEM
-            %
-            % Description:
-            %   Add a System to the Experiment and the HDF5 file
-            %
-            % Syntax:
-            %   addSystem(obj, system)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                system      {mustBeA(system, 'aod.core.System')}
-            end
-            
-            system.setParent(obj);
-            obj.addEntity(system);
         end
     end
 

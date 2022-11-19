@@ -420,7 +420,7 @@ disp(device1.parameters)
 channel = aod.core.Channel('MyChannel');
 % Create a device and add it to the channel
 device = aod.core.Device('Manufacturer', 'ThorLabs', 'Model', 'idk');
-channel.addDevice(device);
+channel.add(device);
 % Change a parameter on the device variable
 device.setParam('Model', 'P20K');
 % And it is also changed within the Channel!
@@ -452,7 +452,7 @@ disp(channel.Devices.parameters)
 % Get documentation for a class or function
 help aod.core.Experiment
 % Get documentation for a function within a class
-help aod.core.Experiment\addChannel
+help aod.core.Experiment\add
 	\end{lstlisting}
 	\noindent The documentation for each class includes (if relevant), the following information:\smallskip\\
 	\textbf{className \myparent{parentClassName(s)}}\smallskip\\
@@ -560,31 +560,26 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 			\item \aodparam{Administrator} - who performed the experiment
 			\item \aodparam{System} - the name of they system used
 		\end{itemize}
-		\docheader{Methods:} This may seem like a lot, but many of the methods are conceptually identical (e.g. if you know how to use \aodfcn{addAnalysis}, then you know how to use all the add methods)
+		\docheader{Methods:} This may seem like a lot, but many of the methods are conceptually identical (e.g. if you know how to use \aodfcn{add}, then you know how to use all the add methods)
 		\begin{itemize}
 			\item \aodfcn{setHomeDirectory(obj, filePath)} - change file path to experiment data folder
-			\item \aodfcn{epoch = id2epoch(obj)} - input ID and returns Epoch, if exists\\
+			\item \aodfcn{add(obj, entity)} - add Analysis, Calibration, Epoch, Segmentation, Source or System\\
 			%
-			\item \aodfcn{addEpoch(obj, epoch)}
+			\item \aodfcn{epoch = id2epoch(obj)} - input ID and returns Epoch, if exists
 			\item \aodfcn{removeEpochByID(obj, epochID)}
 			\item \aodfcn{clearEpochs(obj)}\\
 			%
-			\item \aodfcn{addAnalysis(obj, analysis)}
 			\item \aodfcn{clearAnalyses(obj)}
 			%
-			\item \aodfcn{addCalibration(obj, calibration)}
 			\item \aodfcn{removeCalibration(obj, ID)}
 			\item \aodfcn{clearCalibrations(obj)}\\
 			%
-			\item \aodfcn{addSegmentation(obj, segmentation)}
 			\item \aodfcn{removeSegmentation(obj, ID)}
 			\item \aodfcn{clearSegmentation(obj)}\\
 			%
-			\item \aodfcn{addSource(obj, source)}
 			\item \aodfcn{removeSource(obj, ID)}
 			\item \aodfcn{clearSources(obj)}\\
 			%
-			\item \aodfcn{addSystem(obj, system)}
 			\item \aodfcn{removeSystem(obj, ID)}
 			\item \aodfcn{clearSystems(obj)}\\
 			%
@@ -672,7 +667,7 @@ obj = aod.core.System(name)
 		\end{itemize}
 		\docheader{Sealed Methods:}
 		\begin{itemize}
-			\item \aodfcn{addChannel(obj, channel)}
+			\item \aodfcn{add(obj, entity)} - Add a Channel to the system
 			\item \aodfcn{removeChannel(obj, ID)} - ID is the index of the channel to remove
 			\item \aodfcn{clearChannels(obj)}
 			\item \aodfcn{assignUUID(obj, UUID)}
@@ -698,7 +693,7 @@ obj = aod.core.Channel(name, 'DataFolder', value)
 		\docheader{Sealed Methods:}
 		\begin{itemize}
 			\item \aodfcn{setDataFolder(obj, dataFolder)}
-			\item \aodfcn{addDevice(obj, device)}
+			\item \aodfcn{add(obj, device)} - Add a Device to the channel
 			\item \aodfcn{removeDevice(obj, ID)}
 			\item \aodfcn{clearDevices(obj)}
 			\item \aodfcn{assignUUID(obj, UUID)}
@@ -777,11 +772,8 @@ obj = aod.core.Epoch(ID)
 		\begin{itemize}
 			\item \aodfcn{setSource(obj, system)}
 			\item \aodfcn{setSystem(obj, system)}
-			\item \aodfcn{add(obj, entity)} - Add a dataset, registration, response, stimulus to the Epoch
-			% \item \aodfcn{addDataset(obj, dataset)}
-			% \item \aodfcn{addResponse(obj, response)}
-			% \item \aodfcn{addRegistration(obj, registration)}
-			% \item \aodfcn{addStimulus(obj, stimulus)}
+			\item \aodfcn{add(obj, entity)} - Add a dataset, registration, response, stimulus to the Epoch\\
+			%
 			\item \aodfcn{removeDataset(obj, ID)}
 			\item \aodfcn{removeResponse(obj, ID)}
 			\item \aodfcn{removeRegistration(obj, ID)}

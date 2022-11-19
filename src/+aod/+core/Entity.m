@@ -23,6 +23,7 @@ classdef (Abstract) Entity < handle
 %   h = ancestor(obj, className)
 %   setName(obj, name)
 %   setDescription(obj, txt, overwrite)
+%
 %   addNote(obj, txt)
 %   removeNote(obj, ID)
 %   clearNotes(obj)
@@ -43,10 +44,8 @@ classdef (Abstract) Entity < handle
 %   sync(obj)
 %   checkGroupNames(obj)
 %
-% Sealed Protected methods:
+% Protected methods (with aod.persistent.Entity subclass access allowed):
 %   setUUID(obj, uuid)
-%
-% Protected methods accessible by any subclass of aod.core.Entity
 %   addParent(obj, parent)
 %
 % Private methods:
@@ -59,6 +58,9 @@ classdef (Abstract) Entity < handle
         UUID                        string = string.empty()
         description                 char = char.empty() 
         notes                       char = char.empty()
+    end
+
+    properties (Hidden, SetAccess = private)
         entityType                  %aod.core.EntityTypes
     end
 

@@ -27,14 +27,14 @@ classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
     end
 
     methods (Sealed)
-        function addChannel(obj, channel)
-            % ADDCHANNEL
+        function add(obj, channel)
+            % ADD
             % 
             % Description:
-            %   Add an Analysis to the Experiment and the HDF5 file
+            %   Add a Channel to the Experiment and the HDF5 file
             %
             % Syntax:
-            %   addChannel(obj, channel)
+            %   add(obj, channel)
             % -------------------------------------------------------------
             arguments
                 obj
