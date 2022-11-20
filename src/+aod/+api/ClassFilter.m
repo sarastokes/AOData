@@ -9,9 +9,6 @@ classdef ClassFilter < aod.api.FilterQuery
 %
 % Constructor:
 %   obj = ClassFilter(hdfName, className)
-%
-% Methods:
-%   applyFilter(obj)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

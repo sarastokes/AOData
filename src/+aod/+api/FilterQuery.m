@@ -31,17 +31,28 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
         filterIdx 
     end
 
+    events
+        FilterReset
+    end
+
     methods (Abstract)
         apply(obj)
     end
 
     methods 
         function obj = FilterQuery(hdfName)
-            if nargin > 0
-                obj.hdfName = hdfName;
-                obj.populateGroupNames();
-                obj.filterIdx = false(size(obj.allGroupNames));
+            if nargin == 0
+                return
             end
+
+            hdfName = string(hdfName);
+            if numel(hdfName) > 1
+                warning('FilterQuery:NotYetImplemented',...
+                    'Multiple HDF5 file queries not yet implemented');
+            end
+            obj.hdfName = hdfName;
+            obj.populateGroupNames();
+            obj.filterIdx = false(size(obj.allGroupNames));
         end
 
         function names = getMatches(obj)
@@ -68,6 +79,15 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
             %   resetFilterIdx(i)
             % -------------------------------------------------------------
             obj.filterIdx = false(size(obj.allGroupNames));
+            notify(obj, 'FilterReset');
+        end
+    end
+
+    methods (Access = ?aod.api.QueryManager)
+        function setFilterIdx(obj, idx)
+            assert(numel(idx) == obj.filterIdx,...
+                'The provided filter is the wrong size!');
+            obj.filterIdx = idx;
         end
     end
 

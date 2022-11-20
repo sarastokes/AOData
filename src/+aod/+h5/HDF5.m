@@ -209,6 +209,33 @@ classdef HDF5 < handle
 
     % Dataset methods
     methods (Static)   
+        function datasetNames = collectDatasets(hdfName)
+            % COLLECTDATASETS
+            %
+            % Description:
+            %   Collect all the dataset names in an HDF file or subfile
+            %
+            % Syntax:
+            %   datasetNames = collectDatasets(hdfName)
+            %
+            % Inputs:
+            %   hdfName         either file name or H5ML.id
+            %
+            % See also:
+            %   datasetVisitFcn
+            % -------------------------------------------------------------
+            if ~isa(hdfName, 'H5ML.id')
+                rootID = aod.h5.HDF5.openFile(hdfName, true);
+                rootIDx = onCleanup(@()H5F.close(rootID));
+            else
+                rootID = hdfName;
+            end
+
+            datasetNames = string.empty();
+            [~, datasetNames] = H5O.visit(rootID, 'H5_INDEX_NAME',...
+                'H5_ITER_NATIVE', @datasetVisitFcn, datasetNames);
+        end
+
         function makeMatrixDataset(fileName, pathName, dsetName, data)
             % MAKEMATRIXDATASET
             % 
@@ -864,6 +891,31 @@ classdef HDF5 < handle
 
             idx = strfind(pathName, '/');
             lastName = pathName(idx(end)+1:end);
+        end
+
+        function out = getPathOrder(pathName)
+            % GETPATHORDER
+            %
+            % Description:
+            %   Returns the order of a path (e.g. the order of the root
+            %   group ("/Group1") = 1, the order of "/Group1/Subgroup1" = 2
+            %
+            % Syntax:
+            %   out = getPathOrder(pathName)
+            % -------------------------------------------------------------
+            arguments
+                pathName            string
+            end
+            
+            if ~isscalar(pathName)
+                out = [];
+                for i = 1:numel(pathName)
+                    out = cat(1, out, aod.h5.HDF5.getPathOrder(pathName(i)));
+                end
+                return
+            end
+
+            out = numel(strfind(pathName, "/"));
         end
     end
 end 
