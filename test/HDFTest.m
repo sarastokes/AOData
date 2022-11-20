@@ -6,6 +6,9 @@ classdef HDFTest < matlab.unittest.TestCase
 %
 % Parent:
 %    matlab.unittest.TestCase
+%
+% Use:
+%   result = runtests('HDFTest.m')
 % -------------------------------------------------------------------------
 
     properties

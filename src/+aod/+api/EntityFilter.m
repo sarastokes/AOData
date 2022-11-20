@@ -20,10 +20,14 @@ classdef EntityFilter < aod.api.FilterQuery
             entityName = char(aod.core.EntityTypes.init(entityName));
             obj@aod.api.FilterQuery(hdfName);
             obj.entityName = entityName;
-            obj.applyFilter();
+            obj.apply();
         end
+    end
 
-        function applyFilter(obj)
+    % Implementation of FilterQuery abstract methods
+    methods
+        function apply(obj)
+            obj.resetFilterIdx();
             % Select groups that match the entity
             for i = 1:numel(obj.allGroupNames)
                 if obj.filterIdx(i)

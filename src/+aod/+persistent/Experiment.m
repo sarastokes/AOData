@@ -43,6 +43,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         end
     end
 
+    % Core methods
     methods
         function setHomeDirectory(obj, homeDirectory)
             % SETHOMEDIRECTORY
@@ -64,9 +65,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 
             obj.homeDirectory = homeDirectory;
         end
-    end
 
-    methods
         function add(obj, entity)
             import aod.core.EntityTypes
         
@@ -93,6 +92,13 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
                     error('Experiment_add:InvalidEntityType',...
                         'Only Analysis, Calibration, Epoch, Segmentation, System and Source can be added to Experiment')
             end
+        end
+    end
+
+    % Access methods
+    methods
+        function getSource(obj, sourceDescriptor)
+            
         end
     end
 

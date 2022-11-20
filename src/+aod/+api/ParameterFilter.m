@@ -2,7 +2,7 @@ classdef ParameterFilter < aod.api.FilterQuery
 % PARAMETERFILTER
 %
 % Description:
-%   Filter entities based on the presence of a parameter or having a 
+%   Filter entities based on the presence of a parameter or matching a 
 %   specific parameter value
 %
 % Parent:
@@ -14,7 +14,7 @@ classdef ParameterFilter < aod.api.FilterQuery
 %
 % Notes:
 %   If paramValue isn't set, entities will be filtered by whether they have
-%   the parameter paramName or not
+%   the parameter "paramName" or not
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -31,15 +31,25 @@ classdef ParameterFilter < aod.api.FilterQuery
             obj.paramName = char(paramName);
             obj.paramValue = paramValue;
 
-            obj.applyFilter();
+            obj.apply();
         end
+    end
 
-        function applyFilter(obj)
+    % Implementation of FilterQuery abstract methods
+    methods
+        function apply(obj)
             % Filter by whether paramName is present
             for i = 1:numel(obj.allGroupNames)
                 obj.filterIdx(i) = aod.h5.HDF5.hasAttribute(...
                     obj.hdfName, obj.allGroupNames(i), obj.paramName);
             end
+            % Throw a warning if nothing matched the filter
+            if nnz(obj.filterIdx) == 0
+                warning('ParameterFilter_apply:NoMatches',...
+                    'No matches were found for paramName %s', obj.paramName);
+                return  % No need to check paramValue matches
+            end
+
             % If necessary, filter by whether paramName matches paramValue
             if ~isempty(obj.paramValue)
                 for i = 1:numel(obj.allGroupNames)
@@ -47,6 +57,12 @@ classdef ParameterFilter < aod.api.FilterQuery
                         attValue = h5readatt(obj.hdfName, obj.allGroupNames(i), obj.paramName);
                         obj.filterIdx(i) = isequal(attValue, obj.paramValue);
                     end
+                end
+                % Throw a warning if nothing matched the filter
+                if nnz(obj.filterIdx) == 0
+                    warning('ParameterFilter_apply:NoMatches',...
+                        'No matches were found for %s =', obj.paramName);
+                    disp(obj.paramValue);
                 end
             end
         end

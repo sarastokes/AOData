@@ -10,13 +10,20 @@ classdef EntityTypes
 %       Defines acceptable entity types for setParent()
 %   out = parentContainer(obj)
 %       Defines the name of the container each entity type is placed in
-%   out = childContainers(obj)
+%   out = persistentParentContainer(obj)
+%       Defines the back-end persistent container name
+%   out = childContainers(obj, fullVariableName)
 %       Defines the child containers within each entity type
 %   
 %   out = collectAll(obj, experiment)
 %       Returns all members of an entity type within an experiment
 %   out = empty(obj)
 %       Returns an empty instance of the entity type class
+%
+%   out = getCoreClassName(obj)
+%       Returns the parent core class (e.g. aod.core.Epoch for EPOCH)
+%   out = getPersistentClassName(obj)
+%       Returns the parent persistent class (e.g. aod.persistent.Epoch)
 %   
 %   obj = init(entityName)
 %       Returns the entity type given the entity name
@@ -114,6 +121,14 @@ classdef EntityTypes
         end
 
         function out = persistentParentContainer(obj)
+            % PERSISTENTPARENTCONTAINER
+            % 
+            % Description:
+            %   Defines the back-end container name for persistent entity
+            %
+            % Syntax:
+            %   out = persistentParentContainer(obj)
+            % -------------------------------------------------------------
             out = obj.parentContainer();
             if ~isempty(out)
                 out = [out, 'Container'];
@@ -127,7 +142,12 @@ classdef EntityTypes
             %   Defines and returns the containers within an entity
             %
             % Syntax:
-            %   containers = childContainers(obj)
+            %   containers = childContainers(obj, fullVariableName)
+            %
+            % Inputs:
+            %   obj
+            %   fullVariableName        logical
+            %       Whether to return the full name of persistent back-end
             %
             % Example:
             %   For SYSTEM, childContainers returns 'Channels'
@@ -397,7 +417,7 @@ classdef EntityTypes
             end
         end
 
-        function out = allContainerNames(obj)
+        function out = allContainerNames(obj) %#ok<INUSD> 
             % GETALLCONTAINERS
             %
             %
@@ -419,6 +439,8 @@ classdef EntityTypes
             %
             % Syntax:
             %   out = get(obj)
+            %
+            % TODO: Change name to getByClass
             % -------------------------------------------------------------
             arguments 
                 obj         {mustBeA(obj, 'aod.core.Entity')}
@@ -461,14 +483,18 @@ classdef EntityTypes
             % INIT
             %
             % Description:
-            %   Initialize from entity name as text
+            %   Initialize from entity name as text (string or char)
             %
             % Syntax:
             %   obj = aod.core.EntityTypes.init(entityName)
             %
+            % Example:
+            %   obj = aod.core.EntityTypes.init('epoch')
+            %
             % Notes:
             %   For compatibility, if a aod.core.EntityTypes is passed as
             %   input, it will be returned without error
+            %   Several abbreviations are also defined, see code
             % -------------------------------------------------------------
             if isa(entityName, 'aod.core.EntityTypes')
                 obj = entityName;
@@ -510,6 +536,7 @@ classdef EntityTypes
         end
 
         function obj = fromClassName(obj, className)
+            % TODO: no longer needed
             if isstring(className)
                 className = char(className);
             end
@@ -518,7 +545,7 @@ classdef EntityTypes
             end
 
             if ~isSubclass(className, {'aod.core.Entity', 'aod.core.Experiment'})
-                error("EntityTypes/fromClassName",...
+                error("EntityTypes_fromClassName",...
                     "%s is not an subclass of aod.core.Entity or aod.persistent.Entity");
             end
             

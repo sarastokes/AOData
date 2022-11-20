@@ -15,6 +15,11 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
 %
 % Public methods:
 %   names = getMatches(obj)
+%
+% Protected methods:
+%   resetFilterIdx(obj)
+%
+% TODO: Multiple HDF5 files
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -27,7 +32,7 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
     end
 
     methods (Abstract)
-        applyFilter(obj)
+        apply(obj)
     end
 
     methods 
@@ -35,7 +40,7 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
             if nargin > 0
                 obj.hdfName = hdfName;
                 obj.populateGroupNames();
-                obj.filterIdx = true(size(obj.allGroupNames));
+                obj.filterIdx = false(size(obj.allGroupNames));
             end
         end
 
@@ -48,8 +53,21 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
             % Syntax:
             %   names = getMatches(obj)
             % -------------------------------------------------------------
-
             names = obj.allGroupNames(obj.filterIdx);
+        end
+    end
+
+    methods (Access = protected)
+        function resetFilterIdx(obj)
+            % RESETFILTERIDX
+            %
+            % Description:
+            %   Resets index representing filter matches
+            %
+            % Syntax:
+            %   resetFilterIdx(i)
+            % -------------------------------------------------------------
+            obj.filterIdx = false(size(obj.allGroupNames));
         end
     end
 

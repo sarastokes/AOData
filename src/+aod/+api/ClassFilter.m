@@ -30,11 +30,14 @@ classdef ClassFilter < aod.api.FilterQuery
 
             if nargin > 1 && ~isempty(className)
                 obj.className = className;
-                obj.applyFilter();
+                obj.apply();
             end
         end
+    end
 
-        function applyFilter(obj)
+    % Implementation of FilterQuery abstract methods
+    methods
+        function apply(obj)
             % APPLYFILTER
             %
             % Description:
@@ -43,10 +46,16 @@ classdef ClassFilter < aod.api.FilterQuery
             % Syntax:
             %   applyFilter(obj)
             % -------------------------------------------------------------
+            obj.resetFilterIdx();
             for i = 1:numel(obj.allClassNames)
                 if obj.filterIdx(i)
                     obj.filterIdx(i) = strcmpi(obj.className, obj.allClassNames(i));
                 end
+            end
+            % Throw a warning if nothing matched the filter
+            if nnz(obj.filterIdx) == 0
+                warning('ClassFilter_apply:NoMatches',...
+                    'ClassFilter for %s returned no matches', obj.className);
             end
         end
     end

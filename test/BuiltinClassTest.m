@@ -1,4 +1,15 @@
 classdef BuiltinClassTest < matlab.unittest.TestCase
+% BUILTINCLASSTEST
+%
+% Description:
+%   Tests instantiation of builtin classes
+%
+% Parent:
+%   matlab.unittest.TestCase
+%
+% Example:
+%   results = runtests('BuiltinCassTest.m')
+% -------------------------------------------------------------------------
 
     methods (Test)
         % DEVICES ---------------------------------------------------------

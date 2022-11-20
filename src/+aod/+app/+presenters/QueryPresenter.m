@@ -182,8 +182,6 @@ classdef QueryPresenter < appbox.Presenter
             if evt.data.Value == ""
                 return
             end
-
-            %newLocation = [evt.data.Source.Layout.Row, 2];
         end
 
         function onViewParameterNameSet(obj, ~, evt)
