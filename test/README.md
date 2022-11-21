@@ -11,12 +11,12 @@ The AOData test suite currently contains the following:
 - ```SyncTest``` - tests validation performed when adding an entity to an experiment
 
 
-An individual test can be run as:
-```matlab
-result = runtests('HDFTest');
-```
 
 The full test suite can be run with:
 ```matlab
 results = runAODataTestSuite();
+```
+An individual test can be run as:
+```matlab
+result = runtests('HDFTest');
 ```

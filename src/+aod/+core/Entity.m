@@ -209,6 +209,11 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.clearNotes()
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) clearNotes(x), obj);
+                return
+            end
+
             obj.notes = char.empty();
         end
     end
@@ -224,10 +229,15 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = hasParam(obj, paramName)
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                tf = arrayfun(@(x) x.hasParam(paramName), obj);
+                return
+            end
+            
             tf = obj.parameters.isKey(paramName);
         end
 
-        function paramValue = getParam(obj, paramName, errorTypes)
+        function paramValue = getParam(obj, paramName, errorType)
             % GETPARAM
             %
             % Description:
@@ -245,7 +255,12 @@ classdef (Abstract) Entity < handle
             if nargin < 3
                 errorType = ErrorTypes.ERROR;
             else
-                errorType = ErrorTypes.init(errorTypes);
+                errorType = ErrorTypes.init(errorType);
+            end
+
+            if ~isscalar(obj)
+                paramValue = arrayfun(@(x) x.getParam(paramName, errorType), obj);
+                return
             end
 
             if obj.hasParam(paramName)
@@ -277,6 +292,11 @@ classdef (Abstract) Entity < handle
             if nargin == 1
                 return
             end
+            
+            if ~isscalar(obj)
+                arrayfun(@(x) setParam(x, varargin{:}), obj);
+                return
+            end
 
             if nargin == 2 && isstruct(varargin{1})
                 S = varargin{1};
@@ -300,6 +320,10 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   removeParam(obj, paramName)
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) removeParam(x, paramName), obj);
+            end
+
             if obj.hasParam(paramName)
                 remove(obj.parameters, paramName);
             end
@@ -317,6 +341,16 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = hasFile(obj, fileName)
             % -------------------------------------------------------------
+            arguments
+                obj 
+                fileName                char
+            end
+
+            if ~isscalar(obj)
+                tf = arrayfun(@(x) hasFile(x, fileName), obj);
+                return
+            end
+
             tf = obj.files.isKey(fileName);
         end
 
@@ -336,6 +370,11 @@ classdef (Abstract) Entity < handle
                 filePath                char
             end
 
+            if ~isscalar(obj)
+                arrayfun(@(x) setFile(x, fileName, filePath), obj);
+                return
+            end
+
             fPath = obj.getHomeDirectory();
             if ~isempty(fPath)
                 filePath = erase(filePath, fPath);
@@ -353,6 +392,12 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   removeFile(obj, fileName)
             % -------------------------------------------------------------
+
+            if ~isscalar(obj)
+                arrayfun(@(x) removeFile(x, fileName), obj);
+                return
+            end
+
             if obj.hasFile(fileName)
                 remove(obj.files, fileName);
             end
@@ -377,6 +422,12 @@ classdef (Abstract) Entity < handle
                 errorType = ErrorTypes.ERROR;
             else
                 errorType = ErrorTypes.init(errorType);
+            end
+
+            if ~isscalar(obj)
+                fileValue = aod.util.arrayfun(@(x) getFile(x, fileName, ErrorTypes.NONE), obj);
+                fileValue = string(fileValue);
+                return
             end
 
             if obj.hasFile(fileName)
@@ -408,11 +459,18 @@ classdef (Abstract) Entity < handle
             % Notes:
             %   Optional inputs are passed to getFile()
             % -------------------------------------------------------------
+
+            if ~isscalar(obj)
+                fileValue = arrayfun(@(x) getExptFile(x, fileName, varargin{:}), obj);
+                return
+            end
+
             fPath = obj.getHomeDirectory();
             if isempty(fPath)
                 error("getExptFile:NoHomeDirectory",...
                     "Add entity to experiment to use getExptFile");
             end
+            
 
             fileValue = obj.getFile(fileName, varargin{:});
             if isempty(fileValue)
@@ -432,7 +490,7 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   out = getHomeDirectory(obj)
             % -------------------------------------------------------------
-            h = ancestor(obj, 'aod.core.Experiment');
+            h = ancestor(obj(1), 'aod.core.Experiment');
             if ~isempty(h)
                 out = h.homeDirectory;
             else

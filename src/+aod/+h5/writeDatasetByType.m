@@ -3,7 +3,7 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
 %
 % Supported data types:
 %   datetime, char, numeric, logical, table, timetable, string, duration
-%   enum, affine2d, imref2d, simtform2d
+%   enum, affine2d, imref2d, simtform2d, cfit
 % -------------------------------------------------------------------------
 
     arguments
@@ -114,6 +114,17 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
                 'ImageExtentInWorldY', data.ImageExtentInWorldY,...
                 'YIntrinsicLimits', data.YIntrinsicLimits,...
                 'XIntrinsicLimits', data.XIntrinsicLimits);
+        case 'cfit'
+            coeffNames = string(coeffnames(data));
+            coeffValues = [];
+            for i = 1:numel(coeffNames)
+                coeffValues = cat(2, coeffValues, data.(coeffNames(i)));
+            end
+            HDF5.makeTextDataset(fileName, pathName, dsetName,...
+                [fitType, ' ', fit]);
+            HDF5.writeatts(fileName, fullPath, 'Class', class(data),...
+                'FitType', fitType,...
+                'Coefficients', coeffValues);
         otherwise
             success = false;
     end

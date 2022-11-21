@@ -3,7 +3,7 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
 %
 % Supported data types:
 %   datetime, char, numeric, logical, table, timetable, string, duration
-%   enum, affine2d, imref2d, simtform2d
+%   enum, affine2d, imref2d, simtform2d, cfit
 % -------------------------------------------------------------------------
     import aod.h5.HDF5
 
@@ -97,6 +97,11 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
                 return
             end
             out = imref2d(imageSize);
+        case 'cfit'
+            coeffValues = h5readatt(hdfName, fullPath, 'CoeffValues');
+            fitType = h5readatt(hdfName, fullPath, 'FitType');
+            ft = fittype(fitType);
+            out = cfit(ft, coeffValues(:));
         otherwise
             out = data;
     end

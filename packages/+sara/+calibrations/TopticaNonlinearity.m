@@ -28,7 +28,7 @@ classdef TopticaNonlinearity < aod.core.Calibration
         laserLine
     end
 
-    properties (Access = private)
+    properties (SetAccess = private)
         fitFcn
     end
 
