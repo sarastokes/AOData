@@ -10,9 +10,6 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = Channel(name, varargin)
 %
-% Parameters:
-%   DataFolder                  char, folder for the channel's data
-%
 % Properties:
 %   Devices                     container for all devices in channel
 %
@@ -27,14 +24,13 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Channel(name, varargin)
+        function obj = Channel(name)
+            % CHANNEL
+            %
+            % Description:
+            %   
+            % -------------------------------------------------------------
             obj = obj@aod.core.Entity(name);
-
-            ip = aod.util.InputParser();
-            addParameter(ip, 'DataFolder', '', @ischar);
-            parse(ip, varargin{:});
-
-            obj.setParam(ip.Results);
         end
     end
     
@@ -77,16 +73,6 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   clearDevices(obj)
             % -------------------------------------------------------------
             obj.Devices = [];
-        end
-
-        function setDataFolder(obj, folderName)
-            % SETDATAFOLDER
-            %
-            % Syntax:
-            %   setDataFolder(obj, folderName)
-            % -------------------------------------------------------------
-            assert(istext(folderName), 'Data folder must be string or char');
-            obj.setParam('DataFolder', folderName);
         end
 
         function assignUUID(obj, UUID)

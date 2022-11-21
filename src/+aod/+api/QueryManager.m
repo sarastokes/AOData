@@ -61,6 +61,7 @@ classdef QueryManager < handle
             end
 
             obj.Filters = cat(1, obj.Filters, filterObj);
+            addlistener(filterObj, 'FilterResetIndex', @(h,d)obj.onFilterResetIndex);
             obj.applyFilters();
         end
 
@@ -90,6 +91,9 @@ classdef QueryManager < handle
 
         function removeFilter(obj, ID)
             % REMOVEFILTERS
+            %
+            % Description:
+            %   Remove a specific filter by index
             %
             % Syntax:
             %   removeFilter(obj, ID)
@@ -135,6 +139,15 @@ classdef QueryManager < handle
             for i = 1:numel(obj.Filters)
                 obj.filterIdx = obj.filterIdx & obj.Filters(i).filterIdx;
             end
+        end
+    end
+
+    % Callbacks
+    methods (Access = private)
+        function onFilterResetIndex(obj, src, ~)
+            % ONFILTERRESETINDEX
+            % -------------------------------------------------------------
+            assignin('base', 'src', src);
         end
     end
 end

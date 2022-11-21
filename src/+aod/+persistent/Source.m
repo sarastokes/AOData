@@ -38,11 +38,11 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
             % -------------------------------------------------------------
             arguments
                 obj
-                source      {mustBeA(source, 'aod.core.Source')}
+                entity      {mustBeA(entity, 'aod.core.Source')}
             end
 
-            source.setParent(obj);
-            obj.addEntity(source);
+            entity.setParent(obj);
+            obj.addEntity(entity);
         end
     end
 

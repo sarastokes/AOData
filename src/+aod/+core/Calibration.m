@@ -4,14 +4,31 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Description:
 %   A calibration associated with the system or experiment
 %
-% Constructor:
-%   obj = aod.core.Calibration(name, calibrationDate)
-%
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
+% -------------------------------------------------------------------------
+%
+% Constructor:
+%   obj = aod.core.Calibration(name, calibrationDate)
+%   obj = aod.core.Calibration(name, calibrationDate,...
+%       'Administrator', 'AdministratorName')
+%
+% Inputs:
+%   name                    char/string
+%       Calibration name
+%   calibrationDate         datetime or text (format YYYYmmmDD)
+%       Date the calibration was performed
+% Optional key/value inputs:
+%   Administrator           char/string
+%       Who performed the calibration
+%
+% -------------------------------------------------------------------------
 % Properties:
 %   calibrationDate         date calibration was performed (yyyyMMdd)
+%
+% Parameters:
+%   Administrator           who performed the calibration
 %
 % Sealed methods:
 %   setCalibrationDate(obj, calibrationDate)
@@ -26,17 +43,49 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Calibration(name, calibrationDate)
+        function obj = Calibration(name, calibrationDate, varargin)
+            % CALIBRATION
+            %
+            % Description:
+            %   A measurement associated a system or experiment
+            %
+            % Constructor:
+            %   obj = aod.core.Calibration(name, calibrationDate)
+            %   obj = aod.core.Calibration(name, calibrationDate,...
+            %       'Administrator', 'AdministratorName')
+            %
+            % Inputs:
+            %   name                    char/string
+            %       Calibration name
+            %   calibrationDate         datetime or text (format yyyyMMdd)
+            %       Date the calibration was performed
+            % Optional key/value inputs:
+            %   Administrator           char/string
+            %       Who performed the calibration
+            % -------------------------------------------------------------
             obj = obj@aod.core.Entity(name);
             
             if nargin > 1 && ~isempty(calibrationDate)
                 obj.setCalibrationDate(calibrationDate);
             end
+
+            ip = aod.util.InputParser();
+            addParameter(ip, 'Administrator', [], @istext);
+            parse(ip, varargin{:})
+            obj.setParam('Administrator', ip.Results.Administrator);
         end
     end
 
     methods (Sealed)
         function setTarget(obj, target)
+            % SETTARGET
+            %
+            % Description:
+            %   Set the system, channel or device being calibrated
+            %
+            % Syntax:
+            %   setTarget(obj, target)
+            % -------------------------------------------------------------
             import aod.core.EntityTypes
             entityType = EntityTypes.get(target);
             

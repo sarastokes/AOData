@@ -39,3 +39,4 @@
 
 ##### Documentation
 - [x] Handle class
+- [ ] Date formats

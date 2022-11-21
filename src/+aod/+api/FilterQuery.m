@@ -1,5 +1,5 @@
-classdef FilterQuery < handle & matlab.mixin.Heterogeneous
-% FILTERQUERY
+classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
+% FILTERQUERY (Abstract)
 %
 % Description:
 %   Parent class for filtering entities in an AOData HDF5 file
@@ -32,7 +32,7 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
     end
 
     events
-        FilterReset
+        FilterResetIndex
     end
 
     methods (Abstract)
@@ -41,6 +41,14 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
 
     methods 
         function obj = FilterQuery(hdfName)
+            % FILTERQUERY
+            %
+            % Constructor:
+            %   obj = FilterQuery(hdfName)
+            %
+            % Inputs:
+            %   hdfName             HDF5 file name and path
+            % -------------------------------------------------------------
             if nargin == 0
                 return
             end
@@ -79,12 +87,22 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
             %   resetFilterIdx(i)
             % -------------------------------------------------------------
             obj.filterIdx = false(size(obj.allGroupNames));
-            notify(obj, 'FilterReset');
+            notify(obj, 'FilterResetIndex');
         end
     end
 
     methods (Access = ?aod.api.QueryManager)
         function setFilterIdx(obj, idx)
+            % SETFILTERIDX
+            %
+            % Description:
+            %   Allows QueryManager to supply filterIdx obtained from 
+            %   filters ahead of current FilterQuery obj in queue to 
+            %   reduce computational load
+            %
+            % Syntax:
+            %   setFilterIdx(obj, idx) 
+            % -------------------------------------------------------------
             assert(numel(idx) == obj.filterIdx,...
                 'The provided filter is the wrong size!');
             obj.filterIdx = idx;
@@ -93,6 +111,14 @@ classdef FilterQuery < handle & matlab.mixin.Heterogeneous
 
     methods (Access = private)
         function populateGroupNames(obj)
+            % POPULATEGROUPNAMES
+            %
+            % Description:
+            %   Creates a string array of all groups in the HDF5 file(s)
+            %
+            % Syntax:
+            %   populateGroupNames(obj)
+            % -------------------------------------------------------------
             names = aod.h5.HDF5.collectGroups(obj.hdfName);
             containerNames = aod.core.EntityTypes.allContainerNames();
             for i = 1:numel(containerNames)

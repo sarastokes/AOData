@@ -12,12 +12,13 @@ classdef HDFTest < matlab.unittest.TestCase
 % -------------------------------------------------------------------------
 
     properties
-        HDF_FILE = fullfile(getpref('AOData', 'BasePackage'), 'test\\test.h5');
+        HDF_FILE = [fullfile(getpref('AOData', 'BasePackage'),...
+            filesep, 'test', filesep, 'test.h5')];
     end
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            fileID = H5F.create(testCase.HDF_FILE);
+            fileID = H5F.create(testCase.HDF_FILE, 'H5F_ACC_TRUNC');
             H5F.close(fileID);
         end
     end

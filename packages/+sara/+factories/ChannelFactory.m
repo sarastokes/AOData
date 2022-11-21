@@ -21,8 +21,8 @@ classdef ChannelFactory < aod.util.Factory
 
             switch channelName 
                 case 'ReflectanceImaging'
-                    channel = aod.core.Channel('ReflectanceImaging',...
-                        'DataFolder', 'Ref');
+                    channel = aod.core.Channel('ReflectanceImaging');
+                    channel.setParam('DataFolder', 'Ref');
                     channel.add(aod.builtin.devices.LightSource( 796,...
                         'Manufacturer', 'SuperLum'));
                     if ~isempty(pinhole) && pinhole ~= 20
@@ -38,7 +38,7 @@ classdef ChannelFactory < aod.util.Factory
                         'Manufacturer', 'QPhotonics'));
                 case 'MustangImaging'
                     channel = aod.core.Channel('MustangImaging');
-                    channel.setDataFolder('Vis');
+                    channel.setParam('DataFolder', 'Vis');
                     channel.add(aod.builtin.devices.LightSource(488,...
                         'Manufacturer', 'Qioptiq'));
                     channel.add(aod.builtin.devices.BandpassFilter(520, 15));
@@ -49,7 +49,7 @@ classdef ChannelFactory < aod.util.Factory
                     end
                 case 'TopticaImaging'
                     channel = aod.core.Channel('TopticaImaging');
-                    channel.setDataFolder('Vis');
+                    channel.setParam('DataFolder', 'Vis');
                     channel.add(sara.devices.Toptica(topticaLine));
                     channel.add(aod.builtin.devices.PMT('VisiblePMT',...
                         'Manufacturer', 'Hamamatsu', 'Model', 'H16722'));

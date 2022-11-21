@@ -2,10 +2,14 @@ classdef FilterTypes
 
     enumeration
         ENTITY
-        CLASS
-        NAME
         PARAMETER
         DATASET
+        LINK
+
+        % Convenience subclasses of the above filters
+        CLASS
+        NAME
+        PARENT
     end
 
     methods
@@ -15,14 +19,16 @@ classdef FilterTypes
             switch obj
                 case FilterTypes.ENTITY
                     out = str2func('aod.api.EntityFitler');
-                case FilterTypes.CLASS
-                    out = str2func('aod.api.ClassFilter');
-                case FilterTypes.NAME
-                    out = str2func('aod.api.NameFilter');
                 case FilterTypes.PARAMETER
                     out = str2func('aod.api.ParameterFilter');
                 case FilterTypes.DATASET
                     out = str2func('aod.api.DatasetFilter');
+                case FilterTypes.LINK
+                    out = str2func('aod.api.LinkFilter');
+                case FilterTypes.CLASS
+                    out = str2func('aod.api.ClassFilter');
+                case FilterTypes.NAME
+                    out = str2func('aod.api.NameFilter');
             end
         end
     end
@@ -34,14 +40,18 @@ classdef FilterTypes
             switch lower(filterType)
                 case 'entity'
                     obj = FilterTypes.ENTITY;
-                case 'class'
-                    obj = FilterTypes.CLASS;
                 case 'parameter'
                     obj = FilterTypes.PARAMETER;
-                case 'name'
-                    obj = FilterTypes.NAME;
                 case 'dataset'
                     obj = FilterTypes.DATASET;
+                case 'link'
+                    obj = FilterTypes.LINK;
+                case 'class'
+                    obj = FilterTypes.CLASS;
+                case 'name'
+                    obj = FilterTypes.NAME;
+                case 'parent'
+                    obj = FilterTypes.PARENT;
             end
 
             if nargin > 1

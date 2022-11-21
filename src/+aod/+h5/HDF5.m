@@ -667,6 +667,31 @@ classdef HDF5 < handle
 
     % Link methods
     methods (Static)
+        function linkNames = collectAllSoftlinks(hdfName)
+            % COLLECTALLSOFTLINKS
+            %
+            % Description:
+            %   Returns all soft link names
+            %
+            % Syntax:
+            %   linkNames = collectAllSoftlinks(hdfName)
+            %
+            % Inputs:
+            %   hdfName         HDF file name or H5ML.id
+            % -------------------------------------------------------------
+            
+            if ~isa(hdfName, 'H5ML.id')
+                rootID = aod.h5.HDF5.openFile(hdfName, true);
+                rootIDx = onCleanup(@()H5F.close(rootID));
+            else
+                rootID = hdfName;
+            end
+            
+            linkNames = string.empty();
+            [~, linkNames] = H5L.visit(rootID, 'H5_INDEX_NAME',...
+                'H5_ITER_NATIVE', @softlinkVisitFcn, linkNames);
+        end
+
         function createLink(fileName, targetPath, linkPath, linkName)
             % CREATELINK 
             %
@@ -891,6 +916,33 @@ classdef HDF5 < handle
 
             idx = strfind(pathName, '/');
             lastName = pathName(idx(end)+1:end);
+        end
+
+        function [path, name] = splitPath(pathName)
+            % SPLITPATH
+            %
+            % Description:
+            %   Splits the final name from the rest of the path
+            %
+            % Syntax:
+            %   [path, name] = splitPath(pathName)
+            %
+            % See also:
+            %   aod.h5.HDF5.getPathEnd
+            %   aod.h5.HDF5.getPathParent
+            % -------------------------------------------------------------
+            arguments
+                pathName            char 
+            end
+
+            idx = strfind(pathName, '/');
+            if isempty(idx)
+                path = '/';
+                name = pathName;
+            else
+                name = pathName(idx(end)+1:end);
+                ath = pathName(1:idx(1));
+            end
         end
 
         function out = getPathOrder(pathName)

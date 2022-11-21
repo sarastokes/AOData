@@ -679,20 +679,19 @@ obj = aod.core.System(name)
 		
 		\begin{lstlisting}[language=matlab]
 obj = aod.core.Channel(name)
-obj = aod.core.Channel(name, 'DataFolder', value)
 		\end{lstlisting}
 		
 		\docheader{Properties:}
 		\begin{itemize}
 			\item \aodprop{Devices} - container for all \aodclass{aod.core.Device}s within the Channel
 		\end{itemize}
-		\docheader{Parameters:}
-		\begin{itemize}
-			\item \aodparam{DataFolder} - optional, folder name within experiment file where channel's data was written
-		\end{itemize}
+		%\docheader{Parameters:}
+		%\begin{itemize}
+		%	\item \aodparam{DataFolder} - optional, folder name within experiment file where channel's data was written
+		%\end{itemize}
 		\docheader{Sealed Methods:}
 		\begin{itemize}
-			\item \aodfcn{setDataFolder(obj, dataFolder)}
+			% \item \aodfcn{setDataFolder(obj, dataFolder)}
 			\item \aodfcn{add(obj, device)} - Add a Device to the channel
 			\item \aodfcn{removeDevice(obj, ID)}
 			\item \aodfcn{clearDevices(obj)}
@@ -897,7 +896,6 @@ obj = aod.core.Source(name, parent)
 system = aod.core.System('systemName');
 
 channel = aod.core.Channel('channelName');
-channel = aod.core.Channel('channelName', 'DataFolder', 'folderName')
 
 device = aod.core.Device('name');
 device = aod.core.Device('name', 'Manufacturer', manufacturerName, 'Model', modelName);

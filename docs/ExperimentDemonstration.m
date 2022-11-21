@@ -4,9 +4,9 @@ experiment = aod.core.Experiment('DemoExperiment', aoFolder, '20220825');
 experiment.setDescription('AOData demonstration');
 
 % Create a system
-system = aod.core.System('Fluorescence', 'DataFolderName', 'Vis'); 
-% Add a parameter (written as an attribute of the system's HDF5 group)
-system.addParam('LastAlignment', '20220908');
+system = aod.core.System('Fluorescence'); 
+% Add parameters (written as an attribute of the system's HDF5 group)
+system.addParam('DataFolder', 'Vis', 'LastAlignment', '20220908');
 experiment.add(system);
 
 % Create a channel and associated devices
