@@ -238,36 +238,45 @@ pic me set={file}{file},
 		
 \section{Getting Started}
 	\subsection{Installation}
+        \subsubsection{Downloading AOData}
 		\noindent You can get the latest version of the AOData on Github: \myurl{https://github.com/sarastokes/ao-data-tools}. Download \myurl{\href{https://git-scm.com/}{git}} if you do not have it already, then go to the folder you want to clone AOData into. Right click and select "Git Bash". Then type in:
 		\begin{lstlisting}[language=bash]
 git clone https://github.com/sarastokes/AOData --recurse-submodules
 		\end{lstlisting}
 		
-		\noindent Add the folder and all the subfolders to your MATLAB path with:
-		\begin{lstlisting}[language=matlab]
-addpath(genpath('yourfilepath/ao-data-tools'))
-		\end{lstlisting} 
-		I would strongly recommend installing \myurl{\href{https://git-scm.com/}{git}} and using that to clone the repository. There are many reasons for using git but here are a few relevant ones:
+		\noindent I would strongly recommend using git. In case you are not familiar, there are many reasons for using git but here are a few relevant ones:
 		\begin{itemize}
 			\item You can easily keep up-to-date with changes to AOData. You will undoubtedly have feedback and suggestions that I will want to implement. If I update the repository accordingly, you can update your local copy with a single command.
 			\item If you consistently track your own code with git, you don't have to worry about backwards compatibility issues. If you, for example, change the inputs to a function, your earlier analysis code calling that function will no longer work. Avoiding changing your functions when those changes are warranted isn't great either. If you want to repeat that analysis later and have been tracking your code with git, you can just roll back your repository and run it as it existed at the time you did your analysis. 
 		\end{itemize}
-		%I'm happy to help get you started with git - 
 		Long story short: it won't take you long to get going with git and it'll make your life infinitely easier in the future. 
 		If you're still not convinced, you can click on the green button labeled Code at the URL above and download the code as a zip file. 
+
+        \subsubsection{Starting AOData in MATLAB}
+		\noindent Add the folder and all the subfolders to your MATLAB path with:
+		\begin{lstlisting}[language=matlab]
+addpath(genpath('yourfilepath/ao-data-tools'));
+		\end{lstlisting} 
+        You will need to add AOData to your MATLAB path every time you open MATLAB. If you intend to use AOData frequently and want to avoid this, add the above line to your startup file If you do not have one, create a file called \texttt{startup.m} in the ``MATLAB'' folder that is created within Documents when you download MATLAB. This file will run every time you start up MATLAB. 
+        \begin{lstlisting}[language=matlab]
+initializeAOData();
+        \end{lstlisting}
+        You only need to initialize AOData once. Rerun this if you move the location of the AOData folder on your computer. This function stores information about AOData's location on your computer in MATLAB's user preferences. After completion it opens \aodfcn{SearchPathApp}. If you are using any user-defined AOData packages, add them. This is an important step because AOData If you create a new package after initialization, you can return 
+        \\$\quad$\\ 
 	
 	\subsection{Dependencies}
-		\noindent You will need MATLAB to create the initial data files for your experiment. The code is tested on MATLAB 2022a with both PC and Mac; beyond that all bets are off. Once the HDF5 file is created, you can take it to any language that can read an HDF5 file (I don't know of a language that doesn't read HDF5 files). The base code does not require any additional MATLAB toolboxes. 
+		\noindent You will need MATLAB to create the initial data files for your experiment. The code is tested on MATLAB 2022n with both PC and Mac; beyond that all bets are off. The base AOData code does not require any additional MATLAB toolboxes. Once the HDF5 file is created, you can use it in any programming language that can read an HDF5 file (virtually all major programming languages support HDF5). % AODataViewer
 		
-		Parts of the example package require the Signal Processing, Image Processing and Symbolic Math toolboxes. A few classes require open-source code bases that were too large/specialized to merit packaging with AOData: \myurl{\href{https://github.com/Psychtoolbox-3/Psychtoolbox-3}{Psychtoolbox}}, \myurl{\href{https://github.com/spitschan/SilentSubstitutionToolbox}{Silent Substitution Toolbox}} and \myurl{\href{https://github.com/Stage-VSS/stage}{Stage-VSS}}. 
+		%Parts of the example package require the Signal Processing, Image Processing and Symbolic Math toolboxes. A few classes require open-source code bases that were too large/specialized to merit packaging with AOData: \myurl{\href{https://github.com/Psychtoolbox-3/Psychtoolbox-3}{Psychtoolbox}}, \myurl{\href{https://github.com/spitschan/SilentSubstitutionToolbox}{Silent Substitution Toolbox}} and \myurl{\href{https://github.com/Stage-VSS/stage}{Stage-VSS}}. 
 		
-		Code I didn't write myself is included in the \texttt{lib} folder and typically includes credit in the documentation. There are some miscellaneous functions, as well as three toolboxes: \myurl{\href{https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab-a-toolbox-to-encode-decode-json-files?s_tid=ta_fx_results}{JSONlab 2.0}}, \myurl{\href{https://github.com/DylanMuir/ReadImageJROI}{ReadImageJROI}} and \myurl{\href{https://github.com/cafarm/appbox}{appbox}}. 
+		Code I didn't write myself is included in the \texttt{lib} folder. There are some miscellaneous functions (usually the authors have their information in the documentation), as well as three toolboxes: \myurl{\href{https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab-a-toolbox-to-encode-decode-json-files?s_tid=ta_fx_results}{JSONlab 2.0}}, \myurl{\href{https://github.com/DylanMuir/ReadImageJROI}{ReadImageJROI}} and \myurl{\href{https://github.com/cafarm/appbox}{appbox}}. 
 	 
 
 \section{Framework}\label{section:Framework}
-	\noindent An overview of the persistent hierarchy is shown below. Each item in the list corresponds to a core class in AOData. These classes aren't meant to be used as is and they probably can't as they don't contain any implementation that could limit their use. The idea is that it's always easier to add code than to change core code (which undoubtedly causes side-effects). 
+	\noindent An overview of the AOData object model is shown below. Each item in the list corresponds to a core class in AOData. These classes aren't meant to be used as is and they probably can't as they don't contain any implementation that could limit their use. The idea is that it's always easier to add code than to change core code (which undoubtedly causes side-effects and backwards-compatibility issues). 
 	
-	Instead, they establish the components of an experiment, the organization of those components within an experiment and the relationships between them. They are meant to be as generic and flexible as possible rather than specialized for a specific purpose (like physiology experiments in primates on a specific system). The messy details of reading/writing to HDF5 files is also handled so you don't have to worry about that as long as you're using standard MATLAB data types. 
+	Instead, they establish the components of an experiment, the organization of those components within an experiment and the relationships between them. They are meant to be as generic and flexible as possible rather than specialized for a specific purpose (like physiology experiments in primates on a specific system). 
+    %The messy details of reading/writing to HDF5 files is also handled so you don't have to worry about that as long as you're using standard MATLAB data types. 
 	\\$\quad$\\
 	\textbf{Experiment}
 	\begin{itemize}
@@ -294,15 +303,32 @@ addpath(genpath('yourfilepath/ao-data-tools'))
 		\item Analysis
 	\end{itemize}
 	$\quad$\\
-	You will need to subclass these and customize them to your experiment. By inheriting the organization established by these components means your code will also inherit their benefits. It also means that anyone familiar with the basic framework can look at your code and understand what is going on, without reading the code itself.
+    A note on terminology: Throughout the documentation, the components of the AOData object model are referred  as entities. For example, Epoch and Calibration are both \textit{entities} and ``Epoch'' and ``Calibration'' are their \textit{entity types}. This is done for clarity; object-oriented programming is used extensively in AOData and it would be confusing not to distinguish the core AOData objects from other types of objects. Technically speaking though, in the MATLAB implementation, Calibration, Epoch, etc. truly are entities because they inherit from a superclass called Entity, which ensures they all behave in the same way. 
+
+	You will need to subclass these to customize them for your experiments. By using the AOData object model, your code will inheriting the organization established by these components. It also means that anyone familiar with the basic framework can look at your code and understand what is going on, without reading the code itself.
+
+\section{Using AOData's Documentation}
+	\label{section:DocInfo}
+	\noindent AOData contains extensive documentation within the class and function files and that is the authoritative source for understanding how to use AOData's code. For any function or class, you obtain help by typing in one of the two commands:
+    \begin{lstlisting}[language=matlab]
+% For help on a function or class 
+doc functionName
+doc className
+% For help on a class method (a function within a class)
+doc className/functionName
+    \end{lstlisting}
+    If you don't want the full documentation and instead just want to quickly know how to use something, you can exchange \texttt{doc} with \texttt{help} to print the core documentation to the command line.
+
+    
+    This documentation is meant to provide the other information about AOData: a high-level description of the software and details on implementation that would be difficult to discern without reading the full codebase. 
+	
+	A few conventions are used throughout the documentation. Classes are marked as \aodclass{MyClass}, properties of classes are marked as \aodprop{MyProperty}, functions are marked as \aodfcn{MyFunction()} and parameters are marked as \aodparam{MyParameter}. Miscellaneous code outside a code listing environment is marked as \texttt{MyCode}.
 	
 \section{Background}
 	\noindent A basic working knowledge of MATLAB is assumed. Some quick background on HDF5 files and MATLAB concepts that you might not find in an intro class or encounter in your own programming are explained below. 
-
-	A few conventions are used throughout the documentation. Classes are marked as \aodclass{MyClass}, properties of classes are marked as \aodprop{MyProperty}, functions are marked as \aodfcn{MyFunction()} and parameters are marked as \aodparam{MyParameter}. Miscellaneous code outside a code listing environment is marked as \texttt{MyCode}.
 	
 	\subsection{Packages}
-		Folders beginning with a plus sign are interpreted as \textbf{packages}. So to call Device in the file structure below, you need to use \aodclass{aod.core.Device}, not \aodclass{Device}. \\$\quad$\vspace{-2ex}\\
+		\noindent Folders beginning with a plus sign are interpreted as \textbf{packages}. So to call Device in the file structure below, you need to use \aodclass{aod.core.Device}, not \aodclass{Device}. \\$\quad$\vspace{-2ex}\\
 	
 	\begin{tikzpicture}[scale=0.95]
 		\draw[color=black!60!white]
@@ -332,17 +358,18 @@ clear import
 		
 		Classes have \textbf{properties}, \textbf{methods} and \textbf{events}. An imperfect analogy: a function gives you an unlabeled can of soup. A class gives you a can of soup with a label and nutrition facts (properties) along with a can opener, a microwave and a spoon (methods). When the soup expires you get a notification that it expired (event). 
 		
-		Once you know what the code is supposed to do, classes can be way easier than functions and scripts. If you aren't familiar with OOP, this will be the biggest learning curve for using AOData. Below I describe some of the key concepts of OOP. I won't thoroughly explain them, just address their benefits as motivation for taking the time to learn more about OOP.
+		If you aren't familiar with OOP, this will be the biggest learning curve for using AOData. The tutorials have information on how to use object-oriented programming within the context of AOData and there are also resources listed in \ref{section:CodeDoc}.  
+		
+		Once you know what the code is supposed to do, classes can be way easier than functions and scripts.  Below I describe some of the key concepts of OOP, because they are also key benefits of taking the time to learn more about OOP.
 		\begin{enumerate}
-			\item \textbf{Polymorphism:} For example when you can concatenate \aodclass{char} and \aodclass{double} in MATLAB, you use the same function, \aodfcn{cat()}. This is because both classes define a \aodfcn{cat()} method. Without classes, this would require two separate functions, \aodfcn{concatenateDouble()} and \aodfcn{concatenateChar()}. So classes standardize behavior and make code way easier to write and remember. % consistent interface
+			\item \textbf{Polymorphism:} For example when you can concatenate \aodclass{char} and \aodclass{double} in MATLAB, you use the same function, \aodfcn{cat()}. This is because both classes define a \aodfcn{cat()} method. Without classes, this would require two separate functions with different names, \aodfcn{concatenateDouble()} and \aodfcn{concatenateChar()}. So classes standardize behavior and make code way easier to write and remember. % consistent interface
 			\item \textbf{Inheritance:}
 			\item \textbf{Encapsulation:}
-			\item \textbf{Abstraction:} OOP allows you to hide complicated code from end-users and build a simple, easy interface for interacting with that code base. 
+			\item \textbf{Abstraction:} OOP allows you to hide complicated code from end-users and build a simple, easy interface for interacting with that code base. Keep in mind, you are your own ``end-user'' -- you may understand everything about a piece of code when you first write it, but in a few months or years when those details are no longer fresh in your memory, you will be the chief beneficiary of the simple, easy interface.
 		\end{enumerate}
 		
 		To get started, you will want to be familiar with constructors, property and method specification, how access is specified and how inheritance works. You will also want to be comfortable with Static methods and Dependent properties. You can wait on other topics and learn about them as they become relevant. 
-		MATLAB's documentation and particularly their examples that demonstrate building classes are worthwhile. A few more resources: an intuitive explanation from the Sampath lab that's particularly strong with inheritance (\myurl{\href{https://github.com/sampath-lab-ucla/MATLAB_Resources/blob/master/Introduction_08_OOP.m}{here}}). 
-		
+		MATLAB's documentation and particularly their examples that demonstrate building classes are worthwhile. A few more resources: an intuitive explanation from the Sampath lab that's particularly strong with inheritance (\myurl{\href{https://github.com/sampath-lab-ucla/MATLAB_Resources/blob/master/Introduction_08_OOP.m}{here}}). 		
 	\subsection{HDF5 Files} \label{subsection:HDF5_Intro}
 		\noindent A processed experiment from AOData is written as \href{https://portal.hdfgroup.org/display/support}{\myurl{Hierarchical Data Format (HDF)}} file (specifically HDF5, the newest version). The file format was initially developed by the US National Center for Supercomputing Applications and is now supported by the HDF Group, a non-profit committed to ensuring continued development and accessibility of HDF. An intuitive high-level explanation can be found \myurl{\href{https://www.neonscience.org/resources/learning-hub/tutorials/about-hdf5}{here}}.			
 		\subsubsection{Benefits of HDF5}
@@ -362,17 +389,17 @@ clear import
 			\end{figure}
 	
 		\subsubsection{Components of an HDF5 File}	
-			\noindent The two main aspects of an HDF5 file are \textbf{groups} and \textbf{datasets}. In addition there are \textbf{attributes} that can be attached to groups and datasets. A cool
+			\noindent The two main aspects of an HDF5 file are \textbf{groups} and \textbf{datasets}. In addition there are \textbf{attributes} that can be attached to groups and datasets.
 			\begin{itemize}
 				\item \textbf{Groups} define organization within the file and can optionally have associated metadata (attributes). Every HDF5 file contains a root group that can contain datasets or other groups. Working with groups is similar to working with directories and files in UNIX. For example: \texttt{/} is the root group, \texttt{/foo} is a member of the root group called \texttt{foo}, \texttt{.} signifies the specified file, group or object.\\
 			Each instance of the core classes in the AOData framework (see \myurl{\ref{section:Framework}} on ``Framework'') above are written as a group in the HDF5 file. 
 			%\\$\quad$\\
-				\item \textbf{Datasets} organize and contain ``raw'' data values. A dataset consists of the data itself and metadata (attributes) that describes the data. Most MATLAB data types have a comparable HDF5 datatype, with two exceptions - multi-level structures (a \aodclass{struct} where one or more fields is another \aodclass{struct}) and \aodclass{containers.Map}. 
+				\item \textbf{Datasets} organize and contain ``raw'' data values. A dataset consists of the data itself and metadata (attributes) that describes the data. Most MATLAB data types have a comparable HDF5 datatype, with one exception - multi-level structures (a \aodclass{struct} where one or more fields is another \aodclass{struct} or another compound datatype like \aodclass{table} or \aodclass{containers.Map}). The details of conversion to HDF5 datatype are discussed in \ref{section:HDF5_Details}. 
 			%\\$\quad$\\
 				\item \textbf{Attributes} can optionally be associated with HDF5 objects. They have two parts: a \textit{name} and a \textit{value}. Typically an attribute is small and contains metadata about the object it is attached to, either a group or a dataset. 
 			%\\$\quad$\\
 				\item \textbf{References} are low-level pointers to other objects. They can be stored and retrieved as data, created as an attribute or an entire dataset of reference type. 
-				There are two types of references, the first is used often in AOData.
+				There are two types of references, the first is used often in AOData for links between entities.
 				\begin{enumerate}
 					\item \textit{Object references} point to a particular object in a file, either a dataset or a named datatype. 
 					\item \textit{Region references} always point to a dataset and additionally contain info about a certain selection (\textit{dataset region}) on that dataset. %For example, you could specify a region of interest and store it as an attribute on the dataset
@@ -380,17 +407,22 @@ clear import
 			\end{itemize}
 		\subsubsection{Viewing HDF5 files}
 			\noindent A disadvantage of using HDF5 files is that they are binary and not human-readable (i.e. you can't pull the file up in a text editor and read it, like for a JSON file). Instead, you will need some sort of software to visualize the contents of an HDF file. The most commonly used is the HDF Group's \href{https://www.hdfgroup.org/downloads/hdfview/}{\myurl{HDFView}}. This is definitely worth installing. 
-			\\I also wrote a viewer for MATLAB that is designed around the AOData framework called \aodclass{H5TreeView}. 
+			\\
+			HDFView is very generic because HDF5 files can be very diverse. AOData HDF5 files are built around the AOData object model, which provides a predictable structure. 
+			I wrote \aodclass{AODataViewer} to be designed around the AOData framework. 
 			\begin{lstlisting}[language=matlab]
-	H5TreeView('myfile.h5');
+AODataViewer('myfile.h5');
 			\end{lstlisting}
-			There are a number of nice options if you're comfortable with Python, such as \href{https://github.com/ganymede42/h5pyViewer}{\myurl{h5pyViewer}} and \href{https://vitables.org}{\myurl{ViTables}}. Regardless of the language you intend to use, I recommend first looking through the files with \aodclass{H5TreeView} because it's designed to facilitate understanding the AOData framework.
+			There is also a standalone compiled version that does not require a MATLAB license: \textcolor{red}{link}.
+			
+			There are a number of nice options if you're comfortable with Python, such as \href{https://github.com/ganymede42/h5pyViewer}{\myurl{h5pyViewer}} and \href{https://vitables.org}{\myurl{ViTables}}. Regardless of the language you intend to use, I recommend first looking through the files with \aodclass{AODataViewer} because it's designed to facilitate understanding the AOData framework.
 			\\$\quad$\\
-			\noindent Understanding how AOData writes experiment data to an HDF5 file is described in \myurl{\ref{section:HDF5_Details}} on ``HDF5 File Details''. Groups are shown with folders and datasets are shown with files. Groups that are containers for multiple entities are italicized, the other groups correspond to entities. Checking out the example file will make this clearer.
+			\noindent \textcolor{red}{Figure here.} Understanding how AOData writes experiment data to an HDF5 file is described in \myurl{\ref{section:HDF5_Details}} on ``HDF5 File Details''. Groups are shown with folders and datasets are shown with files. Groups that are containers for multiple entities are italicized, the other groups correspond to entities. Checking out the example file will make this clearer.
 	\subsection{Advanced MATLAB Concepts}
-		\noindent This section has information on a few MATLAB-specific topics (other languages probably have similar things using different names) that aren't routinely covered in the introductory documentation but are critical to how AOData operates. \textit{You don't need to read and understand this prior to using AOData!} You may never need to deal with these directly; after all, the whole point of abstraction in the OOP section is that complicated behind the scenes code is handled and kept hidden from end-users. At some point though as you work with AOData, you might have questions about these topics and can circle back to the information below:
+		\noindent This section has information on a few MATLAB-specific topics (other languages probably have similar things using different names) that aren't routinely covered in the introductory documentation but are critical to how AOData operates. \textit{You don't need to read and understand this prior to using AOData!} You may never need to deal with these directly; after all, the whole point of abstraction in \ref{subsection:OOP} is that complicated behind-the-scenes code is handled and kept hidden from end-users. 
+		At some point though as you work with AOData, you might have questions about these topics and can circle back to the information below:
 	\subsubsection{Handle vs. Value Classes}\label{subsubsection:HandleValue}
-		\noindent When you work with \matclass{char} and \matclass{double}, you are working with value classes. 
+		\noindent When you work with \matclass{char} and \matclass{double}, you are working with \underline{value classes}. 
 		\begin{lstlisting}[language=matlab]
 % Create a double variable
 a = 3.14
@@ -401,7 +433,7 @@ b = 3.14159;
 % You have changed b, but not a
 disp([a, b])
 	\end{lstlisting}
-	\noindent By contrast, most classes in AOData are handle classes. Handle classes provide a ``handle'' to the object, which is stored only one in memory:
+	\noindent By contrast, most classes in AOData are \underline{handle classes}. Handle classes provide a ``handle'' to the object, which is stored only one in memory:
 	\begin{lstlisting}[language=matlab]
 % Create a standalone Device class. It's from ThorLabs but you don't remember the Model
 device1 = aod.core.Device([], 'Manufacturer', 'ThorLabs', 'Model', 'idk');
@@ -428,25 +460,30 @@ disp(channel.Devices.parameters)
 		\end{lstlisting}
 		%See MATLAB's documentation on \href{https://www.mathworks.com/help/matlab/matlab_oop/comparing-handle-and-value-classes.html}{\myurl{Comparison of Handle and Value Classes}} for more information.
 	
-	\subsubsection{matlab.mixin.Heterogeneous}\label{subsubsection:Heterogeneous}
+	\subsubsection{matlab.mixin.Heterogeneous}
+		\label{subsubsection:Heterogeneous}
 		\noindent When you create custom classes in MATLAB, you can only concatenate members of the same class. This gets annoying when you have multiple subclasses of one of your custom classes and want to make them into an array (which we do for all containers). By subclassing \matclass{matlab.mixin.Heterogenous} in each core class (other than Entity), your subclasses of, for example, \aodclass{aod.core.Device} can be concatenated into an array. A quirk of using \matclass{matlab.mixin.Heterogeneous} is that all methods in the class subclassing it must be either \texttt{Sealed} or \texttt{Abstract}. You don't have to continue this practice when subclassing the core classes and do not need to declare inheritance again from \matclass{matlab.mixin.Heterogeneous}. Also, your classes cannot inherit two classes that use \matclass{matlab.mixin.Heterogeneous} (e.g. both Device and Channel), though I can't imagine why you would need to do that anyway.
-	\subsubsection{Enumerations}\label{subsubsection:Enum}
+	\subsubsection{Enumerations}
+		\label{subsubsection:Enum}
 		\noindent Enumerations are useful when you have a list of things and you want to standardize their behavior. MATLAB's documentation (see \myurl{\ref{section:CodeDoc}}) will do a better job describing this than I will, but two things are worth mentioning here. First, entity behavior is codified in an enumeration (\aodclass{aod.core.EntityTypes}). Second, you may want to include a static \aodfcn{init} method if you want to read back your own enumerations classes from HDF to MATLAB. You don't need to deal with enumerations to use AOData, but they can be helpful (for more examples see \aodclass{sara.EpochTypes} and \aodclass{sara.SpectralTypes}).	
+		
 	\subsubsection{Dynamic Properties}
 		\label{subsubsection:DynProps}
-		\noindent The MATLAB \aodclass{dynamicprops} class enables ad-hoc addition of properties to specific instances of a class (``instance properties''). 
+		\noindent The MATLAB \aodclass{dynamicprops} class enables ad-hoc addition of properties to specific instances of a class (often called ``instance properties'' in other programming languages). The advantage of dynamic properties is that they allow the persistent interface to adapt to customized subclasses of the core classes without any prior knowledge of said subclass (other than which entity type it is). 
 
 \section{Workflow}
 	\label{section:Workflow}
 	\noindent To use AOData for an experiment, you will follow the workflow below. 
 	\begin{enumerate}
-		\item Build your experiment in MATLAB using the Core Classes (see \myurl{\ref{section:CoreClasses}})
+		\item Define how your experiment will map to the AOData object model in MATLAB using the Core Interface (see \myurl{\ref{section:CoreInterface}}). Creating the subclasses will require an initial investment, after which users will only need to work in the core interface when changes are made to an experiment. 
+		\item Experiment specification file (example). 
 		\item Write your experiment to the HDF5 file with \aodfcn{aod.h5.writeExperimentToFile}.
-		\item Once you have the HDF5 file, you can continue your analysis in any language you would like. If you choose to use MATLAB for analysis, you will access your HDF5 file through the Persistent Classes (see \myurl{\ref{section:PersistentClasses}}). You can still make changes to the HDF5 file at this point and the techniques for doing so are defined below.
+		\item Once you have the HDF5 file, you can continue your analysis in any language you would like. If you choose to use MATLAB for analysis, you will access your HDF5 file through the Persistent Interface (see \myurl{\ref{section:PersistentInterface}}). You can still make changes to the HDF5 file at this point and the techniques for doing so are defined below.
 	\end{enumerate}
 	\noindent You will need to define subclasses of the core classes to define how exactly you want your experiment to be set up. This will require an initial investment of time to set the classes up. Once established, it is unlikely you will need to modify these unless you change up how you're performing your experiments (which can often mean different data types, metadata and/or parameters). 
-\section{Core Classes}
-	\label{section:CoreClasses}
+
+\section{Core Interface}
+	\label{section:CoreInterface}
 	\noindent This information is compiled here to serve as a single resource for core classes. It may not be the best gateway for learning about the core classes for the first time. If the documentation below seems like too much information, try to read through \myurl{\ref{subsection:EntityDoc}} on \aodclass{aod.core.Entity} and then read \myurl{\ref{subsection:ClassDesign}} on ``Class Design Principles'', before returning.  However, each class and function is thoroughly documented in the source code. For more detail on any aspect below, try using the \matfcn{help} command in MATLAB:
 	\begin{lstlisting}[language=matlab]
 % Get documentation for a class or function
@@ -497,7 +534,7 @@ obj = aod.core.Entity(name)
 		\end{itemize}
 		\docheader{Private Properties:} These are handled behind the scenes and average users shouldn't need to worry about them
 		\begin{itemize}
-			\item \aodprop{Parent} optional, another entity that the current entity falls under in the persistent hierarchy (e.g. the Parent for an Epoch is the Experiment). This is set when you add the entity to another entity using one of the add functions, like \aodfcn{addEpochs()} for \aodclass{aod.core.Experiment}.
+			\item \aodprop{Parent} optional, another entity that the current entity falls under in the  hierarchy (e.g. the Parent for an Epoch is the Experiment). This is set when you add the entity to another entity using \aodfcn{add()}.
 			\item \aodprop{UUID} - a randomly-generated unique identifier from \aodfcn{aod.util.generateUUID()}. Behind the scenes, these are used to search through entities and their HDF5 counterparts, providing a solution for indexing which is one of HDF5's larger shortcomings. See \myurl{\ref{subsubsection:EntityManager}} on \aodclass{aod.h5.EntityManager} for the solution.
 		\end{itemize}
 		\docheader{Dependent Properties:} 
@@ -509,6 +546,8 @@ obj = aod.core.Entity(name)
 			\item \aodfcn{setDescription(obj, txt)}
 			\item \aodfcn{addNote(obj, txt)}
 			\item \aodfcn{clearNotes(obj)}\\
+			%
+			\item \aodfcn{add(obj, entity)} - Add an entity\\
 			%
 			\item \aodfcn{tf = hasParam(obj, 'paramName')}
 			\item \aodfcn{addParam(obj, 'paramName', paramValue)} - add parameters as key/value pair(s) or a struct
@@ -522,7 +561,7 @@ obj = aod.core.Entity(name)
 			\item \aodfcn{removeFile(obj, fileKey)}\\
 			%
 			\item \aodfcn{fPath = getHomeDirectory(obj)} - once an entity has been added to the Experiment or to another entity that is added, this function will return the \aodprop{homeDirectory} of \aodclass{aod.core.Experiment}
-			\item \aodfcn{h = ancestor(obj, className)} - recursively searches \aodprop{Parent} to find an entity that that is a className or subclass of className 
+			\item \aodfcn{h = ancestor(obj, entityType)} - recursively searches \aodprop{Parent} to find an entity of the specified type. % find an entity that that is a className or subclass of className 
 		\end{itemize}
 		\docheader{Protected methods:}
 		\begin{itemize}
@@ -532,7 +571,7 @@ obj = aod.core.Entity(name)
 		\end{itemize}
 			
 	\subsection{aod.core.Experiment  \myparent{aod.core.Entity}}
-		\noindent The parent class for all other entities, containing everything associated with a specific experiment. Experiment is written first to the HDF5 file and the other entities are written in the order shown below.
+		\noindent The parent class for all other entities, containing everything associated with a specific experiment. Experiment is written first to the HDF5 file and the other entities are written in the order shown below. 
 			
 		\begin{lstlisting}[language=matlab]
 obj = aod.core.Experiment('name', experimentDate, 'homeDirectory')
@@ -542,12 +581,12 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 		\docheader{Properties:}
 		\begin{itemize}
 			\item \aodprop{homeDirectory} - file path to experiment folder
-			\item \aodprop{experimentDate} - date that the experiment occurred (YYYYMMDD)
+			\item \aodprop{experimentDate} - date that the experiment occurred (yyyyMMdd)
 			\item \aodprop{Analyses} - container for all Analyses within the Experiment
+			\item \aodprop{Calibrations} - container for all Calibrations within the Experiment
 			\item \aodprop{Epochs} - container for all Epochs within the Experiment
 			\item \aodprop{Sources} - container for all Sources within the Experiment
 			\item \aodprop{Segmentations} - container for all Segmentations within the Experiment
-			\item \aodprop{Calibrations} - container for all Calibrations within the Experiment
 			\item \aodprop{Systems} - container for all Systems within the Experiment
 		\end{itemize}		
 		\docheader{Dependent Properties:}
@@ -1010,8 +1049,8 @@ obj = aod.core.Protocol(calibration, varargin)
 			\item \texttt{CaseSensitive=false} - Having two parameters to the same class that are identical other than their case (e.g. \texttt{'MyParam'} and \texttt{'myparam'}) is bad practice and should never be done, so we might as well make the parsing case-insensitive.
 		\end{enumerate}
 
-\section{Persistent Classes}
-	\label{section:PersistentClasses}
+\section{Persistent Interface}
+	\label{section:PersistentInterface}
 	\noindent The largest investment for AOData tools is creating customized subclasses for writing the data into an HDF5 file. The interface for reading files back in requires no additional customization. Load your file in with:
 	\begin{lstlisting}[language=matlab]
 experiment = loadExperiment(hdfName);
@@ -1164,7 +1203,6 @@ T = table(obj);
 		
 		Every method of \aodclass{aod.h5.HDF5} is Static. There's no constructor or properties, it's just a collection of related functions in a single location. 
 	 
-	
 \section{Using AOData}
 	\subsection{Class Design Principles}\label{subsection:ClassDesign}
 		\noindent Before delving into the specifics of getting set up, first let's just take a general principles look at the design of just one of the classes, \aodclass{aod.core.Device}, and how it should be used. 

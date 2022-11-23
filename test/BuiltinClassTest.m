@@ -13,9 +13,9 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
     methods (Test)
         % DEVICES ---------------------------------------------------------
-        function testPinhole(testCase)
+        function testPinhole(testCase) %#ok<*MANU> 
             obj = aod.builtin.devices.Pinhole(25,... 
-                'Manufacturer', 'ThorLabs', 'Model', 'P20K');
+                'Manufacturer', 'ThorLabs', 'Model', 'P20K'); %#ok<*NASGU> 
         end
 
         function testLightSource(testCase)

@@ -4,6 +4,9 @@ classdef Experiment < aod.core.Entity
 % Description:
 %   A single experiment
 %
+% Parent:
+%   aod.core.Entity
+%
 % Constructor:
 %   obj = Experiment(name, experimentFolderPath, experimentDate)
 %   obj = Experiment(name, experimentFolderPath, experimentDate,...
@@ -73,7 +76,7 @@ classdef Experiment < aod.core.Entity
             parse(ip, varargin{:});
             obj.setParam(ip.Results);
 
-            obj.appendGitHashes();
+            % obj.appendGitHashes();
         end
     end
 

@@ -17,31 +17,34 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            testCase.Experiment = ToyExperiment(true);
+            % Creates an experiment, writes to HDF5 and reads back in
+            ToyExperiment(true);
+            fileName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'test.h5');
+            testCase.EXPT = loadExperiment(fileName);
         end
     end
 
     methods (Test)
         function testLinkFilter(testCase)
-            fObj = aod.api.LinkFilter(obj.Experiment.hdfName, 'Parent');
+            fObj = aod.api.LinkFilter(testCase.Experiment.hdfName, 'Parent');
             % Only Experiment does not have a parent
             testCase.verifyEqual(numel(fObj.getMatches), numel(fObj.allGroupNames) - 1);
         end
 
         function testEntityFilter(testCase)
-            fObj = aod.api.EntityFilter(obj.Experiment.hdfName, 'Experiment');
+            fObj = aod.api.EntityFilter(testCase.Experiment.hdfName, 'Experiment');
             testCase.verifyEqual(numel(fObj.getMatches), 1);
         end
 
         function testParameterFilter(testCase)
             % Has parameter
-            fObj = aod.api.ParameterFilter(obj.Experiment.hdfName, 'Laboratory');
+            fObj = aod.api.ParameterFilter(testCase.Experiment.hdfName, 'Laboratory');
             testCase.verifyEqual(numel(fObj.getMatches), 1);
             % Specific parameter value
-            fObj = aod.api.ParameterFilter(obj.Experiment.hdfName,... 
+            fObj = aod.api.ParameterFilter(testCase.Experiment.hdfName,... 
                 'Laboratory', 'Primate-1P');
             testCase.verifyEqual(numel(fObj.getMatches), 1);
-            fObj = aod.api.ParameterFilter(obj.Experiment.hdfName,...
+            fObj = aod.api.ParameterFilter(testCase.Experiment.hdfName,...
                 'Laboratory', 'none');
             testCase.verifyEqual(numel(fObj.getMatches), 0);
         end

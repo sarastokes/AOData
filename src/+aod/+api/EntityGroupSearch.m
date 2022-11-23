@@ -4,6 +4,12 @@ classdef EntityGroupSearch < handle
 % Description:
 %   Simulation of AOQuery for core interface
 %
+% Queries:
+%   Parameter, Dataset, File, Name, Class, Subclass
+%
+% Constructor:
+%   obj = EntityGroupSearch(entityGroup, queryType, varargin)
+%
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -52,18 +58,8 @@ classdef EntityGroupSearch < handle
             end
         end
 
-        function subclassQuery(obj, className)
-            arguments
-                obj
-                className
-            end
-            fprintf('Performing subclass query for %s\n', className);            
-            for i = 1:numel(obj.Group)
-                obj.filterIdx(i) = isSubclass(obj.Group(i), className);
-            end
-        end
-
         function datasetQuery(obj, dsetName, dsetSpec)
+            % DATASETQUERY
             fprintf('Performing dataset query for %s\n', dsetName);
             for i = 1:numel(obj.Group)
                 obj.filterIdx(i) = isprop(obj.Group(i), dsetName);
@@ -73,6 +69,12 @@ classdef EntityGroupSearch < handle
                 return
             end
             if ishandle(dsetSpec)
+                for i = 1:numel(obj.Group)
+                    if ~obj.filterIdx(i)
+                        continue
+                    end
+                    obj.filterIdx(i) = dsetSpec(obj.Group(i).dsetName);
+                end
             else
                 for i = 1:numel(obj.Group)
                     if ~obj.filterIdx(i)
@@ -84,10 +86,13 @@ classdef EntityGroupSearch < handle
         end
 
         function parameterQuery(obj, paramName, paramSpec)
+            % PARAMETERQUERY
             fprintf('Performing parameter query for %s\n', paramName);
-            for i = 1:numel(obj.Group)
-                obj.filterIdx(i) = obj.Group(i).hasParam(paramName);
-            end
+            %for i = 1:numel(obj.Group)
+            %    obj.filterIdx(i) = obj.Group(i).hasParam(paramName);
+            %end
+            obj.filterIdx = hasParam(obj.Group, paramName);
+
             if nargin < 3
                 return
             end
@@ -114,8 +119,24 @@ classdef EntityGroupSearch < handle
         end
     end
 
+    % Derivative queries
+    methods
+        function subclassQuery(obj, className)
+            % SUBCLASSQUERY
+            arguments
+                obj
+                className
+            end
+            fprintf('Performing subclass query for %s\n', className);            
+            for i = 1:numel(obj.Group)
+                obj.filterIdx(i) = isSubclass(obj.Group(i), className);
+            end
+        end
+    end
+
     methods %(Access = protected)
         function out = queryByType(obj, varargin)
+            % QUERYBYTYPE
             switch obj.queryType
                 case 'Class'
                     obj.classQuery(varargin{1});
@@ -129,6 +150,9 @@ classdef EntityGroupSearch < handle
                     obj.parameterQuery(varargin{:})
             end
 
+            fprintf('\tQuery returned %u of %u entities\n',... 
+                nnz(obj.filterIdx), numel(obj.Group));
+
             if nnz(obj.filterIdx) == 0
                 out = [];
             else
@@ -136,4 +160,10 @@ classdef EntityGroupSearch < handle
             end
         end
     end 
+
+    methods (Static)
+        function out = go(entityGroup, queryType, varargin)
+            obj = aod.api.EntityGroupSearch()
+        end
+    end
 end

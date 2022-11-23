@@ -23,7 +23,7 @@ classdef Experiment < aod.core.Experiment
             % GETFILEHEADER
             %
             % Description:
-            %   All files within our experiments begin with ID_YYYYMMDD
+            %   All files within our experiments begin with ID_yyyyMMdd
             %
             % Syntax:
             %   value = obj.getFileHeader()

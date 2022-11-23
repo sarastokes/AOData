@@ -6,6 +6,7 @@ classdef (Abstract) Entity < handle
 %
 % Constructor:
 %   obj = aod.core.Entity()
+%   obj = aod.core.Entity(name)
 %   obj = aod.core.Entity(name, 'Parent', parentEntity)
 %
 % Properties:
@@ -76,6 +77,7 @@ classdef (Abstract) Entity < handle
     methods
         function obj = Entity(varargin)
 
+            % Input parsing
             ip = aod.util.InputParser();
             addOptional(ip, 'Name', [], @(x) istext(x) | isempty(x));
             addParameter(ip, 'Parent', []);
@@ -88,6 +90,7 @@ classdef (Abstract) Entity < handle
                 obj.setParent(ip.Results.Parent);
             end
 
+            % Initialize containers
             obj.files = aod.util.Parameters();
             obj.parameters = aod.util.Parameters();
             
@@ -132,7 +135,7 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    methods 
+    methods (Sealed)
         function setName(obj, name)
             % SETNAME
             %
@@ -177,11 +180,21 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.addNote(txt)
             % -------------------------------------------------------------
+            arguments
+                obj
+                txt             string = string.empty()
+            end
+
             if isempty(txt)
                 return
             end
-            assert(istext(txt), 'Input to notes must be char or string');
-            obj.notes = [obj.notes, char(txt), '; '];
+
+            if ~isscalar(obj)
+                arrayfun(@(x) addNote(x, txt), obj);
+                return
+            end
+
+            obj.notes = cat(1, obj.notes, txt);
         end
 
         function removeNote(obj, ID)
@@ -193,14 +206,9 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.removeNote(obj, ID)
             % -------------------------------------------------------------
-            out = strfind(obj.notes, ';');
             assert(ID > 1 && ID <= numel(out),...
                 'Invalid ID %u, must be between 1-%u', ID, max(noteIDs));
-            if ID == numel(out)
-                obj.notes = obj.notes(out(end):end);
-            else
-                obj.notes = [obj.notes(1:out(ID)-1), obj.notes(out(ID+1):end)];
-            end
+            obj.notes(ID) = [];
         end
 
         function clearNotes(obj)
@@ -214,12 +222,26 @@ classdef (Abstract) Entity < handle
                 return
             end
 
-            obj.notes = char.empty();
+            obj.notes = string.empty();
+        end
+    end
+
+    % Creation/destruction methods
+    methods
+        function remove(obj)
+            if isempty(obj.Parent)
+                error('delete:NoParent', 'Entity cannot be deleted if parent is unset');
+            end
+            
+            parentContainer = obj.entityType.parentContainer();
+            h = obj.Parent.(parentContainer);
+            idx = arrayfun(@(x) isequal(x, obj.UUID), h);
+            h(idx) = [];
         end
     end
 
     % Parameter methods
-    methods
+    methods (Sealed)
         function tf = hasParam(obj, paramName)
             % HASPARAM
             %
@@ -331,7 +353,7 @@ classdef (Abstract) Entity < handle
     end
 
     % File methods
-    methods 
+    methods (Sealed)
         function tf = hasFile(obj, fileName)
             % HASFILE
             %
@@ -507,6 +529,11 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   value = obj.getLabel()
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                value = arrayfun(@(x) getLabel(x), obj);
+                return
+            end
+
             if isempty(obj.Name)
                 value = char(getClassWithoutPackages(obj));
             else

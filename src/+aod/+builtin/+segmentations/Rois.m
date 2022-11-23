@@ -93,8 +93,8 @@ classdef Rois < aod.core.Segmentation
             end
 
             if isnumeric(rois)
-                if ~isdouble(obj.rois)
-                    obj.rois = double(obj.rois);
+                if ~isnumeric(obj.Data)
+                    obj.Data = double(obj.Data);
                 end
                 obj.setMap(rois);
                 obj.Reader = [];

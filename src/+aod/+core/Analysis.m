@@ -2,26 +2,31 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 % ANALYSIS
 %
 % Description:
-%   Implements data analysis. Meant to be expanded by subclasses
+%   Any analysis performed on experimental data, with implementation 
+%   defined by subclasses.
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Analysis(parent, name, analysisDate)
+%   obj = Analysis(name)
+%   obj = Analysis(name, 'Date', analysisDate, 'Parent', entity)
 %
-% Properties:
-%   analysisDate                date of analysis ('yyyyMMdd')
+% Parameters:
+%   analysisDate                datetime or text in format 'yyyyMMdd'
+%       Date analysis was performed (default = today)
 % -------------------------------------------------------------------------
-    properties
-        analysisDate                datetime
-    end
 
     methods
-        function obj = Analysis(name, analysisDate)
-            obj = obj@aod.core.Entity(name);
-            if nargin > 1
-                obj.setAnalysisDate(analysisDate);
+        function obj = Analysis(name, varargin)
+            obj = obj@aod.core.Entity(name, varargin{:});
+            
+            ip = aod.util.InputParser();
+            addParameter(ip, 'Date', getDateYMD());
+            parse(ip, varargin{:});
+
+            if ~isempty(ip.Results.Date)
+                obj.setAnalysisDate(ip.Results.Date);
             end
         end
     end
@@ -36,6 +41,10 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   analysisDate            datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
+            if nargin == 1 || isempty(analysisDate)
+                obj.setParam('Date', '');
+            end
+            
             if ~isdatetime(analysisDate) %#ok<*PROP> 
                 try
                     analysisDate = datetime(analysisDate, 'Format', 'yyyyMMdd');
@@ -48,7 +57,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
                     end
                 end
             end
-            obj.analysisDate = analysisDate;
+            obj.setParam('Date', analysisDate);
         end
     end
 

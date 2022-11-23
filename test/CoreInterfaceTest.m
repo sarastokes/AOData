@@ -23,21 +23,40 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
     methods (Test)
         function calibrationIO(testCase)
-            cal1 = aod.core.Calibration('PowerMeasurement', '20220823');
-            cal2 = aod.core.Calibration('PowerMeasurement', '20220825');
-
+            % Add a first calibration
+            cal1 = aod.core.Calibration('PowerMeasurement1', '20220823');
             testCase.EXPT.add(cal1);
-            testCase.EXPT.add(cal2);
-            testCase.verifyEqual(numel(obj.EXPT.Calibrations), 2);
-            testCase.verifyEqual(...
-                numel(obj.EXPT.getCalibration('aod.core.Calibration')), 2);
-            
-            testCase.EXPT.removeCalibration(1);
-            testCase.verifyEqual(numel(obj.EXPT.Calibrations), 1);
-            testCase.verifyEqual(obj.EXPT.Calibrations(1).UUID, cal2.UUID);
+            testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 1);
 
-            testCase.EXPT.clearAllCalibrations();
-            testCase.verifyEqual(numel(obj.EXPT.Calibrations), 0);
+            % Add a second calibration
+            cal2 = aod.core.Calibration('PowerMeasurement2', '20220825');
+            testCase.EXPT.add(cal2);
+            testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
+
+            % Indexing
+            testCase.verifyEqual(cal2.UUID, testCase.EXPT.Calibrations(2).UUID);
+
+            % Access calibrations
+            calOut = testCase.EXPT.getCalibration('aod.core.Calibration');
+            testCase.verifyEqual(numel(calOut), 2);
+            
+            % Remove a single calibraiton
+            testCase.EXPT.removeCalibration(1);
+            testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 1);
+            testCase.verifyEqual(testCase.EXPT.Calibrations(1).UUID, cal2.UUID);
+
+            % Clear all existing calibrations
+            testCase.EXPT.clearCalibrations();
+            testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 0);
+        end
+
+        function analysisIO(testCase)
+            analysis1 = aod.core.Analysis('TestAnalysis1', 'Date', getDateYMD());
+            
+            % Add an experiment
+            testCase.EXPT.add(analysis1);
+            testCase.verifyEqual(numel(testCase.EXPT.Analyses), 1);
+
         end
     end
 end 

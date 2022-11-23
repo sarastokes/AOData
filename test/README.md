@@ -20,3 +20,15 @@ An individual test can be run as:
 ```matlab
 result = runtests('HDFTest');
 ```
+
+
+##### Code Coverage
+|Folder|Statement|Function|
+|------|---------|---------|
+|core|51.9%|48.36%|
+|h5|54.04%|54.38%|
+|persistent|16.92%|18.89%|
+|util|10.78%|21.73%|
+
+
+TODO: Specific tests for custom displays, enumerations

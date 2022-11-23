@@ -22,11 +22,11 @@ classdef RepositoryManager < handle
     end
 
     properties (Hidden, Constant)
-        AOD_PATH = fileparts(fileparts(fileparts(fileparts(mfilename('fullpath')))));
+        AOD_PATH = getpref('AOData', 'BasePackage');
     end
 
     methods
-        function obj = PackageManager()
+        function obj = RepositoryManager()
             % Check user preferences for package
             obj.findPackages();
             % Ensure full packages are added to MATLAB's search path
@@ -49,31 +49,6 @@ classdef RepositoryManager < handle
                 for i = 1:numel(obj.userPackages)
                     fprintf('\t%s\n', obj.userPackages{i});
                 end
-            end
-        end
-
-        function addPackage(obj, packagePath)
-            arguments
-                obj
-                packagePath     string      {mustBeFolder}
-            end
-            obj.userPackages = cat(1, obj.userPackages, packagePath);
-            obj.setUserPackages();
-        end
-
-        function removePackage(obj, packagePath)
-            arguments
-                obj
-                packagePath     string 
-            end
-            idx = find(obj.userPackages == packagePath);
-            if isempty(idx)
-                obj.listPackages();
-                error("PackageManager:UnrecognizedPackage",...
-                    "%s not found", packagePath);
-            else
-                obj.userPackages(idx) = [];
-                setpref('AOData', 'UserPackages', obj.userPackages);
             end
         end
     end

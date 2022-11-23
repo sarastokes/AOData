@@ -13,21 +13,20 @@ classdef HDFTest < matlab.unittest.TestCase
 
     properties
         HDF_FILE = [fullfile(getpref('AOData', 'BasePackage'),...
-            filesep, 'test', filesep, 'test.h5')];
+            filesep, 'test', filesep, 'HdfTest.h5')];
     end
 
     methods (TestClassSetup)
-        function methodSetup(testCase)
-            fileID = H5F.create(testCase.HDF_FILE, 'H5F_ACC_TRUNC');
-            H5F.close(fileID);
+        function hdfSetup(testCase)
+            aod.h5.HDF5.createFile(testCase.HDF_FILE, true)
         end
     end
 
     methods (TestClassTeardown)
-        function methodTeardown(testCase)
-            if exist(testCase.HDF_FILE, 'file')
-                delete(testCase.HDF_FILE);
-            end
+        function methodTeardown(testCase) %#ok<MANU> 
+            %if exist(testCase.HDF_FILE, 'file')
+            %    delete(testCase.HDF_FILE);
+            %end
         end
     end
 

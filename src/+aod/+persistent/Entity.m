@@ -618,12 +618,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.loadInfo();
 
             % DATASETS
-            if obj.ismember('files', obj.dsetNames)
-                obj.files = obj.loadDataset('files', 'aod.util.Parameters');
-            end
             obj.description = obj.loadDataset('description');
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
+            obj.files = obj.loadDataset('files', 'aod.util.Parameters');
 
             % LINKS
             obj.Parent = obj.loadLink('Parent');

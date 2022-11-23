@@ -3,7 +3,6 @@
 Object-oriented framework for organizing the data, metadata and code related to an experiment. Designed with adaptive optics experiments in mind but applies well to other imaging datasets. 
 
 ### Organization 
-
 For storing data and metadata associated with an experiment:
 
 - **Experiment**
@@ -29,7 +28,7 @@ For creating stimulus protocols, there is also the `Protocol` class. The advanta
 Each class is generic and meant to be subclassed and tailored to specific imaging experiments. Examples can be found in the `\packages` folder.
 
 ### Dependencies
-- MATLAB 2022a
+- MATLAB 2022b (earlier versions may work but are not guarenteed). AODataViewer is available as a standalone application usable without a MATLAB license by request.
 - The core classes do not require additional toolboxes. Some of the examples in `\packages` require the following additional MATLAB toolboxes: Signal Processing, Image Processing and Symbolic Math.
 
 ### Included 3rd party toolboxes:

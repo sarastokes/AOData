@@ -34,13 +34,15 @@ classdef CoreClassInstantiationTest < matlab.unittest.TestCase
             testCase.Experiment.add(source);
         end
 
-        function testResponse(testCase)
+        % TODO test epoch
+
+        function testResponse(testCase) %#ok<*MANU> 
             resp = aod.core.Response('MyResponse');
             resp.setTiming(1:4);
         end
 
         function testDataset(testCase)
-            dset = aod.core.Dataset('MyDataset');
+            dset = aod.core.Dataset('MyDataset'); %#ok<*NASGU> 
         end
 
         function testStimulus(testCase)
@@ -48,7 +50,7 @@ classdef CoreClassInstantiationTest < matlab.unittest.TestCase
         end
 
         function testAnalysis(testCase)
-            obj = aod.core.Analysis('MyAnalysis', '20220825');
+            obj = aod.core.Analysis('MyAnalysis', 'Date', '20220825');
             testCase.Experiment.add(obj);
         end
 

@@ -545,8 +545,8 @@ classdef EntityTypes
             end
 
             if ~isSubclass(className, {'aod.core.Entity', 'aod.core.Experiment'})
-                error("EntityTypes_fromClassName",...
-                    "%s is not an subclass of aod.core.Entity or aod.persistent.Entity");
+                error("EntityTypes_fromClassName:NotAODataClass",...
+                    "%s is not an subclass of aod.core.Entity or aod.persistent.Entity", className);
             end
             
             if isSubclass(x, 'aod.persistent.Entity')

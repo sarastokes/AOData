@@ -10,25 +10,27 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 %
 % Constructor:
-%   obj = aod.core.Calibration(name, calibrationDate)
-%   obj = aod.core.Calibration(name, calibrationDate,...
+%   obj = aod.core.Calibration(name)
+%   obj = aod.core.Calibration(name, 'Date', calibrationDate,...
 %       'Administrator', 'AdministratorName')
 %
 % Inputs:
 %   name                    char/string
 %       Calibration name
-%   calibrationDate         datetime or text (format YYYYmmmDD)
-%       Date the calibration was performed
 % Optional key/value inputs:
+%   calibrationDate         datetime or text (format: yyyyMMdd)
+%       Date the calibration was performed
 %   Administrator           char/string
 %       Who performed the calibration
 %
 % -------------------------------------------------------------------------
 % Properties:
-%   calibrationDate         date calibration was performed (yyyyMMdd)
+%   calibrationDate         datetime or text in format yyyyMMdd
+%       Date calibration was performed (yyyyMMdd)
 %
 % Parameters:
-%   Administrator           who performed the calibration
+%   Administrator           char
+%       Who performed the calibration
 %
 % Sealed methods:
 %   setCalibrationDate(obj, calibrationDate)
