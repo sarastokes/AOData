@@ -16,6 +16,13 @@ reportFormat = CoverageReport(reportDir);
 suite = testsuite(pwd);
 runner = testrunner("textoutput");
 
+p = CodeCoveragePlugin.forPackage("aod", ...
+    'IncludingSubpackages', true,...
+    'Producing', CoverageReport(reportDir));
+runner.addPlugin(p);
+results = runner.run(suite);
+cd(prevPWD);
+
 % Folders for code coverage reports
 aodDir = fullfile(baseDir, 'src', '+aod');
 p1 = CodeCoveragePlugin.forFolder(fullfile(aodDir, '+core'),...

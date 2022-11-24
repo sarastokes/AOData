@@ -2,7 +2,7 @@ classdef HDFTest < matlab.unittest.TestCase
 % HDFTEST
 %
 % Description:
-%   Tests MATLAB datatype to HDF5 I/O
+%   Tests MATLAB datatype I/O to HDF5
 %
 % Parent:
 %    matlab.unittest.TestCase
@@ -82,7 +82,7 @@ classdef HDFTest < matlab.unittest.TestCase
         end
 
 
-        % Common MATLAB-specific data types
+        % MATLAB-specific data types
         function testAffine2d(testCase)
             inputAffine2d = affine2d(eye(3));
             aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'affine2d', inputAffine2d);
@@ -91,7 +91,7 @@ classdef HDFTest < matlab.unittest.TestCase
         end
 
         function testSimtform2d(testCase)
-            inputTform = simtform2d(1, 1, eye(3));
+            inputTform = simtform2d(3, 30, [10 20.5]);
             aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'simtform2d', inputTform);
             outputTform = aod.h5.readDatasetByType(testCase.HDF_FILE, '/', 'simtform2d');
             testCase.verifyEqual(inputTform, outputTform);

@@ -10,6 +10,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 % Use:
 %   result = runtests('PersistorTest.m')
 % -------------------------------------------------------------------------
+
     properties
         EXPT 
     end
@@ -18,9 +19,9 @@ classdef PersistorTest < matlab.unittest.TestCase
         function methodSetup(testCase)
             % Creates an experiment, writes to HDF5 and reads back in
             ToyExperiment(true);
-            fileName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'test.h5');
+            fileName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'ToyExperiment.h5');
             testCase.EXPT = loadExperiment(fileName);
-            testCase.EXPT.setReadOnlyMode(true);
+            testCase.EXPT.setReadOnlyMode(false);
         end
     end
 

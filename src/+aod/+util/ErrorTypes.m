@@ -1,4 +1,10 @@
 classdef ErrorTypes 
+% ERRORTYPES
+%
+% Description:
+%   Enumerated type standardizing error handling
+%
+% -------------------------------------------------------------------------
 
     enumeration
         ERROR
@@ -27,7 +33,7 @@ classdef ErrorTypes
                     obj = aod.util.ErrorTypes.NONE;
                 otherwise
                     error("ErrorTypes:UnrecognizedInput",...
-                        'Message levels are error, warning and none');
+                        'Message levels are error, warning, missing and none');
             end
         end
     end

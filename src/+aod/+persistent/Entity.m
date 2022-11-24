@@ -28,6 +28,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   out = getExptFile(obj, fileKey)
 %   setFile(obj, fileKey, fileValue)
 %   removeFile(obj, fileKey)
+%
+%   tf = isequal(obj, entity)
 %   
 % Events:
 %   FileChanged
@@ -123,6 +125,18 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
             
             obj.factory.persistor.setReadOnly(tf);
+        end
+    end
+
+    % Overloaded MATLAB methods
+    methods
+        function tf = isequal(obj, entity)
+            arguments
+                obj
+                entity      {mustBeA(entity, 'aod.persistent.Entity')}
+            end
+
+            tf = isequal(obj.UUID, entity.UUID);
         end
     end
 

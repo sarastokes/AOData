@@ -6,25 +6,28 @@ function mustBeEntity(obj, entityType)
     %   specific entity type (either core or persistent interface)
     %
     % Syntax:
-    %   mustBeEntity(obj, entityType)
+    %   mustBeEntityTy[e(obj, entityType)
     %
     % Inputs:
     %   obj             AOData object
     %   entityType      aod.core.EntityTypes or char/string of entityType
     %
     % Examples:
-    %   mustBeEntity(obj, aod.core.EntityTypes.SEGMENTATION)
-    %   mustBeEntity(obj, 'segmentation');
+    %   mustBeEntityType(obj, aod.core.EntityTypes.SEGMENTATION)
+    %   mustBeEntityType(obj, 'segmentation');
     % ---------------------------------------------------------------------
+
+    entityType = aod.core.EntityTypes.init(entityType);
 
     if ~isscalar(obj)
         for i = 1:numel(obj)
-            mustBeEntity(obj, entityType);
+            mustBeEntityType(obj, entityType);
         end
     end
 
-    if ~isSubclass(obj, {'aod.core.Entity', 'aod.persistent.Entity'})
-        eidType = 'mustBeEntity:InputIsNotAODataEntity';
-        msgType = 'Input must be subclass of aod.core.Entity or aod.persistent.Entity';
+    if ~isSubclass(obj, entityType.getCoreClassName()) ...
+            && ~isSubclass(obj, entityType.getPersistentClassName())
+        eidType = 'mustBeEntityType:EntityTypeDoesNotMatch';
+        msgType = sprintf('Entity must be %s', char(entityType));
         throwAsCaller(MException(eidType, msgType));
     end

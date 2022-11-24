@@ -68,6 +68,6 @@ function experiment = ToyExperiment(writeToHDF)
     experiment.add(aod.core.Analysis('TestAnalysis', 'Date', getDateYMD()));
 
     if writeToHDF
-        fileName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'test.h5');
+        fileName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'ToyExperiment.h5');
         aod.h5.writeExperimentToFile(fileName, experiment, true);
     end

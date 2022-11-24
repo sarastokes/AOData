@@ -16,6 +16,10 @@ The full test suite can be run with:
 ```matlab
 results = runAODataTestSuite();
 ```
+A code coverage report for the full "aod" package can be run with:
+```matlab
+results = runAODataTestSuite('Coverage', true);
+```
 An individual test can be run as:
 ```matlab
 result = runtests('HDFTest');
@@ -23,12 +27,6 @@ result = runtests('HDFTest');
 
 
 ##### Code Coverage
-|Folder|Statement|Function|
-|------|---------|---------|
-|core|51.9%|48.36%|
-|h5|54.04%|54.38%|
-|persistent|16.92%|18.89%|
-|util|10.78%|21.73%|
-
+As of 23Nov2022, the aod package report contains 127 files and has **30.33%** statement coverage (3992 executable) and **30.17%** function coverage (696 executable).
 
 TODO: Specific tests for custom displays, enumerations

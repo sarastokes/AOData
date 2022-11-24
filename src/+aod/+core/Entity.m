@@ -700,4 +700,16 @@ classdef (Abstract) Entity < handle
             end
         end
     end
+
+    % Overloaded MATLAB functions
+    methods
+        function tf = isequal(obj, entity)
+            arguments
+                obj
+                entity      {aod.util.mustBeEntity(entity)}
+            end
+
+            tf = isequal(obj.UUID, entity.UUID);
+        end
+    end
 end 
