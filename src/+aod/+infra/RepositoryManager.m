@@ -55,7 +55,7 @@ classdef RepositoryManager < handle
 
     methods (Access = private)
         function compileCommitIDs(obj)
-            obj.commitIDs = containers.Map();
+            obj.commitIDs = aod.util.Parameters();
             ID = obj.getCommitHash(obj.basePackage);
             repo = obj.getRepoName(obj.basePackage);
             obj.commitIDs(repo) = ID;
@@ -153,10 +153,13 @@ classdef RepositoryManager < handle
             % Syntax:
             %   ID = PackageManager.getRepoName(fPath)
             % -------------------------------------------------------------
-            txt = strsplit(fPath, filesep);
-            if isempty(txt{end})
-                txt = txt{1:end-1};
+            arguments
+                fPath       char
             end
+            if endsWith(fPath, filesep)
+                fPath = fPath(1:end-1);
+            end
+            txt = strsplit(fPath, filesep);
             repoName = txt{end};
         end
     end

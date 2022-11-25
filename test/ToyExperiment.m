@@ -23,6 +23,7 @@ function experiment = ToyExperiment(writeToHDF)
     experiment.addNote('This is the first note');
     experiment.addNote('This is the second note');
 
+    % Add a source
     source = sara.factories.SubjectFactory.create(851, 'OS', 'Right');
     experiment.add(source);
 
@@ -38,9 +39,14 @@ function experiment = ToyExperiment(writeToHDF)
         'WavefrontSensing', system);
     experiment.add(system);
 
-    calibration = sara.calibrations.MustangPower('20220823');
-    calibration.addMeasurement(24:26, 16:18);
-    experiment.add(calibration);
+    calibration1 = aod.builtin.calibrations.PowerMeasurement(...
+        'Mustang', getDateYMD(), 488);
+    calibration1.addMeasurement(24:26, 16:18);
+    experiment.add(calibration1);
+
+    calibration2 = aod.builtin.calibrations.Optimization([],...
+        getDateYMD(), 'xPMT', 6, 'yPMT', 7, 'zPMT', 8, 'SourcePosition', 3);
+    experiment.add(calibration2);
 
     epoch = aod.core.Epoch(1, 'Source', source, 'System', system);
     epoch.setFile('PresyncFile', fullfile(cd, 'PresyncFile.txt'));

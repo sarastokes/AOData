@@ -76,7 +76,7 @@ classdef Experiment < aod.core.Entity
             parse(ip, varargin{:});
             obj.setParam(ip.Results);
 
-            % obj.appendGitHashes();
+            obj.appendGitHashes();
         end
     end
 
@@ -106,7 +106,10 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   setHomeDirectory(obj, filePath)
             % -------------------------------------------------------------
-            assert(isfolder(filePath), 'filePath is not valid!');
+            arguments
+                obj
+                filePath            {mustBeFolder(filePath)}
+            end
             obj.homeDirectory = filePath;
         end
 
@@ -114,14 +117,28 @@ classdef Experiment < aod.core.Entity
             % ADD 
             %
             % Description:
-            %   Add a new entity to the experiment
+            %   Add a new entity or entities to the experiment
             %
             % Syntax:
             %   add(obj, entity)
             %
+            % Inputs:
+            %   entity          aod.core.Entity
+            %       One or more entities of the same entity type
+            %
             % Notes: Only entities contained by  experiment can be added:
             %   Analysis, Epoch, Calibration, Segmentation, Source, System
             % ------------------------------------------------------------- 
+            arguments
+                obj
+                entity      {mustBeA(entity, 'aod.core.Entity')}
+            end
+
+            if ~isscalar(entity)
+                arrayfun(@(x) add(obj, x), entity);
+                return
+            end
+
             import aod.core.EntityTypes
             entityType = EntityTypes.get(entity);
 
@@ -159,7 +176,7 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             try
                 RM = aod.infra.RepositoryManager();
-                obj.Code = RM.commitIDs();
+                obj.Code = RM.commitIDs;
             catch ME  % Rethrow as warning instead of error
                 disp(getReport(ME, 'extended', 'hyperlinks', 'on'));
             end
@@ -188,11 +205,15 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   idx = id2index(obj, IDs)
             % -------------------------------------------------------------
+            if ~isscalar(IDs)
+                idx = arrayfun(@(x) id2index(obj, x), IDs);
+                return
+            end
             idx = find(obj.epochIDs == IDs);
         end
     end
 
-    % Property access methods
+    % Entity access methods
     methods 
         function cal = getCalibration(obj, className)
             % GETCALIBRATION
@@ -239,6 +260,7 @@ classdef Experiment < aod.core.Entity
                 data = mean(data, 3);
             end
         end
+
     end
 
     % Segmentation methods
@@ -345,7 +367,6 @@ classdef Experiment < aod.core.Entity
             obj.Sources = aod.core.Source.empty();
         end
         
-
         function sources = getAllSources(obj)
             % GETALLSOURCES
             %
@@ -492,7 +513,7 @@ classdef Experiment < aod.core.Entity
             assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
 
             if ismember(epoch.ID, obj.epochIDs)
-                error("addEpoch:EpochAlreadyExists",...
+                error("addEpoch:EpochIDAlreadyExists",...
                     "Epoch %u is already present", epoch.ID);
             end
 
@@ -520,6 +541,48 @@ classdef Experiment < aod.core.Entity
             %   obj.clearEpochs()
             % -------------------------------------------------------------
             obj.Epochs = aod.core.Epoch.empty();
+        end
+
+        function datasets = getEpochDatasets(obj, epochIDs)
+            % GETEPOCHDATASETS
+            %
+            % Description:
+            %   Return the datasets for specified epoch(s)
+            %
+            % Syntax:
+            %   datasets = getEpochDatasets(obj, epochIDs)
+            %
+            % Inputs:
+            %   epochIDs            double
+            %       The IDs for 1 or more epochs (not index in Epochs)
+            % -------------------------------------------------------------
+            datasets = vertcat(obj.Epochs(epochIDs).Datasets);
+        end
+
+        function registrations = getEpochRegistrations(obj, epochIDs)
+            % GETEPOCHREGISTRATIONS
+            %
+            % Description:
+            %   Return the registrations for specified epoch(s)
+            %
+            % Syntax:
+            %   datasets = getEpochRegistrations(obj, epochIDs)
+            %
+            % Inputs:
+            %   epochIDs            double
+            %       The IDs for 1 or more epochs (not index in Epochs)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                epochIDs    {aod.util.mustBeEpochID(obj, epochIDs)} = []
+            end
+
+            if isempty(epochIDs)
+                registrations = vertcat(obj.Epochs.Registrations);
+            else
+                epochIdx = obj.id2index(epochIDs);
+                registrations = vertcat(obj.Epochs(epochIdx).Registrations);
+            end
         end
     end
 
@@ -615,8 +678,25 @@ classdef Experiment < aod.core.Entity
         end
     end
 
-    % Control of Epoch properties, use at own risk
+    % Methods for returning or modifying entities for epoch(s)
     methods
+
+        function stimuli = getEpochStimuli(obj, epochIDs)
+            % GETEPOCHSTIMULI
+            %
+            % Description:
+            %   Return the stimuli for specified epoch(s)
+            %
+            % Syntax:
+            %   stimuli = getEpochStimuli(obj, epochIDs)
+            %
+            % Inputs:
+            %   epochIDs            double
+            %       The IDs for 1 or more epochs (not index in Epochs)
+            % -------------------------------------------------------------
+            stimuli = vertcat(obj.Epochs(epochIDs).Stimuli);
+        end
+
         function clearEpochDatasets(obj, epochIDs)
             % CLEAREPOCHDATASETS
             %

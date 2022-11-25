@@ -12,17 +12,20 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
     methods (Test, TestTags = {'Initialization'})
         function ErrorTypesInit(testCase)
-            out = aod.util.ErrorTypes.init('error');
-            out = aod.util.ErrorTypes.init('warning');
-            out = aod.util.ErrorTypes.init('missing');
-            out = aod.util.ErrorTypes.init('none');
-        end
-    end
+            import matlab.unittest.constraints.Throws
+            import aod.util.ErrorTypes
 
-    methods (Test, TestTags={'EntityTypes'})
-        function testExperimentType(testCase)
-            expType = aod.core.EntityTypes.init('experiment');
-            testCase.verifyThat(isempty(expType.validParentTypes));
+            out = aod.util.ErrorTypes.init('error');
+            testCase.verifyEqual(out, ErrorTypes.ERROR);
+            out = aod.util.ErrorTypes.init('warning');
+            testCase.verifyEqual(out, ErrorTypes.WARNING);
+            out = aod.util.ErrorTypes.init('missing');
+            testCase.verifyEqual(out, ErrorTypes.MISSING);
+            out = aod.util.ErrorTypes.init('none');
+            testCase.verifyEqual(out, ErrorTypes.NONE);
+            testCase.verifyThat(...
+                @() aod.util.ErrorTypes.init('BadInput'),...
+                Throws("ErrorTypes:UnrecognizedInput"));
         end
     end
 end 

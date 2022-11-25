@@ -51,9 +51,7 @@ classdef RoomMeasurement < aod.core.Calibration
             end
 
             for i = numel(timestamp)
-                datestamp = datetime([...
-                    datestr(obj.calibrationDate), ' ', char(timestamp(i))],... 
-                    'InputFormat', 'dd-MMM-yyyy HH:mm');
+                datestamp = datetime(timestamp(i), 'Format', 'HH:mm');
                 if isempty(obj.measurements)
                     obj.measurements = cell2table({datestamp, temperature(i), humidity(i)});
                     obj.measurements.Properties.VariableNames = {'Time', 'Temperature', 'Humidity'};

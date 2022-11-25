@@ -112,18 +112,10 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   calDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
-            if ~isdatetime(calDate)
-                try
-                    calDate = datetime(calDate, 'Format', 'yyyyMMdd');
-                catch ME 
-                    if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
-                        error("setCalibrationDate:FailedDatetimeConversion",...
-                            "Failed to convert to datetime, use format yyyyMMdd");
-                    else
-                        rethrow(ME);
-                    end
-                end
+            if isempty(calDate)
+                return
             end
+            calDate = aod.util.validateDate(calDate);
             obj.calibrationDate = calDate;
         end
     end

@@ -78,12 +78,12 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
         case 'affine2d'
             out = affine2d(data);
         case 'simtform2d'
-            T = h5readatt(hdfName, fullPath, 'Transformation');
+            T = h5readatt(hdfName, fullPath, 'Translation')';
             S = h5readatt(hdfName, fullPath, 'Scale');
             R = h5readatt(hdfName, fullPath, 'RotationAngle');
             out = simtform2d(S, R, T);
         case 'imref2d'
-            imageSize = h5readatt(hdfName, fullPath, 'ImageSize');
+            imageSize = h5readatt(hdfName, fullPath, 'ImageSize')';
             pixelExtentX = h5readatt(hdfName, fullPath, 'PixelExtentInWorldX');
             pixelExtentY = h5readatt(hdfName, fullPath, 'PixelExtentInWorldY');
             if pixelExtentX ~= 1 || pixelExtentY ~= 1
@@ -92,7 +92,8 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
             end
             xWorldLimits = h5readatt(hdfName, fullPath, 'XWorldLimits');
             yWorldLimits = h5readatt(hdfName, fullPath, 'YWorldLimits');
-            if xWorldLimits ~= (imageSize(1)-0.5) || yWorldLimits ~= (imageSize(2) - 0.5)
+            if xWorldLimits(2) ~= (imageSize(2)+0.5) ...
+                    || yWorldLimits(2) ~= (imageSize(1) + 0.5)
                 out = imref2d(imageSize, xWorldLimits, yWorldLimits);
                 return
             end

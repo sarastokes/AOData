@@ -16,6 +16,14 @@
 *.DS_Store
 *.vscode
 
-## Folders
+## Development folders
 dev/
+deprecated/
 .ipynb_checkpoints/
+
+## Testing folders and files
+test/coverage_report/
+test/test.h5
+test/ExperimentTest.h5
+test/ToyExperiment.h5
+test/HdfTest.h5

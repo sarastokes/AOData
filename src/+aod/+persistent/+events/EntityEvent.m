@@ -23,7 +23,7 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
                 action          {mustBeMember(action, {'Add', 'Remove'})}
             end
             
-            assert(isUUID(uuid), "Input is not a valid UUID");
+            uuid = aod.util.validateUUID(uuid);
             obj.UUID = uuid;
             obj.Action = action;
         end

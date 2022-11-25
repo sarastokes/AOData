@@ -48,6 +48,7 @@ classdef EntityManager < handle
         end
 
         function hdfPath = uuid2path(obj, uuid)
+            uuid = aod.util.validateUUID(uuid);
             if ~obj.hasUUID(uuid)
                 error("EntityManager:UuidNotFound",...
                     "The UUID %s is not present", uuid);
@@ -56,21 +57,22 @@ classdef EntityManager < handle
         end
 
         function tf = hasUUID(obj, uuid)
+            uuid = aod.util.validateUUID(uuid);
             tf = ismember(uuid, obj.Table.UUID);
         end
     end
 
     methods (Access = private)
         function processGroups(obj, info)
-            [idx, UUID] = findAttribute(info, 'UUID');
+            [idx, UUID] = obj.findAttribute(info, 'UUID');
             if ~isempty(idx)
-                [~, className] = findAttribute(info, 'Class');
+                [~, className] = obj.findAttribute(info, 'Class');
                 obj.pathMap(UUID) = info.Name;
                 if isempty(className)
                     className = 'Unknown';
                 end
                 obj.classMap(UUID) = className;
-                [~, entityType] = findAttribute(info, 'EntityType');
+                [~, entityType] = obj.findAttribute(info, 'EntityType');
                 obj.entityMap(UUID) = entityType;
             end
 
@@ -79,6 +81,37 @@ classdef EntityManager < handle
                 for i = 1:numel(info.Groups)
                     obj.processGroups(info.Groups(i));
                 end
+            end
+        end
+    end
+
+    methods (Static)
+        function [idx, attributeValue] = findAttribute(info, attributeName)
+            % FINDATTRIBUTE
+            %
+            % Syntax:
+            %   [idx, attributeValue] = findAttribute(info, attributeName)
+            % ---------------------------------------------------------------------
+            arguments
+                info                struct 
+                attributeName       char 
+            end
+
+            if isempty(info.Attributes)
+                idx = []; attributeValue = [];
+                return
+            end
+
+            idx = arrayfun(@(x) strcmp(x.Name, attributeName), info.Attributes);
+            idx = find(idx);
+
+            if ~isempty(idx)
+                attributeValue = info.Attributes(idx).Value;
+                if iscell(attributeValue)
+                    attributeValue = cell2mat(attributeValue);
+                end
+            else
+                attributeValue = [];
             end
         end
     end

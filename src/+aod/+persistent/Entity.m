@@ -291,17 +291,36 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Special property methods
     methods
-        function setName(obj, entityName)
+        function setName(obj, name)
+            % SETNAME
+            %
+            % Description:
+            %   Set, change or remove the entity's name
+            %
+            % Syntax:
+            %   setName(obj, name)
+            %
+            % Notes:
+            %   This will not change the entity group name
+            % -------------------------------------------------------------
             arguments
                 obj
-                entityName          char        = ''
+                name                char        = ''
             end
             obj.checkReadOnlyMode();
-            obj.setDataset('Name', obj, entityName);
-            obj.Name = entityName;
+            obj.setDataset('Name', obj, name);
+            obj.Name = name;
         end
 
         function setDescription(obj, txt)
+            % SETDESCRIPTION
+            %
+            % Description:
+            %   Set, change or remove the entity's description
+            %
+            % Syntax:
+            %   setDescription(obj, txt)
+            % -------------------------------------------------------------
             arguments
                 obj
                 txt     char = []
@@ -393,8 +412,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                paramName           char
-                paramValue
+                paramName       {aod.util.mustNotBeSystemAttribute(paramName)}
+                paramValue      = []
             end
 
             obj.checkReadOnlyMode();

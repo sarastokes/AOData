@@ -74,6 +74,22 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Channels = [];
         end
 
+        function devices = getAllDevices(obj)
+            % GETALLDEVICES
+            %
+            % Description:
+            %   Get devices within all channels
+            %
+            % Syntax:
+            %   devices = getAllDevices(obj)
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                devices = arrayfun(@(x) getAllDevices(x), obj);
+                return
+            end
+            devices = vertcat(obj.Channels.Devices);
+        end
+
         function assignUUID(obj, UUID)
             % ASSIGNUUID
             %

@@ -12,11 +12,11 @@ classdef Optimization < aod.core.Calibration
 %   xPMT
 %   yPMT
 %   zPMT
-%   zLightSource
+%   SourcePosition
 %   xPMT_InVivo
 %   yPMT_InVivo
 %   zPMT_InVivo
-%   zLightSource
+%   SourcePosition_InVivo
 %
 % Methods:
 %   setPMT(obj, x, y, z)
@@ -38,10 +38,11 @@ classdef Optimization < aod.core.Calibration
             addParameter(ip, 'xPMT', [], @isnumeric);
             addParameter(ip, 'yPMT', [], @isnumeric);
             addParameter(ip, 'zPMT', [], @isnumeric);
-            addParameter(ip, 'zLightSource', [], @isnumeric);
+            addParameter(ip, 'SourcePosition', [], @isnumeric);
             parse(ip, varargin{:});
 
-            obj.setParam(ip.Results);
+            obj.setPMT(ip.Results.xPMT, ip.Results.yPMT, ip.Results.zPMT);
+            obj.setSourcePosition(ip.Results.SourcePosition);
         end
 
         function setPMT(obj, x, y, z)
@@ -56,7 +57,7 @@ classdef Optimization < aod.core.Calibration
             end
         end
 
-        function setLightSource(obj, z)
+        function setSourcePosition(obj, z)
             if ~isempty(z)
                 obj.setParam('zLightSource', z);
             end
@@ -74,9 +75,9 @@ classdef Optimization < aod.core.Calibration
             end
         end
 
-        function setLightSource_InVivo(obj, z)
+        function setSourcePosition_InVivo(obj, z)
             if ~isempty(z)
-                obj.setParam('zLightSource_InVivo', z);
+                obj.setParam('SourcePosition_InVivo', z);
             end
         end
     end

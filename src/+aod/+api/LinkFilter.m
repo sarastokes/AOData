@@ -39,6 +39,9 @@ classdef LinkFilter < aod.api.FilterQuery
             obj.resetFilterIdx();
 
             for i = 1:numel(obj.allGroupNames)
+                if ~obj.filterIdx(i)
+                    continue
+                end
                 groupIdx = find(obj.allLinkParents == obj.allGroupNames(i));
                 if ~isempty(groupIdx)
                     linkIdx = nnz(endsWith(obj.allLinkNames(groupIdx), obj.linkName,...

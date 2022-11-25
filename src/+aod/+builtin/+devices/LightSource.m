@@ -22,42 +22,41 @@ classdef LightSource < aod.core.Device
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
-        spectra
-    end
+        % The spectra of the light source
+        spectra         double 
+    end 
 
-    properties (Hidden, SetAccess = protected)
-        calibrationNames
-    end
-
-    properties (Dependent)
-        Calibrations
-    end
-    
     methods
         function obj = LightSource(wavelength, varargin)
             obj = obj@aod.core.Device([], varargin{:});            
             obj.setWavelength(wavelength);
         end
-
-        function value = get.Calibrations(obj)
-            value = [];
-            if isempty(obj.calibrationNames)
-                return
-            end
-            parent = obj.ancestor('aod.core.Experiment');
-            for i = 1:numel(obj.calibrationNames)
-                value = cat(1, value,...
-                    parent.getCalibration(obj.calibrationNames(i)));
-            end
-        end
     end
     
     methods 
         function setWavelength(obj, wavelength)
+            % Set the wavelength in nm
+            %
+            % Syntax:
+            %   setWavelength(obj, wavelength)
+            %
+            % Inputs:
+            %   wavelength      double
+            %       The light source wavelength (nm)
+            % -------------------------------------------------------------
             obj.setParam('Wavelength', wavelength);
         end
         
         function setSpectra(obj, spectra)
+            % Set the light source's spectra
+            %
+            % Syntax:
+            %   setSpectra(obj, spectra)
+            %
+            % Inputs:
+            %   spectra         double
+            %       Spectra for light source (first column, nm)
+            % -------------------------------------------------------------
             obj.spectra = spectra;
         end
     end

@@ -86,7 +86,7 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
             % Syntax:
             %   resetFilterIdx(i)
             % -------------------------------------------------------------
-            obj.filterIdx = false(size(obj.allGroupNames));
+            obj.filterIdx = true(size(obj.allGroupNames));
             notify(obj, 'FilterResetIndex');
         end
     end

@@ -67,6 +67,16 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         end
 
         function add(obj, entity)
+            arguments
+                obj
+                entity      {mustBeA(entity, 'aod.core.Entity')}
+            end
+
+            if ~isscalar(entity)
+                arrayfun(@(x) add(obj, x), entity);
+                return
+            end
+
             import aod.core.EntityTypes
         
             switch entity.entityType
@@ -92,13 +102,6 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
                     error('Experiment_add:InvalidEntityType',...
                         'Only Analysis, Calibration, Epoch, Segmentation, System and Source can be added to Experiment')
             end
-        end
-    end
-
-    % Access methods
-    methods
-        function getSource(obj, sourceDescriptor)
-            
         end
     end
 

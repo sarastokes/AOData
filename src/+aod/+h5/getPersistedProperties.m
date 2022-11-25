@@ -54,6 +54,10 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
             % Containers are not persisted with containing entity
             abandonedProps = cat(1, abandonedProps,...
                 string(mc.PropertyList(i).Name));
+        elseif ~strcmp(mc.PropertyList(i).GetAccess, 'public')
+            % Properties without public get access are not available
+            abandonedProps = cat(1, abandonedProps,...
+                string(mc.PropertyList(i).Name));
         elseif mc.PropertyList(i).Transient
             % Transient properties are akways abandoned
             abandonedProps = cat(1, abandonedProps,...

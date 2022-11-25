@@ -9,6 +9,9 @@ classdef HDFTest < matlab.unittest.TestCase
 %
 % Use:
 %   result = runtests('HDFTest.m')
+%
+% See also:
+%   runAODataTestSuite
 % -------------------------------------------------------------------------
 
     properties

@@ -9,7 +9,12 @@ classdef PersistorTest < matlab.unittest.TestCase
 %
 % Use:
 %   result = runtests('PersistorTest.m')
+%
+% See also:
+%   runAODataTestSuite
 % -------------------------------------------------------------------------
+
+%#ok<*NASGU> 
 
     properties
         EXPT 
@@ -26,24 +31,42 @@ classdef PersistorTest < matlab.unittest.TestCase
     end
 
     methods (Test)
+        function testParamRead(testCase)
+            testCase.verifyEqual(...
+                testCase.EXPT.getParam('Administrator'), 'Sara Patterson');
+        end
+
+        function testCustomDisplay(testCase)
+            disp(testCase.EXPT)
+        end
+
         function testParamSet(testCase)
+            import matlab.unittest.constraints.Throws
+
             % Ensure system attributes aren't editable
-            testCase.verifyWarning( ...
+            testCase.verifyThat( ...
                 @() testCase.EXPT.setParam('Class', 'TestValue'),...
-                "setParam:SystemAttribute");
+                Throws("mustNotBeSystemAttribute:InvalidInput"));
             
             % Add a new parameter, ensure other attributes are editable
-            testCase.verifyWarningFree( ...
-                @() testCase.EXPT.setParam('TestParam', 'TestValue'));
+            testCase.EXPT.setParam('TestParam', 0);
             info = h5info('test.h5', '/Experiment');
-            attributeNames = string({info.Attributes});
+            attributeNames = string({info.Attributes.Name});
             testCase.verifyTrue(ismember("TestParam", attributeNames));
 
             % Remove the new parameter
             testCase.EXPT.removeParam('TestParam');
             info = h5info('test.h5', '/Experiment');
-            attributeNames = string({info.Attributes});
-            testCase.verifyTrue(ismember("TestParam", attributeNames));
-        end 
+            attributeNames = string({info.Attributes.Name});
+            testCase.verifyFalse(ismember("TestParam", attributeNames));
+        end
+        
+        function testExperimentIndexing(testCase)
+            out = testCase.EXPT.Epochs(1); 
+            out = testCase.EXPT.Calibrations(0);
+            out = testCase.EXPT.Segmentations(0);
+            out = testCase.EXPT.Systems(1);
+            out = testCase.EXPT.Sources(1);
+        end
     end 
 end

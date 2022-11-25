@@ -13,7 +13,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = Analysis(name, 'Date', analysisDate, 'Parent', entity)
 %
 % Parameters:
-%   analysisDate                datetime or text in format 'yyyyMMdd'
+%   Date                    datetime or text in format 'yyyyMMdd'
 %       Date analysis was performed (default = today)
 % -------------------------------------------------------------------------
 
@@ -45,18 +45,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
                 obj.setParam('Date', '');
             end
             
-            if ~isdatetime(analysisDate) %#ok<*PROP> 
-                try
-                    analysisDate = datetime(analysisDate, 'Format', 'yyyyMMdd');
-                catch ME 
-                    if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
-                        error("setAnalysisDate:FailedDatetimeConversion",...
-                            "Failed to set analysisDate, use format yyyyMMdd");
-                    else
-                        rethrow(ME);
-                    end
-                end
-            end
+            analysisDate = aod.util.validateDate(analysisDate);
             obj.setParam('Date', analysisDate);
         end
     end

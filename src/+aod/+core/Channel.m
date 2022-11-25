@@ -44,8 +44,16 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   add(obj, device)
             % -------------------------------------------------------------
-            assert(isSubclass(device, 'aod.core.Device'),...
-                'Must be subclass of aod.core.Device');
+            arguments
+                obj
+                device          {mustBeA(device, 'aod.core.Device')}
+            end
+
+            if ~isscalar(device)
+                arrayfun(@(x) add(obj, x), device);
+                return
+            end
+            
             device.setParent(obj);
             obj.Devices = cat(1, obj.Devices, device);
         end

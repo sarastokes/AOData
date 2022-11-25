@@ -6,13 +6,15 @@ function results = runAODataTestSuite(varargin)
     %
     % Syntax:
     %   results = runAODataTestSuite()
-    %   results = runAODataTestSuite('Coverage', tf, 'KeepFiles', tf)
+    %   results = runAODataTestSuite(varargin)
     %
     % Optional key/value inputs:
     %   Coverage            logical (default = false)
     %       Whether to output coverage report
     %   KeepFiles           logical (default = false)
     %       Whether to keep HDF5 files produced by the test suite
+    %   Debug               logical (default = false)
+    %       Whether to stop on failures
     % ---------------------------------------------------------------------
     
     ip = inputParser();
@@ -23,6 +25,7 @@ function results = runAODataTestSuite(varargin)
 
     coverageFlag = ip.Results.Coverage;
     fileFlag = ip.Results.KeepFiles;
+    debugFlag = ip.Results.Debug;
 
     % Initialization
     if ~ispref('AOData', 'BasePackage')
@@ -35,9 +38,9 @@ function results = runAODataTestSuite(varargin)
     cd(fileparts(mfilename('fullpath')));
 
     if coverageFlag
-        results = testWithCoverageReport();
+        results = testWithCoverageReport(debugFlag);
     else
-        results = testWithoutCoverageReport();
+        results = testWithoutCoverageReport(debugFlag);
     end
 
     % Clean up test files
@@ -51,19 +54,19 @@ function results = runAODataTestSuite(varargin)
 end
 
 function results = testWithoutCoverageReport(debugFlag)
+    import matlab.unittest.plugins.StopOnFailuresPlugin
+    suite = testsuite(pwd);
+    runner = testrunner("textoutput");
     if debugFlag
-        import matlab.unittest.plugins.StopOnFailuresPlugin
+        runner.addPlugin(StopOnFailuresPlugin);
     end
-    results = runtests();
+    results = runner.run(suite);
 end
 
 function results = testWithCoverageReport(debugFlag)
     import matlab.unittest.plugins.CodeCoveragePlugin
-    import matlab.unittest.plugins.codecoverage.CoverageReport
-    
-    if debugFlag
-        import matlab.unittest.plugins.StopOnFailuresPlugin
-    end
+    import matlab.unittest.plugins.codecoverage.CoverageReport    
+    import matlab.unittest.plugins.StopOnFailuresPlugin
     
     flag = exist('coverage_report', 'dir');
     if flag == 0
@@ -72,6 +75,9 @@ function results = testWithCoverageReport(debugFlag)
 
     suite = testsuite(pwd);
     runner = testrunner("textoutput");
+    if debugFlag
+        runner.addPlugin(StopOnFailuresPlugin);
+    end
 
     p = CodeCoveragePlugin.forPackage("aod",...
         'IncludingSubpackages', true,...

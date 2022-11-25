@@ -54,30 +54,40 @@ classdef (Abstract) Entity < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        % The Entity's parent Entity (aod.core.Entity subclass)
         Parent                      % aod.core.Entity
+        % User-defined name for the entity, defines the HDF5 group name
         Name(1,:)                   char = char.empty()
+        % Unique identifier for the entity
         UUID                        string = string.empty()
+        % A description of the entity
         description                 char = char.empty() 
+        % Notes about the entity
         notes                       char = char.empty()
     end
 
     properties (Hidden, SetAccess = private)
+        % The entity's type (aod.core.EntityTypes)
         entityType                  %aod.core.EntityTypes
     end
 
     properties (SetAccess = protected)
+        % Files associated with the entity
         files                       % aod.util.Parameters
+        % Metadata for the entity which maps to HDF5 attributes
         parameters                  % aod.util.Parameters
     end
     
     properties (Dependent)
+        % Automated name from getLabel(), used for HDF5 group name if the name property is not set
         label
     end
 
     methods
         function obj = Entity(varargin)
+            
 
-            % Input parsing
+            % Input parsing and processing
             ip = aod.util.InputParser();
             addOptional(ip, 'Name', [], @(x) istext(x) | isempty(x));
             addParameter(ip, 'Parent', []);
@@ -86,20 +96,22 @@ classdef (Abstract) Entity < handle
             if ~isempty(ip.Results.Name)
                 obj.setName(ip.Results.Name);
             end
+
+            % Assign entity type
+            obj.assignEntityType();
+
+            % Generate a random unique identifier to distinguish the class
+            obj.UUID = aod.util.generateUUID();
+
+            % Set the Parent, if necessary
             if ~isempty(ip.Results.Parent)
                 obj.setParent(ip.Results.Parent);
             end
-
+            
             % Initialize containers
             obj.files = aod.util.Parameters();
             obj.parameters = aod.util.Parameters();
             
-            % Generate a random unique identifier to distinguish the class
-            obj.UUID = aod.util.generateUUID();
-
-            % Assign entity type
-            entityType = aod.core.EntityTypes.get(obj);
-            obj.entityType = entityType;
         end
 
         function value = get.label(obj)
@@ -590,7 +602,7 @@ classdef (Abstract) Entity < handle
                     end
                     propValue = obj.(propList(i));
                     propType = aod.core.EntityTypes.get(propValue);
-                    matches = findByUUID(propType.collectAll(h), propValue.UUID);
+                    matches = aod.util.findByUUID(propType.collectAll(h), propValue.UUID);
                     if isempty(matches)
                         warning("Entity:SyncWarning",...
                             "prop %s (%s) does not match existing entities in experiment",...
@@ -641,6 +653,11 @@ classdef (Abstract) Entity < handle
                 return
             end
             
+            if ~isscalar(obj)
+                arrayfun(@(x) setParent(x, parent), obj);
+                return
+            end
+            
             if obj.isValidParent(parent)
                 obj.Parent = parent;
             else
@@ -651,7 +668,7 @@ classdef (Abstract) Entity < handle
             obj.checkGroupNames();
         end
 
-        function setUUID(obj, UUID)
+        function setUUID(obj, uuid)
             % SETUUID
             %   
             % Description:
@@ -659,14 +676,17 @@ classdef (Abstract) Entity < handle
             %   Useful in ensuring sources match across experiments
             %
             % Syntax:
-            %   obj.setUUID(UUID)
+            %   obj.setUUID(uuid)
             %
             % See also:
-            %   generateUUID
+            %   aod.util.generateUUID
             % -------------------------------------------------------------
-            assert(isstring(UUID) & strlength(UUID) == 36,...
-                'ENTITY: UUID is not properly formatted, use aod.util.generateUUID()');
-            obj.UUID = UUID;
+            uuid = aod.util.validateUUID(uuid);
+            obj.UUID = uuid;
+        end
+
+        function assignEntityType(obj)
+            obj.entityType = aod.core.EntityTypes.get(obj);
         end
     end
 
@@ -704,6 +724,11 @@ classdef (Abstract) Entity < handle
     % Overloaded MATLAB functions
     methods
         function tf = isequal(obj, entity)
+            % Test whether two entities have the same UUID
+            %
+            % Syntax:
+            %   tf = isequal(obj, entity)
+            % -------------------------------------------------------------
             arguments
                 obj
                 entity      {aod.util.mustBeEntity(entity)}

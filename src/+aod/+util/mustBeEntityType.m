@@ -1,12 +1,12 @@
-function mustBeEntity(obj, entityType)
-    % MUSTBEENTITY
+function mustBeEntityType(obj, entityType)
+    % MUSTBEENTITYTYPE
     %
     % Description:
     %   Argument validation function to determine whether input is a 
     %   specific entity type (either core or persistent interface)
     %
     % Syntax:
-    %   mustBeEntityTy[e(obj, entityType)
+    %   mustBeEntityType(obj, entityType)
     %
     % Inputs:
     %   obj             AOData object
@@ -21,7 +21,7 @@ function mustBeEntity(obj, entityType)
 
     if ~isscalar(obj)
         for i = 1:numel(obj)
-            mustBeEntityType(obj, entityType);
+            aod.util.mustBeEntityType(obj, entityType);
         end
     end
 

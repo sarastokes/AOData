@@ -45,18 +45,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
             if isempty(regDate)
                 return
             end
-            if ~isdatetime(regDate)
-                try
-                    regDate = datetime(regDate, 'Format', 'yyyyMMdd');
-                catch ME 
-                    if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
-                        error("setRegistrationDate:FailedDatetimeConversion",...
-                            "Failed to convert to datetime, use format yyyyMMdd");
-                    else
-                        rethrow(ME);
-                    end
-                end
-            end
+            regDate = aod.util.validateDate(regDate);
             obj.registrationDate = regDate;
         end
     end
