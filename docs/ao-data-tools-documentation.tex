@@ -514,6 +514,7 @@ obj = MyClass(inputs)
 		\item \aodclass{SubclassName}
 	\end{itemize}
 	\noindent Methods may be listed with some combination of Abstract, Sealed, Static, Protected or Private. Properties may be listed as Abstract, Dependent, Protected or Private. If access isn't specified, assume it is Public. If these terms aren't familiar, check out the resource recommendations in \myurl{\ref{subsection:OOP}} on ``Object Oriented Programming''.
+
 	\subsection{ao.core.Entity \textcolor{gray}{(handle)}}
 		\label{subsection:EntityDoc}
 		\noindent  Abstract parent class to all core classes that are persisted into the HDF5 file. Because all core classes inherit \aodclass{aod.core.Entity}, they all operate in a similar way and if you learn the basics of this parent class, you'll already need to know most of how the subclasses work.
@@ -562,6 +563,7 @@ obj = aod.core.Entity(name)
 			%
 			\item \aodfcn{fPath = getHomeDirectory(obj)} - once an entity has been added to the Experiment or to another entity that is added, this function will return the \aodprop{homeDirectory} of \aodclass{aod.core.Experiment}
 			\item \aodfcn{h = ancestor(obj, entityType)} - recursively searches \aodprop{Parent} to find an entity of the specified type. % find an entity that that is a className or subclass of className 
+			\item \aodfcn{assignUUID(obj, UUID)} - assign a specific UUID to an entity. UUIDs are generated automatically for all entities and must be unique within in an experiment. However, some entities may not be unique across experiments. Use this method if you would like to have, for example, a Source or Device that is identifiable by the same UUID in each experiment. 
 		\end{itemize}
 		\docheader{Protected methods:}
 		\begin{itemize}
@@ -620,9 +622,12 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 			\item \aodfcn{clearSources(obj)}\\
 			%
 			\item \aodfcn{removeSystem(obj, ID)}
-			\item \aodfcn{clearSystems(obj)}\\
+			\item \aodfcn{clearSystems(obj)}
+			\item \aodfcn{getAllChannels(obj)}
+			\item \aodfcn{getAllDevices(obj)}\\
 			%
-			\item \aodfcn{clearEpochResposnes(obj, epochIDs)}
+			\item \aodfcn{clearAllDatasets(obj, epochIDs)}
+			\item \aodfcn{clearEpochResponses(obj, epochIDs)}
 			\item \aodfcn{clearEpochRegistrations(obj, epochIDs)}
 			\item \aodfcn{clearEpochStimuli(obj, epochIDs)}
 		\end{itemize}
@@ -634,9 +639,11 @@ obj = aod.core.Source(parent, 'name')
 		\end{lstlisting}
 		\docheader{Sealed Methods:}
 		\begin{itemize}
+			\item \aodfcn{add(obj, source)} - add source 
+			\item \aodfcn{remove(obj, sourceID)} - remove a child source
+			\item \aodfcn{clearChildSources(obj)} - clear all child sources
 			\item \aodfcn{sources = getParents(obj)}
 			\item \aodfcn{ID = getParentID(obj)}
-			\item \aodfcn{assignUUID(obj, UUID)}
 		\end{itemize}
 
 		\noindent Sources are nestable. For an example hierarchy, see the following Source subclasses where you might have 2 locations in 1 eye of 1 subject. 
@@ -706,10 +713,10 @@ obj = aod.core.System(name)
 		\end{itemize}
 		\docheader{Sealed Methods:}
 		\begin{itemize}
-			\item \aodfcn{add(obj, entity)} - Add a Channel to the system
+			\item \aodfcn{add(obj, channel)} - Add a Channel to the system
 			\item \aodfcn{removeChannel(obj, ID)} - ID is the index of the channel to remove
 			\item \aodfcn{clearChannels(obj)}
-			\item \aodfcn{assignUUID(obj, UUID)}
+			\item \aodfcn{getAllDevices(obj)}
 		\end{itemize}
 		
 	\subsection{aod.core.Channel \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
@@ -724,17 +731,11 @@ obj = aod.core.Channel(name)
 		\begin{itemize}
 			\item \aodprop{Devices} - container for all \aodclass{aod.core.Device}s within the Channel
 		\end{itemize}
-		%\docheader{Parameters:}
-		%\begin{itemize}
-		%	\item \aodparam{DataFolder} - optional, folder name within experiment file where channel's data was written
-		%\end{itemize}
 		\docheader{Sealed Methods:}
 		\begin{itemize}
-			% \item \aodfcn{setDataFolder(obj, dataFolder)}
 			\item \aodfcn{add(obj, device)} - Add a Device to the channel
 			\item \aodfcn{removeDevice(obj, ID)}
 			\item \aodfcn{clearDevices(obj)}
-			\item \aodfcn{assignUUID(obj, UUID)}
 		\end{itemize}
 
 	\subsection{aod.core.Device  \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
@@ -748,10 +749,6 @@ obj = aod.core.Device(name, 'Model', value, 'Manufacturer', value);
 		\begin{itemize}
 			\item \aodparam{Manufacturer}
 			\item \aodparam{Model}
-		\end{itemize}
-		\docheader{Sealed Methods:}
-		\begin{itemize}
-			\item \aodfcn{assignUUID(obj, UUID)}
 		\end{itemize}
 		\docheader{Examples:}
 		\begin{itemize}
@@ -789,7 +786,7 @@ obj = aod.core.Segmentation(data)
 		\end{itemize}
 
 	\subsection{aod.core.Epoch \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
-		\noindent A single period of data acquisition within the Experiment. 
+		\noindent A single period of data acquisition within the Experiment. Epochs differ from the other entities in one key way: because they already have an intuitive numeric identifier (\aodprop{ID}, the video number in the experiment), this is used rather than their index in the \aodprop{Epochs} container for methods like \aodfcn{remove()} 
 	
 		\begin{lstlisting}[language=matlab]
 obj = aod.core.Epoch(ID)
@@ -810,7 +807,7 @@ obj = aod.core.Epoch(ID)
 		\begin{itemize}
 			\item \aodfcn{setSource(obj, system)}
 			\item \aodfcn{setSystem(obj, system)}
-			\item \aodfcn{add(obj, entity)} - Add a dataset, registration, response, stimulus to the Epoch\\
+			\item \aodfcn{add(obj, entity)} - Add a Dataset, Registration, Response or Stimulus to the Epoch\\
 			%
 			\item \aodfcn{removeDataset(obj, ID)}
 			\item \aodfcn{removeResponse(obj, ID)}
@@ -842,7 +839,7 @@ obj = aod.core.Registration(name, registrationDate)
 			\item \aodclass{aod.builtin.registrations.StripRegistration}
 		\end{itemize}
 	\subsection{aod.core.Stimulus \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
-		\noindent Stimuli presented during the Epoch. The contents of \aodclass{aod.core.Stimulus} can be generated automatically by passing a \aodclass{aod.core.Protocol} used to create the stimulus presented during the trial.
+		\noindent Stimuli presented during the Epoch. Optionally, the contents of \aodclass{aod.core.Stimulus} can be generated automatically by passing a \aodclass{aod.core.Protocol} used to create the stimulus presented during the trial.
 		\begin{lstlisting}
 obj = aod.core.Stimulus(name)
 obj = aod.core.Stimulus(name, protocol)
@@ -948,7 +945,7 @@ registration = aod.core.Registration('name', regDate)
 registration = aod.core.Registration('name', regDate, data)
 
 stimulus = aod.core.Stimulus(name);
-stimulus = aod.core.Stimulus(name, protocol); % TODO
+stimulus = aod.core.Stimulus(name, protocol);
 
 dataset = aod.core.Dataset(name);
 dataset = aod.core.Dataset(name, data);
@@ -963,7 +960,7 @@ response = aod.core.Response(name);
 	\subsection{aod.util.Factory \textcolor{gray}{(handle)}}
 		\noindent Factory classes simplify the creation of standardized entities. For example, if you have some standard Devices you frequently use, you could subclass Device and create a class for each or you could create a pipeline with Factory to keep OOP from getting out of control. See \aodclass{sara.factories.ChannelFactory} for an example. 
 		
-		Factory is an abstract class with two abstract methods, a public \aodfcn{get()} method and a static \aodfcn{create()} method. The \aodfcn{get()} method is where your implementation goes... define the parameters you want to provide and how you will use them to return a specific entity. 
+		Factory is an abstract class with two abstract methods, a public \aodfcn{get()} method and a static \aodfcn{create()} method. The \aodfcn{get()} method is where your implementation goes: define the parameters you want to provide and how you will use them to return a specific entity. 
 		\begin{lstlisting}[language=matlab]
 % Instantiate the object
 obj = MyFactory();
@@ -972,15 +969,25 @@ entity = get(obj, varargin)
 		\end{lstlisting}
 		Sometimes you might want to have some properties associated with your Factory class, which means you need to instantiate the object before calling \aodfcn{get()}. If you're lazy like me and don't want to always be instantiating first, especially for factories that have no associated properties, there's the static \aodfcn{create()} method, which wraps the two lines above.
 		\begin{lstlisting}[language=matlab]
-methods (Static)
-	function entity = create(varargin)
-		obj = MyFactory();
-		entity = obj.get(varargin);
-	end
-end
-
 % Get the entity using create
 entity = MyFactory.create(varargin);
+		\end{lstlisting}
+		Here's a blueprint for a Factory class showing \aodfcn{get()} and \aodfcn{create()}.
+		\begin{lstlisting}[language=matlab]
+classdef MyFactory < aod.util.Factory
+	methods 
+		function obj = get(varargin)
+			% Implementation: use parameters to return a specific entity
+		end
+	end
+
+	methods (Static)
+		function entity = create(varargin)
+			obj = MyFactory();
+			entity = obj.get(varargin);
+		end
+	end
+end
 		\end{lstlisting}
 		
 	\subsection{aod.util.Parameters \myparent{containers.Map}}
@@ -1170,9 +1177,10 @@ experiment.Epochs(1:5).Responses
 		\end{enumerate}
 		\noindent When writing an entity, properties are handled as follows:
 		\begin{itemize}
-			\item Transient properties are not written. Dependent properties are written unless they are also marked Hidden
+			% \item The \aodprop{parameters} property is not written as a dataset, but instead written as attributes of the entity's group
 			\item Empty properties are not written
-			\item Properties referring to other entities (that are not containers, e.g. \aodprop{Parent}) are written as link within the entity group. Data is written in an order that ensures linked entities are written before the entity containing their link.
+			\item Transient properties and properties without public GetAccess are not written. Dependent properties are written unless they are also marked Hidden.
+			\item Properties referring to other entities (that are not containers, e.g. \aodprop{Epochs} in \aodclass{aod.core.Experiment}) are written as link within the entity group. Data is written in an order that ensures linked entities are written before the entity containing their link. When adding links to custom subclasses, keep in mind the order of entities in the AOData object model, as this is the order they are written to the HDF5 files. 
 			\item All other properties are written as datasets within the entity group. Virtually all MATLAB data types are supported, except multilevel \matclass{struct}. Most other data types translate well, with a few quirks:
 			\begin{itemize}
 				\item HDF5 doesn't have a \matclass{datetime} class, so these properties are written as a text dataset, with attributes specifying the format to aid conversion when reading the HDF5 file back into MATLAB.

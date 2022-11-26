@@ -127,7 +127,7 @@ classdef Persistor < handle
             fullPath = aod.h5.HDF5.buildPath(src.hdfPath, evt.Name);
             if isempty(evt.NewValue)
                 % Dataset should be deleted
-                aod.h5.deleteObject(obj.hdfName, fullPath, evt.Name);
+                aod.h5.HDF5.deleteObject(obj.hdfName, fullPath, evt.Name);
             elseif ~aod.h5.HDF5.exists(obj.hdfName, fullPath) 
                 % Dataset does not yet exist
                 aod.h5.writeDatasetByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);

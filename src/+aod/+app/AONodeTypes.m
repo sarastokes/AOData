@@ -26,6 +26,7 @@ classdef AONodeTypes
         NUMERIC 
         TABLE 
         TIMETABLE 
+        TIMESERIES
         DATETIME 
         STRUCTURE
         MAP 
@@ -135,11 +136,11 @@ classdef AONodeTypes
             if isenum(data)
                 obj = AONodeTypes.ENUM;
             else
-                obj = AONodeTypes.get(class(data));
+                obj = AONodeTypes.init(class(data));
             end
         end
 
-        function obj = get(nodeName)
+        function obj = init(nodeName)
             if isa(nodeName, 'aod.app.AONodeTypes')
                 obj = nodeName;
                 return 
@@ -168,14 +169,14 @@ classdef AONodeTypes
                     obj = AONodeTypes.TIMESERIES;
                 case 'enum'
                     obj = AONodeTypes.ENUM;
+                case 'containers.map'
+                    obj = AONodeTypes.MAP;
                 case 'struct'
                     obj = AONodeTypes.STRUCTURE;
                 case {'aod.util.parameters', 'files'}
                     obj = AONodeTypes.FILES;
                 case 'affine2d'
                     obj = AONodeTypes.TRANSFORM;
-                case 'files'
-                    obj = AONodeTypes.FILES;
                 case 'notes'
                     obj = AONodeTypes.NOTES;
                 otherwise

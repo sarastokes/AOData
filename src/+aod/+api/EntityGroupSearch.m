@@ -163,7 +163,8 @@ classdef EntityGroupSearch < handle
 
     methods (Static)
         function out = go(entityGroup, queryType, varargin)
-            obj = aod.api.EntityGroupSearch()
+            obj = aod.api.EntityGroupSearch(entityGroup, queryType, varargin{:});
+            out = obj.getMatches();
         end
     end
 end

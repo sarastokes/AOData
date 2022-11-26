@@ -35,6 +35,18 @@ classdef FilterTypes
     
     methods (Static)
         function out = get(filterType, varargin)
+
+            obj = aod.api.FilterTypes.init(filterType);
+
+            if nargin > 1
+                fcn = obj.getFcn();
+                out = fcn(varargin{:});
+            else
+                out = obj;
+            end
+        end
+
+        function obj = init(filterType)
             import aod.api.FilterTypes
 
             switch lower(filterType)
@@ -52,13 +64,9 @@ classdef FilterTypes
                     obj = FilterTypes.NAME;
                 case 'parent'
                     obj = FilterTypes.PARENT;
-            end
-
-            if nargin > 1
-                fcn = obj.getFcn();
-                out = fcn(varargin{:});
-            else
-                out = obj;
+                otherwise
+                    error("FilterTypes_init:UnknownType",...
+                        'FilterType %s not recognized', filterType);
             end
         end
     end

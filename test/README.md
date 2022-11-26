@@ -29,6 +29,6 @@ result = runtests('HDFTest');
 
 
 ##### Code Coverage
-As of 24Nov2022, the aod package report contains **130 files** and has:
-- **36.99%** statement coverage (4033 executable lines) 
-- **37.94%** function coverage (701 executable lines).
+As of 24Nov2022, the aod package report contains **131 files** and has:
+- **41.8%** statement coverage (4031 executable lines) 
+- **42.77%** function coverage (699 executable lines).

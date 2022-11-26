@@ -55,9 +55,10 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.EXPT.clearCalibrations();
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 0);
 
-            % Add them back, together
+            % Add them back, together, and the clear
             testCase.EXPT.add([cal1, cal2]);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
+            testCase.EXPT.clearCalibrations();
         end
 
         function analysisIO(testCase)
@@ -77,7 +78,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Add a date to the analysis
             testCase.EXPT.Analyses(2).setAnalysisDate(getDateYMD());
             dateParam = getParam(testCase.EXPT.Analyses(2), 'Date');
-            testCase.verifyTrue(isequal(dateParam, char(getDateYMD())));
+            test.verifyDatesEqual(testCase, dateParam, getDateYMD());
 
             % Clear the analyses
             testCase.EXPT.clearAnalyses();
@@ -118,7 +119,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(channel1.Devices), 2);
             testCase.verifyEqual(numel(channel2.Devices), 1);
             testCase.verifyEqual(numel(system.getAllDevices()), 3);
-            testCase.verifyEqual(testCase.EXPT.getAllDevices(), 3);
+            testCase.verifyEqual(numel(testCase.EXPT.getAllDevices()), 3);
         end
 
         function epochIO(testCase)
@@ -145,19 +146,59 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
             testCase.verifyEqual(testCase.EXPT.numEpochs, 0);
 
+            % Create an epoch with a non-consecutive ID
+            epoch3 = aod.core.Epoch(4);
+
             % Add the epochs back, together
-            testCase.EXPT.add([epoch1, epoch2]);
+            testCase.EXPT.add([epoch1, epoch2, epoch3]);
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs), 3);
+
+            % Check epoch indexing
+            testCase.verifyEqual(testCase.EXPT.id2index(4), 3);
+            testCase.verifyEqual(testCase.EXPT.id2index([1 2 4]), [1 2 3]);
 
             % Try to add an epoch with the same ID
             badEpoch = aod.core.Epoch(1);
-            testCase.verifyError(@() testCase.EXPT.add(badEpoch), Throws(?MException));
-            testCase.EXPT.add(badEpoch);
+            testCase.verifyError(@() testCase.EXPT.add(badEpoch), ?MException);
         end
 
         function datasetIO(testCase)
-            % Create a dataset
+            import matlab.unittest.constraints.Throws
+
+            % Create some datasets
             dataset1 = aod.core.Dataset('TestDataset1');
-            dataset1.setDescription('This is a test dataset');
+            dataset2 = aod.core.Dataset('TestDataset2');
+            dataset2.setDescription('This is a test dataset');
+            
+            testCase.EXPT.Epochs(1).add(dataset1);
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 1);
+
+            testCase.EXPT.Epochs(1).add(dataset2);
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 2);
+            
+            % Clear all the datasets
+            testCase.EXPT.clearEpochDatasets();
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 0);
+            
+            % Add the datasets back
+            testCase.EXPT.Epochs(1).add([dataset1, dataset2]);
+            
+            % Try to add a dataset to the experiment
+            testCase.verifyThat(...
+                @() testCase.EXPT.add(aod.core.Dataset('TestDataset3')),...
+                Throws("Experiment:AddedInvalidEntity"));
+        end
+    end
+
+    methods (Test)
+        function testEntityGroupSearch(testCase)
+            testCase.EXPT.add(aod.core.Calibration('TestCalibration1', getDateYMD()));
+            testCase.EXPT.add(aod.builtin.calibrations.PowerMeasurement(...
+                'Mustang', getDateYMD(), 488));
+            out = aod.api.EntityGroupSearch(testCase.EXPT.Calibrations,... 
+                'Subclass', 'aod.builtin.calibrations.PowerMeasurement');
+            testCase.verifyEqual(numel(out), 1);
+            testCase.EXPT.clearCalibrations();
         end
     end
 end 

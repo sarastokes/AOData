@@ -16,7 +16,7 @@ classdef H5NodeTypes
     end
 
     methods (Static)
-        function obj = get(nodeType)
+        function obj = init(nodeType)
             if isa(nodeType, 'aod.app.NodeTypes')
                 obj = nodeType;
                 return
@@ -24,15 +24,15 @@ classdef H5NodeTypes
 
             import aod.app.H5NodeTypes
 
-            switch lower(nodeTypes)
+            switch lower(nodeType)
                 case 'none'
-                    obj = NodeTypes.NONE;
+                    obj = H5NodeTypes.NONE;
                 case 'group'
-                    obj = NodeTypes.GROUP;
+                    obj = H5NodeTypes.GROUP;
                 case 'dataset'
-                    obj = NodeTypes.DATASET;
+                    obj = H5NodeTypes.DATASET;
                 case 'link'
-                    obj = NodeTypes.LINK;
+                    obj = H5NodeTypes.LINK;
             end
         end
     end

@@ -616,13 +616,19 @@ classdef HDF5 < handle
                 name                char
             end
 
-            fileID = aod.h5.HDF5.openFile(fileName);
+            fileID = aod.h5.HDF5.openFile(fileName, false);
             fileIDx = onCleanup(@()H5F.close(fileID));
 
-            groupID = H5G.open(fileID, pathName);
-            groupIDx = onCleanup(@()H5G.close(groupID));
+            fprintf('Deleting %s:%s attribute %s\n', fileName, pathName, name);
+            try  % See if pathName refers to a group
+                rootID = H5G.open(fileID, pathName);
+                rootIDx = onCleanup(@()H5G.close(rootID));
+            catch % If not, it refers to a dataset
+                rootID = H5D.open(fileID, pathName);
+                rootIDx = onCleanup(@()H5D.close(rootID));
+            end
 
-            H5A.delete(groupID, name);
+            H5A.delete(rootID, name);
         end
         
         function writeatts(fileName, pathName, varargin)
@@ -746,8 +752,13 @@ classdef HDF5 < handle
             if pathName == '/'
                 parentID = fileID;
             else
-                parentID = H5G.open(fileID, pathName);
-                parentIDx = onCleanup(@()H5G.close(parentID));
+                try    % Try to treat pathName as a group
+                    parentID = H5G.open(fileID, pathName);
+                    parentIDx = onCleanup(@()H5G.close(parentID));
+                catch  % Otherwise handle it as a dataset
+                    parentID = H5D.open(fileID, pathName);
+                    parentIDx = onCleanup(@()H5G.close(parentID));
+                end
             end
             H5L.delete(parentID, name, 'H5P_DEFAULT');
         end

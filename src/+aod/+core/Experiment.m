@@ -164,23 +164,6 @@ classdef Experiment < aod.core.Entity
                         "Entity must be Analysis, Calibration, Segmentation, Source or System");
             end
         end
-
-        function appendGitHashes(obj)
-            % APPENDGITHASHES
-            %
-            % Description:
-            %   Append git hashes
-            %
-            % Syntax:
-            %   appendGitHashes(obj)
-            % -------------------------------------------------------------
-            try
-                RM = aod.infra.RepositoryManager();
-                obj.Code = RM.commitIDs;
-            catch ME  % Rethrow as warning instead of error
-                disp(getReport(ME, 'extended', 'hyperlinks', 'on'));
-            end
-        end
     end
 
     methods
@@ -401,25 +384,6 @@ classdef Experiment < aod.core.Entity
 
     % System methods
     methods 
-        function addSystem(obj, system)
-            % ADDSYSTEM
-            %
-            % Description:
-            %   Add a System to the expeirment
-            %
-            % Syntax:
-            %   obj.addSystem(system)
-            % -------------------------------------------------------------
-            assert(isSubclass(system, 'aod.core.System'),...
-                'Must be a subclass of aod.core.System');
-            
-            warning('addSystem:Deprecated', 'This function will be removed soon');
-            for i = 1:numel(system)
-                system(i).setParent(obj);
-                obj.Systems = cat(1, obj.Systems, system(i));
-            end
-        end
-
         function system = getSystem(obj, systemName)
             % GETSYSTEM
             %
@@ -467,7 +431,10 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             obj.Systems = aod.core.System.empty();
         end
+    end
 
+    % System hierarchy methods
+    methods 
         function channels = getAllChannels(obj)
             % GETALLCHANNELS
             %
@@ -504,25 +471,6 @@ classdef Experiment < aod.core.Entity
 
     % Epoch methods
     methods
-        function addEpoch(obj, epoch)
-            % ADDEPOCH
-            %
-            % Syntax:
-            %   obj.addEpoch(obj, epoch)
-            % -------------------------------------------------------------
-            assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
-
-            if ismember(epoch.ID, obj.epochIDs)
-                error("addEpoch:EpochIDAlreadyExists",...
-                    "Epoch %u is already present", epoch.ID);
-            end
-
-            epoch.setParent(obj);
-
-            obj.Epochs = cat(1, obj.Epochs, epoch);
-            obj.sortEpochs();
-        end
-        
         function removeEpochByID(obj, epochID)
             % REMOVEEPOCHS
             %
@@ -588,29 +536,6 @@ classdef Experiment < aod.core.Entity
 
     % Calibration methods
     methods
-        function addCalibration(obj, calibration)
-            % ADDCALIBRATION
-            %
-            % Description:
-            %   Add calibration(s) to the experiment
-            %
-            % Syntax:
-            %   obj.addCalibration(obj, calibration)
-            %
-            % Input:
-            %   calibration             aod.core.Calibration subclass
-            %       A calibration or array of calibrations
-            % -------------------------------------------------------------
-            warning('addCalibration:Deprecated', 'This function will be removed soon')
-            assert(isSubclass(calibration, 'aod.core.Calibration'),...
-                'addCalibration: Input must be subclass of aod.core.Calibration');
-            
-            for i = 1:numel(calibration)
-                calibration(i).setParent(obj);
-                obj.Calibrations = cat(1, obj.Calibrations, calibration(i));
-            end
-        end
-
         function removeCalibration(obj, ID)
             % REMOVECALIBRATIONS
             %
@@ -634,23 +559,6 @@ classdef Experiment < aod.core.Entity
 
     % Analysis methods
     methods
-        function addAnalysis(obj, analysis)
-            % ADDANALYSIS
-            %
-            % Description:
-            %   Add analysis to experiment
-            %
-            % Syntax:
-            %   addAnalysis(obj, analysis)
-            % -------------------------------------------------------------
-            assert(isSubclass(analysis, 'aod.core.Analysis'),... 
-            'Input must be subclass of aod.core.Analysis');
-
-            warning('addAnalysis:Deprecated', 'This function will be removed soon');
-            analysis.setParent(obj);
-            obj.Analyses = cat(1, obj.Analyses, analysis);
-        end
-
         function removeAnalysis(obj, ID)
             % REMOVEANALYSIS
             %
@@ -787,6 +695,25 @@ classdef Experiment < aod.core.Entity
     end
 
     methods (Access = protected)
+         function addEpoch(obj, epoch)
+            % ADDEPOCH
+            %
+            % Syntax:
+            %   obj.addEpoch(obj, epoch)
+            % -------------------------------------------------------------
+            assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
+
+            if ismember(epoch.ID, obj.epochIDs)
+                error("addEpoch:EpochIDAlreadyExists",...
+                    "Epoch %u is already present", epoch.ID);
+            end
+
+            epoch.setParent(obj);
+
+            obj.Epochs = cat(1, obj.Epochs, epoch);
+            obj.sortEpochs();
+        end
+        
         function sortEpochs(obj)
             % SORTEPOCHS
             %
@@ -801,6 +728,23 @@ classdef Experiment < aod.core.Entity
             end
             [~, idx] = sort(obj.epochIDs);
             obj.Epochs = obj.Epochs(idx);
+        end
+
+        function appendGitHashes(obj)
+            % APPENDGITHASHES
+            %
+            % Description:
+            %   Append git hashes
+            %
+            % Syntax:
+            %   appendGitHashes(obj)
+            % -------------------------------------------------------------
+            try
+                RM = aod.infra.RepositoryManager();
+                obj.Code = RM.commitIDs;
+            catch ME  % Rethrow as warning instead of error
+                disp(getReport(ME, 'extended', 'hyperlinks', 'on'));
+            end
         end
     end
 end

@@ -20,4 +20,5 @@ function writeAttributeByType(hdfName, hdfPath, name, value)
     end
 
     aod.h5.HDF5.writeatts(hdfName, hdfPath, name, value);
+    fprintf('Wrote %s:%s attribute %s\n', hdfName, hdfPath, name);
     

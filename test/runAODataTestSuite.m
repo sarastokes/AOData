@@ -45,7 +45,7 @@ function results = runAODataTestSuite(varargin)
 
     % Clean up test files
     if ~fileFlag
-        delete('test.h5');
+        delete('ToyExperiment.h5');
         delete('HdfTest.h5');
     end
 

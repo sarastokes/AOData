@@ -18,9 +18,11 @@ classdef FilterTest < matlab.unittest.TestCase
     methods (TestClassSetup)
         function methodSetup(testCase)
             % Creates an experiment, writes to HDF5 and reads back in
-            ToyExperiment(true);
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
                 'test', 'ToyExperiment.h5');
+            if ~exist(fileName, 'file')
+                ToyExperiment(true);
+            end
             testCase.EXPT = loadExperiment(fileName);
         end
     end

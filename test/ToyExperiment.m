@@ -50,7 +50,7 @@ function experiment = ToyExperiment(writeToHDF)
 
     epoch = aod.core.Epoch(1, 'Source', source, 'System', system);
     epoch.setFile('PresyncFile', fullfile(cd, 'PresyncFile.txt'));
-    experiment.addEpoch(epoch);
+    experiment.add(epoch);
     epoch.setTiming(1:5);
     epoch.setFile('PostSyncFile', fullfile(cd, 'PostSyncFile.txt'));
 
@@ -70,6 +70,8 @@ function experiment = ToyExperiment(writeToHDF)
     epoch.add(stim);
 
     experiment.add(aod.core.Epoch(2, 'Source', source));
+
+    setParam(experiment.Epochs, 'RefPmtGain', 0.51);
 
     experiment.add(aod.core.Analysis('TestAnalysis', 'Date', getDateYMD()));
 

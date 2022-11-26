@@ -17,22 +17,12 @@ classdef CustomDisplayTest < matlab.unittest.TestCase
 
 %#ok<*MANU> 
 
-    properties
-        EXPT
-    end
-
-    methods (TestClassSetup)
-        function methodSetup(testCase)
-            testCase.EXPT = loadExperiment('ToyExperiment.h5');
-        end
-    end
-
     methods (Test)
         function testParameters(testCase)
             paramObj = aod.util.Parameters();
             disp(paramObj);
-            paramObj('Param1', 1);
-            paramObj('Param2', 2);
+            paramObj('Param1') = 1;
+            paramObj('Param2') = 2;
             disp(paramObj);
         end
     end

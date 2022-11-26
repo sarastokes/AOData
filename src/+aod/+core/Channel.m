@@ -82,24 +82,6 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             obj.Devices = [];
         end
-
-        function assignUUID(obj, UUID)
-            % ASSIGNUUID
-            %
-            % Description:
-            %   The same channels may be used over multiple experiments and
-            %   should share UUIDs. This function provides public access
-            %   to aod.core.Entity's setUUID function to facilitate hard-
-            %   coded UUIDs for common sources
-            %
-            % Syntax:
-            %   obj.assignUUID(UUID)
-            %
-            % See also:
-            %   aod.util.generateUUID
-            % -------------------------------------------------------------
-            obj.setUUID(UUID);
-        end
     end
 
     % Overwritten methods

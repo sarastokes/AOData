@@ -131,11 +131,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % Overloaded MATLAB methods
     methods
         function tf = isequal(obj, entity)
+            % Tests whether the UUIDs of two entities are equal
             arguments
                 obj
                 entity      {mustBeA(entity, 'aod.persistent.Entity')}
             end
-
             tf = isequal(obj.UUID, entity.UUID);
         end
     end
@@ -184,7 +184,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                hdfPath     char 
+                hdfPath     string 
             end
 
             try
@@ -243,16 +243,16 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             obj.checkReadOnlyMode();
 
-            [isEntity, isPersisted] = aod.util.isEntity(entity);
+            [isEntity, isPersisted] = aod.util.isEntity(propValue);
             if isEntity
                 if isPersisted
-                    obj.setLink(propName, entity, propValue);
+                    obj.setLink(propName, propValue);
                 else
                     error("AddProperty:UnpersistedLink",...
                         "Links can only be written to persisted entities");
                 end
             else
-                obj.setDataset(propName, entity, propValue);
+                obj.setDataset(propName, propValue);
             end
         end
 
@@ -268,10 +268,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.checkReadOnlyMode();
 
             p = obj.findprop(propName);
-            if isa(p, 'meta.property')
-                error('removeProperty:FixedProperty',...
-                    'Only dynamic properties can be removed');
-            end
+            % if isa(p, 'meta.property')
+            %    error('removeProperty:FixedProperty',...
+            %        'Only dynamic properties can be removed');
+            %end
 
             if ismember(propName, obj.dsetNames)
                 obj.setDataset(propName, []);
@@ -452,7 +452,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             if ismember(paramName, aod.h5.getSystemAttributes())
                 warning("setParam:SystemAttribute",...
-                    "Parameter %s not set, member of system attributes", paramName);
+                    "Parameter %s not removed, member of system attributes", paramName);
                 return
             end
             
@@ -462,7 +462,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.persistent.events.AttributeEvent(obj.hdfPath, paramName);
+            evtData = aod.persistent.events.AttributeEvent(paramName);
             notify(obj, 'AttributeChanged', evtData);
 
             remove(obj.parameters, paramName);
@@ -572,7 +572,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             out = fullfile(h.homeDirectory, out);
         end
 
-        function setFile(obj, fileName, fileValue)
+        function setFile(obj, fileKey, fileValue)
             % SETFILE
             %
             % Description:
@@ -583,21 +583,21 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                fileName            char
+                fileKey            char
                 fileValue 
             end
 
             obj.checkReadOnlyMode();
             
             if ~isscalar(obj)
-                arrayfun(@(x) x.setFile(fileName, fileValue), obj);
+                arrayfun(@(x) x.setFile(fileKey, fileValue), obj);
                 return
             end
 
-            evtData = aod.persistent.events.FileEvent(fileName, fileValue);
+            evtData = aod.persistent.events.FileEvent(fileKey, fileValue);
             notify(obj, 'FileChanged', evtData);
 
-            obj.files(fileName) = fileValue;
+            obj.files(fileKey) = fileValue;
         end
 
         function removeFile(obj, fileKey)
@@ -627,7 +627,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            evtData = aod.persistent.events.FileEvent(obj.hdfPath, fileKey);
+            evtData = aod.persistent.events.FileEvent(fileKey);
             notify(obj, 'FileChanged', evtData);
 
             remove(obj.files, fileKey);

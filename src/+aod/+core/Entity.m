@@ -46,7 +46,6 @@ classdef (Abstract) Entity < handle
 %   checkGroupNames(obj)
 %
 % Protected methods (with aod.persistent.Entity subclass access allowed):
-%   setUUID(obj, uuid)
 %   addParent(obj, parent)
 %
 % Private methods:
@@ -531,6 +530,25 @@ classdef (Abstract) Entity < handle
                 out = [];
             end
         end
+
+        function assignUUID(obj, uuid)
+            % ASSIGNUUID
+            %
+            % Description:
+            %   The same system may be used over multiple experiments and
+            %   should share UUIDs. This function provides public access
+            %   to aod.core.Entity's setUUID function to facilitate hard-
+            %   coded UUIDs for common sources
+            %
+            % Syntax:
+            %   obj.assignUUID(UUID)
+            %
+            % See also:
+            %   aod.util.generateUUID
+            % -------------------------------------------------------------
+            uuid = aod.util.validateUUID(uuid);
+            obj.UUID = uuid;
+        end
     end
 
     % Methods meant to be overwritten by subclasses, if needed
@@ -666,23 +684,6 @@ classdef (Abstract) Entity < handle
 
             obj.sync();
             obj.checkGroupNames();
-        end
-
-        function setUUID(obj, uuid)
-            % SETUUID
-            %   
-            % Description:
-            %   Allows subclasses to set UUID to a standardized value. 
-            %   Useful in ensuring sources match across experiments
-            %
-            % Syntax:
-            %   obj.setUUID(uuid)
-            %
-            % See also:
-            %   aod.util.generateUUID
-            % -------------------------------------------------------------
-            uuid = aod.util.validateUUID(uuid);
-            obj.UUID = uuid;
         end
 
         function assignEntityType(obj)

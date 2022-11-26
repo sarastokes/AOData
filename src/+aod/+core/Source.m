@@ -27,6 +27,43 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Sealed)
+        function add(obj, subSource)
+            % ADD
+            %
+            % Description:
+            %   Add a sub-source to the current source
+            %
+            % Syntax:
+            %   add(obj, subSource)
+            % -------------------------------------------------------------
+            assert(isSubclass(obj, 'aod.core.Source'),... 
+                'Must be subclass of aod.core.Source');
+
+            subSource.setParent(obj);
+            obj.Sources = cat(1, obj.Sources, subSource);
+        end
+
+        function remove(obj, sourceID)
+            % REMOVE
+            %
+            % Description:
+            %   Remove a child source, or sources
+            % -------------------------------------------------------------
+            assert(sourceID > 0 && sourceID <= numel(obj.Sources),...
+                'Invalid source ID %u, must be between 1 and %u',...
+                sourceID, numel(obj.Sources));
+            obj.Sources(sourceID) = [];
+        end
+
+        function clearSources(obj)
+            % CLEARSOURCES
+            %
+            % Syntax:
+            %   Clear child sources of this source
+            % -------------------------------------------------------------
+            obj.Sources = aod.core.Source.empty();
+        end
+
         function sources = getParents(obj)
             % GETPARENTS
             %
@@ -67,40 +104,6 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 parent = parent.Parent;
             end
             ID = parent.ID;
-        end
-
-        function add(obj, subSource)
-            % ADD
-            %
-            % Description:
-            %   Add a sub-source to the current source
-            %
-            % Syntax:
-            %   add(obj, subSource)
-            % -------------------------------------------------------------
-            assert(isSubclass(obj, 'aod.core.Source'),... 
-                'Must be subclass of aod.core.Source');
-
-            subSource.setParent(obj);
-            obj.Sources = cat(1, obj.Sources, subSource);
-        end
-
-        function assignUUID(obj, UUID)
-            % ASSIGNUUID
-            %
-            % Description:
-            %   The same sources may be used over multiple experiments and
-            %   should share UUIDs. This function provides public access
-            %   to aod.core.Entity's setUUID function to facilitate hard-
-            %   coded UUIDs for common sources
-            %
-            % Syntax:
-            %   obj.assignUUID(UUID)
-            %
-            % See also:
-            %   aod.util.generateUUID
-            % -------------------------------------------------------------
-            obj.setUUID(UUID);
         end
     end
 

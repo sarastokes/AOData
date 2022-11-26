@@ -35,24 +35,4 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.setParam(ip.Results);
         end
     end
-    
-    methods (Sealed)
-        function assignUUID(obj, UUID)
-            % ASSIGNUUID
-            %
-            % Description:
-            %   The same devices may be used over multiple experiments and
-            %   should share UUIDs. This function provides public access
-            %   to aod.core.Entity's setUUID function to facilitate hard-
-            %   coded UUIDs for common sources
-            %
-            % Syntax:
-            %   obj.assignUUID(UUID)
-            %
-            % See also:
-            %   aod.util.generateUUID
-            % -------------------------------------------------------------
-            obj.setUUID(UUID);
-        end
-    end
 end

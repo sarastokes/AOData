@@ -525,7 +525,7 @@ classdef EntityTypes
                 case {'registration', 'registrations', 'reg'}
                     obj = EntityTypes.REGISTRATION;
                 case {'response', 'responses', 'resp'}
-                    obj = EntityTypes.RESPONSES;
+                    obj = EntityTypes.RESPONSE;
                 case {'stimulus', 'stimuli', 'stim'}
                     obj = EntityTypes.STIMULUS;
                 case {'analysis', 'analyses'}
