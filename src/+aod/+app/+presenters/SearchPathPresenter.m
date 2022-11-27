@@ -2,7 +2,7 @@ classdef SearchPathPresenter < appbox.Presenter
 % SEARCHPATHPRESENTER
 %
 % Description:
-%   User interface for setting AOData class search paths
+%   User interface for setting up AOData's search paths and git repos
 %
 % Parent:
 %   appbox.Presenter
@@ -12,7 +12,7 @@ classdef SearchPathPresenter < appbox.Presenter
 %   obj = SearchPathPresenter(view)
 %
 % See also:
-%   symphonyui.presenters.OptionsPresenter
+%   SearchPathApp, aod.app.views.SearchPathView
 % -------------------------------------------------------------------------
     properties (Access = private)
         isChanged
@@ -27,11 +27,20 @@ classdef SearchPathPresenter < appbox.Presenter
             obj.isChanged = false;
             obj.go();
         end
+
+        function v = getView(obj)
+            v = obj.view;
+        end
     end
 
     methods (Access = protected)
         function willGo(obj)
+            if ~ispref('AOData')
+                initializeAOData();
+            end
+            obj.populateBasePackage();
             obj.populateSearchPaths();
+            obj.populateGitRepos();
         end
 
         function bind(obj)
@@ -39,14 +48,23 @@ classdef SearchPathPresenter < appbox.Presenter
 
             v = obj.view;
             obj.addListener(v, 'KeyPress', @obj.onViewKeyPress);
+            obj.addListener(v, 'UpdateBasePackage', @obj.onViewSelectedUpdateBasePackage);
             obj.addListener(v, 'AddSearchPath', @obj.onViewSelectedAddSearchPath);
             obj.addListener(v, 'RemoveSearchPath', @obj.onViewSelectedRemoveSearchPath);
-            obj.addListener(v, 'Save', @obj.onViewSelectedSave);
+            obj.addListener(v, 'SaveSearchPaths', @obj.onViewSelectedSaveSearchPaths);
+            obj.addListener(v, 'AddGitRepo', @obj.onViewSelectedAddGitRepo);
+            obj.addListener(v, 'RemoveGitRepo', @obj.onViewSelectedRemoveGitRepo);
+            obj.addListener(v, 'SaveGitRepos', @obj.onViewSelectedSaveGitRepos);
             obj.addListener(v, 'Cancel', @obj.onViewSelectedCancel);
         end
     end
 
     methods (Access = private)
+        function populateBasePackage(obj)
+            basePath = getpref('AOData', 'BasePackage');
+            obj.view.setBasePackage(basePath);
+        end
+
         function populateSearchPaths(obj)
             obj.view.clearSearchPaths();
             tf = ispref('AOData', 'SearchPaths');
@@ -58,15 +76,45 @@ classdef SearchPathPresenter < appbox.Presenter
             if isempty(path)
                 return
             end
-            % dirs = strsplit(path, ';');
+            path = semicolonchar2string(path);
             for i = 1:numel(path)
                 obj.view.addSearchPath(path(i));
             end
+        end
+
+        function populateGitRepos(obj)
+            obj.view.clearGitRepos();
+            tf = ispref('AOData', 'GitRepos');
+            if ~tf 
+                obj.isChanged = true;
+                return
+            end
+            path = getpref('AOData', 'GitRepos');
+            if isempty(path)
+                return
+            end
+            path = semicolonchar2string(path);
+            for i = 1:numel(path)
+                obj.view.addGitRepo(path(i));
+            end
+        end
+
+        function hardReset(obj)
+            initializeAOData(true);
+            obj.populateBasePackage();
+            obj.populateSearchPaths();
+            obj.populateGitRepos();
         end
     end
 
     % Callback methods
     methods (Access = private)
+        function onViewSelectedUpdateBasePackage(obj, ~, ~)
+            initializeAOData();
+            obj.populateBasePackage();
+            obj.populateGitRepos();
+        end
+
         function onViewSelectedAddSearchPath(obj, ~, ~)
             path = obj.view.showGetDirectory('Select Path');
             if isempty(path)
@@ -82,6 +130,20 @@ classdef SearchPathPresenter < appbox.Presenter
             obj.isChanged = true;
         end
 
+        function onViewSelectedAddGitRepo(obj, ~, ~)
+            path = obj.view.showGetDirectory('Select Git Repo Folder');
+            if isempty(path)
+                return
+            end
+            folderContents = arrayfun(@(x) string(x.name), dir(path));
+            if ~ismember(".git", folderContents)
+                sobj.view.ShowError('Folder is not a git repo: no .git folder found within selected path.');
+                return
+            end
+            obj.view.addGitRepo(path);
+            obj.isChanged = true;
+        end
+
         function onViewSelectedRemoveSearchPath(obj, ~, ~)
             index = obj.view.getSelectedSearchPath();
             if isempty(index)
@@ -91,7 +153,16 @@ classdef SearchPathPresenter < appbox.Presenter
             obj.isChanged = true;
         end
 
-        function onViewSelectedSave(obj, ~, ~)
+        function onViewSelectedRemoveGitRepo(obj, ~, ~)
+            index = obj.view.getSelectedGitRepo();
+            if isempty(index)
+                return
+            end
+            obj.view.removeGitRepo(index);
+            obj.isChanged = true;
+        end
+
+        function onViewSelectedSaveSearchPaths(obj, ~, ~)
             if ~obj.isChanged
                 return
             end
@@ -99,16 +170,35 @@ classdef SearchPathPresenter < appbox.Presenter
             try
                 paths = obj.view.getSearchPaths();
                 if isempty(paths)
-                    setPref('AOData', 'SearchPaths', []);
+                    obj.view.showError('Search Paths must at least include AOData package!');
+                    % obj.hardReset();
+                    return
                 else
-                    pathList = string.empty();
-                    for i = 1:numel(paths)
-                        pathList = cat(1, pathList, paths(i));
-                    end
-                    setpref('AOData', 'SearchPaths', pathList);
+                    paths = string(paths);
+                    setpref('AOData', 'SearchPaths', string2semicolonchar(paths));
                 end
                 disp('Saved search paths')
             catch ME 
+                obj.view.showError(ME.message);
+                return
+            end
+        end
+
+        function onViewSelectedSaveGitRepos(obj, ~, ~)
+            if ~obj.isChanged
+                return
+            end
+
+            try
+                paths = obj.view.getGitRepos();
+                if isempty(paths)
+                    setpref('AOData', 'GitRepos', []);
+                else
+                    paths = string(paths);
+                    setpref('AOData', 'GitRepos', string2semicolonchar(paths));
+                end
+                disp('Saved git repos');
+            catch
                 obj.view.showError(ME.message);
                 return
             end
@@ -120,8 +210,6 @@ classdef SearchPathPresenter < appbox.Presenter
 
         function onViewKeyPress(obj, ~, event)
             switch event.data.Key
-                case 'return'
-                    obj.onViewSelectedSave();
                 case 'escape'
                     obj.onViewSelectedCancel();
             end
