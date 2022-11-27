@@ -21,8 +21,8 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Source(name)
-            obj = obj@aod.core.Entity(name);
+        function obj = Source(name, varargin)
+            obj = obj@aod.core.Entity(name, varargin{:});
         end
     end
 

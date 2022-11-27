@@ -267,11 +267,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             obj.checkReadOnlyMode();
 
-            p = obj.findprop(propName);
-            % if isa(p, 'meta.property')
-            %    error('removeProperty:FixedProperty',...
-            %        'Only dynamic properties can be removed');
-            %end
+            p = findprop(obj, propName);
 
             if ismember(propName, obj.dsetNames)
                 obj.setDataset(propName, []);
@@ -282,7 +278,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     "No link/dataset matches %s", propName);
             end
 
-            p = findprop(obj, propName);
             delete(p);
             obj.loadInfo();
         end
@@ -348,10 +343,15 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 paramName           char
             end
 
-            if isscalar(obj)
-                tf = isKey(obj.parameters, paramName);
+            if ~isscalar(obj)
+                tf = arrayfun(@(x) hasParam(x, paramName), obj);
+                return
+            end
+
+            if isempty(obj.parameters)
+                tf = false;
             else
-                tf = arrayfun(@(x) isKey(x.parameters, paramName), obj);
+                tf = isKey(obj.parameters, paramName);
             end
         end
 
@@ -487,10 +487,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 fileKey             char
             end
 
-            if isscalar(obj)
-                tf = isKey(obj.files, fileKey);
+            if ~isscalar(obj)
+                tf = arrayfun(@(x) hasFile(x, fileKey), obj);
+                return
+            end
+            if isempty(obj.files)
+                tf = false;
             else
-                tf = arrayfun(@(x) isKey(x.files, fileKey), obj);
+                tf = isKey(obj.files, fileKey);
             end
         end
 

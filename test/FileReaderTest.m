@@ -32,6 +32,17 @@ classdef FileReaderTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, [8, 8.5, 7; 0 2.1 -1]);
         end
 
+        function testTXT(testCase)
+            reader = test.TestTxtReader(...
+                fullfile(testCase.dataFolder, 'test.txt'));
+            testCase.verifyEqual(reader.Data.PMTGain, 0.541);
+            testCase.verifyEqual(reader.Data.FieldOfView, [3.69 2.70]);
+            testCase.verifyTrue(endsWith(reader.Data.Video, ...
+                'AOData\test\test_data\test.avi'));
+            testCase.verifyTrue(reader.Data.Stabilization);
+            testCase.verifyTrue(reader.Data.ClosedLoop);
+        end
+
         function testAVI(testCase)
             reader = aod.util.readers.AviReader(...
                 fullfile(testCase.dataFolder, 'test.avi'));

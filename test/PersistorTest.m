@@ -42,10 +42,35 @@ classdef PersistorTest < matlab.unittest.TestCase
                 Throws("Entity:ReadOnlyModeEnabled"));
             testCase.EXPT.setReadOnlyMode(false);
         end
+
+        function testHomeDirectory(testCase)
+            % Changing the home directory is also a dataset change test
+            oldDirectory = testCase.EXPT.homeDirectory;
+            newDirectory = fileparts(testCase.EXPT.homeDirectory);
+            testCase.EXPT.setHomeDirectory(newDirectory);
+            out = h5read('ToyExperiment.h5', '/Experiment/homeDirectory');
+            testCase.verifyEqual(out, newDirectory);
+
+            % Reset the homeDirectory
+            testCase.EXPT.setHomeDirectory(oldDirectory);
+        end
         
         function testParamRead(testCase)
+            testCase.verifyTrue(...
+                testCase.EXPT.hasParam('Administrator'));
             testCase.verifyEqual(...
                 testCase.EXPT.getParam('Administrator'), 'Sara Patterson');
+
+            testCase.verifyFalse(...
+                testCase.EXPT.hasParam('BadParam'));
+
+        end
+
+        function testFileRead(testCase)
+            testCase.verifyTrue(...
+                testCase.EXPT.Epochs(1).hasFile('PresyncFile'));
+            testCase.verifyFalse(...
+                testCase.EXPT.hasFile('PreSyncFile'));
         end
 
         function testCustomDisplay(testCase)
@@ -125,7 +150,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             out = h5read('ToyExperiment.h5', '/Experiment/Test');
             testCase.verifyEqual(eye(3), out);
 
-            % TODO: Remove file
+            % TODO: Remove property
         end
         
         function testExperimentIndexing(testCase)

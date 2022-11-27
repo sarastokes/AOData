@@ -262,6 +262,11 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = hasParam(obj, paramName)
             % -------------------------------------------------------------
+            arguments
+                obj
+                paramName       char
+            end
+
             if ~isscalar(obj)
                 tf = arrayfun(@(x) x.hasParam(paramName), obj);
                 return
@@ -284,6 +289,10 @@ classdef (Abstract) Entity < handle
             % Optional inputs:
             %   errorType       aod.util.ErrorTypes (default = ERROR)            
             % -------------------------------------------------------------
+            if isstring(paramName)
+                paramName = char(paramName);
+            end
+
             import aod.util.ErrorTypes
             if nargin < 3
                 errorType = ErrorTypes.ERROR;
@@ -305,6 +314,8 @@ classdef (Abstract) Entity < handle
                     case ErrorTypes.WARNING 
                         warning('GetParam: Did not find %s in parameters', paramName);
                         paramValue = [];
+                    case ErrorTypes.MISSING
+                        paramValue = NaN;
                     case ErrorTypes.NONE
                         paramValue = [];
                 end
@@ -353,6 +364,11 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   removeParam(obj, paramName)
             % -------------------------------------------------------------
+            arguments
+                obj
+                paramName       char
+            end
+
             if ~isscalar(obj)
                 arrayfun(@(x) removeParam(x, paramName), obj);
             end
@@ -459,7 +475,6 @@ classdef (Abstract) Entity < handle
 
             if ~isscalar(obj)
                 fileValue = aod.util.arrayfun(@(x) getFile(x, fileName, ErrorTypes.NONE), obj);
-                fileValue = string(fileValue);
                 return
             end
 
@@ -472,6 +487,8 @@ classdef (Abstract) Entity < handle
                     case ErrorTypes.WARNING 
                         warning('GetFile: Did not find %s in files', fileName);
                         fileValue = [];
+                    case ErrorTypes.MISSING
+                        fileValue = NaN;
                     case ErrorTypes.NONE
                         fileValue = [];
                 end

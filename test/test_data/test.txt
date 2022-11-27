@@ -1,0 +1,5 @@
+PMTGain = 0.541
+FieldOfView = 3.69, 2.70
+Video = C:\Users\sarap\Dropbox\Postdoc\Code\AOData\test\test_data\test.avi
+Stabilization =               yes
+ClosedLoop = true

@@ -22,7 +22,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
     methods
         function obj = Stimulus(name, protocol)
             obj = obj@aod.core.Entity(name);
-            if nargin > 1
+            % TODO handle with inputParser optional argument
+            if nargin > 1 && ~isempty(protocol)
                 obj.setProtocol(protocol);
             end
         end

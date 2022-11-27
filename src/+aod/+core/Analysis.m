@@ -43,6 +43,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             if nargin == 1 || isempty(analysisDate)
                 obj.setParam('Date', '');
+                return
             end
             
             analysisDate = aod.util.validateDate(analysisDate);

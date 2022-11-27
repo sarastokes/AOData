@@ -8,7 +8,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = System(parent, name)
+%   obj = System(name)
 %
 % Properties:
 %   Channels
@@ -17,7 +17,8 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   add(obj, channel)
 %   removeChannel(obj, ID)
 %   clearChannels(obj)
-%   assignUUID(obj, uuid)
+%   clearAllChannels(obj)
+%   clearAllDevices(obj)
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
@@ -25,8 +26,8 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods
-        function obj = System(name)
-            obj = obj@aod.core.Entity(name);
+        function obj = System(name, varargin)
+            obj = obj@aod.core.Entity(name, varargin{:});
         end      
     end
     
@@ -71,6 +72,11 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   clearChannels(obj)
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) clearChannels(x), obj);
+                return
+            end
+
             obj.Channels = [];
         end
 
@@ -88,6 +94,29 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
                 return
             end
             devices = vertcat(obj.Channels.Devices);
+        end
+
+        function clearAllDevices(obj)
+            % CLEARALLDEVICES
+            %
+            % Description:
+            %   Clear all the devices in all child channels
+            %
+            % Syntax:
+            %   clearAllDevices(obj)
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) clearAllDevices(x), obj);
+                return
+            end
+
+            if isempty(obj.Channels)
+                return
+            end
+
+            for i = 1:numel(obj.Channels)
+                obj.Channels(i).clearDevices();
+            end
         end
     end
     

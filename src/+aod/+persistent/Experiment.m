@@ -109,21 +109,20 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         function populate(obj)
             populate@aod.persistent.Entity(obj);
  
+            % Datasets
             obj.experimentDate = obj.loadDataset('experimentDate');
             obj.homeDirectory = obj.loadDataset('homeDirectory');
             obj.epochIDs = obj.loadDataset('epochIDs');
             obj.setDatasetsToDynProps();
 
+            % Links
             obj.setLinksToDynProps();
 
+            % Containers
             obj.AnalysesContainer = obj.loadContainer('Analyses');
             obj.CalibrationsContainer = obj.loadContainer('Calibrations');
             obj.EpochsContainer = obj.loadContainer('Epochs');
-            try
-                obj.SegmentationsContainer = obj.loadContainer('Segmentations');
-            catch
-                obj.SegmentationsContainer = obj.loadContainer('Regions');
-            end
+            obj.SegmentationsContainer = obj.loadContainer('Segmentations');
             obj.SourcesContainer = obj.loadContainer('Sources');
             obj.SystemsContainer = obj.loadContainer('Systems');
         end

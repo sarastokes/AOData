@@ -11,7 +11,9 @@
 - [x] Dependent but not hidden properties should be written (e.g. epochIDs)
 - [x] Abandon Timing core class
 - [x] Remove entity-specific add methods
-- [ ] Delete method
+- [ ] Remove() method
+- [ ] Fillmissing error type
+- [ ] Consider making channels and devices at the same level
 
 ##### Package
 - [x] Add rotation to 1P-specific SpatialProtocol
@@ -34,7 +36,7 @@
 - [x] Name vs name
 - [x] files property should be lowercase
 - [ ] How to handle Reader properties
-- [ ] Devices with same UUID in multiple channels?
+- [x] Devices with same UUID in multiple channels?
 - [ ] Figure out identification of existing Sources when adding Source hierarchy
 
 ##### Documentation

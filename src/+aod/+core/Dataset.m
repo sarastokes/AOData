@@ -36,14 +36,4 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Data = data;
         end
     end
-
-    methods (Access = protected)
-        function value = getLabel(obj)
-            if ~isempty(obj.Name)
-                value = obj.Name;
-            else
-                value  = 'Dataset';
-            end
-        end
-    end
 end

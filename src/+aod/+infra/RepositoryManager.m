@@ -87,7 +87,7 @@ classdef RepositoryManager < handle
                 if ~isempty(obj.userPackages)
                     obj.setUserPackages();
                 else
-                    setpref('AOData', 'UserPackages', string.empty());
+                    setpref('AOData', 'SearchPaths', string.empty());
                 end
                 return
             end

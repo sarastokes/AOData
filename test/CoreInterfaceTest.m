@@ -29,15 +29,22 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
     methods (Test)
         function calibrationIO(testCase)
+            import matlab.unittest.constraints.Throws
             % Add a first calibration
             cal1 = aod.core.Calibration('PowerMeasurement1', '20220823');
             testCase.EXPT.add(cal1);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 1);
 
-            % Add a second calibration
-            cal2 = aod.core.Calibration('PowerMeasurement2', '20220825');
+            % Add a second calibration with an empty date
+            cal2 = aod.core.Calibration('PowerMeasurement2', []);
             testCase.EXPT.add(cal2);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
+
+            % Add an invalid target
+            badTarget = aod.core.Analysis("TestAnalysis");
+            testCase.verifyThat(...
+                @() testCase.EXPT.Calibrations(1).setTarget(badTarget),...
+                Throws("Calibration:InvalidTarget"));
 
             % Indexing
             testCase.verifyEqual(cal2.UUID, testCase.EXPT.Calibrations(2).UUID);
@@ -78,7 +85,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Add a date to the analysis
             testCase.EXPT.Analyses(2).setAnalysisDate(getDateYMD());
             dateParam = getParam(testCase.EXPT.Analyses(2), 'Date');
-            test.verifyDatesEqual(testCase, dateParam, getDateYMD());
+            test.util.verifyDatesEqual(testCase, dateParam, getDateYMD());
+
+            % Add an empty date to the analysis
+            testCase.EXPT.Analyses(1).setAnalysisDate();
+            testCase.verifyEmpty(getParam(testCase.EXPT.Analyses(1), 'Date'));
 
             % Clear the analyses
             testCase.EXPT.clearAnalyses();
@@ -94,8 +105,10 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
         function systemIO(testCase)
             system = aod.core.System('TestSystem');
-            testCase.EXPT.add(system);
-            testCase.verifyEqual(numel(testCase.EXPT.Systems), 1);
+            system2 = aod.core.System('');
+
+            testCase.EXPT.add([system, system2]);
+            testCase.verifyEqual(numel(testCase.EXPT.Systems), 2);
 
             % Create some channels
             channel1 = aod.core.Channel('TestChannel1');
@@ -120,6 +133,25 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(channel2.Devices), 1);
             testCase.verifyEqual(numel(system.getAllDevices()), 3);
             testCase.verifyEqual(numel(testCase.EXPT.getAllDevices()), 3);
+
+            % Remove a device
+            channel1.removeDevice(2);
+            testCase.verifyEqual(numel(testCase.EXPT.Channels(1).Devices), 1);
+
+            % Clear the devices (channel-specific)
+            channel1.clearDevices();
+            testCase.verifyEqual(numel(testCase.EXPT.Channels(1).Devices), 0);
+
+            % Clear the devices (all)
+            testCase.EXPT.Systems(1).clearAllDevices();
+            testCase.verifyEqual(numel(testCase.EXPT.getAllDevices()), 0);
+
+            % Remove a channel
+            testCase.EXPT.Systems(1).removeChannel(2);
+            testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 1);
+            testCase.EXPT.Systems(1).clearAllChannels();
+            testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 1);
+
         end
 
         function epochIO(testCase)
@@ -157,6 +189,26 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(testCase.EXPT.id2index(4), 3);
             testCase.verifyEqual(testCase.EXPT.id2index([1 2 4]), [1 2 3]);
 
+            % Add a parameter to all
+            setParam(testCase.EXPT.Epochs, 'TestParam1', 0);
+            testCase.verifyTrue(all(hasParam(testCase.EXPT.Epochs, 'TestParam1')));
+            testCase.verifyEqual(testCase.EXPT.Epochs.getParam('TestParam1'), [0;0;0]);
+
+            % Remove a parameter from all
+            testCase.EXPT.Epochs.removeParam('TestParam1');
+            testCase.verifyFalse(any(hasParam(testCase.EXPT.Epochs, 'TestParam1')));
+
+            % Add a file to all
+            testCase.EXPT.Epochs.setFile('TestFile1', 'test.txt');
+            testCase.verifyTrue(all(testCase.EXPT.Epochs.hasFile('TestFile1')));
+            testCase.verifyTrue(strcmp(testCase.EXPT.Epochs(1).getFile('TestFile1'), 'test.txt'));
+            testCase.verifyTrue(startsWith(testCase.EXPT.Epochs(1).getExptFile('TestFile1'),...
+                testCase.EXPT.homeDirectory));
+
+            % Remove a file from all
+            testCase.EXPT.Epochs.removeFile('TestFile1');
+            testCase.verifyFalse(any(hasFile(testCase.EXPT.Epochs, 'TestFile1')));
+
             % Try to add an epoch with the same ID
             badEpoch = aod.core.Epoch(1);
             testCase.verifyError(@() testCase.EXPT.add(badEpoch), ?MException);
@@ -167,14 +219,18 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Create some datasets
             dataset1 = aod.core.Dataset('TestDataset1');
-            dataset2 = aod.core.Dataset('TestDataset2');
+            dataset2 = aod.core.Dataset('TestDataset2', eye(3));
             dataset2.setDescription('This is a test dataset');
             
+            % Add the datasets to the experiment
             testCase.EXPT.Epochs(1).add(dataset1);
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 1);
 
             testCase.EXPT.Epochs(1).add(dataset2);
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 2);
+
+            % Check dataset data
+            testCase.verifyEqual(testCase.EXPT.Epochs(1).Datasets(2).Data, eye(3));
             
             % Clear all the datasets
             testCase.EXPT.clearEpochDatasets();

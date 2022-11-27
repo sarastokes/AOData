@@ -464,7 +464,7 @@ classdef Experiment < aod.core.Entity
             if isempty(obj.Systems)
                 devices = aod.core.Devices.empty();
             else
-                devices = vertcat(obj.Systems.Channels.Devices);
+                devices = arrayfun(@(x) getAllDevices(x), obj.Systems);
             end
         end
     end
