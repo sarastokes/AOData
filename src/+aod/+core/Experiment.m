@@ -464,7 +464,7 @@ classdef Experiment < aod.core.Entity
             if isempty(obj.Systems)
                 devices = aod.core.Devices.empty();
             else
-                devices = arrayfun(@(x) getAllDevices(x), obj.Systems);
+                devices = vertcat(obj.Systems.getAllDevices());
             end
         end
     end
@@ -491,7 +491,7 @@ classdef Experiment < aod.core.Entity
             obj.Epochs = aod.core.Epoch.empty();
         end
 
-        function datasets = getEpochDatasets(obj, epochIDs)
+        function datasets = getEpochDatasets(obj, IDs)
             % GETEPOCHDATASETS
             %
             % Description:
@@ -504,7 +504,31 @@ classdef Experiment < aod.core.Entity
             %   epochIDs            double
             %       The IDs for 1 or more epochs (not index in Epochs)
             % -------------------------------------------------------------
-            datasets = vertcat(obj.Epochs(epochIDs).Datasets);
+            if nargin < 2
+                IDs = obj.epochIDs;
+            end
+            IDs = obj.id2index(IDs);
+            datasets = vertcat(obj.Epochs(IDs).Datasets);
+        end
+
+        function responses = getEpochResponses(obj, IDs)
+            % GETEPOCHRESPONSES
+            %
+            % Description:
+            %   Return the responses for the specified epoch(s)
+            %
+            % Syntax:
+            %   responses = getEpochResponses(obj, IDs)
+            %
+            % Optional inputs:
+            %   epochIDs            doubles
+            %       The IDs for target epochs (not index in Epochs) 
+            % -------------------------------------------------------------
+            if nargin < 2
+                IDs = obj.epochIDs;
+            end
+            IDs = obj.id2index(IDs);
+            responses = vertcat(obj.Epochs(IDs).Responses);
         end
 
         function registrations = getEpochRegistrations(obj, epochIDs)
@@ -588,7 +612,6 @@ classdef Experiment < aod.core.Entity
 
     % Methods for returning or modifying entities for epoch(s)
     methods
-
         function stimuli = getEpochStimuli(obj, epochIDs)
             % GETEPOCHSTIMULI
             %
@@ -628,7 +651,7 @@ classdef Experiment < aod.core.Entity
         end
 
         function clearEpochResponses(obj, epochIDs)
-            % CLEARALLRESPONSES
+            % CLEAREPOCHRESPONSES
             %
             % Description:
             %   Clear responses in all or a subset of Epochs

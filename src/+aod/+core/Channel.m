@@ -20,7 +20,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   assignUUID(obj, uuid)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
-        Devices                     aod.core.Device
+        Devices                     aod.core.Device = aod.core.Device.empty()
     end
 
     methods
@@ -80,7 +80,13 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   clearDevices(obj)
             % -------------------------------------------------------------
-            obj.Devices = [];
+            if ~isscalar(obj)
+                for i = 1:numel(obj)
+                    obj(i).clearDevices();
+                end
+            end
+            
+            obj.Devices = aod.core.Device.empty();
         end
     end
 

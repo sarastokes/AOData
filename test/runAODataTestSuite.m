@@ -37,6 +37,10 @@ function results = runAODataTestSuite(varargin)
     % Run the suite in this function's directory ('test')
     cd(fileparts(mfilename('fullpath')));
 
+    % Delete pre-existing test HDF5 files, if necessary
+    test.util.deleteTestFiles();
+
+    % Run the test suite
     if coverageFlag
         results = testWithCoverageReport(debugFlag);
     else

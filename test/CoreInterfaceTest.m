@@ -129,6 +129,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             channel2.add(device3);
 
             % Access all devices from different entities
+            assignin('base', 'EXPT', testCase.EXPT);
             testCase.verifyEqual(numel(channel1.Devices), 2);
             testCase.verifyEqual(numel(channel2.Devices), 1);
             testCase.verifyEqual(numel(system.getAllDevices()), 3);
@@ -136,11 +137,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Remove a device
             channel1.removeDevice(2);
-            testCase.verifyEqual(numel(testCase.EXPT.Channels(1).Devices), 1);
+            testCase.verifyEqual(numel(testCase.EXPT.Systems(1).Channels(1).Devices), 1);
 
             % Clear the devices (channel-specific)
             channel1.clearDevices();
-            testCase.verifyEqual(numel(testCase.EXPT.Channels(1).Devices), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.Systems(1).Channels(1).Devices), 0);
 
             % Clear the devices (all)
             testCase.EXPT.Systems(1).clearAllDevices();
@@ -149,8 +150,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Remove a channel
             testCase.EXPT.Systems(1).removeChannel(2);
             testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 1);
-            testCase.EXPT.Systems(1).clearAllChannels();
-            testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 1);
+            testCase.EXPT.Systems(1).clearChannels();
+            testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 0);
 
         end
 
@@ -165,7 +166,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 1);
             testCase.verifyEqual(testCase.EXPT.numEpochs, 1);
             testCase.verifyEqual(testCase.EXPT.epochIDs, 1);
-
 
             % Add a second epoch
             testCase.EXPT.add(epoch2);
@@ -212,10 +212,53 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Try to add an epoch with the same ID
             badEpoch = aod.core.Epoch(1);
             testCase.verifyError(@() testCase.EXPT.add(badEpoch), ?MException);
+
+            % Clear all the epochs
+            testCase.EXPT.clearEpochs();
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
+        end
+
+        function responseIO(testCase)
+            import matlab.unittest.constraints.Throws
+
+            % Add two epochs
+            testCase.EXPT.add(aod.core.Epoch(1));
+            testCase.EXPT.add(aod.core.Epoch(2));
+
+            % Create some responses
+            response1 = aod.core.Response('ResponseWithTiming');
+            response1.setData(2:2:8);
+            response1.setTiming(linspace(0.5, 2.5, 4));
+
+            response2 = aod.core.Response('ResponseWithoutTiming');
+            response2.setData(2:2:8);
+            
+            % Add to the epochs
+            testCase.EXPT.Epochs(1).add(response1);
+            testCase.EXPT.Epochs(2).add(response2);
+            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses(1)), 1);
+            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses()), 2);
+
+            % Clear the timing from the first response
+            response1.clearTiming();
+            testCase.verifyEmpty(testCase.EXPT.Epochs(1).Responses(1).Timing);
+            
+            % Clear the responses
+            testCase.EXPT.clearEpochResponses();
+            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses(1)), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses()), 0);
+
+            % Clear the epochs
+            testCase.EXPT.clearEpochs();
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
         end
 
         function datasetIO(testCase)
             import matlab.unittest.constraints.Throws
+
+            % Add an epoch
+            testCase.EXPT.clearEpochs();
+            testCase.EXPT.add(aod.core.Epoch(1));
 
             % Create some datasets
             dataset1 = aod.core.Dataset('TestDataset1');
@@ -223,10 +266,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             dataset2.setDescription('This is a test dataset');
             
             % Add the datasets to the experiment
-            testCase.EXPT.Epochs(1).add(dataset1);
-            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 1);
-
-            testCase.EXPT.Epochs(1).add(dataset2);
+            testCase.EXPT.Epochs(1).add([dataset1, dataset2]);
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 2);
 
             % Check dataset data
@@ -235,10 +275,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Clear all the datasets
             testCase.EXPT.clearEpochDatasets();
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 0);
-            
-            % Add the datasets back
-            testCase.EXPT.Epochs(1).add([dataset1, dataset2]);
-            
+
+            % Clear the epochs
+            testCase.EXPT.clearEpochs();
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
+
             % Try to add a dataset to the experiment
             testCase.verifyThat(...
                 @() testCase.EXPT.add(aod.core.Dataset('TestDataset3')),...
@@ -255,6 +296,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 'Subclass', 'aod.builtin.calibrations.PowerMeasurement');
             testCase.verifyEqual(numel(out), 1);
             testCase.EXPT.clearCalibrations();
+            testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 0);
         end
     end
 end 

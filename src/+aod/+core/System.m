@@ -22,7 +22,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
-        Channels            = aod.core.Channel.empty();
+        Channels           aod.core.Channel = aod.core.Channel.empty();
     end
     
     methods
@@ -77,7 +77,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
                 return
             end
 
-            obj.Channels = [];
+            obj.Channels = aod.core.Channel.empty();
         end
 
         function devices = getAllDevices(obj)
@@ -90,10 +90,14 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %   devices = getAllDevices(obj)
             % -------------------------------------------------------------
             if ~isscalar(obj)
-                devices = arrayfun(@(x) getAllDevices(x), obj);
+                devices = uncell(aod.util.arrayfun(@(x) getAllDevices(x), obj));
                 return
             end
-            devices = vertcat(obj.Channels.Devices);
+            if isempty(obj.Channels)
+                devices = aod.core.Device.empty();
+            else
+                devices = vertcat(obj.Channels.Devices);
+            end
         end
 
         function clearAllDevices(obj)
