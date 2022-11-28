@@ -1,11 +1,11 @@
-classdef SearchPathView < aod.app.UIView
+classdef PackageManagerView < aod.app.UIView
 % SEARCHPATHVIEW
 %
 % Parent:
 %   aod.app.UIView
 %
 % See also:
-%   aod.app.presenters.SearchPathPresenter, SearchPathApp
+%   aod.app.presenters.PackageManagerPresenter, PackageManagerApp
 % -------------------------------------------------------------------------
 
     events
@@ -26,7 +26,7 @@ classdef SearchPathView < aod.app.UIView
     end
 
     methods
-        function obj = SearchPathView()
+        function obj = PackageManagerView()
             obj = obj@aod.app.UIView();
         end
     end

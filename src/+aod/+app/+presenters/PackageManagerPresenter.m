@@ -1,5 +1,5 @@
-classdef SearchPathPresenter < appbox.Presenter
-% SEARCHPATHPRESENTER
+classdef PackageManagerPresenter < appbox.Presenter
+% PackageManagerPRESENTER
 %
 % Description:
 %   User interface for setting up AOData's search paths and git repos
@@ -8,20 +8,20 @@ classdef SearchPathPresenter < appbox.Presenter
 %   appbox.Presenter
 %
 % Constructor:
-%   obj = SearchPathPresenter()
-%   obj = SearchPathPresenter(view)
+%   obj = PackageManagerPresenter()
+%   obj = PackageManagerPresenter(view)
 %
 % See also:
-%   SearchPathApp, aod.app.views.SearchPathView
+%   PackageManagerApp, aod.app.views.PackageManagerView
 % -------------------------------------------------------------------------
     properties (Access = private)
         isChanged
     end
 
     methods
-        function obj = SearchPathPresenter(view)
+        function obj = PackageManagerPresenter(view)
             if nargin < 1
-                view = aod.app.views.SearchPathView();
+                view = aod.app.views.PackageManagerView();
             end
             obj = obj@appbox.Presenter(view);
             obj.isChanged = false;
