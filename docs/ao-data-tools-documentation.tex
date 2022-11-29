@@ -72,6 +72,7 @@
 
 % Customized code
 \usepackage{listings}
+\usepackage{matlab-prettifier}
 \lstdefinestyle{mystyle}{
 	backgroundcolor=\color{backcolor}, 
     commentstyle=\color{codegreen},
@@ -254,11 +255,11 @@ git clone https://github.com/sarastokes/AOData --recurse-submodules
 
         \subsubsection{Starting AOData in MATLAB}
 		\noindent Add the folder and all the subfolders to your MATLAB path with:
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 addpath(genpath('yourfilepath/ao-data-tools'));
 		\end{lstlisting} 
         You will need to add AOData to your MATLAB path every time you open MATLAB. If you intend to use AOData frequently and want to avoid this, add the above line to your startup file If you do not have one, create a file called \texttt{startup.m} in the ``MATLAB'' folder that is created within Documents when you download MATLAB. This file will run every time you start up MATLAB. 
-        \begin{lstlisting}[language=matlab]
+        \begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 initializeAOData();
         \end{lstlisting}
         You only need to initialize AOData once. Rerun this if you move the location of the AOData folder on your computer. This function stores information about AOData's location on your computer in MATLAB's user preferences. After completion it opens \aodfcn{PackageManagerApp}. If you are using any user-defined AOData packages, add them. This is an important step because AOData If you create a new package after initialization, you can return 
@@ -310,7 +311,7 @@ initializeAOData();
 \section{Using AOData's Documentation}
 	\label{section:DocInfo}
 	\noindent AOData contains extensive documentation within the class and function files and that is the authoritative source for understanding how to use AOData's code. For any function or class, you obtain help by typing in one of the two commands:
-    \begin{lstlisting}[language=matlab]
+    \begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % For help on a function or class 
 doc functionName
 doc className
@@ -342,7 +343,7 @@ doc className/functionName
 		\noindent Why not just use regular file folders? Using packages reduces conflicts and increases code clarity. An example: Say I make an object for the Toptica in the 1P system that inherits from \aodclass{aod.core.Device}. I could name it \aodclass{Toptica} or  \aodclass{sara.devices.Toptica}. The first option might work in the short-term. However, Jennifer Hunter's lab has a Toptica too and they might have their own \aodclass{Toptica} class. Most of us only use one system so that could be fine. Except that we borrowed Jennifer's Toptica so now I need a second Toptica class (it's worth keeping them separate as Jennifer's has one less laser line and higher max powers for the other lines). If they have their own package, I just need that and then I don't have to write any code at all! If they don't, I could make the class and call it either \aodclass{TopticaTwo} or \aodclass{hunterlab.devices.Device}. The second option is clearer and specifies exactly  which Toptica is being used used (I \textit{might} remember which Toptica is \aodclass{TopticaTwo}, but no one else will know). It may even help us remember to return Jennifer's Toptica when we're done.
 
 		There is an \matfcn{import} function to simplify calling members of a class within a package. Try to limit its use to within functions. If you use it in the base workspace, you will lose the code clarity advantages of using packages. 
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % To use just aod.core.Device without the package names
 import aod.core.Device
 device = Device([]);
@@ -410,7 +411,7 @@ clear import
 			\\
 			HDFView is very generic because HDF5 files can be very diverse. AOData HDF5 files are built around the AOData object model, which provides a predictable structure. 
 			I wrote \aodclass{AODataViewer} to be designed around the AOData framework. 
-			\begin{lstlisting}[language=matlab]
+			\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 AODataViewer('myfile.h5');
 			\end{lstlisting}
 			There is also a standalone compiled version that does not require a MATLAB license: \textcolor{red}{link}.
@@ -423,7 +424,7 @@ AODataViewer('myfile.h5');
 		At some point though as you work with AOData, you might have questions about these topics and can circle back to the information below:
 	\subsubsection{Handle vs. Value Classes}\label{subsubsection:HandleValue}
 		\noindent When you work with \matclass{char} and \matclass{double}, you are working with \underline{value classes}. 
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Create a double variable
 a = 3.14
 % Copy it to another variable
@@ -434,7 +435,7 @@ b = 3.14159;
 disp([a, b])
 	\end{lstlisting}
 	\noindent By contrast, most classes in AOData are \underline{handle classes}. Handle classes provide a ``handle'' to the object, which is stored only one in memory:
-	\begin{lstlisting}[language=matlab]
+	\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Create a standalone Device class. It's from ThorLabs but you don't remember the Model
 device1 = aod.core.Device([], 'Manufacturer', 'ThorLabs', 'Model', 'idk');
 % Copy set a second variable equal to device1
@@ -447,7 +448,7 @@ disp(device2.parameters)
 disp(device1.parameters)
 		\end{lstlisting}
 		\noindent Why is this relevant to AOData? See below:
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Create a channel
 channel = aod.core.Channel('MyChannel');
 % Create a device and add it to the channel
@@ -485,7 +486,7 @@ disp(channel.Devices.parameters)
 \section{Core Interface}
 	\label{section:CoreInterface}
 	\noindent This information is compiled here to serve as a single resource for core classes. It may not be the best gateway for learning about the core classes for the first time. If the documentation below seems like too much information, try to read through \myurl{\ref{subsection:EntityDoc}} on \aodclass{aod.core.Entity} and then read \myurl{\ref{subsection:ClassDesign}} on ``Class Design Principles'', before returning.  However, each class and function is thoroughly documented in the source code. For more detail on any aspect below, try using the \matfcn{help} command in MATLAB:
-	\begin{lstlisting}[language=matlab]
+	\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Get documentation for a class or function
 help aod.core.Experiment
 % Get documentation for a function within a class
@@ -494,7 +495,7 @@ help aod.core.Experiment\add
 	\noindent The documentation for each class includes (if relevant), the following information:\smallskip\\
 	\textbf{className \myparent{parentClassName(s)}}\smallskip\\
 	The constructor will be shown. There may be two version, one with the minimal number of required inputs and a second showing the optional inputs.
-	\begin{lstlisting}[language=matlab]
+	\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = MyClass(inputs)
 	\end{lstlisting}
 	\docheader{Properties:} - Class properties that are written as datasets, with two exceptions: \aodclass{aod.core.Entity}'s properties are written as parameters and anything designated as a container is a group that contains other entities. %Anything designated as a link, will be written as a link 
@@ -520,7 +521,7 @@ obj = MyClass(inputs)
 		\noindent  Abstract parent class to all core classes that are persisted into the HDF5 file. Because all core classes inherit \aodclass{aod.core.Entity}, they all operate in a similar way and if you learn the basics of this parent class, you'll already need to know most of how the subclasses work.
 		
 		Before getting into the code documentation, it is worth explaining it in the context of AOData's goals. The main question in designing \aodclass{aod.core.Entity} was: What should all components have in common? and How can they be implemented in a flexible/generic way to avoid unnecessarily restricting subclasses? In an ideal world, \aodclass{aod.core.Entity} will be set in stone as any change here will change the rest of the framework. So it needs to provide enough options (optional options, not required options - you should be able to use what you want and ignore the rest) to be robust and flexible. To ensure end-users aren't depending on critical functionality, the things that \aodclass{aod.core.Entity} absolutely \textit{must} do to make the code work should be hidden from the average user.  
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Note that aod.core.Entity is abstract and never directly instantiated.
 % This is the constructor that subclasses will call in their constructors
 obj = aod.core.Entity(name)
@@ -575,7 +576,7 @@ obj = aod.core.Entity(name)
 	\subsection{aod.core.Experiment  \myparent{aod.core.Entity}}
 		\noindent The parent class for all other entities, containing everything associated with a specific experiment. Experiment is written first to the HDF5 file and the other entities are written in the order shown below. 
 			
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Experiment('name', experimentDate, 'homeDirectory')
 obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 	'Administrator', 'YourName', 'System', 'Primate1P')
@@ -634,7 +635,7 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 	\subsection{aod.core.Source \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
 		\label{subsection:aod.core.Source}
 		\noindent The source of the data acquired during the experiment. 
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Source(parent, 'name')
 		\end{lstlisting}
 		\docheader{Sealed Methods:}
@@ -650,7 +651,7 @@ obj = aod.core.Source(parent, 'name')
 		When specifying the source for \aodclass{aod.core.Epoch}, use the most specific Source in the hierarchy.
 		\subsubsection{aod.core.sources.Subject \textcolor{gray}{(aod.core.Source)}}
 			\noindent Top-level source (person, monkey, mouse, model eye).
-			\begin{lstlisting}[language=matlab]
+			\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Subject(name)
 obj = aod.core.Subject(name, 'Species', value, 'Sex', value, 'Demographics', value)
 			\end{lstlisting}
@@ -663,7 +664,7 @@ obj = aod.core.Subject(name, 'Species', value, 'Sex', value, 'Demographics', val
 			\end{itemize}
 		\subsubsection{aod.core.sources.Eye \textcolor{gray}{(aod.core.Source)}}
 			\noindent An Eye within the Subject. \aodprop{Name} is restricted to being either OS or OD.
-			\begin{lstlisting}[language=matlab]
+			\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.sources.Eye(name)
 			\end{lstlisting} 
 			\docheader{Properties:}
@@ -673,7 +674,7 @@ obj = aod.core.sources.Eye(name)
 			
 		\subsubsection{aod.core.sources.Location  	\textcolor{gray}{(aod.core.Source)}}
 			\noindent A location within an Eye.
-			\begin{lstlisting}[language=matlab]
+			\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.sources.Location(name)
 			\end{lstlisting}
 	
@@ -681,7 +682,7 @@ obj = aod.core.sources.Location(name)
 		\label{subsection:CalibrationDoc}
 		\noindent Represents measurements of the system (e.g. spectra/power of light sources, optimized positions of PMT). %I added a few built-in classes for standard calibrations (e.g. \aodclass{aod.builtin.calibrations.PowerMeasurement}) that could be good references on how to implement this class.
 	
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Calibration(name, calibrationDate)
 		\end{lstlisting}
 		\docheader{Properties:}
@@ -702,7 +703,7 @@ obj = aod.core.Calibration(name, calibrationDate)
 		\label{subsection:SystemDoc}
 		\noindent Represents the system configuration you used to acquire the data. While there is only one system, you may use it in different ways within or between experiments, depending on the type of imaging your're doing. The reasoning behind this organization is that you may used one system in two different ways during an experiment (e.g. calcium imaging requires a different set of channels than rhodamine imaging)
 	
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.System(name)
 		\end{lstlisting}
 		\noindent Because it is hard to automate system names, \texttt{name} is a required input
@@ -723,7 +724,7 @@ obj = aod.core.System(name)
 		\label{subsection:ChannelDoc}
 		\noindent A single light path within the System. For example, the calcium imaging channel contains a Mustang laser, a bandpass filter, a PMT and a pinhole. The specifics of these devices may change between experiments (for example, you may test different pinhole sizes for fluorescence imaging) or even within experiments (trying out different dichroic filters).
 		
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Channel(name)
 		\end{lstlisting}
 		
@@ -741,7 +742,7 @@ obj = aod.core.Channel(name)
 	\subsection{aod.core.Device  \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
 		\noindent Any sort of Device within a Channel worth logging. You don't necessarily need to add every single mirror in the light path, just the components that are critical and may have parameters that change between experiments. See \myref{subsection:ClassDesign} on ``Class Design'' for a thorough explanation of how this class was designed that introduces the principles behind all other core classes.
 		
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Device(name)
 obj = aod.core.Device(name, 'Model', value, 'Manufacturer', value);
 		\end{lstlisting}
@@ -762,7 +763,7 @@ obj = aod.core.Device(name, 'Model', value, 'Manufacturer', value);
 	\subsection{aod.core.Segmentation \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
 		\noindent Spatial regions within your acquired data. These could be ROIs in a physiology experiment, coordinates of labeled cells in anatomical imaging or a subregion of the field of view that omits the zeroed pixels after registration.  
 	
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Segmentation()		
 obj = aod.core.Segmentation(data)
 		\end{lstlisting}
@@ -788,7 +789,7 @@ obj = aod.core.Segmentation(data)
 	\subsection{aod.core.Epoch \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
 		\noindent A single period of data acquisition within the Experiment. Epochs differ from the other entities in one key way: because they already have an intuitive numeric identifier (\aodprop{ID}, the video number in the experiment), this is used rather than their index in the \aodprop{Epochs} container for methods like \aodfcn{remove()} 
 	
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Epoch(ID)
 		\end{lstlisting}
 		\docheader{Properties:}
@@ -822,7 +823,7 @@ obj = aod.core.Epoch(ID)
 	\subsection{aod.core.Registration \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
 		\noindent Any registration applied to the raw data acquired during an Epoch. For example, if you use Qiang's registration software, you can use \aodclass{aod.builtin.registrations.StripRegistration} to store the metadata and specify whether you used frame or strip.  
 		
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Registration(name, registrationDate)
 		\end{lstlisting}
 		\docheader{Properties:}
@@ -878,7 +879,7 @@ obj = aod.core.Dataset(name, data)
 	
 	\subsection{aod.core.Response \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
 		\noindent A time-varying signal extracted from the data acquired during an Epoch. You can set \aodprop{Timing} if it differs from the timing set at the \aodclass{Epoch} level, otherwise it will be written as a link to Epoch's \aodprop{Timing}
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Response(name)
 		\end{lstlisting} 
 		\docheader{Properties:}
@@ -902,13 +903,13 @@ obj = aod.core.Response(name)
 		
 		\subsubsection{aod.core.responses.RegionResponse \myparent{aod.core.Response}}
 			\noindent A Response associated with an instance of \aodclass{aod.core.Segmentation}.
-			\begin{lstlisting}[language=matlab]
+			\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.responses.RegionResponse(parent, varargin)
 			\end{lstlisting}
 	
 	\subsection{aod.core.Analysis \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
 		\noindent Represents any analysis performed on entities within the Experiment. This class standardizes recording of the entities analyzed, otherwise it's a blank slate to fill in with the implementation. Placing your code within an Analysis class allows you to save both the results of the analysis and how the results were generated.
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Analysis('name')
 obj = aod.core.Analysis('name', analysisDate)
 		\end{lstlisting}
@@ -922,7 +923,7 @@ obj = aod.core.Analysis('name', analysisDate)
 		\end{itemize}			
 	\subsection{Quick Reference}
 		\noindent A quick overview of classes and constructors:
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 experment = aod.core.Experiment(name, homeFolder, experimentDate);
 experment = aod.core.Experiment(name, homeFolder, experimentDate, 'Administrator', value, 'System', value);
 
@@ -961,19 +962,19 @@ response = aod.core.Response(name);
 		\noindent Factory classes simplify the creation of standardized entities. For example, if you have some standard Devices you frequently use, you could subclass Device and create a class for each or you could create a pipeline with Factory to keep OOP from getting out of control. See \aodclass{sara.factories.ChannelFactory} for an example. 
 		
 		Factory is an abstract class with two abstract methods, a public \aodfcn{get()} method and a static \aodfcn{create()} method. The \aodfcn{get()} method is where your implementation goes: define the parameters you want to provide and how you will use them to return a specific entity. 
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Instantiate the object
 obj = MyFactory();
 % Get the entity based on some number of inputs
 entity = get(obj, varargin)
 		\end{lstlisting}
 		Sometimes you might want to have some properties associated with your Factory class, which means you need to instantiate the object before calling \aodfcn{get()}. If you're lazy like me and don't want to always be instantiating first, especially for factories that have no associated properties, there's the static \aodfcn{create()} method, which wraps the two lines above.
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Get the entity using create
 entity = MyFactory.create(varargin);
 		\end{lstlisting}
 		Here's a blueprint for a Factory class showing \aodfcn{get()} and \aodfcn{create()}.
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 classdef MyFactory < aod.util.Factory
 	methods 
 		function obj = get(varargin)
@@ -1003,7 +1004,7 @@ end
 	\subsection{aod.core.Protocol \myparent{handle}}
 		\label{subsection:ProtocolDoc}
 		\noindent Protocols define how stimuli are constructed from a basic set of parameters and how they are transformed into the format the stimulator requires. See \myurl{\ref{subsection:CreatingAProtocol}} on ``Creating A Protocol'' for a detailed explanation. 
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Protocol(calibration, varargin)
 		\end{lstlisting}
 	
@@ -1059,11 +1060,11 @@ obj = aod.core.Protocol(calibration, varargin)
 \section{Persistent Interface}
 	\label{section:PersistentInterface}
 	\noindent The largest investment for AOData tools is creating customized subclasses for writing the data into an HDF5 file. The interface for reading files back in requires no additional customization. Load your file in with:
-	\begin{lstlisting}[language=matlab]
+	\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 experiment = loadExperiment(hdfName);
 	\end{lstlisting}
 	The organization mirrors that of the core classes used to build an HDF5 file (Experiment contains Analyses, Calibrations, Epochs, Segmenations, Sources and Systems... Systems contain Channels and Channels contain Devices, etc). Each entity has a \aodprop{parameters} property containing all the parameters specified when building the experiment. Entities will have the same properties defined in the core classes and custom subclasses. All you need to worry about is navigating through the experiment to find the information you need.
-	\begin{lstlisting}[language=matlab]
+	\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 % Get all the calibrations
 calibrations = experiment.Calibrations
 
@@ -1201,7 +1202,7 @@ experiment.Epochs(1:5).Responses
 \subsection{HDF5 Classes}
 	\subsubsection{aod.h5.EntityManager \myparent{handle}}\label{subsubsection:EntityManager}
 		\noindent A well-known shortcoming of the file directory organization within HDF5 files is the difficulty indexing and searching contents. The solution for AOData is \aodclass{aod.h5.EntityManager}. Each entity has a unique identifier (UUID). As a result groups with a UUID attribute must reflect entities within the persistent hierarchy. When you need to search through your HDF5 file for some attribute/dataset/group, use the entity groups as the base for your search, then search the paths returned by the EntityManager.
-	\begin{lstlisting}[language=matlab]
+	\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.h5.EntityManager('myfile.h5');
 % Get a table listing each UUID, the corresponding class and the path within the HDF5 file
 T = table(obj);
@@ -1225,7 +1226,7 @@ T = table(obj);
 		That being said, the purpose here is archiving the many aspects of our experiments that are relevant to interpreting the results, like the relationship between Devices, Channels and Systems described above. I took the perspective of asking What does someone else need to know to about this device to understand it 10 years from now? Then I asked whether that information could apply to every single device and if the answer was no, it's not included in \aodclass{aod.core.Device}. I settled on two parameters: \aodparam{Manufacturer} and \aodparam{Model}. I considered serial number as well, but that was only useful for some devices (e.g. a PMT) and completely unnecessary for others (e.g. a pinhole).
 
 		The next question is just how important \aodparam{Manufacturer} and \aodparam{Model} is for a device. It's good information to have and we should have it for all devices, but should I force people to provide as a required input? I decided that was unnecessarily restrictive - a 20 micron pinhole is a 20 micron pinhole even if I don't know for sure that you bought it from ThorLabs. Instead both parameters are optional inputs handled with \aodclass{aod.util.InputParser} (see below).
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 classdef Device < aod.core.Entity
 	
 	function obj = Device(name, varargin)
@@ -1250,7 +1251,7 @@ end
 	Let's say we want to make a subclass for dichroic filters, such as \aodclass{aod.builtin.devices.DichroicFilter}. What are the defining features of a dichroic filter? Basically, all of them have a cutoff wavelength and are either high- or low-pass. These are good parameters to specify: \aodparam{Wavelength} and \aodparam{Bandwidth}. Unlike \aodparam{Manufacturer} and \aodparam{Model}, these are essential to understanding the bandpass filter. There's no point in going to the trouble of specifying a bandpass filter in your HDF5 file if you're not going to include this information. Accordingly, the should be required parameters, specified with \texttt{addRequired} to \aodclass{aod.util.InputParser}.
 	
 	There could be some data associated with the bandpass filter, such as the transmission spectra. This would be a good property: \aodprop{transmission}. However, we can understand the filter without it or look it up online using \aodparam{Model} and \aodparam{Manufacturer}, so \aodprop{transmission} shouldn't be required. If you want to add it, you can do it after constructing the object using \aodfcn{setTransmission()}.
-	\begin{lstlisting}[language=matlab]
+	\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 classdef BandPassFilter < aod.core.Entity
 
 	properties (SetAccess = protected)
@@ -1299,7 +1300,7 @@ end
 		\end{enumerate}
 	
 		\noindent Below is a template for defining a new protocol:
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=Matlab-editor, basicstyle=\mlttfamily\footnotesize]
 classdef MyProtocol < aod.core.Protocol
 
 	% Define properties specific to this protocol
@@ -1349,7 +1350,7 @@ end
 		\end{lstlisting}
 		For example, here's a protocol called \aodclass{Steps} for the LEDs on the 1P primate system. Data is sampled at 25 Hz (\aodprop{sampleRate}) and the update rate for the LEDs is 500 Hz (\aodprop{stimRate}). 
 		This protocol begins at a baseline value (\aodprop{baseIntensity}) for a set amount of time (\aodprop{preTime}), increases (\aodprop{contrast}) for a set amount of time (\aodprop{stimTime}), then returns to the baseline value (\aodprop{baseIntensity}) for a set amount of time (\aodprop{tailTime}), This creates an achromatic step in contrast.
-		\begin{lstlisting}[language=matlab]
+		\begin{lstlisting}[style=Matlab-editor, basicstyle=\mlttfamily\footnotesize]
 classdef Step < aod.core.Protocol
 	
 	% Protocol-specific, all public access properties are saved

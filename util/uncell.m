@@ -24,4 +24,4 @@ function out = uncell(data)
     %    data = data{~idx};
     %end
 
-    out = data{:};
+    out = vertcat(data{:});

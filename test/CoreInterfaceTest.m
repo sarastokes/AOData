@@ -28,6 +28,43 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
     end
 
     methods (Test)
+        function sourceIO(testCase)
+            import matlab.unittest.constraints.Throws
+
+            % Create a parent source
+            source1 = aod.core.Source('MC00851');
+            source2 = aod.core.Source('MC00838');
+            testCase.EXPT.add([source1, source2]);
+            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 2);
+
+            % Create second-level source
+            source1a = aod.core.Source('OS');
+            source1b = aod.core.Source('OD');
+            source1.add([source1a, source1b]);
+            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 4);
+            
+            % Check labels
+            testCase.verifyEqual('MC00851_OS', source1a.label);
+
+            % Create third-level source
+            source1a1 = aod.core.Source('Right');
+            source1a2 = aod.core.Source('Left');
+            source1a.add([source1a1, source1a2]);
+            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
+
+            source1b1 = aod.core.Source('Right');
+            source1b.add(source1b1);
+            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 7);
+
+            % Remove a single source
+            testCase.EXPT.removeSource(2);
+            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
+
+            % Clear all the sources
+            testCase.EXPT.clearSources();
+            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 0);
+        end
+
         function calibrationIO(testCase)
             import matlab.unittest.constraints.Throws
             % Add a first calibration
@@ -152,7 +189,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 1);
             testCase.EXPT.Systems(1).clearChannels();
             testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 0);
-
         end
 
         function epochIO(testCase)
@@ -242,6 +278,12 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Clear the timing from the first response
             response1.clearTiming();
             testCase.verifyEmpty(testCase.EXPT.Epochs(1).Responses(1).Timing);
+
+            % Add timing at the epoch level
+            testCase.EXPT.Epochs(2).setTiming(linspace(0.5, 2.5, 4));
+            testCase.verifyTrue(testCase.EXPT.Epochs(2).hasTiming());
+            testCase.EXPT.Epochs(2).clearTiming();
+            testCase.verifyFalse(testCase.EXPT.Epochs(2).hasTiming());
             
             % Clear the responses
             testCase.EXPT.clearEpochResponses();
@@ -284,6 +326,21 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyThat(...
                 @() testCase.EXPT.add(aod.core.Dataset('TestDataset3')),...
                 Throws("Experiment:AddedInvalidEntity"));
+        end
+
+        function registrationIO(testCase)
+            import matlab.unittest.constraints.Throws
+
+            % Add an epoch 
+            testCase.EXPT.clearEpochs();
+            testCase.EXPT.add(aod.core.Epoch(1));
+            testCase.EXPT.add(aod.core.Epoch(2));
+
+            % Create some registrations
+
+            % Clear the epochs
+            testCase.EXPT.clearEpochs();
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
         end
     end
 

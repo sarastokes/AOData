@@ -69,6 +69,13 @@ classdef HDFTest < matlab.unittest.TestCase
             testCase.verifyEqual(inputLogical, outputLogical);
         end
 
+        function testEnum(testCase)
+            inputEnum = test.TestEnumType.TYPEONE;
+            aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'enum', inputEnum);
+            outputEnum = aod.h5.readDatasetByType(testCase.HDF_FILE, '/', 'enum');
+            testCase.verifyEqual(outputEnum, test.TestEnumType.TYPEONE);
+        end
+
         function testTable(testCase)
             inputTable = table(rangeCol(1,4), {'a'; 'b'; 'c'; 'd'}, ["a", "b", "c", "d"]',...
                 'VariableNames', {'Numbers', 'Characters', 'Strings'});

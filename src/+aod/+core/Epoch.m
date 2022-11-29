@@ -254,6 +254,18 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.startTime = startTime;
         end
 
+        function tf = hasTiming(obj)
+            % SETTIMING
+            %
+            % Description:
+            %   Whether the epoch has timing or not
+            %
+            % Syntax:
+            %   setTiming(obj, timing)
+            % -------------------------------------------------------------
+            tf = ~isempty(obj.Timing);
+        end
+
         function setTiming(obj, timing)
             % SETTIMING
             %

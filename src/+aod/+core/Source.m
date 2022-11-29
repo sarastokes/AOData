@@ -13,7 +13,6 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Methods:
 %   sources = getParents(obj)
-%   ID = getParentID(obj)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -48,6 +47,9 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             % Description:
             %   Remove a child source, or sources
+            %
+            % Syntax:
+            %   remove(obj, sourceID)
             % -------------------------------------------------------------
             assert(sourceID > 0 && sourceID <= numel(obj.Sources),...
                 'Invalid source ID %u, must be between 1 and %u',...
@@ -58,10 +60,37 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         function clearSources(obj)
             % CLEARSOURCES
             %
-            % Syntax:
+            % Description:
             %   Clear child sources of this source
+            %
+            % Syntax:
+            %   clearSources(obj)
             % -------------------------------------------------------------
             obj.Sources = aod.core.Source.empty();
+        end
+
+        function allSources = getAllSources(obj)
+            % GETALLSOURCES
+            %
+            % Description:
+            %   Get all child sources of this source
+            %
+            % Syntax:
+            %   allSources = getAllSources(obj)
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                allSources = uncell(aod.util.arrayfun(@(x) getAllSources(x), obj));
+                return
+            end
+
+            allSources = obj;
+            if isempty(obj.Sources)
+                return
+            end
+            for i = 1:numel(obj.Sources)
+                allSources = cat(1, allSources, obj.Sources(i));
+                allSources = obj.iterSource(obj.Sources(i), allSources);
+            end
         end
 
         function sources = getParents(obj)
@@ -84,27 +113,6 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 sources = flipud(sources);
             end
         end
-
-        function ID = getParentID(obj)
-            % GETPARENTID
-            %
-            % Description:
-            %   Navigate up the source hierarchy to get parent source ID
-            %
-            % Syntax:
-            %   ID = obj.getParentID();
-            % -------------------------------------------------------------
-            if isempty(obj.Parent) || ~isSubclass(obj.Parent, 'aod.core.Source')
-                ID = obj.ID;
-                return 
-            end
-
-            parent = obj.Parent;
-            while isSubclass(parent.Parent, 'aod.core.Source')
-                parent = parent.Parent;
-            end
-            ID = parent.ID;
-        end
     end
 
     
@@ -115,6 +123,18 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 value = [obj.Parent.Name, '_', obj.Name];
             else
                 value = obj.Name;
+            end
+        end
+    end
+
+    methods (Sealed, Access = private)
+        function allSources = iterSource(obj, source, allSources)
+            if isempty(source.Sources)
+                return
+            end
+            for i = 1:numel(source.Sources)
+                allSources = cat(1, allSources, source.Sources(i));
+                allSources = iterSource(obj, source.Sources(i), allSources);
             end
         end
     end

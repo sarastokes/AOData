@@ -333,7 +333,7 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   removeSource(obj, ID)
             % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Sources),...
+            assert(ID > 0 & ID <= numel(obj.Sources),...
                 'ID %u is invalid, must be between 1 and %u', ID, numel(obj.Sources));
             obj.Sources(ID) = [];
         end
@@ -358,27 +358,12 @@ classdef Experiment < aod.core.Entity
             %
             % Syntax:
             %   sources = getAllSources(obj)
-            %
-            % TODO: Improve to return more than 3 levels of sources
             % -------------------------------------------------------------
             sources = aod.core.Source.empty();
             if isempty(obj.Sources)
                 return
             end
-            firstOrderSources = obj.Sources;
-        
-            for i = 1:numel(firstOrderSources)
-                if ~isempty(firstOrderSources(i).Sources)
-                    sources = cat(1, sources, firstOrderSources(i).Sources);
-                end
-            end
-        
-            for i = 1:numel(sources)
-                if ~isempty(sources(i).Sources)
-                    sources = cat(1, sources, sources(i).Sources);
-                end
-            end
-            sources = cat(1, sources, firstOrderSources);
+            sources = obj.Sources.getAllSources();
         end
     end
 
