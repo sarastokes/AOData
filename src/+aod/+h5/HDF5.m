@@ -15,8 +15,9 @@ classdef HDF5 < handle
 %
 %   makeMatrixDataset(fileName, pathName, dsetName, data)
 %   makeEnumDataset(fileName, pathName, dsetName, data)
-%   makeTextDataset(fileName, pathName, dsetName, txt)
-%   makeDateDataset(fileName, pathName, data)
+%   makeTextDataset(fileName, pathName, dsetName, data)
+%   makeDateDataset(fileName, pathName, dsetName, data)
+%   makeMapDataset(fileName, pathName, dsetName, data)
 %   makeStructDataset(fileName, pathName, dsetName, data)
 %   makeCompoundDataset(fileName, pathName, dsetName, data)
 %   makeStringDataset(fileName, pathName, dsetName, data)
@@ -262,6 +263,44 @@ classdef HDF5 < handle
                 end
             end                    
             h5write(fileName, fullPath, data);
+        end
+
+        function makeMapDataset(fileName, pathName, dsetName, data)
+            % MAKEMAPDATASET
+            % 
+            % Description:
+            %   Make a pseudo containers.Map dataset
+            %
+            % Notes:
+            %   See README.md for limitations. Basically values will be 
+            %   written as attributes so they will not have identifying
+            %   attributes for readDatasetByType to use when reading the
+            %   HDF5 file. If you have things like "datetime" in the map,
+            %   they will come back in as char. 
+            %   Also, no multi-level containers, where a value is another 
+            %   container-like object (e.g. table, struct, containers.Map)
+            % -------------------------------------------------------------
+            arguments
+                fileName        {mustBeFile(fileName)}
+                pathName        char
+                dsetName        char
+                data            {mustBeA(data, 'containers.Map')}
+            end
+
+            fullPath = aod.h5.HDF5.buildPath(pathName, dsetName);
+
+            aod.h5.HDF5.makeTextDataset(fileName, pathName, dsetName, 'containers.Map');
+            aod.h5.HDF5.writeatts(fileName, fullPath, 'Class', 'containers.Map');
+            if isempty(data)
+                return
+            end
+
+            keys = data.keys;
+            values = data.values;
+            for i = 1:numel(keys)
+                iValue = values{i};
+                aod.h5.HDF5.writeatts(fileName, fullPath, keys{i}, iValue);
+            end
         end
 
         function makeEnumDataset(fileName, pathName, dsetName, value)
@@ -631,6 +670,11 @@ classdef HDF5 < handle
             H5A.delete(rootID, name);
         end
         
+        function readatt(fileName, pathName, attName)
+            attValue = aod.h5.readAttributeByType(fileName, pathName, attName);
+
+        end
+        
         function writeatts(fileName, pathName, varargin)
             % WRITEATTS
             % 
@@ -640,33 +684,43 @@ classdef HDF5 < handle
             % Syntax:
             %   aod.h5.HDF5.writeatts(fileName, pathName, varargin)
             %
-            % varargin may be a containers.Map of attributes or a list of
-            % attributes specified as key, value
-            % -------------------------------------------------------------
+            % Inputs:
+            %   hdfName     char
+            %       HDF5 file name
+            %   hdfPath     char
+            %       Path of the dataset/group where attributes will be written
+            %   varargin    see below
+            %
+            % Attributes can be specified in the following ways:
+            %   1. A list of one or more key/value pairs
+            %       writeAttributeByType(hdfName, hdfPath, 'A', 1)
+            %       writeAttributeByType(hdfName, hdfPath, 'A', 1, 'B', 2)
+            %   2. A containers.Map
+            %       attMap = containers.Map('A', 1, 'B', 2)
+            %       writeAttributeByType(hdfName, hdfPath, attMap)
+            %   3. A structure
+            %       attStruct = struct('A', 1, 'B', 2)
+            %       writeAttributeByType(hdfName, hdfPath, attStruct)
+            %   4. A structure or containers.Map followed by key/value pairs
+            %       writeAttributeByType(hdfName, hdfPath, attMap, 'C', 3, 'D', 4) 
+            %       writeAttributeByType(hdfName, hdfPath, attStruct, 'C', 3, 'D', 4)
+            % -------------------------------------------------------------------------
             if isstring(pathName)
                 pathName = char(pathName);
             end
 
-            if isSubclass(varargin{1}, 'containers.Map')
-                attMap = varargin{1};
-            else
-                attMap = kv2map(varargin{:});
-            end
+            attMap = kv2map(varargin{:});
             if isempty(attMap)
                 return
             end
             k = attMap.keys;
             for i = 1:numel(k)
                 attValue = attMap(k{i});
-                if isenum(attValue)
-                    attValue = [class(attValue), ',', char(attValue)];
-                end
                 if ~istext(attValue) && isSubclass(attValue, 'aod.core.Entity')
                     warning('writeatts:Skipping Entity %s', class(attValue));
                     continue
                 end
-                h5writeatt(fileName, pathName, k{i},...
-                    aod.h5.HDF5.data2att(attValue));
+                aod.h5.writeAttributeByType(fileName, pathName, k{i}, attValue);
             end
         end
     end
@@ -765,24 +819,7 @@ classdef HDF5 < handle
     end
 
     % Data type methods
-    methods (Static)
-        function out = data2att(varargin)
-            if nargin == 1
-                data = varargin{1};
-            else
-                data = vertcat(varargin{:});
-            end
-            if islogical(data)
-                out = int32(data);
-            elseif isdatetime(data)
-                out = datestr(data); %#ok<*DATST> 
-            elseif isstring(data) && numel(data) == 1
-                out = char(data);
-            else
-                out = data;
-            end
-        end
-        
+    methods (Static)        
         function typeID = getDataType(var)
             % GETDATATYPE
             %

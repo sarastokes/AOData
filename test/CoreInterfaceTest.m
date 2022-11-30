@@ -28,6 +28,21 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
     end
 
     methods (Test)
+        function experimentIO(testCase)
+            % Add a relative file
+            testCase.EXPT.setFile('RelFile', fullfile(cd, 'test.txt'));
+            % Add an absolute file
+            testCase.EXPT.setFile('AbsFile', 'C:\Users\sarap\Desktop\test.txt');
+
+            % Test homeDirectory removal
+            testCase.verifyFalse(contains(testCase.EXPT.files('RelFile'), cd));
+            testCase.verifyTrue(contains(testCase.EXPT.files('AbsFile'), 'C:\Users\sarap\Desktop'));
+
+            % Test getFile vs getExptFile
+            testCase.verifyTrue(contains(testCase.EXPT.getExptFile('AbsFile'), cd));
+            testCase.verifyFalse(contains(testCase.EXPT.getFile('AbsFile'), cd));
+        end
+
         function sourceIO(testCase)
             import matlab.unittest.constraints.Throws
 
@@ -344,16 +359,4 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test)
-        function testEntityGroupSearch(testCase)
-            testCase.EXPT.add(aod.core.Calibration('TestCalibration1', getDateYMD()));
-            testCase.EXPT.add(aod.builtin.calibrations.PowerMeasurement(...
-                'Mustang', getDateYMD(), 488));
-            out = aod.api.EntityGroupSearch(testCase.EXPT.Calibrations,... 
-                'Subclass', 'aod.builtin.calibrations.PowerMeasurement');
-            testCase.verifyEqual(numel(out), 1);
-            testCase.EXPT.clearCalibrations();
-            testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 0);
-        end
-    end
 end 

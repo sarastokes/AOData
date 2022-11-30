@@ -10,15 +10,40 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 % Constructor:
 %   obj = aod.core.Parameters(keySet, valueSet)
 %
-% Notes:
-%   Use is identical to the containers.Map class
+% Methods:
+%   out = toMap(obj)
+%       Convert back to containers.Map
+% All other methods and properties are identical to containers.Map
+%
+% See also:
+%   containers.Map
 % -------------------------------------------------------------------------
     methods
         function obj = Parameters(varargin)
             obj = obj@containers.Map(varargin{:});
         end
+
+        function out = toMap(obj)
+            % Convert to a containers.Map object
+            %
+            % Syntax:
+            %   out = toMap(obj)
+            % -------------------------------------------------------------
+            out = containers.Map();
+            k = obj.keys;
+            v = obj.values;
+
+            if isempty(k)
+                return
+            end
+
+            for i = 1:numel(k)
+                out(k{i}) = v{i};
+            end
+        end
     end
 
+    % matlab.mixin.CustomDisplay
     methods (Access = protected)
         function header = getHeader(obj)
             if isempty(obj)

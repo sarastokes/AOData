@@ -1,9 +1,32 @@
 function success = writeDatasetByType(fileName, pathName, dsetName, data)
-% WRITEDATASETBYTYPE
+% Writes MATLAB dataset with attributes signaling the MATLAB datatype 
+%
+% Syntax:
+%   success = writeDatasetByType(fileName, pathName, dsetName, data)
+%
+% Inputs:
+%   fileName        char
+%       The HDF5 file name
+%   pathName        char
+%       The HDF5 path for the group the dataset should be added to
+%   dsetName        char
+%       The name of the dataset
+%   data            see supported data types
+%       The data to write to the dataset
+%
+% Outputs:
+%   success         logical
+%       Whether or not the data was successfully written to HDF5
 %
 % Supported data types:
-%   datetime, char, numeric, logical, table, timetable, string, duration
-%   enum, affine2d, imref2d, simtform2d, cfit
+%   numeric, char, string, logical, table, timetable, datetime, duration
+%   enum, struct, containers.Map(), affine2d, imref2d, simtform2d, cfit
+% See README.md for limitations - essentially no multilevel data (e.g. 
+%   structs/tables/containers.Maps that contain other tables, structs or 
+%   containers.Maps
+%
+% See also:
+%   readDatasetByType, readAttributeByType, writeAttributeByType
 % -------------------------------------------------------------------------
 
     arguments
@@ -89,6 +112,8 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
 
     % Misc datatypes
     switch class(data)
+        case 'containers.Map'
+            HDF5.makeMapDataset(fileName, pathName, dsetName, data); 
         case 'affine2d'
             HDF5.makeMatrixDataset(fileName, pathName, dsetName, data.T);
             HDF5.writeatts(fileName, fullPath, 'Class', class(data));
@@ -126,5 +151,7 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
                 'FitType', fitType,...
                 'Coefficients', coeffValues);
         otherwise
+            warning('writeDatasetByType:UnidentifiedDataType',...
+                'The datatype %s is not supported', class(data));
             success = false;
     end

@@ -8,7 +8,7 @@ function S  = map2struct(map)
     %   S = map2struct(map)
     %
     % Inputs:
-    %   map             containers.Map (keyvale = char/string)
+    %   map             containers.Map (keyvalue = char/string)
     %
     % History:
     %   03Jun2022 - SSP

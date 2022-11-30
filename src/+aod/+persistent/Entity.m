@@ -43,7 +43,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         parameters              % aod.util.Parameters
         files                   % aod.util.Parameters
         description             string
-        notes
+        notes                   string
     end
 
     properties (SetAccess = private)
@@ -132,6 +132,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     methods
         function tf = isequal(obj, entity)
             % Tests whether the UUIDs of two entities are equal
+            %
+            % Syntax:
+            %   tf = isequal(obj, entity)
+            % -------------------------------------------------------------
+            
             arguments
                 obj
                 entity      {mustBeA(entity, 'aod.persistent.Entity')}

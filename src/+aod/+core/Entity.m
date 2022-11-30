@@ -160,11 +160,11 @@ classdef (Abstract) Entity < handle
             obj.Name = name;
         end
 
-        function setDescription(obj, txt, overwrite)
+        function setDescription(obj, txt)
             % SETDESCRIPTION
             %
             % Syntax:
-            %   setDescription(obj, txt, overwrite)
+            %   setDescription(obj, txt)
             %
             % Inputs:
             %   txt         string
@@ -172,16 +172,16 @@ classdef (Abstract) Entity < handle
             % Optional inputs:
             %   overwrite   logical (default = false)
             %       Whether to overwrite existing description 
+            %
+            % Notes:
+            %   Running setDescription(obj) without providing the 2nd input
+            %   will just delete the current description, if present.
             % -------------------------------------------------------------
-            if nargin < 3
-                overwrite = false;
+            arguments
+                obj
+                txt         string = string.empty()
             end
-            assert(istext(txt), 'Description must be char or string')
 
-            if ~isempty(obj.description) && ~overwrite 
-                warning('Set overwrite=true to change existing description');
-                return
-            end
             obj.description = txt;
         end
         
@@ -194,10 +194,6 @@ classdef (Abstract) Entity < handle
             arguments
                 obj
                 txt             string = string.empty()
-            end
-
-            if isempty(txt)
-                return
             end
 
             if ~isscalar(obj)

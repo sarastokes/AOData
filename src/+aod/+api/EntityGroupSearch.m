@@ -9,7 +9,6 @@ classdef EntityGroupSearch < handle
 %
 % Constructor:
 %   obj = EntityGroupSearch(entityGroup, queryType, varargin)
-%
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -28,8 +27,10 @@ classdef EntityGroupSearch < handle
                 'entityGroup must be a subclass of aod.core.Entity');
             obj.Group = entityGroup;
 
+            % TODO: Repeating queries
+
             queryType = capitalize(string(queryType));
-            assert(ismember(queryType, obj.QUERY_TYPES),...
+            assert(ismember(lower(queryType), lower(obj.QUERY_TYPES)),...
                 'queryType must be: Class, Subclass, Name, Dataset, Parameter');
             obj.queryType = queryType;
 
@@ -60,15 +61,30 @@ classdef EntityGroupSearch < handle
 
         function datasetQuery(obj, dsetName, dsetSpec)
             % DATASETQUERY
+            arguments
+                obj
+                dsetName        char
+                dsetSpec        = []
+            end
+
             fprintf('Performing dataset query for %s\n', dsetName);
             for i = 1:numel(obj.Group)
                 obj.filterIdx(i) = isprop(obj.Group(i), dsetName);
             end
             
-            if nargin < 3
+            % Determine whether to continue and test for a specific value
+            if isempty(dsetSpec)
                 return
+            else 
+                if ~any(obj.filterIdx)
+                    warning('datasetQuery:NoDsetNameMatch',...
+                        'No entities were found with datasets named %s', dsetName);
+                    return
+                end
             end
-            if ishandle(dsetSpec)
+
+            % Filter by the value of dsetName
+            if isa(dsetSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
                     if ~obj.filterIdx(i)
                         continue
@@ -85,18 +101,80 @@ classdef EntityGroupSearch < handle
             end
         end
 
+        function fileQuery(obj, fileName, fileSpec)
+            arguments
+                obj
+                fileName        char
+                fileSpec        = []
+            end
+
+            fprintf('Performing file query for %s\n', fileName);
+
+            % Find the entities with fileName
+            for i = 1:numel(obj.Group)
+                obj.filterIdx(i) = hasFile(obj.Group(i), fileName);
+            end
+
+            % Determine whether to continue and test for a specific value
+            if isempty(paramSpec)
+                return
+            else
+                if ~any(obj.filterIdx)
+                    warning('fileQuery:NoFileNameMatches',...
+                        'No entities were found with the file %s', paramName);
+                    return
+                end
+            end
+
+            % Filter entities with fileName by their values
+            if isa(fileSpec, 'function_handle')
+                for i = 1:numel(obj.Group)
+                    if ~obj.filterIdx(i)
+                        continue
+                    end
+
+                    try
+                        obj.filterIdx(i) = fileSpec(obj.Group(i).getFile(fileName));
+                    catch
+                        warning('fileQuery:InvalidFileFcn',...
+                            'File function for %s was invalid', fileName);
+                    end
+                end
+            else
+                for i = 1:numel(obj.Group)
+                    if ~obj.filterIdx(i)
+                        continue
+                    end
+                    obj.filterIdx(i) = isequal(obj.Group(i).getFile(fileNane), fileSpec);
+                end
+            end
+        end
+
         function parameterQuery(obj, paramName, paramSpec)
-            % PARAMETERQUERY
+            arguments
+                obj
+                paramName       char
+                paramSpec       = []
+            end
+
             fprintf('Performing parameter query for %s\n', paramName);
-            %for i = 1:numel(obj.Group)
-            %    obj.filterIdx(i) = obj.Group(i).hasParam(paramName);
-            %end
+
+            % Find the entities with paramName
             obj.filterIdx = hasParam(obj.Group, paramName);
 
-            if nargin < 3
+            % Determine whether to continue and test for a specific value
+            if isempty(paramSpec)
                 return
+            else
+                if ~any(obj.filterIdx)
+                    warning('parameterQuery:NoParamNameMatches',...
+                        'No entities were found with the parameter %s', paramName);
+                    return
+                end
             end
-            if ishandle(paramSpec)
+
+            % Filter by the value of paramName
+            if isa(paramSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
                     if ~obj.filterIdx(i)
                         continue
@@ -134,19 +212,19 @@ classdef EntityGroupSearch < handle
         end
     end
 
-    methods %(Access = protected)
+    methods (Access = protected)
         function out = queryByType(obj, varargin)
             % QUERYBYTYPE
-            switch obj.queryType
-                case 'Class'
+            switch lower(obj.queryType)
+                case 'class'
                     obj.classQuery(varargin{1});
-                case 'Subclass'
+                case 'subclass'
                     obj.subclassQuery(varargin{1});
-                case 'Name'
+                case 'name'
                     obj.nameQuery(varargin{:});
-                case 'Dataset'
+                case {'dataset', 'dset'}
                     obj.datasetQuery(varargin{:});
-                case 'Parameter'
+                case {'parameter', 'param'}
                     obj.parameterQuery(varargin{:})
             end
 

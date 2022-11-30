@@ -33,7 +33,7 @@ classdef HDFTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test)
+    methods (Test, TestTags={'Dataset'})
         function testString(testCase)
             inputString = "abc";
             aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'String', inputString);
@@ -112,6 +112,21 @@ classdef HDFTest < matlab.unittest.TestCase
             aod.h5.writeDatasetByType(testCase.HDF_FILE, '/', 'imref2d', inputRefObj);
             outputRefObj = aod.h5.readDatasetByType(testCase.HDF_FILE, '/', 'imref2d');
             testCase.verifyEqual(inputRefObj, outputRefObj);
+        end
+    end
+
+    methods (Test, TestTags={'Attributes'})
+        function testLogicalAtt(testCase)
+            aod.h5.HDF5.writeatts(testCase.HDF_FILE, '/', 'Logical_True', true);
+            output = aod.h5.readAttributeByType(testCase.HDF_FILE, '/', 'Logical_True'); 
+            testCase.verifyEqual(output, true);
+        end
+
+        function testEnumAtt(testCase)
+            input = aod.core.EntityTypes.EXPERIMENT;
+            aod.h5.HDF5.writeatts(testCase.HDF_FILE, '/', 'Enum', input);
+            output = aod.h5.readAttributeByType(testCase.HDF_FILE, '/', 'Enum');
+            testCase.verifyEqual(input, output);
         end
     end
 end 
