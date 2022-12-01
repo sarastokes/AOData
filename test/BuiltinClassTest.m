@@ -41,6 +41,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
         function testNDF(testCase)
             obj = aod.builtin.devices.NeutralDensityFilter(0.6,...
                 'Manufacturer', 'ThorLabs', 'Model', 'NE06A-A');
+            obj.setTransmission([400:700; zeros(size(400:700))]);
         end
 
         function testBandpassFilter(testCase)

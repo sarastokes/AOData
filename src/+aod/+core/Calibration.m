@@ -37,7 +37,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        calibrationDate(1,1)                datetime
+        calibrationDate                 datetime
     end
 
     properties (SetAccess = protected)
@@ -112,7 +112,8 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   calDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
-            if isempty(calDate)
+            if nargin < 2 || isempty(calDate)
+                obj.calibrationDate = datetime.empty();
                 return
             end
             calDate = aod.util.validateDate(calDate);

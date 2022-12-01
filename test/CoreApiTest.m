@@ -46,7 +46,6 @@ classdef CoreApiTest < matlab.unittest.TestCase
                     testCase.EXPT.Epochs(end).setFile('MyFile', '');
                 end
             end
-            assignin('base', 'tEXPT', testCase.EXPT);
         end
     end
 
@@ -88,7 +87,7 @@ classdef CoreApiTest < matlab.unittest.TestCase
 
             % Match files values using a function handle
             egObj = aod.api.EntityGroupSearch(testCase.EXPT.Epochs,...
-                'File', 'MyFile', @(x) contains(x, '.txt'));
+                'File', 'MyFile', @(x) endsWith(x, '.txt'));
             testCase.verifyEqual(numel(egObj.getMatches()), 4);
         end
     end

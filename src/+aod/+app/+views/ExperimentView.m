@@ -226,7 +226,7 @@ classdef ExperimentView < aod.app.UIView
             %   Initialize the components of the view
             % -------------------------------------------------------------
             obj.figureHandle.Position(3:4) = [500 450];
-            movegui(obj.figureHandle, 'center');
+            % movegui(obj.figureHandle, 'center'); too slow
 
             mainLayout = uigridlayout(obj.figureHandle);
             mainLayout.RowHeight = {'1.5x', '1x'};

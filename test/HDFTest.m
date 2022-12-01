@@ -91,7 +91,6 @@ classdef HDFTest < matlab.unittest.TestCase
             testCase.verifyEqual(inputDuration, outputDuration);
         end
 
-
         % MATLAB-specific data types
         function testAffine2d(testCase)
             inputAffine2d = affine2d(eye(3));

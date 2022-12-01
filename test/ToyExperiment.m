@@ -28,9 +28,7 @@ function experiment = ToyExperiment(writeToHDF)
     experiment.add(source);
 
     % Add the system(s)
-    system = aod.core.System('SpectralPhysiology');
-    [~, system] = sara.factories.ChannelFactory.create(...
-        'MaxwellianView', system, 'NDF', 1.0);
+    system = aod.core.System('BaseSystem');
     [~, system] = sara.factories.ChannelFactory.create(...
         'MustangImaging', system, 'Pinhole', 25);
     [~, system] = sara.factories.ChannelFactory.create(...

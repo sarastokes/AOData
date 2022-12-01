@@ -1,4 +1,4 @@
-function mirrorClass = findMirror(entityType, entityClass)
+function mirrorClass = findMirror(entityType, entityClass, classManager)
     % FINDMIRROR
     %
     % Description:
@@ -6,24 +6,34 @@ function mirrorClass = findMirror(entityType, entityClass)
     %
     % Syntax:
     %   mirrorClass = findMirror(entityType, entityClass)
+    %   mirrorClass = findMirror(entityType, entityClass, repositoryManager)
+    %
+    % Notes:
+    %   Instantiating ClassRepository is time-consuming (179 ms per call)  
+    %   so if calling findMirror repeatedly, provide classRepository
     %
     % History:
     %   15Nov2022 - SSP
+    %   30Nov2022 - SSP - Optional passing of ClassRepository for speed
     % ---------------------------------------------------------------------
     
     arguments
-        entityType          {mustBeA(entityType, 'aod.core.EntityTypes')}
-        entityClass         string 
+        entityType      {mustBeA(entityType, 'aod.core.EntityTypes')}
+        entityClass     string 
+        classManager    {mustBeA(classManager, 'aod.infra.ClassRepository')} = []
     end
 
+    if isempty(classManager)
+        classManager = aod.infra.ClassRepository();
+    end
+    
     persistentClass = entityType.getPersistentClassName();
 
     % Default condition is that there is no mirror class
     mirrorClass = persistentClass;
 
     % Check for custom subclasses of default persistent class
-    classRepo = aod.infra.ClassRepository();
-    customClassNames = classRepo.get(persistentClass);
+    customClassNames = classManager.get(persistentClass);
     if isempty(customClassNames)
         mirrorClass = persistentClass;
         return

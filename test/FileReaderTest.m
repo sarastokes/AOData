@@ -2,7 +2,7 @@ classdef FileReaderTest < matlab.unittest.TestCase
 % FILEREADERTEST
 %
 % Description:
-%   Tests modification of HDF5 files from persistent interface
+%   Tests builtin support for reading files
 %
 % Parent:
 %    matlab.unittest.TestCase
@@ -21,6 +21,15 @@ classdef FileReaderTest < matlab.unittest.TestCase
     methods (TestClassSetup)
         function methodSetup(testCase)
             testCase.dataFolder = fullfile(fileparts(mfilename('fullpath')), 'test_data');
+            writematrix([8, 8.5, 7; 0 2.1 -1], ...
+                fullfile(testCase.dataFolder, 'test.csv'));
+        end
+    end
+
+    methods (TestMethodTeardown)
+        function methodTeardown(testCase)
+            writematrix([8, 8.5, 7; 0 2.1 -1], ...
+                fullfile(testCase.dataFolder, 'test.csv'));
         end
     end
 
@@ -29,7 +38,15 @@ classdef FileReaderTest < matlab.unittest.TestCase
             reader = aod.util.readers.CsvReader(...
                 fullfile(testCase.dataFolder, 'test.csv'));
             out = reader.read();
-            testCase.verifyEqual(out, [8, 8.5, 7; 0 2.1 -1]);
+            testCase.verifyEqual(out, [8, 8.5, 7; 0 2.1 -1], ...
+                'AbsTol', 0.001);
+
+            % Change the data and test reload
+            writematrix(-1*out, fullfile(testCase.dataFolder, 'test.csv'));
+            reader.reload();
+            testCase.verifyEqual(reader.Data, -1 * [8, 8.5, 7; 0 2.1 -1], ...
+                'AbsTol', 0.001);
+
         end
 
         function testTXT(testCase)

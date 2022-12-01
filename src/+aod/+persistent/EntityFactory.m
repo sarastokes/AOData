@@ -15,7 +15,8 @@ classdef EntityFactory < handle
     properties (SetAccess = private)
         hdfName
         persistor
-        entityManager 
+        entityManager
+        classManager
         cache 
     end
 
@@ -23,6 +24,7 @@ classdef EntityFactory < handle
         function obj = EntityFactory(hdfName)
             obj.hdfName = hdfName;
             obj.entityManager = aod.h5.EntityManager(hdfName);
+            obj.classManager = aod.infra.ClassRepository();
             obj.persistor = aod.persistent.Persistor(hdfName);
             addlistener(obj.persistor, 'EntityChanged', @obj.onEntityChanged);
 
@@ -52,7 +54,8 @@ classdef EntityFactory < handle
             className = T{T.Path == hdfPath, 'Class'};
             entityType = aod.core.EntityTypes.init(obj.entityManager.entityMap(uuid));
 
-            mirrorFcn = str2func(aod.infra.findMirror(entityType, className));
+            mirrorFcn = str2func(aod.infra.findMirror(...
+                entityType, className, obj.classManager));
             e = mirrorFcn(obj.hdfName, hdfPath, obj);
 
             obj.persistor.bind(e);

@@ -220,21 +220,13 @@ classdef EntityTypes
                 case EntityTypes.SOURCE 
                     out = expt.getAllSources();
                 case EntityTypes.REGISTRATION
-                    if ~isempty(expt.Epochs)
-                        out = vertcat(expt.Epochs.Registrations);
-                    end
+                    out = expt.getEpochRegistrations();
                 case EntityTypes.RESPONSE
-                    if ~isempty(expt.Epochs)
-                        out = vertcat(expt.Epochs.Registrations);
-                    end
+                    out = expt.getEpochRegistrations();
                 case EntityTypes.DATASET 
-                    if ~isempty(expt.Epochs)
-                        out = vertcat(expt.Epochs.Datasets);
-                    end
+                    out = expt.getEpochDatasets();
                 case EntityTypes.STIMULUS
-                    if ~isempty(expt.Epochs)
-                        out = vertcat(expt.Epochs.Stimulus);
-                    end
+                    out = expt.getEpochStimuli();
             end
         end 
 
@@ -532,57 +524,6 @@ classdef EntityTypes
                     obj = EntityTypes.ANALYSIS;
                 otherwise
                     obj = [];
-            end
-        end
-
-        function obj = fromClassName(obj, className)
-            % TODO: no longer needed
-            if isstring(className)
-                className = char(className);
-            end
-            if ~ischar(className)
-                className = class(className);
-            end
-
-            if ~isSubclass(className, {'aod.core.Entity', 'aod.core.Experiment'})
-                error("EntityTypes_fromClassName:NotAODataClass",...
-                    "%s is not an subclass of aod.core.Entity or aod.persistent.Entity", className);
-            end
-            
-            if isSubclass(x, 'aod.persistent.Entity')
-                obj = x.entityType;
-                return
-            end
-
-            import aod.core.EntityTypes;
-            if isSubclass(x, 'aod.core.Entity')
-                if isSubclass(x, 'aod.core.Experiment')
-                    obj = EntityTypes.EXPERIMENT;
-                elseif isSubclass(x, 'aod.core.Epoch')
-                    obj = EntityTypes.EPOCH;
-                elseif isSubclass(x, 'aod.core.Source')
-                    obj = EntityTypes.SOURCE;
-                elseif isSubclass(x, 'aod.core.Calibration')
-                    obj = EntityTypes.CALIBRATION;
-                elseif isSubclass(x, 'aod.core.Segmentation')
-                    obj = EntityTypes.SEGMENTATION;
-                elseif isSubclass(x, 'aod.core.System')
-                    obj = EntityTypes.SYSTEM;
-                elseif isSubclass(x, 'aod.core.Channel')
-                    obj = EntityTypes.CHANNEL;
-                elseif isSubclass(x, 'aod.core.Device')
-                    obj = EntityTypes.DEVICE;
-                elseif isSubclass(x, 'aod.core.Analysis')
-                    obj = EntityTypes.ANALYSIS;
-                elseif isSubclass(x, 'aod.core.Registration')
-                    obj = EntityTypes.REGISTRATION;
-                elseif isSubclass(x, 'aod.core.Stimulus')
-                    obj = EntityTypes.STIMULUS;
-                elseif isSubclass(x, 'aod.core.Dataset')
-                    obj = EntityTypes.DATASET;
-                elseif isSubclass(x, 'aod.core.Response')
-                    obj = EntityTypes.RESPONSE;
-                end
             end
         end
     end

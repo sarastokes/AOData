@@ -1,21 +1,22 @@
 function results = runAODataTestSuite(varargin)
-    % RUNAODATATESTSUITE
-    %
-    % Description:
-    %   Runs the full AOData test suite with optional code coverage report
-    %
-    % Syntax:
-    %   results = runAODataTestSuite()
-    %   results = runAODataTestSuite(varargin)
-    %
-    % Optional key/value inputs:
-    %   Coverage            logical (default = false)
-    %       Whether to output coverage report
-    %   KeepFiles           logical (default = false)
-    %       Whether to keep HDF5 files produced by the test suite
-    %   Debug               logical (default = false)
-    %       Whether to stop on failures
-    % ---------------------------------------------------------------------
+% RUNAODATATESTSUITE
+%
+% Description:
+%   Runs the full test suite with options for code coverage reports, 
+%   debugging and keeping files produced during testing
+%
+% Syntax:
+%   results = runAODataTestSuite()
+%   results = runAODataTestSuite(varargin)
+%
+% Optional key/value inputs:
+%   Coverage            logical (default = false)
+%       Whether to output coverage report
+%   KeepFiles           logical (default = false)
+%       Whether to keep HDF5 files produced by the test suite
+%   Debug               logical (default = false)
+%       Whether to stop on failures
+% ---------------------------------------------------------------------
     
     ip = inputParser();
     addParameter(ip, 'Coverage', false, @islogical);
@@ -47,10 +48,9 @@ function results = runAODataTestSuite(varargin)
         results = testWithoutCoverageReport(debugFlag);
     end
 
-    % Clean up test files
+    % Clean up files produced by tests, if necessary
     if ~fileFlag
-        delete('ToyExperiment.h5');
-        delete('HdfTest.h5');
+        test.util.deleteTestFiles();
     end
 
     % Return to user's previous working directory
@@ -72,8 +72,7 @@ function results = testWithCoverageReport(debugFlag)
     import matlab.unittest.plugins.codecoverage.CoverageReport    
     import matlab.unittest.plugins.StopOnFailuresPlugin
     
-    flag = exist('coverage_report', 'dir');
-    if flag == 0
+    if ~exist('coverage_report', 'dir');
         mkdir('coverage_report');
     end
 

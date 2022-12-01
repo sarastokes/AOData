@@ -60,9 +60,9 @@ classdef (Abstract) Entity < handle
         % Unique identifier for the entity
         UUID                        string = string.empty()
         % A description of the entity
-        description                 char = char.empty() 
+        description                 string = string.empty() 
         % Notes about the entity
-        notes                       char = char.empty()
+        notes                       string = string.empty()
     end
 
     properties (Hidden, SetAccess = private)
@@ -193,7 +193,7 @@ classdef (Abstract) Entity < handle
             % -------------------------------------------------------------
             arguments
                 obj
-                txt             string = string.empty()
+                txt             string
             end
 
             if ~isscalar(obj)
@@ -201,7 +201,11 @@ classdef (Abstract) Entity < handle
                 return
             end
 
-            obj.notes = cat(1, obj.notes, txt);
+            if isempty(obj.notes)
+                obj.notes = txt;
+            else
+                obj.notes = cat(1, obj.notes, txt);
+            end
         end
 
         function removeNote(obj, ID)
@@ -213,8 +217,17 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.removeNote(obj, ID)
             % -------------------------------------------------------------
-            assert(ID > 1 && ID <= numel(out),...
-                'Invalid ID %u, must be between 1-%u', ID, max(noteIDs));
+            arguments
+                obj
+                ID      {mustBeInteger(ID)}
+            end
+
+            if ~isscalar(obj)
+                arrayfun(@(x) removeNote(x, ID), obj);
+                return
+            end
+            assert(ID > 0 && ID <= numel(obj.notes),...
+                'Invalid ID %u, must be between 1-%u', ID, numel(obj.notes));
             obj.notes(ID) = [];
         end
 

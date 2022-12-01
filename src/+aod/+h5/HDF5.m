@@ -627,19 +627,6 @@ classdef HDF5 < handle
                 'H5_ITER_NATIVE', 0, @attributeIterateFcn, names);
         end
 
-        function [x, S] = getAttributeNamesFull(fileName, pathName)
-            arguments
-                fileName            {mustBeFile(fileName)} 
-                pathName            char = '\'
-            end
-
-            if nargin == 1
-                pathName = '\';
-            end
-            S = h5info(fileName, pathName);
-            x = arrayfun(@(x) string(x.Name), S.Attributes);
-        end
-
         function deleteAttribute(fileName, pathName, name)
             % DELETEATTRIBUTE
             %
@@ -989,7 +976,7 @@ classdef HDF5 < handle
                 name = pathName;
             else
                 name = pathName(idx(end)+1:end);
-                ath = pathName(1:idx(1));
+                path = pathName(1:idx(1));
             end
         end
 

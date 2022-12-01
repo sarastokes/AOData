@@ -3,12 +3,11 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
 %
 % Supported data types:
 %   datetime, char, numeric, logical, table, timetable, string, duration
-%   enum, affine2d, imref2d, simtform2d, cfit
+%   enum, containers.Map, affine2d, imref2d, simtform2d, cfit
 % -------------------------------------------------------------------------
     import aod.h5.HDF5
 
     fullPath = HDF5.buildPath(groupPath, dsetName);
-    disp(fullPath)
 
     if nargin < 4
         className = h5readatt(hdfName, fullPath, 'Class');

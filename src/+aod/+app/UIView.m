@@ -17,6 +17,10 @@ classdef UIView < handle
         figureHandle
     end
 
+    methods (Abstract)
+        createUi(obj);
+    end
+
     methods
 
         function obj = UIView()
@@ -165,9 +169,4 @@ classdef UIView < handle
         end
 
     end
-
-    methods (Abstract)
-        createUi(obj);
-    end
-
 end

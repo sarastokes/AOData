@@ -15,6 +15,7 @@ function appHandle = AODataViewer(experiment)
     % ---------------------------------------------------------------------
     
     p = aod.app.presenters.ExperimentPresenter(experiment);
+    p.show();
     if nargout > 0
         appHandle = p;
     end

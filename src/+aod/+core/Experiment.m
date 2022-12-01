@@ -49,7 +49,7 @@ classdef Experiment < aod.core.Entity
         homeDirectory           char
         experimentDate(1,1)     datetime
 
-        Analyses                aod.core.Analysis
+        Analyses                aod.core.Analysis = aod.core.Analysis.empty()
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
         Segmentations           aod.core.Segmentation
@@ -135,7 +135,10 @@ classdef Experiment < aod.core.Entity
             end
 
             if ~isscalar(entity)
-                arrayfun(@(x) add(obj, x), entity);
+                %arrayfun(@(x) add(obj, x), entity);
+                for i = 1:numel(entity)
+                    obj.add(entity(i));
+                end
                 return
             end
 
@@ -145,18 +148,34 @@ classdef Experiment < aod.core.Entity
             switch entityType 
                 case EntityTypes.ANALYSIS
                     entity.setParent(obj);
-                    obj.Analyses = cat(1, obj.Analyses, entity);
+                    if isempty(obj.Analyses)
+                        obj.Analyses = entity;
+                    else
+                        obj.Analyses = cat(1, obj.Analyses, entity);
+                    end
                 case EntityTypes.CALIBRATION
                     entity.setParent(obj);
-                    obj.Calibrations = cat(1, obj.Calibrations, entity);
+                    if isempty(obj.Calibrations)
+                        obj.Calibrations = entity;
+                    else
+                        obj.Calibrations = cat(1, obj.Calibrations, entity);
+                    end
                 case EntityTypes.EPOCH
                     obj.addEpoch(entity);
                 case EntityTypes.SEGMENTATION
                     entity.setParent(obj);
-                    obj.Segmentations = cat(1, obj.Segmentations, entity);
+                    if isempty(obj.Segmentations)
+                        obj.Segmentations = entity;
+                    else
+                        obj.Segmentations = cat(1, obj.Segmentations, entity);
+                    end
                 case EntityTypes.SYSTEM 
                     entity.setParent(obj);
-                    obj.Systems = cat(1, obj.Systems, entity);
+                    if isempty(obj.Systems)
+                        obj.Systems = entity;
+                    else
+                        obj.Systems = cat(1, obj.Systems, entity);
+                    end
                 case EntityTypes.SOURCE 
                     obj.addSource(entity);
                 otherwise
@@ -447,7 +466,7 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             
             if isempty(obj.Systems)
-                devices = aod.core.Devices.empty();
+                devices = aod.core.Device.empty();
             else
                 devices = vertcat(obj.Systems.getAllDevices());
             end
@@ -456,13 +475,17 @@ classdef Experiment < aod.core.Entity
 
     % Epoch methods
     methods
-        function removeEpochByID(obj, epochID)
-            % REMOVEEPOCHS
+        function removeEpoch(obj, epochID)
+            % REMOVEEPOCH
             %
             % Syntax:
             %   removeEpoch(obj, epochID)
             % -------------------------------------------------------------
-            assert(ismember(epochID, obj.epochIDs), 'ID not found in epochIDs!');
+            arguments
+                obj
+                epochID     {aod.util.mustBeEpochID(obj, epochID)}
+            end
+            
             idx = obj.id2index(epochID);
             obj.Epochs(idx) = [];
         end
@@ -577,7 +600,7 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   removeAnalysis(obj, ID)
             % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Analyses),...
+            assert(ID > 0 & ID <= numel(obj.Analyses),...
                 'ID %u invalid, must be between 1 and %u', ID, numel(obj.Analyses));
             obj.Analyses(ID) = [];
         end

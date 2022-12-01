@@ -1,9 +1,9 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 29Nov2022, the ```aod``` package report contains **131 files** and has:
-- **44.03%** statement coverage (4225 executable) 
-- **46.87%** function coverage (721 executable).
+As of 30Nov2022, the ```aod``` package report contains **129 files** and has:
+- **50.73%** statement coverage (4082 executable) 
+- **51.98%** function coverage (706 executable).
 
 ## Tests
 The AOData test suite currently contains the following:
@@ -16,6 +16,7 @@ The AOData test suite currently contains the following:
 - ```FilterTest``` - tests AOQuery filters
 - ```PersistorTest``` - tests modification of HDF5 files from persistent interface
 - ```SyncTest``` - tests validation performed when adding an entity to an experiment
+- ```UtilityTest``` - tests the utility functions supporting AOData
 
 
 ## Use

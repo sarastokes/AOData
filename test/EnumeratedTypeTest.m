@@ -58,6 +58,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, H5NodeTypes.LINK);
         end
 
+
         function AODataNodesInit(testCase)
             import aod.app.AONodeTypes
             
@@ -81,6 +82,79 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, AONodeTypes.FILES);
             out = AONodeTypes.init('randominput');
             testCase.verifyEqual(out, AONodeTypes.UNKNOWN);
+        end
+    end
+    
+    methods (Test, TestTags={'GroupLoadState'})
+        function GroupLoadStateInit(testCase)
+            import matlab.unittest.constraints.Throws
+            import aod.app.GroupLoadState
+
+            % Initialize by name
+            out = GroupLoadState.init('none');
+            testCase.verifyEqual(out, GroupLoadState.NONE);
+            out = GroupLoadState.init('contents');
+            testCase.verifyEqual(out, GroupLoadState.CONTENTS);
+            out = GroupLoadState.init('attributes');
+            testCase.verifyEqual(out, GroupLoadState.ATTRIBUTES);
+            out = GroupLoadState.init('name');
+            testCase.verifyEqual(out, GroupLoadState.NAME);
+
+            % Return if GroupLoadState
+            testCase.verifyEqual(GroupLoadState.init(GroupLoadState.NAME),...
+                GroupLoadState.NAME);
+            
+            % Error on unrecognized input
+            testCase.verifyThat(...
+                @() GroupLoadState.init('badinput'),...
+                Throws("init:UnrecognizedInput"));
+        end
+
+        function GroupLoadStateProps(testCase)
+            import aod.app.GroupLoadState
+            testCase.verifyTrue(GroupLoadState.CONTENTS.hasAttributes());
+            testCase.verifyFalse(GroupLoadState.NAME.hasAttributes());
+
+            testCase.verifyTrue(GroupLoadState.CONTENTS.hasContents());
+            testCase.verifyFalse(GroupLoadState.NAME.hasContents());
+
+            testCase.verifyTrue(GroupLoadState.ATTRIBUTES.hasName());
+            testCase.verifyFalse(GroupLoadState.NONE.hasName());
+        end
+    end
+
+    methods (Test, TestTags={'EntityTypes'})
+        function EntityTypeInit(testCase)
+            import aod.core.EntityTypes
+
+            testCase.verifyEqual(EntityTypes.init(EntityTypes.EXPERIMENT),...
+                EntityTypes.EXPERIMENT);
+            out = EntityTypes.init('channel');
+            testCase.verifyEqual(out, EntityTypes.CHANNEL);
+            out = EntityTypes.init('device');
+            testCase.verifyEqual(out, EntityTypes.DEVICE);
+            out = EntityTypes.init('segmentation');
+            testCase.verifyEqual(out, EntityTypes.SEGMENTATION);
+            out = EntityTypes.init('stimulus');
+            testCase.verifyEqual(out, EntityTypes.STIMULUS);
+            out = EntityTypes.init('analysis');
+            testCase.verifyEqual(out, EntityTypes.ANALYSIS);
+        end
+
+        function persistentParentContainer(testCase)
+            out = aod.core.EntityTypes.EPOCH.persistentParentContainer();
+            testCase.verifyEqual('EpochsContainer', out);
+        end
+
+        function collectAll(testCase)
+            out = collectAll(aod.core.EntityTypes.EXPERIMENT, testCase.EXPT);
+            testCase.verifyNumElements(out, 1);
+            testCase.verifyEqual(out.UUID, testCase.EXPT.UUID);
+        end
+
+        function getCoreClassName(testCase)
+            className = aod.core.EntityTypes.EXPERIMENT.getCoreClassName();
+            testCase.verifyEqual(className, 'aod.core.Experiment');
         end
     end
 end 

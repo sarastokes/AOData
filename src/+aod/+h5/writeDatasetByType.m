@@ -65,20 +65,6 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
         return
     end
 
-    if isstruct(data)
-        try 
-            HDF5.makeCompoundDataset(fileName, pathName, dsetName, data);
-            HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-        catch
-            if aod.h5.HDF5.exists(fileName, fullPath)
-                HDF5.deleteObject(fileName, fullPath);
-            end
-            HDF5.makeStructDataset(fileName, pathName, dsetName, data);
-            HDF5.writeatts(fileName, fullPath, 'Class', class(data));
-        end
-        return
-    end
-
     if isdatetime(data)
         HDF5.makeDateDataset(fileName, pathName, dsetName, data);
         return
@@ -119,14 +105,11 @@ function success = writeDatasetByType(fileName, pathName, dsetName, data)
             HDF5.writeatts(fileName, fullPath, 'Class', class(data));
         case 'simtform2d'
             HDF5.makeTextDataset(fileName, pathName, dsetName, 'simtform2d');
-            % Technically, only rotation, scale & transformation are needed
             HDF5.writeatts(fileName, fullPath, 'Class', class(data),...
                 'Dimensionality', data.Dimensionality,...
                 'Scale', data.Scale,...
                 'RotationAngle', data.RotationAngle,...
-                'Translation', data.Translation,...
-                'R', data.R,...
-                'A', data.A);
+                'Translation', data.Translation);
         case 'imref2d'
             HDF5.makeTextDataset(fileName, pathName, dsetName, 'imref2d');
             HDF5.writeatts(fileName, fullPath, 'Class', class(data),...
