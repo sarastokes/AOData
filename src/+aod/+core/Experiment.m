@@ -96,6 +96,76 @@ classdef Experiment < aod.core.Entity
     end
 
     methods
+        function out = search(obj, entityType, varargin)
+            % SEARCH
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (described below in examples)
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            %
+            % Examples:
+            % Search for Sources named "OD"
+            %   out = obj.search('Source', 'Name', "OD")
+            %
+            % Search for Devices of class "aod.builtin.devices.Pinhole"
+            %   out = obj.search('Device', 'Class', 'aod.builtin.devices.Pinhole')
+            %
+            % Search for Calibrations that are a subclass of 
+            % "aod.builtin.calibrations.PowerMeasurement"
+            %   out = obj.search('Calibration', 'Subclass',... 
+            %       'aod.builtin.calibrations.PowerMeasurement')
+            %
+            % Search for Epochs that have Parameter "Defocus"
+            %   out = obj.search('Epoch', 'Parameter', 'Defocus')
+            %
+            % Search for Epochs with Parameter "Defocus" = 0.3
+            %   out = obj.search('Epoch', 'Parameter', 'Defocus', 0.3)
+            % -------------------------------------------------------------
+
+            import aod.core.EntityTypes
+
+            entityType = EntityTypes.init(entityType);
+
+            switch entityType
+                case EntityTypes.SOURCE
+                    group = obj.getAllSources();
+                case EntityTypes.SYSTEM 
+                    group = obj.Systems;
+                case EntityTypes.CHANNEL;
+                    group = obj.getAllChannels();
+                case EntityTypes.Device
+                    group = obj.getAllDevices();
+                case EntityTypes.CALIBRATION
+                    group = obj.Calibrations;
+                case EntityTypes.SEGMENTATION
+                    group = obj.Segmentations;
+                case EntityTypes.EPOCH
+                    group = obj.Epochs;
+                case EntityTypes.RESPONSE
+                    group = obj.getAllResponses();
+                case EntityTypes.REGISTRATION
+                    group = obj.getEpochRegistrations();
+                case EntityTypes.DATASET 
+                    group = obj.getEpochDatasets();
+                case EntityTypes.STIMULUS
+                    group = obj.getEpochStimuli();
+                case EntityTypes.ANALYSIS
+                    group = obj.Analyses;
+                case EntityTypes.EXPERIMENT
+                    % There is only one experiment
+                    out = obj;
+                    return
+            end
+
+            egObj = aod.api.EntityGroupSearch(group, varargin);
+            out = egObj.getMatches();
+        end
+    end
+
+    methods
         function setHomeDirectory(obj, filePath)
             % SETHOMEDIRECTORY
             %

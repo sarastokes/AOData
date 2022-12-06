@@ -27,7 +27,7 @@ classdef EntityGroupSearch < handle
                 'entityGroup must be a subclass of aod.core.Entity');
             obj.Group = entityGroup;
 
-            % TODO: Repeating queries
+            % TODO: Repeating queries?
 
             queryType = capitalize(string(queryType));
             assert(ismember(lower(queryType), lower(obj.QUERY_TYPES)),...
@@ -53,7 +53,6 @@ classdef EntityGroupSearch < handle
                 className       char
             end
 
-            fprintf('Performing class query for %s\n', className);  
             for i = 1:numel(obj.Group)
                 obj.filterIdx(i) = strcmp(class(obj.Group(i)), className);
             end
@@ -67,7 +66,6 @@ classdef EntityGroupSearch < handle
                 dsetSpec        = []
             end
 
-            fprintf('Performing dataset query for %s\n', dsetName);
             for i = 1:numel(obj.Group)
                 obj.filterIdx(i) = isprop(obj.Group(i), dsetName);
             end
@@ -107,8 +105,6 @@ classdef EntityGroupSearch < handle
                 fileName        char
                 fileSpec        = []
             end
-
-            fprintf('Performing file query for %s\n', fileName);
 
             % Find the entities with fileName
             for i = 1:numel(obj.Group)
@@ -157,8 +153,6 @@ classdef EntityGroupSearch < handle
                 paramSpec       = []
             end
 
-            fprintf('Performing parameter query for %s\n', paramName);
-
             % Find the entities with paramName
             obj.filterIdx = hasParam(obj.Group, paramName);
 
@@ -205,7 +199,7 @@ classdef EntityGroupSearch < handle
                 obj
                 className
             end
-            fprintf('Performing subclass query for %s\n', className);            
+                       
             for i = 1:numel(obj.Group)
                 obj.filterIdx(i) = isSubclass(obj.Group(i), className);
             end
@@ -228,8 +222,8 @@ classdef EntityGroupSearch < handle
                     obj.parameterQuery(varargin{:})
             end
 
-            fprintf('\tQuery returned %u of %u entities\n',... 
-                nnz(obj.filterIdx), numel(obj.Group));
+            fprintf('\t%s query returned %u of %u entities\n',... 
+                obj.queryType, nnz(obj.filterIdx), numel(obj.Group));
 
             if nnz(obj.filterIdx) == 0
                 out = [];

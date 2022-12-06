@@ -359,15 +359,14 @@ clear import
 		
 		Classes have \textbf{properties}, \textbf{methods} and \textbf{events}. An imperfect analogy: a function gives you an unlabeled can of soup. A class gives you a can of soup with a label and nutrition facts (properties) along with a can opener, a microwave and a spoon (methods). When the soup expires you get a notification that it expired (event). 
 		
-		If you aren't familiar with OOP, this will be the biggest learning curve for using AOData. The tutorials have information on how to use object-oriented programming within the context of AOData and there are also resources listed in \ref{section:CodeDoc}.  
+		If you aren't familiar with OOP, this will be the biggest learning curve for using AOData. The tutorials have information on how to use object-oriented programming within the context of AOData and there are also resources listed in \ref{section:CodeDoc}.	Once you know what the code is supposed to do, classes can be way easier to work with than functions and scripts.  
 		
-		Once you know what the code is supposed to do, classes can be way easier than functions and scripts.  Below I describe some of the key concepts of OOP, because they are also key benefits of taking the time to learn more about OOP.
-		\begin{enumerate}
-			\item \textbf{Polymorphism:} For example when you can concatenate \aodclass{char} and \aodclass{double} in MATLAB, you use the same function, \aodfcn{cat()}. This is because both classes define a \aodfcn{cat()} method. Without classes, this would require two separate functions with different names, \aodfcn{concatenateDouble()} and \aodfcn{concatenateChar()}. So classes standardize behavior and make code way easier to write and remember. % consistent interface
-			\item \textbf{Inheritance:}
-			\item \textbf{Encapsulation:}
-			\item \textbf{Abstraction:} OOP allows you to hide complicated code from end-users and build a simple, easy interface for interacting with that code base. Keep in mind, you are your own ``end-user'' -- you may understand everything about a piece of code when you first write it, but in a few months or years when those details are no longer fresh in your memory, you will be the chief beneficiary of the simple, easy interface.
-		\end{enumerate}
+		Object oriented programming is an approach that focuses on organizing code into self-contained units called objects. These objects contain both the data and the functions that operate on the data, enabling modular and organized code. There are a number of benefits:
+		\begin{itemize}
+			\item \textbf{Improved readability and understandability.} OOP allows for creation of clear, intuitively named objects that represent real-world concepts, making it easier to understand the purpose and function of code. 
+			\item \textbf{Reusability}. OOP allows for the creation of generic objects that can be easily reused in different contexts, reducing the need to write new code for scratch. This saves time and reduces the potential for errors.
+			\item \textbf{Easier debugging and maintenance.} OOP allows for the isolation of individual objects, making it easier to identify and fix any errors that may arise. In addition, OOP allows for the modification of individual objects without affecting the rest of the code, making it easier to maintain and update the code over time. 
+		\end{itemize}
 		
 		To get started, you will want to be familiar with constructors, property and method specification, how access is specified and how inheritance works. You will also want to be comfortable with Static methods and Dependent properties. You can wait on other topics and learn about them as they become relevant. 
 		MATLAB's documentation and particularly their examples that demonstrate building classes are worthwhile. A few more resources: an intuitive explanation from the Sampath lab that's particularly strong with inheritance (\myurl{\href{https://github.com/sampath-lab-ucla/MATLAB_Resources/blob/master/Introduction_08_OOP.m}{here}}). 		
