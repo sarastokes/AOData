@@ -59,9 +59,9 @@ classdef Persistor < handle
             % -------------------------------------------------------------
             if isempty(evt.Value)
                 % Remove attribute
-                aod.h5.HDF5.deleteAttribute(obj.hdfName, src.hdfPath, evt.Name);
+                h5tools.deleteAttribute(obj.hdfName, src.hdfPath, evt.Name);
             else % Add/change attribute
-                aod.h5.writeAttributeByType(obj.hdfName, src.hdfPath, evt.Name, evt.Value);
+                h5tools.writeatt(obj.hdfName, src.hdfPath, evt.Name, evt.Value);
             end
         end
 
@@ -76,7 +76,7 @@ classdef Persistor < handle
             % -------------------------------------------------------------
             if isempty(evt.Value)
                 % Link removed
-                aod.h5.HDF5.deleteObject(obj.hdfName, char(src.hdfPath));
+                h5tools.deleteObject(obj.hdfName, char(src.hdfPath));
             end
         end
 
@@ -100,10 +100,10 @@ classdef Persistor < handle
             if strcmp(evt.Action, 'Add')
                 aod.h5.writeEntity(obj.hdfName, evt.Entity);
             elseif strcmp(evt.Action, 'Remove')
-                aod.h5.HDF5.deleteObject(obj.hdfName, hdfPath);
+                h5tools.deleteObject(obj.hdfName, hdfPath);
             elseif strcmp(evt.Action, 'Replace')
-                aod.h5.HDF5.deleteObject(obj.hdfName, parent.hdfPath,...
-                    aod.h5.HDF5.getPathEnd(hdfPath));
+                h5tools.deleteObject(obj.hdfName, parent.hdfPath,...
+                    h5tools.util.getPathEnd(hdfPath));
                 aod.h5.writeEntity(obj.hdfName, evt.NewEntity);
                 h5writeatt(obj.hdfName, hdfPath, 'UUID', uuid);
             end
@@ -124,16 +124,16 @@ classdef Persistor < handle
             % Syntax:
             %   onDatasetChanged(obj, src, evt)
             % -------------------------------------------------------------
-            fullPath = aod.h5.HDF5.buildPath(src.hdfPath, evt.Name);
+            fullPath = h5tools.util.buildPath(src.hdfPath, evt.Name);
             if isempty(evt.NewValue)
                 % Dataset should be deleted
-                aod.h5.HDF5.deleteObject(obj.hdfName, fullPath, evt.Name);
-            elseif ~aod.h5.HDF5.exists(obj.hdfName, fullPath) 
+                h5tools.deleteObject(obj.hdfName, fullPath, evt.Name);
+            elseif ~h5tools.exist(obj.hdfName, fullPath) 
                 % Dataset does not yet exist
-                aod.h5.writeDatasetByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
+                aod.h5.write(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
             else  
                 % Dataset exists and should be overwritten
-                aod.h5.writeDatasetByType(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
+                aod.h5.write(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
             end
         end
 
@@ -146,12 +146,12 @@ classdef Persistor < handle
             % Syntax:
             %   onFileChanged(obj, src, evt)
             % -------------------------------------------------------------
-            filePath = aod.h5.HDF5.buildPath(evt.Source.hdfPath, 'files');
+            filePath = h5tools.util.buildPath(evt.Source.hdfPath, 'files');
             if isempty(evt.Value)
                 % Remove file
-                aod.h5.HDF5.deleteAttribute(obj.hdfName, filePath, evt.Name);
+                h5tools.deleteAttribute(obj.hdfName, filePath, evt.Name);
             else % Add/change file
-                aod.h5.writeAttributeByType(obj.hdfName, filePath, evt.Name, evt.Value);
+                h5tools.writeatt(obj.hdfName, filePath, evt.Name, evt.Value);
             end
         end
     end

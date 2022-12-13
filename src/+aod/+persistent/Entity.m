@@ -813,7 +813,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 d = [];
                 return
             end
-            d = aod.h5.readDatasetByType(obj.hdfName, obj.hdfPath, name, varargin{:});
+            d = aod.h5.read(obj.hdfName, obj.hdfPath, name, varargin{:});
         end
 
         function c = loadContainer(obj, containerName)
@@ -826,7 +826,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   c = loadContainer(obj, containerName)
             % -------------------------------------------------------------
             c = aod.persistent.EntityContainer(...
-                aod.h5.HDF5.buildPath(obj.hdfPath, containerName), obj.factory);
+                h5tools.util.buildPath(obj.hdfPath, containerName), obj.factory);
         end
     end
 
@@ -888,7 +888,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 if ~isprop(obj, obj.dsetNames(i))
                     p = obj.addprop(obj.dsetNames(i));
                     p.Description = 'Dataset';
-                    dsetValue = aod.h5.readDatasetByType(...
+                    dsetValue = aod.h5.read(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                     obj.(obj.dsetNames(i)) = dsetValue;
                 end

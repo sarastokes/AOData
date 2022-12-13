@@ -109,11 +109,4 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
     end
-
-    % Overwritten methods from Entity
-    methods (Access = protected)
-        function value = getLabel(obj)
-            value = obj.protocolName;
-        end
-    end
 end

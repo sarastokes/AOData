@@ -1171,7 +1171,7 @@ experiment.Epochs(1:5).Responses
 		\begin{enumerate}
 			\item \aodfcn{writeExperimentToFile(hdfName, experiment)}
 			\item \aodfcn{writeEntity(hdfName, entity)}
-			\item \aodfcn{writeDatasetByType(hdfName, hdfPath, dsetName, data)},\\ \aodfcn{readDatasetByType(hdfName, hdfPath, dsetName, data)},\\ 
+			\item \aodfcn{write(hdfName, hdfPath, dsetName, data)},\\ \aodfcn{read(hdfName, hdfPath, dsetName, data)},\\ 
 			\aodfcn{writeAttributesByType()},\\ \aodfcn{readAttributesByType()}
 			\item \aodclass{aod.h5.HDF5}
 		\end{enumerate}
@@ -1207,7 +1207,7 @@ obj = aod.h5.EntityManager('myfile.h5');
 T = table(obj);
 	\end{lstlisting}
 	\subsubsection{aod.h5.HDF5}
-		\noindent The goal of AOData is to abstract the messy details of HDF5 writing, so you never have to worry about it in writing your own code. If you do need delve into HDF5 writing for some reason, this class provides the interface for mapping data to and from HDF5 files. MATLAB has high-level functions (\matfcn{h5write}, \matfcn{h5read}, \matfcn{h5info}, \matfcn{h5readatt}, \matfcn{h5writeatt}); however, they still require a decent understanding of how HDF5 I/O works. Other aspects aren't supported by the high-level functions and require directly working with the C API. A consistent interface to all these functions is provided by \aodclass{aod.h5.HDF5}. This is the back-end for the even higher-level HDF5 functions provided by AOData (\aodfcn{aod.h5.writeEntity()}, \aodfcn{aod.h5.writeDatasetByType()}, \aodfcn{aod.h5.readDatasetByType()}).
+		\noindent The goal of AOData is to abstract the messy details of HDF5 writing, so you never have to worry about it in writing your own code. If you do need delve into HDF5 writing for some reason, this class provides the interface for mapping data to and from HDF5 files. MATLAB has high-level functions (\matfcn{h5write}, \matfcn{h5read}, \matfcn{h5info}, \matfcn{h5readatt}, \matfcn{h5writeatt}); however, they still require a decent understanding of how HDF5 I/O works. Other aspects aren't supported by the high-level functions and require directly working with the C API. A consistent interface to all these functions is provided by \aodclass{aod.h5.HDF5}. This is the back-end for the even higher-level HDF5 functions provided by AOData (\aodfcn{aod.h5.writeEntity()}, \aodfcn{aod.h5.write()}, \aodfcn{aod.h5.read()}).
 		
 		Every method of \aodclass{aod.h5.HDF5} is Static. There's no constructor or properties, it's just a collection of related functions in a single location. 
 	 

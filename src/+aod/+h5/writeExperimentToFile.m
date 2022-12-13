@@ -19,7 +19,7 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
     end
     
     % Create the file
-    aod.h5.HDF5.createFile(hdfName, overwriteFlag);
+    h5tools.createFile(hdfName, overwriteFlag);
     
     % Write the experiment first
     aod.h5.writeEntity(hdfName, obj);

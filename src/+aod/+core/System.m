@@ -123,11 +123,4 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
     end
-    
-    % Overloaded methods
-    methods (Access = protected)
-        function value = getLabel(obj)
-            value = [obj.Name, 'System'];
-        end
-    end
 end

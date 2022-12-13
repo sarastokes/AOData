@@ -51,20 +51,25 @@ classdef GroupLoadState
 
     methods (Static)
         function obj = init(input)
-            if isa(txt, 'aod.app.GroupLoadState')
+            if isa(input, 'aod.app.GroupLoadState')
                 obj = input;
                 return
             end
 
+            import aod.app.GroupLoadState 
+            
             switch lower(input)
                 case 'none'
+                    obj = GroupLoadState.NONE;
                 case 'contents'
+                    obj = GroupLoadState.CONTENTS;
                 case 'name'
+                    obj = GroupLoadState.NAME;
                 case 'attributes'
                     obj = GroupLoadState.ATTRIBUTES;
                 otherwise
                     error('init:UnrecognizedInput',...
-                        'Input %s did not match a GroupLoadState type');
+                        'Input %s did not match a GroupLoadState type', input);
             end
         end
     end

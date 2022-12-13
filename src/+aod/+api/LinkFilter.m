@@ -68,7 +68,7 @@ classdef LinkFilter < aod.api.FilterQuery
             % Syntax:
             %   collectAllLinks(obj)
             % -------------------------------------------------------------
-            obj.allLinkNames = aod.h5.HDF5.collectAllSoftlinks(obj.hdfName);
+            obj.allLinkNames = h5tools.collectSoftlinks(obj.hdfName);
             obj.getLinkParentPaths();
         end
 
@@ -84,7 +84,7 @@ classdef LinkFilter < aod.api.FilterQuery
             obj.allLinkParents = string.empty();
             for i = 1:numel(obj.allLinkNames)
                 obj.allLinkParents = cat(1, obj.allLinkParents,... 
-                    string(aod.h5.HDF5.getPathParent(obj.allLinkNames(i))));
+                    string(h5tools.util.getPathParent(obj.allLinkNames(i))));
             end
         end
     end

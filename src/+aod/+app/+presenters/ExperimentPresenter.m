@@ -133,7 +133,7 @@ classdef ExperimentPresenter < appbox.Presenter
             end
             dsetNames = entity.dsetNames;
             for i = 1:numel(dsetNames)
-                dsetPath = aod.h5.HDF5.buildPath(parentNode.Tag, dsetNames(i));
+                dsetPath = h5tools.util.buildPath(parentNode.Tag, dsetNames(i));
                 info = h5info(obj.Experiment.hdfName, dsetPath);
                 nodeData = struct(...
                     'H5Node', aod.app.H5NodeTypes.DATASET,...
@@ -163,7 +163,7 @@ classdef ExperimentPresenter < appbox.Presenter
                 linkedEntity = entity.(entity.linkNames(i));
 
                 obj.view.makeLinkNode(parentNode, entity.linkNames(i),...
-                    aod.h5.HDF5.buildPath(parentNode.Tag, entity.linkNames(i)),...
+                    h5tools.util.buildPath(parentNode.Tag, entity.linkNames(i)),...
                     linkedEntity.hdfPath);
             end
         end
@@ -246,7 +246,7 @@ classdef ExperimentPresenter < appbox.Presenter
             node = obj.view.getSelectedNode();
             hdfPath = node.Tag;
             if node.NodeData.H5Node ~= aod.app.H5NodeTypes.GROUP
-                hdfPath = aod.h5.HDF5.buildPath(hdfPath, node.Text);
+                hdfPath = h5tools.util.buildPath(hdfPath, node.Text);
             end
             clipboard('copy', hdfPath);
         end

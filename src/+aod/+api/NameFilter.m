@@ -64,7 +64,7 @@ classdef NameFilter < aod.api.FilterQuery
         function collectNames(obj)
             obj.allNames = repmat("", [numel(obj.allGroupNames), 1]);
             for i = 1:numel(obj.allNames)
-                obj.allNames(i) = aod.h5.HDF5.getPathEnd(obj.allGroupNames(i));
+                obj.allNames(i) = h5tools.util.getPathEnd(obj.allGroupNames(i));
             end
         end
     end

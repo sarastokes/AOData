@@ -30,5 +30,5 @@ function writeParameters(hdfName, groupPath, params)
         if isdatetime(iValue)
             iValue = datestr(iValue);
         end
-        aod.h5.HDF5.writeatts(hdfName, groupPath, keys{i}, iValue);
+        h5tools.writeatt(hdfName, groupPath, keys{i}, iValue);
     end

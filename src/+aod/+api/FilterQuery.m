@@ -119,7 +119,7 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
             % Syntax:
             %   populateGroupNames(obj)
             % -------------------------------------------------------------
-            names = aod.h5.HDF5.collectGroups(obj.hdfName);
+            names = h5tools.collectGroups(obj.hdfName);
             containerNames = aod.core.EntityTypes.allContainerNames();
             for i = 1:numel(containerNames)
                 names = names(~endsWith(names, containerNames(i)));

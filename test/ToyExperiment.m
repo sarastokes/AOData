@@ -28,7 +28,7 @@ function experiment = ToyExperiment(writeToHDF)
     experiment.add(source);
 
     % Add the system(s)
-    system = aod.core.System('BaseSystem');
+    system = aod.core.System('Base');
     [~, system] = sara.factories.ChannelFactory.create(...
         'MustangImaging', system, 'Pinhole', 25);
     [~, system] = sara.factories.ChannelFactory.create(...

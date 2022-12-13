@@ -40,7 +40,7 @@ classdef ParameterFilter < aod.api.FilterQuery
         function apply(obj)
             % Filter by whether paramName is present
             for i = 1:numel(obj.allGroupNames)
-                obj.filterIdx(i) = aod.h5.HDF5.hasAttribute(...
+                obj.filterIdx(i) = h5tools.hasAttribute(...
                     obj.hdfName, obj.allGroupNames(i), obj.paramName);
             end
             % Throw a warning if nothing matched the filter

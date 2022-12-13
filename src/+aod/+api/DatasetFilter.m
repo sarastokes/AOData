@@ -53,8 +53,7 @@ classdef DatasetFilter < aod.api.FilterQuery
             if ~isempty(obj.dsetValue)
                 for i = 1:numel(obj.allGroupNames)
                     if obj.filterIdx(i)
-                        out = h5read(obj.hdfName, aod.h5.HDF5.buildPath(...
-                            obj.allGroupNames(i), obj.dsetName));
+                        out = aod.h5.read(obj.hdfName, obj.allGroupNames(i), obj.dsetName);
                         if out ~= obj.dsetValue
                             obj.filterIdx(i) = false;
                         end
@@ -70,23 +69,23 @@ classdef DatasetFilter < aod.api.FilterQuery
 
     methods %(Access = private)
         function groupDsets = getGroupDatasets(obj, groupName)
-            gOrder = aod.h5.HDF5.getPathOrder(groupName);
+            gOrder = h5tools.util.getPathOrder(groupName);
             groupDsets = string.empty();
             idx = find(startsWith(obj.allDatasetNames, groupName) ...
-                & aod.h5.HDF5.getPathOrder(obj.allDatasetNames) == gOrder+1);
+                & h5tools.util.getPathOrder(obj.allDatasetNames) == gOrder+1);
 
             if isempty(idx)
                 return
             end
             % Extract just the dataset name from the full HDF5 path
             for i = 1:numel(idx)
-                iName = aod.h5.HDF5.getPathEnd(obj.allDatasetNames(idx(i)));
+                iName = h5tools.util.getPathEnd(obj.allDatasetNames(idx(i)));
                 groupDsets = cat(1, groupDsets, iName);
             end
         end
 
         function collectDatasets(obj)
-            obj.allDatasetNames = aod.h5.HDF5.collectDatasets(obj.hdfName);
+            obj.allDatasetNames = h5tools.collectDatasets(obj.hdfName);
         end
     end
 end

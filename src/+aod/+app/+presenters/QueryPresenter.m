@@ -204,7 +204,7 @@ classdef QueryPresenter < appbox.Presenter
 
     methods (Access = private)
         function populateGroupNames(obj)
-            names = aod.h5.HDF5.collectGroups(obj.Experiment.hdfName);
+            names = h5tools.collectGroups(obj.Experiment.hdfName);
             containerNames = aod.core.EntityTypes.allContainerNames();
             for i = 1:numel(containerNames)
                 names = names(~endsWith(names, containerNames(i)));
