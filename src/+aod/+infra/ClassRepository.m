@@ -24,7 +24,7 @@ classdef ClassRepository < handle
                 path = obj.getPathPreferences();
                 if isempty(path)
                     warning('ClassRepository:NoClassPaths',...
-                        'Set class paths using PackageManagerApp');
+                        'Set class paths using AODataManagerApp');
                     return
                end
             end
@@ -64,7 +64,7 @@ classdef ClassRepository < handle
             if ~ispref('AOData', 'SearchPaths')
                 searchPaths = [];
                 warning('getPathPreferences:SearchPathsNotSet',...
-                    'Use PackageManagerApp to set search paths');
+                    'Use AODataManagerApp to set search paths');
                 return
             end
             searchPaths = getpref('AOData', 'SearchPaths');

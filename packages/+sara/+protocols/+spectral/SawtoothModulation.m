@@ -81,7 +81,7 @@ classdef SawtoothModulation < sara.protocols.SpectralProtocol
 
         function fName = getFileName(obj)
             if obj.contrast < 1
-                contrastTxt = sprintf('%sc_', 100*obj.contrast);
+                contrastTxt = sprintf('%uc_', 100*obj.contrast);
             else
                 contrastTxt = '';
             end

@@ -16,7 +16,7 @@ function initializeAOData(varargin)
 %   Reset               logical (default = false)
 %       Resets all preferences to basic settings (only AOData)
 %   NoApp               logical (default = false)
-%       Suppresses opening of PackageManagerApp 
+%       Suppresses opening of AODataManagerApp 
 % -------------------------------------------------------------------------
     ip = aod.util.InputParser();
     addParameter(ip, 'Reset', false, @islogical);
@@ -34,7 +34,7 @@ function initializeAOData(varargin)
         setpref('AOData', 'SearchPaths', string(thisDir));
         % TODO: Check if .git is present
         setpref('AOData', 'GitRepos', thisDir);
-        fprintf('AOData is already initialized, add custom packages in PackageManagerApp\n');
+        fprintf('AOData is already initialized, add custom packages in AODataManagerApp\n');
     else  % Preferences exist but may have been changed
         if ~isequal(thisDir, getpref('AOData', 'BasePackage'))
             setpref('AOData', 'BasePackage', thisDir);
@@ -53,12 +53,12 @@ function initializeAOData(varargin)
                     setpref('AOData', 'GitRepos', string2semicolonchar(gitRepos));
                 end 
             end
-            fprintf('AOData paths have been updated to new location, check custom packages in PackageManagerApp\n');
+            fprintf('AOData paths have been updated to new location, check custom packages in AODataManagerApp\n');
         end
-        fprintf('AOData is already initialized, add custom packages in PackageManagerApp\n');
+        fprintf('AOData is already initialized, add custom packages in AODataManagerApp\n');
     end
 
     if appFlag
-        fprintf('Opening PackageManagerApp for addition of any custom code...\n')
-        PackageManagerApp();
+        fprintf('Opening AODataManagerApp for addition of any custom code...\n')
+        AODataManagerApp();
     end

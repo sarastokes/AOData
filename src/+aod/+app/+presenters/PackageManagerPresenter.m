@@ -12,7 +12,7 @@ classdef PackageManagerPresenter < appbox.Presenter
 %   obj = PackageManagerPresenter(view)
 %
 % See also:
-%   PackageManagerApp, aod.app.views.PackageManagerView
+%   AODataManagerApp, aod.app.views.PackageManagerView
 % -------------------------------------------------------------------------
     properties (Access = private)
         isChanged

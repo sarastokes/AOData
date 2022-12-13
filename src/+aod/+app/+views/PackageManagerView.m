@@ -5,7 +5,7 @@ classdef PackageManagerView < aod.app.UIView
 %   aod.app.UIView
 %
 % See also:
-%   aod.app.presenters.PackageManagerPresenter, PackageManagerApp
+%   aod.app.presenters.PackageManagerPresenter, AODataManagerApp
 % -------------------------------------------------------------------------
 
     events

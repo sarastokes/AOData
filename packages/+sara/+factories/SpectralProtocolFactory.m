@@ -115,6 +115,7 @@ classdef SpectralProtocolFactory < aod.util.Factory
                     otherwise
                         error('%s total time unrecognized', fileName);
                 end
+                
                 if contains(fileName, 'sawtooth')
                     if contains(fileName, '_on_')
                         polarityClass = 'positive';

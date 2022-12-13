@@ -35,6 +35,10 @@ function out = readDatasetByType(hdfName, groupPath, dsetName, className)
         data = h5read(hdfName, fullPath);
     end
 
+    if iscellstr(data)
+        assignin('base', 'data', data);
+    end
+
     switch className 
         case 'datetime'
             out = datetime(data, 'Format',... 

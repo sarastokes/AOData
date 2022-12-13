@@ -1,11 +1,11 @@
-function PackageManagerApp()
-    % PACKAGEMANAGERAPP
+function AODataManagerApp()
+    % AODATAMANAGERAPP
     %
     % Description:
-    %   View and edit search paths for AOData classes
+    %   Opens app for viewing and editing AOData search paths and repos
     %
     % Syntax:
-    %   PackageManagerApp()
+    %   AODataManagerApp()
     %
     % See also:
     %   aod.app.views.PackageManagerView,
