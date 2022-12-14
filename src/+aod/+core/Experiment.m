@@ -19,7 +19,7 @@ classdef Experiment < aod.core.Entity
 % Properties:
 %   Epochs                      Container for Epochs
 %   Source                      Container experiment's for Sources
-%   Segmentations               Container for experiment's Segmentations
+%   Annotations               Container for experiment's Annotations
 %   Calibrations                Container for experiment's Calibrations
 %   Systems                     Container for experiment's Systems
 %   homeDirectory               File path for experiment files 
@@ -52,7 +52,7 @@ classdef Experiment < aod.core.Entity
         Analyses                aod.core.Analysis = aod.core.Analysis.empty()
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
-        Segmentations           aod.core.Segmentation
+        Annotations           aod.core.Annotation
         Calibrations            aod.core.Calibration
         Systems                 aod.core.System
 
@@ -140,8 +140,8 @@ classdef Experiment < aod.core.Entity
                     group = obj.getAllDevices();
                 case EntityTypes.CALIBRATION
                     group = obj.Calibrations;
-                case EntityTypes.SEGMENTATION
-                    group = obj.Segmentations;
+                case EntityTypes.ANNOTATION
+                    group = obj.Annotations;
                 case EntityTypes.EPOCH
                     group = obj.Epochs;
                 case EntityTypes.RESPONSE
@@ -197,7 +197,7 @@ classdef Experiment < aod.core.Entity
             %       One or more entities of the same entity type
             %
             % Notes: Only entities contained by  experiment can be added:
-            %   Analysis, Epoch, Calibration, Segmentation, Source, System
+            %   Analysis, Epoch, Calibration, Annotation, Source, System
             % ------------------------------------------------------------- 
             arguments
                 obj
@@ -232,12 +232,12 @@ classdef Experiment < aod.core.Entity
                     end
                 case EntityTypes.EPOCH
                     obj.addEpoch(entity);
-                case EntityTypes.SEGMENTATION
+                case EntityTypes.ANNOTATION
                     entity.setParent(obj);
-                    if isempty(obj.Segmentations)
-                        obj.Segmentations = entity;
+                    if isempty(obj.Annotations)
+                        obj.Annotations = entity;
                     else
-                        obj.Segmentations = cat(1, obj.Segmentations, entity);
+                        obj.Annotations = cat(1, obj.Annotations, entity);
                     end
                 case EntityTypes.SYSTEM 
                     entity.setParent(obj);
@@ -250,7 +250,7 @@ classdef Experiment < aod.core.Entity
                     obj.addSource(entity);
                 otherwise
                     error("Experiment:AddedInvalidEntity",...
-                        "Entity must be Analysis, Calibration, Segmentation, Source or System");
+                        "Entity must be Analysis, Calibration, Annotation, Source or System");
             end
         end
     end
@@ -296,13 +296,13 @@ classdef Experiment < aod.core.Entity
             cal = getByClass(obj.Calibrations, className);
         end
 
-        function segmentation = getSegmentation(obj, className)
-            % GETSEGMENTATION
+        function annotation = getAnnotation(obj, className)
+            % GETANNOTATION
             %
             % Syntax:
-            %   segmentation = obj.getSegmentation(className)
+            %   annotation = obj.getAnnotation(className)
             % -------------------------------------------------------------
-            segmentation = getByClass(obj.Segmentations, className);
+            annotation = getByClass(obj.Annotations, className);
         end
 
         function data = getResponse(obj, epochIDs, className, varargin)
@@ -335,49 +335,49 @@ classdef Experiment < aod.core.Entity
 
     end
 
-    % Segmentation methods
+    % Annotation methods
     methods
-        function addSegmentation(obj, segmentation)
-            % ADDSEGMENTATION
+        function addAnnotation(obj, annotation)
+            % ADDANNOTATION
             %
             % Description:
-            %   Add aod.core.Segmentation entity to the Experiment
+            %   Add aod.core.Annotation entity to the Experiment
             %
             % Syntax:
-            %   addSegmentation(obj, segmentation)
+            %   addAnnotation(obj, annotation)
             % -------------------------------------------------------------
-            assert(isSubclass(segmentation, 'aod.core.Segmentation'),... 
-                'Input must be subclass of aod.core.Segmentation');
+            assert(isSubclass(annotation, 'aod.core.Annotation'),... 
+                'Input must be subclass of aod.core.Annotation');
 
-            segmentation.setParent(obj);
-            obj.Segmentations = cat(1, obj.Segmentations, segmentation);
+            annotation.setParent(obj);
+            obj.Annotations = cat(1, obj.Annotations, annotation);
         end
 
 
-        function removeSegmentation(obj, ID)
-            % REMOVESEGMENTATION
+        function removeAnnotation(obj, ID)
+            % REMOVEANNOTATION
             %
             % Description:
-            %   Remove one or more segmentations by ID 
+            %   Remove one or more annotations by ID 
             %
             % Syntax:
-            %   removeSegmentation(obj, ID)
+            %   removeAnnotation(obj, ID)
             % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Segmentations),...
-                'ID %u invalid, must be between 1-%u', ID, numel(obj.Segmentations));
-            obj.Segmentations(ID) = [];
+            assert(ID > 0 & ID < numel(obj.Annotations),...
+                'ID %u invalid, must be between 1-%u', ID, numel(obj.Annotations));
+            obj.Annotations(ID) = [];
         end
 
-        function clearSegmentations(obj)
-            % CLEARSEGMENTATIONS
+        function clearAnnotations(obj)
+            % CLEARANNOTATIONS
             %
             % Description:
-            %   Clear all segmentations in the experiment
+            %   Clear all annotations in the experiment
             %
             % Syntax:
-            %   obj.clearSegmentations()
+            %   obj.clearAnnotations()
             % -------------------------------------------------------------
-            obj.Segmentations = aod.core.Segmentation.empty();
+            obj.Annotations = aod.core.Annotation.empty();
         end
     end
 

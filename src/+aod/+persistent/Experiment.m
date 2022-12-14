@@ -24,7 +24,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         AnalysesContainer         
         EpochsContainer        
         SourcesContainer                 
-        SegmentationsContainer                 
+        AnnotationsContainer                 
         CalibrationsContainer            
         SystemsContainer                 
     end
@@ -89,7 +89,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
                 case EntityTypes.EPOCH
                     entity.setParent(obj);
                     obj.addEntity(entity);
-                case EntityTypes.SEGMENTATION
+                case EntityTypes.ANNOTATION
                     entity.setParent(obj);
                     obj.addEntity(entity);
                 case EntityTypes.SOURCE
@@ -100,7 +100,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
                     obj.addEntity(entity);
                 otherwise
                     error('Experiment_add:InvalidEntityType',...
-                        'Only Analysis, Calibration, Epoch, Segmentation, System and Source can be added to Experiment')
+                        'Only Analysis, Calibration, Epoch, Annotation, System and Source can be added to Experiment')
             end
         end
     end
@@ -122,7 +122,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
             obj.AnalysesContainer = obj.loadContainer('Analyses');
             obj.CalibrationsContainer = obj.loadContainer('Calibrations');
             obj.EpochsContainer = obj.loadContainer('Epochs');
-            obj.SegmentationsContainer = obj.loadContainer('Segmentations');
+            obj.AnnotationsContainer = obj.loadContainer('Annotations');
             obj.SourcesContainer = obj.loadContainer('Sources');
             obj.SystemsContainer = obj.loadContainer('Systems');
         end
@@ -160,13 +160,13 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
             end
         end
 
-        function out = Segmentations(obj, idx)
+        function out = Annotations(obj, idx)
             if nargin < 2
                 idx = 0;
             end
             out = [];
             for i = 1:numel(obj)
-                out = cat(1, out, obj(i).SegmentationsContainer(idx));
+                out = cat(1, out, obj(i).AnnotationsContainer(idx));
             end
         end
 

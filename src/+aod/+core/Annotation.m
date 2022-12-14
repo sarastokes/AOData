@@ -1,13 +1,13 @@
-classdef Segmentation < aod.core.Entity & matlab.mixin.Heterogeneous
-% SEGMENTATION
+classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
+% ANNOTATION
 %
 % Description:
 %   Spatial regions within acquired data. Could be ROIs in a physiology 
 %   experiment, coordinates of structures of interest, etc.
 %
 % Constructor:
-%   obj = Segmentation(name, varargin)
-%   obj = Segmentation(name, data, varargin)
+%   obj = Annotation(name, varargin)
+%   obj = Annotation(name, data, varargin)
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
@@ -29,7 +29,7 @@ classdef Segmentation < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Segmentation(name, varargin)
+        function obj = Annotation(name, varargin)
             obj = obj@aod.core.Entity(name);
 
             ip = aod.util.InputParser();

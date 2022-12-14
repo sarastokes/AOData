@@ -120,9 +120,9 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
         end
     end 
 
-    methods (Test, TestTags={'Segmentations'})
+    methods (Test, TestTags={'Annotations'})
         function testRois(testCase)
-            obj = aod.builtin.segmentations.Rois('851_OSR_20220823',...
+            obj = aod.builtin.annotations.Rois('851_OSR_20220823',...
                 randn(360, 242), 'Size', [360, 242]);
         end
     end

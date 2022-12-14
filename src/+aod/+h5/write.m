@@ -1,5 +1,5 @@
 function success = write(fileName, pathName, dsetName, data)
-% Writes MATLAB dataset with attributes signaling the MATLAB datatype 
+% Writes MATLAB dataset to an HDF5 dataset 
 %
 % Syntax:
 %   success = write(fileName, pathName, dsetName, data)
@@ -21,18 +21,17 @@ function success = write(fileName, pathName, dsetName, data)
 % Supported data types:
 %   numeric, char, string, logical, table, timetable, datetime, duration
 %   enum, struct, containers.Map(), affine2d, imref2d, simtform2d, cfit
-% See README.md for limitations - essentially no multilevel data (e.g. 
-%   structs/tables/containers.Maps that contain other tables, structs or 
-%   containers.Maps
+%   See h5tools-matlab documentation for limitations.
 %
 % See also:
-%   h5tools.write
+%   h5tools.write, aod.h5.read
 
-% By Sara Patterson, 2022 (h5tools-matlab)
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    % Detailed input checking is performed by h5tools
     arguments
-        fileName            char 
+        fileName             char 
         pathName            char 
         dsetName            char 
         data

@@ -293,7 +293,7 @@ initializeAOData();
 			\end{itemize}
 		\end{itemize}
 		\item Calibration
-		\item Segmentation
+		\item Annotation
 		\item Epoch
 		\begin{itemize}
 			\item Registration
@@ -588,7 +588,7 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 			\item \aodprop{Calibrations} - container for all Calibrations within the Experiment
 			\item \aodprop{Epochs} - container for all Epochs within the Experiment
 			\item \aodprop{Sources} - container for all Sources within the Experiment
-			\item \aodprop{Segmentations} - container for all Segmentations within the Experiment
+			\item \aodprop{Annotations} - container for all Annotations within the Experiment
 			\item \aodprop{Systems} - container for all Systems within the Experiment
 		\end{itemize}		
 		\docheader{Dependent Properties:}
@@ -604,7 +604,7 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 		\docheader{Methods:} This may seem like a lot, but many of the methods are conceptually identical (e.g. if you know how to use \aodfcn{add}, then you know how to use all the add methods)
 		\begin{itemize}
 			\item \aodfcn{setHomeDirectory(obj, filePath)} - change file path to experiment data folder
-			\item \aodfcn{add(obj, entity)} - add Analysis, Calibration, Epoch, Segmentation, Source or System\\
+			\item \aodfcn{add(obj, entity)} - add Analysis, Calibration, Epoch, Annotation, Source or System\\
 			%
 			\item \aodfcn{epoch = id2epoch(obj)} - input ID and returns Epoch, if exists
 			\item \aodfcn{removeEpochByID(obj, epochID)}
@@ -615,8 +615,8 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 			\item \aodfcn{removeCalibration(obj, ID)}
 			\item \aodfcn{clearCalibrations(obj)}\\
 			%
-			\item \aodfcn{removeSegmentation(obj, ID)}
-			\item \aodfcn{clearSegmentation(obj)}\\
+			\item \aodfcn{removeAnnotation(obj, ID)}
+			\item \aodfcn{clearAnnotation(obj)}\\
 			%
 			\item \aodfcn{removeSource(obj, ID)}
 			\item \aodfcn{clearSources(obj)}\\
@@ -759,12 +759,12 @@ obj = aod.core.Device(name, 'Model', value, 'Manufacturer', value);
 			\item \aodclass{aod.builtin.devices.PMT}
 		\end{itemize}
 	
-	\subsection{aod.core.Segmentation \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
+	\subsection{aod.core.Annotation \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
 		\noindent Spatial regions within your acquired data. These could be ROIs in a physiology experiment, coordinates of labeled cells in anatomical imaging or a subregion of the field of view that omits the zeroed pixels after registration.  
 	
 		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
-obj = aod.core.Segmentation()		
-obj = aod.core.Segmentation(data)
+obj = aod.core.Annotation()		
+obj = aod.core.Annotation(data)
 		\end{lstlisting}
 		\docheader{Properties:}
 		\begin{itemize}
@@ -782,7 +782,7 @@ obj = aod.core.Segmentation(data)
 		\end{itemize}
 		\docheader{Examples:}
 		\begin{itemize}
-			\item \aodclass{aod.builtin.segmentations.Rois}
+			\item \aodclass{aod.builtin.annotations.Rois}
 		\end{itemize}
 
 	\subsection{aod.core.Epoch \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
@@ -901,7 +901,7 @@ obj = aod.core.Response(name)
 		\noindent Keep in mind that you can set the \aodprop{Parent} prior to adding the response to an Epoch. This is often needed for initializing a Response, as information from the parent Epoch might be required. All of the examples above take this approach and can be used as reference.
 		
 		\subsubsection{aod.core.responses.RegionResponse \myparent{aod.core.Response}}
-			\noindent A Response associated with an instance of \aodclass{aod.core.Segmentation}.
+			\noindent A Response associated with an instance of \aodclass{aod.core.Annotation}.
 			\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.responses.RegionResponse(parent, varargin)
 			\end{lstlisting}
@@ -1112,7 +1112,7 @@ experiment.Epochs(1:5).Responses
 				\FTdir(root,Systems,Systems - container for all Systems within the Experiment){}     
 				\FTdir(root,Calibrations,Calibrations - container for all Calibrations within the Experiment){}
 				\FTdir(root,Epochs,Epochs - container for all Epochs within the Experiment){}     
-				\FTdir(root,Segmentations,Segmentations - container for all Segmentations within the Experiment){}  
+				\FTdir(root,Annotations,Annotations - container for all Annotations within the Experiment){}  
 				\FTdir(root,Analyses,Analyses - container for all Analyses within the Experiment){}        
 			};
 		\end{tikzpicture}

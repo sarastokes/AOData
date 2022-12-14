@@ -156,7 +156,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         function testExperimentIndexing(testCase)
             out = testCase.EXPT.Epochs(1); 
             out = testCase.EXPT.Calibrations(0);
-            out = testCase.EXPT.Segmentations(0);
+            out = testCase.EXPT.Annotations(0);
             out = testCase.EXPT.Systems(1);
             out = testCase.EXPT.Sources(1);
         end

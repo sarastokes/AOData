@@ -12,7 +12,7 @@ For storing data and metadata associated with an experiment:
     - Channel
       - Device
   - Calibration
-  - Segmentation
+  - Annotation
   - Epoch
     - Dataset
     - Registration

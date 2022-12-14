@@ -13,8 +13,8 @@ function mustBeEntityType(obj, entityType)
     %   entityType      aod.core.EntityTypes or char/string of entityType
     %
     % Examples:
-    %   mustBeEntityType(obj, aod.core.EntityTypes.SEGMENTATION)
-    %   mustBeEntityType(obj, 'segmentation');
+    %   mustBeEntityType(obj, aod.core.EntityTypes.ANNOTATION)
+    %   mustBeEntityType(obj, 'annotation');
     % ---------------------------------------------------------------------
 
     entityType = aod.core.EntityTypes.init(entityType);

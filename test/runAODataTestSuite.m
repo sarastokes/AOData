@@ -1,4 +1,4 @@
-function results = runAODataTestSuite(varargin)
+function [results, coverageTable] = runAODataTestSuite(varargin)
 % RUNAODATATESTSUITE
 %
 % Description:
@@ -8,6 +8,7 @@ function results = runAODataTestSuite(varargin)
 % Syntax:
 %   results = runAODataTestSuite()
 %   results = runAODataTestSuite(varargin)
+%   [results, coverageTable] = runAODataTestSuite('Coverage', false);
 %
 % Optional key/value inputs:
 %   Coverage            logical (default = false)
@@ -16,7 +17,17 @@ function results = runAODataTestSuite(varargin)
 %       Whether to keep HDF5 files produced by the test suite
 %   Debug               logical (default = false)
 %       Whether to stop on failures
-% ---------------------------------------------------------------------
+%
+% Outputs:
+%   results             matlab.unittest.TestResult
+%       The results of each test case
+%   coverageTable       table
+%       A table containing the statement/function coverage summary, 
+%       empty if the Coverage parameter was false.
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
+
     
     ip = inputParser();
     addParameter(ip, 'Coverage', false, @islogical);
@@ -44,8 +55,12 @@ function results = runAODataTestSuite(varargin)
     % Run the test suite
     if coverageFlag
         results = testWithCoverageReport(debugFlag);
+        if nargout > 1 
+            coverageTable = readCoverageReport(fullfile(pwd, 'coverage_report'));
+        end
     else
         results = testWithoutCoverageReport(debugFlag);
+        coverageTable = [];
     end
 
     % Clean up files produced by tests, if necessary

@@ -133,8 +133,8 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, EntityTypes.CHANNEL);
             out = EntityTypes.init('device');
             testCase.verifyEqual(out, EntityTypes.DEVICE);
-            out = EntityTypes.init('segmentation');
-            testCase.verifyEqual(out, EntityTypes.SEGMENTATION);
+            out = EntityTypes.init('annotation');
+            testCase.verifyEqual(out, EntityTypes.ANNOTATION);
             out = EntityTypes.init('stimulus');
             testCase.verifyEqual(out, EntityTypes.STIMULUS);
             out = EntityTypes.init('analysis');

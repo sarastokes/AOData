@@ -15,8 +15,8 @@ function isEntitySubclass(obj, entityType)
     %   % Check whether class is an Entity subclass
     %   tf = isEntitySubclass(obj)
     %
-    %   % Check whether class is a Segmentation subclass
-    %   tf = isEntitySubclass(obj, "Segmentation")
+    %   % Check whether class is a Annotation subclass
+    %   tf = isEntitySubclass(obj, "Annotation")
     %
     % History:
     %   16Nov2022 - SSP

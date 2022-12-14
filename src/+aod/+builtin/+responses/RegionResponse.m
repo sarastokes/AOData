@@ -2,27 +2,27 @@ classdef RegionResponse < aod.core.Response
 % REGIONRESPONSE
 %
 % Description:
-%   The average response with each region of a segmentation
+%   The average response with each region of a annotation
 %
 % Parent:
 %   aod.core.Response
 %
 % Constructor:
-%   obj = RegionResponse(name, parent, segmentation, varargin)
+%   obj = RegionResponse(name, parent, annotation, varargin)
 %
 % Properties:
-%   Segmentation
+%   Annotation
 %
 % Private properties:
 %   listeners
 %
 % Methods:
-%   setSegmentation(obj, segmentation)
+%   setAnnotation(obj, annotation)
 %   signals = getData(obj, ID)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Segmentation
+        Annotation
     end
 
     properties (Access = private)
@@ -30,29 +30,29 @@ classdef RegionResponse < aod.core.Response
     end
 
     methods
-        function obj = RegionResponse(name, parent, segmentation, varargin)
+        function obj = RegionResponse(name, parent, annotation, varargin)
             obj = obj@aod.core.Response(name);
             obj.setParent(parent);
-            obj.setSegmentation(segmentation);
+            obj.setAnnotation(annotation);
 
             obj.load(varargin{:});
 
             % Listen for changes to regions and flag for update
-            obj.listeners = addlistener(obj.Segmentation,... 
+            obj.listeners = addlistener(obj.Annotation,... 
                 'UpdatedRois', @obj.onUpdatedRois);
         end
     end
 
     methods
-        function setSegmentation(obj, segmentation)
-            % SETSEGMENTATION
+        function setAnnotation(obj, annotation)
+            % SETANNOTATION
             %
             % Syntax:
-            %   setSegmentation(obj, segmentation)
+            %   setAnnotation(obj, annotation)
             % -------------------------------------------------------------
-            assert(isSubclass(segmentation, {'aod.core.Segmentation', 'aod.persistent.Segmentation'}),...
-                'Input must be subclass of aod.core.Segmentation');
-            obj.Segmentation = segmentation;
+            assert(isSubclass(annotation, {'aod.core.Annotation', 'aod.persistent.Annotation'}),...
+                'Input must be subclass of aod.core.Annotation');
+            obj.Annotation = annotation;
         end
 
         function signals = getData(obj, IDs, timePoints) 
@@ -94,14 +94,14 @@ classdef RegionResponse < aod.core.Response
             % Syntax:
             %   load(obj)
             % -------------------------------------------------------------
-            roiMask = double(obj.Segmentation.Data);
+            roiMask = double(obj.Annotation.Data);
             h = obj.ancestor(aod.core.EntityTypes.EXPERIMENT);
             sampleRate = h.sampleRate;
             imStack = obj.Parent.getStack();
-            roiList = obj.Segmentation.roiIDs;
+            roiList = obj.Annotation.roiIDs;
         
             A = [];
-            for i = 1:obj.Segmentation.Count
+            for i = 1:obj.Annotation.Count
                 [a, b] = find(roiMask == roiList(i));
                 % Look for ROIs exceeding image size
                 a(b > size(imStack,2)) = [];
@@ -133,7 +133,7 @@ classdef RegionResponse < aod.core.Response
             if isempty(obj.Responses)
                 obj.load();
             end
-            ID = obj.Segmentation.parseRoi(ID);
+            ID = obj.Annotation.parseRoi(ID);
 
             signals = obj.Data.Signals(:, ID)';
             xpts = obj.Data.Time';

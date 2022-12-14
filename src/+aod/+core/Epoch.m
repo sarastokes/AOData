@@ -49,7 +49,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Source                      = aod.core.Source.empty()
         System                      = aod.core.System.empty()
-        Segmentation                = aod.core.Segmentation.empty()
+        Annotation                = aod.core.Annotation.empty()
     end
     
     methods 
@@ -189,8 +189,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 return
             end
             % TODO: Update
-            if isempty(obj.Parent.Segmentations)
-                error('Experiment must contain Segmentations');
+            if isempty(obj.Parent.Annotations)
+                error('Experiment must contain Annotations');
             end
             resp = getByClass(obj.Responses, responseClassName);
             if isempty(resp)

@@ -58,10 +58,10 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
         end
     end
     
-    % Write segmentations
-    if ~isempty(obj.Segmentations)
-        for i = 1:numel(obj.Segmentations)
-            aod.h5.writeEntity(hdfName, obj.Segmentations(i));
+    % Write annotations
+    if ~isempty(obj.Annotations)
+        for i = 1:numel(obj.Annotations)
+            aod.h5.writeEntity(hdfName, obj.Annotations(i));
         end
     end
     

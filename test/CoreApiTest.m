@@ -8,10 +8,12 @@ classdef CoreApiTest < matlab.unittest.TestCase
 %   matlab.unittest.TestCase
 %
 % Use:
-%   result = runtests('CoreAoiTest.m')
+%   result = runtests('CoreApiTest.m')
 %
-% See also:
-%   runAODataTestSuite
+% See Also:
+%   runAODataTestSuite, aod.api.EntityGroupSearch
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties

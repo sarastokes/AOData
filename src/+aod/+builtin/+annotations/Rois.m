@@ -1,11 +1,11 @@
-classdef Rois < aod.core.Segmentation
+classdef Rois < aod.core.Annotation
 % ROIS
 % 
 % Description:
 %   ROIs in physiology experiment
 % 
 % Parent:
-%   aod.core.Segmentation
+%   aod.core.Annotation
 %
 % Constructor:
 %   obj = Rois(name, rois)
@@ -13,7 +13,7 @@ classdef Rois < aod.core.Segmentation
 %
 % Optional Parameters:
 %   Size            % needed for loading ImageJRois, otherwise calculated
-% Optional Parameters (inherited from aod.core.Segmentation):
+% Optional Parameters (inherited from aod.core.Annotation):
 %   Source          aod.core.Source
 %
 % Derived Parameters (automatically calculated from Data):
@@ -56,7 +56,7 @@ classdef Rois < aod.core.Segmentation
 
     methods
         function obj = Rois(name, rois, varargin)
-            obj = obj@aod.core.Segmentation(name, varargin{:});
+            obj = obj@aod.core.Annotation(name, varargin{:});
 
             ip = aod.util.InputParser();
             addParameter(ip, 'Size', [], @isnumeric);
@@ -132,7 +132,7 @@ classdef Rois < aod.core.Segmentation
             % SETIMAGE
             % 
             % Description:
-            %   Set an image used for segmentation
+            %   Set an image used for annotation
             %
             % Syntax
             %   setImage(obj, img)

@@ -39,7 +39,7 @@ classdef EntityTypes
         SYSTEM
         CHANNEL 
         DEVICE 
-        SEGMENTATION 
+        ANNOTATION 
         EPOCH 
         DATASET
         STIMULUS 
@@ -65,7 +65,7 @@ classdef EntityTypes
                     parentTypes = {'none'};
                 case EntityTypes.SOURCE
                     parentTypes = {'aod.core.Experiment', 'aod.core.Source', 'aod.persistent.Experiment', 'aod.persistent.Source'};
-                case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.SEGMENTATION, EntityTypes.CALIBRATION}
+                case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.ANNOTATION, EntityTypes.CALIBRATION}
                     parentTypes = {'aod.core.Experiment', 'aod.persistent.Experiment'};
                 case EntityTypes.CHANNEL 
                     parentTypes = {'aod.core.System', 'aod.persistent.System'};
@@ -103,8 +103,8 @@ classdef EntityTypes
                     out = 'Devices';
                 case EntityTypes.EPOCH
                     out = 'Epochs';
-                case EntityTypes.SEGMENTATION
-                    out = 'Segmentations';
+                case EntityTypes.ANNOTATION
+                    out = 'Annotations';
                 case EntityTypes.REGISTRATION
                     out = 'Registrations';
                 case EntityTypes.RESPONSE
@@ -161,7 +161,7 @@ classdef EntityTypes
 
             switch obj
                 case EntityTypes.EXPERIMENT
-                    out = {'Calibrations', 'Analyses', 'Epochs', 'Systems', 'Segmentations', 'Sources'};
+                    out = {'Calibrations', 'Analyses', 'Epochs', 'Systems', 'Annotations', 'Sources'};
                 case EntityTypes.SOURCE 
                     out = {'Sources'};
                 case EntityTypes.EPOCH
@@ -209,8 +209,8 @@ classdef EntityTypes
                     out = expt.Epochs;
                 case EntityTypes.SYSTEM 
                     out = expt.Systems;
-                case EntityTypes.SEGMENTATION 
-                    out = expt.Segmentations;
+                case EntityTypes.ANNOTATION 
+                    out = expt.Annotations;
                 case EntityTypes.CALIBRATION
                     out = expt.Calibrations;
                 case EntityTypes.CHANNEL 
@@ -330,8 +330,8 @@ classdef EntityTypes
                     hdfPath = [parentPath, '/Devices/', groupName];
                 case EntityTypes.CALIBRATION
                     hdfPath = [parentPath, '/Calibrations/', groupName];
-                case EntityTypes.SEGMENTATION
-                    hdfPath = [parentPath, '/Segmentations/', groupName];
+                case EntityTypes.ANNOTATION
+                    hdfPath = [parentPath, '/Annotations/', groupName];
                 case EntityTypes.EPOCH
                     hdfPath = [parentPath, '/Epochs/', groupName];
                 case EntityTypes.DATASET
@@ -363,7 +363,7 @@ classdef EntityTypes
             switch obj 
                 case EntityTypes.EXPERIMENT 
                     hdfPath = [];
-                case {EntityTypes.SYSTEM, EntityTypes.EPOCH, EntityTypes.SEGMENTATION,...
+                case {EntityTypes.SYSTEM, EntityTypes.EPOCH, EntityTypes.ANNOTATION,...
                         EntityTypes.ANALYSIS, EntityTypes.CALIBRATION}
                     hdfPath = '/Experiment';
                 case EntityTypes.SOURCE 
@@ -417,7 +417,7 @@ classdef EntityTypes
             %   out = getAllContainers(obj)
             %
             % -------------------------------------------------------------
-            out = ["Sources", "Calibrations", "Segmentations",... 
+            out = ["Sources", "Calibrations", "Annotations",... 
                 "Datasets", "Epochs", "Registrations", "Stimuli",... 
                 "Systems", "Channels", "Devices", "Responses", "Analyses"];
         end
@@ -464,8 +464,8 @@ classdef EntityTypes
                 out = EntityTypes.RESPONSE;
             elseif isSubclass(obj, {'aod.core.Analysis', 'aod.persistent.Analysis'})
                 out = EntityTypes.ANALYSIS;
-            elseif isSubclass(obj, {'aod.core.Segmentation', 'aod.persistent.Segmentation'})
-                out = EntityTypes.SEGMENTATION;
+            elseif isSubclass(obj, {'aod.core.Annotation', 'aod.persistent.Annotation'})
+                out = EntityTypes.ANNOTATION;
             else
                 error('Unrecognized entity type: %s', class(obj));
             end
@@ -508,8 +508,8 @@ classdef EntityTypes
                     obj = EntityTypes.DEVICE;
                 case {'calibration', 'calibrations', 'cal'}
                     obj = EntityTypes.CALIBRATION;
-                case {'segmentation', 'seg'}
-                    obj = EntityTypes.SEGMENTATION;
+                case {'annotation', 'ann'}
+                    obj = EntityTypes.ANNOTATION;
                 case {'epoch', 'epochs','ep'}
                     obj = EntityTypes.EPOCH;
                 case {'dataset', 'datasets', 'dset'}

@@ -1,8 +1,8 @@
-classdef Segmentation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% SEGMENTATION
+classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% ANNOTATION
 %
 % Description:
-%   Represents a persisted Segmentation in an HDF5 file
+%   Represents a persisted Annotation in an HDF5 file
 %
 % Parent:
 %   aod.persistent.Entity
@@ -10,10 +10,10 @@ classdef Segmentation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyn
 %   dynamicprops
 %
 % Constructor:
-%   obj = Segmentation(hdfFile, hdfPath, factory)
+%   obj = Annotation(hdfFile, hdfPath, factory)
 %
 % See also:
-%   aod.core.Segmentation
+%   aod.core.Annotation
 % -------------------------------------------------------------------------
 
 
@@ -23,7 +23,7 @@ classdef Segmentation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyn
     end
 
     methods 
-        function obj = Segmentation(hdfFile, hdfPath, factory)
+        function obj = Annotation(hdfFile, hdfPath, factory)
             obj = obj@aod.persistent.Entity(hdfFile, hdfPath, factory);
         end
     end
@@ -61,7 +61,7 @@ classdef Segmentation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyn
     % Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
-            obj = aod.persistent.Segmentation([], [], []);
+            obj = aod.persistent.Annotation([], [], []);
         end
     end
 end
