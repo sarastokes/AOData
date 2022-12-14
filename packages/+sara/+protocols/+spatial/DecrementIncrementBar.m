@@ -45,9 +45,6 @@ classdef DecrementIncrementBar < sara.protocols.spatial.DecrementIncrement
                 case 'horizontal'
                     obj.barSize = floor(obj.canvasSize(2)/obj.numBars);
             end
-
-            % Stimulus-specific property settings
-            obj.groupBy = {'BaseIntensity', 'Contrast', 'NumBars', 'BarID'};
         end
 
         function stim = generate(obj)

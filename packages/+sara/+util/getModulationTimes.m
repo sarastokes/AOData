@@ -1,20 +1,20 @@
 function [ups, downs] = getModulationTimes(stim)
-    % GETMODULATIONTIMES
-    %
-    % Description:
-    %   Extract start and stop times for increments and decrements
-    %
-    % Syntax:
-    %   [ups, downs] = getModulationTimes(stim)
-    %
-    % Notes:
-    %   The first value in the stimulus is assumed to be the baseline and 
-    %   modulations are extracted relative to that value
-    %
-    % History:
-    %   17Feb2022 - SSP
-    %   16Jul2022 - SSP - Generalized & renamed
-    % ---------------------------------------------------------------------
+% GETMODULATIONTIMES
+%
+% Description:
+%   Extract start and stop times for increments and decrements
+%
+% Syntax:
+%   [ups, downs] = sara.util.getModulationTimes(stim)
+%
+% Notes:
+%   The first value in the stimulus is assumed to be the baseline and 
+%   modulations are extracted relative to that value
+%
+% History:
+%   17Feb2022 - SSP
+%   16Jul2022 - SSP - Generalized & renamed
+% ---------------------------------------------------------------------
 
     stim = stim(:);
     

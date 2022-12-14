@@ -70,7 +70,14 @@ function writeEntity(hdfName, obj)
 
     % Write parent link, if necessary
     if ~isequal(parentPath, '/')
-        h5tools.writelink(hdfName, hdfPath, 'Parent', parentPath);
+        try
+            h5tools.writelink(hdfName, hdfPath, 'Parent', parentPath);
+        catch ME
+            if contains(ME.message, 'name already exists')
+                warning('writeEntity:LinkExists',...
+                    'Parent link from %s to %s exists', hdfPath, parentPath);
+            end
+        end
     end
 
     % Handle timing

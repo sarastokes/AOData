@@ -154,7 +154,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
             if nargin < 2
                 ledValues = obj.mapToStimulator();
             end
-            ax = ledPlot(ledValues, obj.pts2sec(1:size(ledValues, 2)));
+            ax = sara.util.ledPlot(ledValues, obj.pts2sec(1:size(ledValues, 2)));
             title(ax, obj.getFileName(), 'Interpreter','none');
             xlabel(ax, 'Time (sec)');
             ylabel(ax, 'Power (uW)');

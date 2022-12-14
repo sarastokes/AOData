@@ -39,7 +39,7 @@ classdef Pulse < sara.protocols.SpatialProtocol
                 fName = sprintf('lights_off_%u_%u',...
                     abs(100*obj.contrast), obj.totalTime);
             else
-                [a, b] = parseModulation(obj.baseIntensity, obj.contrast);
+                [a, b] = sara.util.parseModulation(obj.baseIntensity, obj.contrast);
                 fName = [sprintf('%s_%s_%up_%us_%ut', a, b,... 
                     abs(100*obj.contrast), obj.stimTime, obj.totalTime)];
             end

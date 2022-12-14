@@ -32,7 +32,7 @@ classdef PhysiologyLocation < aod.core.sources.Location
             obj = obj@aod.core.sources.Location(char(capitalize(name)));
         end
 
-        function setAvgImage(obj, avgImage)
+        function setImage(obj, avgImage)
             if ischar(avgImage)
                 obj.avgImage = imread(avgImage);
             else

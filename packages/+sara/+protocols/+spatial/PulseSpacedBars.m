@@ -63,9 +63,6 @@ classdef PulseSpacedBars < sara.protocols.spatial.Pulse
             else
                 obj.numBars = floor(obj.canvasSize(2) / obj.barWidth);
             end
-
-            % Stimulus-specific parameters
-            obj.groupBy = {'BaseIntensity', 'Contrast', 'BarSpacing', 'BarID'};
         end
 
         function stim = generate(obj)

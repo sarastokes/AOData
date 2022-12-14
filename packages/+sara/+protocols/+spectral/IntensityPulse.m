@@ -33,7 +33,7 @@ classdef IntensityPulse < sara.protocols.SpectralProtocol
         function ledValues = mapToStimulator(obj)
             stim = obj.generate();
 
-            ups = getModulationTimes(stim);
+            ups = sara.util.getModulationTimes(stim);
             if obj.lumNorm
                 bkgdPowers = obj.Calibration.stimPowers.Background;
             else

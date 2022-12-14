@@ -6,7 +6,7 @@ function [modType, modName] = parseModulation(baseValue, modValue)
 %   or contrast
 %
 % Syntax:
-%   [modType, modName] = parseModulation(baseValue, modValue)
+%   [modType, modName] = sara.util.parseModulation(baseValue, modValue)
 %
 % History:
 %   14Jul2022 - SSP

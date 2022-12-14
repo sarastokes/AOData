@@ -24,7 +24,7 @@ classdef SiftRegistration < aod.builtin.registrations.RigidRegistration
             addRequired(ip, 'ReferenceID', @isnumeric);
             % Whether stack was bleach-corrected first
             addParameter(ip, 'DUP', false, @islogical);
-            addParameter(ip, 'WhichStack', 'AVG', @ischar);
+            addParameter(ip, 'WhichStack', 'SUM', @ischar);
             % The default parameters for SIFT, only need to specify if one
             % of the defaults presented in ImageJ is changed
             addParameter(ip, 'InitialGaussianBlur', 1.6, @isnumeric);
@@ -36,7 +36,7 @@ classdef SiftRegistration < aod.builtin.registrations.RigidRegistration
             addParameter(ip, 'ClosestNextClosestRatio', 4, @isnumeric);
             addParameter(ip, 'MaximalAlignmentRatio', 25, @isnumeric);
             addParameter(ip, 'InlierRatio', 0.05, @isnumeric);
-            addParameter(ip, 'ExpectedTransformation', 'translation',...
+            addParameter(ip, 'ExpectedTransformation', 'rigid',...
                 @(x) ismember(lower(x), {'translation', 'rigid', 'affine', 'similarity'}));
             addParameter(ip, 'Interpolate', true, @islogical);
             parse(ip, varargin{:});

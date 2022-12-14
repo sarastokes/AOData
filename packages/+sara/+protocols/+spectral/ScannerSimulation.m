@@ -67,7 +67,7 @@ classdef ScannerSimulation < sara.protocols.spectral.Pulse
 
         function fName = getFileName(obj)
             if obj.contrast ~= 0
-                [a, b] = parseModulation(obj.baseIntensity, obj.contrast);
+                [a, b] = sara.util.parseModulation(obj.baseIntensity, obj.contrast);
                 fName = sprintf('scannersim_%s_%s_%s_%us_%ua_%ut',...
                     a, b, lower(char(obj.spectralClass)),... 
                     obj.stimTime, obj.preTime, obj.totalTime);

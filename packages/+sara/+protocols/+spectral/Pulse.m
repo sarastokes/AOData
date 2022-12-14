@@ -38,7 +38,7 @@ classdef Pulse < sara.protocols.SpectralProtocol
         end
         
         function fName = getFileName(obj)
-            [a, b] = parseModulation(obj.baseIntensity, obj.contrast);
+            [a, b] = sara.util.parseModulation(obj.baseIntensity, obj.contrast);
             if obj.baseIntensity == 0
                 magVal = sprintf('%ui', round(100*obj.amplitude));
             else

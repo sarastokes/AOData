@@ -265,7 +265,11 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   epoch = id2epoch(obj, IDs)
             % -------------------------------------------------------------
-            epoch = obj.Epochs(find(obj.epochIDs == IDs));
+            if ~isscalar(IDs)
+                epoch = aod.util.arrayfun(@(x) obj.Epochs(find(obj.epochIDs==x)), IDs);
+            else
+                epoch = obj.Epochs(find(obj.epochIDs == IDs));
+            end
         end
 
         function idx = id2index(obj, IDs)

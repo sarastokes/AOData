@@ -64,6 +64,9 @@ classdef (Abstract) TxtReader < aod.util.FileReader
             %   "2.5, 1.2", "2.5/1.2", "2.5/1.2,3" etc.)
             % -------------------------------------------------------------
             out = obj.strtrim(obj.readProperty(header));
+            if isempty(out)
+                return
+            end
             pat = digitsPattern + "." + digitsPattern | digitsPattern;
             out = str2double(extract(out, pat))';
         end

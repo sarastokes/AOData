@@ -25,9 +25,6 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
 %   totalPoints             total number of time points in stimulus
 %   amplitude               computed from contrast as described above
 %
-% Protected properties:
-%   groupBy             optional hierarchy of parameters for grouping 
-%
 % Methods:
 %   trace = temporalTrace(obj) 
 %   plotTemporalTrace(obj)
@@ -48,10 +45,6 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
         contrast
     end
     
-    properties (SetAccess = protected)
-        groupBy             = cell.empty()
-    end
-
     properties (Dependent)
         totalTime
         totalSamples
@@ -62,8 +55,6 @@ classdef (Abstract) StimulusProtocol < aod.core.Protocol
     methods
         function obj = StimulusProtocol(calibration, varargin)
             obj = obj@aod.core.Protocol(calibration);
-
-            obj.groupBy = {'baseIntensity', 'contrast'};
 
              % Input parsing
             ip = inputParser();
