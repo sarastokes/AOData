@@ -29,7 +29,8 @@ The core interface is used to define the mapping of information related to an ex
 
 The persistent interface provides an API for reading, modifying and extending an existing AOData HDF5 file and is completely independent of the core interface. In other words, the user-defined subclasses in the core interface are used to define the contents of the HDF5 file, while the persistent interface simply reflects the contents of the HDF5 file. While the inner workings of the two interfaces differ, the functions they provide the same user-facing functions and are largely interchangeable. However, the persistent interface offers extended capabilities for viewing the contents of HDF5 files with a customized HDF5 viewer (AODataViewer) and querying the contents of AOData HDF5 files. AOData includes an HDF5 file viewer tailored to AOData files (AODataViewer) along with an API for searching AOData files (AOQuery) and user interface (AOQueryBuilder).
 
-![Code](docs/aodata_code.png) 
+
+<img src="https://github.com/sarastokes/AOData/blob/main/docs/aodata_code.PNG?raw=true" width="400">
 
 ### Examples
 Each class is generic and meant to be subclassed and tailored to specific imaging experiments. Examples can be found in the "aod.builtin" package and detailed tutorials are being developed in the "tutorials" folder. A paper describing AOData is in preparation.
@@ -39,5 +40,10 @@ MATLAB 2022b. Earlier versions may work but are not guarenteed. Additional toolb
 
 AOData ships with [h5tools-matlab](https://github.com/sarastokes/h5tools-matlab), a toolbox of high-level functions extending MATLAB's HDF5 support, which was originally written to support AOData. In addition, several third-party open source programs are included: [appbox](https://github.com/cafarm/appbox), [getGitInfo](https://www.mathworks.com/matlabcentral/fileexchange/32864-get-git-info), [JSONLab 2.0](https://www.mathworks.com/matlabcentral/fileexchange/33381-jsonlab-a-toolbox-to-encode-decode-json-files?s_tid=ta_fx_results),  [ReadImageJROI](https://github.com/DylanMuir/ReadImageJROI). These can be found in the "lib" folder. 
 
-### Contact
-Feel free to reach out with any questions or comments (spatte16@ur.rochester.edu).
+### More information
+- AOData's [documentation](docs/ao-data-tools-documentation.pdf)
+- HDF5 files: [The HDF Group](https://www.hdfgroup.org/) and [What is HDF5?](https://www.neonscience.org/resources/learning-hub/tutorials/about-hdf5) 
+- Object oriented programming in MATLAB: [documentation](https://www.mathworks.com/products/matlab/object-oriented-programming.html)
+- Existing data management systems inspiring AOData: [Symphony-DAS](https://symphony-das.github.io) and [NeurodataWithoutBorders](https://www.nwb.org/)
+- [ARIA](https://aria.cvs.rochester.edu/): the Advanced Retinal Imaging Alliance at the University of Rochester
+- Feel free to reach out with any questions or comments: spatte16@ur.rochester.edu.
