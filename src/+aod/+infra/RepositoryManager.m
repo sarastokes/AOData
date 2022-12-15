@@ -1,24 +1,32 @@
 classdef RepositoryManager < handle 
-% REPOSITORYMANAGER
+% Manages git repositories used by AOData
 %
 % Description:
-%   Preference setting for base aod-tools package and user-defined packages
-%
-% Parent:
-%   handle
+%   Collects information about git repositories used by AOData
 %
 % Constructor:
 %   obj = RepositoryManager()
 %
 % Properties:
+%   repositoryInfo - table containing information about each repository
+%
+% Private properties:
 %   basePackage - file path of base aod-tools repository
 %   userPackages - file path(s) of user-defined packages
-%   commitIDs - containers.Map: package names as keys, commit IDs as values
+%
+% See Also:
+%   AODataManagerApp, getGitInfo   
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (SetAccess = private)
+        repositoryInfo
+    end
+
+    properties (Access = private)
         basePackage
         userPackages
-        commitIDs
     end
 
     properties (Hidden, Constant)
@@ -32,11 +40,11 @@ classdef RepositoryManager < handle
             % Ensure full packages are added to MATLAB's search path
             obj.addPackagesToPath();
             % Get repo information
-            obj.compileCommitIDs();
+            obj.getRepoInfo();
         end
 
-        function refreshIDs(obj)
-            obj.compileCommitIDs();
+        function update(obj)
+            obj.getRepoInfo();
         end
 
         function listPackages(obj)
@@ -54,21 +62,37 @@ classdef RepositoryManager < handle
     end
 
     methods (Access = private)
-        function compileCommitIDs(obj)
-            obj.commitIDs = aod.util.Parameters();
-            ID = obj.getCommitHash(obj.basePackage);
-            repo = obj.getRepoName(obj.basePackage);
-            obj.commitIDs(repo) = ID;
+        function getRepoInfo(obj)
+            % Collects information about associated repos into a table
+            userDirectory = pwd;
+            
+            repoMap = containers.Map();
+            repoMap('AOData') = obj.getCommitHash(obj.basePackage);
 
-            if isempty(obj.userPackages)
-                return
+            if ~isempty(obj.userPackages)
+                for i = 1:numel(obj.userPackages)
+                    gitInfo = obj.getCommitHash(obj.userPackages(i));
+                    repo = obj.getRepoName(obj.userPackages(i));
+                    repoMap(repo) = gitInfo;
+                end
             end
 
-            for i = 1:numel(obj.userPackages)
-                ID = obj.getCommitHash(obj.userPackages(i));
-                repo = obj.getRepoName(obj.userPackages(i));
-                obj.commitIDs(repo) = ID;
-            end
+            % Convert to table (TODO: Clean)
+            repoNames = repoMap.keys;
+            S = [];
+            for i = 1:numel(repoNames)
+                S = [S, repoMap(repoNames{i})]; %#ok<AGROW> 
+            end  
+
+            obj.repositoryInfo = struct2table(S);
+            obj.repositoryInfo.branch = string(obj.repositoryInfo.branch);
+            obj.repositoryInfo.hash = string(obj.repositoryInfo.hash);
+            obj.repositoryInfo.remote = string(obj.repositoryInfo.remote);
+            obj.repositoryInfo.url = string(obj.repositoryInfo.url);
+            obj.repositoryInfo.Properties.RowNames = repoNames;
+
+            % Return to user's previous directory
+            cd(userDirectory);
         end
 
         function addPackagesToPath(obj)
@@ -87,7 +111,7 @@ classdef RepositoryManager < handle
                 if ~isempty(obj.userPackages)
                     obj.setUserPackages();
                 else
-                    setpref('AOData', 'SearchPaths', string.empty());
+                    setpref('AOData', 'UserPackages', string.empty());
                 end
                 return
             end
@@ -129,19 +153,14 @@ classdef RepositoryManager < handle
     end
 
     methods (Static)
-        function ID = getCommitHash(fPath)
-            % GETCOMMITHASH
-            %
-            % Description:
-            %   Gets commit hash given repository file path
+        function info = getCommitHash(fPath)
+            % Gets commit information given repository file path
             %
             % Syntax:
             %   ID = PackageManager.getCommitHash(fPath)
             % -------------------------------------------------------------
-            [~, ID] = system('git -C %s rev-parse HEAD');
-            if ~isempty(ID)
-                ID = strtrim(ID);
-            end
+            cd(fPath)
+            info = getGitInfo();
         end
 
         function repoName = getRepoName(fPath)

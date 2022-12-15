@@ -19,8 +19,16 @@ classdef RigidRegistration < aod.core.Registration
 % Methods:
 %   data = apply(obj, data)
 %
+% Static methods:
+%   tform = affine2d_to_3d(tform)
+%
 % Inherited methods:
 %   setRegistrationDate(obj, regDate)
+%
+% Dependencies:
+%   Image Processing Toolbox
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -45,27 +53,50 @@ classdef RigidRegistration < aod.core.Registration
         end
 
         function data = apply(obj, data)
-            if ndims(data) == 2
+            if ismatrix(data)
                 refObj = imref2d([size(data, 1), size(data, 2)]);
                 data = imwarp(data, refObj, obj.tform,...
                     'OutputView', refObj);
                 return 
             end
 
-            try
-                tForm = affine2d_to_3d(obj.tform);
-                viewObj = affineOutputView(size(data), tForm,...
-                    'BoundsStyle', 'SameAsInput');
-                data = imwarp(data, tForm, 'OutputView', viewObj);
-            catch
-                [x, y, t] = size(data);
-                refObj = imref2d([x y]);
-                for i = 1:t
-                    data(:,:,i) = imwarp(data(:,:,i), refObj,...
-                        obj.tform, 'OutputView', refObj);
-                end 
-                warning('RigidRegistration:UsedSlowProcess');
+            tForm = obj.affine2d_to_3d(obj.tform);
+            viewObj = affineOutputView(size(data), tForm,...
+                'BoundsStyle', 'SameAsInput');
+            data = imwarp(data, tForm, 'OutputView', viewObj);
+        end
+    end
+
+    methods (Static)
+        function tform = affine2d_to_3d(T)
+            % Converts affine2d to affine3d 
+            %
+            % Description:
+            %   Converts affine2d to affine3d so a full video or stack of 
+            %   images can be transformed without using a long for loop
+            %
+            % Syntax:
+            %   tform = affine2d_to_3d
+            %
+            % Inputs:
+            %   T           affine3d or 3x3 transformation matrix
+            %       The affine transform matrix
+            %
+            % Outputs:
+            %   tform       affine3d
+            %       A 3D affine transform object 
+            % -------------------------------------------------------------
+            if isa(T, 'affine2d')
+                T = T.T;
             end
+
+            T2 = eye(4);
+            T2(2,1) = T(2,1);
+            T2(1,2) = T(1,2);
+            T2(4,1) = T(3,1);
+            T2(4,2) = T(3,2);
+            
+            tform = affine3d(T2);
         end
     end
 end 

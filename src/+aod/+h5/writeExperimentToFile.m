@@ -1,11 +1,28 @@
 function writeExperimentToFile(hdfName, obj, overwriteFlag)
-% WRITEEXPERIMENTTOFILE
+% Writes a full experiment to an HDF5 file
+%
+% Description:
+%   Handles persists an experiment to an HDF5 file
 %
 % Syntax:
-%   writeExperimentToFile(hdfName, overwriteFlag)
+%   aod.h5.writeExperimentToFile(hdfName, obj, overwriteFlag)
 %
-% History:
-%   26Aug2022 - SSP
+% Inputs:
+%   hdfName             char
+%       Name of the HDF5 file to be written. If path is not specified, the 
+%       file will be written to the current directory
+%   obj                 aod.core.Experiment
+%       Experiment to write
+%   overwriteFlag       logical (default = false)
+%       Whether to overwrite existing HDF5 file with same name/location
+%
+% Outputs:
+%   N/A
+%
+% See Also:
+%   loadExperiment, aod.h5.writeEntity
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     arguments
         hdfName                 char 
@@ -20,6 +37,12 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
     
     % Create the file
     h5tools.createFile(hdfName, overwriteFlag);
+
+    % Add info about the environment in which the AOData file was created
+    matlabInfo = ver('MATLAB');
+    h5tools.writeatt(hdfName, '/', aod.infra.getAODataEnv());
+    h5tools.writeatt(hdfName, '/', 'FileCreated', string(datetime('now')),...
+        'LastModified', string(datetime('now')));
     
     % Write the experiment first
     aod.h5.writeEntity(hdfName, obj);

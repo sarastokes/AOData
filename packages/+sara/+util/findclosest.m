@@ -1,5 +1,4 @@
 function [i,nv] = findclosest(arr,v)
-
 % FINDCLOSEST
 %
 % [I,V] = FINDCLOSEST(ARRAY,VALUE)

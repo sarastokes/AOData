@@ -5,10 +5,12 @@ classdef QueryPresenter < appbox.Presenter
 %   appbox.Presenter
 %
 % Constructor:
-%   obj = QueryPresenter(experiment, view)
+%   obj = aod.app.presenters.QueryPresenter(experiment, view)
 %
 % See also:
-%   QueryView
+%   AOQueryBuilder, aod.app.views.QueryView
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties

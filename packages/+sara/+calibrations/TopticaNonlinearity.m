@@ -79,11 +79,11 @@ classdef TopticaNonlinearity < aod.core.Calibration
             values = unique(powerStim);
             if numel(values) < 10
                 for i = 1:numel(values)
-                    stim(powerStim == values(i)) = findclosest(lut, values(i));
+                    stim(powerStim == values(i)) = sara.util.findclosest(lut, values(i));
                 end
             else
                 for i = 1:numel(powerStim)
-                    stim(i) = findclosest(lut, powerStim(i));
+                    stim(i) = sara.util.findclosest(lut, powerStim(i));
                 end
             end
 

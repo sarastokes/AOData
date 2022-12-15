@@ -6,6 +6,8 @@ classdef Persistor < handle
 %
 % Constructor:
 %   obj = Persistor(hdfName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

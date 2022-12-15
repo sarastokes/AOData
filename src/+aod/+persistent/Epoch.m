@@ -14,6 +14,8 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 %
 % See also:
 %   aod.core.Epoch
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

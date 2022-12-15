@@ -52,11 +52,11 @@ classdef Experiment < aod.core.Entity
         Analyses                aod.core.Analysis = aod.core.Analysis.empty()
         Epochs                  aod.core.Epoch
         Sources                 aod.core.Source
-        Annotations           aod.core.Annotation
+        Annotations             aod.core.Annotation
         Calibrations            aod.core.Calibration
         Systems                 aod.core.System
 
-        Code                    % containers.Map
+        Code                    
     end
 
     properties (Dependent)
@@ -844,12 +844,8 @@ classdef Experiment < aod.core.Entity
             % Syntax:
             %   appendGitHashes(obj)
             % -------------------------------------------------------------
-            try
-                RM = aod.infra.RepositoryManager();
-                obj.Code = RM.commitIDs;
-            catch ME  % Rethrow as warning instead of error
-                disp(getReport(ME, 'extended', 'hyperlinks', 'on'));
-            end
+            RM = aod.infra.RepositoryManager();
+            obj.Code = RM.repositoryInfo;
         end
     end
 end

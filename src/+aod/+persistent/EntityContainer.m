@@ -13,6 +13,8 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 %
 % Notes:
 %   EntityContainer(0) returns all entities
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (Hidden, Dependent)

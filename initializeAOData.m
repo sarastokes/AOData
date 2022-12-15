@@ -17,7 +17,10 @@ function initializeAOData(varargin)
 %       Resets all preferences to basic settings (only AOData)
 %   NoApp               logical (default = false)
 %       Suppresses opening of AODataManagerApp 
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     ip = aod.util.InputParser();
     addParameter(ip, 'Reset', false, @islogical);
     addParameter(ip, 'NoApp', false, @islogical);

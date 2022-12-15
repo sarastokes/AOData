@@ -88,11 +88,11 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
             if numel(values) < 10
                 % If theres just a few unique values, don't run point by point
                 for i = 1:numel(values)
-                    stim(powerStim == values(i)) = findclosest(lookupTable, values(i));
+                    stim(powerStim == values(i)) = sara.util.findclosest(lookupTable, values(i));
                 end
             else
                 for i = 1:numel(powerStim)
-                    stim(i) = findclosest(lookupTable, powerStim(i));
+                    stim(i) = sara.util.findclosest(lookupTable, powerStim(i));
                 end
             end
 

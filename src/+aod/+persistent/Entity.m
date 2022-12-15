@@ -37,6 +37,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   GroupChanged
 %   DatasetChanged
 %   AttributeChanged
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -49,6 +51,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     properties (SetAccess = private)
         Parent                  % aod.persistent.Entity
         UUID                    string
+        lastModified             datetime
     end
 
     properties (Dependent)
@@ -670,11 +673,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             % ATTRIBUTES
             % Universial attributes that map to properties, not parameters
-            specialAttributes = ["UUID", "description", "Class", "EntityType"];
+            specialAttributes = ["UUID", "Class", "EntityType", "LastModified"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.core.EntityTypes.init(obj.loadAttribute('EntityType'));
             obj.entityClassName = obj.loadAttribute('Class');
+            obj.lastModified = datetime(obj.loadAttribute('LastModified'),... 
+                'Format', 'dd-MMM-uuuu HH:mm:ss');
 
             % Parse the remaining attributes
             for i = 1:numel(obj.attNames)

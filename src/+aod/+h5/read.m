@@ -10,7 +10,7 @@ function out = read(hdfName, pathName, dsetName, className)
 % 
 % See Also: h5tools.read
 
-% By Sara Patterson, 2022 (h5tools-matlab)
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
     % No need for argument checking that occurs in h5tools.read

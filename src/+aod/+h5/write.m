@@ -1,5 +1,5 @@
 function success = write(fileName, pathName, dsetName, data)
-% Writes MATLAB dataset with attributes signaling the MATLAB datatype 
+% Writes MATLAB dataset to an HDF5 dataset 
 %
 % Syntax:
 %   success = write(fileName, pathName, dsetName, data)
@@ -21,29 +21,28 @@ function success = write(fileName, pathName, dsetName, data)
 % Supported data types:
 %   numeric, char, string, logical, table, timetable, datetime, duration
 %   enum, struct, containers.Map(), affine2d, imref2d, simtform2d, cfit
-% See README.md for limitations - essentially no multilevel data (e.g. 
-%   structs/tables/containers.Maps that contain other tables, structs or 
-%   containers.Maps
+%   See h5tools-matlab documentation for limitations.
 %
 % See also:
-%   h5tools.write
+%   h5tools.write, aod.h5.read
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
-
-    arguments
-        fileName            char 
-        pathName            char 
-        dsetName            char 
-        data
-    end
-
-    fullPath = h5tools.util.buildPath(pathName, dsetName);
-
-    if isa(data, 'aod.util.Parameters')
-        h5tools.datasets.makeTextDataset(fileName, pathName, dsetName, "aod.util.Parameters");
-        h5tools.writeatt(fileName, fullPath, data);
-    else
-        h5tools.write(fileName, pathName, dsetName, data);
-    end
-    success = true;
+    
+        % Detailed input checking is performed by h5tools
+        arguments
+            fileName             char 
+            pathName            char 
+            dsetName            char 
+            data
+        end
+    
+        fullPath = h5tools.util.buildPath(pathName, dsetName);
+    
+        if isa(data, 'aod.util.Parameters')
+            h5tools.datasets.makeTextDataset(fileName, pathName, dsetName, "aod.util.Parameters");
+            h5tools.writeatt(fileName, fullPath, data);
+        else
+            h5tools.write(fileName, pathName, dsetName, data);
+        end
+        success = true;

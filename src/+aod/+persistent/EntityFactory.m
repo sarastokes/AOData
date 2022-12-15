@@ -10,6 +10,8 @@ classdef EntityFactory < handle
 %
 % Static method access:
 %   experiment = EntityFactory.init(hdfName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

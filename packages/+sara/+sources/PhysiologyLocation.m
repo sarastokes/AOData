@@ -29,7 +29,7 @@ classdef PhysiologyLocation < aod.core.sources.Location
                 name = "unknown";
             end
 
-            obj = obj@aod.core.sources.Location(char(capitalize(name)));
+            obj = obj@aod.core.sources.Location(char(appbox.capitalize(name)));
         end
 
         function setImage(obj, avgImage)

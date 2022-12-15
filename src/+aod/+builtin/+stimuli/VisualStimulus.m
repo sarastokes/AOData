@@ -6,7 +6,8 @@ classdef VisualStimulus < aod.core.Stimulus
 %
 % Constructor:
 %   obj = VisualStimulus(protocol)
-%
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods
@@ -20,7 +21,7 @@ classdef VisualStimulus < aod.core.Stimulus
             value = [];
             txt = strsplit(obj.protocolName, '_');
             for i = 1:numel(txt)
-                value = [value, capitalize(txt{i})]; %#ok<AGROW> 
+                value = [value, appbox.capitalize(txt{i})]; %#ok<AGROW> 
             end
         end
     end

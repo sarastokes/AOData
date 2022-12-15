@@ -9,6 +9,8 @@ classdef EntityGroupSearch < handle
 %
 % Constructor:
 %   obj = EntityGroupSearch(entityGroup, queryType, varargin)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -29,7 +31,7 @@ classdef EntityGroupSearch < handle
 
             % TODO: Repeating queries?
 
-            queryType = capitalize(string(queryType));
+            queryType = appbox.capitalize(string(queryType));
             assert(ismember(lower(queryType), lower(obj.QUERY_TYPES)),...
                 'queryType must be: Class, Subclass, Name, Dataset, Parameter');
             obj.queryType = queryType;

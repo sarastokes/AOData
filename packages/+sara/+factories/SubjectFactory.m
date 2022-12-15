@@ -46,7 +46,7 @@ classdef SubjectFactory < aod.util.Factory
             if nargin < 4 || isempty(location)
                 location = "Unknown";
             else
-                location = capitalize(location);
+                location = appbox.capitalize(location);
                 if ischar(location)
                     location = string(location);
                 end

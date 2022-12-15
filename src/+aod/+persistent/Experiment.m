@@ -1,5 +1,5 @@
 classdef Experiment < aod.persistent.Entity & dynamicprops
-% EXPERIMENT
+% An Experiment in an HDF5 file
 %
 % Description:
 %   Represents a persisted Experiment in an HDF5 file
@@ -14,6 +14,8 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 %
 % See also:
 %   aod.core.Experiment
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -26,7 +28,9 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         SourcesContainer                 
         AnnotationsContainer                 
         CalibrationsContainer            
-        SystemsContainer                 
+        SystemsContainer      
+        
+        Code
     end
 
     properties (Dependent)
@@ -113,6 +117,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
             obj.experimentDate = obj.loadDataset('experimentDate');
             obj.homeDirectory = obj.loadDataset('homeDirectory');
             obj.epochIDs = obj.loadDataset('epochIDs');
+            obj.Code = obj.loadDataset('Code');
             obj.setDatasetsToDynProps();
 
             % Links

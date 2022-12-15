@@ -7,7 +7,7 @@ function writeEntity(hdfName, obj)
 % Syntax:
 %   aod.h5.writeEntity(hdfName, entity)
 
-% By Sara Patterson, 2022 (h5tools-matlab)
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     arguments
         hdfName             {mustBeHdfFile(hdfName)}
@@ -66,7 +66,9 @@ function writeEntity(hdfName, obj)
 
     % Write entity identifiers
     h5tools.writeatt(hdfName, hdfPath,...
-        'UUID', obj.UUID, 'Class', class(obj), 'EntityType', char(entityType));
+        'UUID', obj.UUID, 'Class', class(obj),... 
+        'EntityType', char(entityType),...
+        'LastModified', string(datetime('now')));
 
     % Write parent link, if necessary
     if ~isequal(parentPath, '/')
@@ -114,7 +116,6 @@ function writeEntity(hdfName, obj)
     
     % Write file paths, if necessary
     if ~isempty(obj.files)
-        %h = ancestor(obj, 'aod.core.Experiment');
         h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.util.Parameters");
         h5tools.writeatt(hdfName, [hdfPath, '/files'], obj.files);
     end

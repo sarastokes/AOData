@@ -73,7 +73,7 @@ classdef DichroicFilter < aod.core.Device
     methods (Access = protected)
         function value = getLabel(obj)
             value = [num2str(obj.getParam('Wavelength')), 'nm',...
-                capitalize(obj.getParam('Pass')), 'Pass', 'Filter'];
+                appbox.capitalize(obj.getParam('Pass')), 'Pass', 'Filter'];
         end
     end
 end
