@@ -13,4 +13,5 @@ function aodataVersion = getVersionNumber()
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     aodataVersion = "0.0.0";

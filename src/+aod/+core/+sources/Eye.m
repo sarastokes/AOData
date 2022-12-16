@@ -1,5 +1,5 @@
 classdef Eye < aod.core.Source 
-% EYE
+% An eye imaged in an experiment
 %
 % Description:
 %   An eye within a Subject
@@ -8,10 +8,12 @@ classdef Eye < aod.core.Source
 %   aod.core.Source
 %
 % Constructor:
-%   obj = Eye(name)
+%   obj = aod.core.sources.Eye(name)
 %
 % Note:
 %   Name is restricted to either 'OD' or 'OS'      
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods

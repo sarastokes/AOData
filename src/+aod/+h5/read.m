@@ -8,7 +8,8 @@ function out = read(hdfName, pathName, dsetName, className)
 %   out = aod.h5.read(hdfName, pathName, dsetName)
 %   out = aod.h5.read(hdfName, pathName, dsetName, className)
 % 
-% See Also: h5tools.read
+% See Also: 
+%   h5tools.read
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

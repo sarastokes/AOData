@@ -1,5 +1,5 @@
 classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
-% SOURCE
+% A source of acquired data
 %
 % Description:
 %   The source of data collected in an experiment
@@ -8,11 +8,13 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Source(name)
-%   obj = Source(name, parent)
+%   obj = aod.core.Source(name)
+%   obj = aod.core.Source(name, varargin)
 %
 % Methods:
 %   sources = getParents(obj)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

@@ -24,6 +24,8 @@ classdef (Abstract) Protocol < handle
 %
 % Methods (to be redefined by subclasses if needed):
 %   stim = mapToStimulator(obj)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties  

@@ -1,5 +1,5 @@
 classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
-% DATASET
+% Any miscellaneous dataset associated with an epoch
 %
 % Description:
 %   Miscellaneous datasets associated with an Epoch
@@ -8,14 +8,19 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Dataset(name)
-%   obj = Dataset(name, data)
+%   obj = aod.core.Dataset(name)
+%   obj = aod.core.Dataset(name, data)
 %
 % Properties:
 %   Data
 %
 % Sealed methods:
 %   setData(obj, data)
+%
+% See Also:
+%   aod.persistent.Dataset
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

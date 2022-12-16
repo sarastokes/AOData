@@ -9,7 +9,9 @@ classdef (ConstructOnLoad) DatasetEvent < event.EventData
 %
 % Constructor:
 %   obj = DatasetEvent(name, newValue, oldValue)
-% ------------------------------------------------------------------------
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
     
     properties
         Name

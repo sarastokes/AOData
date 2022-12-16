@@ -1,5 +1,5 @@
 classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
-% STIMULUS
+% A stimulus presented during an Epoch
 %
 % Description:
 %   A stimulus presented during an Epoch
@@ -10,6 +10,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = aod.core.Stimulus(name)
 %   obj = aod.core.Stimulus(name, protocol)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

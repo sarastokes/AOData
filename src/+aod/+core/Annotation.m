@@ -1,22 +1,28 @@
 classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
-% ANNOTATION
+% An annotation for acquired data
 %
 % Description:
 %   Spatial regions within acquired data. Could be ROIs in a physiology 
 %   experiment, coordinates of structures of interest, etc.
 %
+% Parent:
+%   aod.core.Entity, matlab.mixin.Heterogeneous
+%
 % Constructor:
-%   obj = Annotation(name, varargin)
-%   obj = Annotation(name, data, varargin)
+%   obj = aod.core.Annotation(name, varargin)
+%   obj = aod.core.Annotation(name, data, varargin)
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Properties:
-%   Data                    
+%   Data  
+%   Source                  
 %
 % Sealed protected methods:
 %   setData(obj, data)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -25,7 +31,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     properties (Access = protected)
-        Reader
+        Reader                      % TODO: Remove
     end
 
     methods

@@ -15,7 +15,7 @@ classdef (Abstract) Entity < handle
 %   parameters                  aod.util.Parameters
 %   files                       aod.util.Parameters
 %   description                 string
-%   notes                       char
+%   notes                       string
 %
 % Dependent properties:
 %   label                       string      (defined by getLabel)
@@ -50,6 +50,8 @@ classdef (Abstract) Entity < handle
 %
 % Private methods:
 %   tf = isValidParent(obj, parent)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -633,7 +635,7 @@ classdef (Abstract) Entity < handle
             idx = arrayfun(@(x) strcmp(x.GetAccess, 'public'), mc.PropertyList);
             propList = propList(idx);
             % Remove system properties
-            propList = setdiff(propList, aod.h5.getSpecialProps());
+            propList = setdiff(propList, aod.h5.getSystemProperties());
             % Remove containers
             if ~isempty(obj.entityType.childContainers())
                 propList = setdiff(propList, obj.entityType.childContainers());

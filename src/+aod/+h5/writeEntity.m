@@ -26,7 +26,7 @@ function writeEntity(hdfName, obj)
     % Determine which properties will be persisted
     persistedProps = aod.h5.getPersistedProperties(obj);
     % Extract out independently set properties
-    specialProps = aod.h5.getSpecialProps();
+    specialProps = aod.h5.getSystemProperties();
     persistedProps = setdiff(persistedProps, specialProps);
     % Extract out container properties
     containers = entityType.childContainers();

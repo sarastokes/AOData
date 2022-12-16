@@ -1,5 +1,20 @@
 classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% A Channel in an HDF5 file
+%
+% Syntax:
+%   obj = aod.persistent.Channel
+%
+% Parent:
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
+%
+% Constructor:
+%   obj = aod.persistent.Channel(hdfName, hdfPath, factory)
+%
+% See Also:
+%   aod.core.Channel
 
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
     properties (SetAccess = protected)
         DevicesContainer
     end

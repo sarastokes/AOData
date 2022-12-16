@@ -10,6 +10,8 @@ classdef (ConstructOnLoad) AttributeEvent < event.EventData
 % Notes:
 %   notify(obj, 'ChangedAttribute', AttributeEvent(hdfPath, name, value))
 %   addListener(entity, 'ChangedAttribute', @callback)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties                 

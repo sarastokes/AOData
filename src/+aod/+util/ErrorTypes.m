@@ -3,7 +3,8 @@ classdef ErrorTypes
 %
 % Description:
 %   Enumerated type standardizing error handling
-%
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration

@@ -6,6 +6,11 @@ classdef (ConstructOnLoad) FileEvent < event.EventData
 %
 % Parent:
 %   event.EventData
+%
+% Constructor:
+%   obj = aod.persistent.events.FileEvent(name, value)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties

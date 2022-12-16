@@ -6,11 +6,8 @@ classdef ClassRepository < handle
 %
 % Input:
 %   path        Search path(s) split by ';'
-%
-% History:
-%   06Nov2021 - SSP - Adapted from Symphony's ClassRepository
-%   04Dec2021 - SSP - Added superclass list method
-%   15Nov2022 - SSP - String return from get()
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

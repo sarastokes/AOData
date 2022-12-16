@@ -1,16 +1,14 @@
 classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% SOURCE
+% A Source in an HDF5 file
 %
 % Description:
 %   Represents a persisted Source in an HDF5 file
 %
 % Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = Source(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Source(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Source

@@ -1,19 +1,19 @@
 classdef Dataset < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% DATASET
+% A dataset in an HDF5 file
 %
 % Description:
 %   Represents a persisted Dataset in an HDF5 file
 %
 % Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = Dataset(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Dataset(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Dataset
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods

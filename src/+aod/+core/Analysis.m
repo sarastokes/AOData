@@ -15,6 +15,8 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 % Parameters:
 %   Date                    datetime or text in format 'yyyyMMdd'
 %       Date analysis was performed (default = today)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods

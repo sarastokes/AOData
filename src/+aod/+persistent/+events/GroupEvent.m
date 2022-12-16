@@ -8,8 +8,10 @@ classdef (ConstructOnLoad) GroupEvent < event.EventData
 %   event.EventData
 %
 % Constructor:
-%   obj = GroupEvent(entity)
-% ------------------------------------------------------------------------
+%   obj = aod.persistent.events.GroupEvent(entity, action, oldEntity)
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     properties
         Entity

@@ -18,11 +18,10 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
 %       Names of properties that written as entity attributes
 %   abandonedProps      string
 %       Names of properties that are not written 
-%
-% History:
-%   08Jun2022 - SSP
-%   16Aug2022 - SSP - Expanded to distinguish attribute properties
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+    
 
     arguments
         obj                 {mustBeA(obj, 'aod.core.Entity')}

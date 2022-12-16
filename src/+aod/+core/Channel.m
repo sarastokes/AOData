@@ -18,6 +18,8 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   removeDevice(obj, ID)
 %   clearDevices(obj)
 %   assignUUID(obj, uuid)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     properties (SetAccess = private)
         Devices                     aod.core.Device = aod.core.Device.empty()

@@ -87,7 +87,6 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 
     methods (Access = protected)
         function entities = parenReference(obj, indexOp)
-            assignin('base', 'indexOp', indexOp)
             if isempty(obj.memberPaths)
                 entities = [];
                 return

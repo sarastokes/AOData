@@ -1,19 +1,19 @@
 classdef Device < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% DEVICE
+% A Device in an HDF5 file
 %
 % Description:
 %   Represents a persisted Device in an HDF5 file
 %
 % Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = Device(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Device(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Device
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods

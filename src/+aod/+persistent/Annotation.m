@@ -1,5 +1,5 @@
 classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% ANNOTATION
+% An Annotation in an HDF5 file
 %
 % Description:
 %   Represents a persisted Annotation in an HDF5 file
@@ -10,12 +10,11 @@ classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 %   dynamicprops
 %
 % Constructor:
-%   obj = Annotation(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Annotation(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Annotation
 % -------------------------------------------------------------------------
-
 
     properties (SetAccess = protected)
         Data 

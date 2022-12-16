@@ -29,6 +29,8 @@ classdef EntityTypes
 %       Returns the entity type given the entity name
 %   obj = get(entity)
 %       Given an entity (aod.core.Entity subclass), returns the entity type
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     % Core entities in the order they are written to HDF5 files

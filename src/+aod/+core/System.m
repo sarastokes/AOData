@@ -1,5 +1,5 @@
 classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
-% SYSTEM
+% A configuration of an AO imaging system
 %
 % Description:
 %    A configuration of the AO imaging system 
@@ -8,7 +8,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = System(name)
+%   obj = aod.core.System(name)
 %
 % Properties:
 %   Channels
@@ -19,6 +19,8 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %   clearChannels(obj)
 %   clearAllChannels(obj)
 %   clearAllDevices(obj)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)

@@ -1,5 +1,5 @@
 classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
-% CALIBRATION
+% A measurement associated with the system or experiment
 %
 % Description:
 %   A calibration associated with the system or experiment
@@ -34,10 +34,16 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Sealed methods:
 %   setCalibrationDate(obj, calibrationDate)
+%
+% -------------------------------------------------------------------------
+% See Also:
+%   aod.persistent.Calibration
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        calibrationDate                 datetime
+        calibrationDate (1,1)               datetime
     end
 
     properties (SetAccess = protected)

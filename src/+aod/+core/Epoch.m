@@ -1,5 +1,5 @@
 classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
-% EPOCH
+% A period of data acquision during an experiment
 %
 % Description:
 %   A continuous period of data acquisition within an experiment
@@ -8,7 +8,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Epoch(ID)
+%   obj = aod.core.Epoch(ID)
 %
 % Properties:
 %   ID                              Epoch identifier (integer)
@@ -30,6 +30,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % Notes:
 %   Inheritance from matlab.mixin.Heterogeneous allows forming arrays of 
 %   multiple Epoch subclasses
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

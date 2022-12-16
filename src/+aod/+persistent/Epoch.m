@@ -1,16 +1,14 @@
 classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% EPOCH
+% An Epoch within an HDF5 file
 %
 % Description:
 %   Represents a persisted Epoch in an HDF5 file
 %
 % Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = Epoch(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Epoch(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Epoch

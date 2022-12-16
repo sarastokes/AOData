@@ -1,5 +1,5 @@
 classdef Subject < aod.core.Source 
-% SUBJECT
+% A subject imaged in an experiment
 %
 % Description:
 %   Top-level source of data in experiment (e.g. mouse, human, model eye)
@@ -17,6 +17,8 @@ classdef Subject < aod.core.Source
 %   Sex
 %   Age
 %   Demographics
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods 

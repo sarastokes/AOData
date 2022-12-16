@@ -10,15 +10,16 @@ classdef Calibration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyna
 %   dynamicprops
 %
 % Constructor:
-%   obj = Calibration(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Calibration(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Calibration
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-
     properties (SetAccess = private)
-        calibrationDate(1,1)                    datetime 
+        calibrationDate(1,1)            datetime 
     end
 
     methods

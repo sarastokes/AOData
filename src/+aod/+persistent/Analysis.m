@@ -1,4 +1,17 @@
 classdef Analysis < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% An Analysis in an HDF5 file
+%
+% Description:
+%   An Analysis in an HDF5 file
+%
+% Parent:
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
+%
+% Constructor:
+%   obj = aod.persistent.Analysis
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         analysisDate                    

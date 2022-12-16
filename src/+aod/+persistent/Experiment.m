@@ -5,12 +5,10 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 %   Represents a persisted Experiment in an HDF5 file
 %
 % Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = Experiment(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Experiment(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Experiment
@@ -20,8 +18,8 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 
     properties (SetAccess = protected)
         homeDirectory           char
-        experimentDate(1,1)     datetime
-        epochIDs
+        experimentDate (1,1)     datetime
+        epochIDs (1,:)
 
         AnalysesContainer         
         EpochsContainer        

@@ -1,5 +1,5 @@
 classdef ExperimentPresenter < appbox.Presenter 
-% EXPERIMENTVIEW
+% Presenter for AODataViewer
 %
 % Parent:
 %   appbox.Presenter
@@ -7,8 +7,10 @@ classdef ExperimentPresenter < appbox.Presenter
 % Syntax:
 %   obj = ExperimentPresenter()
 %
-% See also:
-%   aod.app.views.ExperimentView
+% See Also:
+%   aod.app.views.ExperimentView, AODataViewer
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties 
@@ -205,7 +207,11 @@ classdef ExperimentPresenter < appbox.Presenter
             % Description:
             %   When node is expanded, make sure everything is loaded in
             % -------------------------------------------------------------
-            node = evt.data.Node;
+            if isa(evt, 'matlab.ui.container.TreeNode')
+                node = evt;
+            else
+                node = evt.data.Node;
+            end
 
             % Only entity nodes require further loading
             if node.NodeData.AONode ~= aod.app.AONodeTypes.ENTITY
@@ -235,11 +241,18 @@ classdef ExperimentPresenter < appbox.Presenter
         function onViewFollowedLink(obj, ~, ~)
             node = obj.view.getSelectedNode;
             newNode = obj.view.path2node(node.NodeData.LinkPath);
-            assignin('base','newNode', newNode);
+
             if ~isempty(newNode)
                 obj.view.showNode(newNode);
                 obj.view.selectNode(newNode);
+                % Ensure Parent nodes get expanded properly
+                iNode = newNode;
+                while ~isa(iNode, 'matlab.ui.container.Tree')
+                    obj.onViewExpandedNode([], iNode);
+                    iNode = iNode.Parent;
+                end
             end
+
         end
 
         function onViewCopyHdfAddress(obj, ~, ~)

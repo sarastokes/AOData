@@ -1,14 +1,15 @@
 function mustNotBeSystemAttribute(name)
-    % MUSTNOTBESYSTEMATTRIBUTE
-    %
-    % Description:
-    %   Argument validation function to determine whether input is 
-    %   reserved by AOData
-    %
-    % Syntax:
-    %   mustNotBeSystemAttribute(name)
-    %
-    % ---------------------------------------------------------------------
+% Validate argument is not a system attribute
+%
+% Description:
+%   Argument validation function to determine whether input is 
+%   reserved by AOData
+%
+% Syntax:
+%   aod.util.mustNotBeSystemAttribute(name)
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     arguments
         name            string

@@ -1,19 +1,19 @@
 classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% SYSTEM
+% A System in an HDF5 file
 %
 % Description:
 %   Represents a persisted System in an HDF5 file
 %
 % Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = System(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.System(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.System
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

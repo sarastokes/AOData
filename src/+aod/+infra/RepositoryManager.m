@@ -5,7 +5,7 @@ classdef RepositoryManager < handle
 %   Collects information about git repositories used by AOData
 %
 % Constructor:
-%   obj = RepositoryManager()
+%   obj = aod.infra.RepositoryManager()
 %
 % Properties:
 %   repositoryInfo - table containing information about each repository

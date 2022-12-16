@@ -1,5 +1,5 @@
 classdef ExperimentView < aod.app.UIView 
-% EXPERIMENTVIEW
+% UI for AODataViewer
 %
 % Parent:
 %   aod.app.UIView
@@ -7,9 +7,12 @@ classdef ExperimentView < aod.app.UIView
 % Syntax:
 %   obj = ExperimentView()
 %
-% See also:
-%   aod.app.presenters.ExperimentPresenter
+% See Also:
+%   aod.app.presenters.ExperimentPresenter, AODataViewer
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     events 
         NodeSelected 
         NodeExpanded 
@@ -119,7 +122,7 @@ classdef ExperimentView < aod.app.UIView
             obj.Attributes.ColumnName = {'Attribute', 'Value'};
             if nargin > 1
                 obj.Attributes.Data = data;
-                systemAttributes = {'UUID', 'label', 'entityType', 'Class', 'Format'};
+                systemAttributes = aod.h5.getSystemAttributes();
                 rowIdx = find(cellfun(@(x) ismember(x, systemAttributes), data{:, 1}));
                 addStyle(obj.Attributes, obj.SYSTEM_STYLE, 'Row', rowIdx);
             end
@@ -137,6 +140,9 @@ classdef ExperimentView < aod.app.UIView
 
         function setTablePanelView(obj, data)
             obj.TablePanel.Visible = 'on';
+            if islogical(data)
+                data = double(data);
+            end
             obj.TablePanel.Data = data;
             if isnumeric(obj.TablePanel.Data)
                 set(obj.TablePanel, "RowName", "numbered", ...

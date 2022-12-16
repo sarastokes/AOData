@@ -1,11 +1,11 @@
 classdef (Abstract) Factory < handle
-% FACTORY
+% FACTORY (Abstract)
 %
 % Description:
 %   Generic parent class for factories
 %
 % Constructor:
-%   obj = Factory()
+%   obj = aod.util.Factory()
 %
 % Abstract methods:
 %   newObj = create(obj, varargin)
@@ -16,6 +16,8 @@ classdef (Abstract) Factory < handle
 % Notes:
 %   Implementation goes into create() and get() is an optional static  
 %   method for calling create() without instantiating the object first
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods (Abstract)

@@ -21,6 +21,8 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   setParam(obj, varargin)
 %   value = getParam(obj, paramName, mustReturnParam)
 %   tf = hasParam(obj, paramName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
     methods

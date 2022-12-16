@@ -1,21 +1,20 @@
 function mirrorClass = findMirror(entityType, entityClass, classManager)
-    % FINDMIRROR
-    %
-    % Description:
-    %   Determines how core class is mirrored in the persistent interface
-    %
-    % Syntax:
-    %   mirrorClass = findMirror(entityType, entityClass)
-    %   mirrorClass = findMirror(entityType, entityClass, repositoryManager)
-    %
-    % Notes:
-    %   Instantiating ClassRepository is time-consuming (179 ms per call)  
-    %   so if calling findMirror repeatedly, provide classRepository
-    %
-    % History:
-    %   15Nov2022 - SSP
-    %   30Nov2022 - SSP - Optional passing of ClassRepository for speed
-    % ---------------------------------------------------------------------
+% Search for a core class mirror in the persistent interface
+%
+% Description:
+%   Determines how core class is mirrored in the persistent interface
+%
+% Syntax:
+%   mirrorClass = findMirror(entityType, entityClass)
+%   mirrorClass = findMirror(entityType, entityClass, repositoryManager)
+%
+% Notes:
+%   Instantiating ClassRepository is time-consuming (179 ms per call)  
+%   so if calling findMirror repeatedly, provide classRepository
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
+    
     
     arguments
         entityType      {mustBeA(entityType, 'aod.core.EntityTypes')}

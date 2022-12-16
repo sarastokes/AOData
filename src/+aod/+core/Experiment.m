@@ -43,6 +43,8 @@ classdef Experiment < aod.core.Entity
 %   clearEpochRegistrations(obj, epochIDs)
 %   clearEpochResponses(obj, epochIDs)
 %   clearEpochStimuli(obj, epochIDs)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

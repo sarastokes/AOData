@@ -1,5 +1,5 @@
 classdef Response < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% RESPONSE
+% A Response in an HDF5 file
 %
 % Description:
 %   Represents a persisted Response in an HDF5 file
@@ -16,7 +16,7 @@ classdef Response < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
 %   aod.core.Response
 % -------------------------------------------------------------------------
 
-    properties
+    properties (SetAccess = protected)
         Data
         Timing 
     end

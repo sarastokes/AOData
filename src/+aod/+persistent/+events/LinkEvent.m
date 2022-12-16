@@ -8,8 +8,10 @@ classdef (ConstructOnLoad) LinkEvent < event.EventData
 %   event.EventData
 %
 % Constructor:
-%   obj = LinkEvent(name, value)
-% ------------------------------------------------------------------------
+%   obj = aod.persistent.events.LinkEvent(name, value)
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     properties
         Name

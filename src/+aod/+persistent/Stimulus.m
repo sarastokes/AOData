@@ -5,15 +5,15 @@ classdef Stimulus < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
 %   Represents a persisted Stimulus in an HDF5 file
 %
 % Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = Stimulus(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Stimulus(hdfFile, hdfPath, factory)
 %
 % See also:
 %   aod.core.Stimulus
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)

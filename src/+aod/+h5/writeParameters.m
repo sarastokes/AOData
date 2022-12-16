@@ -1,5 +1,5 @@
 function writeParameters(hdfName, groupPath, params)
-% WRITEPARAMETERS
+% Write aod.util.Parameters to an HDF5 file
 %
 % Description:
 %   Write an aod.util.Parameters as attributes to a group
@@ -15,7 +15,12 @@ function writeParameters(hdfName, groupPath, params)
 %   params          aod.util.Parameters
 %       Key/value pairs to write as attributes
 %
+% See Also:
+%   aod.util.Parameters, aod.h5.write
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+    
     arguments 
         hdfName             {mustBeFile(hdfName)}
         groupPath           char 

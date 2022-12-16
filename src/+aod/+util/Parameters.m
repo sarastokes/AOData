@@ -17,6 +17,8 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 %
 % See also:
 %   containers.Map
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     methods
         function obj = Parameters(varargin)

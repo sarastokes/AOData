@@ -1,11 +1,14 @@
 classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
-% RESPONSE
+% A response extracted from data acquired during an epoch
 %
 % Description:
-%   A response measured during an Epoch
+%   A response extracted from data acquired during an Epoch
 %
 % Parent: 
 %   aod.core.Entity, matlab.mixin.Heterogeneous
+%
+% Constructor:
+%   obj = aod.core.Response(name)
 %
 % Properties:
 %   Data 
@@ -15,11 +18,13 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   setData(obj, data)
 %   addTiming(obj, timing)
 %   clearTiming(obj)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         Data                             
-        Timing                              % aod.core.Timing
+        Timing                             
     end
 
     methods

@@ -2,16 +2,21 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 % REGISTRATION
 %
 % Description:
-%   Class for registration of images/videos
+%   Any correction applied to the acquired data
+%
+% Parent:
+%   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = Registration(parent, data)
+%   obj = aod.core.Registration(parent, data)
 %
 % Abstract methods:
 %   varargout = apply(obj, varargin)
 %
 % Sealed methods:
 %   setRegistrationDate(obj, regDate)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

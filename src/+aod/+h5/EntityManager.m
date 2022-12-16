@@ -7,7 +7,10 @@ classdef EntityManager < handle
 %
 % Constructor:
 %   obj = EntityManager(hdfName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+    
 
     properties
         hdfName

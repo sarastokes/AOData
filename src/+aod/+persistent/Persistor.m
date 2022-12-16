@@ -1,11 +1,11 @@
 classdef Persistor < handle
-% PERSISTOR
+% Manages persistence to an existing HDF5 file
 %
 % Description:
 %   Serves as interface between AOData and an HDF5 file
 %
 % Constructor:
-%   obj = Persistor(hdfName)
+%   obj = aod.persistent.Persistor(hdfName)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

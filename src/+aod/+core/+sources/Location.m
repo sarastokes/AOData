@@ -1,5 +1,5 @@
 classdef Location < aod.core.Source
-% LOCATION
+% A location imaged in an experiment
 %
 % Description:
 %   An imaging location within an eye
@@ -8,7 +8,9 @@ classdef Location < aod.core.Source
 %   aod.core.Source
 %
 % Constructor:
-%   obj = Location(name)         
+%   obj = aod.core.sources.Location(name)         
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods

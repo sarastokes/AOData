@@ -8,7 +8,9 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
 %   event.EventData
 %
 % Constructor:
-%   obj = EntityEvent(uuid)
+%   obj = aod.persistent.events.EntityEvent(uuid, action)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties

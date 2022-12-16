@@ -1,5 +1,5 @@
 function p = AODataManagerApp()
-% AODATAMANAGERAPP
+% Opens user interface for managing AOData
 %
 % Description:
 %   Opens app for viewing and editing AOData search paths and repos

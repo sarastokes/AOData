@@ -6,7 +6,7 @@ classdef EntityFactory < handle
 %   for faster interaction
 %
 % Constructor:
-%   obj = EntityFactory(hdfName)
+%   obj = aod.persistent.EntityFactory(hdfName)
 %
 % Static method access:
 %   experiment = EntityFactory.init(hdfName)

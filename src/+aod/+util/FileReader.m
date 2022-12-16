@@ -5,8 +5,9 @@ classdef (Abstract) FileReader < handle
 %   Standardized interface for reading files
 %
 % Constructor:
-%   obj = FileReader(varargin)
-%
+%   obj = aod.util.FileReader(varargin)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     properties (SetAccess = protected)
         Path 
