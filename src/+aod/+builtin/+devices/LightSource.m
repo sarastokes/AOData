@@ -22,13 +22,20 @@ classdef LightSource < aod.core.Device
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
+        % The peak wavelength of the light source (nm)
+        wavelength      double
         % The spectra of the light source
         spectra         double 
     end 
 
     methods
         function obj = LightSource(wavelength, varargin)
-            obj = obj@aod.core.Device([], varargin{:});            
+            obj = obj@aod.core.Device([], varargin{:});   
+            
+            ip = aod.util.InputParser();
+            addParameter(ip, 'SerialNumber', [], @isstring);
+            parse(ip, varargin{:});
+            
             obj.setWavelength(wavelength);
         end
     end

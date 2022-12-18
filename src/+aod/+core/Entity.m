@@ -86,8 +86,6 @@ classdef (Abstract) Entity < handle
 
     methods
         function obj = Entity(varargin)
-            
-
             % Input parsing and processing
             ip = aod.util.InputParser();
             addOptional(ip, 'Name', [], @(x) istext(x) | isempty(x));
@@ -118,7 +116,9 @@ classdef (Abstract) Entity < handle
         function value = get.label(obj)
             value = obj.getLabel();
         end
+    end
 
+    methods
         function h = ancestor(obj, className)
             % ANCESTOR
             %
@@ -245,20 +245,6 @@ classdef (Abstract) Entity < handle
             end
 
             obj.notes = string.empty();
-        end
-    end
-
-    % Creation/destruction methods
-    methods
-        function remove(obj)
-            if isempty(obj.Parent)
-                error('delete:NoParent', 'Entity cannot be deleted if parent is unset');
-            end
-            
-            parentContainer = obj.entityType.parentContainer();
-            h = obj.Parent.(parentContainer);
-            idx = arrayfun(@(x) isequal(x, obj.UUID), h);
-            h(idx) = [];
         end
     end
 
@@ -597,6 +583,22 @@ classdef (Abstract) Entity < handle
             else
                 value = obj.Name;
             end
+        end
+        
+        function removeEntity(obj)
+            % Remove the entity from the experiment
+            %
+            % Syntax:
+            %   removeEntity(obj)
+            % -------------------------------------------------------------
+            if isempty(obj.Parent)
+                error('remove:NoParent', 'Entity cannot be deleted if parent is unset');
+            end
+            
+            parentContainer = obj.entityType.parentContainer();
+            h = obj.Parent.(parentContainer);
+            idx = arrayfun(@(x) isequal(x, obj.UUID), h);
+            h(idx) = [];
         end
 
         function sync(obj)

@@ -1,13 +1,14 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 30Nov2022, the ```aod``` package report contains **129 files** and has:
-- **50.73%** statement coverage (4082 executable) 
-- **51.98%** function coverage (706 executable).
+As of 17Dec2022, the ```aod``` package report contains **129 files** and has:
+- **48.83%** statement coverage (3682 executable) 
+- **51.62%** function coverage (647 executable).
 
 ## Tests
 The AOData test suite currently contains the following:
 - ```BuiltinClassTest``` - tests operation of builtin subclasses
+- ```CoreApiTest``` - tests core interface queries
 - ```CoreInterfaceTest``` - tests basic functions of the core interface
 - ```CustomDisplayTest``` - ensures custom displays do not throw errors
 - ```EnumerationTest``` - tests basic functioning of enumeration classes not covered elsewhere

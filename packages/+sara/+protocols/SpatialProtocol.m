@@ -17,7 +17,7 @@ classdef (Abstract) SpatialProtocol < aod.builtin.protocols.StimulusProtocol
 % Each method will call the prior steps
 % You can either provide a file name to writeStim or overwrite getFileName
 %
-% Abstract methods (from aod.core.Protocol, implement in subclasses):
+% Abstract methods (from aod.util.Protocol, implement in subclasses):
 %   stim = obj.generate()
 %
 % Methods (inherited, implemented by subclasses):

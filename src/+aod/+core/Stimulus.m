@@ -57,8 +57,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setProtocol(obj, protocol)
             % -------------------------------------------------------------
-            assert(isSubclass(protocol, 'aod.core.Protocol'),...
-                'Protocol must be subclass of aod.core.Protocol');
+            assert(isSubclass(protocol, 'aod.util.Protocol'),...
+                'Protocol must be subclass of aod.util.Protocol');
 
             obj.protocolClass = class(protocol);
             obj.setFile('Protocol', fileparts(protocol.getFileName()));

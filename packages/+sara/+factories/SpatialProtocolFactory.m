@@ -183,7 +183,7 @@ classdef SpatialProtocolFactory < aod.util.Factory
                         'BaseIntensity', 0.5, 'Contrast', 1);
                 otherwise
                     warning('Unrecognized file name %s', fileName);
-                    protocol = aod.core.protocols.Empty(obj.calibration);
+                    protocol = aod.util.Protocol.empty();
             end
         end
     end 

@@ -28,23 +28,24 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Sealed)
-        function add(obj, subSource)
+        function add(obj, childSource)
             % ADD
             %
             % Description:
             %   Add a sub-source to the current source
             %
             % Syntax:
-            %   add(obj, subSource)
+            %   add(obj, childSource)
             % -------------------------------------------------------------
-            assert(isSubclass(obj, 'aod.core.Source'),... 
-                'Must be subclass of aod.core.Source');
-
-            subSource.setParent(obj);
-            obj.Sources = cat(1, obj.Sources, subSource);
+            arguments 
+                obj 
+                childSource       {mustBeA(childSource, 'aod.core.Source')}
+            end
+            childSource.setParent(obj);
+            obj.Sources = cat(1, obj.Sources, childSource);
         end
 
-        function remove(obj, sourceID)
+        function remove(obj, ID)
             % REMOVE
             %
             % Description:
@@ -53,22 +54,14 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   remove(obj, sourceID)
             % -------------------------------------------------------------
-            assert(sourceID > 0 && sourceID <= numel(obj.Sources),...
-                'Invalid source ID %u, must be between 1 and %u',...
-                sourceID, numel(obj.Sources));
-            obj.Sources(sourceID) = [];
-        end
-
-        function clearSources(obj)
-            % CLEARSOURCES
-            %
-            % Description:
-            %   Clear child sources of this source
-            %
-            % Syntax:
-            %   clearSources(obj)
-            % -------------------------------------------------------------
-            obj.Sources = aod.core.Source.empty();
+            if isnumeric(ID)
+                mustBeInteger(ID); 
+                mustBeInRange(ID, 1, numel(obj.Sources));
+                ID = sort(ID, 'descend');
+                obj.Sources(ID) = [];
+            elseif istext(ID) && strcmpi(ID, 'all')
+                obj.Sources = aod.core.Sources.empty();
+            end
         end
 
         function allSources = getAllSources(obj)

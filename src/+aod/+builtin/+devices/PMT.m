@@ -24,8 +24,7 @@ classdef PMT < aod.core.Device
             obj = obj@aod.core.Device(name, varargin{:});
             
             ip = aod.util.InputParser();
-            addParameter(ip, 'Position', [], @isnumeric);
-            addParameter(ip, 'Gain', [], @isnumeric);
+            addParameter(ip, 'SerialNumber', [], @ischar);
             parse(ip, varargin{:});
 
             obj.setParam(ip.Results);

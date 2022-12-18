@@ -36,7 +36,7 @@ classdef (Abstract) SpectralProtocol < aod.builtin.protocols.StimulusProtocol
 %   value = calculateTotalTime(obj)
 %   value = calculateAmplitude(obj)
 %
-% See aod.builtin.protocols.StimulusProtocol and aod.core.Protocol for
+% See aod.builtin.protocols.StimulusProtocol and aod.util.Protocol for
 %   additional inherited methods
 % -------------------------------------------------------------------------
 

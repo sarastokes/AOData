@@ -1,6 +1,6 @@
 
 ##### Creating a new protocol
-Subclass `aod.core.Protocol` or one of the subclasses (e.g. `aod.core.StimulusProtocol`)  if those are applicable.
+Subclass `aod.util.Protocol` or one of the subclasses (e.g. `aod.core.StimulusProtocol`)  if those are applicable.
 
 Each `Protocol` subclass must define two properties: `sampleRate`, the rate data is sampled in Hz, and `stimRate`, the rate stimuli are presented in Hz. 
 
@@ -14,7 +14,7 @@ You can either provide the filename to `writeStim` or define a method for determ
 
 Below is a template for defining a new protocol:
 ```matlab
-classdef MyProtocol < aod.core.Protocol
+classdef MyProtocol < aod.util.Protocol
 
     % Define properties specific to this protocol
     properties
@@ -31,7 +31,7 @@ classdef MyProtocol < aod.core.Protocol
 
     methods
         function obj = MyProtocol(varargin)
-            obj = obj@aod.core.Protocol(varargin{:});
+            obj = obj@aod.util.Protocol(varargin{:});
 
             % Parse properties specific to this protocol
             ip = inputParser();
@@ -78,7 +78,7 @@ In addition, the protocol requires the maximum power for each of the 3 LEDs (`le
 The calculation for the contrast step is found in `generate()`. For LED stimuli, the normalized values must be scaled by each LED's max power (`ledMaxPowers`), so that occurs in the `mapToStimulator()` function. Finally, to write a stimulus file for the imaging software, the values for each LED are written to a text file using an external function `writeLEDStimulusFile`.
 
 ```matlab
-classdef Step < aod.core.Protocol
+classdef Step < aod.util.Protocol
 
     % Protocol-specific, all public access properties are saved
     properties
@@ -103,7 +103,7 @@ classdef Step < aod.core.Protocol
 
     methods
         function obj = ContrastStep(ledMaxPowers, varargin)
-            obj = obj@aod.core.Protocol(varargin{:});
+            obj = obj@aod.util.Protocol(varargin{:});
 
             obj.ledMaxValues = ledMaxValues;
 
@@ -179,7 +179,7 @@ classdef Step < aod.core.Protocol
 end
 ```
 
-You might notice a this protocol used few functions and properties that weren't defined. These are inherited from `aod.core.Protocol`. For example, several methods are defined for converting between seconds and samples (`obj.sec2samples(sec)`, `obj.samples2sec(samples)`) which use the value you set for `sampleRate`. To convert between seconds and the stimulator's timing, there's `obj.sec2pts(sec)` and `obj.pts2sec(pts)` which use your value for `stimRate`. There's also a property `totalTime` which calls the function `obj.calculateTotalTime()`. See the `aod.core.Protocol` code for more.
+You might notice a this protocol used few functions and properties that weren't defined. These are inherited from `aod.util.Protocol`. For example, several methods are defined for converting between seconds and samples (`obj.sec2samples(sec)`, `obj.samples2sec(samples)`) which use the value you set for `sampleRate`. To convert between seconds and the stimulator's timing, there's `obj.sec2pts(sec)` and `obj.pts2sec(pts)` which use your value for `stimRate`. There's also a property `totalTime` which calls the function `obj.calculateTotalTime()`. See the `aod.util.Protocol` code for more.
 
 
 To create a `Steps` protocol, provide the `ledMaxPowers` and any of the optional arguments if you want to use something other than their default value (defined in the `inputParser` block)...

@@ -678,8 +678,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.core.EntityTypes.init(obj.loadAttribute('EntityType'));
             obj.entityClassName = obj.loadAttribute('Class');
-            obj.lastModified = datetime(obj.loadAttribute('LastModified'),... 
-                'Format', 'dd-MMM-uuuu HH:mm:ss');
+            lastModTime = obj.loadAttribute('LastModified');
+            if ~isempty(lastModTime)
+                obj.lastModified = datetime(lastModTime, ...
+                    'Format', 'dd-MMM-uuuu HH:mm:ss');
+            end
 
             % Parse the remaining attributes
             for i = 1:numel(obj.attNames)

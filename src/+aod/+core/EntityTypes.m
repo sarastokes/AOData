@@ -256,6 +256,8 @@ classdef EntityTypes
                     out = aod.core.Channel.empty();
                 case EntityTypes.DEVICE
                     out = aod.core.Device.empty();
+                case EntityTypes.SOURCE 
+                    out = aod.core.Source.empty();
                 case EntityTypes.EPOCH
                     out = aod.core.Epoch.empty();
                 case EntityTypes.DATASET
@@ -266,8 +268,6 @@ classdef EntityTypes
                     out = aod.core.Response.empty();
                 case EntityTypes.STIMULUS
                     out = aod.core.Stimulus.empty();
-                otherwise
-                    out = [];
             end
         end
 
@@ -510,7 +510,7 @@ classdef EntityTypes
                     obj = EntityTypes.DEVICE;
                 case {'calibration', 'calibrations', 'cal'}
                     obj = EntityTypes.CALIBRATION;
-                case {'annotation', 'ann'}
+                case {'annotation', 'annotations'}
                     obj = EntityTypes.ANNOTATION;
                 case {'epoch', 'epochs','ep'}
                     obj = EntityTypes.EPOCH;

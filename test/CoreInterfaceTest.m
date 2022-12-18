@@ -88,11 +88,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 7);
 
             % Remove a single source
-            testCase.EXPT.removeSource(2);
+            testCase.EXPT.remove('Source', 2);
             testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
 
             % Clear all the sources
-            testCase.EXPT.clearSources();
+            testCase.EXPT.remove('Source', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 0);
         end
 
@@ -104,7 +104,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 1);
 
             % Add a second calibration with an empty date
-            cal2 = aod.builtin.calibrations.PowerMeasurement('Mustang', []);
+            cal2 = aod.builtin.calibrations.PowerMeasurement('Mustang', [], 488);
             cal2.addMeasurement(22, 100);
             testCase.EXPT.add(cal2);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
@@ -119,22 +119,22 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(cal2.UUID, testCase.EXPT.Calibrations(2).UUID);
 
             % Remove a calibration date
-            testCase.EXPT.Calibrations(1).setCalibrationDate();
+            testCase.EXPT.Calibrations(1).setCalibrationDate([]);
             testCase.verifyTrue(isempty(testCase.EXPT.Calibrations(1).calibrationDate));
             
             % Remove a single calibraiton
-            testCase.EXPT.removeCalibration(1);
+            testCase.EXPT.remove('Calibration', 1);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 1);
             testCase.verifyEqual(testCase.EXPT.Calibrations(1).UUID, cal2.UUID);
 
             % Clear all existing calibrations
-            testCase.EXPT.clearCalibrations();
+            testCase.EXPT.remove('Calibration', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 0);
 
             % Add them back, together, and the clear
             testCase.EXPT.add([cal1, cal2]);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
-            testCase.EXPT.clearCalibrations();
+            testCase.EXPT.remove('Calibration', 'all');
         end
 
         function analysisIO(testCase)
@@ -161,9 +161,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEmpty(getParam(testCase.EXPT.Analyses(1), 'Date'));
 
             % Remove analyses one by one
-            testCase.EXPT.removeAnalysis(1);
+            testCase.EXPT.remove('Analysis', 1);
             testCase.verifyEqual(numel(testCase.EXPT.Analyses), 1);
-            testCase.EXPT.removeAnalysis(1);
+            testCase.EXPT.remove('Analysis', 1);
             testCase.verifyEmpty(testCase.EXPT.Analyses);
 
             % Create a third analysis with pre-set Parent
@@ -175,7 +175,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Analyses), 3);
             
             % Clear all the analyses
-            testCase.EXPT.clearAnalyses();
+            testCase.EXPT.remove('Analysis', 'all');
         end
 
         function systemIO(testCase)
@@ -246,12 +246,12 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 0);
 
             % Remove a system
-            testCase.EXPT.removeSystem(1);
+            testCase.EXPT.remove('System', 1);
             testCase.verifyEqual(numel(testCase.EXPT.Systems), 1);
             testCase.verifyEqual(testCase.EXPT.Systems(1).UUID, system2.UUID);
 
             % Clear all systems
-            testCase.EXPT.clearSystems();
+            testCase.EXPT.remove('System', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Systems), 0);
         end
 
@@ -277,7 +277,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(testCase.EXPT.epochIDs, [1 2]);
 
             % Clear all the epochs
-            testCase.EXPT.clearEpochs();
+            testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyNumElements(testCase.EXPT.Epochs, 0);
             testCase.verifyEqual(testCase.EXPT.numEpochs, 0);
 
@@ -323,11 +323,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 Throws("Epoch:AddedInvalidEntity"));
 
             % Remove an epoch (by non-consecutive ID)
-            testCase.EXPT.removeEpoch(4);
+            testCase.EXPT.remove('Epoch', 4);
             testCase.verifyNumElements(testCase.EXPT.Epochs, 2);
 
             % Clear all the epochs
-            testCase.EXPT.clearEpochs();
+            testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyNumElements(testCase.EXPT.Epochs, 0);
         end
 
@@ -368,7 +368,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses()), 0);
 
             % Clear the epochs
-            testCase.EXPT.clearEpochs();
+            testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
         end
 
@@ -376,7 +376,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             import matlab.unittest.constraints.Throws
 
             % Add an epoch
-            testCase.EXPT.clearEpochs();
+            testCase.EXPT.remove('Epoch', 'all');
             testCase.EXPT.add(aod.core.Epoch(1));
 
             % Create some datasets
@@ -397,7 +397,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 0);
 
             % Clear the epochs
-            testCase.EXPT.clearEpochs();
+            testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
 
             % Try to add a dataset to the experiment
@@ -410,14 +410,14 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             import matlab.unittest.constraints.Throws
 
             % Add an epoch 
-            testCase.EXPT.clearEpochs();
+            testCase.EXPT.remove('Epoch', 'all');
             testCase.EXPT.add(aod.core.Epoch(1));
             testCase.EXPT.add(aod.core.Epoch(2));
 
             % Create some registrations
 
             % Clear the epochs
-            testCase.EXPT.clearEpochs();
+            testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
         end
     end

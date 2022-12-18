@@ -43,7 +43,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        calibrationDate (1,1)               datetime
+        calibrationDate                 datetime
     end
 
     properties (SetAccess = protected)

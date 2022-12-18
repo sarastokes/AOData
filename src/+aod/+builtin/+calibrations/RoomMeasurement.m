@@ -1,5 +1,5 @@
 classdef RoomMeasurement < aod.core.Calibration 
-% ROOMMEASUREMENT
+% Measurements of temperature and humidity during experiment
 %
 % Description:
 %   Record of room measurements made during the experiment
@@ -8,14 +8,15 @@ classdef RoomMeasurement < aod.core.Calibration
 %   aod.core.Calibration
 % 
 % Syntax:
-%   obj = RoomMeasurement(calibrationDate)
+%   obj = aod.builtin.calibrations.RoomMeasurement(calibrationDate)
 %
 % Properties:
 %   measurements
 %
 % Methods:
 %   addMeasurement(obj, timestamp, temperature, humidity)
-%   T = table(obj)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -25,13 +26,6 @@ classdef RoomMeasurement < aod.core.Calibration
     methods
         function obj = RoomMeasurement(calibrationDate, varargin)
             obj = obj@aod.core.Calibration([], calibrationDate);
-
-            ip = aod.util.InputParser();
-            addParameter(ip, 'TemperatureUnits', 'F', @ischar);
-            addParameter(ip, 'HumitityUnits', '%', @ischar);
-            parse(ip, varargin{:});
-
-            obj.setParam(ip.Results);
         end
 
         function addMeasurement(obj, timestamp, temperature, humidity)
@@ -50,16 +44,26 @@ classdef RoomMeasurement < aod.core.Calibration
                 humidity                double
             end
 
+            timestamp = obj.hoursmins2duration(input);
+
             for i = numel(timestamp)
                 datestamp = datetime(timestamp(i), 'Format', 'HH:mm');
+                %dur = obj.hoursmins2duration(timestamp(i));
                 T = cell2table({datestamp, temperature(i), humidity(i)});
                 T.Properties.VariableNames = {'Time', 'Temperature', 'Humidity'};
+                T.Properties.VariableUnits = ["HH:mm", "Degrees F", "%"];
                 if isempty(obj.measurements)
                     obj.measurements = T;
                 else
                     obj.measurements = [obj.measurements; T];
                 end
             end
+        end
+    end
+
+    methods (Static)
+        function out = hoursmins2duration(input)
+            out = hours(extractBefore(input, ":")) + hours(extractAfter(input, ":"));
         end
     end
 end 

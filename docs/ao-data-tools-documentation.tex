@@ -604,25 +604,12 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 		\docheader{Methods:} This may seem like a lot, but many of the methods are conceptually identical (e.g. if you know how to use \aodfcn{add}, then you know how to use all the add methods)
 		\begin{itemize}
 			\item \aodfcn{setHomeDirectory(obj, filePath)} - change file path to experiment data folder
-			\item \aodfcn{add(obj, entity)} - add Analysis, Calibration, Epoch, Annotation, Source or System\\
+			\item \aodfcn{add(obj, entity)} - add Analysis, Annotation, Calibration, Epoch, Annotation, Source or System
+			\item \aodfcn{remove(obj, entity, ID)} - remove an Analysis, Annotation, Calibration, Epoch, Source or System. ID should be the index of the entity/entities (or epochID for Epochs) to remove or "all" to clear all \\
 			%
 			\item \aodfcn{epoch = id2epoch(obj)} - input ID and returns Epoch, if exists
-			\item \aodfcn{removeEpochByID(obj, epochID)}
-			\item \aodfcn{clearEpochs(obj)}\\
+			\item \aodfcn{idx = id2index(obj, ID)} - input ID and return the index of the Epoch in Epochs \\
 			%
-			\item \aodfcn{clearAnalyses(obj)}
-			%
-			\item \aodfcn{removeCalibration(obj, ID)}
-			\item \aodfcn{clearCalibrations(obj)}\\
-			%
-			\item \aodfcn{removeAnnotation(obj, ID)}
-			\item \aodfcn{clearAnnotation(obj)}\\
-			%
-			\item \aodfcn{removeSource(obj, ID)}
-			\item \aodfcn{clearSources(obj)}\\
-			%
-			\item \aodfcn{removeSystem(obj, ID)}
-			\item \aodfcn{clearSystems(obj)}
 			\item \aodfcn{getAllChannels(obj)}
 			\item \aodfcn{getAllDevices(obj)}\\
 			%
@@ -794,7 +781,8 @@ obj = aod.core.Epoch(ID)
 		\docheader{Properties:}
 		\begin{itemize}
 			\item \aodprop{ID} - (required) number of epoch within the experiment. ID must be an integer, though not necessarily consecutive, to facilitate indexing and sorting of Epochs. If you have some other non-integer specification for individual trials, your subclasses can use the \aodfcn{setName()} function to define that convention and assign it to \aodprop{Name}. 
-			\item \aodprop{startTime} - time the epoch started (\aodclass{datetime})
+			\item \aodprop{startTime} - time the epoch started (\aodclass{datetime})\\
+			%
 			\item \aodprop{Timing} - timestamps for data acquisition during the epoch
 			\item \aodprop{Registrations} - container for \aodclass{aod.core.Registration}
 			\item \aodprop{Responses} - container for \aodclass{aod.core.Response}
@@ -806,17 +794,12 @@ obj = aod.core.Epoch(ID)
 		\docheader{Sealed Methods:}
 		\begin{itemize}
 			\item \aodfcn{setSource(obj, system)}
-			\item \aodfcn{setSystem(obj, system)}
-			\item \aodfcn{add(obj, entity)} - Add a Dataset, Registration, Response or Stimulus to the Epoch\\
+			\item \aodfcn{setSystem(obj, system)}\\
 			%
-			\item \aodfcn{removeDataset(obj, ID)}
-			\item \aodfcn{removeResponse(obj, ID)}
-			\item \aodfcn{removeRegistration(obj, ID)}
-			\item \aodfcn{removeStimulus(obj, ID)}
-			\item \aodfcn{clearDatasets(obj)}
-			\item \aodfcn{clearResponses(obj)}
-			\item \aodfcn{clearRegistrations(obj)}
-			\item \aodfcn{clearStimuli(obj)}
+			\item \aodfcn{add(obj, entity)} - Add a Dataset, Registration, Response or Stimulus to the Epoch
+			\item \aodfcn{remove(obj, entityType, ID)} - Remove...
+			\item \aodfcn{search(obj, entityType, varargin)}
+			%
 		\end{itemize}	
 
 	\subsection{aod.core.Registration \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
@@ -839,7 +822,7 @@ obj = aod.core.Registration(name, registrationDate)
 			\item \aodclass{aod.builtin.registrations.StripRegistration}
 		\end{itemize}
 	\subsection{aod.core.Stimulus \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
-		\noindent Stimuli presented during the Epoch. Optionally, the contents of \aodclass{aod.core.Stimulus} can be generated automatically by passing a \aodclass{aod.core.Protocol} used to create the stimulus presented during the trial.
+		\noindent Stimuli presented during the Epoch. Optionally, the contents of \aodclass{aod.core.Stimulus} can be generated automatically by passing a \aodclass{aod.util.Protocol} used to create the stimulus presented during the trial.
 		\begin{lstlisting}
 obj = aod.core.Stimulus(name)
 obj = aod.core.Stimulus(name, protocol)
@@ -1000,11 +983,11 @@ end
 		
 		There is one other use for \aodclass{aod.util.Parameters} and that is providing a \aodclass{containers.Map}-like data type to store files associated with an entity (e.g. \aodprop{files} for \aodclass{aod.core.Epoch}). Any property named \aodprop{files} will be written as a group with the contents as attributes. This is a bit odd but it was the best option available as I didn't want to clutter up the entity attributes or datasets with a bunch of file names.
 
-	\subsection{aod.core.Protocol \myparent{handle}}
+	\subsection{aod.util.Protocol \myparent{handle}}
 		\label{subsection:ProtocolDoc}
 		\noindent Protocols define how stimuli are constructed from a basic set of parameters and how they are transformed into the format the stimulator requires. See \myurl{\ref{subsection:CreatingAProtocol}} on ``Creating A Protocol'' for a detailed explanation. 
 		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
-obj = aod.core.Protocol(calibration, varargin)
+obj = aod.util.Protocol(calibration, varargin)
 		\end{lstlisting}
 	
 		\docheader{Abstract Methods:}
@@ -1031,7 +1014,7 @@ obj = aod.core.Protocol(calibration, varargin)
 			\item \aodfcn{value = samples2sec(obj)}
 		\end{itemize}
 		
-		\noindent How is \aodclass{aod.core.Protocol} different from \aodclass{aod.core.Stimulus}? A Protocol defines how the stimulus was created and provides a record of the parameters used. A Stimulus is what actually happened during the experiment (e.g. for the LEDs we have two outputs: a JSON file with the LED voltages at each stimulation interval which is 2 ms and a CSV file with the voltages at each frame along with the timing of each frame). 
+		\noindent How is \aodclass{aod.util.Protocol} different from \aodclass{aod.core.Stimulus}? A Protocol defines how the stimulus was created and provides a record of the parameters used. A Stimulus is what actually happened during the experiment (e.g. for the LEDs we have two outputs: a JSON file with the LED voltages at each stimulation interval which is 2 ms and a CSV file with the voltages at each frame along with the timing of each frame). 
 	
 	\subsection{aod.util.FileReader \myparent{handle}}
 		\label{subsection:FileReaderDoc}
@@ -1287,7 +1270,7 @@ end
 		\noindent The option to store not only the output, but also the file name and how the file was read.
 	\subsection{Creating a protocol}
 		\label{subsection:CreatingAProtocol}
-		\noindent Each subclass of \aodclass{aod.core.Protocol} must define two properties: \aodprop{sampleRate}, the rate data is sampled in Hz, and \aodprop{stimRate}, the rate stimuli are presented in Hz.
+		\noindent Each subclass of \aodclass{aod.util.Protocol} must define two properties: \aodprop{sampleRate}, the rate data is sampled in Hz, and \aodprop{stimRate}, the rate stimuli are presented in Hz.
 		\\
 		The stimulus is created and written with the following methods:
 		\begin{enumerate}
@@ -1300,7 +1283,7 @@ end
 	
 		\noindent Below is a template for defining a new protocol:
 		\begin{lstlisting}[style=Matlab-editor, basicstyle=\mlttfamily\footnotesize]
-classdef MyProtocol < aod.core.Protocol
+classdef MyProtocol < aod.util.Protocol
 
 	% Define properties specific to this protocol
 	properties
@@ -1316,7 +1299,7 @@ classdef MyProtocol < aod.core.Protocol
 	
 	methods
 		function obj = MyProtocol(varargin)
-			obj = obj@aod.core.Protocol(varargin{:});
+			obj = obj@aod.util.Protocol(varargin{:});
 			
 			% Parse properties specific to this protocol
 			ip = aod.util.InputParser();
@@ -1350,7 +1333,7 @@ end
 		For example, here's a protocol called \aodclass{Steps} for the LEDs on the 1P primate system. Data is sampled at 25 Hz (\aodprop{sampleRate}) and the update rate for the LEDs is 500 Hz (\aodprop{stimRate}). 
 		This protocol begins at a baseline value (\aodprop{baseIntensity}) for a set amount of time (\aodprop{preTime}), increases (\aodprop{contrast}) for a set amount of time (\aodprop{stimTime}), then returns to the baseline value (\aodprop{baseIntensity}) for a set amount of time (\aodprop{tailTime}), This creates an achromatic step in contrast.
 		\begin{lstlisting}[style=Matlab-editor, basicstyle=\mlttfamily\footnotesize]
-classdef Step < aod.core.Protocol
+classdef Step < aod.util.Protocol
 	
 	% Protocol-specific, all public access properties are saved
 	properties
@@ -1375,7 +1358,7 @@ classdef Step < aod.core.Protocol
 	
 	methods
 		function obj = ContrastStep(ledMaxPowers, varargin)
-			obj = obj@aod.core.Protocol(varargin{:});
+			obj = obj@aod.util.Protocol(varargin{:});
 			
 			obj.ledMaxValues = ledMaxValues;
 			
@@ -1451,7 +1434,7 @@ classdef Step < aod.core.Protocol
 end
 		\end{lstlisting}
 	\noindent 
-	You might notice a this protocol used few functions and properties that weren't defined. These are inherited from \aodclass{aod.core.Protocol}. For example, several methods are defined for converting between seconds and samples (\aodfcn{obj.sec2samples(sec)}, \aodfcn{obj.samples2sec(samples)}) which use the value you set for \aodprop{sampleRate}. To convert between seconds and the stimulator's timing, there's \aodfcn{obj.sec2pts(sec)} and \aodfcn{obj.pts2sec(pts)} which use your value for \aodprop{stimRate}. There's also a property \aodprop{totalTime} which calls the function \aodfcn{calculateTotalTime()}. See the \aodclass{aod.core.Protocol} code for more.	
+	You might notice a this protocol used few functions and properties that weren't defined. These are inherited from \aodclass{aod.util.Protocol}. For example, several methods are defined for converting between seconds and samples (\aodfcn{obj.sec2samples(sec)}, \aodfcn{obj.samples2sec(samples)}) which use the value you set for \aodprop{sampleRate}. To convert between seconds and the stimulator's timing, there's \aodfcn{obj.sec2pts(sec)} and \aodfcn{obj.pts2sec(pts)} which use your value for \aodprop{stimRate}. There's also a property \aodprop{totalTime} which calls the function \aodfcn{calculateTotalTime()}. See the \aodclass{aod.util.Protocol} code for more.	
 
 \section{Miscellaneous FAQs}
 	\label{section:Misc}

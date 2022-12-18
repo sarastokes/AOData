@@ -1,8 +1,8 @@
 classdef Experiment < aod.core.Entity
-% EXPERIMENT
+% An adaptive optics imaging session
 %
 % Description:
-%   A single experiment
+%   A single adaptive optics imaging experiment
 %
 % Parent:
 %   aod.core.Entity
@@ -17,9 +17,9 @@ classdef Experiment < aod.core.Entity
 %   Laboratory                  Which lab the experiment occurred in
 %
 % Properties:
-%   Epochs                      Container for Epochs
-%   Source                      Container experiment's for Sources
-%   Annotations               Container for experiment's Annotations
+%   Epochs                      Container for experiment's Epochs
+%   Source                      Container for experiment's Sources
+%   Annotations                 Container for experiment's Annotations
 %   Calibrations                Container for experiment's Calibrations
 %   Systems                     Container for experiment's Systems
 %   homeDirectory               File path for experiment files 
@@ -31,32 +31,26 @@ classdef Experiment < aod.core.Entity
 % 
 % Public methods:
 %   setHomeDirectory(obj, filePath)
-%   addAnalysis(obj, entity)
-%
-%   calibration = getCalibration(obj, className)
-%   data = getResponse(obj, epochIDs, className, varargin)
-%   imStack = getStacks(obj, epochIDs)
-%
 %   id = id2epoch(obj, epochID)
 %   idx = id2index(obj, epochID)
-%   clearEpochDatasets(obj, epochIDs)
-%   clearEpochRegistrations(obj, epochIDs)
-%   clearEpochResponses(obj, epochIDs)
-%   clearEpochStimuli(obj, epochIDs)
+%
+%   add(obj, entity)
+%   remove(obj, entityType, ID)
+%   out = search(obj, entityType, varargin)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         homeDirectory           char
-        experimentDate(1,1)     datetime
+        experimentDate (1,1)    datetime
 
-        Analyses                aod.core.Analysis = aod.core.Analysis.empty()
-        Epochs                  aod.core.Epoch
-        Sources                 aod.core.Source
-        Annotations             aod.core.Annotation
-        Calibrations            aod.core.Calibration
-        Systems                 aod.core.System
+        Analyses                aod.core.Analysis       = aod.core.Analysis.empty()
+        Epochs                  aod.core.Epoch          = aod.core.Epoch.empty()
+        Sources                 aod.core.Source         = aod.core.Source.empty()
+        Annotations             aod.core.Annotation     = aod.core.Annotation.empty()
+        Calibrations            aod.core.Calibration    = aod.core.Calibration.empty()
+        Systems                 aod.core.System         = aod.core.System.empty()
 
         Code                    
     end
@@ -98,8 +92,150 @@ classdef Experiment < aod.core.Entity
     end
 
     methods
-        function out = search(obj, entityType, varargin)
-            % SEARCH
+        function setHomeDirectory(obj, filePath)
+            % SETHOMEDIRECTORY
+            %
+            % Description:
+            %   Set a new base filepath. Useful if you are analyzing data 
+            %   on multiple computers
+            %
+            % Syntax:
+            %   setHomeDirectory(obj, filePath)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                filePath            {mustBeFolder(filePath)}
+            end
+            obj.homeDirectory = filePath;
+        end
+    end 
+
+    methods
+        function add(obj, entity)
+            % ADD 
+            %
+            % Description:
+            %   Add a new entity or entities to the experiment
+            %
+            % Syntax:
+            %   add(obj, entity)
+            %
+            % Inputs:
+            %   entity          aod.core.Entity
+            %       One or more entities of the same entity type
+            %
+            % Notes: Only entities contained by  experiment can be added:
+            %   Analysis, Epoch, Calibration, Annotation, Source, System
+            % ------------------------------------------------------------- 
+            arguments
+                obj
+                entity      {mustBeA(entity, 'aod.core.Entity')}
+            end
+
+            if ~isscalar(entity)
+                for i = 1:numel(entity)
+                    obj.add(entity(i));
+                end
+                return
+            end
+
+            import aod.core.EntityTypes
+            entityType = EntityTypes.get(entity);
+
+            switch entityType 
+                case EntityTypes.ANALYSIS
+                    entity.setParent(obj);
+                    if isempty(obj.Analyses)
+                        obj.Analyses = entity;
+                    else
+                        obj.Analyses = cat(1, obj.Analyses, entity);
+                    end
+                case EntityTypes.ANNOTATION
+                    entity.setParent(obj);
+                    if isempty(obj.Annotations)
+                        obj.Annotations = entity;
+                    else
+                        obj.Annotations = cat(1, obj.Annotations, entity);
+                    end
+                case EntityTypes.CALIBRATION
+                    entity.setParent(obj);
+                    if isempty(obj.Calibrations)
+                        obj.Calibrations = entity;
+                    else
+                        obj.Calibrations = cat(1, obj.Calibrations, entity);
+                    end
+                case EntityTypes.EPOCH
+                    obj.addEpoch(entity);
+                case EntityTypes.SYSTEM 
+                    entity.setParent(obj);
+                    if isempty(obj.Systems)
+                        obj.Systems = entity;
+                    else
+                        obj.Systems = cat(1, obj.Systems, entity);
+                    end
+                case EntityTypes.SOURCE 
+                    obj.addSource(entity);
+                otherwise
+                    error("Experiment:AddedInvalidEntity",...
+                        "Entity must be Analysis, Calibration, Annotation, Epoch, Source or System");
+            end
+        end
+
+        function remove(obj, entityType, ID)
+            % Remove specific entites or clear all entities of a given type
+            %
+            % Syntax:
+            %   remove(obj, entityType, idx)
+            %
+            % Examples:
+            %   % Remove the 2nd calibration
+            %   remove(obj, 'Calibration', 2);
+            %
+            %   % Remove all systems
+            %   remove(obj, 'System', 'all');
+            % -------------------------------------------------------------
+
+            import aod.core.EntityTypes
+            entityType = EntityTypes.init(entityType);
+
+            % Check whether to clear all entities
+            ID = convertCharsToStrings(ID);
+            if isstring(ID) && isequal(ID, "all")
+                obj.(entityType.parentContainer) = entityType.empty();
+                return
+            elseif isnumeric(ID)
+                mustBeInteger(ID);
+                ID = sort(ID, 'descend');
+                if entityType ~= EntityTypes.EPOCH
+                    mustBeInRange(ID, 1, numel(obj.(entityType.parentContainer)));
+                end
+            else
+                error('remove:InvalidId',...
+                    'ID must be "all" or integer index of entities to remove');
+            end
+
+            switch entityType
+                case EntityTypes.ANALYSIS
+                    obj.Analyses(ID) = [];
+                case EntityTypes.ANNOTATION 
+                    obj.Annotations(ID) = [];
+                case EntityTypes.CALIBRATION
+                    obj.Calibrations(ID) = [];
+                case EntityTypes.EPOCH 
+                    aod.util.mustBeEpochID(obj, ID);
+                    obj.Epochs(obj.id2index(ID)) = [];
+                case EntityTypes.SOURCE
+                    obj.Sources(ID) = [];
+                case EntityTypes.SYSTEM
+                    obj.Systems(ID) = [];
+                otherwise
+                    error('remove:NonChildEntityType',...
+                        'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
+            end
+        end
+
+        function out = search(obj, entityType, queryType, varargin)
+            % Search all entities of a specific type within experiment
             %
             % Description:
             %   Search all entities of a specific type that match the given
@@ -136,7 +272,7 @@ classdef Experiment < aod.core.Entity
                     group = obj.getAllSources();
                 case EntityTypes.SYSTEM 
                     group = obj.Systems;
-                case EntityTypes.CHANNEL;
+                case EntityTypes.CHANNEL
                     group = obj.getAllChannels();
                 case EntityTypes.Device
                     group = obj.getAllDevices();
@@ -157,103 +293,12 @@ classdef Experiment < aod.core.Entity
                 case EntityTypes.ANALYSIS
                     group = obj.Analyses;
                 case EntityTypes.EXPERIMENT
-                    % There is only one experiment
-                    out = obj;
+                    out = obj;  % There is only one experiment
                     return
             end
 
-            egObj = aod.api.EntityGroupSearch(group, varargin);
+            egObj = aod.core.EntitySearch(group, queryType, varargin{:});
             out = egObj.getMatches();
-        end
-    end
-
-    methods
-        function setHomeDirectory(obj, filePath)
-            % SETHOMEDIRECTORY
-            %
-            % Description:
-            %   Set a new base filepath. Useful if you are analyzing data 
-            %   on multiple computers
-            %
-            % Syntax:
-            %   setHomeDirectory(obj, filePath)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                filePath            {mustBeFolder(filePath)}
-            end
-            obj.homeDirectory = filePath;
-        end
-
-        function add(obj, entity)
-            % ADD 
-            %
-            % Description:
-            %   Add a new entity or entities to the experiment
-            %
-            % Syntax:
-            %   add(obj, entity)
-            %
-            % Inputs:
-            %   entity          aod.core.Entity
-            %       One or more entities of the same entity type
-            %
-            % Notes: Only entities contained by  experiment can be added:
-            %   Analysis, Epoch, Calibration, Annotation, Source, System
-            % ------------------------------------------------------------- 
-            arguments
-                obj
-                entity      {mustBeA(entity, 'aod.core.Entity')}
-            end
-
-            if ~isscalar(entity)
-                %arrayfun(@(x) add(obj, x), entity);
-                for i = 1:numel(entity)
-                    obj.add(entity(i));
-                end
-                return
-            end
-
-            import aod.core.EntityTypes
-            entityType = EntityTypes.get(entity);
-
-            switch entityType 
-                case EntityTypes.ANALYSIS
-                    entity.setParent(obj);
-                    if isempty(obj.Analyses)
-                        obj.Analyses = entity;
-                    else
-                        obj.Analyses = cat(1, obj.Analyses, entity);
-                    end
-                case EntityTypes.CALIBRATION
-                    entity.setParent(obj);
-                    if isempty(obj.Calibrations)
-                        obj.Calibrations = entity;
-                    else
-                        obj.Calibrations = cat(1, obj.Calibrations, entity);
-                    end
-                case EntityTypes.EPOCH
-                    obj.addEpoch(entity);
-                case EntityTypes.ANNOTATION
-                    entity.setParent(obj);
-                    if isempty(obj.Annotations)
-                        obj.Annotations = entity;
-                    else
-                        obj.Annotations = cat(1, obj.Annotations, entity);
-                    end
-                case EntityTypes.SYSTEM 
-                    entity.setParent(obj);
-                    if isempty(obj.Systems)
-                        obj.Systems = entity;
-                    else
-                        obj.Systems = cat(1, obj.Systems, entity);
-                    end
-                case EntityTypes.SOURCE 
-                    obj.addSource(entity);
-                otherwise
-                    error("Experiment:AddedInvalidEntity",...
-                        "Entity must be Analysis, Calibration, Annotation, Source or System");
-            end
         end
     end
 
@@ -291,160 +336,8 @@ classdef Experiment < aod.core.Entity
         end
     end
 
-    % Entity access methods
-    methods 
-        function cal = getCalibration(obj, className)
-            % GETCALIBRATION
-            %
-            % Syntax:
-            %   cal = obj.getCalibration(className)
-            % -------------------------------------------------------------
-            cal = getByClass(obj.Calibrations, className);
-        end
-
-        function annotation = getAnnotation(obj, className)
-            % GETANNOTATION
-            %
-            % Syntax:
-            %   annotation = obj.getAnnotation(className)
-            % -------------------------------------------------------------
-            annotation = getByClass(obj.Annotations, className);
-        end
-
-        function data = getResponse(obj, epochIDs, className, varargin)
-            % GETRESPONSE
-            %
-            % Description:
-            %   Get a response from specified epoch(s)
-            %
-            % Syntax:
-            %   data = getResponse(obj, epochIDs, className, varargin)
-            % -------------------------------------------------------------
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
-            addParameter(ip, 'Average', false, @islogical);
-            parse(ip, varargin{:});
-            avgFlag = ip.Results.Average;
-
-            data = [];
-            for i = 1:numel(epochIDs)
-                epoch = obj.id2epoch(epochIDs(i));
-                resp = epoch.getResponse(className, ip.Unmatched);
-                data = cat(3, data, resp.Data);
-            end
-
-            if avgFlag && ndims(data) == 3
-                data = mean(data, 3);
-            end
-        end
-
-    end
-
-    % Annotation methods
-    methods
-        function addAnnotation(obj, annotation)
-            % ADDANNOTATION
-            %
-            % Description:
-            %   Add aod.core.Annotation entity to the Experiment
-            %
-            % Syntax:
-            %   addAnnotation(obj, annotation)
-            % -------------------------------------------------------------
-            assert(isSubclass(annotation, 'aod.core.Annotation'),... 
-                'Input must be subclass of aod.core.Annotation');
-
-            annotation.setParent(obj);
-            obj.Annotations = cat(1, obj.Annotations, annotation);
-        end
-
-
-        function removeAnnotation(obj, ID)
-            % REMOVEANNOTATION
-            %
-            % Description:
-            %   Remove one or more annotations by ID 
-            %
-            % Syntax:
-            %   removeAnnotation(obj, ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Annotations),...
-                'ID %u invalid, must be between 1-%u', ID, numel(obj.Annotations));
-            obj.Annotations(ID) = [];
-        end
-
-        function clearAnnotations(obj)
-            % CLEARANNOTATIONS
-            %
-            % Description:
-            %   Clear all annotations in the experiment
-            %
-            % Syntax:
-            %   obj.clearAnnotations()
-            % -------------------------------------------------------------
-            obj.Annotations = aod.core.Annotation.empty();
-        end
-    end
-
     % Source methods
     methods
-        function addSource(obj, source)
-            % ADDSOURCE
-            %
-            % Description:
-            %   Assign source(s) to the experiment
-            %
-            % Syntax:
-            %   obj.addSource(source, overwrite)
-            %
-            % Note:
-            %   To add a new Source to an existing source, use the 
-            %   add function of the target parent aod.core.Source
-            % -------------------------------------------------------------
-            assert(isSubclass(source, 'aod.core.Source'),...
-                'Must be a subclass of aod.core.Source');
-            for i = 1:numel(source)
-                % Get the full source hierarchy
-                h = source.getParents();
-                % Set the parent of the top-level source
-                if isempty(h)
-                    source.setParent(obj);
-                    obj.Sources = cat(1, obj.Sources, source);
-                else % Source has parents
-                    % TODO: Recognize existing parents
-                    h(1).setParent(obj);
-                    obj.Sources = cat(1, obj.Sources, h(1));
-                end
-            end
-        end
-
-        function removeSource(obj, ID)
-            % REMOVESOURCE
-            %  
-            % Description:
-            %   Remove a specific source by index
-            %
-            % Syntax:
-            %   removeSource(obj, ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID <= numel(obj.Sources),...
-                'ID %u is invalid, must be between 1 and %u', ID, numel(obj.Sources));
-            obj.Sources(ID) = [];
-        end
-
-        function clearSources(obj)
-            % CLEARSOURCES
-            %
-            % Description:
-            %   Remove all sources in the experiment
-            % 
-            % Syntax:
-            %   clearSources(obj)
-            % -------------------------------------------------------------
-            obj.Sources = aod.core.Source.empty();
-        end
-        
         function sources = getAllSources(obj)
             % GETALLSOURCES
             %
@@ -459,57 +352,6 @@ classdef Experiment < aod.core.Entity
                 return
             end
             sources = obj.Sources.getAllSources();
-        end
-    end
-
-    % System methods
-    methods 
-        function system = getSystem(obj, systemName)
-            % GETSYSTEM
-            %
-            % Description:
-            %   Get a specific system by name (searches name then label)
-            %
-            % Syntax:
-            %   system = getSystem(obj, systemName)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                systemName      string
-            end
-
-            if isempty(obj.Systems)
-                system = [];
-                return 
-            end
-
-            idx = find(matches(names, systemName, "IgnoreCase", true));
-            if ~isempty(idx)
-                system = obj.Systems(idx);
-            end
-        end
-
-        function removeSystem(obj, ID)
-            % REMOVESYSTEM
-            %
-            % Description:
-            %   Remove a system from the experiment
-            %
-            % Syntax:
-            %   removeSystem(obj, ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Systems),...
-                'ID %u invalid, must be between 1-%u', ID, numel(obj.Systems));
-            obj.Systems(ID) = [];
-        end
-
-        function clearSystems(obj)
-            % CLEARSYSTEMS
-            %
-            % Syntax:
-            %   obj.clearSystems()
-            % -------------------------------------------------------------
-            obj.Systems = aod.core.System.empty();
         end
     end
 
@@ -551,30 +393,6 @@ classdef Experiment < aod.core.Entity
 
     % Epoch methods
     methods
-        function removeEpoch(obj, epochID)
-            % REMOVEEPOCH
-            %
-            % Syntax:
-            %   removeEpoch(obj, epochID)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                epochID     {aod.util.mustBeEpochID(obj, epochID)}
-            end
-            
-            idx = obj.id2index(epochID);
-            obj.Epochs(idx) = [];
-        end
-        
-        function clearEpochs(obj)
-            % CLEAREPOCHS
-            %
-            % Syntax:
-            %   obj.clearEpochs()
-            % -------------------------------------------------------------
-            obj.Epochs = aod.core.Epoch.empty();
-        end
-
         function datasets = getEpochDatasets(obj, IDs)
             % GETEPOCHDATASETS
             %
@@ -640,62 +458,7 @@ classdef Experiment < aod.core.Entity
                 registrations = vertcat(obj.Epochs(epochIdx).Registrations);
             end
         end
-    end
 
-    % Calibration methods
-    methods
-        function removeCalibration(obj, ID)
-            % REMOVECALIBRATIONS
-            %
-            % Syntax:
-            %   obj.removeCalibrations(ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID <= numel(obj.Calibrations),...
-                'ID %u is invalid, must be between 1-%u', ID, numel(obj.Calibrations));
-            obj.Calibrations(ID) = [];
-        end
-
-        function clearCalibrations(obj)
-            % CLEARCALIBRATIONS
-            %
-            % Syntax:
-            %   obj.clearCalibrations()
-            % -------------------------------------------------------------
-            obj.Calibrations = aod.core.Calibration.empty();
-        end
-    end
-
-    % Analysis methods
-    methods
-        function removeAnalysis(obj, ID)
-            % REMOVEANALYSIS
-            %
-            % Description:
-            %   Remove a system from the experiment
-            %
-            % Syntax:
-            %   removeAnalysis(obj, ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID <= numel(obj.Analyses),...
-                'ID %u invalid, must be between 1 and %u', ID, numel(obj.Analyses));
-            obj.Analyses(ID) = [];
-        end
-
-        function clearAnalyses(obj)
-            % CLEARANALYSES
-            %
-            % Description:
-            %   Clear all analyses in the experiment
-            % 
-            % Syntax:
-            %   clearAnalyses(obj)
-            % -------------------------------------------------------------
-            obj.Analyses = aod.core.Analysis.empty();
-        end
-    end
-
-    % Methods for returning or modifying entities for epoch(s)
-    methods
         function stimuli = getEpochStimuli(obj, epochIDs)
             % GETEPOCHSTIMULI
             %
@@ -709,9 +472,22 @@ classdef Experiment < aod.core.Entity
             %   epochIDs            double
             %       The IDs for 1 or more epochs (not index in Epochs)
             % -------------------------------------------------------------
-            stimuli = vertcat(obj.Epochs(epochIDs).Stimuli);
-        end
+            arguments
+                obj
+                epochIDs    {aod.util.mustBeEpochID(obj, epochIDs)} = []
+            end
 
+            if isempty(epochIDs)
+                stimuli = vertcat(obj.Epochs.Stimuli);
+            else
+                epochIdx = obj.id2index(epochIDs);
+                stimuli = vertcat(obj.Epochs(epochIdx).Stimuli);
+            end
+        end
+    end
+
+    % Methods for returning or modifying entities for epoch(s)
+    methods
         function clearEpochDatasets(obj, epochIDs)
             % CLEAREPOCHDATASETS
             %
@@ -730,7 +506,7 @@ classdef Experiment < aod.core.Entity
             end
             for i = 1:numel(epochIDs)
                 ep = obj.id2epoch(epochIDs(i));
-                ep.clearDatasets();
+                ep.remove('Dataset', 'all');
             end
         end
 
@@ -752,7 +528,7 @@ classdef Experiment < aod.core.Entity
             end
             for i = 1:numel(epochIDs)
                 ep = obj.id2epoch(epochIDs(i));
-                ep.clearResponses();
+                ep.remove('Response', 'all');
             end
         end
 
@@ -772,7 +548,7 @@ classdef Experiment < aod.core.Entity
 
             for i = 1:numel(epochIDs)
                 ep = obj.id2epoch(epochIDs(i));
-                ep.clearRegistrations();
+                ep.remove('Registration', 'all');
             end
         end
 
@@ -796,12 +572,42 @@ classdef Experiment < aod.core.Entity
 
             for i = 1:numel(epochIDs)
                 ep = obj.id2epoch(epochIDs(i));
-                ep.clearStimuli();
+                ep.remove('Stimuli', 'all');
             end
         end
     end
 
     methods (Access = protected)
+        function addSource(obj, source)
+            % ADDSOURCE
+            %
+            % Description:
+            %   Assign source(s) to the experiment
+            %
+            % Syntax:
+            %   obj.addSource(source, overwrite)
+            %
+            % Note:
+            %   To add a new Source to an existing source, use the 
+            %   add function of the target parent aod.core.Source
+            % -------------------------------------------------------------
+            assert(isSubclass(source, 'aod.core.Source'),...
+                'Must be a subclass of aod.core.Source');
+            for i = 1:numel(source)
+                % Get the full source hierarchy
+                h = source.getParents();
+                % Set the parent of the top-level source
+                if isempty(h)
+                    source.setParent(obj);
+                    obj.Sources = cat(1, obj.Sources, source);
+                else % Source has parents
+                    % TODO: Recognize existing parents
+                    h(1).setParent(obj);
+                    obj.Sources = cat(1, obj.Sources, h(1));
+                end
+            end
+        end
+
          function addEpoch(obj, epoch)
             % ADDEPOCH
             %

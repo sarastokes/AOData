@@ -12,46 +12,42 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Properties:
 %   ID                              Epoch identifier (integer)
-%   startTime                       Time when epoch began
+%   startTime                       Time when epoch began (datetime)
+%   Datasets                        Container for epoch's datasets
 %   Registrations                   Container for epoch's registrations
 %   Responses                       Container for epoch's responses
 %   Stimuli                         Container for epoch's stimuli
-%   Datasets                        Container for epoch's datasets
 %   Source                          Link to Source used during the epoch
 %   System                          Link to System used during the epoch
 %
 % Public methods:
 %   add(obj, entity)
-%   clearDatasets(obj)
-%   clearRegistrations(obj)
-%   clearResponses(obj)
-%   clearStimuli(obj)
+%   remove(obj, entityType, ID)
+%   out = search(obj, entityType, varargin)
 %
-% Notes:
-%   Inheritance from matlab.mixin.Heterogeneous allows forming arrays of 
-%   multiple Epoch subclasses
+% See Also:
+%   aod.persistent.Epoch, aod.core.Entity
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        ID(1,1)                     double
+        ID (1,1)            double          {mustBeInteger}
     end
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
-        startTime(1,1)              datetime
-        Timing                      
-        Registrations               aod.core.Registration
-        Responses                   aod.core.Response  
-        Stimuli                     aod.core.Stimulus
-        Datasets                    aod.core.Dataset
+        startTime (1,1)     datetime
+        Timing (1,:)        double      
+        Registrations       aod.core.Registration
+        Responses           aod.core.Response
+        Stimuli             aod.core.Stimulus
+        Datasets            aod.core.Dataset
     end
 
     % Entity link properties
     properties (SetAccess = protected)
-        Source                      = aod.core.Source.empty()
-        System                      = aod.core.System.empty()
-        Annotation                = aod.core.Annotation.empty()
+        Source          {mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
+        System          {mustBeEntityType(System, 'System')} = aod.core.System.empty()
     end
     
     methods 
@@ -83,6 +79,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   Dataset, Response, Registration, Stimulus
             % ------------------------------------------------------------- 
             import aod.core.EntityTypes
+
             entityType = EntityTypes.get(entity);
 
             switch entityType
@@ -103,103 +100,76 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                         "Entity must be Dataset, Registration, Response or Stimulus");
             end
         end
-    end
 
-    % Access methods
-    methods (Sealed)
-        function dset = getDataset(obj, datasetClassName)
-            % GETDATASET
-            %
-            % Syntax:
-            %   dset = getDataset(obj, datasetClassName)
-            %
-            % Inputs:
-            %   dsetClassName       char, class of dataset to retrieve
-            % Ouputs:
-            %   dset                aod.core.Dataset or subclass
-            % -------------------------------------------------------------
+        function remove(obj, entityType, ID)
+
             if ~isscalar(obj)
-                dset = [];
-                for i = 1:numel(obj)
-                    dset = cat(1, dset, obj(i).getDataset(datasetClassName));
-                end
-                return
+                arrayfun(@(x) remove(x, entityType, ID), obj);
+                return 
             end
-            dset = getByClass(obj.Datasets, char(datasetClassName));
+
+            import aod.core.EntityTypes
+
+            entityType = aod.core.EntityTypes.init(entityType);
+
+            ID = convertCharsToStrings(ID);
+            if isstring(ID) && strcmpi(ID, "all")
+                obj.(entityType.parentContainer()) = entityType.empty();
+                return
+            elseif isnumeric(ID)
+                mustBeInteger(ID);
+                mustBeInRange(ID, 1, numel(obj.(entityType.parentContainer())));
+                ID = sort(ID, "descend");
+            else
+                error('remove:InvalidID',...
+                    'ID must be "all" or integer index of entities to remove');
+            end
+
+            switch entityType 
+                case entityType.DATASET
+                    obj.Datasets(ID) = []; 
+                case entityType.REGISTRATION
+                    obj.Registrations(ID) = [];
+                case entityType.RESPONSE
+                    obj.Responses(ID) = [];
+                case entityType.STIMULUS 
+                    obj.Stimuli(ID) = [];
+                otherwise
+                    error('remove:NonChildEntity',...
+                        'Entity must be Dataset, Registration, Response or Stimulus');
+            end
         end
 
-        function reg = getRegistration(obj, regClassName)
-            % GETREGISTRATION
+        function out = search(obj, entityType, queryType, varargin)
+            % SEARCH
             %
-            % Syntax:
-            %   dset = getRegistration(obj, regClassName)
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (described below in examples)
             %
             % Inputs:
-            %   regClassName        char, class of dataset to retrieve
-            % Ouputs:
-            %   reg                 aod.core.Registration or subclass
+            %   entityType          char or aod.core.EntityTypes
             % -------------------------------------------------------------
-            if ~isscalar(obj)
-                reg = [];
-                for i = 1:numel(obj)
-                    reg = cat(1, reg, obj(i).getRegistration(regClassName));
-                end
-                return
-            end
-            reg = getByClass(obj.Registrations, char(regClassName));
-        end
+            
+            import aod.core.EntityTypes
 
-        function stim = getStimulus(obj, stimClassName)
-            % GETSTIMULUS
-            %
-            % Syntax:
-            %   stim = obj.getStimulus(stimClassName)
-            %
-            % Inputs:
-            %   stimClassName       char, class of stimulus to retrieve
-            % Ouputs:
-            %   stim                aod.core.Stimulus or subclass
-            % ----------------------------------------------------------
-            if ~isscalar(obj)
-                stim = [];
-                for i = 1:numel(obj)
-                    stim = cat(1, stim, obj(i).getStimulus(stimClassName));
-                end
-                return
+            entityType = EntityTypes.init(entityType);
+
+            switch entityType
+                case EntityTypes.DATASET 
+                    group = obj.Datasets;
+                case EntityTypes.REGISTRATION 
+                    group = obj.Registrations;
+                case EntityTypes.RESPONSE
+                    group = obj.Responses;
+                case EntityTypes.STIMULUS 
+                    group = obj.Stimuli;
+                otherwise
+                    error('search:InvalidEntityType',...
+                        'Only Dataset, Registration, Response and Stimulus can be searched from Epoch');
             end
-            stim = getByClass(obj.Stimuli, char(stimClassName));
-        end
-      
-        function resp = getResponse(obj, responseClassName, varargin)
-            % GETRESPONSE
-            %
-            % Syntax:
-            %   resp = getResponse(obj, responseClassName, varargin)
-            %   resp = getResponse(obj, responseClassName, Keep, varargin)
-            %
-            % Inputs:
-            %   responseClassName    response name to compute
-            % Optional inputs:
-            %   keep                 Add to Epoch (default = false)
-            % Additional key/value inputs are sent to response constructor
-            % -------------------------------------------------------------
-            if ~isscalar(obj)
-                resp = [];
-                for i = 1:numel(obj)
-                    resp = cat(1, resp, obj(i).getResponse(stimClassName, varargin{:}));
-                end
-                return
-            end
-            % TODO: Update
-            if isempty(obj.Parent.Annotations)
-                error('Experiment must contain Annotations');
-            end
-            resp = getByClass(obj.Responses, responseClassName);
-            if isempty(resp)
-                constructor = str2func(responseClassName);
-                resp = constructor(obj, varargin{:});
-                resp.setParent(obj);
-            end
+
+            out = aod.core.EntitySearch.go(group, queryType, varargin{:});
         end
     end
 
@@ -291,183 +261,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   clearTiming(obj)
             % -------------------------------------------------------------
             obj.Timing = [];
-        end
-    end
-
-    % Dataset methods
-    methods
-        function addDataset(obj, dataset)
-            % ADDDATASET
-            %
-            % Syntax:
-            %   obj.addDataset(dataset)
-            % -------------------------------------------------------------
-            assert(isSubclass(dataset, 'aod.core.Dataset'),...
-                'Must be a subclass of aod.core.Dataset');
-                
-            warning('addDataset:Deprecated', 'This function will be removed soon');
-            dataset.setParent(obj);
-            obj.Datasets = cat(1, obj.Datasets, dataset);
-        end
-
-        function removeDataset(obj, ID)
-            % REMOVEDATASET
-            %
-            % Syntax:
-            %   removeDataset(obj, ID)
-            %
-            % Inputs:
-            %   ID can be index or dataset name
-            % -------------------------------------------------------------
-            if istext(ID)
-                ID = find(vertcat(obj.Datasets.Name) == ID);
-                if isempty(ID)
-                    error("removeDataset:InvalidName",...
-                        "Dataset named %s not found", ID);
-                end
-            elseif isnumeric(ID)
-                assert(ID > 0 & ID <= numel(obj.Datasets),...
-                    "Invalid dataset number, only %u are present", ID);                
-            end
-            obj.Datasets(ID) = [];
-        end
-
-        function clearDatasets(obj)
-            % CLEARDATASETS
-            %
-            % Syntax:
-            %   clearDatasets(obj)
-            % -------------------------------------------------------------
-            obj.Datasets = aod.core.Dataset.empty();
-        end
-    end
-
-    % Registration methods
-    methods
-        function addRegistration(obj, reg)
-            % ADDREGISTRATION
-            %
-            % Syntax:
-            %   obj.addRegistration(reg)
-            % -------------------------------------------------------------
-            assert(isSubclass(reg, 'aod.core.Registration'),...
-                'addRegistration: input was not a subclass of aod.core.Registration');
-
-            warning('addRegistration:Deprecated', 'This function will be removed soon');
-            reg.setParent(obj);
-            obj.Registrations = cat(1, obj.Registrations, reg);
-        end
-
-        function removeRegistration(obj, ID)
-            % REMOVEREGISTRATION
-            %
-            % Description:
-            %   Remove a specific registration from the Epoch
-            %
-            % Syntax:
-            %   removeRegistration(obj, ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Registrations),...
-                'Invalid ID %u, must be between 1-%u', ID, numel(obj.Registrations));
-                
-            obj.Registrations(ID) = [];
-        end
-
-        function clearRegistrations(obj)
-            % CLEARRESPONSES
-            %
-            % Description:
-            %   Clear all registrations associated with the epoch
-            %
-            % Syntax:
-            %   obj.clearRegistrations()
-            % -------------------------------------------------------------
-            obj.Registrations = aod.core.Registration.empty();
-        end
-    end
-
-    % Response methods
-    methods
-        function addResponse(obj, resp)
-            % ADDRESPONSE
-            %
-            % Syntax:
-            %   addResponse(obj, response)
-            % -------------------------------------------------------------
-            arguments 
-                obj
-                resp(1,1)           {mustBeA(resp, 'aod.core.Response')}
-            end
-            
-            warning('addResponse:Deprecated', 'This function will be removed soon');
-            resp.setParent(obj);
-            obj.Responses = cat(1, obj.Responses, resp);
-        end
-
-        function removeResponse(obj, ID)
-            % REMOVERESPONSE
-            %
-            % Description:
-            %   Remove a specific response from the Epoch
-            %
-            % Syntax:
-            %   removeResponse(obj, ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Responses),...
-                'Invalid ID %u, must be between 1-%u', ID, numel(obj.Responses));
-                
-            obj.Responses(ID) = [];
-        end
-
-        function clearResponses(obj)
-            % CLEARRESPONSES
-            %
-            % Syntax:
-            %   obj.clearResponses()
-            % -------------------------------------------------------------
-            obj.Responses = aod.core.Response.empty();
-        end
-    end
-
-    % Stimulus methods
-    methods 
-        function addStimulus(obj, stim)
-            % ADDSTIMULUS
-            %
-            % Syntax:
-            %   obj.addStimulus(stim)
-            % -------------------------------------------------------------
-
-            assert(isSubclass(stim, 'aod.core.Stimulus'),... 
-                'stim must be subclass of aod.core.Stimulus');
-
-            warning('addStimulus:Deprecated', 'This function will be removed soon');
-            stim.setParent(obj);
-            obj.Stimuli = cat(1, obj.Stimuli, stim);
-        end
-
-        function removeStimulus(obj, ID)
-            % REMOVESTIMULUS
-            %
-            % Description:
-            %   Remove a specific stimulus from the Epoch
-            %
-            % Syntax:
-            %   removeStimulus(obj, ID)
-            % -------------------------------------------------------------
-            assert(ID > 0 & ID < numel(obj.Stimuli),...
-                'Invalid ID %u, must be between 1-%u', ID, numel(obj.Stimuli));
-
-            obj.Stimuli(ID) = [];
-        end
-
-        function clearStimuli(obj)
-            % ADDSTIMULUS
-            %
-            % Syntax:
-            %   obj.addStimulus(stim, overwrite)
-            % -------------------------------------------------------------
-            obj.Stimuli = aod.core.Stimulus.empty();
         end
     end
 

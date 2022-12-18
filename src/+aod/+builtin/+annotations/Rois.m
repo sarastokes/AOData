@@ -105,7 +105,7 @@ classdef Rois < aod.core.Annotation
                 elseif endsWith(roiFileName, 'csv')
                     obj.Reader = aod.util.readers.CsvReader(roiFileName);
                 end
-                obj.setMap(obj.Reader.read());
+                obj.setMap(obj.Reader.readFile());
             end
             obj.setMetadata();
         end

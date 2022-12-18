@@ -8,7 +8,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = aod.core.Response(name)
+%   obj = aod.core.Response(name, fileName, fileReader)
 %
 % Properties:
 %   Data 
@@ -24,12 +24,36 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = protected)
         Data                             
-        Timing                             
+        Timing (1,:)                            
+
+        fileName            string
+        fileReader          % aod.util.FileReader
+
+        Dataset             aod.core.Dataset 
     end
 
     methods
-        function obj = Response(name)
-            obj = obj@aod.core.Entity(name);
+        function obj = Response(name, fileName, reader)
+            arguments
+                name        char
+                fileName    char        = []
+                reader                  = []
+            end
+            
+            obj@aod.core.Entity(name);
+            obj.fileName = fileName;
+            obj.setFileReader(reader);
+        end
+    end
+
+    methods (Sealed)
+        function setFileReader(obj, reader)
+            if nargin == 1 || isempty(reader)
+                return
+            end
+            assert(isSubclass(reader, 'aod.util.FileReader'),...
+                'Input must be a subclass of aod.util.FileReader');
+            obj.fileReader = reader;
         end
     end
 
@@ -49,6 +73,8 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   addTiming(obj, timing)
             % -------------------------------------------------------------
+            assert(isnumeric(timing) || isduration(timing),...
+                'Timing must be numeric or duration');
             obj.Timing = timing;
         end
 
