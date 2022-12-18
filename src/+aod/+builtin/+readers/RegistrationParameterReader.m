@@ -12,6 +12,8 @@ classdef RegistrationParameterReader < aod.util.readers.TxtReader
 %
 % See also:
 %   aod.builtin.registrations.StripRegistration
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -26,8 +28,19 @@ classdef RegistrationParameterReader < aod.util.readers.TxtReader
             obj.extractDate();
         end
 
-        function out = read(obj)
+        function extractDate(obj)
+            % EXTRACTDATE
+            %
+            %   Assumes there are two dates in file name and second is the
+            %   date the file was registered
+            % -------------------------------------------------------------
+            matches = extract(obj.Name, digitsPattern(8));
+            if numel(matches) == 2
+                obj.registrationDate = matches{2};
+            end
+        end
 
+        function out = readFile(obj)
             out = struct();
             out.FilteringOption = obj.readText('Filtering option:');
             out.System = obj.readText('Algorithm runs on:');
@@ -57,18 +70,6 @@ classdef RegistrationParameterReader < aod.util.readers.TxtReader
             out.Rotate90Degrees = obj.readYesNo('Run video rotating 90 degrees:');
             out.Desinusoid = obj.readYesNo('Run video with desinusoiding:');
             obj.Data = out;
-        end
-
-        function extractDate(obj)
-            % EXTRACTDATE
-            %
-            %   Assumes there are two dates in file name and second is the
-            %   date the file was registered
-            % -------------------------------------------------------------
-            matches = extract(obj.Name, digitsPattern(8));
-            if numel(matches) == 2
-                obj.registrationDate = matches{2};
-            end
         end
     end
 

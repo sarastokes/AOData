@@ -68,7 +68,7 @@ classdef StripRegistration < aod.core.Registration
             else
                 reader = aod.builtin.readers.RegistrationReportReader.init(fPath, ID);
             end
-            S = reader.read();
+            S = reader.readFile();
 
             [S, hasFrame] = extractField(S, 'hasFrame');
             obj.setParam('Frame', hasFrame);
@@ -89,7 +89,7 @@ classdef StripRegistration < aod.core.Registration
             else
                 reader = aod.builtin.readers.RegistrationParameterReader.init(fPath, ID);
             end
-            obj.setParam(reader.read());
+            obj.setParam(reader.readFile());
             obj.setFile('RegistrationParameters', reader.fullFile);
         end
     end

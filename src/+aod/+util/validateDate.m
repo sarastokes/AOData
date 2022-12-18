@@ -1,13 +1,26 @@
 function out = validateDate(dateIn)
-    % VALIDATEDATE
-    %
-    % Description:
-    %   Determines whether input is datetime and if not, converts using
-    %   yyyyMMdd format.
-    %
-    % Syntax:
-    %   out = validateDate(dateIn)
-    % ---------------------------------------------------------------------
+% Validate YMD date
+%
+% Description:
+%   Determines whether input is datetime and if not, converts using
+%   yyyyMMdd format.
+%
+% Syntax:
+%   out = aod.util.validateDate(dateIn)
+%
+% Inputs:
+%   dateIn          datetime or char in yyyyMMdd format
+%
+% Outputs:
+%   out             datetime 
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
+
+    if isempty(dateIn)
+        out = dateIn;
+        return
+    end
 
     if isdatetime(dateIn)
         out = dateIn;

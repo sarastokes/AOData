@@ -1,14 +1,22 @@
 classdef AONodeTypes 
-% AONODETYPES
+% Node types in AODataViewer Tree
 %
 % Description:
 %   Enumerated type for uitreenodes representing specific AOData components
 %
 % Methods:
-%   out = getIconPath(obj)
+%   out = aod.app.AONodeTypes.getIconPath(obj)
+%       Gets the node-specific icon type
 %
 % Static methods:
-%   obj = get(txt)
+%   obj = aod.app.AONodeTypes.get(data, datasetName)
+%       Matches AOData system names if dataset name is provided, then 
+%       passes the data to init()
+%   obj = aod.app.AONodeTypes.init(nodeName);
+%       Returns the node type given the text name which can often be 
+%       extracted from the data with class()
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration
@@ -33,9 +41,11 @@ classdef AONodeTypes
         ENUM 
         TRANSFORM
 
-        % System types
+        % Specific AOData types
         FILES
         NOTES
+        NAME
+        CODE
     end
 
     properties (Hidden, Constant)
@@ -110,10 +120,6 @@ classdef AONodeTypes
                     out = 'chain.png';
                 case AONodeTypes.TEXT 
                     out = 'text.png';
-                case AONodeTypes.FILES 
-                    out = 'filecabinet.png';
-                case AONodeTypes.NOTES
-                    out = 'notepad.png';
                 case AONodeTypes.DATETIME 
                     out = 'time.png';
                 case {AONodeTypes.TABLE, AONodeTypes.TIMETABLE}
@@ -122,6 +128,12 @@ classdef AONodeTypes
                     out = 'structure.png';
                 case AONodeTypes.ENUM
                     out = 'list.png';
+                case AONodeTypes.FILES 
+                    out = 'filecabinet.png';
+                case AONodeTypes.NOTES
+                    out = 'notepad.png';
+                case AONodeTypes.NAME 
+                    out = 'card.png';
                 otherwise
                     out = 'data.png';
             end
@@ -130,9 +142,23 @@ classdef AONodeTypes
     end
 
     methods (Static)
-        function obj = getFromData(data)
+        function obj = get(data, name)
+            
             import aod.app.AONodeTypes
 
+            % First try dataset name, if provided
+            if nargin > 1
+                switch lower(name) 
+                    case 'name'
+                        obj = AONodeTypes.NAME;
+                    case 'files'
+                        obj = AONodeTypes.FILES;
+                    case 'notes'
+                        obj = AONodeTypes.NOTES;
+                end
+            end
+
+            % Then try data type
             if isenum(data)
                 obj = AONodeTypes.ENUM;
             else

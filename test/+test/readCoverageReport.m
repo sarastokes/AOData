@@ -1,4 +1,4 @@
-function out = readCoverageReport(coverageFolder)
+function [summaryTable, detailTable] = readCoverageReport(coverageFolder)
 % Reads the summary table from coverage report 
 %
 % Description:
@@ -32,7 +32,23 @@ function out = readCoverageReport(coverageFolder)
     missedLines = cellfun(@str2double, extractBetween(tline, '"Missed":', ','));
     pctCoverage = cellfun(@str2double, extractBetween(tline, '"PercentCoverage":', '}'));
 
-    out = table(totalLines, executedLines, missedLines, pctCoverage, ...
+    % Extract out file-specific info
+    allNames = string(uncell(extractBetween(tline, '"FileNameArray":[', ']')));
+    allNames = erase(allNames, '"');
+    eachName = strsplit(allNames, ',');
+
+    executable = extractBetween(tline, 'ExecutableArray":[', ']');
+    allStatement = cellfun(@str2double, extract(executable{1}, digitsPattern));
+    allFunction = cellfun(@str2double, extract(executable{2}, digitsPattern));
+
+    executed = extractBetween(tline, 'ExecutedArray":[', ']');
+    execStatement = cellfun(@str2double, extract(executed{1}, digitsPattern));
+    execFunction = cellfun(@str2double, extract(executed{2}, digitsPattern));
+
+    detailTable = table(eachName', execStatement, allStatement, execFunction, allFunction,...
+        'VariableNames', {'Name', 'StatementExec', 'StatementAll', 'FunctionExec', 'FunctionAll'});
+
+    summaryTable = table(totalLines, executedLines, missedLines, pctCoverage, ...
         'RowNames', {'Statement', 'Function'},...
         'VariableNames', {'Total', 'Executed', 'Missed', 'PercentCoverage'});
 

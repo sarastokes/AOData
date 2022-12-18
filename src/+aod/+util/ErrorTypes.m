@@ -1,8 +1,10 @@
 classdef ErrorTypes 
-% ERRORTYPES
+% Methods for specifying error handling in AOData
 %
 % Description:
 %   Enumerated type standardizing error handling
+%
+% TODO: Improve or remove
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 classdef (Abstract) TxtReader < aod.util.FileReader
-% TEXTREADER (abstract)
+% Text file reader (abstract)
 %
 % Description:
 %   Superclass for text reader classes with useful methods for robust code
@@ -8,7 +8,7 @@ classdef (Abstract) TxtReader < aod.util.FileReader
 %   obj = aod.util.FileReader
 %
 % Constructor:
-%   obj = TxtReader(varargin)
+%   obj = aod.util.readers.TxtReader(varargin)
 %
 % Protected methods:
 %   out = readText(obj, header)
@@ -33,12 +33,13 @@ classdef (Abstract) TxtReader < aod.util.FileReader
 %   the code will be robust to small changes in the data file (e.g. adding 
 %   a field) and only small changes will be necessary for the removal or 
 %   change of a field (remove the line from the code or change the header)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = TxtReader(varargin)
-            obj = obj@aod.util.FileReader(varargin{:});
-            obj.validExtensions = '*.txt';
+        function obj = TxtReader(fileName)
+            obj = obj@aod.util.FileReader(fileName);
         end
     end
 

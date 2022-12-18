@@ -1,5 +1,5 @@
 classdef TiffReader < aod.util.FileReader
-% TIFFREADER
+% Reads .tiff files
 %
 % Description:
 %   Reads in TIFF files
@@ -8,30 +8,36 @@ classdef TiffReader < aod.util.FileReader
 %   aod.util.FileReader
 %
 % Constructor:
-%   obj = TiffReader(fName)
+%   obj = aod.util.readers.TiffReader(fName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     methods
         function obj = TiffReader(varargin)
-            obj = obj@aod.util.FileReader(varargin{:});
-            obj.validExtensions = {'*.tif', '*.tiff'};
+            obj = obj@aod.util.FileReader(fileName);
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             obj.Data = obj.loadTiff(obj.fullFile);
-            out = obj.Data;
+            
+            imInfo = imfinfo(fileName);
+            dType = sprintf('uint%u', imInfo(1).BitDepth);
+            nFrames = size(imfinfo(fileName));
+            
+            out = zeros(imInfo(1).Height, imInfo(1).Width, dType);
+        
+            for i = 1:nFrames
+                out(:,:,i) = imread(fileName, 'Index', i);
+            end
+            obj.Data = out;
         end
     end
 
     methods (Static)
-        function ts = loadTiff(fileName)
-            imInfo = imfinfo(fileName);
-            nFrames = size(imfinfo(fileName));
-            
-            ts = zeros(imInfo(1).Height, imInfo(1).Width, 'uint8');
-        
-            for i = 1:nFrames
-                ts(:,:,i) = imread(fileName, 'Index', i);
-            end
+        function out = read(varargin)
+            obj = aod.util.readers.TiffReader(varargin{:});
+            out = obj.readFile();
         end
     end
 end

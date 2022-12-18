@@ -1,23 +1,26 @@
 classdef MatReader < aod.util.FileReader
-% MATREADER
+% Read a .mat file
 %
 % Description:
-%   Reads in a .mat file
+%   Reads in a .mat file. If it contains one variable, that will be 
+%   returned. Multiple variables within a .mat file will be returned as 
+%   a struct.
 %
 % Parent:
 %   aod.util.FileReader
 %
 % Syntax:
-%   obj = MatReader(fName)
-%   obj = MatReader(varargin)
+%   obj = aod.util.readers.MatReader(fName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     methods
-        function obj = MatReader(varargin)
-            obj = obj@aod.util.FileReader(varargin{:});
-            obj.validExtensions = '*.mat';
+        function obj = MatReader(fileName)
+            obj = obj@aod.util.FileReader(fileName);
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             S = load(obj.fullFile);
             f = fieldnames(S);
             if numel(f) == 1
@@ -26,6 +29,13 @@ classdef MatReader < aod.util.FileReader
                 obj.Data = f;
             end
             out = obj.Data;
+        end
+    end
+
+    methods (Static)
+        function out = read(varargin)
+            obj = aod.util.readers.MatReader(varargin{:});
+            out = obj.readFile();
         end
     end
 end

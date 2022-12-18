@@ -9,15 +9,15 @@ classdef SpectralPhysiologyParameterReader < sara.readers.EpochParameterReader
 %
 % Constructor:
 %   obj = SpectralPhysiologyParameterReader(fileName)
-%   obj = SpectralPhysiologyParameterReader(filePath, ID)
+%   obj = SpectralPhysiologyParameterReader.init(filePath, ID)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = SpectralPhysiologyParameterReader(varargin)
-            obj@sara.readers.EpochParameterReader(varargin{:});
+        function obj = SpectralPhysiologyParameterReader(fileName)
+            obj@sara.readers.EpochParameterReader(fileName);
         end
 
-        function ep = read(obj, ep)
+        function ep = readFile(obj, ep)
             ep = read@sara.readers.EpochParameterReader(obj, ep);
 
             % If it's spectral physiology, then we know AOM1 was Mustang
@@ -40,5 +40,12 @@ classdef SpectralPhysiologyParameterReader < sara.readers.EpochParameterReader
             ep.setFile('LUT2', obj.readText('LUT2 = '));
             ep.setFile('LUT3', obj.readText('LUT3 = '));
         end
+    end
+
+    methods (Static)
+        function obj = init(filePath, ID)
+            fileName = obj.getFileName(filePath, ID);
+            obj = sara.readers.SpectralPhysiologyParameterReader(fileName);
+        end 
     end
 end

@@ -8,14 +8,14 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 %   containers.Map, matlab.mixin.CustomDisplay
 %
 % Constructor:
-%   obj = aod.core.Parameters(keySet, valueSet)
+%   obj = aod.util.Parameters(keySet, valueSet)
 %
 % Methods:
 %   out = toMap(obj)
 %       Convert back to containers.Map
 % All other methods and properties are identical to containers.Map
 %
-% See also:
+% See Also:
 %   containers.Map
 
 % By Sara Patterson, 2022 (AOData)

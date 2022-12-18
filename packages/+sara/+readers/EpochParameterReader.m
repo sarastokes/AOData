@@ -9,6 +9,10 @@ classdef EpochParameterReader < aod.util.readers.TxtReader
 %
 % Syntax:
 %   obj = EpochParameterReader(fileName)
+%
+% Notes:
+%   readFile() requires an Epoch as an input - parameters will be directly
+%   assigned to the epoch to reduce complexity of passing them back
 % -------------------------------------------------------------------------
 
     methods
@@ -16,32 +20,7 @@ classdef EpochParameterReader < aod.util.readers.TxtReader
             obj@aod.util.readers.TxtReader(varargin{:});
         end
 
-        function getFileName(obj, varargin)
-            if nargin == 3
-                filePath = varargin{1};
-                ID = varargin{2};
-            end
-
-            files = ls(filePath);
-            files = deblank(string(files));
-            files = files(contains(files, '.txt'));
-            [~, idx] = extractMatches(files,... 
-                digitBoundary + int2fixedwidthstr(ID, 4) + digitBoundary);
-
-            obj.Path = filePath;
-            if numel(idx) > 1
-                files = files(idx);
-                % Choose the shortest
-                [~, minIdx] = min(strlength(files));
-                obj.Name = char(files(minIdx));
-            elseif isempty(idx)
-                error('File for ID %u not found in %s!', ID, filePath);
-            else
-                obj.Name = char(files(idx));
-            end
-        end
-
-        function ep = read(obj, ep)
+        function ep = readFile(obj, ep)
             txt = obj.readText('Date/Time = ');
             txt = erase(txt, ' (yyyy-mm-dd:hh:mm:ss)');
             ep.setStartTime(datetime(txt, 'InputFormat', 'yyyy-MM-dd HH:mm:ss'));
@@ -74,6 +53,33 @@ classdef EpochParameterReader < aod.util.readers.TxtReader
             ep.setParam('AOM1', obj.readNumber('AOM_VALUE1 = '));
             ep.setParam('AOM2', obj.readNumber('AOM_VALUE2 = '));
             ep.setParam('AOM3', obj.readNumber('AOM_VALUE3 = '));
+        end
+    end
+
+    methods (Static)
+        function obj = init(filePath, ID)
+            fileName = obj.getFileName(filePath, ID);
+            obj = sara.readers.EpochParameterReader(fileName);
+        end 
+
+        function fileName = getFileName(filePath, ID)
+            files = ls(filePath);
+            files = deblank(string(files));
+            files = files(contains(files, '.txt'));
+            [~, idx] = extractMatches(files,... 
+                digitBoundary + int2fixedwidthstr(ID, 4) + digitBoundary);
+
+            if numel(idx) > 1
+                files = files(idx);
+                % Choose the shortest
+                [~, minIdx] = min(strlength(files));
+                fileName = char(files(minIdx));
+            elseif isempty(idx)
+                error('File for ID %u not found in %s!', ID, filePath);
+            else
+                fileName = char(files(idx));
+            end
+            fileName = fullfile(filePath, fileName);
         end
     end
 end

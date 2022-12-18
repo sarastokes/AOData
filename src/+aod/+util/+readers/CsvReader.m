@@ -8,18 +8,26 @@ classdef CsvReader < aod.util.FileReader
 %   aod.util.FileReader
 %
 % Constructor:
-%   obj = CsvReader(fName)
-%   obj = CsvReader(varargin)
+%   obj = aod.util.readers.CsvReader(fName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     methods
-        function obj = CsvReader(varargin)
-            obj = obj@aod.util.FileReader(varargin{:});
-            obj.validExtensions = '*.csv';
+        function obj = CsvReader(fileName)
+            obj = obj@aod.util.FileReader(fileName);
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             out = csvread(obj.fullFile); %#ok<CSVRD> 
             obj.Data = out;
+        end
+    end
+
+    methods (Static)
+        function out = read(fileName)
+            obj = aod.util.readers.CsvReader(fileName);
+            out = obj.readFile();
         end
     end
 end

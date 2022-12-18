@@ -6,7 +6,7 @@ classdef ImageJRoiReader < aod.util.FileReader
 %   polygon ROI processing
 %
 % Syntax:
-%   obj = ImageJRoiReader(fullFilePath, imSize)
+%   obj = aod.builtin.readers.ImageJRoiReader(fullFilePath, imSize)
 %
 % Inputs:
 %   filePath    char
@@ -16,28 +16,21 @@ classdef ImageJRoiReader < aod.util.FileReader
 %
 % See also:
 %   roiImportImageJ, ReadImageJROI, ROIs2Regions, poly2mask
-%
-% History:
-%   06Nov2020 - SSP
-%   07Apr2020 - SSP - Added support for Polygon ROIs
-%   28Sep2021 - SSP - Added numRois output
-%   19May2022 - SSP - Redesigned as FileReader
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (SetAccess = private)
-        Size(1,2) {mustBeInteger}
+        Size (1,2)          {mustBeInteger}
     end
 
     methods
-        function obj = ImageJRoiReader(fullFilePath, imSize)
-            obj@aod.util.FileReader(fullFilePath);
+        function obj = ImageJRoiReader(fileName, imSize)
+            obj@aod.util.FileReader(fileName);
             obj.Size = imSize;
         end
 
-        function getFileName(~, varargin)
-            error('Not yet implemented');
-        end
-
-        function out = read(obj)
+        function out = readFile(obj)
             sROI = ReadImageJROI(obj.fullFile);
 
             if strcmp(sROI{1}.strType, 'Polygon')
@@ -58,6 +51,13 @@ classdef ImageJRoiReader < aod.util.FileReader
                 obj.Data = labelmatrix(regions)';
             end
             out = obj.Data;
+        end
+    end
+
+    methods (Static)
+        function out = read(fileName, imSize)
+            obj = aod.builtin.readers.ImageJRoiReader(fileName, imSize);
+            out = obj.readFile();
         end
     end
 end

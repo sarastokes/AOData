@@ -101,7 +101,7 @@ classdef Experiment < aod.core.Experiment
                     tforms = fullfile(obj.getAnalysisFolder(), tforms);
                 end
                 TR = sara.readers.RigidTransformReader(tforms);
-                tforms = TR.read();
+                tforms = TR.readFile();
                 if ~isempty(whichTforms)
                     tforms = tforms(:, :, whichTforms);
                 end

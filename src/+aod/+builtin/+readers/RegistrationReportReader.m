@@ -12,10 +12,8 @@ classdef RegistrationReportReader < aod.util.FileReader
 %
 % Static instantiation:
 %   obj = RegistrationReportReader.init(folderPath, ID)
-%
-% History:
-%   09Mar2022 - SSP - from ao.core.Dataset/checkRegistrationReports
-%   24Aug2022 - SSP - removed dependency on folder being called "Ref"
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods
@@ -23,7 +21,7 @@ classdef RegistrationReportReader < aod.util.FileReader
             obj@aod.util.FileReader(fileName);
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             obj.Data = struct();
 
             opts = delimitedTextImportOptions();
@@ -68,6 +66,11 @@ classdef RegistrationReportReader < aod.util.FileReader
     end
 
     methods (Static)
+        function out = read(fileName)
+            obj = aod.builtin.readers.RegistrationReportReader(fileName);
+            out = obj.readFile();
+        end
+
         function obj = init(folderPath, ID)
             % CREATEBYID
             %

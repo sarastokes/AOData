@@ -9,7 +9,7 @@ classdef SpatialFrameTableReader < aod.util.FileReader
             obj = obj@aod.util.FileReader(fName);
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
             T = readtable(obj.fullFile);
             if isempty(T)

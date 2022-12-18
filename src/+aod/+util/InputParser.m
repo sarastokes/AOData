@@ -1,12 +1,12 @@
 function ip = InputParser()
-% INPUTPARSER
+% Wraps inputParser with important settings for AOData
 %
 % Description:
 %   A wrapper for the builtin inputParser class that simplify setting
 %   3 defaults that would otherwise need to be retyped with every class
 %
 % Syntax:
-%   ip = inputParser()
+%   ip = aod.util.InputParser()
 %
 % Notes:
 %   Why these three defaults?

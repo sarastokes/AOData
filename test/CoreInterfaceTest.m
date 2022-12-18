@@ -104,7 +104,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 1);
 
             % Add a second calibration with an empty date
-            cal2 = aod.core.Calibration('PowerMeasurement2', []);
+            cal2 = aod.builtin.calibrations.PowerMeasurement('Mustang', []);
+            cal2.addMeasurement(22, 100);
             testCase.EXPT.add(cal2);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
 
@@ -116,10 +117,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Indexing
             testCase.verifyEqual(cal2.UUID, testCase.EXPT.Calibrations(2).UUID);
-
-            % Access calibrations
-            calOut = testCase.EXPT.getCalibration('aod.core.Calibration');
-            testCase.verifyEqual(numel(calOut), 2);
 
             % Remove a calibration date
             testCase.EXPT.Calibrations(1).setCalibrationDate();

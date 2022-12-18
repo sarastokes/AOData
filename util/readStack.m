@@ -1,9 +1,11 @@
 function imStack = readStack(videoName)
-    % READSTACK
-    %
-    % Syntax:
-    %   imStack = readStack(videoName)
-    % -------------------------------------------------------------
+% READSTACK
+%
+% Syntax:
+%   imStack = readStack(videoName)
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
     [~, ~, extension] = fileparts(videoName);
     switch extension
         case {'.tif', '.tiff'}
@@ -13,5 +15,5 @@ function imStack = readStack(videoName)
         otherwise
             error('Unrecognized file extension!');
     end
-    imStack = reader.read();
+    imStack = reader.readFile();
     fprintf('Loaded %s\n', videoName);

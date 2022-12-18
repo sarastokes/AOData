@@ -19,12 +19,9 @@ classdef LedFrameTableReader < aod.util.FileReader
     methods
         function obj = LedFrameTableReader(fName)
             obj = obj@aod.util.FileReader(fName);
-
-            obj.read();
         end
 
-        function out = read(obj)  
-            
+        function out = readFile(obj)  
             warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
             T = readtable(obj.fullFile);
             T.Properties.VariableNames = {'Frame', 'TimeInterval', 'TimeStamp', 'R', 'G', 'B'};
@@ -64,6 +61,13 @@ classdef LedFrameTableReader < aod.util.FileReader
             out = TT;
 
             obj.frameRate = 1000/mean(T.TimeInterval);
+        end
+    end
+
+    methods (Static)
+        function out = read(fName)
+            obj = sara.readers.LedFrameTableReader(fName);
+            out = obj.readFile();
         end
     end
 end

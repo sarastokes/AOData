@@ -1,14 +1,15 @@
-classdef EntityGroupSearch < handle
-% ENTITYGROUPQUERY
+classdef EntitySearch < handle
+% Search entities in an experiment (core interface)
 %
 % Description:
-%   Simulation of AOQuery for core interface
+%   Simulation of AOQuery for core interface. Enables searching entities 
+%   of a specifc type with the queries listed below.
 %
 % Queries:
 %   Parameter, Dataset, File, Name, Class, Subclass
 %
 % Constructor:
-%   obj = EntityGroupSearch(entityGroup, queryType, varargin)
+%   obj = aod.core.EntitySearch(entityGroup, queryType, varargin)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -24,7 +25,7 @@ classdef EntityGroupSearch < handle
     end
 
     methods
-        function obj = EntityGroupSearch(entityGroup, queryType, varargin)
+        function obj = EntitySearch(entityGroup, queryType, varargin)
             assert(isSubclass(entityGroup, 'aod.core.Entity'),...
                 'entityGroup must be a subclass of aod.core.Entity');
             obj.Group = entityGroup;
@@ -32,8 +33,10 @@ classdef EntityGroupSearch < handle
             % TODO: Repeating queries?
 
             queryType = appbox.capitalize(string(queryType));
-            assert(ismember(lower(queryType), lower(obj.QUERY_TYPES)),...
+            if ~ismember(lower(queryType), lower(obj.QUERY_TYPES))
+                error('EntitySearch:InvalidQuery',...
                 'queryType must be: Class, Subclass, Name, Dataset, Parameter');
+            end
             obj.queryType = queryType;
 
             % Index for specifying groups that match query
@@ -57,6 +60,28 @@ classdef EntityGroupSearch < handle
 
             for i = 1:numel(obj.Group)
                 obj.filterIdx(i) = strcmp(class(obj.Group(i)), className);
+            end
+        end
+
+        function nameQuery(obj, nameSpec)
+            arguments
+                obj
+                nameSpec
+            end
+
+            if isa(nameSpec, 'function_handle')
+                for i = 1:numel(obj.Group)
+                    if nameSpec(obj.Group(i).Name)
+                        obj.filterIdx(i) = true;
+                    end
+                end
+            else
+                nameSpec = convertStringsToChars(nameSpec);
+                for i = 1:numel(obj.Group)
+                    if strcmp(obj.Group(i).Name, nameSpec)
+                        obj.filterIdx(i) = true;
+                    end
+                end
             end
         end
 
@@ -217,8 +242,8 @@ classdef EntityGroupSearch < handle
                 case 'subclass'
                     obj.subclassQuery(varargin{1});
                 case 'name'
-                    obj.nameQuery(varargin{:});
-                case {'dataset', 'dset'}
+                    obj.nameQuery(varargin{1});
+                case {'dataset', 'property'}
                     obj.datasetQuery(varargin{:});
                 case {'parameter', 'param'}
                     obj.parameterQuery(varargin{:})
@@ -237,7 +262,7 @@ classdef EntityGroupSearch < handle
 
     methods (Static)
         function out = go(entityGroup, queryType, varargin)
-            obj = aod.api.EntityGroupSearch(entityGroup, queryType, varargin{:});
+            obj = aod.core.EntitySearch(entityGroup, queryType, varargin{:});
             out = obj.getMatches();
         end
     end

@@ -25,19 +25,16 @@ classdef SimilarityTransformReader < aod.util.FileReader
     end
 
     methods
-        function obj = SimilarityTransformReader(varargin)
-            obj = obj@aod.util.FileReader(varargin{:});
-            obj.read();
+        function obj = SimilarityTransformReader(fName)
+            obj = obj@aod.util.FileReader(fName);
+
+            obj.readFile()
         end
     end
 
     % Overloaded methods from aod.util.FileReader
     methods 
-        function getFileName(~, ~)
-            error('SimilarityTransformReader only accepts full file paths');
-        end
-
-        function out = read(obj)
+        function out = readFile(obj)
             % READ
             %
             % Syntax:
@@ -58,4 +55,12 @@ classdef SimilarityTransformReader < aod.util.FileReader
             out = S;
         end
     end
+
+    methods (Static)
+        function out = read(fName)
+            obj = sara.readers.SimilarityTransformReader(fName);
+            out = obj.Data;
+        end
+    end
+
 end 

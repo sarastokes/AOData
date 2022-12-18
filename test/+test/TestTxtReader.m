@@ -5,10 +5,10 @@ classdef TestTxtReader < aod.util.readers.TxtReader
             obj = obj@aod.util.readers.TxtReader(varargin{:});
 
             % Read now rather than waiting for end-user to call read()
-            obj.read();
+            obj.readFile();
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             obj.Data = struct();
             obj.Data.PMTGain = obj.readNumber('PMTGain =');
             obj.Data.FieldOfView = obj.readNumber('FieldOfView =');

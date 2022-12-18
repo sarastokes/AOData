@@ -140,13 +140,13 @@ classdef ExperimentPresenter < appbox.Presenter
                 nodeData = struct(...
                     'H5Node', aod.app.H5NodeTypes.DATASET,...
                     'EntityPath', parentNode.Tag,...
-                    'AONode', aod.app.AONodeTypes.getFromData(entity.(dsetNames(i))),...
+                    'AONode', aod.app.AONodeTypes.get(entity.(dsetNames(i)), dsetNames(i)),...
                     'Attributes', obj.attributes2map(info.Attributes));
-                if dsetNames(i) == "files"
-                    nodeData.AONode = aod.app.AONodeTypes.FILES;
-                elseif dsetNames(i) == "notes"
-                    nodeData.AONode = aod.app.AONodeTypes.NOTES;
-                end
+                %if dsetNames(i) == "files"
+                %    nodeData.AONode = aod.app.AONodeTypes.FILES;
+                %elseif dsetNames(i) == "notes"
+                %    nodeData.AONode = aod.app.AONodeTypes.NOTES;
+                %end
                 g = obj.view.makeDatasetNode(parentNode, dsetNames(i),...
                     dsetPath, nodeData);
             end

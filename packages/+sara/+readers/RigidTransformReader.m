@@ -23,11 +23,7 @@ classdef RigidTransformReader < aod.util.FileReader
         function obj = RigidTransformReader(varargin)
             obj@aod.util.FileReader(varargin{:});
         end
-
-        function getFileName(~, ~)
-            error('RigidTransformReader only accepts full file paths')
-        end
-
+        
         function tform = getTransform(obj, ID)
             if isempty(obj.Data)
                 error('Read file first!');

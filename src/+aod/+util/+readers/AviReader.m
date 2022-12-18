@@ -1,5 +1,5 @@
 classdef AviReader < aod.util.FileReader
-% AVIREADER
+% Read an AVI file
 %
 % Description:
 %   Reads in AVI files
@@ -8,19 +8,27 @@ classdef AviReader < aod.util.FileReader
 %   aod.util.FileReader
 %
 % Constructor:
-%   obj = AviReader(fName)
-%   obj = AviReader(varargin)
+%   obj = aod.util.readers.AviReader(fName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+
     methods
-        function obj = AviReader(varargin)
-            obj = obj@aod.util.FileReader(varargin{:});
-            obj.validExtensions = '*.avi';
+        function obj = AviReader(fileName)
+            obj = obj@aod.util.FileReader(fileName);
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             obj.Data = video2stack(obj.fullFile);
             out = obj.Data;
+        end
+    end
+
+    methods (Static)
+        function out = read(varargin)
+            obj = aod.util.readers.AviReader(varargin{:});
+            out = obj.readFile();
         end
     end
 end

@@ -31,13 +31,13 @@ classdef EpochFactory < aod.util.Factory
                     reader = aod.builtin.readers.FrameTableReader(...
                         ep.getExptFile('FrameTable'));
                 end
-                ep.setTiming(reader.read());
+                ep.setTiming(reader.readFile());
             end
 
             % Add imaging parameters, if necessary
             if ep.hasFile('ImagingParams')
                 reader = sara.readers.EpochParameterReader(ep.getExptFile('ImagingParams'));
-                ep = reader.read(ep);
+                ep = reader.readFile(ep);
             end
             
             % Add stimuli defined in epoch parameters

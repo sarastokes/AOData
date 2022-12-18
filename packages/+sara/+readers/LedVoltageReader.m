@@ -8,7 +8,7 @@ classdef LedVoltageReader < aod.util.FileReader
 %   aod.util.FileReader
 %
 % Constructor:
-%   obj = LedVoltageReader(fName)
+%   obj = sara.readers.LedVoltageReader(fName)
 % -------------------------------------------------------------------------
 
     methods
@@ -16,12 +16,11 @@ classdef LedVoltageReader < aod.util.FileReader
             obj = obj@aod.util.FileReader(fName);
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             J = loadjson(obj.fullFile);
             dataTable = J.datatable;
             lines = strsplit(dataTable, newline);
-        
-        
+          
             frameNumber = []; ID = []; voltage1 = []; voltage2 = []; voltage3 = [];
             timestamp = []; 
         
@@ -46,6 +45,13 @@ classdef LedVoltageReader < aod.util.FileReader
             TT{end, 'Frame'} = TT{end-1, 'Frame'};
             obj.Data = TT;
             out = obj.Data;
+        end
+    end
+
+    methods (Static)
+        function out = get(fileName)
+            obj = sara.readers.LedVoltageReader(fileName);
+            out = obj.readFile();
         end
     end
 end

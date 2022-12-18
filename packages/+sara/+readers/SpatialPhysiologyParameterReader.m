@@ -17,7 +17,7 @@ classdef SpatialPhysiologyParameterReader < sara.readers.EpochParameterReader
             obj@sara.readers.EpochParameterReader(varargin{:});
         end
 
-        function ep = read(obj, ep)
+        function ep = readFile(obj, ep)
             ep = read@sara.readers.EpochParameterReader(obj, ep);
 
             % If it's spectral physiology, then we know AOM1 was Mustang
@@ -36,5 +36,12 @@ classdef SpatialPhysiologyParameterReader < sara.readers.EpochParameterReader
             % Power modulation 
             ep.setParam('PowerModulation', obj.readYesNo('Stimulus power modulation = '));
         end
+    end
+
+    methods 
+        function obj = init(filePath, ID)
+            fileName = obj.getFileName(filePath, ID);
+            obj = sara.readers.SpatialPhysiologyParameterReader(fileName);
+        end 
     end
 end

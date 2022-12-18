@@ -9,7 +9,10 @@ classdef FrameTableReader < aod.util.FileReader
 %
 % Constructor:
 %   obj = FrameTableReader(fName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (SetAccess = protected)
         frameRate 
     end
@@ -17,9 +20,10 @@ classdef FrameTableReader < aod.util.FileReader
     methods
         function obj = FrameTableReader(fName)
             obj = obj@aod.util.FileReader(fName);
+            obj.readFile();
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             warning('off', 'MATLAB:table:ModifiedAndSavedVarnames');
             T = readtable(obj.fullFile);
             if isempty(T)

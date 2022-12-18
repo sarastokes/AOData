@@ -1,5 +1,5 @@
 classdef JsonReader < aod.util.FileReader
-% CSVREADER
+% Read a JSON file
 %
 % Description:
 %   Basis for reading in JSON files
@@ -8,17 +8,29 @@ classdef JsonReader < aod.util.FileReader
 %   aod.util.FileReader
 %
 % Constructor:
-%   obj = JsonReader(fName)
+%   obj = aod.util.readers.JsonReader(fName)
+%
+% See Also:
+%   loadjson
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     methods
         function obj = JsonReader(varargin)
             obj = obj@aod.util.FileReader(varargin{:});
-            obj.validExtensions = '*.json';
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             out = loadjson(obj.fullFile);
             obj.Data = out;
+        end
+    end
+
+    methods (Static)
+        function out = read(varargin)
+            obj = aod.util.readers.JsonReader(varargin{:});
+            out = obj.readFile();
         end
     end
 end
