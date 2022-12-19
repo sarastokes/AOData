@@ -15,9 +15,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Methods:
 %   add(obj, channel)
-%   removeChannel(obj, ID)
-%   clearChannels(obj)
-%   clearAllChannels(obj)
+%   remove(obj, ID), remove(obj, entityType, ID)
 %   clearAllDevices(obj)
 
 % By Sara Patterson, 2022 (AOData)
@@ -34,6 +32,27 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
+        function out = get(obj, entityType, queries)
+            import aod.core.EntityTypes
+            entityType = EntityTypes.init(entityType);
+
+            switch entityType
+                case EntityTypes.CHANNEL 
+                    group = obj.Channels;
+                case EntityTypes.DEVICE 
+                    group = obj.getChannelDevices();
+                otherwise
+                    error('get:InvalidEntityType',...
+                        'Only Channel and Device can be searched from System');
+            end
+            
+            if nargin > 2
+                out = aod.core.EntitySearch.go(group, queries);
+            else
+                out = group;
+            end
+        end
+
         function add(obj, channel)
             % ADD
             %
@@ -47,54 +66,60 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Channels = cat(1, obj.Channels, channel);
         end
 
-        function removeChannel(obj, ID)
-            % REMOVECHANNEL
+        function remove(obj, varargin)
+            % Remove a channel
             %
             % Description:
             %   Remove the specfied channel
             %
             % Syntax:
-            %   removeChannel(obj, ID)
+            %   remove(obj, ID)
+            %   remove(obj, entityType, ID)
+            %
+            % Notes:
+            %   Because System has only one child entity, remove() can be 
+            %   called without specifying the entityType (assumed to be 
+            %   Channel). It will also work if entityType is specified
             % -------------------------------------------------------------
-            if isempty(obj.Channels)
-                error("removeChannel:NoChannelsPresent",...
-                    "Cannot remove channel as no channels are present");
+
+            if nargin == 2
+                ID = varargin{1};
+            elseif nargin == 3
+                entityType = aod.core.EntityTypes.init(varargin{2});
+                assert(entityType == aod.core.EntityTypes.CHANNEL,...
+                    'Only Channels can be removed from System');
+                ID = varargin{3};
             end
-            assert(ID <= numel(obj.Channels),... 
-                'Invalid ID %u, must be between 1-%u', numel(obj.Channels));
-            obj.Channels(ID) = [];
-        end
-        
-        function clearChannels(obj)
-            % CLEARCHANNELS
-            %
-            % Description:
-            %   Clear all channels
-            %
-            % Syntax:
-            %   clearChannels(obj)
-            % -------------------------------------------------------------
+            
             if ~isscalar(obj)
-                arrayfun(@(x) clearChannels(x), obj);
+                arrayfun(@(x) remove(x, ID), obj);
                 return
             end
 
-            obj.Channels = aod.core.Channel.empty();
+            if isnumeric(ID)
+                mustBeInteger(ID); mustBeInRange(ID, 1, numel(obj.Channels));
+                obj.Channels(ID) = [];
+            elseif istext(ID) && strcmpi(ID, 'all')
+                obj.Channels = aod.core.Channels.empty();
+            else
+                error('remove:InvalidID', 'ID must be integer indices or "all"');
+            end
         end
 
-        function devices = getAllDevices(obj)
-            % GETALLDEVICES
+        function devices = getChannelDevices(obj)
+            % Get all Devices within System's Channels
             %
             % Description:
             %   Get devices within all channels
             %
             % Syntax:
-            %   devices = getAllDevices(obj)
+            %   devices = getChannelDevices(obj)
             % -------------------------------------------------------------
             if ~isscalar(obj)
-                devices = uncell(aod.util.arrayfun(@(x) getAllDevices(x), obj));
+                devices = uncell(aod.util.arrayfun(@(x) getChannelDevices(x), obj));
                 return
             end
+
             if isempty(obj.Channels)
                 devices = aod.core.Device.empty();
             else

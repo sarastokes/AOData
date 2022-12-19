@@ -23,7 +23,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % Public methods:
 %   add(obj, entity)
 %   remove(obj, entityType, ID)
-%   out = search(obj, entityType, varargin)
+%   out = get(obj, entityType, varargin)
 %
 % See Also:
 %   aod.persistent.Epoch, aod.core.Entity
@@ -140,8 +140,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
 
-        function out = search(obj, entityType, queryType, varargin)
-            % SEARCH
+        function out = get(obj, entityType, queries)
+            % Search Epoch's child entities
             %
             % Description:
             %   Search all entities of a specific type that match the given
@@ -169,7 +169,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                         'Only Dataset, Registration, Response and Stimulus can be searched from Epoch');
             end
 
-            out = aod.core.EntitySearch.go(group, queryType, varargin{:});
+            if nargin > 2 && ~isempty(group)
+                out = aod.core.EntitySearch.go(group, queries);
+            else
+                out = group;
+            end
         end
     end
 

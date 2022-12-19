@@ -44,8 +44,6 @@ classdef RoomMeasurement < aod.core.Calibration
                 humidity                double
             end
 
-            timestamp = obj.hoursmins2duration(input);
-
             for i = numel(timestamp)
                 datestamp = datetime(timestamp(i), 'Format', 'HH:mm');
                 %dur = obj.hoursmins2duration(timestamp(i));

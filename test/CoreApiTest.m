@@ -54,42 +54,46 @@ classdef CoreApiTest < matlab.unittest.TestCase
     methods (Test)
         function testSubclassSearch(testCase)
             egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,... 
-                'Class', 'aod.builtin.calibrations.PowerMeasurement');
+                {'Class', 'aod.builtin.calibrations.PowerMeasurement'});
             testCase.verifyEqual(numel(egObj.getMatches()), 1);
         end
 
         function testClassSearch(testCase)
             egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,...
-                'Subclass', 'aod.core.Calibration');
+                {'Subclass', 'aod.core.Calibration'});
             testCase.verifyEqual(numel(egObj.getMatches()), 2);
+
+            out = testCase.EXPT.get('Calibration',...
+                {'Subclass', 'aod.core.Calibration'});
+            testCase.verifyNumElements(out, 2);
         end
 
         function testParameterSearch(testCase)
             % Match param presence
-            egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
-                'Parameter', 'PmtGain');
-            testCase.verifyEqual(numel(egObj.getMatches()), 5);
+            out = aod.core.EntitySearch.go(testCase.EXPT.Epochs,...
+                {'Parameter', 'PmtGain'});
+            testCase.verifyNumElements(out, 5);
 
             % Match param values
             egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
-                'Parameter', 'PmtGain', 0.5);
+                {'Parameter', 'PmtGain', 0.5});
             testCase.verifyEqual(numel(egObj.getMatches()), 1);
 
             % Match param values using a function handle
             egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
-                'Parameter', 'PmtGain', @(x) x < 0.505);
+                {'Parameter', 'PmtGain', @(x) x < 0.505});
             testCase.verifyEqual(numel(egObj.getMatches()), 2);
         end
 
         function testFileSearch(testCase)
             % Match file presence
-            egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
-                'File', 'MyFile');
-            testCase.verifyEqual(numel(egObj.getMatches()), 5);
+            out = aod.core.EntitySearch.go(testCase.EXPT.Epochs,...
+                {'File', 'MyFile'});
+            testCase.verifyNumElements(out, 5);
 
             % Match files values using a function handle
             egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
-                'File', 'MyFile', @(x) endsWith(x, '.txt'));
+                {'File', 'MyFile', @(x) endsWith(x, '.txt')});
             testCase.verifyEqual(numel(egObj.getMatches()), 4);
         end
     end

@@ -55,8 +55,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyTrue(isempty(testCase.EXPT.description));
 
             % Check empty entities
-            testCase.verifyEmpty(testCase.EXPT.getAllChannels());
-            testCase.verifyEmpty(testCase.EXPT.getAllDevices());
+            testCase.verifyEmpty(testCase.EXPT.get('Channel'));
+            testCase.verifyEmpty(testCase.EXPT.get('Device'));
         end
 
         function sourceIO(testCase)
@@ -186,17 +186,18 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Systems), 2);
 
             % Request system child entities, while there are none
-            testCase.verifyEmpty(testCase.EXPT.getAllChannels());
-            testCase.verifyEmpty(testCase.EXPT.getAllDevices());
+            testCase.verifyEmpty(testCase.EXPT.get('Channel'));
+            testCase.verifyEmpty(testCase.EXPT.get('Device'));
 
             % Create some channels
             channel1 = aod.core.Channel('TestChannel1');
             channel2 = aod.core.Channel('TestChannel2');
+            channel3 = aod.core.Channel('TestChannel3');
 
             % Test handle class addition
-            system.add([channel1, channel2]);
-            testCase.verifyEqual(numel(system.Channels), 2);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 2);
+            system.add([channel1, channel2, channel3]);
+            testCase.verifyEqual(numel(system.Channels), 3);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 3);
 
             % Create some devices
             device1 = aod.builtin.devices.Pinhole(20);
@@ -210,11 +211,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Access all devices from different entities
             testCase.verifyEqual(numel(channel1.Devices), 2);
             testCase.verifyEqual(numel(channel2.Devices), 1);
-            testCase.verifyEqual(numel(system.getAllDevices()), 3);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllDevices()), 3);
+            testCase.verifyEqual(numel(system.get('Device')), 3);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Device')), 3);
             
             % Work with device array
-            allDevices = testCase.EXPT.getAllDevices();
+            allDevices = testCase.EXPT.get('Device');
             % Add notes to all the devices, then remove them
             allDevices.addNote("This is a note");
             testCase.verifyEqual(numel(device1.notes), 1);
@@ -235,15 +236,17 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Clear the devices (all)
             testCase.EXPT.Systems(1).clearAllDevices();
-            testCase.verifyEqual(numel(testCase.EXPT.getAllDevices()), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.getChannelDevices()), 0);
 
             % Remove a channel
-            testCase.EXPT.Systems(1).removeChannel(2);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 1);
+            testCase.EXPT.Systems(1).remove('Channel', 2);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 2);
+            test.EXPT.Systems(1).remove(2);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 1);
 
             % Clear all channels
-            testCase.EXPT.Systems(1).clearChannels();
-            testCase.verifyEqual(numel(testCase.EXPT.getAllChannels()), 0);
+            testCase.EXPT.Systems(1).remove('Channel', 'all');
+            testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 0);
 
             % Remove a system
             testCase.EXPT.remove('System', 1);

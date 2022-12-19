@@ -41,11 +41,12 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 obj 
                 childSource       {mustBeA(childSource, 'aod.core.Source')}
             end
+
             childSource.setParent(obj);
             obj.Sources = cat(1, obj.Sources, childSource);
         end
 
-        function remove(obj, ID)
+        function remove(obj, varargin)
             % REMOVE
             %
             % Description:
@@ -54,6 +55,21 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   remove(obj, sourceID)
             % -------------------------------------------------------------
+
+            if isscalar(obj)
+                arrayfun(@(x) remove(x, varargin{:}), obj);
+                return
+            end
+
+            if nargin == 3
+                entityType = aod.core.EntityTypes.init(varargin{2});
+                assert(entityType == aod.core.EntityTypes.SOURCE,...
+                    'Only Sources can be removed from Source');
+                ID = varargin{3};
+            elseif nargin == 2
+                ID = varargin{2};
+            end
+
             if isnumeric(ID)
                 mustBeInteger(ID); 
                 mustBeInRange(ID, 1, numel(obj.Sources));

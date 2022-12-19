@@ -610,9 +610,6 @@ obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
 			\item \aodfcn{epoch = id2epoch(obj)} - input ID and returns Epoch, if exists
 			\item \aodfcn{idx = id2index(obj, ID)} - input ID and return the index of the Epoch in Epochs \\
 			%
-			\item \aodfcn{getAllChannels(obj)}
-			\item \aodfcn{getAllDevices(obj)}\\
-			%
 			\item \aodfcn{clearAllDatasets(obj, epochIDs)}
 			\item \aodfcn{clearEpochResponses(obj, epochIDs)}
 			\item \aodfcn{clearEpochRegistrations(obj, epochIDs)}
@@ -701,9 +698,8 @@ obj = aod.core.System(name)
 		\docheader{Sealed Methods:}
 		\begin{itemize}
 			\item \aodfcn{add(obj, channel)} - Add a Channel to the system
-			\item \aodfcn{removeChannel(obj, ID)} - ID is the index of the channel to remove
-			\item \aodfcn{clearChannels(obj)}
-			\item \aodfcn{getAllDevices(obj)}
+			\item \aodfcn{remove(obj, ID)} - ID is the index of the channel to remove. The standard remove syntax is also accepted: \aodfcn{remove(obj, entityType, ID)}, but entityType must be Channel
+			\item \aodfcn{getChannelDevices(obj)}
 		\end{itemize}
 		
 	\subsection{aod.core.Channel \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}} 
@@ -798,7 +794,7 @@ obj = aod.core.Epoch(ID)
 			%
 			\item \aodfcn{add(obj, entity)} - Add a Dataset, Registration, Response or Stimulus to the Epoch
 			\item \aodfcn{remove(obj, entityType, ID)} - Remove...
-			\item \aodfcn{search(obj, entityType, varargin)}
+			\item \aodfcn{get(obj, entityType, varargin)}
 			%
 		\end{itemize}	
 

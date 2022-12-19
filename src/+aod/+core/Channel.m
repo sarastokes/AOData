@@ -11,32 +11,72 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = Channel(name, varargin)
 %
 % Properties:
-%   Devices                     container for all devices in channel
+%   Devices                     container for Channel's devices
 %
 % Methods:
 %   add(obj, device)
-%   removeDevice(obj, ID)
-%   clearDevices(obj)
+%   remove(obj, ID)
 %   assignUUID(obj, uuid)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (SetAccess = private)
         Devices                     aod.core.Device = aod.core.Device.empty()
     end
 
     methods
-        function obj = Channel(name)
+        function obj = Channel(name, varargin)
             % CHANNEL
             %
             % Description:
             %   
             % -------------------------------------------------------------
-            obj = obj@aod.core.Entity(name);
+            obj = obj@aod.core.Entity(name, varargin{:});
         end
     end
     
     methods (Sealed)
+        function out = get(obj, entityType, queries)
+            % Search Epoch's child entities
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (described below in examples)
+            %
+            % Syntax:
+            %   out = get(obj, entityType)
+            %   out = get(obj, queries)   
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            %       Child entity type to access (Device)
+            %   queries             cell
+            %       One or more queries within cells
+            %
+            % Notes:
+            %   query specification is documented in aod.core.EntitySearch
+            %
+            % See Also:
+            %   aod.core.EntitySearch
+            % -------------------------------------------------------------
+
+            import aod.core.EntityTypes
+
+            entityType = EntityTypes.init(entityType);
+            
+            if entityType ~= EntityTypes.DEVICE 
+                error('get:InvalidEntityType',...
+                    'Only Devices can be searched from Channel');
+            end
+
+            if nargin > 2
+                out = aod.core.EntitySearch.go(obj.Devices, queries);
+            else
+                out = obj.Devices;
+            end
+        end
+    
         function add(obj, device)
             % ADD
             %
@@ -60,35 +100,37 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Devices = cat(1, obj.Devices, device);
         end
         
-        function removeDevice(obj, deviceID)
-            % REMOVEDEVICES
+        function remove(obj, varargin)
+            % Remove an entity (device)
             %
             % Description:
             %   Remove a Device from the channel
             %
             % Syntax:
-            %   removeDevice(obj, deviceID)
-            % -------------------------------------------------------------
-            assert(deviceID <= numel(obj.Devices), 'Invalid Device number');
-            obj.Devices(deviceID) = [];
-        end
-        
-        function clearDevices(obj)
-            % CLEARDEVICES
+            %   remove(obj, ID)
+            %   remove(obj, entityType, ID)
             %
-            % Description:
-            %   Clear all Devices from the Channel
-            %
-            % Syntax:
-            %   clearDevices(obj)
+            % Notes:
+            %   entityType argument is optional as only Device can be  
+            %   removed from a Channel 
             % -------------------------------------------------------------
-            if ~isscalar(obj)
-                for i = 1:numel(obj)
-                    obj(i).clearDevices();
-                end
-            end
             
-            obj.Devices = aod.core.Device.empty();
+            if nargin == 3
+                entityType = aod.core.EntityTypes.init(varargin{2});
+                ID = varargin{3};
+            elseif nargin == 2
+                ID = varargin{2};
+            end
+
+            if isnumeric(ID)
+                mustBeInteger(ID); mustBeInRange(ID, 1, numel(obj.Devices));
+                obj.Devices(ID) = [];
+            elseif istext(ID) && strcmpi(ID, 'all')
+                obj.Devices = aod.core.Device.empty();
+            else
+                error('remove:InvalidID',...
+                    'ID must be integer indices or "all"');
+            end
         end
     end
 

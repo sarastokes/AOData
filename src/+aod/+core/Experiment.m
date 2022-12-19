@@ -36,7 +36,7 @@ classdef Experiment < aod.core.Entity
 %
 %   add(obj, entity)
 %   remove(obj, entityType, ID)
-%   out = search(obj, entityType, varargin)
+%   out = get(obj, entityType, varargin)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -234,7 +234,7 @@ classdef Experiment < aod.core.Entity
             end
         end
 
-        function out = search(obj, entityType, queryType, varargin)
+        function out = get(obj, entityType, queries)
             % Search all entities of a specific type within experiment
             %
             % Description:
@@ -246,21 +246,21 @@ classdef Experiment < aod.core.Entity
             %
             % Examples:
             % Search for Sources named "OD"
-            %   out = obj.search('Source', 'Name', "OD")
+            %   out = obj.get('Source', 'Name', "OD")
             %
             % Search for Devices of class "aod.builtin.devices.Pinhole"
-            %   out = obj.search('Device', 'Class', 'aod.builtin.devices.Pinhole')
+            %   out = obj.get('Device', 'Class', 'aod.builtin.devices.Pinhole')
             %
             % Search for Calibrations that are a subclass of 
             % "aod.builtin.calibrations.PowerMeasurement"
-            %   out = obj.search('Calibration', 'Subclass',... 
+            %   out = obj.get('Calibration', 'Subclass',... 
             %       'aod.builtin.calibrations.PowerMeasurement')
             %
             % Search for Epochs that have Parameter "Defocus"
-            %   out = obj.search('Epoch', 'Parameter', 'Defocus')
+            %   out = obj.get('Epoch', 'Parameter', 'Defocus')
             %
             % Search for Epochs with Parameter "Defocus" = 0.3
-            %   out = obj.search('Epoch', 'Parameter', 'Defocus', 0.3)
+            %   out = obj.get('Epoch', 'Parameter', 'Defocus', 0.3)
             % -------------------------------------------------------------
 
             import aod.core.EntityTypes
@@ -272,10 +272,18 @@ classdef Experiment < aod.core.Entity
                     group = obj.getAllSources();
                 case EntityTypes.SYSTEM 
                     group = obj.Systems;
-                case EntityTypes.CHANNEL
-                    group = obj.getAllChannels();
-                case EntityTypes.Device
-                    group = obj.getAllDevices();
+                case EntityTypes.CHANNEL                          
+                    if isempty(obj.Systems)
+                        group = aod.core.Channel.empty();
+                    else
+                        group = vertcat(obj.Systems.Channels);
+                    end
+                case EntityTypes.DEVICE            
+                    if isempty(obj.Systems)
+                        group = aod.core.Device.empty();
+                    else
+                        group = vertcat(obj.Systems.getChannelDevices());
+                    end
                 case EntityTypes.CALIBRATION
                     group = obj.Calibrations;
                 case EntityTypes.ANNOTATION
@@ -283,7 +291,7 @@ classdef Experiment < aod.core.Entity
                 case EntityTypes.EPOCH
                     group = obj.Epochs;
                 case EntityTypes.RESPONSE
-                    group = obj.getAllResponses();
+                    group = obj.getEpochResponses();
                 case EntityTypes.REGISTRATION
                     group = obj.getEpochRegistrations();
                 case EntityTypes.DATASET 
@@ -297,8 +305,11 @@ classdef Experiment < aod.core.Entity
                     return
             end
 
-            egObj = aod.core.EntitySearch(group, queryType, varargin{:});
-            out = egObj.getMatches();
+            if nargin > 2 && ~isempty(group)
+                out = aod.core.EntitySearch.go(group, queries);
+            else
+                out = group;
+            end
         end
     end
 
@@ -352,42 +363,6 @@ classdef Experiment < aod.core.Entity
                 return
             end
             sources = obj.Sources.getAllSources();
-        end
-    end
-
-    % System hierarchy methods
-    methods 
-        function channels = getAllChannels(obj)
-            % GETALLCHANNELS
-            %
-            % Description:
-            %   Returns all channels within the experiment
-            %
-            % Syntax:
-            %   channels = getAllChannels(obj)
-            % -------------------------------------------------------------
-            if isempty(obj.Systems)
-                channels = aod.core.Channel.empty();
-            else
-                channels = vertcat(obj.Systems.Channels);
-            end
-        end
-
-        function devices = getAllDevices(obj)
-            % GETALLDEVICES
-            %
-            % Description:
-            %   Returns all devices within the experiment
-            %
-            % Syntax:
-            %   devices = getAllDevices(obj)
-            % -------------------------------------------------------------
-            
-            if isempty(obj.Systems)
-                devices = aod.core.Device.empty();
-            else
-                devices = vertcat(obj.Systems.getAllDevices());
-            end
         end
     end
 

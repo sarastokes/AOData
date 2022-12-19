@@ -216,9 +216,9 @@ classdef EntityTypes
                 case EntityTypes.CALIBRATION
                     out = expt.Calibrations;
                 case EntityTypes.CHANNEL 
-                    out = expt.getAllChannels();
+                    out = expt.get(obj);
                 case EntityTypes.DEVICE 
-                    out = expt.getAllDevices();
+                    out = expt.get(obj);
                 case EntityTypes.SOURCE 
                     out = expt.getAllSources();
                 case EntityTypes.REGISTRATION
