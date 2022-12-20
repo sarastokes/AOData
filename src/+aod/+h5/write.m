@@ -1,4 +1,4 @@
-function success = write(fileName, pathName, dsetName, data)
+function success = write(fileName, pathName, dsetName, data, description)
 % Writes MATLAB dataset to an HDF5 dataset 
 %
 % Syntax:
@@ -29,12 +29,13 @@ function success = write(fileName, pathName, dsetName, data)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
-        % Detailed input checking is performed by h5tools
+        % Detailed input checking for first 4 is performed by h5tools
         arguments
-            fileName             char 
+            fileName            char 
             pathName            char 
             dsetName            char 
             data
+            description         string      = []
         end
     
         fullPath = h5tools.util.buildPath(pathName, dsetName);
@@ -42,7 +43,12 @@ function success = write(fileName, pathName, dsetName, data)
         if isa(data, 'aod.util.Parameters')
             h5tools.datasets.makeTextDataset(fileName, pathName, dsetName, "aod.util.Parameters");
             h5tools.writeatt(fileName, fullPath, data);
+            success = true;
         else
-            h5tools.write(fileName, pathName, dsetName, data);
+            success = h5tools.write(fileName, pathName, dsetName, data);
+            % Description only written for datasets without mapped params
+            if ~isempty(description)
+                h5tools.writeatt(fileName, fullPath, 'Description', description);
+            end
         end
-        success = true;
+        

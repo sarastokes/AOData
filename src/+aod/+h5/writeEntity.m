@@ -147,11 +147,15 @@ function writeEntity(hdfName, obj)
             h5tools.writelink(hdfName, hdfPath, persistedProps(i), parentPath);
             continue
         end
-        success = aod.h5.write(hdfName, hdfPath, persistedProps(i), prop);
 
+        % Write dataset description, if exists
+        dsetDescription = aod.util.getClassPropDescription(mc, persistedProps(i));
+        % Write dataset
+        success = aod.h5.write(hdfName, hdfPath, persistedProps(i), prop, dsetDescription);
         if ~success
             error('Unrecognized property %s of type %s', persistedProps(i), class(prop));
         end
+
     end
 end
 

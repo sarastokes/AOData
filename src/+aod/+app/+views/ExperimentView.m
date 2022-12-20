@@ -124,7 +124,9 @@ classdef ExperimentView < aod.app.UIView
                 obj.Attributes.Data = data;
                 systemAttributes = aod.h5.getSystemAttributes();
                 rowIdx = find(cellfun(@(x) ismember(x, systemAttributes), data{:, 1}));
-                addStyle(obj.Attributes, obj.SYSTEM_STYLE, 'Row', rowIdx);
+                if ~isempty(rowIdx)
+                    addStyle(obj.Attributes, obj.SYSTEM_STYLE, 'Row', rowIdx);
+                end
             end
         end
 
