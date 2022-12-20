@@ -18,7 +18,7 @@ classdef SpectralPhysiologyParameterReader < sara.readers.EpochParameterReader
         end
 
         function ep = readFile(obj, ep)
-            ep = read@sara.readers.EpochParameterReader(obj, ep);
+            ep = readFile@sara.readers.EpochParameterReader(obj, ep);
 
             % If it's spectral physiology, then we know AOM1 was Mustang
             stim = sara.stimuli.Mustang(ep.getParam('AOM1'));

@@ -116,10 +116,14 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             
             if nargin == 3
-                entityType = aod.core.EntityTypes.init(varargin{2});
-                ID = varargin{3};
-            elseif nargin == 2
+                entityType = aod.core.EntityTypes.init(varargin{1});
+                if entityType ~= aod.core.EntityTypes.DEVICE
+                    error('remove:InvalidEntity', ...
+                        'Only Device can be removed from Channel');
+                end
                 ID = varargin{2};
+            elseif nargin == 2
+                ID = varargin{1};
             end
 
             if isnumeric(ID)

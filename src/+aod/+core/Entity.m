@@ -731,24 +731,7 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = isValidParent(parent)
             % -------------------------------------------------------------
-            validParents = obj.entityType.validParentTypes;
-
-            if isempty(validParents)
-                tf = true;
-                return;
-            elseif strcmp(validParents, {'none'})
-                tf = false;
-                return
-            end
-
-            for i = 1:numel(validParents)
-                if isSubclass(parent, validParents{i})
-                    tf = true;
-                    break
-                else
-                    tf = false;
-                end
-            end
+            tf = ismember(parent.entityType, obj.entityType.validParentTypes());
         end
     end
 

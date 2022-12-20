@@ -126,7 +126,6 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
-    
     % Overloaded methods
     methods (Access = protected)    
         function value = getLabel(obj)  

@@ -1,4 +1,4 @@
-function isEntitySubclass(obj, entityType)
+function tf = isEntitySubclass(obj, entityType)
     % ISENTITYSUBCLASS
     %
     % Description:

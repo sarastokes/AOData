@@ -85,10 +85,10 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             if nargin == 2
                 ID = varargin{1};
             elseif nargin == 3
-                entityType = aod.core.EntityTypes.init(varargin{2});
+                entityType = aod.core.EntityTypes.init(varargin{1});
                 assert(entityType == aod.core.EntityTypes.CHANNEL,...
                     'Only Channels can be removed from System');
-                ID = varargin{3};
+                ID = varargin{2};
             end
             
             if ~isscalar(obj)
@@ -100,7 +100,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
                 mustBeInteger(ID); mustBeInRange(ID, 1, numel(obj.Channels));
                 obj.Channels(ID) = [];
             elseif istext(ID) && strcmpi(ID, 'all')
-                obj.Channels = aod.core.Channels.empty();
+                obj.Channels = aod.core.Channel.empty();
             else
                 error('remove:InvalidID', 'ID must be integer indices or "all"');
             end
@@ -146,7 +146,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             for i = 1:numel(obj.Channels)
-                obj.Channels(i).clearDevices();
+                remove(obj.Channels(i), 'Device', 'all');
             end
         end
     end

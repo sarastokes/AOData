@@ -242,6 +242,12 @@ classdef EntitySearch < handle
                 out = [];
                 return
             end
+            if nargin < 2
+                warning('go:NoQueries',... 
+                    'EntitySearch was not provided a query, returning full group');
+                out = group;
+                return
+            end
             obj = aod.core.EntitySearch(entityGroup, queries);
             out = obj.getMatches();
         end

@@ -14,13 +14,13 @@ classdef ImageReader < aod.util.FileReader
 % -------------------------------------------------------------------------
 
     methods
-        function ImageReader(varargin)
+        function obj = ImageReader(varargin)
             obj@aod.util.FileReader(varargin{:});
             obj.extensions = {'*.png', '*.jpeg', '*.bmp'};
         end
         
         function out = readFile(obj)
-            out.Data = imread(obj.fullFile);
+            obj.Data = imread(obj.fullFile);
             out = obj.Data;
         end
     end

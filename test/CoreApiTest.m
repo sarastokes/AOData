@@ -33,6 +33,10 @@ classdef CoreApiTest < matlab.unittest.TestCase
             testCase.EXPT.add(aod.builtin.calibrations.PowerMeasurement(...
                 'Mustang', getDateYMD(), 488));
 
+            % Add analyses
+            testCase.EXPT.add(aod.core.Analysis('Analysis1'));
+            testCase.EXPT.add(aod.core.Analysis('Analysis2'));
+
             % Add epochs with a few parameters and files
             epochIDs = [1, 2, 6, 7, 8, 9];
             pmtGains = [0.491, 0.5, 0.51, 0.51, 0.515, 0.515];
@@ -52,37 +56,49 @@ classdef CoreApiTest < matlab.unittest.TestCase
     end
 
     methods (Test)
-        function testSubclassSearch(testCase)
-            egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,... 
-                {'Class', 'aod.builtin.calibrations.PowerMeasurement'});
-            testCase.verifyEqual(numel(egObj.getMatches()), 1);
+        function testEmptySearch(testCase)
+            testCase.verifyWarning(...
+                @() aod.core.EntitySearch.go('Response'),...
+                "go:NoQueries");
         end
 
-        function testClassSearch(testCase)
-            egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,...
-                {'Subclass', 'aod.core.Calibration'});
-            testCase.verifyEqual(numel(egObj.getMatches()), 2);
+        function testNameSearch(testCase)
+            out = testCase.EXPT.get('Analysis',...
+                {'Name', 'Analysis1'});
+            testCase.verifyNumElements(out, 1);
 
+            out = testCase.EXPT.get('Analysis',...
+                {'Name', @(x) contains(x, 'Analysis')});
+            testCase.verifyNumElements(out, 2);
+        end
+
+        function testSubclassSearch(testCase)
             out = testCase.EXPT.get('Calibration',...
                 {'Subclass', 'aod.core.Calibration'});
             testCase.verifyNumElements(out, 2);
         end
 
+        function testClassSearch(testCase)
+            egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,...
+                {'Class', 'aod.builtin.calibrations.PowerMeasurement'});
+            testCase.verifyEqual(numel(egObj.getMatches()), 2);
+        end
+
         function testParameterSearch(testCase)
             % Match param presence
-            out = aod.core.EntitySearch.go(testCase.EXPT.Epochs,...
+            out = testCase.EXPT.get('Epoch',...
                 {'Parameter', 'PmtGain'});
             testCase.verifyNumElements(out, 5);
 
             % Match param values
-            egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
+            out = testCase.EXPT.get('Epoch',...
                 {'Parameter', 'PmtGain', 0.5});
-            testCase.verifyEqual(numel(egObj.getMatches()), 1);
+            testCase.verifyNumElements(out, 1);
 
             % Match param values using a function handle
-            egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
+            out = testCase.EXPT.get('Epoch',...
                 {'Parameter', 'PmtGain', @(x) x < 0.505});
-            testCase.verifyEqual(numel(egObj.getMatches()), 2);
+            testCase.verifyNumElements(out, 2);
         end
 
         function testFileSearch(testCase)

@@ -60,21 +60,50 @@ classdef EntityTypes
             % Syntax:
             %   parentTypes = validParentTypes(obj)
             % -------------------------------------------------------------
+            
             import aod.core.EntityTypes
 
             switch obj 
                 case EntityTypes.EXPERIMENT
-                    parentTypes = {'none'};
+                    parentTypes = [];
                 case EntityTypes.SOURCE
-                    parentTypes = {'aod.core.Experiment', 'aod.core.Source', 'aod.persistent.Experiment', 'aod.persistent.Source'};
+                    parentTypes = [EntityTypes.EXPERIMENT, EntityTypes.SOURCE];
                 case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.ANNOTATION, EntityTypes.CALIBRATION}
-                    parentTypes = {'aod.core.Experiment', 'aod.persistent.Experiment'};
+                    parentTypes = EntityTypes.EXPERIMENT;
                 case EntityTypes.CHANNEL 
-                    parentTypes = {'aod.core.System', 'aod.persistent.System'};
+                    parentTypes = EntityTypes.SYSTEM;
                 case EntityTypes.DEVICE
-                    parentTypes = {'aod.core.Channel', 'aod.persistent.Channel'};
+                    parentTypes = EntityTypes.CHANNEL;
                 case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE, EntityTypes.DATASET}
-                    parentTypes = {'aod.core.Epoch', 'aod.persistent.Epoch'};
+                    parentTypes = EntityTypes.EPOCH;
+            end
+        end
+
+        function childTypes = validChildTypes(obj)
+            % Return valid child entity types
+            %
+            % Syntax:
+            %   childTypes = validChildTypes(obj)
+            % -------------------------------------------------------------
+
+            import aod.core.EntityTypes
+
+            switch obj 
+                case EntityTypes.EXPERIMENT 
+                    childTypes = [EntityTypes.ANALYSIS, EntityTypes.ANNOTATION,... 
+                        EntityTypes.CALIBRATION, EntityTypes.EPOCH, ...
+                        EntityTypes.SOURCE, EntityTypes.SYSTEM];
+                case EntityTypes.EPOCH 
+                    childTypes = [EntityTypes.DATASET, EntityTypes.REGISTRATION,...
+                        EntityTypes.RESPONSE, EntityTypes.STIMULUS];
+                case EntityTypes.SYSTEM
+                    childTypes = EntityTypes.CHANNEL;
+                case EntityTypes.CHANNEL
+                    childTypes = EntityTypes.DEVICE;
+                case EntityTypes.SOURCE
+                    childTypes = EntityTypes.SOURCE;
+                otherwise
+                    childTypes = [];
             end
         end
 
@@ -159,21 +188,12 @@ classdef EntityTypes
                 fullVariableName        logical = false
             end
 
-            import aod.core.EntityTypes
-
-            switch obj
-                case EntityTypes.EXPERIMENT
-                    out = {'Calibrations', 'Analyses', 'Epochs', 'Systems', 'Annotations', 'Sources'};
-                case EntityTypes.SOURCE 
-                    out = {'Sources'};
-                case EntityTypes.EPOCH
-                    out = {'Registrations', 'Stimuli', 'Responses', 'Datasets'};
-                case EntityTypes.SYSTEM 
-                    out = {'Channels'};
-                case EntityTypes.CHANNEL 
-                    out = {'Devices'};
-                otherwise
-                    out = [];
+            out = arrayfun(@(x) x.parentContainer, obj.validChildTypes,... 
+                'UniformOutput', false);
+            if ~isempty(out)
+                out = string(out);
+            else
+                out = [];
             end
 
             if fullVariableName && ~isempty(out)
@@ -222,13 +242,13 @@ classdef EntityTypes
                 case EntityTypes.SOURCE 
                     out = expt.getAllSources();
                 case EntityTypes.REGISTRATION
-                    out = expt.getEpochRegistrations();
+                    out = expt.getFromEpoch('all', 'Registration');
                 case EntityTypes.RESPONSE
-                    out = expt.getEpochRegistrations();
+                    out = expt.getFromEpoch('all', 'Response');
                 case EntityTypes.DATASET 
-                    out = expt.getEpochDatasets();
+                    out = expt.getFromEpoch('all','Dataset');
                 case EntityTypes.STIMULUS
-                    out = expt.getEpochStimuli();
+                    out = expt.getFromEpoch('all', 'Stimulus');
             end
         end 
 
@@ -477,25 +497,35 @@ classdef EntityTypes
             % INIT
             %
             % Description:
-            %   Initialize from entity name as text (string or char)
+            %   Initialize from entity name as text (string or char) or 
+            %   from an object in the core or persistent interface
             %
             % Syntax:
             %   obj = aod.core.EntityTypes.init(entityName)
             %
             % Example:
+            % % Return from name
             %   obj = aod.core.EntityTypes.init('epoch')
+            %
+            % % Return from class
+            %   epoch = aod.core.Epoch(1);
+            %   obj = aod.core.EntityTypes.init(epoch);
             %
             % Notes:
             %   For compatibility, if a aod.core.EntityTypes is passed as
             %   input, it will be returned without error
             %   Several abbreviations are also defined, see code
             % -------------------------------------------------------------
+            
+            import aod.core.EntityTypes;
+
             if isa(entityName, 'aod.core.EntityTypes')
                 obj = entityName;
                 return
+            elseif aod.util.isEntitySubclass(entityName)
+                obj = aod.core.EntityTypes.get(entityName);
+                return
             end
-            
-            import aod.core.EntityTypes;
 
             switch lower(entityName)
                 case {'experiment', 'exp'}

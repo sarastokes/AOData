@@ -21,5 +21,11 @@ classdef UtilityTest < matlab.unittest.TestCase
             map = params.toMap();
             testCase.verifyClass(map, 'containers.Map');
         end
+
+        function testRepoManager(testCase)
+            RM = aod.infra.RepositoryManager();
+            RM.listPackages();
+            RM.update();
+        end
     end
 end 

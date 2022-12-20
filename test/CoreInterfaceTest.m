@@ -29,6 +29,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
     methods (Test)
         function experimentIO(testCase)
+            import matlab.unittest.constraints.Throws
+            
             % Add a relative file
             testCase.EXPT.setFile('RelFile', fullfile(cd, 'test_data', 'test.txt'));
             % Add an absolute file
@@ -57,6 +59,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Check empty entities
             testCase.verifyEmpty(testCase.EXPT.get('Channel'));
             testCase.verifyEmpty(testCase.EXPT.get('Device'));
+
+            % Check entity checks for remove
+            testCase.verifyThat(...
+                @()testCase.EXPT.remove('Response', 'all'),...
+                Throws("remove:NonChildEntityType"));
         end
 
         function sourceIO(testCase)
@@ -227,21 +234,21 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             clearNotes([device1, device2, device3]);
             
             % Remove a device
-            channel1.removeDevice(2);
+            channel1.remove('Device', 2);
             testCase.verifyEqual(numel(testCase.EXPT.Systems(1).Channels(1).Devices), 1);
 
             % Clear the devices (channel-specific)
-            channel1.clearDevices();
+            channel1.remove('Device', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Systems(1).Channels(1).Devices), 0);
 
             % Clear the devices (all)
             testCase.EXPT.Systems(1).clearAllDevices();
-            testCase.verifyEqual(numel(testCase.EXPT.getChannelDevices()), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Device', 'all')), 0);
 
             % Remove a channel
             testCase.EXPT.Systems(1).remove('Channel', 2);
             testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 2);
-            test.EXPT.Systems(1).remove(2);
+            testCase.EXPT.Systems(1).remove(2);
             testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 1);
 
             % Clear all channels
@@ -325,6 +332,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 @() testCase.EXPT.Epochs(1).add(cal),...
                 Throws("Epoch:AddedInvalidEntity"));
 
+            % Try to remove a calibration from an epoch
+            testCase.verifyThat(...
+                @()testCase.EXPT.removeByEpoch('all', 'Calibration'),...
+                Throws("removeByEpoch:InvalidEntityType"));
+
             % Remove an epoch (by non-consecutive ID)
             testCase.EXPT.remove('Epoch', 4);
             testCase.verifyNumElements(testCase.EXPT.Epochs, 2);
@@ -352,8 +364,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Add to the epochs
             testCase.EXPT.Epochs(1).add(response1);
             testCase.EXPT.Epochs(2).add(response2);
-            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses(1)), 1);
-            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses()), 2);
+            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch(1, 'Response')), 1);
+            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Response')), 2);
 
             % Clear the timing from the first response
             response1.clearTiming();
@@ -366,9 +378,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyFalse(testCase.EXPT.Epochs(2).hasTiming());
             
             % Clear the responses
-            testCase.EXPT.clearEpochResponses();
-            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses(1)), 0);
-            testCase.verifyEqual(numel(testCase.EXPT.getEpochResponses()), 0);
+            testCase.EXPT.removeByEpoch('all', 'Response');
+            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch(1, 'Response')), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Response')), 0);
 
             % Clear the epochs
             testCase.EXPT.remove('Epoch', 'all');
@@ -390,13 +402,13 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Add the datasets to the experiment
             testCase.EXPT.Epochs(1).add([dataset1, dataset2]);
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 2);
-            testCase.verifyEqual(numel(testCase.EXPT.getEpochDatasets()), 2);
+            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Datasets')), 2);
 
             % Check dataset data
             testCase.verifyEqual(testCase.EXPT.Epochs(1).Datasets(2).Data, eye(3));
             
             % Clear all the datasets
-            testCase.EXPT.clearEpochDatasets();
+            testCase.EXPT.removeByEpoch('all', 'Dataset');
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 0);
 
             % Clear the epochs

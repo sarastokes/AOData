@@ -17,8 +17,8 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        homeDirectory           char
-        experimentDate (1,1)     datetime
+        homeDirectory               char
+        experimentDate (1,1)        datetime
         epochIDs (1,:)
 
         AnalysesContainer         
@@ -28,7 +28,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         CalibrationsContainer            
         SystemsContainer      
         
-        Code
+        Code                        table
     end
 
     properties (Dependent)

@@ -52,12 +52,12 @@ classdef Experiment < aod.core.Entity
         Calibrations            aod.core.Calibration    = aod.core.Calibration.empty()
         Systems                 aod.core.System         = aod.core.System.empty()
 
-        Code                    
+        Code                          
     end
 
     properties (Dependent)
-        epochIDs
-        numEpochs
+        epochIDs    
+        numEpochs (1,1)         double 
     end
     
     methods 
@@ -108,11 +108,43 @@ classdef Experiment < aod.core.Entity
             end
             obj.homeDirectory = filePath;
         end
+        
+        function epoch = id2epoch(obj, IDs)
+            % ID2EPOCH
+            %
+            % Description:
+            %   Input epoch ID(s), get Epoch(s)
+            %
+            % Syntax:
+            %   epoch = id2epoch(obj, IDs)
+            % -------------------------------------------------------------
+            if ~isscalar(IDs)
+                epoch = aod.util.arrayfun(@(x) obj.Epochs(find(obj.epochIDs==x)), IDs);
+            else
+                epoch = obj.Epochs(find(obj.epochIDs == IDs));
+            end
+        end
+
+        function idx = id2index(obj, IDs)
+            % ID2INDEX
+            %
+            % Description:
+            %   Returns index of an epoch given an epoch ID
+            %
+            % Syntax:
+            %   idx = id2index(obj, IDs)
+            % -------------------------------------------------------------
+            if ~isscalar(IDs)
+                idx = arrayfun(@(x) id2index(obj, x), IDs);
+                return
+            end
+            idx = find(obj.epochIDs == IDs);
+        end
     end 
 
     methods
         function add(obj, entity)
-            % ADD 
+            % Add a new entity to the Experiment 
             %
             % Description:
             %   Add a new entity or entities to the experiment
@@ -197,6 +229,10 @@ classdef Experiment < aod.core.Entity
 
             import aod.core.EntityTypes
             entityType = EntityTypes.init(entityType);
+            if ~ismember(entityType, obj.entityType.validChildTypes())
+                error('remove:NonChildEntityType',...
+                    'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
+            end
 
             % Check whether to clear all entities
             ID = convertCharsToStrings(ID);
@@ -229,8 +265,6 @@ classdef Experiment < aod.core.Entity
                 case EntityTypes.SYSTEM
                     obj.Systems(ID) = [];
                 otherwise
-                    error('remove:NonChildEntityType',...
-                        'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
             end
         end
 
@@ -291,13 +325,13 @@ classdef Experiment < aod.core.Entity
                 case EntityTypes.EPOCH
                     group = obj.Epochs;
                 case EntityTypes.RESPONSE
-                    group = obj.getEpochResponses();
+                    group = obj.getFromEpoch('all', 'Response');
                 case EntityTypes.REGISTRATION
-                    group = obj.getEpochRegistrations();
+                    group = obj.getFromEpoch('all', 'Registration');
                 case EntityTypes.DATASET 
-                    group = obj.getEpochDatasets();
+                    group = obj.getFromEpoch('all', 'Dataset');
                 case EntityTypes.STIMULUS
-                    group = obj.getEpochStimuli();
+                    group = obj.getFromEpoch('all', 'Stimulus');
                 case EntityTypes.ANALYSIS
                     group = obj.Analyses;
                 case EntityTypes.EXPERIMENT
@@ -313,47 +347,123 @@ classdef Experiment < aod.core.Entity
         end
     end
 
+    % Source methods
     methods
-        function epoch = id2epoch(obj, IDs)
-            % ID2EPOCH
-            %
-            % Description:
-            %   Input epoch ID(s), get Epoch(s)
-            %
-            % Syntax:
-            %   epoch = id2epoch(obj, IDs)
+    end
+
+    % Epoch methods
+    methods
+        function out = getFromEpoch(obj, ID, entityType, varargin)
+            % Get entities from one, multiple or all epochs
             % -------------------------------------------------------------
-            if ~isscalar(IDs)
-                epoch = aod.util.arrayfun(@(x) obj.Epochs(find(obj.epochIDs==x)), IDs);
+            
+            import aod.core.EntityTypes
+            
+            entityType = EntityTypes.init(entityType);
+            if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
+                error('remove:NonChildEntityType',...
+                    'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
+            end
+
+            if isempty(obj.Epochs)
+                out = [];
+            end
+
+            if isempty(ID)
+                ID = obj.epochIDs;
+            elseif istext(ID) && strcmpi(ID, 'all')
+                ID = obj.epochIDs;
             else
-                epoch = obj.Epochs(find(obj.epochIDs == IDs));
+                aod.util.mustBeEpochID(obj, ID);
+            end
+            idx = obj.id2index(ID);
+
+            switch entityType 
+                case EntityTypes.DATASET
+                    group = vertcat(obj.Epochs(idx).Datasets);
+                case EntityTypes.REGISTRATION
+                    group = vertcat(obj.Epochs(idx).Registrations);
+                case EntityTypes.RESPONSE
+                    group = vertcat(obj.Epochs(idx).Responses);
+                case EntityTypes.STIMULUS 
+                    group = vertcat(obj.Epochs(idx).Stimuli);
+            end
+
+            % Default is empty unless meets criteria below
+            if nargin > 3
+                % Was index provided for entities returned?
+                if ~iscell(varargin{1})
+                    entityID = varargin{1};
+                    if isnumeric(entityID)
+                        mustBeInteger(entityID); mustBeInRange(entityID, 1, numel(group));
+                        group = group(entityID);
+                    end 
+                    if nargin > 4
+                        out = aod.core.EntitySearch.go(group, varargin{2:end});
+                    else
+                        out = group;
+                    end
+                    return
+                else
+                    if ~isempty(group)
+                        out = aod.core.EntitySearch.go(group, varargin{:});
+                    end
+                end
+                return
+            else
+                out = group;
             end
         end
 
-        function idx = id2index(obj, IDs)
-            % ID2INDEX
-            %
-            % Description:
-            %   Returns index of an epoch given an epoch ID
+        function removeByEpoch(obj, ID, entityType, entityID)
+            % Remove entities from child Epoch(s)
             %
             % Syntax:
-            %   idx = id2index(obj, IDs)
+            %   removeByEpoch(obj, ID, entityType, entityID)
+            %
+            % Inputs:
+            %   ID              integer or "all"
+            %       Epoch IDs to process
+            %   entityType      aod.core.EntityTypes or char
+            %       Type of entity within Epoch to remove
+            % Optional inputs:
+            %   entityID        integer or "all" (default = "all")
+            %       Entity indices to process
+            %
             % -------------------------------------------------------------
-            if ~isscalar(IDs)
-                idx = arrayfun(@(x) id2index(obj, x), IDs);
-                return
+
+            if nargin < 4
+                entityID = "all";
             end
-            idx = find(obj.epochIDs == IDs);
+
+            if istext(ID) && strcmpi(ID, 'all')
+                ID = obj.epochIDs;
+            else
+                aod.util.mustBeEpochID(obj, ID);
+            end
+            ID = sort(ID, 'descend');
+            idx = obj.id2index(ID);
+
+            import aod.core.EntityTypes
+            entityType = aod.core.EntityTypes.init(entityType);
+            if ~ismember(entityType, [EntityTypes.DATASET, EntityTypes.STIMULUS,...
+                    EntityTypes.RESPONSE, EntityTypes.REGISTRATION])
+                error('removeByEpoch:InvalidEntityType',...
+                    'Only Dataset, Stimulus, Registration and Response can be removed from an Epoch');
+            end
+
+            for i = 1:numel(idx)
+                remove(obj.id2epoch(idx(i)), entityType, entityID);
+            end
         end
     end
 
-    % Source methods
-    methods
+    methods 
         function sources = getAllSources(obj)
-            % GETALLSOURCES
+            % Returns all sources in an Experiment 
             %
             % Description:
-            %   Returns up to three levels of sources in expeirment
+            %   Returns all sources and nested sources in Experiment
             %
             % Syntax:
             %   sources = getAllSources(obj)
@@ -363,196 +473,29 @@ classdef Experiment < aod.core.Entity
                 return
             end
             sources = obj.Sources.getAllSources();
-        end
-    end
-
-    % Epoch methods
-    methods
-        function datasets = getEpochDatasets(obj, IDs)
-            % GETEPOCHDATASETS
-            %
-            % Description:
-            %   Return the datasets for specified epoch(s)
-            %
-            % Syntax:
-            %   datasets = getEpochDatasets(obj, epochIDs)
-            %
-            % Inputs:
-            %   epochIDs            double
-            %       The IDs for 1 or more epochs (not index in Epochs)
-            % -------------------------------------------------------------
-            if nargin < 2
-                IDs = obj.epochIDs;
-            end
-            IDs = obj.id2index(IDs);
-            datasets = vertcat(obj.Epochs(IDs).Datasets);
-        end
-
-        function responses = getEpochResponses(obj, IDs)
-            % GETEPOCHRESPONSES
-            %
-            % Description:
-            %   Return the responses for the specified epoch(s)
-            %
-            % Syntax:
-            %   responses = getEpochResponses(obj, IDs)
-            %
-            % Optional inputs:
-            %   epochIDs            doubles
-            %       The IDs for target epochs (not index in Epochs) 
-            % -------------------------------------------------------------
-            if nargin < 2
-                IDs = obj.epochIDs;
-            end
-            IDs = obj.id2index(IDs);
-            responses = vertcat(obj.Epochs(IDs).Responses);
-        end
-
-        function registrations = getEpochRegistrations(obj, epochIDs)
-            % GETEPOCHREGISTRATIONS
-            %
-            % Description:
-            %   Return the registrations for specified epoch(s)
-            %
-            % Syntax:
-            %   datasets = getEpochRegistrations(obj, epochIDs)
-            %
-            % Inputs:
-            %   epochIDs            double
-            %       The IDs for 1 or more epochs (not index in Epochs)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                epochIDs    {aod.util.mustBeEpochID(obj, epochIDs)} = []
-            end
-
-            if isempty(epochIDs)
-                registrations = vertcat(obj.Epochs.Registrations);
-            else
-                epochIdx = obj.id2index(epochIDs);
-                registrations = vertcat(obj.Epochs(epochIdx).Registrations);
-            end
-        end
-
-        function stimuli = getEpochStimuli(obj, epochIDs)
-            % GETEPOCHSTIMULI
-            %
-            % Description:
-            %   Return the stimuli for specified epoch(s)
-            %
-            % Syntax:
-            %   stimuli = getEpochStimuli(obj, epochIDs)
-            %
-            % Inputs:
-            %   epochIDs            double
-            %       The IDs for 1 or more epochs (not index in Epochs)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                epochIDs    {aod.util.mustBeEpochID(obj, epochIDs)} = []
-            end
-
-            if isempty(epochIDs)
-                stimuli = vertcat(obj.Epochs.Stimuli);
-            else
-                epochIdx = obj.id2index(epochIDs);
-                stimuli = vertcat(obj.Epochs(epochIdx).Stimuli);
-            end
-        end
-    end
-
-    % Methods for returning or modifying entities for epoch(s)
-    methods
-        function clearEpochDatasets(obj, epochIDs)
-            % CLEAREPOCHDATASETS
-            %
-            % Description:
-            %   Clear responses in all or a subset of Epochs
-            %
-            % Syntax:
-            %   clearEpochDatasets(obj)
-            %   clearEpochDatasets(obj, epochIDs)
-            %
-            % Note:
-            %   If epochIDs is not provided, will clear all epochIDs
-            % -------------------------------------------------------------
-            if nargin < 2
-                epochIDs = obj.epochIDs;
-            end
-            for i = 1:numel(epochIDs)
-                ep = obj.id2epoch(epochIDs(i));
-                ep.remove('Dataset', 'all');
-            end
-        end
-
-        function clearEpochResponses(obj, epochIDs)
-            % CLEAREPOCHRESPONSES
-            %
-            % Description:
-            %   Clear responses in all or a subset of Epochs
-            %
-            % Syntax:
-            %   clearEpochResponses(obj)
-            %   clearEpochResponses(obj, epochIDs)
-            %
-            % Note:
-            %   If epochIDs is not provided, will clear all epochIDs
-            % -------------------------------------------------------------
-            if nargin < 2
-                epochIDs = obj.epochIDs;
-            end
-            for i = 1:numel(epochIDs)
-                ep = obj.id2epoch(epochIDs(i));
-                ep.remove('Response', 'all');
-            end
-        end
-
-        function clearEpochRegistrations(obj, epochIDs)
-            % CLEAREPOCHREGISTRATIONS
-            %
-            % Syntax:
-            %   clearEpochRegistrations(obj)
-            %   clearEpochRegistrations(obj, epochIDs)
-            %
-            % Note:
-            %   If epochIDs is not provided, will clear all epochIDs
-            % -------------------------------------------------------------
-            if nargin < 2
-                epochIDs = obj.epochIDs;
-            end
-
-            for i = 1:numel(epochIDs)
-                ep = obj.id2epoch(epochIDs(i));
-                ep.remove('Registration', 'all');
-            end
-        end
-
-        function clearEpochStimuli(obj, epochIDs)
-            % CLEAREPOCHSTIMULI
-            %
-            % Description:
-            %   Clears stimuli in all or a subset of Epochs
-            %
-            % Syntax:
-            %   clearEpochStimuli(obj)
-            %   clearEpochStimuli(obj, epochIDs)
-            %
-            %
-            % Note:
-            %   If epochIDs is not provided, will clear all epochIDs
-            % -------------------------------------------------------------
-            if nargin < 2
-                epochIDs = obj.epochIDs;
-            end
-
-            for i = 1:numel(epochIDs)
-                ep = obj.id2epoch(epochIDs(i));
-                ep.remove('Stimuli', 'all');
-            end
-        end
+        end 
     end
 
     methods (Access = protected)
+        function addEpoch(obj, epoch)
+            % ADDEPOCH
+            %
+            % Syntax:
+            %   obj.addEpoch(obj, epoch)
+            % -------------------------------------------------------------
+            assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
+
+            if ismember(epoch.ID, obj.epochIDs)
+                error("addEpoch:EpochIDAlreadyExists",...
+                    "Epoch %u is already present", epoch.ID);
+            end
+
+            epoch.setParent(obj);
+
+            obj.Epochs = cat(1, obj.Epochs, epoch);
+            obj.sortEpochs();
+        end
+
         function addSource(obj, source)
             % ADDSOURCE
             %
@@ -583,25 +526,6 @@ classdef Experiment < aod.core.Entity
             end
         end
 
-         function addEpoch(obj, epoch)
-            % ADDEPOCH
-            %
-            % Syntax:
-            %   obj.addEpoch(obj, epoch)
-            % -------------------------------------------------------------
-            assert(isa(epoch, 'aod.core.Epoch'), 'Input must be an Epoch');
-
-            if ismember(epoch.ID, obj.epochIDs)
-                error("addEpoch:EpochIDAlreadyExists",...
-                    "Epoch %u is already present", epoch.ID);
-            end
-
-            epoch.setParent(obj);
-
-            obj.Epochs = cat(1, obj.Epochs, epoch);
-            obj.sortEpochs();
-        end
-        
         function sortEpochs(obj)
             % SORTEPOCHS
             %

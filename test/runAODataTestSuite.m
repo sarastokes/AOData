@@ -1,4 +1,4 @@
-function [results, coverageTable] = runAODataTestSuite(varargin)
+function [results, packageTable] = runAODataTestSuite(varargin)
 % RUNAODATATESTSUITE
 %
 % Description:
@@ -58,17 +58,22 @@ function [results, coverageTable] = runAODataTestSuite(varargin)
         [coverageTable, detailTable] = test.readCoverageReport(fullfile(pwd, 'coverage_report'));
         % Summarize the results by package
         packageNames = ["+api", "+app", "+builtin", "+core", "+h5", "+persistent", "+util"];
+        packageCoverage = struct();
         for i = 1:numel(packageNames)
             idx = startsWith(detailTable.Name, packageNames(i));
             stmt = [sum(detailTable.StatementExec(idx)), sum(detailTable.StatementAll(idx))];
-            fprintf('\t%s:\t\t\t Statement = %u of %u (%.2f%%)\t\t',...
-                packageNames(i), stmt(1), stmt(2), 100*stmt(1)/stmt(2));
             fcn = [sum(detailTable.FunctionExec(idx)), sum(detailTable.FunctionAll(idx))];
-            fprintf('Function = %u of %u (%.2f%%)\n', fcn(1), fcn(2), 100*fcn(1)/fcn(2));
+            packageCoverage.(erase(packageNames(i), "+")) = [...
+                stmt, 100*stmt(1)/stmt(2), fcn, 100*fcn(1)/fcn(2)]';
         end
+        packageTable = struct2table(packageCoverage);
+        packageTable.Total = [coverageTable{1,[2,1,4]}, coverageTable{2,[2,1,4]}]';
+        packageTable.Properties.RowNames = [...
+            "ExecutedStatements", "TotalStatements", "StatementCoverage",... 
+            "ExecutedFunctions", "TotalFunctions", "FunctionCoverage"];
     else
         results = testWithoutCoverageReport(debugFlag);
-        coverageTable = [];
+        packageTable = [];
     end
 
     % Clean up files produced by tests, if necessary
