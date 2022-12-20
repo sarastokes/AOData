@@ -127,17 +127,17 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         function EntityTypeInit(testCase)
             import aod.core.EntityTypes
 
-            testCase.verifyEqual(EntityTypes.init(EntityTypes.EXPERIMENT),...
+            testCase.verifyEqual(EntityTypes.get(EntityTypes.EXPERIMENT),...
                 EntityTypes.EXPERIMENT);
-            out = EntityTypes.init('channel');
+            out = EntityTypes.get('channel');
             testCase.verifyEqual(out, EntityTypes.CHANNEL);
-            out = EntityTypes.init('device');
+            out = EntityTypes.get('device');
             testCase.verifyEqual(out, EntityTypes.DEVICE);
-            out = EntityTypes.init('annotation');
+            out = EntityTypes.get('annotation');
             testCase.verifyEqual(out, EntityTypes.ANNOTATION);
-            out = EntityTypes.init('stimulus');
+            out = EntityTypes.get('stimulus');
             testCase.verifyEqual(out, EntityTypes.STIMULUS);
-            out = EntityTypes.init('analysis');
+            out = EntityTypes.get('analysis');
             testCase.verifyEqual(out, EntityTypes.ANALYSIS);
         end
 
@@ -152,9 +152,18 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out.UUID, testCase.EXPT.UUID);
         end
 
-        function getCoreClassName(testCase)
+        function CoreClassName(testCase)
             className = aod.core.EntityTypes.EXPERIMENT.getCoreClassName();
             testCase.verifyEqual(className, 'aod.core.Experiment');
+        end
+
+        function UniqueExperiment(testCase)
+            % Test where Experiment behaves differently from other entities
+
+            expType = aod.core.EntityTypes.EXPERIMENT;
+            testCase.verifyEmpty(expType.validParentTypes());
+            testCase.verifyEmpty(expType.parentContainer());
+            testCase.verifyEqual(expType.getGroupName(testCase.EXPT), 'Experiment');
         end
     end
 end 

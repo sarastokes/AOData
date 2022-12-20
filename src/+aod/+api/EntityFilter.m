@@ -17,7 +17,7 @@ classdef EntityFilter < aod.api.FilterQuery
 
     methods 
         function obj = EntityFilter(hdfName, entityName)
-            entityName = char(aod.core.EntityTypes.init(entityName));
+            entityName = char(aod.core.EntityTypes.get(entityName));
             obj@aod.api.FilterQuery(hdfName);
             obj.entityName = entityName;
             obj.apply();

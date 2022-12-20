@@ -62,7 +62,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             if nargin == 3
-                entityType = aod.core.EntityTypes.init(varargin{2});
+                entityType = aod.core.EntityTypes.get(varargin{2});
                 assert(entityType == aod.core.EntityTypes.SOURCE,...
                     'Only Sources can be removed from Source');
                 ID = varargin{3};

@@ -20,7 +20,7 @@ function mustBeEntityType(obj, entityType)
 % -------------------------------------------------------------------------
 
 
-    entityType = aod.core.EntityTypes.init(entityType);
+    entityType = aod.core.EntityTypes.get(entityType);
 
     if ~isscalar(obj)
         for i = 1:numel(obj)

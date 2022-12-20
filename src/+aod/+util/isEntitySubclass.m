@@ -26,7 +26,7 @@ function tf = isEntitySubclass(obj, entityType)
         return
     end
 
-    entityType = aod.core.EntityTypes.init(entityType);
+    entityType = aod.core.EntityTypes.get(entityType);
     persistentParentClass = entityType.getPersistentClassName();
     coreParentClass = entityType.getCoreClassName();
 

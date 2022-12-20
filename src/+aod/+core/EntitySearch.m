@@ -9,7 +9,7 @@ classdef EntitySearch < handle
 %   Parameter, Dataset, File, Name, Class, Subclass
 %
 % Constructor:
-%   obj = aod.core.EntitySearch(entityGroup, queries)
+%   obj = aod.core.EntitySearch(entityGroup, varargin)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -91,15 +91,15 @@ classdef EntitySearch < handle
         function nameQuery(obj, nameSpec)
             if isa(nameSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
-                    if obj.filterIdx(i) && nameSpec(obj.Group(i).Name)
-                        obj.filterIdx(i) = true;
+                    if obj.filterIdx(i) 
+                        obj.filterIdx(i) = nameSpec(obj.Group(i).Name);
                     end
                 end
             else
                 nameSpec = convertStringsToChars(nameSpec);
                 for i = 1:numel(obj.Group)
-                    if obj.filterIdx(i) && strcmpi(obj.Group(i).Name, nameSpec)
-                        obj.filterIdx(i) = true;
+                    if obj.filterIdx(i) 
+                        obj.filterIdx(i) = strcmpi(obj.Group(i).Name, nameSpec);
                     end
                 end
             end
@@ -107,6 +107,7 @@ classdef EntitySearch < handle
 
         function datasetQuery(obj, dsetName, dsetSpec)
             % DATASETQUERY
+            % TODO: datetime comparison
             
             if nargin < 3
                 dsetSpec = [];
@@ -133,7 +134,7 @@ classdef EntitySearch < handle
                     if ~obj.filterIdx(i)
                         continue
                     end
-                    obj.filterIdx(i) = dsetSpec(obj.Group(i).dsetName);
+                    obj.filterIdx(i) = dsetSpec(obj.Group(i).(dsetName));
                 end
             else
                 for i = 1:numel(obj.Group)
@@ -237,7 +238,23 @@ classdef EntitySearch < handle
     end
 
     methods (Static)
-        function out = go(entityGroup, queries)
+        function out = go(entityGroup, varargin)
+            % Create EntitySearch object and return query matches
+            %
+            % Description:
+            %   A shortcut method for skipping the instantiation of the
+            %   EntitySearch object and directly returning the matches
+            %
+            % Syntax:
+            %   out = aod.core.EntitySearch.go(entityGroup, varargin)
+            %
+            % Inputs:
+            %   entityGroup         array of core entities
+            %       A group of entities of one type from the core interface
+            %   varargin            one or more queries
+            %       Queries within cells (TODO)
+            % -------------------------------------------------------------
+
             if isempty(entityGroup)
                 out = [];
                 return
@@ -245,10 +262,10 @@ classdef EntitySearch < handle
             if nargin < 2
                 warning('go:NoQueries',... 
                     'EntitySearch was not provided a query, returning full group');
-                out = group;
+                out = entityGroup;
                 return
             end
-            obj = aod.core.EntitySearch(entityGroup, queries);
+            obj = aod.core.EntitySearch(entityGroup, varargin{:});
             out = obj.getMatches();
         end
     end

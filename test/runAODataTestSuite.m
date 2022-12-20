@@ -64,13 +64,18 @@ function [results, packageTable] = runAODataTestSuite(varargin)
             stmt = [sum(detailTable.StatementExec(idx)), sum(detailTable.StatementAll(idx))];
             fcn = [sum(detailTable.FunctionExec(idx)), sum(detailTable.FunctionAll(idx))];
             packageCoverage.(erase(packageNames(i), "+")) = [...
-                stmt, 100*stmt(1)/stmt(2), fcn, 100*fcn(1)/fcn(2)]';
+                stmt, round(100*stmt(1)/stmt(2),2), fcn, round(100*fcn(1)/fcn(2),2)]';
         end
         packageTable = struct2table(packageCoverage);
         packageTable.Total = [coverageTable{1,[2,1,4]}, coverageTable{2,[2,1,4]}]';
         packageTable.Properties.RowNames = [...
             "ExecutedStatements", "TotalStatements", "StatementCoverage",... 
             "ExecutedFunctions", "TotalFunctions", "FunctionCoverage"];
+        % Code coverage without app package
+        baseCode = packageTable.Total - packageTable.app;
+        fprintf('BaseCoverage = %u of %u statements (%.2f%%), %u of %u functions (%.2f%%)\n',...
+            baseCode(1), baseCode(2), round(baseCode(1)/baseCode(2)*100,2),...
+            baseCode(4), baseCode(5), round(baseCode(4)/baseCode(5)*100,2));
     else
         results = testWithoutCoverageReport(debugFlag);
         packageTable = [];

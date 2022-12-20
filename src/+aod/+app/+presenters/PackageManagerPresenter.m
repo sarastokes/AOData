@@ -137,7 +137,7 @@ classdef PackageManagerPresenter < appbox.Presenter
             end
             folderContents = arrayfun(@(x) string(x.name), dir(path));
             if ~ismember(".git", folderContents)
-                sobj.view.ShowError('Folder is not a git repo: no .git folder found within selected path.');
+                obj.view.ShowError('Folder is not a git repo: no .git folder found within selected path.');
                 return
             end
             obj.view.addGitRepo(path);

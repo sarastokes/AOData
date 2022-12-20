@@ -1,5 +1,5 @@
 function [entity, idx] = findByUUID(entities, uuid)
-% FINDBYUUID
+% Find a core entity by UUID
 %
 % Syntax:
 %   [entity, idx] = findByUUID(entities, uuid)
@@ -7,7 +7,12 @@ function [entity, idx] = findByUUID(entities, uuid)
 % History:
 %   09Aug2022 - SSP
 %   02Sep2022 - SSP - Added catch for passing an empty array of entities
+%   20Dec2022 - SSP - Removed outdated cell option for entity input
 % -------------------------------------------------------------------------
+    arguments 
+        entities            {mustBeA(entities, 'aod.core.Entity')}
+        uuid                string
+    end 
 
     if isempty(entities)
         entity = [];
@@ -15,25 +20,11 @@ function [entity, idx] = findByUUID(entities, uuid)
         return
     end
     
-    if iscell(entities)
-        idx = false(1, numel(entities));
-        for i = 1:numel(entities)
-            if isSubclass(entities{i}, 'aod.core.Entity')
-                idx(i) = isequal(entities{i}.UUID, uuid);
-            end
-        end
-    else
-        assert(isSubclass(entities, 'aod.core.Entity'));
-        idx = vertcat(entities.UUID) == uuid;
-    end
-
+    idx = vertcat(entities.UUID) == uuid;
+    
     idx = find(idx);
     if ~isempty(idx)
-        if iscell(entities)
-            entity = entities{idx};
-        else
-            entity = entities(idx);
-        end
+        entity = entities(idx);
     else
         entity = [];
     end

@@ -23,7 +23,11 @@ deprecated/
 
 ## Testing folders and files
 test/coverage_report/
+
 test/test.h5
 test/ExperimentTest.h5
 test/ToyExperiment.h5
 test/HdfTest.h5
+
+test/BaseCoverage.xlsx
+test/~$BaseCoverage.xlsx

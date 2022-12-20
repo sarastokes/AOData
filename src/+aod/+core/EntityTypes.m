@@ -218,6 +218,9 @@ classdef EntityTypes
             assert(isSubclass(expt, 'aod.core.Experiment'),...
                 'Must provide a subclass of aod.core.Experiment');
 
+            out = expt.get(obj);
+            return
+            
             import aod.core.EntityTypes
 
             out = obj.empty();
@@ -327,46 +330,27 @@ classdef EntityTypes
             % Syntax:
             %   hdfPath = getPath(obj, entity, manager, parentPath)
             % -------------------------------------------------------------
-            assert(isSubclass(entity, 'aod.core.Entity'),...
-                'entity must be a subclass of aod.core.Entity');
+            if ~isSubclass(entity, 'aod.core.Entity')
+                error('getPath:InvalidEntity',...
+                    'entity must be a subclass of aod.core.Entity');
+            end
+
+            import aod.core.EntityTypes
+
+            if obj == EntityTypes.EXPERIMENT
+                hdfPath = '/Experiment';
+                return 
+            end
+
             assert(isSubclass(manager, 'aod.h5.EntityManager'),...
                 'manager must be a subclass of aod.h5.EntityManager');
-
             if nargin < 4
                 parentPath = obj.parentPath(entity, manager);
             end
             groupName = obj.getGroupName(entity);
 
-            import aod.core.EntityTypes
-
-            switch obj 
-                case EntityTypes.EXPERIMENT
-                    hdfPath = '/Experiment';
-                case EntityTypes.SOURCE
-                    hdfPath = [parentPath, '/Sources/', groupName];
-                case EntityTypes.SYSTEM
-                    hdfPath = [parentPath, '/Systems/', groupName];
-                case EntityTypes.CHANNEL
-                    hdfPath = [parentPath, '/Channels/', groupName];
-                case EntityTypes.DEVICE
-                    hdfPath = [parentPath, '/Devices/', groupName];
-                case EntityTypes.CALIBRATION
-                    hdfPath = [parentPath, '/Calibrations/', groupName];
-                case EntityTypes.ANNOTATION
-                    hdfPath = [parentPath, '/Annotations/', groupName];
-                case EntityTypes.EPOCH
-                    hdfPath = [parentPath, '/Epochs/', groupName];
-                case EntityTypes.DATASET
-                    hdfPath = [parentPath, '/Datasets/', groupName];
-                case EntityTypes.REGISTRATION
-                    hdfPath = [parentPath, '/Registrations/', groupName];
-                case EntityTypes.STIMULUS
-                    hdfPath = [parentPath, '/Stimuli/', groupName];
-                case EntityTypes.RESPONSE
-                    hdfPath = [parentPath, '/Responses/', groupName];
-                case EntityTypes.ANALYSIS
-                    hdfPath = [parentPath, '/Analyses/', groupName];
-            end
+            hdfPath = h5tools.util.buildPath(...
+                parentPath, obj.parentContainer(), groupName);
         end
 
         function hdfPath = parentPath(obj, entity, manager)
@@ -444,7 +428,7 @@ classdef EntityTypes
                 "Systems", "Channels", "Devices", "Responses", "Analyses"];
         end
 
-        function out = get(obj)
+        function out = getByClass(obj)
             % GET
             %
             % Description:
@@ -452,9 +436,7 @@ classdef EntityTypes
             %   or aod.persistent.Entity
             %
             % Syntax:
-            %   out = get(obj)
-            %
-            % TODO: Change name to getByClass
+            %   out = getByClass(obj)
             % -------------------------------------------------------------
             arguments 
                 obj         {mustBeA(obj, 'aod.core.Entity')}
@@ -489,11 +471,12 @@ classdef EntityTypes
             elseif isSubclass(obj, {'aod.core.Annotation', 'aod.persistent.Annotation'})
                 out = EntityTypes.ANNOTATION;
             else
-                error('Unrecognized entity type: %s', class(obj));
+                error('getByClass:UnknownClass',...
+                    'Unrecognized class: %s', class(obj));
             end
         end
 
-        function obj = init(entityName)
+        function obj = get(entityName)
             % INIT
             %
             % Description:
@@ -501,15 +484,15 @@ classdef EntityTypes
             %   from an object in the core or persistent interface
             %
             % Syntax:
-            %   obj = aod.core.EntityTypes.init(entityName)
+            %   obj = aod.core.EntityTypes.get(entityName)
             %
             % Example:
             % % Return from name
-            %   obj = aod.core.EntityTypes.init('epoch')
+            %   obj = aod.core.EntityTypes.get('epoch')
             %
             % % Return from class
             %   epoch = aod.core.Epoch(1);
-            %   obj = aod.core.EntityTypes.init(epoch);
+            %   obj = aod.core.EntityTypes.get(epoch);
             %
             % Notes:
             %   For compatibility, if a aod.core.EntityTypes is passed as
@@ -523,7 +506,7 @@ classdef EntityTypes
                 obj = entityName;
                 return
             elseif aod.util.isEntitySubclass(entityName)
-                obj = aod.core.EntityTypes.get(entityName);
+                obj = aod.core.EntityTypes.getByClass(entityName);
                 return
             end
 

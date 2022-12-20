@@ -63,7 +63,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 
             import aod.core.EntityTypes
 
-            entityType = EntityTypes.init(entityType);
+            entityType = EntityTypes.get(entityType);
             
             if entityType ~= EntityTypes.DEVICE 
                 error('get:InvalidEntityType',...
@@ -116,7 +116,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             
             if nargin == 3
-                entityType = aod.core.EntityTypes.init(varargin{1});
+                entityType = aod.core.EntityTypes.get(varargin{1});
                 if entityType ~= aod.core.EntityTypes.DEVICE
                     error('remove:InvalidEntity', ...
                         'Only Device can be removed from Channel');
@@ -135,13 +135,6 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
                 error('remove:InvalidID',...
                     'ID must be integer indices or "all"');
             end
-        end
-    end
-
-    % Overwritten methods
-    methods (Access = protected)
-        function value = getLabel(obj)
-            value = [obj.Name, 'Channel'];
         end
     end
 end

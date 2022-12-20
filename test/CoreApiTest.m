@@ -33,6 +33,12 @@ classdef CoreApiTest < matlab.unittest.TestCase
             testCase.EXPT.add(aod.builtin.calibrations.PowerMeasurement(...
                 'Mustang', getDateYMD(), 488));
 
+            % Add a system
+            testCase.EXPT.add(aod.core.System('TestSystem1'));
+            testCase.EXPT.Systems(1).add(aod.core.Channel('TestChannel1'));
+            testCase.EXPT.Systems(1).Channels(1).add(...
+                aod.builtin.devices.DichroicFilter(510, 'Low'));
+
             % Add analyses
             testCase.EXPT.add(aod.core.Analysis('Analysis1'));
             testCase.EXPT.add(aod.core.Analysis('Analysis2'));
@@ -81,7 +87,21 @@ classdef CoreApiTest < matlab.unittest.TestCase
         function testClassSearch(testCase)
             egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,...
                 {'Class', 'aod.builtin.calibrations.PowerMeasurement'});
-            testCase.verifyEqual(numel(egObj.getMatches()), 2);
+            testCase.verifyEqual(numel(egObj.getMatches()), 1);
+        end
+
+
+        function testDatasetSearch(testCase)
+            % Test for presence of a dataset
+            out = aod.core.EntitySearch.go(testCase.EXPT.Calibrations,...
+                {'Dataset', 'measurements'});
+            testCase.verifyNumElements(out, 1);
+
+            out = testCase.EXPT.get('Epochs', {'Dataset', 'ID', 1});
+            testCase.verifyNumElements(out, 1);
+
+            out = testCase.EXPT.get('Epochs', {'Dataset', 'ID', @(x) x < 3});
+            testCase.verifyNumElements(out, 2);
         end
 
         function testParameterSearch(testCase)

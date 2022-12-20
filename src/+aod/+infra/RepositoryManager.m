@@ -21,6 +21,7 @@ classdef RepositoryManager < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        % A table containing all git repositories and their current status
         repositoryInfo
     end
 
@@ -105,50 +106,16 @@ classdef RepositoryManager < handle
         end
 
         function findPackages(obj)
-            S = getpref('AOData');
-            if isempty(S)
-                obj.addBasePackage();
-                if ~isempty(obj.userPackages)
-                    obj.setUserPackages();
-                else
-                    setpref('AOData', 'UserPackages', string.empty());
-                end
-                return
-            end
-
+            S = getpref('AOData'); 
             f = fieldnames(S);
-            if ~ismember(f, 'BasePackage')
-                obj.addBasePackage();
-            else
-                obj.basePackage = getpref('AOData', 'BasePackage');
-            end
-        end
-
-        function addBasePackage(obj)
-            warning("PackageManager:AddingBasePackage",...
-                'Setting AOData/BasePackage user preference');
-            obj.setBasePackage(obj.AOD_PATH);
+            obj.basePackage = getpref('AOData', 'BasePackage');
         end
 
         function checkBasePackage(obj)
             if ~strcmp(obj.AOD_PATH, obj.basePackage)
                 error("PackageManager:InvalidBasePackage",...
-                    "Base Package does not match current aod folder!");
+                    "Base Package does not match current aod folder, Update with AODataManagerApp!");
             end
-        end
-
-        function setBasePackage(obj, aodPath)
-            arguments
-                obj 
-                aodPath         {mustBeFolder}
-            end
-
-            setpref('AOData', 'BasePackage', aodPath);
-            obj.basePackage = aodPath;
-        end
-
-        function setUserPackages(obj)
-            setpref('AOData', 'UserPackages', obj.userPackages);
         end
     end
 

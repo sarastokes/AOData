@@ -54,7 +54,7 @@ classdef EntityFactory < handle
             end
 
             className = T{T.Path == hdfPath, 'Class'};
-            entityType = aod.core.EntityTypes.init(obj.entityManager.entityMap(uuid));
+            entityType = aod.core.EntityTypes.get(obj.entityManager.entityMap(uuid));
 
             mirrorFcn = str2func(aod.infra.findMirror(...
                 entityType, className, obj.classManager));

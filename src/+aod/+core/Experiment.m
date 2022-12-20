@@ -42,7 +42,9 @@ classdef Experiment < aod.core.Entity
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
+        % The experiment's data folder path
         homeDirectory           char
+        % The date the experiment was performed (yyyyMMdd)
         experimentDate (1,1)    datetime
 
         Analyses                aod.core.Analysis       = aod.core.Analysis.empty()
@@ -52,11 +54,14 @@ classdef Experiment < aod.core.Entity
         Calibrations            aod.core.Calibration    = aod.core.Calibration.empty()
         Systems                 aod.core.System         = aod.core.System.empty()
 
+        % A table containing all git repositories and their current status
         Code                          
     end
 
     properties (Dependent)
+        % The IDs of all epochs in the experiment
         epochIDs    
+        % The total number of epochs in the experiment
         numEpochs (1,1)         double 
     end
     
@@ -228,7 +233,7 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
 
             import aod.core.EntityTypes
-            entityType = EntityTypes.init(entityType);
+            entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('remove:NonChildEntityType',...
                     'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
@@ -268,7 +273,7 @@ classdef Experiment < aod.core.Entity
             end
         end
 
-        function out = get(obj, entityType, queries)
+        function out = get(obj, entityType, varargin)
             % Search all entities of a specific type within experiment
             %
             % Description:
@@ -299,7 +304,7 @@ classdef Experiment < aod.core.Entity
 
             import aod.core.EntityTypes
 
-            entityType = EntityTypes.init(entityType);
+            entityType = EntityTypes.get(entityType);
 
             switch entityType
                 case EntityTypes.SOURCE
@@ -340,7 +345,7 @@ classdef Experiment < aod.core.Entity
             end
 
             if nargin > 2 && ~isempty(group)
-                out = aod.core.EntitySearch.go(group, queries);
+                out = aod.core.EntitySearch.go(group, varargin{:});
             else
                 out = group;
             end
@@ -359,7 +364,7 @@ classdef Experiment < aod.core.Entity
             
             import aod.core.EntityTypes
             
-            entityType = EntityTypes.init(entityType);
+            entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
                 error('remove:NonChildEntityType',...
                     'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
@@ -445,7 +450,7 @@ classdef Experiment < aod.core.Entity
             idx = obj.id2index(ID);
 
             import aod.core.EntityTypes
-            entityType = aod.core.EntityTypes.init(entityType);
+            entityType = aod.core.EntityTypes.get(entityType);
             if ~ismember(entityType, [EntityTypes.DATASET, EntityTypes.STIMULUS,...
                     EntityTypes.RESPONSE, EntityTypes.REGISTRATION])
                 error('removeByEpoch:InvalidEntityType',...

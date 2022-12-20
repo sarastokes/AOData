@@ -34,7 +34,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     methods (Sealed)
         function out = get(obj, entityType, queries)
             import aod.core.EntityTypes
-            entityType = EntityTypes.init(entityType);
+            entityType = EntityTypes.get(entityType);
 
             switch entityType
                 case EntityTypes.CHANNEL 
@@ -85,7 +85,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             if nargin == 2
                 ID = varargin{1};
             elseif nargin == 3
-                entityType = aod.core.EntityTypes.init(varargin{1});
+                entityType = aod.core.EntityTypes.get(varargin{1});
                 assert(entityType == aod.core.EntityTypes.CHANNEL,...
                     'Only Channels can be removed from System');
                 ID = varargin{2};

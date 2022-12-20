@@ -110,7 +110,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
             import aod.core.EntityTypes
 
-            entityType = aod.core.EntityTypes.init(entityType);
+            entityType = aod.core.EntityTypes.get(entityType);
 
             ID = convertCharsToStrings(ID);
             if isstring(ID) && strcmpi(ID, "all")
@@ -153,7 +153,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             
             import aod.core.EntityTypes
 
-            entityType = EntityTypes.init(entityType);
+            entityType = EntityTypes.get(entityType);
 
             switch entityType
                 case EntityTypes.DATASET 

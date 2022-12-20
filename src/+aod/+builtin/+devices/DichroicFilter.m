@@ -55,6 +55,7 @@ classdef DichroicFilter < aod.core.Device
             % Syntax:
             %   setPassType(obj, passType)
             % -------------------------------------------------------------
+            passType = lower(passType);
             assert(ismember(passType, {'low', 'high'}),...
                 'PassType must be either ''low'' or ''high''');
             obj.setParam('Pass', passType);

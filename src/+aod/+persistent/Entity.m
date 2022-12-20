@@ -163,11 +163,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   h = obj.ancestor(aod.core.EntityTypes.EXPERIMENT)
             %   h = obj.ancestor('experiment')
             % -------------------------------------------------------------
-            try
-                entityType = aod.core.EntityTypes.get(entityType);
-            catch
-                entityType = aod.core.EntityTypes.init(entityType);
-            end
+            entityType = aod.core.EntityTypes.get(entityType);
 
             h = obj;
             while h.entityType ~= entityType
@@ -676,7 +672,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             specialAttributes = ["UUID", "Class", "EntityType", "LastModified"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
-            obj.entityType = aod.core.EntityTypes.init(obj.loadAttribute('EntityType'));
+            obj.entityType = aod.core.EntityTypes.get(obj.loadAttribute('EntityType'));
             obj.entityClassName = obj.loadAttribute('Class');
             lastModTime = obj.loadAttribute('LastModified');
             if ~isempty(lastModTime)

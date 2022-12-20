@@ -27,5 +27,11 @@ classdef UtilityTest < matlab.unittest.TestCase
             RM.listPackages();
             RM.update();
         end
+
+        function testUUIDValidation(testCase)
+            testCase.verifyError(...
+                @() aod.util.validateUUID('baduuid'),...
+                "validateUUID:InvalidInput");
+        end
     end
 end 
