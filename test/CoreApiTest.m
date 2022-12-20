@@ -64,8 +64,7 @@ classdef CoreApiTest < matlab.unittest.TestCase
     methods (Test)
         function testEmptySearch(testCase)
             testCase.verifyWarning(...
-                @() aod.core.EntitySearch.go('Response'),...
-                "go:NoQueries");
+                @() aod.core.EntitySearch.go('Response'), "go:NoQueries");
         end
 
         function testNameSearch(testCase)
@@ -131,6 +130,17 @@ classdef CoreApiTest < matlab.unittest.TestCase
             egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
                 {'File', 'MyFile', @(x) endsWith(x, '.txt')});
             testCase.verifyEqual(numel(egObj.getMatches()), 4);
+        end
+    end
+
+    methods (Test, TestTags=["Errors", "CoreApi"])
+        function testEntityErrors(testCase)
+            testCase.verifyError(...
+                @() testCase.EXPT.Systems(1).Channels(1).get('Epoch'),...
+                "get:InvalidEntityType");
+            testCase.verifyError(...
+                @() testCase.EXPT.Epochs(1).get('System'),...
+                "get:InvalidEntityType");
         end
     end
 end

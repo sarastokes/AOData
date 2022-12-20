@@ -216,11 +216,16 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             channel2.add(device3);
 
             % Access all devices from different entities
-            testCase.verifyEqual(numel(channel1.Devices), 2);
-            testCase.verifyEqual(numel(channel2.Devices), 1);
+            testCase.verifyNumElements(channel1.Devices, 2);
+            testCase.verifyNumElements(channel1.get('Device'), 2);
+            testCase.verifyNumElements(channel2.Devices, 1);
             testCase.verifyEqual(numel(system.get('Device')), 3);
             testCase.verifyEqual(numel(testCase.EXPT.get('Device')), 3);
-            
+
+            % Query devices from Channel
+            testCase.verifyNumElements(channel1.get('Device',... 
+                {'Param', 'Diameter', 5}), 1);
+
             % Work with device array
             allDevices = testCase.EXPT.get('Device');
             % Add notes to all the devices, then remove them

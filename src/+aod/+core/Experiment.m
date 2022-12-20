@@ -366,8 +366,8 @@ classdef Experiment < aod.core.Entity
             
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
-                error('remove:NonChildEntityType',...
-                    'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
+                error('getFromEpoch:NonChildEntityType',...
+                    'Entity must be a Dataset, Registration, Response or Stimulus');
             end
 
             if isempty(obj.Epochs)

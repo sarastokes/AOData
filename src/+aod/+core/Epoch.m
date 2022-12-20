@@ -154,6 +154,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             import aod.core.EntityTypes
 
             entityType = EntityTypes.get(entityType);
+            if ~ismember(entityType, obj.entityType.validChildTypes())
+                error('get:InvalidEntityType',...
+                    'Entity must be Dataset, Registration, Response and Stimulus');
+            end
 
             switch entityType
                 case EntityTypes.DATASET 
@@ -164,9 +168,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                     group = obj.Responses;
                 case EntityTypes.STIMULUS 
                     group = obj.Stimuli;
-                otherwise
-                    error('search:InvalidEntityType',...
-                        'Only Dataset, Registration, Response and Stimulus can be searched from Epoch');
             end
 
             if nargin > 2 && ~isempty(group)

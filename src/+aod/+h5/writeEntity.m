@@ -17,6 +17,7 @@ function writeEntity(hdfName, obj)
     import aod.core.EntityTypes
 
     entityType = EntityTypes.get(obj);
+    mc = metaclass(obj);
 
     if entityType == EntityTypes.EXPERIMENT
         h5tools.createGroup(hdfName, '/', 'Experiment');

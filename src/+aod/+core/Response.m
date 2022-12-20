@@ -26,34 +26,64 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         Data                             
         Timing (1,:)                            
 
-        fileName            string
+        fileName            char
         fileReader          % aod.util.FileReader
 
         Dataset             aod.core.Dataset 
     end
 
     methods
-        function obj = Response(name, fileName, reader)
-            arguments
-                name        char
-                fileName    char        = []
-                reader                  = []
-            end
-            
-            obj@aod.core.Entity(name);
-            obj.fileName = fileName;
-            obj.setFileReader(reader);
+        function obj = Response(name, varargin)
+
+            obj@aod.core.Entity(name, varargin{:});
+
+            ip = inputParser();
+            addParameter(ip, 'FileName', [], @ischar);
+            addParameter(ip, 'Reader', [], @(x) isSubclass(x, 'aod.util.FileReader'));
+            addParameter(ip, 'Dataset', [], @(x) isSubclass(x, 'aod.core.Dataset'));
+            parse(ip, varargin{:});
+
+            obj.setFileName(ip.Results.FileName);
+            obj.setFileReader(ip.Results.Dataset);
+            obj.setDataset(ip.Results.Dataset);
         end
     end
 
     methods (Sealed)
         function setFileReader(obj, reader)
-            if nargin == 1 || isempty(reader)
+            if isempty(reader)
+                obj.fileReader = [];
                 return
             end
             assert(isSubclass(reader, 'aod.util.FileReader'),...
                 'Input must be a subclass of aod.util.FileReader');
             obj.fileReader = reader;
+        end
+
+        function setFileName(obj, fileName)
+            if isempty(fileName)
+                obj.fileName = '';
+            elseif ~isempty(obj.Parent)
+                tf = obj.Parent.hasFile(fileName);
+                if ~tf
+                    warning('setFileName:FileNotFound',...
+                        'File %s not found in parent Epoch', fileName);
+                end
+                obj.fileName = fileName;
+            end
+        end
+
+        function setDataset(obj, dataset)
+            if isempty(dataset)
+                obj.Dataset = aod.core.Dataset.empty();
+            else
+                if ~isSubclass(dataset, 'aod.core.Dataset')
+                    error('setDataset:InvalidEntity',...
+                        'Dataset must be aod.core.Dataset or subclass');
+                end
+                obj.Dataset = dataset;
+            end
+
         end
     end
 
@@ -90,6 +120,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Access = protected)
         function sync(obj)
+            % Adopt epoch's timing if Response Timing is empty
             sync@aod.core.Entity(obj);
             if isempty(obj.Timing) && ~isempty(obj.Parent.Timing)
                 obj.Timing = obj.Parent.Timing;
