@@ -27,7 +27,6 @@ classdef (Abstract) Entity < handle
 %
 %   addNote(obj, txt)
 %   removeNote(obj, ID)
-%   clearNotes(obj)
 %
 %   tf = hasParam(obj, paramName)
 %   setParam(obj, varargin)
@@ -219,32 +218,17 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.removeNote(obj, ID)
             % -------------------------------------------------------------
-            arguments
-                obj
-                ID      {mustBeInteger(ID)}
-            end
-
             if ~isscalar(obj)
                 arrayfun(@(x) removeNote(x, ID), obj);
                 return
             end
-            assert(ID > 0 && ID <= numel(obj.notes),...
-                'Invalid ID %u, must be between 1-%u', ID, numel(obj.notes));
-            obj.notes(ID) = [];
-        end
-
-        function clearNotes(obj)
-            % CLEARNOTES
-            %
-            % Syntax:
-            %   obj.clearNotes()
-            % -------------------------------------------------------------
-            if ~isscalar(obj)
-                arrayfun(@(x) clearNotes(x), obj);
-                return
+            
+            if istext(ID) && strcmpi(ID, 'all')
+                obj.notes = string.empty();
+            elseif isnumeric(ID)
+                mustBeInteger(ID); mustBeInRange(ID, 1, numel(obj.notes));
+                obj.notes(ID) = [];
             end
-
-            obj.notes = string.empty();
         end
     end
 

@@ -142,11 +142,6 @@ classdef ExperimentPresenter < appbox.Presenter
                     'EntityPath', parentNode.Tag,...
                     'AONode', aod.app.AONodeTypes.get(entity.(dsetNames(i)), dsetNames(i)),...
                     'Attributes', obj.attributes2map(info.Attributes));
-                %if dsetNames(i) == "files"
-                %    nodeData.AONode = aod.app.AONodeTypes.FILES;
-                %elseif dsetNames(i) == "notes"
-                %    nodeData.AONode = aod.app.AONodeTypes.NOTES;
-                %end
                 g = obj.view.makeDatasetNode(parentNode, dsetNames(i),...
                     dsetPath, nodeData);
             end
@@ -186,18 +181,17 @@ classdef ExperimentPresenter < appbox.Presenter
                 obj.view.setAttributeTable();
             end
 
-            switch node.NodeData.H5Node
-                case aod.app.H5NodeTypes.LINK
-                    obj.view.setLinkPanelView(node.NodeData.LinkPath);
-                case aod.app.H5NodeTypes.DATASET
-                    displayType = node.NodeData.AONode.getDisplayType();
-                    if isempty(displayType)
-                        return
-                    end
-                    entity = obj.Experiment.getByPath(node.Parent.Tag);
-                    data = entity.(node.Text);
-                    [displayType, data] = node.NodeData.AONode.displayInfo(data);
-                    obj.view.setDataDisplayPanel(displayType, data);
+            if node.NodeData.H5Node == aod.app.H5NodeTypes.LINK
+                obj.view.setLinkPanelView(node.NodeData.LinkPath);
+            elseif node.NodeData.H5Node == aod.app.H5NodeTypes.DATASET
+                displayType = node.NodeData.AONode.getDisplayType();
+                if isempty(displayType)
+                    return
+                end
+                entity = obj.Experiment.getByPath(node.Parent.Tag);
+                data = entity.(node.Text);
+                [displayType, data] = node.NodeData.AONode.displayInfo(data);
+                obj.view.setDataDisplayPanel(displayType, data);
             end
         end
 

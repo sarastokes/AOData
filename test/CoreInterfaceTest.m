@@ -159,9 +159,10 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Analyses), 2);
 
             % Add a date to the analysis
-            analysis2.setAnalysisDate(getDateYMD());
+            dateYMD = getDateYMD();
+            analysis2.setAnalysisDate(dateYMD);
             dateParam = getParam(analysis2, 'Date');
-            test.util.verifyDatesEqual(testCase, dateParam, getDateYMD());
+            test.util.verifyDatesEqual(testCase, dateParam, dateYMD);
 
             % Add an empty date to the analysis
             testCase.EXPT.Analyses(1).setAnalysisDate();
@@ -236,7 +237,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Clear notes from all the devices, then clear them
             addNote([device1,device2,device3], "This is a note");
-            clearNotes([device1, device2, device3]);
+            removeNote([device1, device2, device3], 'all');
             
             % Remove a device
             channel1.remove('Device', 2);
@@ -278,6 +279,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Add a date to one of them
             epoch1.setStartTime(datetime('now'));
+
+            % Test default label
+            testCase.verifyEqual(epoch1.label, 'Epoch0001');
 
             % Add to an experiment
             testCase.EXPT.add(epoch1);

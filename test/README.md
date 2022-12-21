@@ -1,15 +1,15 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 20Dec2022, the ```aod``` package report contains **127 files** and has:
-- **51.85%** statement coverage (3683 executable). 
-- **52.81%** function coverage (635 executable).
+As of 20Dec2022, the ```aod``` package report contains **128 files** and has:
+- **54.11%** statement coverage (3711 executable). 
+- **55.72%** function coverage (638 executable).
 
-The apps are the least tested, excluding ```aod.app```, code coverage is **60.10%** for statements and **63.73%** for functions.
+The apps are the least tested, excluding ```aod.app```, code coverage is **60.41%** for statements and **64.27%** for functions.
 
 ## Tests
 The AOData test suite currently contains the following:
-- ```AODataViewerTest``` - tests the AODataViewer app
+- ```AODataViewerTest``` - tests display and user interaction with the AODataViewer app
 - ```BuiltinClassTest``` - tests operation of builtin subclasses
 - ```CoreApiTest``` - tests core interface queries
 - ```CoreInterfaceTest``` - tests basic functions of the core interface
@@ -36,5 +36,5 @@ A code coverage report for the full ```aod``` package can be run as shown below.
 
 An individual test can be run as:
 ```matlab
-result = runtests('HDFTest');
+result = runtests('CoreInterfaceTest');
 ```

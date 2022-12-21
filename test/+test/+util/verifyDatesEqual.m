@@ -15,5 +15,5 @@ function verifyDatesEqual(testCase, actual, expected)
     testCase.verifyEqual(actual.Day, expected.Day);
     testCase.verifyEqual(actual.Hour, expected.Hour);
     testCase.verifyEqual(actual.Minute, expected.Minute);
-    testCase.verifyEqual(actual.Second, expected.Second, 'AbsTol', 0.01);
+    testCase.verifyEqual(actual.Second, expected.Second);
     testCase.verifyEqual(actual.TimeZone, expected.TimeZone);

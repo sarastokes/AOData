@@ -506,7 +506,7 @@ classdef EntityTypes
                 obj = entityName;
                 return
             elseif aod.util.isEntitySubclass(entityName)
-                obj = aod.core.EntityTypes.getByClass(entityName);
+                obj = EntityTypes.getByClass(entityName);
                 return
             end
 
