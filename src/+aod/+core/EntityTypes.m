@@ -1,5 +1,5 @@
 classdef EntityTypes
-% ENTITYTYPES
+% Defines the entity types in the AOData Object Model
 %
 % Description:
 %   Establishes business logic for entities and their organization within
@@ -52,10 +52,11 @@ classdef EntityTypes
 
     methods
         function parentTypes = validParentTypes(obj)
-            % VALIDPARENTTYPES
+            % Return valid parent entity types
             %
             % Description:
-            %   Returns the entity types that can be set to "Parent"
+            %   Returns the entity types that can be set to "Parent". This 
+            %   enforces the AOData Object Model hierarchy
             %
             % Syntax:
             %   parentTypes = validParentTypes(obj)
@@ -81,6 +82,10 @@ classdef EntityTypes
 
         function childTypes = validChildTypes(obj)
             % Return valid child entity types
+            %
+            % Description:
+            %   Implements AOData object model hierarchy with limitations 
+            %   on which entities can be added to an entity
             %
             % Syntax:
             %   childTypes = validChildTypes(obj)
@@ -230,20 +235,20 @@ classdef EntityTypes
                     out = expt; 
                 case EntityTypes.ANALYSIS 
                     out = expt.Analyses;
-                case EntityTypes.EPOCH 
-                    out = expt.Epochs;
-                case EntityTypes.SYSTEM 
-                    out = expt.Systems;
                 case EntityTypes.ANNOTATION 
                     out = expt.Annotations;
                 case EntityTypes.CALIBRATION
                     out = expt.Calibrations;
+                case EntityTypes.EPOCH 
+                    out = expt.Epochs;
+                case EntityTypes.SOURCE 
+                    out = expt.getAllSources();
+                case EntityTypes.SYSTEM 
+                    out = expt.Systems;
                 case EntityTypes.CHANNEL 
                     out = expt.get(obj);
                 case EntityTypes.DEVICE 
                     out = expt.get(obj);
-                case EntityTypes.SOURCE 
-                    out = expt.getAllSources();
                 case EntityTypes.REGISTRATION
                     out = expt.getFromEpoch('all', 'Registration');
                 case EntityTypes.RESPONSE
@@ -256,13 +261,16 @@ classdef EntityTypes
         end 
 
         function out = empty(obj)
-            % EMPTY
+            % Return an empty instance of the entity type 
             %
             % Description:
             %   Returns an empty instance of the entity type
             %
             % Syntax:
             %   out = empty(obj)
+            %
+            % Notes:
+            %   Experiment does not support empty and will return [].
             % -------------------------------------------------------------
             import aod.core.EntityTypes
 
@@ -271,6 +279,8 @@ classdef EntityTypes
                     out = [];
                 case EntityTypes.ANALYSIS
                     out = aod.core.Analysis.empty();
+                case EntityTypes.ANNOTATION
+                    out = aod.core.Annotation.empty();
                 case EntityTypes.CALIBRATION
                     out = aod.core.Calibration.empty();
                 case EntityTypes.SYSTEM
@@ -303,6 +313,7 @@ classdef EntityTypes
             % Syntax:
             %   out = getCoreClassName(obj)
             % -------------------------------------------------------------
+
             out = ['aod.core.', appbox.capitalize(char(obj))];
         end
 
@@ -315,6 +326,7 @@ classdef EntityTypes
             % Syntax:
             %   out = getCoreClassName(obj)
             % -------------------------------------------------------------
+
             out = ['aod.persistent.', appbox.capitalize(char(obj))];
         end
     end
@@ -322,24 +334,25 @@ classdef EntityTypes
     % HDF5 methods
     methods 
         function hdfPath = getPath(obj, entity, manager, parentPath)
-            % GETPATH
+            % Returns HDF5 path for core entity
             %
             % Description:
-            %   Determines entity's HDF5 path
+            %   Determines core entity's HDF5 path
             %
             % Syntax:
             %   hdfPath = getPath(obj, entity, manager, parentPath)
             % -------------------------------------------------------------
-            if ~isSubclass(entity, 'aod.core.Entity')
-                error('getPath:InvalidEntity',...
-                    'entity must be a subclass of aod.core.Entity');
-            end
-
+            
             import aod.core.EntityTypes
 
             if obj == EntityTypes.EXPERIMENT
                 hdfPath = '/Experiment';
                 return 
+            end
+
+            if ~isSubclass(entity, 'aod.core.Entity')
+                error('getPath:InvalidEntity',...
+                    'entity must be a subclass of aod.core.Entity');
             end
 
             assert(isSubclass(manager, 'aod.h5.EntityManager'),...
@@ -354,15 +367,19 @@ classdef EntityTypes
         end
 
         function hdfPath = parentPath(obj, entity, manager)
-            % PARENTPATH
+            % Returns parent HDF5 path for an entity
             %
             % Syntax:
             %   hdfPath = parentPath(obj, entity, manager)
             % -------------------------------------------------------------
-            assert(isSubclass(entity, 'aod.core.Entity'),...
-                'entity must be a subclass of aod.core.Entity');
-            assert(isSubclass(manager, 'aod.h5.EntityManager'),...
-                'manager must be a subclass of aod.h5.EntityManager');
+            if nargin > 1
+                assert(isSubclass(entity, 'aod.core.Entity'),...
+                    'entity must be a subclass of aod.core.Entity');
+            end
+            if nargin > 2
+                assert(isSubclass(manager, 'aod.h5.EntityManager'),...
+                    'manager must be a subclass of aod.h5.EntityManager');
+            end
 
             import aod.core.EntityTypes
 
@@ -373,11 +390,11 @@ classdef EntityTypes
                         EntityTypes.ANALYSIS, EntityTypes.CALIBRATION}
                     hdfPath = '/Experiment';
                 case EntityTypes.SOURCE 
-                    if isempty(entity.Parent)
-                        hdfPath = '/Experiment';
-                    else
-                        hdfPath = manager.uuid2path(entity.Parent.UUID);
-                    end
+                    %if isempty(entity.Parent)
+                    %    hdfPath = '/Experiment';
+                    %else
+                    hdfPath = manager.uuid2path(entity.Parent.UUID);
+                    %end
                 otherwise
                     hdfPath = manager.uuid2path(entity.Parent.UUID);
             end
@@ -404,6 +421,7 @@ classdef EntityTypes
                 case EntityTypes.EXPERIMENT
                     out = 'Experiment';
                 case EntityTypes.EPOCH
+                    %% TODO: Put this back in Epoch
                     if ~isempty(entity.Name)
                         out = entity.Name;
                     else
@@ -416,18 +434,19 @@ classdef EntityTypes
         end
 
         function out = allContainerNames(obj) %#ok<INUSD> 
-            % GETALLCONTAINERS
-            %
+            % Returns a list of all container names
             %
             % Syntax:
             %   out = getAllContainers(obj)
-            %
             % -------------------------------------------------------------
             out = ["Sources", "Calibrations", "Annotations",... 
                 "Datasets", "Epochs", "Registrations", "Stimuli",... 
                 "Systems", "Channels", "Devices", "Responses", "Analyses"];
         end
+    end
 
+    % Creation methods
+    methods (Static)
         function out = getByClass(obj)
             % GET
             %
@@ -439,13 +458,17 @@ classdef EntityTypes
             %   out = getByClass(obj)
             % -------------------------------------------------------------
             arguments 
-                obj         {mustBeA(obj, 'aod.core.Entity')}
+                obj         {mustBeA(obj, ["aod.core.Entity","aod.persistent.Entity"])}
             end
 
             import aod.core.EntityTypes 
 
             if isSubclass(obj, {'aod.core.Experiment', 'aod.persistent.Experiment'})
                 out = EntityTypes.EXPERIMENT;
+            elseif isSubclass(obj, {'aod.core.Annotation', 'aod.persistent.Annotation'})
+                out = EntityTypes.ANNOTATION;
+            elseif isSubclass(obj, {'aod.core.Analysis', 'aod.persistent.Analysis'})
+                out = EntityTypes.ANALYSIS;
             elseif isSubclass(obj, {'aod.core.Source', 'aod.persistent.Source'})
                 out = EntityTypes.SOURCE;
             elseif isSubclass(obj, {'aod.core.Calibration', 'aod.persistent.Calibration'})
@@ -466,13 +489,6 @@ classdef EntityTypes
                 out = EntityTypes.STIMULUS;
             elseif isSubclass(obj, {'aod.core.Response', 'aod.persistent.Response'})
                 out = EntityTypes.RESPONSE;
-            elseif isSubclass(obj, {'aod.core.Analysis', 'aod.persistent.Analysis'})
-                out = EntityTypes.ANALYSIS;
-            elseif isSubclass(obj, {'aod.core.Annotation', 'aod.persistent.Annotation'})
-                out = EntityTypes.ANNOTATION;
-            else
-                error('getByClass:UnknownClass',...
-                    'Unrecognized class: %s', class(obj));
             end
         end
 
@@ -509,7 +525,7 @@ classdef EntityTypes
                 obj = EntityTypes.getByClass(entityName);
                 return
             end
-
+  
             switch lower(entityName)
                 case {'experiment', 'exp'}
                     obj = EntityTypes.EXPERIMENT;
@@ -538,7 +554,8 @@ classdef EntityTypes
                 case {'analysis', 'analyses'}
                     obj = EntityTypes.ANALYSIS;
                 otherwise
-                    obj = [];
+                    error('get:UnknownEntity',...
+                        'Entity %s could not be matched to an EntityType');
             end
         end
     end

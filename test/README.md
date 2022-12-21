@@ -2,10 +2,10 @@
 
 ## Code Coverage
 As of 20Dec2022, the ```aod``` package report contains **128 files** and has:
-- **54.11%** statement coverage (3711 executable). 
-- **55.72%** function coverage (638 executable).
+- **55.91%** statement coverage (3743 executable). 
+- **55.90%** function coverage (635 executable).
 
-The apps are the least tested, excluding ```aod.app```, code coverage is **60.41%** for statements and **64.27%** for functions.
+The apps are the least tested, excluding ```aod.app```, code coverage is **62.61%** for statements and **64.53%** for functions.
 
 ## Tests
 The AOData test suite currently contains the following:
@@ -14,7 +14,7 @@ The AOData test suite currently contains the following:
 - ```CoreApiTest``` - tests core interface queries
 - ```CoreInterfaceTest``` - tests basic functions of the core interface
 - ```CustomDisplayTest``` - ensures custom displays do not throw errors
-- ```EnumerationTest``` - tests basic functioning of enumeration classes not covered elsewhere
+- ```EnumeratedTypeTest``` - tests basic functioning of enumeration classes not covered elsewhere
 - ```HDFTest``` - tests I/O accuracy for MATLAB data types to HDF5 datasets and attributes
 - ```FileReaderTest``` - tests builtin file readers
 - ```FilterTest``` - tests AOQuery filters

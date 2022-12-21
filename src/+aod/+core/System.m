@@ -27,6 +27,9 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     
     methods
         function obj = System(name, varargin)
+            if nargin == 0
+                name = [];
+            end
             obj = obj@aod.core.Entity(name, varargin{:});
         end      
     end

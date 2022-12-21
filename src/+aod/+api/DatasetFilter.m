@@ -11,7 +11,10 @@ classdef DatasetFilter < aod.api.FilterQuery
 % Constructor:
 %   obj = DatasetFilter(hdfName, dsetName)
 %   obj = DatasetFilter(hdfName, dsetName, dsetValue)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties
         dsetName
         dsetValue
@@ -67,7 +70,7 @@ classdef DatasetFilter < aod.api.FilterQuery
         end
     end
 
-    methods %(Access = private)
+    methods (Access = private)
         function groupDsets = getGroupDatasets(obj, groupName)
             gOrder = h5tools.util.getPathOrder(groupName);
             groupDsets = string.empty();

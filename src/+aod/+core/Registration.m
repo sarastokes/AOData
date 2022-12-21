@@ -10,27 +10,22 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = aod.core.Registration(parent, data)
 %
-% Abstract methods:
-%   varargout = apply(obj, varargin)
-%
 % Sealed methods:
 %   setRegistrationDate(obj, regDate)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        registrationDate(1,1)               datetime
-    end
-    
-    methods (Abstract)
-        varargout = apply(obj, varargin)
+    properties (SetAccess = protected)
+        registrationDate                datetime = datetime.empty()
     end
 
     methods
-        function obj = Registration(name, registrationDate)
-            obj = obj@aod.core.Entity(name);
-            obj.setRegistrationDate(registrationDate);
+        function obj = Registration(name, registrationDate, varargin)
+            obj@aod.core.Entity(name, varargin{:});
+            if nargin > 1
+                obj.setRegistrationDate(registrationDate);
+            end
         end
     end
 
@@ -47,9 +42,11 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   regDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
-            if isempty(regDate)
+            if nargin < 2 || isempty(regDate)
+                obj.registrationDate = datetime.empty();
                 return
             end
+
             regDate = aod.util.validateDate(regDate);
             obj.registrationDate = regDate;
         end

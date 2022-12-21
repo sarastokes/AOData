@@ -139,11 +139,36 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, EntityTypes.STIMULUS);
             out = EntityTypes.get('analysis');
             testCase.verifyEqual(out, EntityTypes.ANALYSIS);
+
+            testCase.verifyError(@() EntityTypes.get('double'), 'get:UnknownEntity');
+        end
+
+        function Empty(testCase)
+            import aod.core.EntityTypes
+
+            testCase.verifyEmpty(EntityTypes.STIMULUS.empty());
+            testCase.verifyEmpty(EntityTypes.CHANNEL.empty());
+            testCase.verifyClass(EntityTypes.DEVICE.empty(), 'aod.core.Device');
+            testCase.verifyClass(EntityTypes.EXPERIMENT.empty(), 'double');
+        end
+
+        function HdfPaths(testCase)
+            import aod.core.EntityTypes
+
+            testCase.verifyError(...
+                @() EntityTypes.CHANNEL.getPath(123), "getPath:InvalidEntity");
+            testCase.verifyEqual(EntityTypes.EXPERIMENT.getPath(), '/Experiment');
         end
 
         function persistentParentContainer(testCase)
             out = aod.core.EntityTypes.EPOCH.persistentParentContainer();
             testCase.verifyEqual('EpochsContainer', out);
+        end
+
+        function childContainers(testCase)
+            % TODO Check for use
+            out = aod.core.EntityTypes.SYSTEM.childContainers(true);
+            testCase.verifyEqual("ChannelsContainer", out);
         end
 
         function collectAll(testCase)

@@ -96,7 +96,7 @@ classdef (Abstract) Entity < handle
             end
 
             % Assign entity type
-            obj.assignEntityType();
+            obj.entityType = aod.core.EntityTypes.get(obj);
 
             % Generate a random unique identifier to distinguish the class
             obj.UUID = aod.util.generateUUID();
@@ -187,7 +187,7 @@ classdef (Abstract) Entity < handle
         end
         
         function addNote(obj, txt)
-            % ADDNOTE
+            % Append a note to the entity
             % 
             % Syntax:
             %   obj.addNote(txt)
@@ -210,14 +210,22 @@ classdef (Abstract) Entity < handle
         end
 
         function removeNote(obj, ID)
-            % REMOVENOTE
+            % Remove note(s) from the entity
             % 
             % Description:
-            %   Remove a specific note
+            %   Remove a specific note by ID or clear all notes
             %
             % Syntax:
             %   obj.removeNote(obj, ID)
+            %
+            % Examples:
+            %   % Remove 2nd note
+            %   obj.removeNote(2)
+            %
+            %   % Clear all notes
+            %   obj.removeNote("all")
             % -------------------------------------------------------------
+
             if ~isscalar(obj)
                 arrayfun(@(x) removeNote(x, ID), obj);
                 return
@@ -235,13 +243,17 @@ classdef (Abstract) Entity < handle
     % Parameter methods
     methods (Sealed)
         function tf = hasParam(obj, paramName)
-            % HASPARAM
+            % Check whether entity has a parameter
             %
             % Description:
             %   Check whether entity parameters has a specific parameter
             %
             % Syntax:
             %   tf = hasParam(obj, paramName)
+            %
+            % Examples:
+            %   % See whether entity has parameter 'MyParam'
+            %   tf = obj.hasParam('MyParam')
             % -------------------------------------------------------------
             arguments
                 obj
@@ -257,7 +269,7 @@ classdef (Abstract) Entity < handle
         end
 
         function paramValue = getParam(obj, paramName, errorType)
-            % GETPARAM
+            % Get the value of a parameter
             %
             % Description:
             %   Return the value of a specific parameter. 
@@ -268,14 +280,21 @@ classdef (Abstract) Entity < handle
             % Inputs:
             %   paramName       char
             % Optional inputs:
-            %   errorType       aod.util.ErrorTypes (default = ERROR)            
+            %   errorType       aod.util.ErrorTypes (default = ERROR) 
+            %
+            % Examples:
+            %   % Get the value of 'MyParam'
+            %   paramValue = obj.getParam('MyParam')           
             % -------------------------------------------------------------
-            if isstring(paramName)
-                paramName = char(paramName);
-            end
 
+            arguments
+                obj
+                paramName           char 
+                errorType           = []
+            end
+            
             import aod.util.ErrorTypes
-            if nargin < 3
+            if isempty(errorType)
                 errorType = ErrorTypes.ERROR;
             else
                 errorType = ErrorTypes.init(errorType);
@@ -291,9 +310,11 @@ classdef (Abstract) Entity < handle
             else
                 switch errorType 
                     case ErrorTypes.ERROR 
-                        error('GetParam: Did not find %s in parameters', paramName);
+                        error('getParam:NotFound',... 
+                            'Did not find %s in parameters', paramName);
                     case ErrorTypes.WARNING 
-                        warning('GetParam: Did not find %s in parameters', paramName);
+                        warning('getParam:NotFound',... 
+                            'Did not find %s in parameters', paramName);
                         paramValue = [];
                     case ErrorTypes.MISSING
                         paramValue = NaN;
@@ -363,13 +384,17 @@ classdef (Abstract) Entity < handle
     % File methods
     methods (Sealed)
         function tf = hasFile(obj, fileName)
-            % HASFILE
+            % Check whether entity has a file
             %
             % Description:
             %   Check whether entity files has a specific file name
             %
             % Syntax:
             %   tf = hasFile(obj, fileName)
+            %
+            % Examples:
+            %   % Check for the file named 'MyFile'
+            %   tf = obj.hasFile('MyFile')
             % -------------------------------------------------------------
             arguments
                 obj 
@@ -385,15 +410,16 @@ classdef (Abstract) Entity < handle
         end
 
         function setFile(obj, fileName, filePath)
-            % SETFILE
+            % Add or modify a file 
             %
             % Description:
             %   Adds to files prop, stripping out homeDirectory and
             %   trailing/leading whitespace, if needed
             %
             % Syntax:
-            %   obj.addFile(fileName, filePath)
+            %   addFile(obj, fileName, filePath)
             % -------------------------------------------------------------
+
             arguments
                 obj
                 fileName                char
@@ -405,6 +431,11 @@ classdef (Abstract) Entity < handle
                 return
             end
 
+            if strcmpi(fileName, 'all')
+                error('setFile:InvalidName',...
+                    'The name "all" is reserved for operations on all files');
+            end
+
             fPath = obj.getHomeDirectory();
             if ~isempty(fPath)
                 filePath = erase(filePath, fPath);
@@ -414,13 +445,19 @@ classdef (Abstract) Entity < handle
         end
 
         function removeFile(obj, fileName)
-            % REMOVEFILE
+            % Remove a file by name or clear all files
             %
             % Description:
             %   Remove a file by name from files property
             %
             % Syntax:
             %   removeFile(obj, fileName)
+            %
+            % Examples:
+            %   obj.removeFile('MyFile')
+            %
+            %   % Remove all files
+            %   obj.removeFile('all');
             % -------------------------------------------------------------
 
             if ~isscalar(obj)
@@ -428,13 +465,15 @@ classdef (Abstract) Entity < handle
                 return
             end
 
-            if obj.hasFile(fileName)
+            if strcmpi(fileName, 'all')
+                obj.files = aod.util.Parameters();
+            elseif obj.hasFile(fileName)
                 remove(obj.files, fileName);
             end
         end
 
         function fileValue = getFile(obj, fileName, errorType)
-            % GETFILE
+            % Get a file by name
             %
             % Description:
             %   Return the value of a specific file name 
@@ -447,8 +486,15 @@ classdef (Abstract) Entity < handle
             % Optional inputs:
             %   errorType      aod.util.ErrorTypes (default = ERROR)            
             % -------------------------------------------------------------
+
+            arguments
+                obj
+                fileName        char 
+                errorType       = []
+            end
+
             import aod.util.ErrorTypes
-            if nargin < 3
+            if isempty(errorType)
                 errorType = ErrorTypes.ERROR;
             else
                 errorType = ErrorTypes.init(errorType);
@@ -491,6 +537,8 @@ classdef (Abstract) Entity < handle
             %   Optional inputs are passed to getFile()
             % -------------------------------------------------------------
 
+            fileName = convertStringsToChars(fileName);
+
             if ~isscalar(obj)
                 fileValue = arrayfun(@(x) getExptFile(x, fileName, varargin{:}), obj);
                 return
@@ -512,7 +560,7 @@ classdef (Abstract) Entity < handle
         end
 
         function out = getHomeDirectory(obj)
-            % GETHOMEDIRECTORY
+            % Return the home directory from Experiment
             %
             % Description:
             %   Recursively searches Parent for Experiment and returns the
@@ -520,6 +568,10 @@ classdef (Abstract) Entity < handle
             %
             % Syntax:
             %   out = getHomeDirectory(obj)
+            %
+            % Notes:
+            %   If multiple entities are provided, they are assumed to be 
+            %   from the same Experiment
             % -------------------------------------------------------------
             h = ancestor(obj(1), 'aod.core.Experiment');
             if ~isempty(h)
@@ -530,7 +582,7 @@ classdef (Abstract) Entity < handle
         end
 
         function assignUUID(obj, uuid)
-            % ASSIGNUUID
+            % Assign a UUID to the entity
             %
             % Description:
             %   The same system may be used over multiple experiments and
@@ -567,22 +619,6 @@ classdef (Abstract) Entity < handle
             else
                 value = obj.Name;
             end
-        end
-        
-        function removeEntity(obj)
-            % Remove the entity from the experiment
-            %
-            % Syntax:
-            %   removeEntity(obj)
-            % -------------------------------------------------------------
-            if isempty(obj.Parent)
-                error('remove:NoParent', 'Entity cannot be deleted if parent is unset');
-            end
-            
-            parentContainer = obj.entityType.parentContainer();
-            h = obj.Parent.(parentContainer);
-            idx = arrayfun(@(x) isequal(x, obj.UUID), h);
-            h(idx) = [];
         end
 
         function sync(obj)
@@ -693,15 +729,12 @@ classdef (Abstract) Entity < handle
             if obj.isValidParent(parent)
                 obj.Parent = parent;
             else
-                error('%s is not a valid parent', class(parent));
+                error("setParent:InvalidParentType",...
+                    '%s is not a valid parent', class(parent));
             end
 
             obj.sync();
             obj.checkGroupNames();
-        end
-
-        function assignEntityType(obj)
-            obj.entityType = aod.core.EntityTypes.get(obj);
         end
     end
 
@@ -729,7 +762,7 @@ classdef (Abstract) Entity < handle
             % -------------------------------------------------------------
             arguments
                 obj
-                entity      {aod.util.mustBeEntity(entity)}
+                entity      {mustBeA(entity, 'aod.core.Entity')}
             end
 
             tf = isequal(obj.UUID, entity.UUID);

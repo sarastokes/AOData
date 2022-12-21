@@ -122,7 +122,7 @@ classdef EntitySearch < handle
                 return
             else 
                 if ~any(obj.filterIdx)
-                    warning('datasetQuery:NoDsetNameMatch',...
+                    warning('datasetQuery:NoDsetNameMatches',...
                         'No entities were found with datasets named %s', dsetName);
                     return
                 end

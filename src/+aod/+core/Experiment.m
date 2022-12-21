@@ -218,7 +218,7 @@ classdef Experiment < aod.core.Entity
             end
         end
 
-        function remove(obj, entityType, ID)
+        function remove(obj, entityType, varargin)
             % Remove specific entites or clear all entities of a given type
             %
             % Syntax:
@@ -233,26 +233,47 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
 
             import aod.core.EntityTypes
+
+            % Identify and validate entity type to remove
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('remove:NonChildEntityType',...
                     'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
             end
 
-            % Check whether to clear all entities
-            ID = convertCharsToStrings(ID);
-            if isstring(ID) && isequal(ID, "all")
+            % Identify which members of entityType to remove
+            if istext(varargin{1}) && strcmp(varargin{1}, "all")
+                % Remove all entities
                 obj.(entityType.parentContainer) = entityType.empty();
                 return
-            elseif isnumeric(ID)
+            elseif isnumeric(varargin{1})
+                % Remove entities by ID
+                ID = varargin{1};
+                % Validate IDs
                 mustBeInteger(ID);
-                ID = sort(ID, 'descend');
-                if entityType ~= EntityTypes.EPOCH
+                if entityType == EntityTypes.EPOCH
+                    mustBeMember(ID, obj.epochIDs);
+                else
                     mustBeInRange(ID, 1, numel(obj.(entityType.parentContainer)));
                 end
+                ID = sort(ID, 'descend');
+            elseif iscell(varargin{1})
+                % Remove entities matching one or more queries
+                out = aod.core.EntitySearch.go(obj.(entityType.parentContainer), varargin{:});
+                if isempty(out)
+                    warning('remove:NoMatches', 'Query did not return any matches');
+                    return
+                end
+                % Identify IDs corresponding to matched entities
+                ID = [];
+                for i = 1:numel(out)
+                    ID = cat(1, ID, find(obj.(entityType.parentContainer) == out(i)));
+                end
+                fprintf('IDs found:');  %% TODO: Remove (just for debugging)
+                disp(ID);
             else
                 error('remove:InvalidId',...
-                    'ID must be "all" or integer index of entities to remove');
+                    'ID must be "all", an integer indices of entities to remove');
             end
 
             switch entityType

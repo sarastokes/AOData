@@ -33,6 +33,8 @@ classdef Rois < aod.core.Annotation
 %
 % Protected methods:
 %   setMap(obj, map);
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     events 
@@ -42,10 +44,8 @@ classdef Rois < aod.core.Annotation
     properties (SetAccess = protected)
         Metadata            table            = table.empty()
         Image
-    end
-
-    properties (SetAccess = private)
         Size(1,2)           {mustBeInteger}         = [0 0]
+        Reader
     end
 
     % Enables quick access to commonly-used parameters

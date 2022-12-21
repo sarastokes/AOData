@@ -12,6 +12,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 %
 % See also:
 %   runAODataTestSuite
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties
@@ -27,8 +29,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test)
-        function experimentIO(testCase)
+    % Terribly long methods but test function order isn't guarenteed
+    methods (Test, TestTags=["Experiment", "Core", "LevelZero"])
+        function ExperimentIO(testCase)
             import matlab.unittest.constraints.Throws
             
             % Add a relative file
@@ -44,11 +47,20 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyTrue(contains(testCase.EXPT.getExptFile('RelFile'), cd));
             testCase.verifyFalse(contains(testCase.EXPT.getFile('RelFile'), cd));
 
+            % Confirm error for invalid file
+            testCase.verifyError(...
+                @() testCase.EXPT.setFile('All', 'Invalid'),...
+                "setFile:InvalidName");
+
             % Test setHomeDirectory
             testCase.EXPT.setHomeDirectory(fileparts(cd));
             testCase.verifyEqual(testCase.EXPT.getExptFile('RelFile'),...
                 fullfile(fileparts(cd), 'test_data', 'test.txt'));
             testCase.EXPT.setHomeDirectory(cd);
+        end
+
+        function ExperimentMetadata(testCase)
+            import matlab.unittest.constraints.Throws
 
             % Description options
             testCase.EXPT.setDescription('This is a test');
@@ -66,7 +78,26 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 Throws("remove:NonChildEntityType"));
         end
 
-        function sourceIO(testCase)
+        function Equality(testCase)
+            testCase.verifyTrue(isequal(testCase.EXPT, testCase.EXPT));
+        end
+
+        function ParameterAccess(testCase)
+            import aod.util.ErrorTypes
+            testCase.verifyError(...
+                @()testCase.EXPT.getParam('BadParam', ErrorTypes.ERROR),...
+                'getParam:NotFound');
+            testCase.verifyWarning(...
+                @()testCase.EXPT.getParam('BadParam', ErrorTypes.WARNING),...
+                'getParam:NotFound');
+            testCase.verifyTrue(...
+                isnan(testCase.EXPT.getParam('BadParam', ErrorTypes.MISSING)));
+        end
+    end
+
+    methods(Test, TestTags=["Source", "Core", "LevelOne"])
+
+        function SourceIO(testCase)
             import matlab.unittest.constraints.Throws
 
             % Create a parent source
@@ -94,6 +125,13 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             source1b.add(source1b1);
             testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 7);
 
+            % Check remove all files
+            source1.setFile('MyFile1', 'test.txt');
+            source1.setFile('MyFile2', 'test2.txt');
+            testCase.verifyEqual(source1.files.Count, uint64(2));
+            source1.removeFile('all');
+            testCase.verifyEmpty(source1.files);
+
             % Remove a single source
             testCase.EXPT.remove('Source', 2);
             testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
@@ -102,9 +140,12 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.EXPT.remove('Source', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 0);
         end
+    end
 
+    methods (Test, TestTags=["Calibration", "Core", "LevelOne"])
         function calibrationIO(testCase)
             import matlab.unittest.constraints.Throws
+
             % Add a first calibration
             cal1 = aod.core.Calibration('PowerMeasurement1', '20220823');
             testCase.EXPT.add(cal1);
@@ -143,8 +184,10 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
             testCase.EXPT.remove('Calibration', 'all');
         end
+    end
 
-        function analysisIO(testCase)
+    methods (Test, TestTags=["Analysis", "Core", "LevelOne"])
+        function AnalysisIO(testCase)
             % Create an analysis and add a description
             analysis1 = aod.core.Analysis('TestAnalysis1', 'Date', getDateYMD());
             analysis1.setDescription('This is a test analysis');
@@ -184,8 +227,66 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             
             % Clear all the analyses
             testCase.EXPT.remove('Analysis', 'all');
+        end 
+    end
+
+    methods (Test, TestTags=["Annotation", "Core", "LevelOne"])
+        function AnnotationIO(testCase)
+            
+            % Create a few annotations
+            annotation1 = aod.core.Annotation('Annotation1');
+            annotation2 = aod.core.Annotation('Annotation2');
+
+            % Add multiple annotations to the experiment at once
+            testCase.EXPT.add([annotation1, annotation2]);
+            testCase.verifyNumElements(testCase.EXPT.Annotations, 2);
+
+            % Query from Experiment by name
+            out = testCase.EXPT.get('Annotation', {'Name', 'Annotation1'});
+            testCase.verifyNumElements(out, 1);
+
+            % Query from Experiment by parameter presence
+            annotation2.setParam('MyParam', 1);
+            out = testCase.EXPT.get('Annotation', {'Param', 'MyParam'});
+            testCase.verifyNumElements(out, 1);
+            testCase.verifyTrue(strcmpi(out.Name, 'Annotation2'));
+
+            % Query from Experiment by parameter value
+            out = testCase.EXPT.get('Annotation', {'Param', 'MyParam', 1});
+            testCase.verifyNumElements(out, 1);
+            testCase.verifyEmpty(...
+                testCase.EXPT.get('Annotation', {'Param', 'MyParam', 2}));
+
+            % Test query removal from Experiment
+            testCase.EXPT.remove('Annotation', 1);
+            testCase.verifyNumElements(testCase.EXPT.Annotations, 1);
+
+            % Test clear all removal
+            testCase.EXPT.remove('Annotation', 'all');
+            testCase.verifyEmpty(testCase.EXPT.Annotations);
         end
 
+        function AnnotationLinks(testCase)
+            annotation1 = aod.core.Annotation('Annotation1');
+            annotation2 = aod.core.Annotation('Annotation2');
+
+            % Set a valid source
+            setSource([annotation1, annotation2], aod.core.Source('Source1'));
+            testCase.verifyEqual(annotation1.Source.Name, 'Source1');
+            testCase.verifyEqual(annotation2.Source.Name, 'Source1');
+
+            % Set an invalid source
+            testCase.verifyError(...
+                @() annotation1.setSource(aod.core.System('System1')),...
+                "setSource:InvalidEntityType");
+
+            % Remove an existing source
+            annotation1.setSource([]);
+            testCase.verifyEmpty(annotation1.Source);
+        end
+    end
+
+    methods (Test, TestTags=["System", "Core", "LevelOne"])
         function systemIO(testCase)
             system = aod.core.System('TestSystem');
             system2 = aod.core.System('');
@@ -223,6 +324,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(system.get('Device')), 3);
             testCase.verifyEqual(numel(testCase.EXPT.get('Device')), 3);
 
+            % Check device ancestor
+            testCase.verifyEqual(...
+                device1.ancestor(aod.core.EntityTypes.EXPERIMENT),...
+                testCase.EXPT);
+
             % Query devices from Channel
             testCase.verifyNumElements(channel1.get('Device',... 
                 {'Param', 'Diameter', 5}), 1);
@@ -242,6 +348,16 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Remove a device
             channel1.remove('Device', 2);
             testCase.verifyEqual(numel(testCase.EXPT.Systems(1).Channels(1).Devices), 1);
+            
+            % Check for error when removing invalid entity
+            testCase.verifyError(...
+                @() channel1.remove('System', 1), "remove:InvalidEntityType");
+
+            % Check for error when providing invalid ID
+            testCase.verifyError(...
+                @() channel1.remove('bad'), "remove:InvalidID");
+            testCase.verifyError(...
+                @() channel1.remove('Device', 'bad'), "remove:InvalidID");
 
             % Clear the devices (channel-specific)
             channel1.remove('Device', 'all');
@@ -270,9 +386,15 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.EXPT.remove('System', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Systems), 0);
         end
+    end
 
-        function epochIO(testCase)
+    methods (Test, TestTags=["Epoch", "Core", "LevelOne"])
+        function EpochIO(testCase)
             import matlab.unittest.constraints.Throws
+
+            % If previous functions errored, epochs may still be present
+            testCase.EXPT.remove('Epoch', 'all');
+
             % Create some epochs
             epoch1 = aod.core.Epoch(1);
             epoch2 = aod.core.Epoch(2);
@@ -310,6 +432,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Check epoch indexing
             testCase.verifyEqual(testCase.EXPT.id2index(4), 3);
             testCase.verifyEqual(testCase.EXPT.id2index([1 2 4]), [1 2 3]);
+            testCase.verifyNumElements(testCase.EXPT.id2epoch([1 2 4]), 3);
 
             % Add a parameter to all
             setParam(testCase.EXPT.Epochs, 'TestParam1', 0);
@@ -336,11 +459,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyError(@() testCase.EXPT.add(badEpoch), ?MException);
 
             % Try to add a calibration to an epoch
-            cal = aod.core.Calibration('PowerMeasurement', '20220823');
-            testCase.verifyThat(...
-                @() testCase.EXPT.Epochs(1).add(cal),...
-                Throws("Epoch:AddedInvalidEntity"));
-
             % Try to remove a calibration from an epoch
             testCase.verifyThat(...
                 @()testCase.EXPT.removeByEpoch('all', 'Calibration'),...
@@ -355,8 +473,61 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyNumElements(testCase.EXPT.Epochs, 0);
         end
 
-        function responseIO(testCase)
+        function EpochLinks(testCase)
+            
+            % If previous functions errored, epochs may still be present
+            testCase.EXPT.remove('Epoch', 'all');
+
+            % Create some epochs
+            epoch1 = aod.core.Epoch(1);
+            epoch2 = aod.core.Epoch(2);
+
+            % Create some associated entities
+            source1 = aod.core.Source('Source1');
+            system1 = aod.core.System('System1');
+
+            % Try to add an invalid entity to the epoch
+            cal1 = aod.core.Calibration('PowerMeasurement', '20220823');
+            testCase.verifyError(@() epoch1.add(cal1), "add:InvalidEntityType");
+            
+            % Test group assignment
+            testCase.verifyEmpty(epoch1.System);
+            testCase.verifyEmpty(epoch1.Source);
+            setSource([epoch1, epoch2], source1);
+            setSystem([epoch1, epoch2], system1);
+            testCase.verifyTrue(strcmp(epoch1.System.Name, 'System1'));
+            testCase.verifyTrue(strcmp(epoch1.Source.Name, 'Source1'));
+
+            % Try to set invalid Source
+            testCase.verifyError(@()epoch1.setSource(cal1), "setSource:InvalidEntityType");
+            
+            % Try to set invalid System
+            testCase.verifyError(@()epoch1.setSystem(cal1), "setSystem:InvalidEntityType");
+        end
+
+        function EpochTiming(testCase)
+            % Create some epochs
+            epoch1 = aod.core.Epoch(1);
+            epoch2 = aod.core.Epoch(2);
+
+            % Check whether they have Timing
+            testCase.verifyEqual(hasTiming([epoch1, epoch2]), [false, false]);
+
+            % Add timing to one epoch
+            epoch1.setTiming(1:4);
+            
+            % Clear timing
+            clearTiming([epoch1, epoch2]);
+            testCase.verifyEqual(hasTiming([epoch1, epoch2]), [false, false]);
+        end
+    end
+
+    methods (Test, TestTags=["Response", "Core", "LevelTwo"])
+        function ResponseIO(testCase)
             import matlab.unittest.constraints.Throws
+
+            % If previous functions errored, epochs may still be present
+            testCase.EXPT.remove('Epoch', 'all');
 
             % Add two epochs
             testCase.EXPT.add(aod.core.Epoch(1));
@@ -374,6 +545,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.EXPT.Epochs(1).add(response1);
             testCase.EXPT.Epochs(2).add(response2);
             testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch(1, 'Response')), 1);
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Response'), 1);
             testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Response')), 2);
 
             % Clear the timing from the first response
@@ -395,8 +567,10 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
         end
+    end
 
-        function datasetIO(testCase)
+    methods (Test, TestTags=["Dataset", "Core", "LevelTwo"])
+        function DatasetIO(testCase)
             import matlab.unittest.constraints.Throws
 
             % Add an epoch
@@ -410,11 +584,18 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             
             % Add the datasets to the experiment
             testCase.EXPT.Epochs(1).add([dataset1, dataset2]);
+
+            % Test direct dataset access
             testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 2);
+            % Test Epoch's get access
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Datasets'), 2);
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Datasets', {'Name', 'TestDataset1'}), 1);
+            % Test Experiment's get access
             testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Datasets')), 2);
 
             % Check dataset data
             testCase.verifyEqual(testCase.EXPT.Epochs(1).Datasets(2).Data, eye(3));
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Dataset', {'Dataset', 'Data', eye(3)}),1);
             
             % Clear all the datasets
             testCase.EXPT.removeByEpoch('all', 'Dataset');
@@ -429,21 +610,36 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 @() testCase.EXPT.add(aod.core.Dataset('TestDataset3')),...
                 Throws("Experiment:AddedInvalidEntity"));
         end
+    end
 
+    methods (Test, TestTags=["Registration", "Core", "LevelTwo"])
         function registrationIO(testCase)
             import matlab.unittest.constraints.Throws
 
-            % Add an epoch 
+            % If previous functions errored, epochs may still be present
             testCase.EXPT.remove('Epoch', 'all');
+
+            % Add an epoch 
             testCase.EXPT.add(aod.core.Epoch(1));
             testCase.EXPT.add(aod.core.Epoch(2));
 
             % Create some registrations
+            reg1 = aod.core.Registration('Reg1', getDateYMD());
+            reg2 = aod.core.Registration('Reg2');
+
+            % Add and remove registration dates
+            reg1.setRegistrationDate([]);
+            reg2.setRegistrationDate(getDateYMD());
+
+            % Add Registrations to an Epoch
+            testCase.EXPT.Epochs(1).add([reg1, reg2]);
+
+            % Clear the registrations
+            testCase.EXPT.removeByEpoch(1, 'Registration');
 
             % Clear the epochs
             testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
         end
     end
-
 end 

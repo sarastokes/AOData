@@ -29,12 +29,16 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         fileName            char
         fileReader          % aod.util.FileReader
 
-        Dataset             aod.core.Dataset 
+        Dataset             aod.core.Dataset = aod.core.Dataset.empty()
     end
 
     methods
         function obj = Response(name, varargin)
 
+            if nargin == 0
+                name = [];
+            end
+            
             obj@aod.core.Entity(name, varargin{:});
 
             ip = inputParser();

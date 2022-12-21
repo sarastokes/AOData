@@ -1,5 +1,5 @@
 classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
-% An annotation for acquired data
+% An annotation of acquired data
 %
 % Description:
 %   Spatial regions within acquired data. Could be ROIs in a physiology 
@@ -25,23 +25,21 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    % TODO: Add "Image" or remove "Data" from base class?
     properties (SetAccess = protected)
         Data   
+        % Source associated with the Annotation
         Source                      = aod.core.Source.empty()       
-    end
-
-    properties (Access = protected)
-        Reader                      % TODO: Remove
     end
 
     methods
         function obj = Annotation(name, varargin)
-            obj = obj@aod.core.Entity(name);
+            obj@aod.core.Entity(name, varargin{:});
 
+            % Parse inputs (save validation for set functions)
             ip = aod.util.InputParser();
             addOptional(ip, 'Data', []);
-            addParameter(ip, 'Source', [],... 
-                @(x) isSubclass(x, {'aod.core.Source', 'aod.persistent.Source'}));
+            addParameter(ip, 'Source', []);
             parse(ip, varargin{:});
 
             obj.setData(ip.Results.Data);
@@ -49,27 +47,34 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Sealed, Access = protected)
+    methods (Sealed)
         function setSource(obj, source)
-            % SETSOURCE
+            % Set the Source associated with the annotation
             %
             % Syntax:
             %   setSource(obj, source)
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) x.setSource(source), obj);
+                return
+            end
+            
             if isempty(source)
                 obj.Source = aod.core.Source.empty();
-            else
-                assert(isSubclass(source, {'aod.core.Source', 'aod.persistent.Source'}),... 
-                    'Must be a subclass of source');
+            else % Validate then add
+                if ~isSubclass(source, {'aod.core.Source', 'aod.persistent.Source'})
+                    error('setSource:InvalidEntityType',...
+                        'Input must be an aod.core.Source or subclass.');
+                end
                 obj.Source = source;
             end
         end
 
         function setData(obj, data)
-            % SETDATA
+            % Assign Annotation's data 
             %
             % Description:
-            %   Assigns Data property and derived metadata
+            %   Assigns Data property
             %
             % Syntax:
             %   obj.setData(data);
