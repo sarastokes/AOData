@@ -1,12 +1,23 @@
 classdef (Abstract) Protocol < handle 
-% PROTOCOL (abstract)
+% A protocol detailing experimental design
+%
+% Description:
+%   A Protocol can detail how some aspect of an experiment was designed.
+%   For example, determining the LED values for a visual stimulus or laser
+%   modulations for optogenetic stimulation. Protocol differs from Stimulus
+%   in that Stimulus describes what actually happened during the experiment
+%   (e.g. the LED voltages at each frame), while Protocol details the
+%   design and commands that define the commands sent to the system for the
+%   Stimulus. Also, Protocol is not limited to Stimuli and could also
+%   detail, for example, scanner control or any other aspect of the
+%   experiment which can be controlled and altered by the experimenter.
 %
 % Syntax:
 %   obj = aod.core.Protocol(stimTime, calibration, varargin)
 %
 % Properties:
 %   calibration         aod.core.Calibration (optional)
-%   dateCreated         datetime, when the protocol was created (optional)
+%   dateCreated         datetime, when the protocol was created
 %
 % Dependent properties:
 %   totalTime           total stimulus time (from calculateTotalTime)
@@ -38,6 +49,7 @@ classdef (Abstract) Protocol < handle
         stimRate(1,1)       double
     end
 
+    % Abstract methods must be defined by subclasses (see ProtocolTemplate)
     methods (Abstract)
         stim = generate(obj)
         fName = getFileName(obj)
@@ -47,10 +59,21 @@ classdef (Abstract) Protocol < handle
     methods
         function obj = Protocol(calibration)
             if nargin > 0 && ~isempty(calibration)
-                assert(isSubclass(calibration, 'aod.core.Calibration'),...
-                    'Input must be of class aod.core.Calibration');
                 obj.Calibration = calibration;
+            else
+                obj.Calibration = aod.core.empty.Calibration();
             end
+
+            obj.dateCreated = getDateYMD();
+        end
+
+        function setCalibration(obj, calibration)
+            % Set the Calibration
+            %
+            % Notes:
+            %   Argument validation handled by property definition
+            % -------------------------------------------------------------
+            obj.Calibration = calibration;
         end
     end
 
@@ -104,6 +127,41 @@ classdef (Abstract) Protocol < handle
             %   value = samples2sec(obj, pts)
             % -------------------------------------------------------------
             value = floor(pts/obj.sampleRate);
+        end
+    end
+
+    % Overwritten builtin methods
+    methods
+        function tf = isequal(obj, protocol)
+            % Determine whether two protocols are equal
+            if ~strcmp(class(protocol), class(obj))
+                tf = false; return
+            end
+
+            if ~isequal(obj.Calibration, protocol.Calibration)
+                tf = false; return
+            end
+
+            mc = metaclass(obj);
+            for i = 1:numel(mc.PropertyList)
+                propName = mc.PropertyList(i).Name;
+                % Skip Calibration and properties without public access
+                if ~strcmp(mc.PropertyList(i).GetAccess, 'public') || strcmp(propName, 'Calibration')
+                    continue
+                end
+                if isdatetime(obj.(propName)) 
+                    if isDateEqual(obj.(propName), protocol.(propName))
+                        continue 
+                    else
+                        tf = false; return
+                    end
+                end
+                if ~isequal(obj.(propName), protocol.(propName))
+                    tf = false; return
+                end
+            end
+            % If code runs to this point, the two protocols are equal
+            tf = true;
         end
     end
 end 

@@ -1,4 +1,20 @@
 classdef EnumeratedTypeTest < matlab.unittest.TestCase 
+% Test AOData's enumerated types
+%
+% Description:
+%   Tests functionality of enumerated types not covered in other tests
+%
+% Parent:
+%   matlab.unittest.TestCase
+%
+% Use:
+%   result = runtests('EnumeratedTypeTest')
+%
+% See also:
+%   runAODataTestSuite
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     properties
         EXPT
@@ -48,14 +64,20 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         function H5NodeTypesInit(testCase)
             import aod.app.H5NodeTypes
 
-            out = H5NodeTypes.init('none');
+            out = H5NodeTypes.get('none');
             testCase.verifyEqual(out, H5NodeTypes.NONE);
-            out = H5NodeTypes.init('group');
+            out = H5NodeTypes.get('group');
             testCase.verifyEqual(out, H5NodeTypes.GROUP);
-            out = H5NodeTypes.init('dataset');
+            out = H5NodeTypes.get('dataset');
             testCase.verifyEqual(out, H5NodeTypes.DATASET);
-            out = H5NodeTypes.init('link');
+            out = H5NodeTypes.get('link');
             testCase.verifyEqual(out, H5NodeTypes.LINK);
+
+            testCase.verifyEqual(H5NodeTypes.get(H5NodeTypes.LINK),... 
+                H5NodeTypes.LINK);
+            
+            testCase.verifyError(...
+                @()H5NodeTypes.get('bad'), 'get:UnknownNodeType');
         end
 
 

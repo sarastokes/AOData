@@ -1,18 +1,17 @@
 function uuid = validateUUID(uuid)
-    % VALIDATEUUID
-    %
-    % Description:
-    %   Validates the composition of a UUID
-    %
-    % Syntax:
-    %   uuid = validateUUID(uuid)
-    %
-    % See also:
-    %   aod.util.generateUUID
-    %
-    % History:
-    %   24Nov2022 - SSP
-    % ---------------------------------------------------------------------
+% Ensure UUID is valid
+%
+% Description:
+%   Validates the composition of a UUID
+%
+% Syntax:
+%   uuid = aod.util.validateUUID(uuid)
+%
+% See also:
+%   aod.util.generateUUID
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
     arguments
         uuid        string
     end

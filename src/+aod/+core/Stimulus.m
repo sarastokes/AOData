@@ -15,16 +15,17 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Calibration
+        Calibration                 aod.core.Calibration
 
-        protocolClass
-        protocolName
+        protocolClass               char = char.empty()
+        protocolName                char = char.empty()
+        dateProtocolCreated         datetime = datetime.empty()
     end
     
     methods
         function obj = Stimulus(name, protocol)
             obj = obj@aod.core.Entity(name);
-            % TODO handle with inputParser optional argument
+            
             if nargin > 1 && ~isempty(protocol)
                 obj.setProtocol(protocol);
             end
@@ -57,17 +58,20 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setProtocol(obj, protocol)
             % -------------------------------------------------------------
-            assert(isSubclass(protocol, 'aod.util.Protocol'),...
-                'Protocol must be subclass of aod.util.Protocol');
-
+            arguments
+                obj 
+                protocol        {mustBeA(protocol, 'aod.util.Protocol')}
+            end 
+            
             obj.protocolClass = class(protocol);
+            obj.dateProtocolCreated = protocol.dateCreated;
             obj.setFile('Protocol', fileparts(protocol.getFileName()));
             [~, obj.protocolName, ~] = fileparts(protocol.getFileName());
             obj.getProtocolParameters(protocol);
         end
 
         function protocol = getProtocol(obj, calibration)
-            % GETPROTOCOL
+            % Regenerate the protocol
             %
             % Description:
             %   Use properties to regenerate the Protocol object
@@ -76,10 +80,13 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             %   protocol = getProtocol(obj)
             % -------------------------------------------------------------
             if isempty(obj.protocolName)
-                error("Stimulus:ProtocolNotSet",...
+                error("getProtocol:ProtocolNotSet",...
                     "Stimulus needs protocol for this function");
             end
-            protocolFcn = str2func(obj.protocolName);
+            if nargin < 2
+                calibration = [];
+            end
+            protocolFcn = str2func(obj.protocolClass);
             protocol = protocolFcn(calibration, map2struct(obj.parameters));
         end
     end
@@ -87,7 +94,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Sealed, Access = protected)
         function getProtocolParameters(obj, protocol)
-            % GETPROTOCOLPARAMETERS
+            % Extract parameters from protocol
             %
             % Description:
             %   Extract calibration and parameters, save to Stimulus
@@ -98,14 +105,16 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             mc = metaclass(protocol);
             for i = 1:numel(mc.PropertyList)
                 if strcmp(mc.PropertyList(i).GetAccess, 'public')
-                    if isnumeric(mc.PropertyList(i).Name) && isnan(mc.PropertyList(i).Name)
+                    propName = mc.PropertyList(i).Name;
+                    if isnumeric(propName) && isnan(propName)
                         continue
                     end
-                    if strcmpi(mc.PropertyList(i).Name, 'Calibration')
-                        obj.setCalibration(protocol.(mc.PropertyList(i).Name));
+                    if strcmpi(propName, 'Calibration')
+                        obj.setCalibration(protocol.(propName));
+                    elseif strcmpi(propName, 'dateCreated')
+                        obj.dateProtocolCreated = protocol.(propName);
                     else
-                        obj.setParam(mc.PropertyList(i).Name,...
-                            protocol.(mc.PropertyList(i).Name));
+                        obj.setParam(propName, protocol.(propName));
                     end
                 end
             end

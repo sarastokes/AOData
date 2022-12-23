@@ -224,40 +224,6 @@ classdef EntityTypes
                 'Must provide a subclass of aod.core.Experiment');
 
             out = expt.get(obj);
-            return
-            
-            import aod.core.EntityTypes
-
-            out = obj.empty();
-
-            switch obj 
-                case EntityTypes.EXPERIMENT
-                    out = expt; 
-                case EntityTypes.ANALYSIS 
-                    out = expt.Analyses;
-                case EntityTypes.ANNOTATION 
-                    out = expt.Annotations;
-                case EntityTypes.CALIBRATION
-                    out = expt.Calibrations;
-                case EntityTypes.EPOCH 
-                    out = expt.Epochs;
-                case EntityTypes.SOURCE 
-                    out = expt.getAllSources();
-                case EntityTypes.SYSTEM 
-                    out = expt.Systems;
-                case EntityTypes.CHANNEL 
-                    out = expt.get(obj);
-                case EntityTypes.DEVICE 
-                    out = expt.get(obj);
-                case EntityTypes.REGISTRATION
-                    out = expt.getFromEpoch('all', 'Registration');
-                case EntityTypes.RESPONSE
-                    out = expt.getFromEpoch('all', 'Response');
-                case EntityTypes.DATASET 
-                    out = expt.getFromEpoch('all','Dataset');
-                case EntityTypes.STIMULUS
-                    out = expt.getFromEpoch('all', 'Stimulus');
-            end
         end 
 
         function out = empty(obj)

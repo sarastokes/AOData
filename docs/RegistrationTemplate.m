@@ -1,6 +1,12 @@
 classdef RegistrationTemplate < aod.core.Registration 
 % Custom registrations must inherit from aod.core.Registration, as above
 
+% STANDARDS:
+% - If your registration has not been applied to the data and you intend to
+%   apply it when reading the data in, use an "apply" method. If the data 
+%   is already registered and you are just recording the registration 
+%   that was performed, delete apply();
+
     properties
         % Any properties relevant to your registration go here
         % If you have none, delete this block

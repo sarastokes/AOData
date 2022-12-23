@@ -28,8 +28,8 @@ function out = validateDate(dateIn)
         try
             out = datetime(dateIn, 'Format', 'yyyyMMdd');
         catch ME 
-            if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
-                error("setCalibrationDate:FailedDatetimeConversion",...
+            if ismember(ME.identifier, ["MATLAB:datestr:ConvertToDateNumber", "MATLAB:datetime:ParseErr"])
+                error("validateDate:FailedDatetimeConversion",...
                     "Failed to convert to datetime, use format yyyyMMdd");
             else
                 rethrow(ME);

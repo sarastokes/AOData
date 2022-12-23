@@ -154,10 +154,6 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   setName(obj, name)
             % -------------------------------------------------------------
-            arguments
-                obj
-                name        char
-            end
             obj.Name = name;
         end
 
@@ -335,10 +331,7 @@ classdef (Abstract) Entity < handle
             %   obj.setParam(paramName1, value1, paramName2, value2)
             %   obj.setParam(struct)
             % -------------------------------------------------------------
-            if nargin == 1
-                return
-            end
-            
+
             if ~isscalar(obj)
                 arrayfun(@(x) setParam(x, varargin{:}), obj);
                 return
@@ -510,9 +503,9 @@ classdef (Abstract) Entity < handle
             else
                 switch errorType 
                     case ErrorTypes.ERROR 
-                        error('GetFile: Did not find %s in files', fileName);
+                        error('getFile:NotFound', 'Did not find %s in files', fileName);
                     case ErrorTypes.WARNING 
-                        warning('GetFile: Did not find %s in files', fileName);
+                        warning('getFile:NotFound', 'Did not find %s in files', fileName);
                         fileValue = [];
                     case ErrorTypes.MISSING
                         fileValue = NaN;
@@ -550,7 +543,6 @@ classdef (Abstract) Entity < handle
                     "Add entity to experiment to use getExptFile");
             end
             
-
             fileValue = obj.getFile(fileName, varargin{:});
             if isempty(fileValue)
                 fileValue = [];

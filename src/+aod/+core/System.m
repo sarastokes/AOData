@@ -27,9 +27,6 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     
     methods
         function obj = System(name, varargin)
-            if nargin == 0
-                name = [];
-            end
             obj = obj@aod.core.Entity(name, varargin{:});
         end      
     end
@@ -57,7 +54,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function add(obj, channel)
-            % ADD
+            % Add a Channel to the System
             %
             % Syntax:
             %   add(obj, channel)

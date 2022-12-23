@@ -8,7 +8,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = aod.core.Epoch(ID)
+%   obj = aod.core.Epoch(ID, varargin)
 %
 % Properties:
 %   ID                              Epoch identifier (integer)
@@ -39,6 +39,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         % Time the Epoch (i.e. data acquisition) began
         startTime (1,1)     datetime
+        % Timing of samples during Epoch
         Timing (1,:)        double  
 
         Registrations       aod.core.Registration
@@ -105,20 +106,22 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
 
-        function remove(obj, entityType, ID)
+        function remove(obj, entityType, varargin)
             % Remove an entity from the Epoch
             %
             % Syntax:
             %   remove(obj, entityType, ID)
             %
+            % Inputs:
+            %   ID          integer(s), "all" or query cell
+            %       Which entities to remove
+            %
             % Notes: Only entities contained by Epoch can be added:
             %   Dataset, Response, Registration, Stimulus
-            % 
-            % TODO: Add queries
             % ------------------------------------------------------------- 
 
             if ~isscalar(obj)
-                arrayfun(@(x) remove(x, entityType, ID), obj);
+                arrayfun(@(x) remove(x, entityType, varargin{:}), obj);
                 return 
             end
 
@@ -130,31 +133,43 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                     'Entity must be Dataset, Registration, Response and Stimulus');
             end
 
-            if istext(ID) && strcmpi(ID, 'all')
+            % Remove all entities?
+            if istext(varargin{1}) && strcmpi(varargin{1}, 'all')
                 obj.(entityType.parentContainer()) = entityType.empty();
                 return
-            elseif isnumeric(ID)
-                mustBeInteger(ID);
-                mustBeInRange(ID, 1, numel(obj.(entityType.parentContainer())));
-                ID = sort(ID, "descend");
+            end  
+
+            % Remove specific entities, by ID or by query
+            if isnumeric(varargin{1})
+                mustBeInteger(varargin{1});
+                mustBeInRange(varargin{1}, 0, numel(obj.(entityType.parentContainer())));
+                idx = varargin{1};
+            elseif iscell(varargin{1})
+                % Get the indices of entities matching query
+                [~, idx] = aod.core.EntitySearch.go(obj.get(entityType), varargin{:});
+                if isempty(idx)
+                    warning('remove:NoQueryMatches',...
+                        'The query returned no matches, no entities removed.');
+                    return
+                end
             else
                 error('remove:InvalidID',...
                     'ID must be "all" or integer index of entities to remove');
             end
-
+    
             switch entityType 
-                case entityType.DATASET
-                    obj.Datasets(ID) = []; 
-                case entityType.REGISTRATION
-                    obj.Registrations(ID) = [];
-                case entityType.RESPONSE
-                    obj.Responses(ID) = [];
-                case entityType.STIMULUS 
-                    obj.Stimuli(ID) = [];
+                case EntityTypes.DATASET
+                    obj.Datasets(idx) = []; 
+                case EntityTypes.REGISTRATION
+                    obj.Registrations(idx) = [];
+                case EntityTypes.RESPONSE
+                    obj.Responses(idx) = [];
+                case EntityTypes.STIMULUS 
+                    obj.Stimuli(idx) = [];
             end
         end
 
-        function out = get(obj, entityType, queries)
+        function out = get(obj, entityType, varargin)
             % Search Epoch's child entities
             %
             % Description:
@@ -185,7 +200,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             if nargin > 2 && ~isempty(group)
-                out = aod.core.EntitySearch.go(group, queries);
+                out = aod.core.EntitySearch.go(group, varargin{:});
             else
                 out = group;
             end
@@ -215,7 +230,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
             if ~aod.util.isEntitySubclass(source, 'Source')
                 error('setSource:InvalidEntityType',...
-                    'Must be a core or persisstent Source');
+                    'Must be a core or persistent Source');
             end
             
             obj.Source = source;
@@ -290,7 +305,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setTiming(obj, timing)
             % -------------------------------------------------------------
-            assert(isnumeric(timing), 'Timing must be numeric');
+            assert(isnumeric(timing) || isduration(timing),... 
+                'Timing must be numeric or duration');
             obj.Timing = timing;
         end
 

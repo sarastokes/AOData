@@ -28,7 +28,6 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    
     ip = inputParser();
     addParameter(ip, 'Coverage', false, @islogical);
     addParameter(ip, 'KeepFiles', false, @islogical);

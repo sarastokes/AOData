@@ -1,14 +1,15 @@
 classdef CoreInterfaceTest < matlab.unittest.TestCase 
-% COREINTERFACETEST
+% Test the basic functionality of AOData's core interface
 %
 % Description:
-%   Tests adding, searching and removing entities to an Experiment
+%   Tests adding, searching and removing entities to an Experiment and 
+%   functionality inherited from aod.core.Entity (e.g. parameters, files)
 %
 % Parent:
 %   matlab.unittest.TestCase
 %
 % Use:
-%   result = runtests('HDFTest.m')
+%   result = runtests('CoreInterfaceTest')
 %
 % See also:
 %   runAODataTestSuite
@@ -22,6 +23,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function methodSetup(testCase)
+            % Create an experiment
             testCase.EXPT = aod.core.Experiment(...
                 '851_20221117', cd, '20221117',...
                 'Administrator', 'Sara Patterson',... 
@@ -92,11 +94,42 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 'getParam:NotFound');
             testCase.verifyTrue(...
                 isnan(testCase.EXPT.getParam('BadParam', ErrorTypes.MISSING)));
+            testCase.verifyEmpty(...
+                testCase.EXPT.getParam('BadParam', ErrorTypes.NONE));
+        end
+
+        function FileAccess(testCase)
+
+            import aod.util.ErrorTypes
+
+            testCase.verifyError(...
+                @()testCase.EXPT.getFile('BadFile', ErrorTypes.ERROR),...
+                'getFile:NotFound');
+            testCase.verifyWarning(...
+                @()testCase.EXPT.getFile('BadFile', ErrorTypes.WARNING),...
+                'getFile:NotFound');
+            testCase.verifyTrue(...
+                isnan(testCase.EXPT.getFile('BadFile', ErrorTypes.MISSING)));
+            testCase.verifyEmpty(...
+                testCase.EXPT.getFile('BadFile', ErrorTypes.NONE));
+
+            epoch = aod.core.Epoch(10);
+            epoch.setFile('MyFile', 'test.txt');
+            testCase.verifyError(...
+                @()epoch.getExptFile('MyFile'), "getExptFile:NoHomeDirectory");
+        end
+
+        function ExperimentErrors(testCase)
+            % Miscellaneous errors not tested elsewhere
+            testCase.verifyError(...
+                @() testCase.EXPT.getFromEpoch('all', 'Calibration'),...
+                'getFromEpoch:NonChildEntityType');
+
+            testCase.verifyEmpty(testCase.EXPT.getFromEpoch('all', 'Response'));
         end
     end
 
     methods(Test, TestTags=["Source", "Core", "LevelOne"])
-
         function SourceIO(testCase)
             import matlab.unittest.constraints.Throws
 
@@ -308,6 +341,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(system.Channels), 3);
             testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 3);
 
+            % Test get access
+            testCase.verifyNumElements(system.get('Channel'), 3);
+            testCase.verifyNumElements( ...
+                system.get('Channel', {'Name', 'TestChannel1'}), 1);
+
             % Create some devices
             device1 = aod.builtin.devices.Pinhole(20);
             device2 = aod.builtin.devices.Pinhole(5);
@@ -385,6 +423,15 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Clear all systems
             testCase.EXPT.remove('System', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Systems), 0);
+        end
+
+        function SystemErrors(testCase)
+            system1 = aod.core.System('System1');
+            testCase.verifyError(@()system1.get('Epoch'), 'get:InvalidEntityType');
+
+            % No error even though device is empty
+            system2 = aod.core.System('System2');
+            clearAllDevices([system1, system2]);
         end
     end
 
@@ -474,7 +521,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
 
         function EpochLinks(testCase)
-            
             % If previous functions errored, epochs may still be present
             testCase.EXPT.remove('Epoch', 'all');
 
@@ -520,6 +566,42 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             clearTiming([epoch1, epoch2]);
             testCase.verifyEqual(hasTiming([epoch1, epoch2]), [false, false]);
         end
+
+        function EpochRemove(testCase)
+
+            epoch1 = aod.core.Epoch(1);
+            epoch2 = aod.core.Epoch(2);
+            
+            % Test removal specification with response
+            epoch1.add(aod.core.Response('Response1'));
+            epoch2.add(aod.core.Response('Response2a'));
+            epoch2.add(aod.core.Response('Response2b'));
+
+            remove([epoch1, epoch2], 'Response', 1);
+            testCase.verifyNumElements(epoch2.Responses, 1);
+
+            testCase.verifyWarning(...
+                @() epoch2.remove('Response', {'Name', 'Response1'}),...
+                "remove:NoQueryMatches");
+
+            testCase.verifyError(@() epoch1.remove('Response', 'badID'),...
+                "remove:InvalidID");
+            testCase.verifyError(@() epoch1.remove('Calibration'),...
+                "remove:InvalidEntityType");
+
+            % Test additional entities, remove from Epoch
+            epoch1.add(aod.core.Stimulus('Stim1'));
+            epoch1.remove('Stimulus', 'all');
+            testCase.verifyEmpty(epoch1.Stimuli);
+
+            epoch1.add(aod.core.Dataset('Dataset1'));
+            epoch1.remove('Dataset', 'all');
+            testCase.verifyEmpty(epoch1.Datasets);
+
+            epoch1.add(aod.core.Registration('Reg1', getDateYMD()));
+            epoch1.remove('Registration', 'all');
+            testCase.verifyEmpty(epoch1.Registrations);
+        end
     end
 
     methods (Test, TestTags=["Response", "Core", "LevelTwo"])
@@ -541,12 +623,12 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             response2 = aod.core.Response('ResponseWithoutTiming');
             response2.setData(2:2:8);
             
-            % Add to the epochs
-            testCase.EXPT.Epochs(1).add(response1);
-            testCase.EXPT.Epochs(2).add(response2);
-            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch(1, 'Response')), 1);
-            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Response'), 1);
-            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Response')), 2);
+            % Add to an epoch and test various access methods
+            testCase.EXPT.Epochs(1).add([response1, response2]);
+            testCase.verifyNumElements(testCase.EXPT.getFromEpoch(1, 'Response'), 2);
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Response'), 2);
+            testCase.verifyNumElements(testCase.EXPT.getFromEpoch('all', 'Response'), 2);
+            testCase.verifyNumElements(testCase.EXPT.get('Response'), 2);
 
             % Clear the timing from the first response
             response1.clearTiming();
@@ -557,6 +639,10 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyTrue(testCase.EXPT.Epochs(2).hasTiming());
             testCase.EXPT.Epochs(2).clearTiming();
             testCase.verifyFalse(testCase.EXPT.Epochs(2).hasTiming());
+
+            % Remove a response
+            testCase.EXPT.Epochs(1).remove('Response', 1);
+            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch(1, 'Response')), 1);
             
             % Clear the responses
             testCase.EXPT.removeByEpoch('all', 'Response');
@@ -592,6 +678,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Datasets', {'Name', 'TestDataset1'}), 1);
             % Test Experiment's get access
             testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Datasets')), 2);
+            testCase.verifyNumElements(testCase.EXPT.get('Datasets'), 2);
 
             % Check dataset data
             testCase.verifyEqual(testCase.EXPT.Epochs(1).Datasets(2).Data, eye(3));
@@ -633,6 +720,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Add Registrations to an Epoch
             testCase.EXPT.Epochs(1).add([reg1, reg2]);
+            
+            % Test access from Experiment
+            testCase.verifyNumElements(testCase.EXPT.get('Registration'), 2);
 
             % Clear the registrations
             testCase.EXPT.removeByEpoch(1, 'Registration');
@@ -640,6 +730,55 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Clear the epochs
             testCase.EXPT.remove('Epoch', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.Epochs), 0);
+        end
+    end
+
+    methods (Test, TestTags=["Stimulus", "CoreApi"])
+        function StimulusIO(testCase)
+            
+            % If previous functions errored, epochs may still be present
+            testCase.EXPT.remove('Epoch', 'all');
+
+            % Create two Epochs and add to the Experiment
+            epoch1 = aod.core.Epoch(1);
+            epoch2 = aod.core.Epoch(2);
+            testCase.EXPT.add([epoch1, epoch2]);
+
+            % Create two stimuli
+            stim1 = aod.core.Stimulus('Stim1');
+            stim2 = aod.core.Stimulus('Stim2');
+
+            % Add to the epochs
+            epoch1.add(stim1); 
+            epoch2.add(stim2);
+
+            % Test various access methods
+            testCase.verifyNumElements(epoch1.Stimuli, 1);
+            testCase.verifyNumElements(testCase.EXPT.get('Stimulus'), 2);
+            testCase.verifyNumElements(testCase.EXPT.getFromEpoch('all', 'Stimulus'), 2);
+            testCase.verifyNumElements(testCase.EXPT.getFromEpoch(1, 'Stimulus'), 1);
+        end
+
+        function StimulusErrors(testCase)
+            stim1 = aod.core.Stimulus('StimWithoutProtocol');
+            testCase.verifyError(@() stim1.getProtocol(), "getProtocol:ProtocolNotSet");
+        end
+
+        function StimulusProtocol(testCase)
+            % Create protocols with and without calibration
+            protocol1 = test.TestStimProtocol([],...
+                'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
+                'BaseIntensity', 0.5, 'Contrast', 1);
+
+            % Create a stimulus with the protocol
+            stim1 = aod.core.Stimulus('StimWithProtocol', protocol1);
+
+            % Verify Stimulus protocol properties are correct
+            testCase.verifyEqual(stim1.protocolName, 'TestStimProtocol');
+            testCase.verifyTrue(strcmp(stim1.protocolClass, class(protocol1)));
+
+            % Verify protocol output is correct
+            testCase.verifyEqual(stim1.getProtocol(), protocol1);
         end
     end
 end 

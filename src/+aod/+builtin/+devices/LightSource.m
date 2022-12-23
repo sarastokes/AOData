@@ -33,7 +33,7 @@ classdef LightSource < aod.core.Device
             obj = obj@aod.core.Device([], varargin{:});   
             
             ip = aod.util.InputParser();
-            addParameter(ip, 'SerialNumber', [], @isstring);
+            addParameter(ip, 'SerialNumber', [], @istext);
             parse(ip, varargin{:});
             
             obj.setWavelength(wavelength);

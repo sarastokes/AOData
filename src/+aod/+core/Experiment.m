@@ -269,8 +269,6 @@ classdef Experiment < aod.core.Entity
                 for i = 1:numel(out)
                     ID = cat(1, ID, find(obj.(entityType.parentContainer) == out(i)));
                 end
-                fprintf('IDs found:');  %% TODO: Remove (just for debugging)
-                disp(ID);
             else
                 error('remove:InvalidId',...
                     'ID must be "all", an integer indices of entities to remove');
@@ -381,6 +379,7 @@ classdef Experiment < aod.core.Entity
     methods
         function out = getFromEpoch(obj, ID, entityType, varargin)
             % Get entities from one, multiple or all epochs
+            % TODO: Is ID useful here?
             % -------------------------------------------------------------
             
             import aod.core.EntityTypes
@@ -414,6 +413,11 @@ classdef Experiment < aod.core.Entity
                 case EntityTypes.STIMULUS 
                     group = vertcat(obj.Epochs(idx).Stimuli);
             end
+            
+            if isempty(group)
+                out = group;
+                return
+            end
 
             % Default is empty unless meets criteria below
             if nargin > 3
@@ -424,18 +428,17 @@ classdef Experiment < aod.core.Entity
                         mustBeInteger(entityID); mustBeInRange(entityID, 1, numel(group));
                         group = group(entityID);
                     end 
+                    % Were queries provided as well
                     if nargin > 4
                         out = aod.core.EntitySearch.go(group, varargin{2:end});
                     else
                         out = group;
                     end
-                    return
-                else
+                else % Was the extra input just queries
                     if ~isempty(group)
                         out = aod.core.EntitySearch.go(group, varargin{:});
                     end
                 end
-                return
             else
                 out = group;
             end

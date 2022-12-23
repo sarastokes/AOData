@@ -1,13 +1,15 @@
 function mustBeEpochID(obj, epochIDs)
-    % mustBeEpochID
-    %
-    % Description:
-    %   Validation function for determining whether user-specified epochIDs
-    %   are present in the parent Experiment
-    %
-    % Syntax:
-    %   mustBeEpochID(obj, epochIDs)
-    % ---------------------------------------------------------------------
+% mustBeEpochID
+%
+% Description:
+%   Validation function for determining whether user-specified epochIDs
+%   are present in the parent Experiment
+%
+% Syntax:
+%   aod.util.mustBeEpochID(obj, epochIDs)
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     arguments
         obj         {aod.util.mustBeEntity(obj)}

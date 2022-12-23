@@ -27,9 +27,14 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             testCase.verifyEqual(paramValue, 'm');
         end
 
-        function testLightSource(testCase)
+        function PMT(testCase)
             obj = aod.builtin.devices.PMT('VisiblePMT',...
                 'Manufacturer', 'Hamamatsu', 'Model', 'H16722');
+        end
+
+        function LightSource(testCase)
+            obj = aod.builtin.devices.LightSource(488, 'SerialNumber', '123');
+            obj.setSpectra([1:10; 11:20]);
         end
 
         function testDichroicFilter(testCase)
@@ -54,16 +59,20 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Calibrations'})
         function testRoomMeasurement(testCase)
             obj = aod.builtin.calibrations.RoomMeasurement(getDateYMD());
+            % Add a first measurement
             obj.addMeasurement("11:45", 71.1, 28);
             testCase.verifyEqual(size(obj.measurements), [1 3]);
+            % Append a measurement
+            obj.addMeasurement("12:20", 71.2, 28);
+            testCase.verifyEqual(size(obj.measurements), [2 3]);
         end
     end
 
     methods (Test, TestTags = {'Registrations'})
-
         function testRigidRegistration(testCase)
             obj = aod.builtin.registrations.RigidRegistration(...
                 'SIFT', '20220822', eye(3));
+            testCase.verifyClass(obj.affine2d_to_3d(eye(3)), 'affine3d');
         end
 
         function testStripRegistration(testCase)
@@ -75,30 +84,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Stimuli'})
         function testImagingLight(testCase)
             obj = aod.builtin.stimuli.ImagingLight('Mustang', 22, '%');
-        end
-    end
-
-    methods (Test, TestTags = {'Protocols'})
-        function testContrastProtocol(testCase)
-            % Make two protocols
-            protocol1 = test.TestProtocol(...
-                'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
-                'BaseIntensity', 0.5, 'Contrast', 1);
-            protocol2 = test.TestProtocol(...
-                'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
-                'BaseIntensity', 0, 'Intensity', 0.75);
-
-            % The stimRate was twice the sampleRate
-            testCase.verifyEqual(protocol1.totalPoints, 2*protocol1.totalSamples);
-            
-            % The stimulus should match stimRate, not sampleRate
-            stim = protocol1.generate();
-            testCase.verifyEqual(numel(stim), protocol1.totalPoints);
-            testCase.verifyEqual(max(stim), 1);
-
-            % Contrast vs intensity specification
-            testCase.verifyEqual(protocol1.amplitude, 0.5);
-            testCase.verifyEqual(protocol2.amplitude, 0.75);
+            obj.setValue(23, '%');
         end
     end
 

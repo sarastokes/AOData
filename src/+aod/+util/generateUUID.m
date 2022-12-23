@@ -9,6 +9,8 @@ function UUID = generateUUID()
 %
 % References:
 %   Adapted from Luca Della Santina's Follicle Finder
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     jUUID = java.util.UUID.randomUUID;

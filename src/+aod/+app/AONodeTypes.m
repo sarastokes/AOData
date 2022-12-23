@@ -1,5 +1,5 @@
 classdef AONodeTypes 
-% Node types in AODataViewer Tree
+% Node types in AODataViewer display tree
 %
 % Description:
 %   Enumerated type for uitreenodes representing specific AOData components
@@ -15,16 +15,14 @@ classdef AONodeTypes
 %   obj = aod.app.AONodeTypes.init(nodeName);
 %       Returns the node type given the text name which can often be 
 %       extracted from the data with class()
+%
+% Notes:
+%   Might have gone a bit overboard with the icons but it looks cool
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration
-        UNKNOWN
-
-        % Link types
-        LINK  
-
         % Group types
         ENTITY 
         CONTAINER
@@ -42,10 +40,17 @@ classdef AONodeTypes
         TRANSFORM
 
         % Specific AOData types
+        HOMEDIRECTORY
         FILES
         NOTES
         NAME
         CODE
+
+        % Link types
+        LINK
+
+        % Error prevention type
+        UNKNOWN
     end
 
     properties (Hidden, Constant)
@@ -95,11 +100,11 @@ classdef AONodeTypes
             import aod.app.AONodeTypes;
 
             switch obj
-                case {AONodeTypes.TEXT, AONodeTypes.DATETIME, AONodeTypes.ENUM}
+                case [AONodeTypes.TEXT, AONodeTypes.DATETIME, AONodeTypes.ENUM, AONodeTypes.NAME]
                     out = 'Text';
-                case {AONodeTypes.TABLE, AONodeTypes.TIMETABLE}
+                case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE, AONodeTypes.CODE]
                     out = 'Table';
-                case {AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM}
+                case [AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM]
                     out = 'Table';
                 otherwise
                     out = [];
@@ -122,9 +127,9 @@ classdef AONodeTypes
                     out = 'text.png';
                 case AONodeTypes.DATETIME 
                     out = 'time.png';
-                case {AONodeTypes.TABLE, AONodeTypes.TIMETABLE}
+                case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE]
                     out = 'table.png';
-                case {AONodeTypes.STRUCTURE, AONodeTypes.MAP}
+                case [AONodeTypes.STRUCTURE, AONodeTypes.MAP]
                     out = 'structure.png';
                 case AONodeTypes.ENUM
                     out = 'list.png';
@@ -134,6 +139,10 @@ classdef AONodeTypes
                     out = 'notepad.png';
                 case AONodeTypes.NAME 
                     out = 'card.png';
+                case AONodeTypes.CODE 
+                    out = 'code.png';
+                case AONodeTypes.HOMEDIRECTORY 
+                    out = 'home.png';
                 otherwise
                     out = 'data.png';
             end
@@ -143,10 +152,18 @@ classdef AONodeTypes
 
     methods (Static)
         function obj = get(data, name)
+            % Get AONodeType by data class or dataset name
+            %
+            % Syntax:
+            %   obj = aod.app.AONodeTypes.get(data, name)
+            % -------------------------------------------------------------
             
             import aod.app.AONodeTypes
 
-            % First try dataset name, if provided
+            obj = [];
+
+            % First chec dataset name, if provided, to see if it is a 
+            % special AOData dataset.
             if nargin > 1
                 switch lower(name) 
                     case 'name'
@@ -155,10 +172,19 @@ classdef AONodeTypes
                         obj = AONodeTypes.FILES;
                     case 'notes'
                         obj = AONodeTypes.NOTES;
+                    case 'code'
+                        obj = AONodeTypes.CODE;
+                    case 'homedirectory'
+                        obj = AONodeTypes.HOMEDIRECTORY;
                 end
             end
 
-            % Then try data type
+            % Was obj identified by dataset name?
+            if ~isempty(obj)
+                return
+            end
+
+            % Then try identifying by data type
             if isenum(data)
                 obj = AONodeTypes.ENUM;
             else
@@ -205,6 +231,8 @@ classdef AONodeTypes
                     obj = AONodeTypes.TRANSFORM;
                 case 'notes'
                     obj = AONodeTypes.NOTES;
+                case 'homedirectory'
+                    obj = AONodeTypes.HOMEDIRECTORY;
                 otherwise
                     warning('AONodeTypes_get:UnrecognizedInput',...
                         'Node name %s was not recognized', nodeName);

@@ -28,8 +28,8 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Dataset(name, data)
-            obj = obj@aod.core.Entity(name);
+        function obj = Dataset(name, data, varargin)
+            obj = obj@aod.core.Entity(name, varargin{:});
             if nargin > 1
                 obj.setData(data);
             end

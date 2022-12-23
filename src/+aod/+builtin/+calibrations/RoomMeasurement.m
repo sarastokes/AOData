@@ -25,7 +25,7 @@ classdef RoomMeasurement < aod.core.Calibration
 
     methods
         function obj = RoomMeasurement(calibrationDate, varargin)
-            obj = obj@aod.core.Calibration([], calibrationDate);
+            obj = obj@aod.core.Calibration('RoomMeasurement', calibrationDate);
         end
 
         function addMeasurement(obj, timestamp, temperature, humidity)
@@ -56,12 +56,6 @@ classdef RoomMeasurement < aod.core.Calibration
                     obj.measurements = [obj.measurements; T];
                 end
             end
-        end
-    end
-
-    methods (Static)
-        function out = hoursmins2duration(input)
-            out = hours(extractBefore(input, ":")) + hours(extractAfter(input, ":"));
         end
     end
 end 

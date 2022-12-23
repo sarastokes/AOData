@@ -12,9 +12,11 @@ classdef UtilityTest < matlab.unittest.TestCase
 %
 % See also:
 %   runAODataTestSuite
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    methods (Test)
+    methods (Test, TestTags=["Utility"])
         function testParameters(testCase)
             params = aod.util.Parameters();
             params('A') = 1;
@@ -28,10 +30,21 @@ classdef UtilityTest < matlab.unittest.TestCase
             RM.update();
         end
 
-        function testUUIDValidation(testCase)
+    end
+
+    methods (Test, TestTags=["Validation", "Utility"])
+        function ValidateUUID(testCase)
             testCase.verifyError(...
                 @() aod.util.validateUUID('baduuid'),...
                 "validateUUID:InvalidInput");
+        end
+
+        function ValidateDate(testCase)
+            testCase.verifyEmpty(aod.util.validateDate([]));
+
+            testCase.verifyError(...
+                @()aod.util.validateDate('BadDate'),... 
+                "validateDate:FailedDatetimeConversion");
         end
     end
 end 

@@ -1,9 +1,17 @@
-classdef TestProtocol < aod.builtin.protocols.StimulusProtocol
-% TESTPROTOCOL
+classdef TestStimProtocol < aod.builtin.protocols.StimulusProtocol
+% A subclass of Stimulus Protocol for testing purposes
 %
 % Description:
 %   A basic protocol designed to test functionality of both the core
 %   Protocol class and the builtin StimulusProtocol class
+%
+% Parent:
+%   aod.builtin.protocols.StimulusProtocol
+%
+% Constructor:
+%   obj = test.TestStimProtocol(calibration, varargin)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
 %#ok<*INUSD,*MANU>
@@ -13,7 +21,7 @@ classdef TestProtocol < aod.builtin.protocols.StimulusProtocol
     end
 
     methods
-        function obj = TestProtocol(varargin)
+        function obj = TestStimProtocol(calibration, varargin)
             obj = obj@aod.builtin.protocols.StimulusProtocol([], varargin{:});
         end
 
@@ -28,7 +36,7 @@ classdef TestProtocol < aod.builtin.protocols.StimulusProtocol
         end
 
         function fName = getFileName(obj) 
-            fName = 'TestProtocol';
+            fName = 'TestStimProtocol';
         end
     end
 end 

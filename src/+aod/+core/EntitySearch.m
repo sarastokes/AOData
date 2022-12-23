@@ -38,9 +38,20 @@ classdef EntitySearch < handle
             end
         end
 
-        function out = getMatches(obj)
+        function [out, ID] = getMatches(obj)
             % Return group members matching query criteria
+            %
+            % Syntax:
+            %   [out, ID] = getMatches(obj)
+            %
+            % Outputs:
+            %   out                 array of entities
+            %       The entities from entityGroup matching query criteria
+            %   ID                  integers
+            %       The indices of the matching entities in entityGroup 
+            % -------------------------------------------------------------
             out = obj.Group(obj.filterIdx);
+            ID = find(obj.filterIdx);
         end
     end
 
@@ -71,8 +82,10 @@ classdef EntitySearch < handle
         end
     end 
 
+    % Query methods
     methods (Access = private)
         function classQuery(obj, className)
+            % Find entities that are members of specified class
             for i = 1:numel(obj.Group)
                 if obj.filterIdx(i)
                     obj.filterIdx(i) = strcmpi(class(obj.Group(i)), className);
@@ -81,6 +94,7 @@ classdef EntitySearch < handle
         end
         
         function subclassQuery(obj, className)
+            % Find entities that are members/subclasses of specified class
             for i = 1:numel(obj.Group)
                 if obj.filterIdx(i)
                     obj.filterIdx(i) = isSubclass(obj.Group(i), className);
@@ -89,6 +103,7 @@ classdef EntitySearch < handle
         end
 
         function nameQuery(obj, nameSpec)
+            % Find entities by name
             if isa(nameSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
                     if obj.filterIdx(i) 
@@ -106,7 +121,7 @@ classdef EntitySearch < handle
         end
 
         function datasetQuery(obj, dsetName, dsetSpec)
-            % DATASETQUERY
+            % Find entities by dataset name and value
             % TODO: datetime comparison
             
             if nargin < 3
@@ -147,7 +162,7 @@ classdef EntitySearch < handle
         end
 
         function fileQuery(obj, fileName, fileSpec)
-
+            % Find entities by file name/value
             if nargin < 3
                 fileSpec = [];
             end
@@ -195,6 +210,7 @@ classdef EntitySearch < handle
         end
 
         function parameterQuery(obj, paramName, paramSpec)
+            % Find entities by parameter name/value
             if nargin < 3
                 paramSpec = [];
             end
@@ -238,7 +254,7 @@ classdef EntitySearch < handle
     end
 
     methods (Static)
-        function out = go(entityGroup, varargin)
+        function [out, ID] = go(entityGroup, varargin)
             % Create EntitySearch object and return query matches
             %
             % Description:
@@ -246,19 +262,26 @@ classdef EntitySearch < handle
             %   EntitySearch object and directly returning the matches
             %
             % Syntax:
-            %   out = aod.core.EntitySearch.go(entityGroup, varargin)
+            %   [out, ID] = aod.core.EntitySearch.go(entityGroup, varargin)
             %
             % Inputs:
             %   entityGroup         array of core entities
             %       A group of entities of one type from the core interface
             %   varargin            one or more queries
             %       Queries within cells (TODO)
+            %
+            % Outputs:
+            %   out                 array of entities
+            %       The entities from entityGroup matching query criteria
+            %   ID                  integers
+            %       The indices of the matching entities in entityGroup 
             % -------------------------------------------------------------
 
             if isempty(entityGroup)
                 out = [];
                 return
             end
+
             if nargin < 2
                 warning('go:NoQueries',... 
                     'EntitySearch was not provided a query, returning full group');
@@ -266,7 +289,7 @@ classdef EntitySearch < handle
                 return
             end
             obj = aod.core.EntitySearch(entityGroup, varargin{:});
-            out = obj.getMatches();
+            [out, ID] = obj.getMatches();
         end
     end
 end

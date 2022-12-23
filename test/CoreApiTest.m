@@ -1,5 +1,5 @@
 classdef CoreApiTest < matlab.unittest.TestCase
-% COREINTERFACETEST
+% Test search capabilitites in the core interface
 %
 % Description:
 %   Tests API for filtering entities in the core interface
@@ -11,7 +11,7 @@ classdef CoreApiTest < matlab.unittest.TestCase
 %   result = runtests('CoreApiTest.m')
 %
 % See Also:
-%   runAODataTestSuite, aod.core.EntitySearch
+%   runAODataTestSuite, aod.core.EntitySearch, CoreInterfaceTest
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -22,6 +22,14 @@ classdef CoreApiTest < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function methodSetup(testCase)
+            % Set up an experiment with:
+            % - 2 Calibrations (base & PowerMeasurement)
+            % - 1 System 
+            % - 2 Analyses
+            % - 6 Epochs w/ varying parameters & files
+            % - 4 Registrations ('RegType1' on 1/2, 'RegType2' on 6/7)
+            % - 3 Datasets ('Dset1' on 1/2, 'Dset2' on 1)
+
             testCase.EXPT = aod.core.Experiment(...
                 '851_20221117', cd, '20221117',...
                 'Administrator', 'Sara Patterson',... 
@@ -58,6 +66,15 @@ classdef CoreApiTest < matlab.unittest.TestCase
                     testCase.EXPT.Epochs(end).setFile('MyFile', '');
                 end
             end
+
+            testCase.EXPT.Epochs(1).add(aod.core.Registration('RegType1'));
+            testCase.EXPT.Epochs(2).add(aod.core.Registration('RegType1'));
+            testCase.EXPT.Epochs(3).add(aod.core.Registration('RegType2'));
+            testCase.EXPT.Epochs(4).add(aod.core.Registration('RegType2'));
+
+            testCase.EXPT.Epochs(1).add(aod.core.Dataset('Dset1'));
+            testCase.EXPT.Epochs(1).add(aod.core.Dataset('Dset2'));
+            testCase.EXPT.Epochs(2).add(aod.core.Dataset('Dset1'));
         end
     end
 
@@ -146,7 +163,31 @@ classdef CoreApiTest < matlab.unittest.TestCase
             % Match files values using a function handle
             egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
                 {'File', 'MyFile', @(x) endsWith(x, '.txt')});
-            testCase.verifyEqual(numel(egObj.getMatches()), 4);
+            testCase.verifyNumElements(egObj.getMatches(), 4);
+
+            % Match files by name
+            egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
+                {'File', 'MyFile', 'test.txt'});
+            testCase.verifyNumElements(egObj.getMatches(), 4);
+        end
+    end
+
+    methods (Test, TestTags=["CoreApi"])
+        function EmptyEpochs(testCase)
+            testCase.verifyNumElements(...
+                testCase.EXPT.getFromEpoch('all', 'Registration'), 4);
+            testCase.verifyNumElements(...
+                testCase.EXPT.getFromEpoch([], 'Registration'), 4);
+        end
+
+        function SubEpochEntities(testCase)
+            out = testCase.EXPT.getFromEpoch('all', 'Dataset', 1);
+            testCase.verifyNumElements(out, 1);
+            testCase.verifyTrue(strcmp(out.Name, 'Dset1'));
+            
+            out = testCase.EXPT.getFromEpoch(...
+                'all', 'Registration', {'Name', 'RegType1'});
+            testCase.verifyNumElements(out, 2);
         end
     end
 

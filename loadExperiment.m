@@ -1,13 +1,15 @@
 function e = loadExperiment(hdfName, entityFactory)
-    % LOADEXPERIMENT
-    %
-    % Description:
-    %   Load an experiment from an HDF5 file
-    %
-    % Syntax:
-    %   e = loadExperiment(hdfName)
-    %   e = loadExperiment(hdfName, entityFactory)
-    % --------------------------------------------------------------------
+% Load an AOData HDF5  file
+%
+% Description:
+%   Load an experiment from an HDF5 file to persistent interface
+%
+% Syntax:
+%   e = loadExperiment(hdfName)
+%   e = loadExperiment(hdfName, entityFactory)
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     % We need the full HDF5 file path
     [hdfPath, hdfName, ext] = fileparts(hdfName);
