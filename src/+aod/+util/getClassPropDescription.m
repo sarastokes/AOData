@@ -24,4 +24,8 @@ function out = getClassPropDescription(mc, propName)
         mc = metaclass(mc);
     end
     idx = find(arrayfun(@(x) strcmp(x.Name, propName), mc.PropertyList));
+    if isempty(idx)
+        error("getClassPropDescription:PropertyNotFound",...
+            "Property %s not found", propName);
+    end
     out = mc.PropertyList(idx).Description;

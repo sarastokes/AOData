@@ -48,7 +48,11 @@ classdef ProtocolTest < matlab.unittest.TestCase
             protocol2 = test.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
+
+            % Compare identical protocols
             testCase.verifyEqual(protocol1, protocol2);
+            % Compare protocol with another class
+            testCase.verifyNotEqual(protocol1, 123);
             
             % Change the date
             protocol2.dateCreated = getDateYMD('20221122');
@@ -57,6 +61,13 @@ classdef ProtocolTest < matlab.unittest.TestCase
             % Restore date, add a calibration
             protocol2.dateCreated = getDateYMD();
             protocol2.setCalibration(aod.core.Calibration('TestCalibration'));
+            testCase.verifyNotEqual(protocol1, protocol2);
+
+            % Compare protocols with different parameters
+            protocol3 = test.TestStimProtocol([],...
+                'PreTime', 6, 'StimTime', 5, 'TailTime', 5,...
+                'BaseIntensity', 0.5, 'Contrast', 1);
+            testCase.verifyNotEqual(protocol1, protocol3);
         end
 
         function Errors(testCase)
@@ -65,6 +76,15 @@ classdef ProtocolTest < matlab.unittest.TestCase
                 'BaseIntensity', 0.5, 'Contrast', 1);
             testCase.verifyError(@()protocol1.setCalibration(123),...
                 'MATLAB:class:NoConversionDefined');
+        end
+
+        function StimVsFrameRates(testCase)
+            % Sample rate = 25, stimRate = 50
+            protocol1 = test.TestStimProtocol([],...
+                'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
+                'BaseIntensity', 0.5, 'Contrast', 1);
+            testCase.verifyEqual(protocol1.pts2sec(50), 1);
+            testCase.verifyEqual(protocol1.samples2pts(2), 4);
         end
 
         function ContrastVsIntensity(testCase)

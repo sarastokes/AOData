@@ -42,7 +42,8 @@ classdef (Abstract) Factory < handle
             % Syntax:
             %   varargout = create(varargin)
             % ------------------------------------------------------------- 
-            error('Not yet implemented');
+            error('create:NotImplemented',...
+                'Subclasses must implement the create method');
         end
     end
 end

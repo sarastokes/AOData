@@ -8,11 +8,11 @@ function out = findFileReader(fileName)
 
     switch ext 
         case '.avi'
-            out = aod.util.AviReader(fileName);
+            out = aod.util.readers.AviReader(fileName);
         case {'.tif', '.tiff'}
-            out = aod.util.TiffReader(fileName);
+            out = aod.util.readers.TiffReader(fileName);
         case '.json'
-            out = aod.util.JsonReader(fileName);
+            out = aod.util.readers.JsonReader(fileName);
         case '.mat'
             out = aod.util.readers.MatReader(fileName);
         case {'.png', '.bmp', '.jpeg'}

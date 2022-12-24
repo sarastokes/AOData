@@ -37,8 +37,8 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
-        function out = get(obj, entityType, queries)
-            % Search Epoch's child entities
+        function out = get(obj, entityType, varargin)
+            % Search Channel's child entities
             %
             % Description:
             %   Search all entities of a specific type that match the given
@@ -71,7 +71,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             if nargin > 2
-                out = aod.core.EntitySearch.go(obj.Devices, queries);
+                out = aod.core.EntitySearch.go(obj.Devices, varargin{:});
             else
                 out = obj.Devices;
             end

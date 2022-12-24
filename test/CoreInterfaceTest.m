@@ -31,6 +31,16 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
     end
 
+    methods (Static)
+        function source = createSource()
+            % Create a source with two sub-sources
+            source = aod.core.Source('MC00851');
+            source1a = aod.core.Source('OS');
+            source1b = aod.core.Source('OD');
+            source.add([source1a, source1b]);
+        end
+    end
+
     % Terribly long methods but test function order isn't guarenteed
     methods (Test, TestTags=["Experiment", "Core", "LevelZero"])
         function ExperimentIO(testCase)
@@ -49,20 +59,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyTrue(contains(testCase.EXPT.getExptFile('RelFile'), cd));
             testCase.verifyFalse(contains(testCase.EXPT.getFile('RelFile'), cd));
 
-            % Confirm error for invalid file
-            testCase.verifyError(...
-                @() testCase.EXPT.setFile('All', 'Invalid'),...
-                "setFile:InvalidName");
-
             % Test setHomeDirectory
             testCase.EXPT.setHomeDirectory(fileparts(cd));
             testCase.verifyEqual(testCase.EXPT.getExptFile('RelFile'),...
                 fullfile(fileparts(cd), 'test_data', 'test.txt'));
             testCase.EXPT.setHomeDirectory(cd);
-        end
-
-        function ExperimentMetadata(testCase)
-            import matlab.unittest.constraints.Throws
 
             % Description options
             testCase.EXPT.setDescription('This is a test');
@@ -73,11 +74,25 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Check empty entities
             testCase.verifyEmpty(testCase.EXPT.get('Channel'));
             testCase.verifyEmpty(testCase.EXPT.get('Device'));
+        end
+
+        function ExperimentErrors(testCase)
+            % Miscellaneous errors not tested elsewhere
+            testCase.verifyError(...
+                @() testCase.EXPT.getFromEpoch('all', 'Calibration'),...
+                'getFromEpoch:NonChildEntityType');
+
+            testCase.verifyEmpty(testCase.EXPT.getFromEpoch('all', 'Response'));
 
             % Check entity checks for remove
-            testCase.verifyThat(...
+            testCase.verifyError(...
                 @()testCase.EXPT.remove('Response', 'all'),...
-                Throws("remove:NonChildEntityType"));
+                "remove:NonChildEntityType");
+            
+            % Confirm error for invalid file
+            testCase.verifyError(...
+                @() testCase.EXPT.setFile('All', 'Invalid'),...
+                "setFile:InvalidName");
         end
 
         function Equality(testCase)
@@ -117,15 +132,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             epoch.setFile('MyFile', 'test.txt');
             testCase.verifyError(...
                 @()epoch.getExptFile('MyFile'), "getExptFile:NoHomeDirectory");
-        end
-
-        function ExperimentErrors(testCase)
-            % Miscellaneous errors not tested elsewhere
-            testCase.verifyError(...
-                @() testCase.EXPT.getFromEpoch('all', 'Calibration'),...
-                'getFromEpoch:NonChildEntityType');
-
-            testCase.verifyEmpty(testCase.EXPT.getFromEpoch('all', 'Response'));
         end
     end
 
@@ -172,6 +178,18 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Clear all the sources
             testCase.EXPT.remove('Source', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 0);
+        end
+
+        function RemoveSourceByQuery(testCase)
+            % Create a source with two sub-sources
+            source = testCase.createSource();
+            testCase.verifyNumElements(source.Sources, 2);
+
+            source.remove('Source', {'Name', 'OS'});
+            testCase.verifyNumElements(source.Sources, 1);
+
+            source.remove({'Name', 'OD'});
+            testCase.verifyEmpty(source.Sources);
         end
     end
 

@@ -106,7 +106,6 @@ classdef CoreApiTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(egObj.getMatches()), 1);
         end
 
-
         function testDatasetSearch(testCase)
             % Test for presence of a dataset
             out = aod.core.EntitySearch.go(testCase.EXPT.Calibrations,...
@@ -192,13 +191,19 @@ classdef CoreApiTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags=["Errors", "CoreApi"])
-        function testEntityErrors(testCase)
+        function EntityErrors(testCase)
             testCase.verifyError(...
                 @() testCase.EXPT.Systems(1).Channels(1).get('Epoch'),...
                 "get:InvalidEntityType");
             testCase.verifyError(...
                 @() testCase.EXPT.Epochs(1).get('System'),...
                 "get:InvalidEntityType");
+        end
+        
+        function IDErrors(testCase)
+            testCase.verifyError(...
+                @() testCase.EXPT.Systems(1).remove('Channel', 'BadID'),...
+                "remove:InvalidID");
         end
     end
 end

@@ -14,7 +14,7 @@ classdef TiffReader < aod.util.FileReader
 % -------------------------------------------------------------------------
 
     methods
-        function obj = TiffReader(varargin)
+        function obj = TiffReader(fileName)
             obj = obj@aod.util.FileReader(fileName);
         end
 

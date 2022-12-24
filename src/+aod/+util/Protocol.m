@@ -120,13 +120,13 @@ classdef (Abstract) Protocol < handle
             value = floor(t * obj.sampleRate);
         end
 
-        function value = samples2pts(obj, pts)
-            % PTS2SEC
+        function value = samples2pts(obj, samples)
+            % Convert samples to stim points
             %
             % Syntax:
-            %   value = samples2sec(obj, pts)
+            %   value = samples2sec(obj, samples)
             % -------------------------------------------------------------
-            value = floor(pts/obj.sampleRate);
+            value = floor(samples/obj.sampleRate * obj.stimRate);
         end
     end
 

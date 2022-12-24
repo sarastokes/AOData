@@ -53,22 +53,22 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   Remove a child source, or sources
             %
             % Syntax:
-            %   remove(obj, sourceID)
+            %   remove(obj, varargin)
             % -------------------------------------------------------------
 
-            if isscalar(obj)
-                arrayfun(@(x) remove(x, varargin{:}), obj);
-                return
-            end
-
-            if nargin == 3
-                entityType = aod.core.EntityTypes.get(varargin{2});
+            import aod.core.EntityTypes
+            
+            try 
+                entityType = EntityTypes.get(varargin{1});
+                startIdx = 2;
                 assert(entityType == aod.core.EntityTypes.SOURCE,...
                     'Only Sources can be removed from Source');
-                ID = varargin{3};
-            elseif nargin == 2
-                ID = varargin{2};
+            catch
+                    entityType = EntityTypes.SOURCE;
+                    startIdx = 1;
             end
+
+            ID = varargin{startIdx};
 
             if isnumeric(ID)
                 mustBeInteger(ID); 
@@ -76,7 +76,17 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 ID = sort(ID, 'descend');
                 obj.Sources(ID) = [];
             elseif istext(ID) && strcmpi(ID, 'all')
-                obj.Sources = aod.core.Sources.empty();
+                obj.Sources = aod.core.Source.empty();
+            elseif iscell(ID)
+                [~, ID] = aod.core.EntitySearch.go(obj.Sources, varargin{startIdx:end});
+                if ~isempty(ID)
+                    obj.Sources(ID) = [];
+                else
+                    warning('remove:NoQueryMatches',...
+                        'No sources matched provided queries, none were removed');
+                end
+            else
+                error('remove:InvalidID', 'Must be "all", indices or query cell(s)');
             end
         end
 

@@ -24,12 +24,23 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyClass(map, 'containers.Map');
         end
 
+        function Factory(testCase)
+            obj = test.TestFactory();
+            testCase.verifyError(@() obj.create(), "create:NotImplemented");
+        end
+
         function testRepoManager(testCase)
             RM = aod.infra.RepositoryManager();
             RM.listPackages();
             RM.update();
         end
 
+        function FindByUUID(testCase)
+            % Confirm no error when entities is empty
+            [entity, idx] = aod.util.findByUUID(aod.core.Calibration.empty(), "d18642a3-745a-4d63-ae26-3c8e1d87c944");
+            testCase.verifyEmpty(entity);
+            testCase.verifyEmpty(idx);
+        end
     end
 
     methods (Test, TestTags=["Validation", "Utility"])
@@ -45,6 +56,45 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyError(...
                 @()aod.util.validateDate('BadDate'),... 
                 "validateDate:FailedDatetimeConversion");
+        end
+    end
+
+    methods (Test, TestTags=["Files", "Utility"])
+        function FindFileReader(testCase)
+            testCase.verifyClass(aod.util.findFileReader('test.avi'),...
+                'aod.util.readers.AviReader');
+            testCase.verifyClass(aod.util.findFileReader('test.tif'),...
+                'aod.util.readers.TiffReader');
+            testCase.verifyClass(aod.util.findFileReader('test.json'),...
+                'aod.util.readers.JsonReader');
+            testCase.verifyClass(aod.util.findFileReader('test.mat'),...
+                'aod.util.readers.MatReader');
+            testCase.verifyClass(aod.util.findFileReader('test.png'),...
+                'aod.util.readers.ImageReader');
+            
+            testCase.verifyError(...
+                @() aod.util.findFileReader('test.zip'),...
+                "findFileReader:UnknownExtension");
+        end
+
+        function FileManagerClass(testCase)
+            %obj1 = test.FileManager(pwd);
+            %obj2 = test.FileManager([pwd, filesep]);
+
+            % Check trailing filesep handling
+            %testCase.verifyEqual(obj1.baseFolderPath, obj2.baseFolderPath);
+        end
+    end 
+
+    methods (Test, TestTags=["Metaclass", "Utility"])
+        function PropDescription(testCase)
+            epoch1 = aod.core.Epoch(1);
+            testCase.verifyEqual(...
+                aod.util.getClassPropDescription(epoch1, 'ID'),...
+                aod.util.getClassPropDescription(metaclass(epoch1), 'ID'));
+            testCase.verifyError(...
+                @() aod.util.getClassPropDescription(epoch1, 'BadName'),...
+                "getClassPropDescription:PropertyNotFound");
         end
     end
 end 

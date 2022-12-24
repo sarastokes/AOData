@@ -31,9 +31,9 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
     entityType = aod.core.EntityTypes.get(obj);
     containerProps = entityType.childContainers();
     
-    alwaysPersistedProps = ["notes", "Parent", "files", "description"];
-    alwaysAttributeProps = ["UUID", "Name", "label", "parameters", "entityType"];
-    alwaysAbandonedProps = ["allowableParentTypes", "Reader"];
+    alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
+    alwaysAttributeProps = ["UUID", "label", "parameters", "entityType"];
+    alwaysAbandonedProps = "Reader";  %% TODO
     persistedProps = [];
     attributeProps = [];
     abandonedProps = [];
@@ -76,13 +76,22 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
         end
     end
 
+    % Find empty props
+    emptyProps = false(1, numel(persistedProps));
+    for i = 1:numel(persistedProps)
+        emptyProps(i) = isempty(obj.(persistedProps(i)));
+    end
+    assignin('base', 'emptyProps', emptyProps);
+
     if verbose
         if isempty(persistedProps)
             fprintf('No properties persisted\n');
         else
             fprintf('Persisted properties:\n');
             for i = 1:numel(persistedProps)
-                fprintf('\t%s\n', persistedProps(i));
+                if ~emptyProps(i)
+                    fprintf('\t%s\n', persistedProps(i));
+                end
             end
         end
 
@@ -92,6 +101,11 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
             fprintf('Abandoned properties:\n');
             for i = 1:numel(abandonedProps)
                 fprintf('\t%s\n', abandonedProps(i));
+            end
+            for i = 1:numel(persistedProps) 
+                if emptyProps(i)
+                    fprintf('\t%s (empty)\n', persistedProps(i));
+                end
             end
         end
 
@@ -104,4 +118,6 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
             end
         end
     end
-end
+
+    abandonedProps = cat(1, abandonedProps, persistedProps(emptyProps));
+    persistedProps(emptyProps) = [];

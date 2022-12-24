@@ -16,7 +16,6 @@ classdef ImageReader < aod.util.FileReader
     methods
         function obj = ImageReader(varargin)
             obj@aod.util.FileReader(varargin{:});
-            obj.extensions = {'*.png', '*.jpeg', '*.bmp'};
         end
         
         function out = readFile(obj)
