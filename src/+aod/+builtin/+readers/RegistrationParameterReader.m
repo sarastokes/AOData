@@ -34,7 +34,8 @@ classdef RegistrationParameterReader < aod.util.readers.TxtReader
             %   Assumes there are two dates in file name and second is the
             %   date the file was registered
             % -------------------------------------------------------------
-            matches = extract(obj.Name, digitsPattern(8));
+            [~, fileName, ~] = fileparts(obj.fullFile);
+            matches = extract(fileName, digitsPattern(8));
             if numel(matches) == 2
                 obj.registrationDate = matches{2};
             end

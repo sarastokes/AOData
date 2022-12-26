@@ -19,24 +19,23 @@ classdef TiffReader < aod.util.FileReader
         end
 
         function out = readFile(obj)
-            obj.Data = obj.loadTiff(obj.fullFile);
-            
-            imInfo = imfinfo(fileName);
+            imInfo = imfinfo(obj.fullFile);
             dType = sprintf('uint%u', imInfo(1).BitDepth);
-            nFrames = size(imfinfo(fileName));
+            nFrames = size(imfinfo(obj.fullFile));
             
             out = zeros(imInfo(1).Height, imInfo(1).Width, dType);
         
             for i = 1:nFrames
-                out(:,:,i) = imread(fileName, 'Index', i);
+                out(:,:,i) = imread(obj.fullFile, 'Index', i);
             end
+            out = squeeze(out);
             obj.Data = out;
         end
     end
 
     methods (Static)
-        function out = read(varargin)
-            obj = aod.util.readers.TiffReader(varargin{:});
+        function out = read(fileName)
+            obj = aod.util.readers.TiffReader(fileName);
             out = obj.readFile();
         end
     end

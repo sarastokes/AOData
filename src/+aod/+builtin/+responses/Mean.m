@@ -1,4 +1,4 @@
-classdef Mean < aod.core.Response
+classdef Mean < aod.core.ResponseFromFile
 % MEAN
 %
 % Description:
@@ -12,8 +12,8 @@ classdef Mean < aod.core.Response
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Mean(parent)
-            obj = obj@aod.core.Response('Mean');
+        function obj = Mean(fileName, parent)
+            obj = obj@aod.core.ResponseFromFile('Mean', 'Parent', parent);
             obj.setParent(parent);
             obj.load();
         end

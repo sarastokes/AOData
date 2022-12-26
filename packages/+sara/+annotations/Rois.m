@@ -40,8 +40,12 @@ classdef Rois < aod.core.Annotation
     end
 
     properties (SetAccess = protected)
+        % Unique identifiers of ROIs
         Metadata            table            = table.empty()
+        % Image used for segmenting ROIs
         Image
+        % FileReader for extracting ROIs
+        Reader              
     end
 
     properties (SetAccess = private)
@@ -104,8 +108,10 @@ classdef Rois < aod.core.Annotation
                     obj.Reader = aod.builtin.readers.ImageJRoiReader(roiFileName, imSize);
                 elseif endsWith(roiFileName, 'csv')
                     obj.Reader = aod.util.readers.CsvReader(roiFileName);
+                else
+                    obj.Reader = aod.util.findFileReader(roiFileName);
                 end
-                obj.setMap(obj.Reader.readFile());
+                obj.setMap(double(obj.Reader.readFile()));
             end
             obj.setMetadata();
         end

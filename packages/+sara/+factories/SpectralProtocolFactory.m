@@ -96,6 +96,12 @@ classdef SpectralProtocolFactory < aod.util.Factory
                 return
             end
 
+            % Tyler's protocols
+            protocol = obj.checkTylerProtocols(fileName);
+            if ~isempty(protocol)
+                return
+            end
+
             % Temporal frequency tuning curves
             if contains(fileName, 'hz')
                 contrast = extractFlaggedNumber(fileName, 'c_');
@@ -204,7 +210,36 @@ classdef SpectralProtocolFactory < aod.util.Factory
                 return
             end
 
+            
             error('SpectralProtocolFactory: Did not recognize %s!', fileName);
+        end
+
+        function protocol = checkTylerProtocols(obj, fileName)
+
+            % Tyler's protocols
+            if strcmpi(fileName, 'control_nd1.0')
+                protocol = tyler.protocols.spectral.Sinewave(obj.calibration,...
+                    'Control', true);
+                return
+            end
+
+            if contains(fileName, '_0.15hz_nd1.0')
+                switch fileName(1:3)
+                    case 'l_i'
+                        spectralClass = sara.SpectralTypes.Liso;
+                    case 'm_i'
+                        spectralClass = sara.SpectralTypes.Miso;
+                    case 's_i'
+                        spectralClass = sara.SpectralTypes.Siso;
+                    case 'lum'
+                        spectralClass = sara.SpectralTypes.Luminance;
+                end
+                
+                protocol = tyler.protocols.spectral.Sinewave(obj.calibration,...
+                    'SpectralClass', spectralClass, 'Control', false);
+                return 
+            end
+            protocol = [];
         end
     end
             

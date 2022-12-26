@@ -38,13 +38,17 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         % Time the Epoch (i.e. data acquisition) began
-        startTime (1,1)     datetime
+        startTime           datetime
         % Timing of samples during Epoch
         Timing (1,:)        double  
 
+        % Container for Epoch's Registrations
         Registrations       aod.core.Registration
-        Responses           aod.core.Response
+        % Container for Epoch's Responses
+        Responses           aod.core.Response = aod.core.Response.empty()
+        % Container for Epoch's Stimuli
         Stimuli             aod.core.Stimulus
+        % Container for Epoch's Datasets
         Datasets            aod.core.Dataset
     end
 
@@ -271,11 +275,24 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % SETSTARTTIME
             %
             % Description:
-            %   Set the time the epoch began
+            %   Set the time the epoch began. If input is empty, existing 
+            %   startTime will be erased
             %
             % Syntax:
             %   setStartTime(obj, startTime)
+            %
+            % Inputs:
+            %   startTime           datetime
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) setStartTime(x, startTime), obj);
+                return
+            end
+
+            if isempty(startTime)
+                obj.startTime = datetime.empty();
+            end
+
             obj.startTime = startTime;
         end
 
@@ -305,26 +322,19 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setTiming(obj, timing)
             % -------------------------------------------------------------
-            assert(isnumeric(timing) || isduration(timing),... 
-                'Timing must be numeric or duration');
-            obj.Timing = timing;
-        end
 
-        function clearTiming(obj)
-            % CLEARTIMING
-            %
-            % Description:
-            %   Remove Epoch timing
-            %
-            % Syntax:
-            %   clearTiming(obj)
-            % -------------------------------------------------------------
             if ~isscalar(obj)
-                arrayfun(@(x) x.clearTiming(), obj);
-                return
+                arrayfun(@(x) setTiming(x, timing), obj);
+                return 
             end
 
-            obj.Timing = [];
+            if isempty(timing)
+                % Clear timing
+                obj.Timing = [];
+                return 
+            end
+
+            obj.Timing = timing;
         end
     end
 

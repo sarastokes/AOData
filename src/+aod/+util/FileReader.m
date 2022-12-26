@@ -13,14 +13,15 @@ classdef (Abstract) FileReader < handle
     properties (SetAccess = protected)
         % Full file name, including file path
         fullFile
+        % Key/value parameters related to file reading
+        parameters
     end
 
     properties (Transient, SetAccess = protected)
         % Transient, file data should be added to an entity if worth saving
         Data        
     end
-
-
+    
     methods (Abstract)
         % Reads the file and assigns to "Data" (or user-defined properties)
         out = readFile(obj)
@@ -30,6 +31,7 @@ classdef (Abstract) FileReader < handle
         function obj = FileReader(fileName)
             fileName = completeFileName(fileName);
             obj.fullFile = fileName;
+            obj.parameters = aod.util.Parameters();
             % Because some files may be time-consuming to load, readFile()
             % is not called bu default when the FileReader is created
         end

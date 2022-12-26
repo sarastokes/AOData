@@ -601,11 +601,6 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   value = obj.getLabel()
             % -------------------------------------------------------------
-            if ~isscalar(obj)
-                value = arrayfun(@(x) getLabel(x), obj);
-                return
-            end
-
             if isempty(obj.Name)
                 value = char(getClassWithoutPackages(obj));
             else
@@ -709,12 +704,12 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.setParent(parent)
             % -------------------------------------------------------------
-            if isempty(parent)
-                return
-            end
-            
             if ~isscalar(obj)
                 arrayfun(@(x) setParent(x, parent), obj);
+                return
+            end
+
+            if isempty(parent)
                 return
             end
             
@@ -740,7 +735,16 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = isValidParent(parent)
             % -------------------------------------------------------------
-            tf = ismember(parent.entityType, obj.entityType.validParentTypes());
+            try
+                tf = ismember(parent.entityType, obj.entityType.validParentTypes());
+            catch ME
+                if strcmp(ME.identifier, 'MATLAB:index:expected_one_output_from_intermediate_indexing')
+                    assignin('base', 'obj', obj);
+                    assignin('base', 'parent', parent);
+                else
+                    rethrow(ME);
+                end
+            end
         end
     end
 

@@ -29,9 +29,7 @@ classdef TemporalModulation < sara.protocols.SpectralProtocol
             obj = obj@sara.protocols.SpectralProtocol(...
                 calibration, varargin{:});
 
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            ip.KeepUnmatched = true;
+            ip = aod.util.InputParser();
             addParameter(ip, 'TemporalFrequency', 5, @isnumeric);
             addParameter(ip, 'ModulationClass', 'square', ...
                 @(x) ismember(x, {'square', 'sine'}));

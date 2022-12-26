@@ -470,8 +470,6 @@ classdef Experiment < aod.core.Entity
             else
                 aod.util.mustBeEpochID(obj, ID);
             end
-            ID = sort(ID, 'descend');
-            idx = obj.id2index(ID);
 
             import aod.core.EntityTypes
             entityType = aod.core.EntityTypes.get(entityType);
@@ -481,8 +479,8 @@ classdef Experiment < aod.core.Entity
                     'Only Dataset, Stimulus, Registration and Response can be removed from an Epoch');
             end
 
-            for i = 1:numel(idx)
-                remove(obj.id2epoch(idx(i)), entityType, entityID);
+            for i = 1:numel(ID)
+                remove(obj.id2epoch(ID(i)), entityType, entityID);
             end
         end
     end

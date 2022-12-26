@@ -105,7 +105,7 @@ classdef Experiment < aod.core.Experiment
                 if ~isempty(whichTforms)
                     tforms = tforms(:, :, whichTforms);
                 end
-                assert(TR.Count == numel(epochIDs), ...
+                assert(size(tforms,3) == numel(epochIDs), ...
                     'Epoch IDs does not match number of transforms');
             end
 

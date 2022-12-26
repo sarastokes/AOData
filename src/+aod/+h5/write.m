@@ -13,6 +13,9 @@ function success = write(fileName, pathName, dsetName, data, description)
 %       The name of the dataset
 %   data            see supported data types
 %       The data to write to the dataset
+% Optional inputs:
+%   description     string
+%       A description of the dataset
 %
 % Outputs:
 %   success         logical
@@ -22,9 +25,10 @@ function success = write(fileName, pathName, dsetName, data, description)
 %   numeric, char, string, logical, table, timetable, datetime, duration
 %   enum, struct, containers.Map(), affine2d, imref2d, simtform2d, cfit
 %   See h5tools-matlab documentation for limitations.
+% AOData also adds support for aod.util.Parameters and aod.util.FileReader
 %
 % See also:
-%   h5tools.write, aod.h5.read
+%   h5tools.write, aod.h5.read, aod.h5.writeFileReader
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -44,6 +48,9 @@ function success = write(fileName, pathName, dsetName, data, description)
             h5tools.datasets.makeTextDataset(fileName, pathName, dsetName, "aod.util.Parameters");
             h5tools.writeatt(fileName, fullPath, data);
             success = true;
+        % elseif isSubclass(data, 'aod.util.FileReader')
+        %     aod.h5.writeFileReader(fileName, pathName, dsetName, data, description);
+        %     success = true;
         else
             success = h5tools.write(fileName, pathName, dsetName, data);
             % Description only written for datasets without mapped params

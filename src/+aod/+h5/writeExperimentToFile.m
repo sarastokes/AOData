@@ -25,7 +25,7 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     arguments
-        hdfName                 char 
+        hdfName                  
         obj                     {mustBeA(obj, 'aod.core.Experiment')}
         overwriteFlag           logical = false
     end
@@ -39,7 +39,6 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
     h5tools.createFile(hdfName, overwriteFlag);
 
     % Add info about the environment in which the AOData file was created
-    matlabInfo = ver('MATLAB');
     h5tools.writeatt(hdfName, '/', aod.infra.getAODataEnv());
     h5tools.writeatt(hdfName, '/', 'FileCreated', string(datetime('now')),...
         'LastModified', string(datetime('now')));

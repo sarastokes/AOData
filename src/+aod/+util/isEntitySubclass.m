@@ -1,26 +1,31 @@
 function tf = isEntitySubclass(obj, entityType)
-    % ISENTITYSUBCLASS
-    %
-    % Description:
-    %   Check entity subclass identity (either core or persistent)
-    %
-    % Syntax:
-    %   tf = isEntitySubclass(obj, entityType)
-    %
-    % Inputs:
-    %   obj             object to check class 
-    %   entityType      char/aod.core.EntityTypes (default = all entities)
-    %
-    % Examples:
-    %   % Check whether class is an Entity subclass
-    %   tf = isEntitySubclass(obj)
-    %
-    %   % Check whether class is a Annotation subclass
-    %   tf = isEntitySubclass(obj, "Annotation")
-    %
-    % History:
-    %   16Nov2022 - SSP
-    % ---------------------------------------------------------------------
+% Determine whether input is a valid entity or entityType
+%
+% Description:
+%   Check entity subclass identity (either core or persistent). With one 
+%   input, returns whether an Entity. With two inputs, returns whether it's 
+%   an entity and of a specific entityType
+%
+% Syntax:
+%   tf = aod.util.isEntitySubclass(obj, entityType)
+%
+% Inputs:
+%   obj             object to check class 
+%   entityType      char/aod.core.EntityTypes (default = all entities)
+%
+% Examples:
+%   % Check whether class is an Entity subclass
+%   tf = aod.util.isEntitySubclass(obj)
+%
+%   % Check whether class is a Annotation subclass
+%   tf = aod.util.isEntitySubclass(obj, "Annotation")
+%
+% See also:
+%   aod.core.EntityTypes
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
+
     if nargin < 2
         tf = isSubclass(obj, {'aod.core.Entity', 'aod.persistent.Entity'});
         return

@@ -1,7 +1,6 @@
 classdef RigidTransformReader < aod.util.FileReader
 % RIGIDTRANSFORMREADER
 %
-%
 % Parent:
 %   aod.util.FileReader
 %
@@ -16,7 +15,7 @@ classdef RigidTransformReader < aod.util.FileReader
 % -------------------------------------------------------------------------
     
     properties
-        Count(1,1) {mustBeInteger} = 0
+        Count (1,1)     {mustBeInteger}     = 0
     end
 
     methods
@@ -31,7 +30,7 @@ classdef RigidTransformReader < aod.util.FileReader
             tform = affine2d(squeeze(obj.Data(:, :, ID)));
         end
 
-        function out = read(obj)
+        function out = readFile(obj)
             header = 'Transformation Matrix: AffineTransform[[';
         
             TT = [];

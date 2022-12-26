@@ -581,7 +581,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             epoch1.setTiming(1:4);
             
             % Clear timing
-            clearTiming([epoch1, epoch2]);
+            setTiming([epoch1, epoch2], []);
             testCase.verifyEqual(hasTiming([epoch1, epoch2]), [false, false]);
         end
 
@@ -649,13 +649,13 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyNumElements(testCase.EXPT.get('Response'), 2);
 
             % Clear the timing from the first response
-            response1.clearTiming();
+            response1.setTiming([]);
             testCase.verifyEmpty(testCase.EXPT.Epochs(1).Responses(1).Timing);
 
             % Add timing at the epoch level
             testCase.EXPT.Epochs(2).setTiming(linspace(0.5, 2.5, 4));
             testCase.verifyTrue(testCase.EXPT.Epochs(2).hasTiming());
-            testCase.EXPT.Epochs(2).clearTiming();
+            testCase.EXPT.Epochs(2).setTiming([]);
             testCase.verifyFalse(testCase.EXPT.Epochs(2).hasTiming());
 
             % Remove a response

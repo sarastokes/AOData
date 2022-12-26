@@ -58,7 +58,7 @@ classdef EpochParameterReader < aod.util.readers.TxtReader
 
     methods (Static)
         function obj = init(filePath, ID)
-            fileName = obj.getFileName(filePath, ID);
+            fileName = sara.readers.EpochParameterReader.getFileName(filePath, ID);
             obj = sara.readers.EpochParameterReader(fileName);
         end 
 

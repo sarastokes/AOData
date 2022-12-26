@@ -109,7 +109,6 @@ classdef ChannelFactory < aod.util.Factory
             if nargin > 1
                 assert(isSubclass(system, 'aod.core.System'));
                 system.add(channel);
-                out = system;
             else
                 system = [];
             end

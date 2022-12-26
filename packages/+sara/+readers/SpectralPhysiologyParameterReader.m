@@ -17,35 +17,35 @@ classdef SpectralPhysiologyParameterReader < sara.readers.EpochParameterReader
             obj@sara.readers.EpochParameterReader(fileName);
         end
 
-        function ep = readFile(obj, ep)
-            ep = readFile@sara.readers.EpochParameterReader(obj, ep);
+        function epoch = readFile(obj, epoch)
+            epoch = readFile@sara.readers.EpochParameterReader(obj, epoch);
 
             % If it's spectral physiology, then we know AOM1 was Mustang
-            stim = sara.stimuli.Mustang(ep.getParam('AOM1'));
-            ep.addStimulus(stim);
+            stim = sara.stimuli.Mustang(epoch.getParam('AOM1'));
+            epoch.addStimulus(stim);
 
             % Reflectance window
             x = obj.readNumber('ReflectanceWindowX = ');
             y = obj.readNumber('ReflectanceWindowY = ');
             dx = obj.readNumber('ReflectanceWindowDX = ');
             dy = obj.readNumber('ReflectanceWindowDY = ');
-            ep.setParam('ReflectanceWindow', [x y dx dy]);
+            epoch.setParam('ReflectanceWindow', [x y dx dy]);
 
             % LED stimulus specifications
-            ep.setParam('LedInterval', obj.readNumber('Interval value = '));
-            ep.setParam('LedIntervalUnit', obj.readText('Interval unit = '));
+            epoch.setParam('LedInterval', obj.readNumber('Interval value = '));
+            epoch.setParam('LedIntervalUnit', obj.readText('Interval unit = '));
             
             % LUT files (may not be necessary with Calibration class)
-            ep.setFile('LUT1', obj.readText('LUT1 = '));
-            ep.setFile('LUT2', obj.readText('LUT2 = '));
-            ep.setFile('LUT3', obj.readText('LUT3 = '));
+            epoch.setFile('LUT1', obj.readText('LUT1 = '));
+            epoch.setFile('LUT2', obj.readText('LUT2 = '));
+            epoch.setFile('LUT3', obj.readText('LUT3 = '));
         end
     end
 
     methods (Static)
-        function obj = init(filePath, ID)
-            fileName = obj.getFileName(filePath, ID);
+        function epoch = read(fileName, epoch)
             obj = sara.readers.SpectralPhysiologyParameterReader(fileName);
+            epoch = obj.readFile(epoch);
         end 
     end
 end

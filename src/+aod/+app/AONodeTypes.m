@@ -41,6 +41,7 @@ classdef AONodeTypes
 
         % Specific AOData types
         HOMEDIRECTORY
+        FILEREADER
         FILES
         NOTES
         NAME
@@ -176,11 +177,19 @@ classdef AONodeTypes
                         obj = AONodeTypes.CODE;
                     case 'homedirectory'
                         obj = AONodeTypes.HOMEDIRECTORY;
+                    case 'filereader'
+                        obj = AONodeTypes.FILEREADER;
                 end
             end
 
             % Was obj identified by dataset name?
             if ~isempty(obj)
+                return
+            end
+
+            % Is the node type in the dataset itself
+            if istext(data) && strcmp(data, 'FileReader')
+                obj = AONodeTypes.FILEREADER;
                 return
             end
 
@@ -227,6 +236,8 @@ classdef AONodeTypes
                     obj = AONodeTypes.STRUCTURE;
                 case {'aod.util.parameters', 'files'}
                     obj = AONodeTypes.FILES;
+                case 'aod.util.FileReader'
+                    obj = AONodeTypes.FILEREADER;
                 case 'affine2d'
                     obj = AONodeTypes.TRANSFORM;
                 case 'notes'
