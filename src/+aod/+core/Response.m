@@ -8,7 +8,16 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = aod.core.Response(name, fileName, fileReader)
+%   obj = aod.core.Response(name, varargin)
+%
+% Inputs:
+%   name        string or char
+%       A name for the Response
+% Optional key/value inputs:
+%   Data        
+%       The data which is the response itself
+%   Timing      duration or numeric
+%       The timing for each response point
 %
 % Properties:
 %   Data 
@@ -18,13 +27,21 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   setData(obj, data)
 %   addTiming(obj, timing)
 %   clearTiming(obj)
+%
+% The following methods operate directly on the Data property and will 
+% return a numeric output rather than a Response:
+%   plus (+), minus (-), not (~), ge (>), gt (>=), le (<), lt (<=), eq (=), 
+%   ne (~=), uminus, uplus, abs, mean, median, std, sum, cumsum, iqr, 
+%   prctile, quantile, sign
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Data                             
-        Timing (1,:)         {mustBeA(Timing, ["double", "duration"])} = []                   
+        % Response data (rows are samples)
+        Data                          
+        % Timing of each sample in the Response      
+        Timing (:,1)         {mustBeA(Timing, ["double", "duration"])} = []                   
     end
 
     methods
@@ -52,10 +69,15 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function setTiming(obj, timing)
-            % SETTIMING
+            % Set Response "Timing", the time each sample was acquired
             %
             % Syntax:
             %   addTiming(obj, timing)
+            %
+            % Inputs:
+            %   timing      vector, numeric or duration
+            %       The timing for each sample in Response. If empty, the 
+            %       contents of Timing will be cleared.
             %
             % Examples:
             %   % Set numeric timing
@@ -66,7 +88,20 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             %   
             %   % Clear timing
             %   obj.setTiming([])
+            %
+            % Notes:
+            %   If Timing is left empty, the Response will inherit the 
+            %   Timing from its parent Epoch (if it exists)
             % -------------------------------------------------------------
+            arguments 
+                obj
+                timing         
+            end
+
+            if ~isempty(timing) 
+                assert(isvector(timing), 'Timing must be a vector');
+                timing = timing(:);  % Columnate
+            end
             obj.Timing = timing;
         end
     end
@@ -79,48 +114,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             if isempty(obj.Timing) && ~isempty(obj.Parent.Timing)
                 obj.Timing = obj.Parent.Timing;
             end
-        end
-    end
-
-    % Overwritten MATLAB methods (dimensions)
-    methods
-        %function varargout = size(obj, varargin)
-        %    [varargout{1:nargout}] = size(obj.Data, varargin{:});
-        %end
-
-        function out = reshape(obj, varargin)
-            out = reshape(obj.Data, varargin{:});
-        end
-
-        function out = length(obj)
-            out = length(obj.Data);
-        end
-
-        function out = ndims(obj)
-            out = ndims(obj.Data);
-        end
-
-        function out = nnz(obj)
-            out = nnz(obj.Data);
-        end
-
-        %function out = numel(obj)
-        %    out = numel(obj.Data);
-        %end
-    end
-
-    % Overwritten MATLAB methods (datatype)
-    methods 
-        function out = double(obj)
-            if ~isdouble(obj.Data)
-                out = double(obj.Data);
-            else
-                out = obj.Data;
-            end
-        end
-
-        function out = logical(obj)
-            out = obj.Data;
         end
     end
 
@@ -184,41 +177,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         
         function out = not(obj)
             out = ~not(obj.Data);
-        end
-
-        function out = transpose(obj)
-            out = obj.Data';
-        end
-
-        function out = ctranspose(obj)
-            out = obj.Data.';
-        end
-    end
-
-    % Overwritten MATLAB methods (is)
-    methods
-        function out = isnan(obj)
-            out = isnan(obj.Data);
-        end
-
-        function out = ismissing(obj)
-            out = ismissing(obj.Data);
-        end
-
-        function out = isnumeric(obj)
-            out = isnumeric(obj.Data);
-        end
-
-        function out = isinf(obj)
-            out = isinf(obj.Data);
-        end
-
-        function out = isfinite(obj)
-            out = isfinite(obj.Data);
-        end
-
-        function out = isreal(obj)
-            out = isread(obj.Data);
         end
     end
 

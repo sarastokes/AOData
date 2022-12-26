@@ -28,11 +28,13 @@ classdef ResponseTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test)
+    methods (Test, TestTags=["Response", "Operators"])
         function Equals(testCase)
             testCase.verifyTrue(testCase.RESP3 == testCase.RESP3);
             testCase.verifyTrue(testCase.RESP3 == 3);
             testCase.verifyTrue(3 == testCase.RESP3);
+
+            testCase.verifyFalse(isequal(testCase.RESP2, testCase.DATA2));
         end
 
         function NotEqual(testCase)
@@ -80,37 +82,56 @@ classdef ResponseTest < matlab.unittest.TestCase
 
         function Not(testCase)
             resp = aod.core.Response('Not', 'Data', [1 0]);
-            testCase.verifyEqual(not(resp), [false, true]);
+            testCase.verifyEqual(not(resp), [true, false]);
         end
     end
 
-    methods (Test)
-        function Transpose(testCase)
-            testCase.verifyEqual(testCase.RESP1', [1 2 3]');
-        end
-    end
-
-    methods (Test)
-        function IsMissing(testCase)
-            testCase.verifyFalse(ismissing(testCase.RESP0));
+    methods (Test, TestTags=["Response", "Stats"])
+        function Abs(testCase)
+            resp = aod.core.Response('Test', 'Data', [-1 1]);
+            testCase.verifyEqual(abs(resp), [1 1]);
         end
 
-        function Finite(testCase)
-            infResp = aod.core.Response('Inf', 'Data', Inf);
-            testCase.verifyFalse(isinf(testCase.RESP0));
-            testCase.verifyTrue(isinf(infResp));
-
-            testCase.verifyTrue(isfinite(testCase.RESP0));
-            testCase.verifyFalse(isfinite(infResp));
-        end
-    end
-
-    methods (Test)
         function Mean(testCase)
             testCase.verifyEqual(...
                 mean(testCase.RESP1), mean(testCase.DATA1));
             testCase.verifyEqual(...
                 mean(testCase.RESP2, 1), mean(testCase.DATA2, 1));
+        end
+
+        function Median(testCase)
+            testCase.verifyEqual(...
+                median(testCase.RESP2, 1), median(testCase.DATA2, 1));
+        end
+
+        function Std(testCase)
+            testCase.verifyEqual(...
+                std(testCase.RESP2, [], 2), std(testCase.DATA2, [], 2));
+        end
+
+        function Sum(testCase)
+            testCase.verifyEqual(...
+                sum(testCase.RESP2, 2), sum(testCase.DATA2, 2));
+        end
+
+        function CumSum(testCase)
+            testCase.verifyEqual(...
+                cumsum(testCase.RESP2, 2), cumsum(testCase.DATA2, 2));
+        end
+
+        function Iqr(testCase)
+            testCase.verifyEqual(...
+                iqr(testCase.RESP2, 'all'), iqr(testCase.DATA2, 'all'));
+        end
+
+        function Quantile(testCase)
+            testCase.verifyEqual(...
+                quantile(testCase.RESP2, 3), quantile(testCase.DATA2, 3));
+        end
+
+        function Prctile(testCase)
+            testCase.verifyEqual(...
+                prctile(testCase.RESP2, 50), prctile(testCase.DATA2, 50));
         end
     end
 end

@@ -12,6 +12,7 @@ classdef (Abstract) Entity < handle
 % Properties:
 %   Parent                      aod.core.Entity
 %   Name                        char
+%   UUID                        string
 %   parameters                  aod.util.Parameters
 %   files                       aod.util.Parameters
 %   description                 string
@@ -38,6 +39,8 @@ classdef (Abstract) Entity < handle
 %   value = getFile(obj, fileName, errorType)
 %   value = getExptFile(obj, fileName, varargin)
 %   removeFile(obj, fileName)
+%
+%   tf = isequal(obj, other)
 %
 % Protected methods:
 %   value = getLabel(obj)
@@ -119,7 +122,7 @@ classdef (Abstract) Entity < handle
 
     methods
         function h = ancestor(obj, className)
-            % ANCESTOR
+            % Get parent entity matching a specific entityType
             %
             % Description:
             %   Recursively search 'Parent' property for an entity matching
@@ -149,7 +152,7 @@ classdef (Abstract) Entity < handle
 
     methods (Sealed)
         function setName(obj, name)
-            % SETNAME
+            % Set entity's name
             %
             % Syntax:
             %   setName(obj, name)
@@ -158,7 +161,7 @@ classdef (Abstract) Entity < handle
         end
 
         function setDescription(obj, txt)
-            % SETDESCRIPTION
+            % Set entity's description
             %
             % Syntax:
             %   setDescription(obj, txt)
@@ -321,7 +324,7 @@ classdef (Abstract) Entity < handle
         end
 
         function setParam(obj, varargin)
-            % ADDPARAMETER
+            % Add or change parameter(s)
             %
             % Description:
             %   Add parameter(s) to the parameter property
@@ -351,7 +354,7 @@ classdef (Abstract) Entity < handle
         end
 
         function removeParam(obj, paramName)
-            % REMOVEFILE
+            % Remove a parameter by name
             %
             % Description:
             %   Remove a parameter by name from parameters property
@@ -466,7 +469,7 @@ classdef (Abstract) Entity < handle
         end
 
         function fileValue = getFile(obj, fileName, errorType)
-            % Get a file by name
+            % Get a file by name (use for absolute file paths)
             %
             % Description:
             %   Return the value of a specific file name 
@@ -516,7 +519,7 @@ classdef (Abstract) Entity < handle
         end
 
         function fileValue = getExptFile(obj, fileName, varargin)
-            % GETEXPTFILE
+            % Get file & append homeDirectory (use for relative file paths)
             %
             % Description:
             %   Same as getFile but appends experiment path to the output.
@@ -596,10 +599,21 @@ classdef (Abstract) Entity < handle
     % Methods meant to be overwritten by subclasses, if needed
     methods (Access = protected)
         function value = getLabel(obj)  
-            % GETLABEL
+            % Get entity's label
+            %
+            % Description:
+            %   Determines dependent property label. Returns "name" if set 
+            %   or class name without packages if "name" is empty. 
+            %   Subclasses can overload this method to define automated 
+            %   naming for entities rather than requiring user to input a 
+            %   name upon instantiation. Examples are below in "See also".
             %      
             % Syntax:
-            %   value = obj.getLabel()
+            %   value = obj.getLabel();
+            %
+            % See also:
+            %   aod.builtin.devices.Pinhole, 
+            %   aod.builtin.devices.DichroicFilter
             % -------------------------------------------------------------
             if isempty(obj.Name)
                 value = char(getClassWithoutPackages(obj));
@@ -609,7 +623,7 @@ classdef (Abstract) Entity < handle
         end
 
         function sync(obj)
-            % SYNC
+            % Sync entity with experiment hierarchy, check for conflicts
             % 
             % Description:
             %   Sync is called when an object's Parent is set. Use for 
@@ -668,7 +682,7 @@ classdef (Abstract) Entity < handle
         end
 
         function isUnique = checkGroupNames(obj)
-            % CHECKGROUPNAMES
+            % Check whether an entity group name is unique
             % 
             % Description:
             %   Checks whether entity shares a label with existing entities
@@ -699,7 +713,7 @@ classdef (Abstract) Entity < handle
 
     methods (Sealed, Access = {?aod.core.Entity, ?aod.persistent.Entity})
         function setParent(obj, parent)
-            % SETPARENT
+            % Set the parent property of an entity
             %   
             % Syntax:
             %   obj.setParent(parent)
@@ -727,10 +741,7 @@ classdef (Abstract) Entity < handle
 
     methods (Access = private)
         function tf = isValidParent(obj, parent)
-            % ISVALIDPARENT
-            %
-            % Description:
-            %   Determine if parent is in or subclass of allowable parents
+            % Determine if parent is in or subclass of allowable parents
             %
             % Syntax:
             %   tf = isValidParent(parent)
@@ -751,17 +762,22 @@ classdef (Abstract) Entity < handle
     % Overloaded MATLAB functions
     methods
         function tf = isequal(obj, entity)
-            % Test whether two entities have the same UUID
+            % Test whether two entities have the same UUID. If 2nd input 
+            % is not an entity, returns false
             %
             % Syntax:
             %   tf = isequal(obj, entity)
             % -------------------------------------------------------------
             arguments
                 obj
-                entity      {mustBeA(entity, 'aod.core.Entity')}
+                entity
             end
 
-            tf = isequal(obj.UUID, entity.UUID);
+            if aod.util.isEntitySubclass(entity)
+                tf = isequal(obj.UUID, entity.UUID);
+            else
+                tf = false;
+            end
         end
     end
 end 

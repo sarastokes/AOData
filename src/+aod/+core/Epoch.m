@@ -39,8 +39,10 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         % Time the Epoch (i.e. data acquisition) began
         startTime           datetime
-        % Timing of samples during Epoch
-        Timing (1,:)        double  
+        % Timing of samples during Epoch                             
+        Timing (:,1)         {mustBeA(Timing, ["double", "duration"])} = []
+        % Sample rate (Hz)
+        sampleRate    double                                           = []
 
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
@@ -192,16 +194,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                     'Entity must be Dataset, Registration, Response and Stimulus');
             end
 
-            switch entityType
-                case EntityTypes.DATASET 
-                    group = obj.Datasets;
-                case EntityTypes.REGISTRATION 
-                    group = obj.Registrations;
-                case EntityTypes.RESPONSE
-                    group = obj.Responses;
-                case EntityTypes.STIMULUS 
-                    group = obj.Stimuli;
-            end
+            group = obj.(entityType.parentContainer());
 
             if nargin > 2 && ~isempty(group)
                 out = aod.core.EntitySearch.go(group, varargin{:});
@@ -314,13 +307,25 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function setTiming(obj, timing)
-            % SETTIMING
-            %
-            % Description:
-            %   Set Epoch timing
+            % Set Epoch "Timing", the time each sample was acquired 
             %
             % Syntax:
-            %   setTiming(obj, timing)
+            %   addTiming(obj, timing)
+            %
+            % Inputs:
+            %   timing      vector, numeric or duration
+            %       The timing for each sample in Response. If empty, the 
+            %       contents of Timing will be cleared.
+            %
+            % Examples:
+            %   % Set numeric timing
+            %   obj.setTiming(1:4)
+            %
+            %   % Set duration timing
+            %   obj.setTiming(seconds(1:4))
+            %   
+            %   % Clear timing
+            %   obj.setTiming([])
             % -------------------------------------------------------------
 
             if ~isscalar(obj)
@@ -328,10 +333,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 return 
             end
 
-            if isempty(timing)
-                % Clear timing
-                obj.Timing = [];
-                return 
+            if ~isempty(timing)
+                assert(isvector(timing), 'Timing must be a vector');
+                timing = timing(:);  % Columnate
             end
 
             obj.Timing = timing;

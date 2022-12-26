@@ -19,8 +19,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
     properties (SetAccess = protected)
         ID
         startTime   
-        Timing                
-
+        Timing 
         Source 
         System 
 

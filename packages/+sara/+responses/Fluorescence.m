@@ -9,19 +9,14 @@ classdef Fluorescence < aod.builtin.responses.RegionResponse
 %
 % Constructor:
 %   obj = Fluorescence(parent, annotation, varargin)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods
         function obj = Fluorescence(parent, annotation, varargin)
             obj = obj@aod.builtin.responses.RegionResponse(...
                 'Fluorescence', parent, annotation, varargin{:});
-        end
-
-        function load(obj)
-            load@aod.builtin.responses.RegionResponse(obj);
-            obj.setTiming(aod.core.timing.TimeRate(...
-                1/obj.Experiment.sampleRate, obj.Timing.Count,... 
-                obj.Timing.Start+obj.Timing.Interval));
         end
     end
 

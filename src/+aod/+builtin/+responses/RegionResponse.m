@@ -11,18 +11,21 @@ classdef RegionResponse < aod.core.Response
 %   obj = RegionResponse(name, parent, annotation, varargin)
 %
 % Properties:
-%   Annotation
+%   Annotation          aod.core.Annotation/aod.persistent.Annotation
 %
 % Private properties:
 %   listeners
 %
 % Methods:
 %   setAnnotation(obj, annotation)
-%   signals = getData(obj, ID)
+%   signals = get(obj, ID, timePoints)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Annotation
+        % Annotation defining regions within acquired data
+        Annotation    {mustBeEntityType(Annotation, 'Annotation')} = aod.core.Annotation.empty()
     end
 
     properties (Access = private)
@@ -31,11 +34,10 @@ classdef RegionResponse < aod.core.Response
 
     methods
         function obj = RegionResponse(name, parent, annotation, varargin)
-            obj = obj@aod.core.Response(name);
-            obj.setParent(parent);
+            obj = obj@aod.core.Response(name, 'Parent', parent);
             obj.setAnnotation(annotation);
 
-            obj.load(varargin{:});
+            obj.extractResponse(varargin{:});
 
             % Listen for changes to regions and flag for update
             obj.listeners = addlistener(obj.Annotation,... 
@@ -45,36 +47,38 @@ classdef RegionResponse < aod.core.Response
 
     methods
         function setAnnotation(obj, annotation)
-            % SETANNOTATION
+            % Set the Annotation used to extract Region Responses
             %
             % Syntax:
             %   setAnnotation(obj, annotation)
             % -------------------------------------------------------------
-            assert(isSubclass(annotation, {'aod.core.Annotation', 'aod.persistent.Annotation'}),...
-                'Input must be subclass of aod.core.Annotation');
             obj.Annotation = annotation;
         end
 
-        function signals = getData(obj, IDs, timePoints) 
-            % GETDATA
+        function signals = get(obj, IDs, timePoints) 
+            % Get a subregion of the data, specified by ID and/or time
             %
             % Description:
-            %   Convenience method for easy access of data
+            %   Convenience method for easy access of "Data" property
             %
             % Syntax:
             %   Returns just the signals in the timetable
             % 
             % Optional input:
-            %   IDs         integers
-            %       Specific columns (ROIs) to return (default returns all)
+            %   IDs             integer(s)      (default = all)
+            %       Specific rows (regions) to return
+            %   timePoints      integer(s)      (default = all)
+            %       Specific time points or region of time to return 
+            %
             % Output:
             %   signals     double [time x rois]
             % -------------------------------------------------------------
             if isempty(obj.Data)
-                error('Data has not been set!');
+                error('get:NoData', 'Response Data is empty!');
             end
+
             signals = obj.Data.Signals;
-            if nargin == 2
+            if nargin == 2 || isempty(timePoints)
                 signals = signals(:, IDs);
             elseif nargin == 3
                 if isempty(IDs)
@@ -85,20 +89,25 @@ classdef RegionResponse < aod.core.Response
             end
         end
 
-        function load(obj)
-            % LOAD
-            %
-            % Description:
-            %   Get the average response over all pixels in ROI
+        function out = loadData(obj)
+            % Load data from which Response will be extracted
             %
             % Syntax:
-            %   load(obj)
+            %   loadData(obj)
             % -------------------------------------------------------------
+            out = obj.Parent.getStack();
+        end
+
+        function extractResponse(obj)
+            % Get the average response over all pixels in each region
+            %
+            % Syntax:
+            %   extract(obj)
+            % -------------------------------------------------------------
+            imStack = obj.loadData();
+
             roiMask = double(obj.Annotation.Data);
-            h = obj.ancestor(aod.core.EntityTypes.EXPERIMENT);
-            sampleRate = h.sampleRate;
-            imStack = obj.Parent.getStack();
-            roiList = obj.Annotation.roiIDs;
+            roiList = obj.Annotation.RoiIDs;
         
             A = [];
             for i = 1:obj.Annotation.Count
@@ -119,9 +128,7 @@ classdef RegionResponse < aod.core.Response
                 A = cat(1, A, signal);
             end
 
-            obj.setData(A);
-            obj.setTiming(aod.core.timing.TimeRate(1/sampleRate,... 
-                size(imStack,3), 1/sampleRate));
+            obj.setData(A');
         end
 
         function [signals, xpts] = getRoiResponse(obj, ID)

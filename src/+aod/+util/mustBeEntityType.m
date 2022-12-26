@@ -23,13 +23,13 @@ function mustBeEntityType(obj, entityType)
 
     if ~isscalar(obj)
         for i = 1:numel(obj)
-            aod.util.mustBeEntityType(obj, entityType);
+            aod.util.mustBeEntityType(obj(i), entityType);
         end
     end
 
     if ~isSubclass(obj, entityType.getCoreClassName()) ...
             && ~isSubclass(obj, entityType.getPersistentClassName())
-        eidType = 'mustBeEntityType:EntityTypeDoesNotMatch';
+        eidType = 'mustBeEntityType:InvalidEntityType';
         msgType = sprintf('Entity must be %s', char(entityType));
         throwAsCaller(MException(eidType, msgType));
     end

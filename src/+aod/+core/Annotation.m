@@ -10,7 +10,17 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Constructor:
 %   obj = aod.core.Annotation(name, varargin)
-%   obj = aod.core.Annotation(name, data, varargin)
+%   obj = aod.core.Annotation(name, 'Data', data, 'Source', source)
+%
+% Inputs:
+%   name            char or string
+%       Annotation name
+% Optional key/value inputs:
+%   Data            
+%       Data detailing the annotation locations
+%   Source          aod.core.Source/aod.persistent.Source
+%       The Source of the annotations
+% Additional key/value inputs passed to aod.core.Entity
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
@@ -25,7 +35,6 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    % TODO: Add "Image" or remove "Data" from base class?
     properties (SetAccess = protected)
         Data   
         % Source associated with the Annotation

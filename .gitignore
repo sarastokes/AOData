@@ -23,6 +23,7 @@ deprecated/
 
 ## Testing folders and files
 test/coverage_report/
+test/single_report/
 
 test/test.h5
 test/ExperimentTest.h5

@@ -59,6 +59,23 @@ classdef UtilityTest < matlab.unittest.TestCase
         end
     end
 
+    methods (Test, TestTags=["Argument", "Utility"])
+        function MustBeEntity(testCase)
+            testCase.verifyError(...
+                @() aod.util.mustBeEntity(123), "mustBeEntity:InvalidInput");
+            % Should produce no error
+            aod.util.mustBeEntity([aod.core.Epoch(1), aod.core.Epoch(2)]);
+        end
+
+        function MustBeEntityType(testCase)
+            testCase.verifyError(...
+                @() aod.util.mustBeEntityType(aod.core.Epoch(1), 'Device'),...
+                "mustBeEntityType:InvalidEntityType");
+            % Should produce no error
+            aod.util.mustBeEntityType([aod.core.Epoch(1), aod.core.Epoch(2)], 'Epoch');
+        end
+    end
+
     methods (Test, TestTags=["Files", "Utility"])
         function FindFileReader(testCase)
             testCase.verifyClass(aod.util.findFileReader('test.avi'),...

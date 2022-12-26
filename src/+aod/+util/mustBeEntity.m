@@ -14,12 +14,12 @@ function mustBeEntity(obj)
 
     if ~isscalar(obj)
         for i = 1:numel(obj)
-            aod.util.mustBeEntity(obj);
+            aod.util.mustBeEntity(obj(i));
         end
     end
 
     if ~isSubclass(obj, {'aod.core.Entity', 'aod.persistent.Entity'})
-        eidType = 'mustBeEntity:InputIsNotAODataEntity';
+        eidType = 'mustBeEntity:InvalidInput';
         msgType = 'Input must be subclass of aod.core.Entity or aod.persistent.Entity';
         throwAsCaller(MException(eidType, msgType));
     end

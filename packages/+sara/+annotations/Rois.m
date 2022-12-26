@@ -1,4 +1,4 @@
-classdef Rois < aod.core.Annotation
+classdef Rois < aod.builtin.annotations.Rois
 % ROIS
 % 
 % Description:
@@ -21,18 +21,22 @@ classdef Rois < aod.core.Annotation
 %   RoiIDs
 %
 % Methods:
-%   load(obj)
-%   reload(obj)
-%   setImage(obj, im)
-%
 %   ID = parseRoi(obj, ID)
 %   roiID = uid2roi(obj, UID)
 %   uid = roi2uid(obj, roiID)
 %   addRoiUID(obj, roiID, roiUID)
 %   setRoiUIDs(obj, roiUIDs)
 %
+% Inherited methods:
+%   load(obj)
+%   reload(obj)
+%   setImage(obj, im)
+%
+%
 % Protected methods:
 %   setMap(obj, map);
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     events 
@@ -42,113 +46,34 @@ classdef Rois < aod.core.Annotation
     properties (SetAccess = protected)
         % Unique identifiers of ROIs
         Metadata            table            = table.empty()
-        % Image used for segmenting ROIs
-        Image
-        % FileReader for extracting ROIs
-        Reader              
-    end
-
-    properties (SetAccess = private)
-        Size(1,2)           {mustBeInteger}         = [0 0]
-    end
-
-    % Enables quick access to commonly-used parameters
-    properties (Dependent)
-        count
-        roiIDs
     end
 
     methods
         function obj = Rois(name, rois, varargin)
-            obj = obj@aod.core.Annotation(name, varargin{:});
-
-            ip = aod.util.InputParser();
-            addParameter(ip, 'Size', [], @isnumeric);
-            parse(ip, varargin{:});
-            
-            obj.Size = ip.Results.Size;
-
-            obj.load(rois);
-        end
-
-        function value = get.count(obj)
-            value = obj.getParam('Count', aod.util.ErrorTypes.NONE);
-        end
-
-        function value = get.roiIDs(obj)
-            value = obj.getParam('RoiIDs', aod.util.ErrorTypes.NONE);
+            if istext(rois) && endsWith(rois, '.zip');
+                reader = aod.util.builtin.ImageJRoiReader(rois);
+            else
+                reader = [];
+            end
+            obj = obj@aod.builtin.annotations.Rois(name, rois,...
+                'Reader', reader, varargin{:});
         end
     end
 
     methods
         function load(obj, rois, imSize)
-            % LOAD
-            %
-            % Description:
-            %   Obtain data to send to setMap()
-            %
-            % Syntax:
-            %   load(obj, rois, imSize)
-            % -------------------------------------------------------------
-            if nargin == 3
-                obj.Size = imSize;
-            else
+            load@aod.builtin.annotations.Rois(obj, rois);
+            if nargin < 3 || isempty(imSize)
                 imSize = obj.Size;
-            end
-
-            if isnumeric(rois)
-                if ~isdouble(obj.rois)
-                    obj.rois = double(obj.rois);
-                end
-                obj.setMap(rois);
-                obj.Reader = [];
             else
-                roiFileName = char(rois);
-                if endsWith(roiFileName, 'zip')
-                    obj.Reader = aod.builtin.readers.ImageJRoiReader(roiFileName, imSize);
-                elseif endsWith(roiFileName, 'csv')
-                    obj.Reader = aod.util.readers.CsvReader(roiFileName);
-                else
-                    obj.Reader = aod.util.findFileReader(roiFileName);
-                end
-                obj.setMap(double(obj.Reader.readFile()));
+                obj.Size = imSize;
             end
             obj.setMetadata();
         end
            
         function reload(obj)
-            % RELOAD
-            %
-            % Description:
-            %   Reload ROIs (if loaded from a specific file)
-            %
-            % Syntax:
-            %   reload(obj)
-            % -------------------------------------------------------------
-            if isempty(obj.Reader) 
-                error('No Reader found!');
-            end
-            newMap = obj.Reader.reload();
-            obj.setMap(newMap);
-            obj.setMetadata();
+            reload@aod.builtin.annotations.Rois(obj);
             notify(obj, 'UpdatedRois');
-        end
-
-        function setImage(obj, img)
-            % SETIMAGE
-            % 
-            % Description:
-            %   Set an image used for annotation
-            %
-            % Syntax
-            %   setImage(obj, img)
-            % -------------------------------------------------------------
-            if istext(img)
-                obj.Image = imread(img);
-                obj.setFile('Image', img);
-            else
-                obj.Image = img;
-            end
         end
     end
 
@@ -162,7 +87,7 @@ classdef Rois < aod.core.Annotation
                 ID = obj.uid2roi(ID);
                 return;
             end
-            assert(ID <= obj.count, 'ROI is not within count!');
+            assert(ID <= obj.Count, 'ROI is not within count!');
         end
         
         function roiID = uid2roi(obj, uid)
@@ -226,13 +151,13 @@ classdef Rois < aod.core.Annotation
             % -------------------------------------------------------------
             if isstring(roiUIDs)
                 roiUIDs = roiUIDs(:);
-                assert(numel(roiUIDs) == obj.count, ...
+                assert(numel(roiUIDs) == obj.Count, ...
                     'Number of UIDs must equal number of ROIs');
-                T = table(rangeCol(1, obj.count), roiUIDs,...
+                T = table(rangeCol(1, obj.Count), roiUIDs,...
                     'VariableNames', {'ID', 'UID'});
                 obj.Metadata = T;
             elseif istable(roiUIDs)
-                assert(height(roiUIDs) == obj.count,...
+                assert(height(roiUIDs) == obj.Count,...
                     'Number of UIDs must equal number of ROIs');
                 assert(~isempty(cellfind(roiUIDs.Properties.VariableNames, 'UID')),...
                     'roiUID table must have a column named UID');
@@ -259,7 +184,7 @@ classdef Rois < aod.core.Annotation
             if ~isempty(obj.Metadata)
                 % If there were existing ROIs, make sure to append to  
                 % Metadata rather than erasing existing table
-                newROIs = obj.count - height(obj.Metadata);
+                newROIs = obj.Count - height(obj.Metadata);
                 newTable = table(height(obj.Metadata) + rangeCol(1, newROIs),...
                     repmat("", [newROIs, 1]), 'VariableNames', {'ID', 'UID'});
                 newTable = [obj.Metadata; newTable];
@@ -274,31 +199,10 @@ classdef Rois < aod.core.Annotation
                 forceOverwrite = false;
             end
             if isempty(obj.Metadata) || forceOverwrite
-                obj.Metadata = table(rangeCol(1, obj.count), ...
-                    repmat("", [obj.count, 1]),...
+                obj.Metadata = table(rangeCol(1, obj.Count), ...
+                    repmat("", [obj.Count, 1]),...
                     'VariableNames', {'ID', 'UID'});
             end
-        end
-    end
-
-    methods (Access = protected)     
-        function setMap(obj, map)
-            % SETMAP
-            %
-            % Description:
-            %   Assigns ROI map to Data property and gets derived metadata
-            %
-            % Syntax:
-            %   setMap(obj, data);
-            % -------------------------------------------------------------
-            obj.setData(double(map));
-
-            IDs = unique(obj.Data);
-            IDs(obj.roiIDs == 0) = [];
-            roiCount = nnz(unique(obj.Data));
-
-            obj.setParam('RoiIDs', IDs);
-            obj.setParam('Count', roiCount);
         end
     end
 end
