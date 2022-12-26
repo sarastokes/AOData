@@ -6,6 +6,13 @@ classdef Persistor < handle
 %
 % Constructor:
 %   obj = aod.persistent.Persistor(hdfName)
+%
+% Inputs:
+%   hdfName         char
+%       AOData HDF5 file name and path
+%
+% Events:
+%   EntityChanged       --> aod.persistent.EntityFactory
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -51,14 +58,11 @@ classdef Persistor < handle
 
     methods (Access = protected)
         function onAttChanged(obj, src, evt)
-            % ONATTCHANGED
-            %
-            % Description:
-            %   Processes an attribute change
+            % Callback for changes to an entity's group attributes
             %
             % Syntax:
             %   onAttChanged(obj, src, evt)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             if isempty(evt.Value)
                 % Remove attribute
                 h5tools.deleteAttribute(obj.hdfName, src.hdfPath, evt.Name);
@@ -68,14 +72,11 @@ classdef Persistor < handle
         end
 
         function onLinkChanged(obj, src, evt)
-            % ONLINKCHANGED
-            %
-            % Description:
-            %   Process a link change
+            % Callback for changes to a softlink 
             %
             % Syntax:
             %   onLinkChanged(obj, src, evt)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             if isempty(evt.Value)
                 % Link removed
                 h5tools.deleteObject(obj.hdfName, char(src.hdfPath));
@@ -83,22 +84,23 @@ classdef Persistor < handle
         end
 
         function onGroupChanged(obj, src, evt)
-            % ONGROUPCHANGED
-            %
-            % Description:
-            %   Process a change to an entity's group
+            % Callback for changes to an entity reflecting an HDF5 group
             %
             % Syntax:
             %   onGroupChanged(obj, src, evt)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
 
             % Get entity information prior to changes
-            parent = evt.OldEntity.Parent;
-            uuid = evt.OldEntity.UUID;
             containerName = evt.Entity.entityType.persistentParentContainer();
             hdfPath = char(src.hdfPath);
+            parent = evt.Source;
+            if ~isempty(evt.OldEntity)
+                previousUUID = evt.OldEntity.UUID;
+            else
+                previousUUID = [];
+            end
 
-            % Write/delete the entity
+            % Make the change in the underlying HDF5 file
             if strcmp(evt.Action, 'Add')
                 aod.h5.writeEntity(obj.hdfName, evt.Entity);
             elseif strcmp(evt.Action, 'Remove')
@@ -110,7 +112,9 @@ classdef Persistor < handle
                 h5writeatt(obj.hdfName, hdfPath, 'UUID', uuid);
             end
 
-            evtData = aod.persistent.events.EntityEvent(uuid, evt.Action);
+            % Ensure the change is reflected in EntityFactory
+            evtData = aod.persistent.events.EntityEvent(...
+                evt.Action, previousUUID);
             notify(obj, 'EntityChanged', evtData);
 
             % Refresh the associated EntityContainer
@@ -118,14 +122,11 @@ classdef Persistor < handle
         end
 
         function onDatasetChanged(obj, src, evt)
-            % ONDATASETCHANGED
-            %
-            % Description:
-            %   Processes a change to a dataset
+            % Callback for changes to property reflecting an HDF dataset
             %
             % Syntax:
             %   onDatasetChanged(obj, src, evt)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             fullPath = h5tools.util.buildPath(src.hdfPath, evt.Name);
             if isempty(evt.NewValue)
                 % Dataset should be deleted
@@ -140,14 +141,11 @@ classdef Persistor < handle
         end
 
         function onFileChanged(obj, ~, evt)
-            % ONFILECHANGED
-            %
-            % Description:
-            %   Processes an file change
+            % Callback for changes to "files" property
             %
             % Syntax:
             %   onFileChanged(obj, src, evt)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             filePath = h5tools.util.buildPath(evt.Source.hdfPath, 'files');
             if isempty(evt.Value)
                 % Remove file

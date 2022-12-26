@@ -24,11 +24,14 @@ classdef (ConstructOnLoad) GroupEvent < event.EventData
             arguments
                 entity      {mustBeA(entity, {'aod.core.Entity', 'aod.persistent.Entity'})}
                 action      {mustBeMember(action, {'Add', 'Remove', 'Replace'})}
-                oldEntity   {mustBeA(oldEntity, 'aod.persistent.Entity')} = []
+                oldEntity    = []
             end
             
             obj.Entity = entity;
             obj.Action = action;
+            if ~isempty(oldEntity)
+                mustBeA(entity, 'aod.persistent.Entity');
+            end
             obj.OldEntity = oldEntity;
         end
     end

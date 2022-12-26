@@ -12,6 +12,8 @@ classdef PersistorTest < matlab.unittest.TestCase
 %
 % See also:
 %   runAODataTestSuite
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
 %#ok<*NASGU> 
@@ -154,6 +156,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
         
         function testExperimentIndexing(testCase)
+            %% TODO Add verification
             out = testCase.EXPT.Epochs(1); 
             out = testCase.EXPT.Calibrations(0);
             out = testCase.EXPT.Annotations(0);

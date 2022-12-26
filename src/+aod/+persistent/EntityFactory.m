@@ -67,7 +67,13 @@ classdef EntityFactory < handle
 
     methods (Access = private)
         function onEntityChanged(obj, ~, evt)
+            % Callback for entity changes
+            % -------------------------------------------------------------
+
+            % Refresh the list of UUIDs
             obj.entityManager.collect();
+
+            % Make sure irrelevant UUIDs are removed from the cache
             if strcmp(evt.Action, 'Remove')
                 remove(obj.cache, evt.UUID);
             end

@@ -8,7 +8,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 %   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = aod.persistent.Epoch(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Epoch(hdfFile, pathName, factory)
 %
 % See also:
 %   aod.core.Epoch
@@ -18,7 +18,8 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 
     properties (SetAccess = protected)
         ID
-        startTime                   
+        startTime   
+        Timing                
 
         Source 
         System 
@@ -27,91 +28,42 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
         RegistrationsContainer
         ResponsesContainer
         StimuliContainer
-        Timing
     end
 
     methods
-        function obj = Epoch(hdfFile, hdfPath, factory)
-            obj = obj@aod.persistent.Entity(hdfFile, hdfPath, factory);
+        function obj = Epoch(hdfFile, pathName, factory)
+            obj = obj@aod.persistent.Entity(hdfFile, pathName, factory);
         end
     end
 
     % Addition methods
     methods (Sealed)
-        function addDataset(obj, dataset)
-            % ADDDATASET
-            %
-            % Description:
-            %   Add a Dataset to the Epoch and HDF5 file
+        function add(obj, entity)
+            % Add a new entity to the Epoch
             %
             % Syntax:
-            %   addDataset(obj, dataset)
+            %   add(obj, entity)
             % -------------------------------------------------------------
-            arguments
+            arguments 
                 obj
-                dataset        {mustBeA(dataset, 'aod.core.Dataset')}
+                entity      {mustBeA(entity, 'aod.core.Entity')}
             end
-            warning('addDataset:Deprecated', 'This function will be removed soon');
 
-            dataset.addParent(obj);
-            obj.addEntity(dataset);
-        end
-
-        function addRegistration(obj, registration)
-            % ADDREGISTRATION
-            %
-            % Description:
-            %   Add a Registration to the Epoch and HDF5 file
-            %
-            % Syntax:
-            %   addRegistration(obj, registration)
-            % -------------------------------------------------------------
-            arguments
-                obj 
-                registration    {mustBeA(registration, 'aod.core.Registration')}
+            if ~isscalar(entity)
+                arrayfun(@(x) add(obj, x), entity);
+                return
             end
-            warning('addRegistration:Deprecated', 'This function will be removed soon');
 
-            registration.addParent(obj);
-            obj.addEntity(registration);
-        end
+            import aod.core.EntityTypes
 
-        function addResponse(obj, response)
-            % ADDRESPONSE
-            %
-            % Description:
-            %   Add a Response to the Epoch and HDF5 file
-            %
-            % Syntax:
-            %   addResponse(obj, response)
-            % -------------------------------------------------------------
-            arguments
-                obj 
-                response        {mustBeA(response, 'aod.core.Response')}
+            entityType = EntityTypes.get(entity);
+            if ~ismember(entityType, obj.entityType.validChildTypes())
+                error('add:InvalidEntityType',...
+                    'Entity must be Dataset, Registration, Response and Stimulus');
             end
-            warning('addResponse:Deprecated', 'This function will be removed soon');
 
-            response.addParent(obj);
-            obj.addEntity(response);
-        end
-
-        function addStimuli(obj, stimulus)
-            % ADDSTIMULI
-            %
-            % Description:
-            %   Add a Stimulus to the Epoch and HDF5 file
-            %
-            % Syntax:
-            %   addStimuli(obj, stimulus)
-            % -------------------------------------------------------------
-            arguments
-                obj 
-                stimulus        {mustBeA(stimulus, 'aod.core.Stimulus')}
-            end
-            warning('addStimulus:Deprecated', 'This function will be removed soon');
-
-            stimulus.addParent(obj);
-            obj.addEntity(stimulus);
+            entity.setParent(obj);
+            obj.addEntity(entity);
         end
     end
 
@@ -186,7 +138,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
         end
     end
 
-    % Heterogeneous methods
+    % matlab.mixin.Heterogeneous methods
     methods (Sealed, Static)
         function obj = empty()
             obj = aod.persistent.Epoch([], [], []);

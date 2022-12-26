@@ -1,14 +1,20 @@
 classdef (ConstructOnLoad) EntityEvent < event.EventData
-% ENTITYEVENT
+% An event occurring when an entity changes in a persisted experiment
 %
 % Description:
-%   An event triggered by a specific entity
+%   An event triggered when an entity is added, removed or replaced.
 %
 % Parent:
 %   event.EventData
 %
 % Constructor:
-%   obj = aod.persistent.events.EntityEvent(uuid, action)
+%   obj = aod.persistent.events.EntityEvent(action, oldUUID)
+%
+% Inputs:
+%   action          char
+%       'Add', 'Remove', or 'Replace'
+%   oldUUID         string (default = "")
+%       UUID of existing persisted entity involved in change
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -19,15 +25,14 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
     end
 
     methods
-        function obj = EntityEvent(uuid, action)
+        function obj = EntityEvent(action, oldUUID)
             arguments
-                uuid
                 action          {mustBeMember(action, {'Add', 'Remove'})}
+                oldUUID         string = string.empty()
             end
             
-            uuid = aod.util.validateUUID(uuid);
-            obj.UUID = uuid;
             obj.Action = action;
+            obj.UUID = oldUUID;
         end
     end
 end 

@@ -1,5 +1,5 @@
 classdef (ConstructOnLoad) AttributeEvent < event.EventData
-% ATTRIBUTEEVENT
+% An event triggered by a change to data reflecting an HDF5 attribute
 %
 % Description:
 %   An event triggered when an HDF5 dataset is added/changed/removed
@@ -7,8 +7,17 @@ classdef (ConstructOnLoad) AttributeEvent < event.EventData
 % Parent:
 %   event.EventData
 %
-% Notes:
-%   notify(obj, 'ChangedAttribute', AttributeEvent(hdfPath, name, value))
+% Constructor:
+%   obj = aod.persistent.events.AttributeEvent(name, value)
+%
+% Inputs:
+%   name        char
+%       Attribute name 
+%   value       (default = empty)
+%       Attribute value. If empty, attribute is removed
+%
+% Examples:
+%   notify(obj, 'ChangedAttribute', AttributeEvent(name, value))
 %   addListener(entity, 'ChangedAttribute', @callback)
 
 % By Sara Patterson, 2022 (AOData)

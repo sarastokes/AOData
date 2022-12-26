@@ -8,7 +8,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 %   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = aod.persistent.Experiment(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.Experiment(hdfFile, pathName, factory)
 %
 % See also:
 %   aod.core.Experiment
@@ -19,7 +19,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
     properties (SetAccess = protected)
         homeDirectory               char
         experimentDate (1,1)        datetime
-        epochIDs (1,:)
+        epochIDs (1,:)              
 
         AnalysesContainer         
         EpochsContainer        
@@ -36,8 +36,8 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
     end
 
     methods
-        function obj = Experiment(hdfName, hdfPath, factory)
-            obj = obj@aod.persistent.Entity(hdfName, hdfPath, factory);
+        function obj = Experiment(hdfName, pathName, factory)
+            obj = obj@aod.persistent.Entity(hdfName, pathName, factory);
         end
 
         function value = get.numEpochs(obj)
@@ -69,6 +69,11 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         end
 
         function add(obj, entity)
+            % Add a new entity to the Experiment
+            %
+            % Syntax:
+            %   add(obj, entity)
+            % -------------------------------------------------------------
             arguments
                 obj
                 entity      {mustBeA(entity, 'aod.core.Entity')}
@@ -80,30 +85,15 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
             end
 
             import aod.core.EntityTypes
-        
-            switch entity.entityType
-                case EntityTypes.ANALYSIS
-                    entity.setParent(obj);
-                    obj.addEntity(entity);
-                case EntityTypes.CALIBRATION
-                    entity.setParent(obj);
-                    obj.addEntity(entity);
-                case EntityTypes.EPOCH
-                    entity.setParent(obj);
-                    obj.addEntity(entity);
-                case EntityTypes.ANNOTATION
-                    entity.setParent(obj);
-                    obj.addEntity(entity);
-                case EntityTypes.SOURCE
-                    entity.setParent(obj);
-                    obj.addEntity(entity);
-                case EntityTypes.SYSTEM
-                    entity.setParent(obj);
-                    obj.addEntity(entity);
-                otherwise
-                    error('Experiment_add:InvalidEntityType',...
-                        'Only Analysis, Calibration, Epoch, Annotation, System and Source can be added to Experiment')
+
+            entityType = EntityTypes.get(entity);
+            if ~ismember(entityType, obj.entityType.validChildTypes())
+                error('add:InvalidEntityType',...
+                    'Only Analysis, Calibration, Epoch, Annotation, System and Source can be added to Experiment');
             end
+
+            entity.setParent(obj);
+            obj.addEntity(entity);
         end
     end
 
