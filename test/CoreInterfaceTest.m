@@ -544,9 +544,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             epoch1.remove('Stimulus', 'all');
             testCase.verifyEmpty(epoch1.Stimuli);
 
-            epoch1.add(aod.core.Dataset('Dataset1'));
-            epoch1.remove('Dataset', 'all');
-            testCase.verifyEmpty(epoch1.Datasets);
+            epoch1.add(aod.core.EpochDataset('Dataset1'));
+            epoch1.remove('EpochDataset', 'all');
+            testCase.verifyEmpty(epoch1.EpochDatasets);
 
             epoch1.add(aod.core.Registration('Reg1', getDateYMD()));
             epoch1.remove('Registration', 'all');
@@ -614,29 +614,31 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.EXPT.add(aod.core.Epoch(1));
 
             % Create some datasets
-            dataset1 = aod.core.Dataset('TestDataset1');
-            dataset2 = aod.core.Dataset('TestDataset2', eye(3));
+            dataset1 = aod.core.EpochDataset('TestDataset1');
+            dataset2 = aod.core.EpochDataset('TestDataset2', eye(3));
             dataset2.setDescription('This is a test dataset');
             
             % Add the datasets to the experiment
             testCase.EXPT.Epochs(1).add([dataset1, dataset2]);
 
             % Test direct dataset access
-            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 2);
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).EpochDatasets), 2);
             % Test Epoch's get access
-            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Datasets'), 2);
-            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Datasets', {'Name', 'TestDataset1'}), 1);
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('EpochDataset'), 2);
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get(...
+                'EpochDataset', {'Name', 'TestDataset1'}), 1);
             % Test Experiment's get access
-            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Datasets')), 2);
-            testCase.verifyNumElements(testCase.EXPT.get('Datasets'), 2);
+            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'EpochDataset')), 2);
+            testCase.verifyNumElements(testCase.EXPT.get('EpochDataset'), 2);
 
             % Check dataset data
-            testCase.verifyEqual(testCase.EXPT.Epochs(1).Datasets(2).Data, eye(3));
-            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Dataset', {'Dataset', 'Data', eye(3)}),1);
+            testCase.verifyEqual(testCase.EXPT.Epochs(1).EpochDatasets(2).Data, eye(3));
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1).get(...
+                'EpochDataset', {'Dataset', 'Data', eye(3)}),1);
             
             % Clear all the datasets
-            testCase.EXPT.removeByEpoch('all', 'Dataset');
-            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).Datasets), 0);
+            testCase.EXPT.removeByEpoch('all', 'EpochDataset');
+            testCase.verifyEqual(numel(testCase.EXPT.Epochs(1).EpochDatasets), 0);
 
             % Clear the epochs
             testCase.EXPT.remove('Epoch', 'all');
@@ -644,8 +646,35 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Try to add a dataset to the experiment
             testCase.verifyThat(...
-                @() testCase.EXPT.add(aod.core.Dataset('TestDataset3')),...
+                @() testCase.EXPT.add(aod.core.EpochDataset('TestDataset3')),...
                 Throws("Experiment:AddedInvalidEntity"));
+        end
+    end
+
+    methods (Test, TestTags=["ExperimentDataset", "Core", "LevelOne"])
+        function ExperimentDatasetIO(testCase)
+            
+            % Create some datasets
+            dataset1 = aod.core.ExperimentDataset('TestDataset1');
+            dataset2 = aod.core.ExperimentDataset('TestDataset2', 'Data', eye(3));
+            dataset2.setDescription('This is a test dataset');
+
+            % Add all at once
+            testCase.EXPT.add([dataset1, dataset2]);
+            
+            % Test direct dataset access
+            testCase.verifyEqual(numel(testCase.EXPT.ExperimentDatasets), 2);
+            testCase.verifyEqual(numel(testCase.EXPT.get('ExperimentDataset')), 2);
+
+
+            % Check dataset data
+            testCase.verifyEqual(testCase.EXPT.ExperimentDatasets(2).Data, eye(3));
+            testCase.verifyNumElements(testCase.EXPT.get(...
+                'ExperimentDataset', {'Dataset', 'Data', eye(3)}),1);
+            
+            % Clear all the datasets
+            testCase.EXPT.remove('ExperimentDataset', 'all');
+            testCase.verifyEqual(numel(testCase.EXPT.ExperimentDatasets), 0);
         end
     end
 

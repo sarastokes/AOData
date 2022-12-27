@@ -1,23 +1,23 @@
-classdef Dataset < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
-% A dataset in an HDF5 file
+classdef EpochDataset < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
+% An Epoch dataset in an HDF5 file
 %
 % Description:
-%   Represents a persisted Dataset in an HDF5 file
+%   Represents a persisted EpochDataset in an HDF5 file
 %
 % Parent:
 %   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
-%   obj = aod.persistent.Dataset(hdfFile, hdfPath, factory)
+%   obj = aod.persistent.EpochDataset(hdfFile, hdfPath, factory)
 %
 % See also:
-%   aod.core.Dataset
+%   aod.core.EpochDataset
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Dataset(hdfName, hdfPath, factory)
+        function obj = EpochDataset(hdfName, hdfPath, factory)
             obj = obj@aod.persistent.Entity(hdfName, hdfPath, factory);
         end
     end
@@ -34,7 +34,7 @@ classdef Dataset < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
     % Heterogeneous methods
     methods (Static, Sealed)
         function obj = empty()
-            obj = aod.persistent.Dataset([], [], []);
+            obj = aod.persistent.EpochDataset([], [], []);
         end
     end
 end

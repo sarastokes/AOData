@@ -47,12 +47,13 @@ classdef Experiment < aod.core.Entity
         % The date the experiment was performed (yyyyMMdd)
         experimentDate (1,1)    datetime
 
-        Analyses                aod.core.Analysis       = aod.core.Analysis.empty()
-        Epochs                  aod.core.Epoch          = aod.core.Epoch.empty()
-        Sources                 aod.core.Source         = aod.core.Source.empty()
-        Annotations             aod.core.Annotation     = aod.core.Annotation.empty()
-        Calibrations            aod.core.Calibration    = aod.core.Calibration.empty()
-        Systems                 aod.core.System         = aod.core.System.empty()
+        Analyses                aod.core.Analysis       
+        Epochs                  aod.core.Epoch          
+        Sources                 aod.core.Source         
+        Annotations             aod.core.Annotation     
+        Calibrations            aod.core.Calibration    
+        Systems                 aod.core.System         
+        ExperimentDatasets      aod.core.ExperimentDataset 
 
         % A table containing all git repositories and their current status
         Code                          
@@ -203,6 +204,12 @@ classdef Experiment < aod.core.Entity
                     end
                 case EntityTypes.EPOCH
                     obj.addEpoch(entity);
+                case EntityTypes.EXPERIMENTDATASET
+                    if isempty(obj.ExperimentDatasets)
+                        obj.ExperimentDatasets = entity;
+                    else
+                        obj.ExperimentDatasets = cat(1, obj.ExperimentDatasets, entity);
+                    end
                 case EntityTypes.SYSTEM 
                     entity.setParent(obj);
                     if isempty(obj.Systems)
@@ -214,7 +221,7 @@ classdef Experiment < aod.core.Entity
                     obj.addSource(entity);
                 otherwise
                     error("Experiment:AddedInvalidEntity",...
-                        "Entity must be Analysis, Calibration, Annotation, Epoch, Source or System");
+                        "Entity must be Analysis, Calibration, Annotation, Epoch, ExperimentDataset, Source or System");
             end
         end
 
@@ -238,7 +245,7 @@ classdef Experiment < aod.core.Entity
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('remove:NonChildEntityType',...
-                    'Entity must be Analysis, Annotation, Calibration, Epoch, Source or System');
+                    'Entity must be Analysis, Annotation, Calibration, Epoch, ExperimentDataset, Source or System');
             end
 
             % Identify which members of entityType to remove
@@ -284,6 +291,8 @@ classdef Experiment < aod.core.Entity
                 case EntityTypes.EPOCH 
                     aod.util.mustBeEpochID(obj, ID);
                     obj.Epochs(obj.id2index(ID)) = [];
+                case EntityTypes.EXPERIMENTDATASET
+                    obj.ExperimentDatasets(ID) = [];
                 case EntityTypes.SOURCE
                     obj.Sources(ID) = [];
                 case EntityTypes.SYSTEM
@@ -344,18 +353,20 @@ classdef Experiment < aod.core.Entity
                     end
                 case EntityTypes.CALIBRATION
                     group = obj.Calibrations;
-                case EntityTypes.ANNOTATION
-                    group = obj.Annotations;
+                case EntityTypes.EXPERIMENTDATASET 
+                    group = obj.ExperimentDatasets;
                 case EntityTypes.EPOCH
                     group = obj.Epochs;
                 case EntityTypes.RESPONSE
                     group = obj.getFromEpoch('all', 'Response');
                 case EntityTypes.REGISTRATION
                     group = obj.getFromEpoch('all', 'Registration');
-                case EntityTypes.DATASET 
-                    group = obj.getFromEpoch('all', 'Dataset');
+                case EntityTypes.EPOCHDATASET 
+                    group = obj.getFromEpoch('all', 'EpochDataset');
                 case EntityTypes.STIMULUS
                     group = obj.getFromEpoch('all', 'Stimulus');
+                case EntityTypes.ANNOTATION
+                    group = obj.Annotations;
                 case EntityTypes.ANALYSIS
                     group = obj.Analyses;
                 case EntityTypes.EXPERIMENT
@@ -404,8 +415,8 @@ classdef Experiment < aod.core.Entity
             idx = obj.id2index(ID);
 
             switch entityType 
-                case EntityTypes.DATASET
-                    group = vertcat(obj.Epochs(idx).Datasets);
+                case EntityTypes.EPOCHDATASET
+                    group = vertcat(obj.Epochs(idx).EpochDatasets);
                 case EntityTypes.REGISTRATION
                     group = vertcat(obj.Epochs(idx).Registrations);
                 case EntityTypes.RESPONSE
@@ -473,7 +484,7 @@ classdef Experiment < aod.core.Entity
 
             import aod.core.EntityTypes
             entityType = aod.core.EntityTypes.get(entityType);
-            if ~ismember(entityType, [EntityTypes.DATASET, EntityTypes.STIMULUS,...
+            if ~ismember(entityType, [EntityTypes.EPOCHDATASET, EntityTypes.STIMULUS,...
                     EntityTypes.RESPONSE, EntityTypes.REGISTRATION])
                 error('removeByEpoch:InvalidEntityType',...
                     'Only Dataset, Stimulus, Registration and Response can be removed from an Epoch');

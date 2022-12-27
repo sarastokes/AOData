@@ -13,7 +13,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 % Properties:
 %   ID                              Epoch identifier (integer)
 %   startTime                       Time when epoch began (datetime)
-%   Datasets                        Container for epoch's datasets
+%   EpochDatasets                   Container for epoch's datasets
 %   Registrations                   Container for epoch's registrations
 %   Responses                       Container for epoch's responses
 %   Stimuli                         Container for epoch's stimuli
@@ -38,20 +38,20 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         % Time the Epoch (i.e. data acquisition) began
-        startTime           datetime
+        startTime           datetime = datetime.empty()                          
         % Timing of samples during Epoch                             
         Timing (:,1)         {mustBeA(Timing, ["double", "duration"])} = []
         % Sample rate (Hz)
-        sampleRate    double                                           = []
+        sampleRate          double = []
 
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
         % Container for Epoch's Responses
-        Responses           aod.core.Response = aod.core.Response.empty()
+        Responses           aod.core.Response 
         % Container for Epoch's Stimuli
         Stimuli             aod.core.Stimulus
         % Container for Epoch's Datasets
-        Datasets            aod.core.Dataset
+        EpochDatasets       aod.core.EpochDataset
     end
 
     % Entity link properties
@@ -88,21 +88,21 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   add(obj, entity)
             %
             % Notes: Only entities contained by Epoch can be added:
-            %   Dataset, Response, Registration, Stimulus
+            %   EpochDataset, Response, Registration, Stimulus
             % ------------------------------------------------------------- 
             import aod.core.EntityTypes
 
             entityType = EntityTypes.get(entity);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('add:InvalidEntityType',...
-                    'Entity must be Dataset, Registration, Response and Stimulus');
+                    'Entity must be EpochDataset, Registration, Response and Stimulus');
             end
 
             entity.setParent(obj);
 
             switch entityType
-                case EntityTypes.DATASET
-                    obj.Datasets = cat(1, obj.Datasets, entity);
+                case EntityTypes.EPOCHDATASET
+                    obj.EpochDatasets = cat(1, obj.EpochDatasets, entity);
                 case EntityTypes.REGISTRATION 
                     obj.Registrations = cat(1, obj.Registrations, entity);
                 case EntityTypes.RESPONSE 
@@ -136,7 +136,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             entityType = aod.core.EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('remove:InvalidEntityType',...
-                    'Entity must be Dataset, Registration, Response and Stimulus');
+                    'Entity must be EpochDataset, Registration, Response and Stimulus');
             end
 
             % Remove all entities?
@@ -164,8 +164,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             end
     
             switch entityType 
-                case EntityTypes.DATASET
-                    obj.Datasets(idx) = []; 
+                case EntityTypes.EPOCHDATASET
+                    obj.EpochDatasets(idx) = []; 
                 case EntityTypes.REGISTRATION
                     obj.Registrations(idx) = [];
                 case EntityTypes.RESPONSE
@@ -191,7 +191,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('get:InvalidEntityType',...
-                    'Entity must be Dataset, Registration, Response and Stimulus');
+                    'Entity must be EpochDataset, Registration, Response and Stimulus');
             end
 
             group = obj.(entityType.parentContainer());
@@ -255,7 +255,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
             if ~aod.util.isEntitySubclass(system, 'System')
                 error('setSystem:InvalidEntityType',...
-                    'Must be a core or persisstent System');
+                    'Must be a core or persistent System');
             end
 
             obj.System = system;

@@ -56,6 +56,10 @@ function experiment = ToyExperiment(writeToHDF)
         getDateYMD(), 'xPMT', 6, 'yPMT', 7, 'zPMT', 8, 'SourcePosition', 3);
     experiment.add(calibration2);
 
+    % Experiment Datasets
+    dset1 = aod.core.ExperimentDataset('ExpDataset1', 'Data', eye(3));
+    experiment.add(dset1);
+
     % Epochs
     epoch = aod.core.Epoch(1, 'Source', source, 'System', system);
     epoch.setFile('PresyncFile', fullfile(cd, 'PresyncFile.txt'));
@@ -85,7 +89,7 @@ function experiment = ToyExperiment(writeToHDF)
     epoch.add(stim);
 
     % Datasets
-    epoch.add(aod.core.Dataset('Dataset1', magic(5)));
+    epoch.add(aod.core.EpochDataset('Dataset1', magic(5)));
 
     % Annotation
     experiment.add(aod.core.Annotation('Annotation1'));

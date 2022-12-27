@@ -19,6 +19,10 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    properties (SetAccess = protected)
+        analysisDate            datetime = datetime.empty()
+    end
+
     methods
         function obj = Analysis(name, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
@@ -35,7 +39,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Sealed)
         function setAnalysisDate(obj, analysisDate)
-            % SETANALYSISDATE
+            % Set the analysisDate property
             %
             % Syntax:
             %   setAnalysisDate(obj, analysisDate)
@@ -44,12 +48,12 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
             %   analysisDate            datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
             if nargin == 1 || isempty(analysisDate)
-                obj.setParam('Date', '');
+                obj.analysisDate = datetime.empty();
                 return
             end
             
             analysisDate = aod.util.validateDate(analysisDate);
-            obj.setParam('Date', analysisDate);
+            obj.analysisDate = analysisDate;
         end
     end
 

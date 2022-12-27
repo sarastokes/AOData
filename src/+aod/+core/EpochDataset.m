@@ -1,4 +1,4 @@
-classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
+classdef EpochDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 % Any miscellaneous dataset associated with an epoch
 %
 % Description:
@@ -8,8 +8,8 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = aod.core.Dataset(name)
-%   obj = aod.core.Dataset(name, data)
+%   obj = aod.core.EpochDataset(name)
+%   obj = aod.core.EpochDataset(name, data)
 %
 % Properties:
 %   Data
@@ -18,7 +18,7 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
 %   setData(obj, data)
 %
 % See Also:
-%   aod.persistent.Dataset
+%   aod.persistent.EpochDataset
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -28,7 +28,7 @@ classdef Dataset < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Dataset(name, data, varargin)
+        function obj = EpochDataset(name, data, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
             if nargin > 1
                 obj.setData(data);

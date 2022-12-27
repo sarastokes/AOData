@@ -22,7 +22,8 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         epochIDs (1,:)              
 
         AnalysesContainer         
-        EpochsContainer        
+        EpochsContainer   
+        ExperimentDatasetsContainer
         SourcesContainer                 
         AnnotationsContainer                 
         CalibrationsContainer            
@@ -141,6 +142,17 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
             for i = 1:numel(obj)
                 out = cat(1, out, obj(i).CalibrationsContainer(idx));
             end
+        end
+
+        function out = ExperimentDatasets(obj, idx)
+            if nargin < 2
+                idx = 0;
+            end
+            out = [];
+            for i = 1:numel(obj)
+                out = cat(1, out, obj(i).ExperimentDatasetsContainer(idx));
+            end
+        
         end
 
         function out = Epochs(obj, idx)

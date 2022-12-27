@@ -12,12 +12,13 @@ All AO experiments share a common general structure, which can be broken down in
     - Channel
       - Device
   - Calibration
-  - Annotation
+  - ExperimentDataset
   - Epoch
-    - Dataset
+    - EpochDataset
     - Registration
     - Response
     - Stimulus
+  - Annotation
   - Analysis
  
  The object model is designed to establish a baseline level of standardization, while remaining as flexible, extensible and unrestrictive as possible. 

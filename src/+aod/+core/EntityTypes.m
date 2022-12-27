@@ -42,8 +42,9 @@ classdef EntityTypes
         CHANNEL 
         DEVICE 
         ANNOTATION 
+        EXPERIMENTDATASET
         EPOCH 
-        DATASET
+        EPOCHDATASET
         STIMULUS 
         REGISTRATION 
         RESPONSE
@@ -69,13 +70,15 @@ classdef EntityTypes
                     parentTypes = [];
                 case EntityTypes.SOURCE
                     parentTypes = [EntityTypes.EXPERIMENT, EntityTypes.SOURCE];
-                case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS, EntityTypes.ANNOTATION, EntityTypes.CALIBRATION}
+                case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS,...
+                        EntityTypes.ANNOTATION, EntityTypes.CALIBRATION,... 
+                        EntityTypes.EXPERIMENTDATASET}
                     parentTypes = EntityTypes.EXPERIMENT;
                 case EntityTypes.CHANNEL 
                     parentTypes = EntityTypes.SYSTEM;
                 case EntityTypes.DEVICE
                     parentTypes = EntityTypes.CHANNEL;
-                case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE, EntityTypes.DATASET}
+                case {EntityTypes.REGISTRATION, EntityTypes.STIMULUS, EntityTypes.RESPONSE, EntityTypes.EPOCHDATASET}
                     parentTypes = EntityTypes.EPOCH;
             end
         end
@@ -97,9 +100,10 @@ classdef EntityTypes
                 case EntityTypes.EXPERIMENT 
                     childTypes = [EntityTypes.ANALYSIS, EntityTypes.ANNOTATION,... 
                         EntityTypes.CALIBRATION, EntityTypes.EPOCH, ...
-                        EntityTypes.SOURCE, EntityTypes.SYSTEM];
+                        EntityTypes.SOURCE, EntityTypes.SYSTEM,...
+                        EntityTypes.EXPERIMENTDATASET];
                 case EntityTypes.EPOCH 
-                    childTypes = [EntityTypes.DATASET, EntityTypes.REGISTRATION,...
+                    childTypes = [EntityTypes.EPOCHDATASET, EntityTypes.REGISTRATION,...
                         EntityTypes.RESPONSE, EntityTypes.STIMULUS];
                 case EntityTypes.SYSTEM
                     childTypes = EntityTypes.CHANNEL;
@@ -127,30 +131,32 @@ classdef EntityTypes
             import aod.core.EntityTypes
 
             switch obj
-                case EntityTypes.ANALYSIS
-                    out = 'Analyses';
-                case EntityTypes.CALIBRATION
-                    out = 'Calibrations';
+                case EntityTypes.SOURCE
+                    out = 'Sources';
+                case EntityTypes.SYSTEM
+                    out = 'Systems';
                 case EntityTypes.CHANNEL
                     out = 'Channels';
-                case EntityTypes.DATASET
-                    out = 'Datasets';
                 case EntityTypes.DEVICE
                     out = 'Devices';
+                case EntityTypes.CALIBRATION
+                    out = 'Calibrations';
+                case EntityTypes.EXPERIMENTDATASET
+                    out = 'ExperimentDatasets';
                 case EntityTypes.EPOCH
                     out = 'Epochs';
-                case EntityTypes.ANNOTATION
-                    out = 'Annotations';
+                case EntityTypes.EPOCHDATASET
+                    out = 'EpochDatasets';
                 case EntityTypes.REGISTRATION
                     out = 'Registrations';
                 case EntityTypes.RESPONSE
                     out = 'Responses';
-                case EntityTypes.SOURCE
-                    out = 'Sources';
                 case EntityTypes.STIMULUS
                     out = 'Stimuli';
-                case EntityTypes.SYSTEM
-                    out = 'Systems';
+                case EntityTypes.ANNOTATION
+                    out = 'Annotations';
+                case EntityTypes.ANALYSIS
+                    out = 'Analyses';
                 otherwise
                     out = [];
             end
@@ -243,10 +249,8 @@ classdef EntityTypes
             switch obj 
                 case EntityTypes.EXPERIMENT
                     out = [];
-                case EntityTypes.ANALYSIS
-                    out = aod.core.Analysis.empty();
-                case EntityTypes.ANNOTATION
-                    out = aod.core.Annotation.empty();
+                case EntityTypes.SOURCE 
+                    out = aod.core.Source.empty();
                 case EntityTypes.CALIBRATION
                     out = aod.core.Calibration.empty();
                 case EntityTypes.SYSTEM
@@ -255,18 +259,22 @@ classdef EntityTypes
                     out = aod.core.Channel.empty();
                 case EntityTypes.DEVICE
                     out = aod.core.Device.empty();
-                case EntityTypes.SOURCE 
-                    out = aod.core.Source.empty();
+                case EntityTypes.EXPERIMENTDATASET
+                    out = aod.core.ExperimentDataset.empty();
                 case EntityTypes.EPOCH
                     out = aod.core.Epoch.empty();
-                case EntityTypes.DATASET
-                    out = aod.core.Dataset.empty();
+                case EntityTypes.EPOCHDATASET
+                    out = aod.core.EpochDataset.empty();
                 case EntityTypes.REGISTRATION
                     out = aod.core.Registration.empty();
                 case EntityTypes.RESPONSE
                     out = aod.core.Response.empty();
                 case EntityTypes.STIMULUS
                     out = aod.core.Stimulus.empty();
+                case EntityTypes.ANNOTATION
+                    out = aod.core.Annotation.empty();
+                case EntityTypes.ANALYSIS
+                    out = aod.core.Analysis.empty();
             end
         end
 
@@ -353,14 +361,11 @@ classdef EntityTypes
                 case EntityTypes.EXPERIMENT 
                     hdfPath = [];
                 case {EntityTypes.SYSTEM, EntityTypes.EPOCH, EntityTypes.ANNOTATION,...
-                        EntityTypes.ANALYSIS, EntityTypes.CALIBRATION}
+                        EntityTypes.ANALYSIS, EntityTypes.CALIBRATION,...
+                        EntityTypes.EXPERIMENTDATASET}
                     hdfPath = '/Experiment';
                 case EntityTypes.SOURCE 
-                    %if isempty(entity.Parent)
-                    %    hdfPath = '/Experiment';
-                    %else
                     hdfPath = manager.uuid2path(entity.Parent.UUID);
-                    %end
                 otherwise
                     hdfPath = manager.uuid2path(entity.Parent.UUID);
             end
@@ -405,9 +410,10 @@ classdef EntityTypes
             % Syntax:
             %   out = getAllContainers(obj)
             % -------------------------------------------------------------
-            out = ["Sources", "Calibrations", "Annotations",... 
-                "Datasets", "Epochs", "Registrations", "Stimuli",... 
-                "Systems", "Channels", "Devices", "Responses", "Analyses"];
+            out = ["Sources", "Calibrations",  "ExperimentDatasets",... 
+                 "Epochs", "Registrations", "Stimuli", "EpochDatasets",... 
+                "Systems", "Channels", "Devices", "Responses",... 
+                "Annotations", "Analyses"];
         end
     end
 
@@ -445,10 +451,12 @@ classdef EntityTypes
                 out = EntityTypes.CHANNEL;
             elseif isSubclass(obj, {'aod.core.Device', 'aod.persistent.Device'})
                 out = EntityTypes.DEVICE;
+            elseif isSubclass(obj, {'aod.core.ExperimentDataset', 'aod.persistent.ExperimentDataset'})
+                out = EntityTypes.EXPERIMENTDATASET;
             elseif isSubclass(obj, {'aod.core.Epoch', 'aod.persistent.Epoch'})
                 out = EntityTypes.EPOCH;
-            elseif isSubclass(obj, {'aod.core.Dataset', 'aod.persistent.Dataset'})
-                out = EntityTypes.DATASET;
+            elseif isSubclass(obj, {'aod.core.EpochDataset', 'aod.persistent.EpochDataset'})
+                out = EntityTypes.EPOCHDATASET;
             elseif isSubclass(obj, {'aod.core.Registration', 'aod.persistent.Registration'})
                 out = EntityTypes.REGISTRATION;
             elseif isSubclass(obj, {'aod.core.Stimulus', 'aod.persistent.Stimulus'})
@@ -505,18 +513,20 @@ classdef EntityTypes
                     obj = EntityTypes.DEVICE;
                 case {'calibration', 'calibrations', 'cal'}
                     obj = EntityTypes.CALIBRATION;
-                case {'annotation', 'annotations'}
-                    obj = EntityTypes.ANNOTATION;
+                case {'expdataset', 'experimentdataset', 'expdata', 'experimentdata'}
+                    obj = EntityTypes.EXPERIMENTDATASET;
                 case {'epoch', 'epochs','ep'}
                     obj = EntityTypes.EPOCH;
-                case {'dataset', 'datasets', 'dset'}
-                    obj = EntityTypes.DATASET;
+                case {'epochdataset', 'epochdata', 'epochdset'}
+                    obj = EntityTypes.EPOCHDATASET;
                 case {'registration', 'registrations', 'reg'}
                     obj = EntityTypes.REGISTRATION;
                 case {'response', 'responses', 'resp'}
                     obj = EntityTypes.RESPONSE;
                 case {'stimulus', 'stimuli', 'stim'}
                     obj = EntityTypes.STIMULUS;
+                case {'annotation', 'annotations'}
+                    obj = EntityTypes.ANNOTATION;
                 case {'analysis', 'analyses'}
                     obj = EntityTypes.ANALYSIS;
                 otherwise

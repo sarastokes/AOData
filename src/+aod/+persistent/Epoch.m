@@ -23,7 +23,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
         Source 
         System 
 
-        DatasetsContainer
+        EpochDatasetsContainer
         RegistrationsContainer
         ResponsesContainer
         StimuliContainer
@@ -58,7 +58,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
             entityType = EntityTypes.get(entity);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('add:InvalidEntityType',...
-                    'Entity must be Dataset, Registration, Response and Stimulus');
+                    'Entity must be EpochDataset, Registration, Response and Stimulus');
             end
 
             entity.setParent(obj);
@@ -82,7 +82,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
             obj.setLinksToDynProps();
 
             % CONTAINERS
-            obj.DatasetsContainer = obj.loadContainer('Datasets');
+            obj.EpochDatasetsContainer = obj.loadContainer('EpochDatasets');
             obj.RegistrationsContainer = obj.loadContainer('Registrations');
             obj.ResponsesContainer = obj.loadContainer('Responses');
             obj.StimuliContainer = obj.loadContainer('Stimuli');
@@ -91,13 +91,13 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
     
     % Container abstraction methods
     methods (Sealed)
-        function out = Datasets(obj, idx)
+        function out = EpochDatasets(obj, idx)
             if nargin < 2 
                 idx = 0;
             end
             out = [];
             for i = 1:numel(obj)
-                out = cat(1, out, obj(i).DatasetsContainer(idx));
+                out = cat(1, out, obj(i).EpochDatasetsContainer(idx));
             end
         end
 

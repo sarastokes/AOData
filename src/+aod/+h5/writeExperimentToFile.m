@@ -93,6 +93,13 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
             aod.h5.writeEntity(hdfName, obj.Calibrations(i));
         end
     end
+
+    % Write the experiment datasets
+    if ~isempty(obj.ExperimentDatasets)
+        for i = 1:numel(obj.ExperimentDatasets)
+            aod.h5.writeEntity(hdfName, obj.ExperimentDatasets(i));
+        end
+    end
     
     % Write the epochs and their stimuli, registrations, responses, datasets
     for i = 1:numel(obj.Epochs)
@@ -115,9 +122,9 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
             end
         end
     
-        if ~isempty(obj.Epochs(i).Datasets)
-            for j = 1:numel(obj.Epochs(i).Datasets)
-                aod.h5.writeEntity(hdfName, obj.Epochs(i).Datasets(j));
+        if ~isempty(obj.Epochs(i).EpochDatasets)
+            for j = 1:numel(obj.Epochs(i).EpochDatasets)
+                aod.h5.writeEntity(hdfName, obj.Epochs(i).EpochDatasets(j));
             end
         end
     end

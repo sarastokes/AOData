@@ -28,7 +28,7 @@ classdef CoreApiTest < matlab.unittest.TestCase
             % - 2 Analyses
             % - 6 Epochs w/ varying parameters & files
             % - 4 Registrations ('RegType1' on 1/2, 'RegType2' on 6/7)
-            % - 3 Datasets ('Dset1' on 1/2, 'Dset2' on 1)
+            % - 3 EpochDatasets ('Dset1' on 1/2, 'Dset2' on 1)
 
             testCase.EXPT = aod.core.Experiment(...
                 '851_20221117', cd, '20221117',...
@@ -72,19 +72,19 @@ classdef CoreApiTest < matlab.unittest.TestCase
             testCase.EXPT.Epochs(3).add(aod.core.Registration('RegType2'));
             testCase.EXPT.Epochs(4).add(aod.core.Registration('RegType2'));
 
-            testCase.EXPT.Epochs(1).add(aod.core.Dataset('Dset1'));
-            testCase.EXPT.Epochs(1).add(aod.core.Dataset('Dset2'));
-            testCase.EXPT.Epochs(2).add(aod.core.Dataset('Dset1'));
+            testCase.EXPT.Epochs(1).add(aod.core.EpochDataset('Dset1'));
+            testCase.EXPT.Epochs(1).add(aod.core.EpochDataset('Dset2'));
+            testCase.EXPT.Epochs(2).add(aod.core.EpochDataset('Dset1'));
         end
     end
 
     methods (Test)
-        function testEmptySearch(testCase)
+        function EmptySearch(testCase)
             testCase.verifyWarning(...
                 @() aod.core.EntitySearch.go('Response'), "go:NoQueries");
         end
 
-        function testNameSearch(testCase)
+        function NameSearch(testCase)
             out = testCase.EXPT.get('Analysis',...
                 {'Name', 'Analysis1'});
             testCase.verifyNumElements(out, 1);
@@ -94,19 +94,19 @@ classdef CoreApiTest < matlab.unittest.TestCase
             testCase.verifyNumElements(out, 2);
         end
 
-        function testSubclassSearch(testCase)
+        function SubclassSearch(testCase)
             out = testCase.EXPT.get('Calibration',...
                 {'Subclass', 'aod.core.Calibration'});
             testCase.verifyNumElements(out, 2);
         end
 
-        function testClassSearch(testCase)
+        function ClassSearch(testCase)
             egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,...
                 {'Class', 'aod.builtin.calibrations.PowerMeasurement'});
             testCase.verifyEqual(numel(egObj.getMatches()), 1);
         end
 
-        function testDatasetSearch(testCase)
+        function DatasetSearch(testCase)
             % Test for presence of a dataset
             out = aod.core.EntitySearch.go(testCase.EXPT.Calibrations,...
                 {'Dataset', 'measurements'});
@@ -196,7 +196,7 @@ classdef CoreApiTest < matlab.unittest.TestCase
         end
 
         function SubEpochEntities(testCase)
-            out = testCase.EXPT.getFromEpoch('all', 'Dataset', 1);
+            out = testCase.EXPT.getFromEpoch('all', 'EpochDataset', 1);
             testCase.verifyNumElements(out, 1);
             testCase.verifyTrue(strcmp(out.Name, 'Dset1'));
             
