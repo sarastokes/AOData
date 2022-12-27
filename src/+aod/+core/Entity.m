@@ -274,12 +274,12 @@ classdef (Abstract) Entity < handle
             %   Return the value of a specific parameter. 
             %
             % Syntax:
-            %   paramValue = getParam(obj, paramName, messageType)
+            %   paramValue = getParam(obj, paramName, errorType)
             %
             % Inputs:
             %   paramName       char
             % Optional inputs:
-            %   errorType       aod.util.ErrorTypes (default = ERROR) 
+            %   errorType       aod.util.ErrorTypes (default = WARNING) 
             %
             % Examples:
             %   % Get the value of 'MyParam'
@@ -294,25 +294,22 @@ classdef (Abstract) Entity < handle
             
             import aod.util.ErrorTypes
             if isempty(errorType)
-                errorType = ErrorTypes.ERROR;
+                errorType = ErrorTypes.WARNING;
             else
                 errorType = ErrorTypes.init(errorType);
             end
-
             
             if ~isscalar(obj)
                 paramValue = aod.util.arrayfun(...
                     @(x) x.getParam(paramName, ErrorTypes.MISSING), obj);
-                if iscell(paramValue)
-                    isMissing = cellfun(@ismissing, paramValue);
-                else
-                    isMissing = ismissing(paramValue);
-                end
+
+                % Parse missing values
+                isMissing = getMissing(paramValue);
                 if all(isMissing)
-                    error('getParam:NotFound',...
-                            'Did not find %s in parameters', paramName);
-                    return
+                    error('getParam:NotFound', 'Did not find parameter %s', paramName);
                 end
+
+                % Attempt to return a matrix rather than a cell
                 if iscell(paramValue) && any(isMissing)
                     paramValue = extractCellData(paramValue);
                 end
@@ -516,7 +513,8 @@ classdef (Abstract) Entity < handle
             end
 
             if ~isscalar(obj)
-                fileValue = aod.util.arrayfun(@(x) string(getFile(x, fileName, ErrorTypes.NONE)), obj);
+                fileValue = aod.util.arrayfun(...
+                    @(x) string(getFile(x, fileName, ErrorTypes.NONE)), obj);
                 fileValue = standardizeMissing(fileValue, "");
                 return
             end

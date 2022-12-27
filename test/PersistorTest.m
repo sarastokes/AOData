@@ -41,7 +41,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             % Ensure edits cannot be made when read only mode is true
             testCase.verifyThat( ...
                 @() testCase.EXPT.setParam('NewParam', 'TestValue'),...
-                Throws("Entity:ReadOnlyModeEnabled"));
+                Throws("verifyReadOnlyMode:ReadOnlyModeEnabled"));
             testCase.EXPT.setReadOnlyMode(false);
         end
 
@@ -145,7 +145,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 
         function PropertyIO(testCase)
             % Add a property
-            testCase.EXPT.addProperty('Test', eye(3));
+            testCase.EXPT.addDataset('Test', eye(3));
             % Confirm new property is now a dynamic property
             testCase.verifyTrue(isprop(testCase.EXPT, 'Test'));
             % Confirm new property correctly wrote to HDF5

@@ -101,9 +101,9 @@ classdef AONodeTypes
             import aod.app.AONodeTypes;
 
             switch obj
-                case [AONodeTypes.TEXT, AONodeTypes.DATETIME, AONodeTypes.ENUM, AONodeTypes.NAME]
+                case [AONodeTypes.TEXT, AONodeTypes.DATETIME, AONodeTypes.ENUM, AONodeTypes.NAME, AONodeTypes.DESCRIPTION]
                     out = 'Text';
-                case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE, AONodeTypes.CODE]
+                case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE, AONodeTypes.CODE, AONodeTypes.NOTES]
                     out = 'Table';
                 case [AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM]
                     out = 'Table';

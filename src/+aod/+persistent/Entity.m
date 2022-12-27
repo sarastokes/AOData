@@ -15,8 +15,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   setDescription(obj, txt)
 %   setName(obj, txt)
 %
-%   addProperty(obj, propName, propValue)
-%   removeProperty(obj, propName)
+%   addDataset(obj, propName, propValue)
+%   removeDataset(obj, propName)
 %
 %   tf = hasParam(obj, paramName)
 %   out = getParam(obj, paramName)
@@ -42,19 +42,26 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
+        % Entity metadata that maps to attributes
         parameters              % aod.util.Parameters
+        % Files associated with the entity
         files                   % aod.util.Parameters
+        % A description of the entity
         description             string
+        % Miscellaneous notes about the entity
         notes                   string
     end
 
     properties (SetAccess = private)
         Parent                  % aod.persistent.Entity
+        % A unique identifier for the entity
         UUID                    string
-        lastModified             datetime
+        % When the entity's HDF5 group was last modified
+        lastModified            datetime
     end
 
     properties (Dependent)
+        % Whether the file is in read-only mode or not
         readOnly
     end
 
@@ -80,11 +87,16 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         isInitializing
     end
 
-    events 
+    events
+        % Occurs when "files" property is changed
         FileChanged
+        % Occurs when a softlink is added, removed or modified
         LinkChanged
+        % Occurs when a group is added or removed
         GroupChanged
+        % Occurs when a dataset is added, removed or modified
         DatasetChanged
+        % Occurs when an attribute is added, removed or modified
         AttributeChanged
     end
 
@@ -111,10 +123,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function setReadOnlyMode(obj, tf)
-            % SETREADONLYMODE
-            %
-            % Description:
-            %   Toggle read-only mode on and off
+            % Toggle read-only mode on and off
             %
             % Syntax:
             %   setReadOnlyMode(obj, tf)
@@ -124,37 +133,30 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                tf              logical = true
+                tf      {mustBeA(tf, ["logical", "string", "char"])} = true
             end
-            
-            obj.factory.persistor.setReadOnly(tf);
-        end
-    end
 
-    % Overloaded MATLAB methods
-    methods
-        function tf = isequal(obj, entity)
-            % Tests whether the UUIDs of two entities are equal
-            %
-            % Syntax:
-            %   tf = isequal(obj, entity)
-            % -------------------------------------------------------------
-            
-            arguments
-                obj
-                entity      {mustBeA(entity, 'aod.persistent.Entity')}
+            if istext(tf)
+                if strcmpi(tf, 'on')
+                    tf = true;
+                elseif strcmpi(tf, 'off')
+                    tf = false;
+                end
             end
-            tf = isequal(obj.UUID, entity.UUID);
+            obj.factory.persistor.setReadOnly(tf);
         end
     end
 
     % Navigation methods
     methods
+        function out = getHomeDirectory(obj)
+        
+            h = obj.ancestor('Experiment');
+            out = h.homeDirectory;
+        end
+
         function h = ancestor(obj, entityType)
-            % ANCESTOR
-            %
-            % Description:
-            %   Recursively search Parent for entity matching entityType
+            % Recursively search Parent for entity matching entityType
             %
             % Syntax:
             %   h = ancestor(obj, entityType)
@@ -175,10 +177,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function e = getByPath(obj, hdfPath)
-            % GETBYPATH
-            %
-            % Description:
-            %   Return any entity within the persistent hierarchy 
+            % Return any entity within the persistent hierarchy 
             %
             % Syntax:
             %   e = getByPath(obj, hdfPath)
@@ -208,10 +207,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % Entity methods
     methods
         function replaceEntity(obj, newEntity)
-            % REPLACEENTITY
-            %
-            % Description:
-            %   Replace an entity
+            % Replace an entity while maintaining the same UUID
             %
             % Syntax:
             %   replaceEntity(obj, newEntity)
@@ -228,16 +224,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Dataset methods
     methods
-        function addProperty(obj, propName, propValue)
-            % ADDDATASET
-            %
-            % Description:
-            %   Add a new property (dataset/link) to the entity
+        function addDataset(obj, propName, propValue)
+            % Add a new property (dataset/link) to the entity
             %
             % Syntax:
             %   addDataset(obj, dsetName, dsetValue)
             %
-            % TODO: Add standard attributes
+            % TODO: Add system datasets check
             % -------------------------------------------------------------
             arguments
                 obj
@@ -245,14 +238,16 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 propValue           
             end
 
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
 
             [isEntity, isPersisted] = aod.util.isEntity(propValue);
+
+            % Make the change in the HDF5 file
             if isEntity
                 if isPersisted
                     obj.setLink(propName, propValue);
                 else
-                    error("AddProperty:UnpersistedLink",...
+                    error("addDataset:UnpersistedLink",...
                         "Links can only be written to persisted entities");
                 end
             else
@@ -260,16 +255,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
         end
 
-        function removeProperty(obj, propName)
-            % REMOVEPROPERTY
-            %
-            % Description:
-            %   Remove a dataset/link from the entity
+        function removeDataset(obj, propName)
+            % Remove a dataset/link from the entity
             %
             % Syntax:
-            %   remove(obj, dsetName)
+            %   removeDataset(obj, dsetName)
             % -------------------------------------------------------------
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
 
             p = findprop(obj, propName);
 
@@ -278,12 +270,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             elseif ismember(propName, obj.linkNames)
                 obj.setLink(propName, []);
             else
-                error("removeProperty:PropertyDoesNotExist",...
+                error("removeDataset:PropertyDoesNotExist",...
                     "No link/dataset matches %s", propName);
             end
 
+            % Make the change in the MATLAB object
             delete(p);
-            obj.loadInfo();
         end
         
     end
@@ -291,10 +283,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % Special property methods
     methods
         function setName(obj, name)
-            % SETNAME
-            %
-            % Description:
-            %   Set, change or remove the entity's name
+            % Set, change or clear the entity's name
             %
             % Syntax:
             %   setName(obj, name)
@@ -306,38 +295,85 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 obj
                 name                char        = ''
             end
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
+
+            % Make the change in the HDF5 file
             obj.setDataset('Name', obj, name);
+
+            % Make the change in the MATLAB object
             obj.Name = name;
         end
 
         function setDescription(obj, txt)
-            % SETDESCRIPTION
-            %
-            % Description:
-            %   Set, change or remove the entity's description
+            % Set, change or clear the entity's description
             %
             % Syntax:
             %   setDescription(obj, txt)
             % -------------------------------------------------------------
             arguments
                 obj
-                txt     char = []
+                txt     char = char.empty()
             end
             
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
+
+            % Make the change in the HDF5 file
             obj.setDataset('description', obj, txt);
+
+            % Make the change in the MATLAB object
             obj.description = txt;
+        end
+
+        function addNote(obj, newNote)
+            arguments
+                obj 
+                newNote         string
+            end
+
+            obj.verifyReadOnlyMode();
+
+            newValue = cat(1, obj.notes, newNote);
+
+            % Make the change in the HDF5 file
+            obj.setDataset('notes', newValue);
+
+            % Make the change in the MATLAB object
+            obj.notes = newValue;
+        end
+
+        function removeNote(obj, noteID)
+            arguments
+                obj
+                noteID      
+            end
+
+            if isempty(obj.notes)
+                warning('removeNote:NoNotes',...
+                    'Entity does not have any notes to remove.');
+                return
+            end
+
+            if istext(noteID) && strcmpi(noteID, 'all')
+                newValue = string.empty();
+            elseif isnumeric(noteID)
+                mustBeInteger(noteID);
+                mustBeInRange(noteID, 1, numel(obj.notes));
+                newValue = obj.notes;
+                newValue(ID) = [];
+            end
+
+            % Make the change in the HDF5 file
+            obj.setDataset('notes', newValue);
+            
+            % Make the change in the MATLAB object
+            obj.notes = newValue;
         end
     end
 
     % Parameter methods
     methods (Sealed)
         function tf = hasParam(obj, paramName)
-            % HASPARAM
-            %
-            % Description:
-            %   Check whether parameter is present
+            % Check whether parameter is present
             %
             % Syntax:
             %   tf = hasParam(obj, paramName)
@@ -360,10 +396,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function out = getParam(obj, paramName, errorType)
-            % GETPARAM
-            %
-            % Description:
-            %   Check whether parameter is present
+            % Get the value of a parameter by name
             %
             % Syntax:
             %   out = getParam(obj, paramName)
@@ -373,19 +406,40 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   Error type defaults to WARNING for scalar operations and is
             %   restricted to MISSING for nonscalar operations.
             % -------------------------------------------------------------
+            arguments
+                obj
+                paramName           char 
+                errorType           = []
+            end
+
             import aod.util.ErrorTypes
-            if nargin < 3
+
+            if isempty(errorType)
                 errorType = ErrorTypes.WARNING;
+            else
+                errorType = ErrorTypes.init(errorType);
             end
             
             if ~isscalar(obj)
-                out = arrayfun(@(x) getParam(x, paramName, ErrorTypes.MISSING),...
-                    obj, 'UniformOutput', false);
-                out = vertcat(out{:});
+                out = aod.util.arrayfun(...
+                    @(x) getParam(x, paramName, ErrorTypes.MISSING), obj);
+
+                % Parse missing values
+                isMissing = getMissing(out);
+                if all(isMissing)
+                    error('getParam:NotFound', 'Did not find parameter %s', paramName);
+                end
+
+                % Attempt to return a matrix rather than a cell
+                if iscell(out) && any(isMissing)
+                    out = extractCellData(out);
+                end
                 return
             end
 
-            if ~obj.hasParam(paramName)
+            if obj.hasParam(paramName)
+                out = obj.parameters(paramName);
+            else
                 switch errorType 
                     case ErrorTypes.ERROR
                         error("getParam:ParamNotFound",...
@@ -399,45 +453,37 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     case ErrorTypes.NONE
                         out = [];
                 end
-                return
-            else
-                out = obj.parameters(paramName);
             end
         end
 
         function setParam(obj, paramName, paramValue)
-            % SETPARAM
-            %
-            % Description:
-            %   Add new parameter or change value of existing parameter
+            % Add new parameter or change the value of existing parameter
             %
             % Syntax:
             %   setParam(obj, paramName, paramValue)
             % -------------------------------------------------------------
             arguments
                 obj
-                paramName       {aod.util.mustNotBeSystemAttribute(paramName)}
-                paramValue      = []
+                paramName       char
+                paramValue                  = []
             end
 
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
+            aod.util.mustNotBeSystemAttribute(paramName)
             
             if ~isscalar(obj)
                 arrayfun(@(x) x.setParam(paramName, paramValue), obj);
                 return
             end
 
-            evtData = aod.persistent.events.AttributeEvent(paramName, paramValue);
-            notify(obj, 'AttributeChanged', evtData);
-
+            % Make the change in the HDF5 file
+            obj.setAttribute(paramName, paramValue);
+            % Make the change in the MATLAB object
             obj.parameters(paramName) = paramValue;
         end
 
         function removeParam(obj, paramName)
-            % REMOVEPARAM
-            %
-            % Description:
-            %   Remove a parameter from the entity
+            % Remove a parameter from the entity
             %
             % Syntax:
             %   removeParam(obj, paramName)
@@ -447,7 +493,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 paramName           char
             end
 
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
 
             if ~isscalar(obj)
                 arrayfun(@(x) removeParam(x, paramName), obj);
@@ -478,10 +524,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % File methods
     methods (Sealed)
         function tf = hasFile(obj, fileKey)
-            % HASFILE
-            %
-            % Description:
-            %   Check whether entity has a file
+            % Check whether entity has a file
             %
             % Syntax:
             %   tf = hasFile(obj, fileKey)
@@ -503,10 +546,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function out = getFile(obj, fileKey, errorType)
-            % GETFILE
-            %
-            % Description:
-            %   Get file by name
+            % Get file by name
             %
             % Syntax:
             %   out = getFile(obj, fileKey, errorType)
@@ -517,16 +557,21 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                fileKey             char
-                errorType           = aod.util.ErrorTypes.WARNING
+                fileKey        char 
+                errorType       = []
             end
-            
+
             import aod.util.ErrorTypes
+            if isempty(errorType)
+                errorType = ErrorTypes.ERROR;
+            else
+                errorType = ErrorTypes.init(errorType);
+            end
 
             if ~isscalar(obj)
-                out = arrayfun(@(x) getFile(x, fileKey, ErrorTypes.MISSING),...
-                    obj, 'UniformOutput', false);
-                out = vertcat(out{:});
+                out = aod.util.arrayfun(...
+                    @(x) string(getFile(x, fileKey, ErrorTypes.NONE)), obj);
+                out = standardizeMissing(out, "");
                 return
             end
 
@@ -551,10 +596,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function out = getExptFile(obj, fileKey, errorType)
-            % GETEXPTFILE
-            %
-            % Description:
-            %   Return file name with home directory appended
+            % Get file by name with home directory appended
             %
             % Syntax:
             %   out = getExptFile(obj, fileKey, errorType)
@@ -568,23 +610,19 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             if ~isscalar(obj)
-                out = arrayfun(@(x) getExptFile(x, fileKey, ErrorTypes.MISSING),...
-                    obj, 'UniformOutput', false);
-                out = vertcat(out{:});
+                out = arrayfun(@(x) getExptFile(x, fileKey, ErrorTypes.MISSING), obj);
                 return
             end
 
             out = obj.getFile(fileKey, errorType);
             
-            h = obj.ancestor('Experiment');
-            out = fullfile(h.homeDirectory, out);
+            if ~isempty(out) || ~ismissing(out)
+                out = fullfile(obj.getHomeDirectory(), out);
+            end
         end
 
         function setFile(obj, fileKey, fileValue)
-            % SETFILE
-            %
-            % Description:
-            %   Add new file or change value of existing file
+            % Add new file or change the value of existing file
             %
             % Syntax:
             %   setFile(obj, fileName, fileValue)
@@ -595,24 +633,23 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 fileValue 
             end
 
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
             
             if ~isscalar(obj)
                 arrayfun(@(x) x.setFile(fileKey, fileValue), obj);
                 return
             end
 
+            % Make the change in the HDF5 file
             evtData = aod.persistent.events.FileEvent(fileKey, fileValue);
             notify(obj, 'FileChanged', evtData);
 
+            % Make the change in the MATLAB object
             obj.files(fileKey) = fileValue;
         end
 
         function removeFile(obj, fileKey)
-            % REMOVEFILE
-            %
-            % Description:
-            %   Remove a file from entity's file directory
+            % Remove a file from entity's file directory
             %
             % Syntax:
             %   removeFile(obj, fileKey)
@@ -622,7 +659,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 fileKey             char
             end
 
-            obj.checkReadOnlyMode();
+            obj.verifyReadOnlyMode();
 
             if ~isscalar(obj)
                 arrayfun(@(x) removeFile(x, fileKey), obj);
@@ -635,11 +672,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
+            % Make the change in the HDF5 file
             evtData = aod.persistent.events.FileEvent(fileKey);
             notify(obj, 'FileChanged', evtData);
 
+            % Make the change in the MATLAB object
             remove(obj.files, fileKey);
-
             obj.loadInfo();
         end
     end
@@ -647,7 +685,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % Initialization and creation
     methods (Access = protected)
         function populate(obj)
-            % POPULATE
+            % Load datasets and attributes from HDF5, assign pre-defined
             %
             % Syntax:
             %   populate(obj)
@@ -676,6 +714,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.entityClassName = obj.loadAttribute('Class');
             lastModTime = obj.loadAttribute('LastModified');
             if ~isempty(lastModTime)
+                % TODO Improve datetime
+                lastModTime = extractBefore(lastModTime, " (");
                 obj.lastModified = datetime(lastModTime, ...
                     'Format', 'dd-MMM-uuuu HH:mm:ss');
             end
@@ -688,59 +728,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 end
             end
         end
-
-        function addEntity(obj, entity)
-            % ADDENTITY
-            %
-            % Description:
-            %   Add a new entity to the persistent hierarchy
-            %
-            % Syntax:
-            %   addEntity(obj, entity)
-            % -------------------------------------------------------------
-            evtData = aod.persistent.events.GroupEvent(entity, 'Add');
-            notify(obj, 'GroupChanged', evtData);
-        end
-    end
-
-    methods (Access = protected)
-        function deleteEntity(obj)
-            % DELETEENTITY
-            %
-            % Description:
-            %   Delete the entity
-            %
-            % Syntax:
-            %   deleteEntity(obj)
-            % -------------------------------------------------------------
-            obj.checkReadOnlyMode();
-            evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
-            notify(obj, 'GroupChanged', evtData);
-        end
-
-        function checkReadOnlyMode(obj)
-            % CHECKREADONLYMODE
-            %
-            % Description:
-            %   Throws error if persistent hierarchy is in read only mode
-            %
-            % Syntax:
-            %   checkReadOnlyMode(obj)
-            % -------------------------------------------------------------
-            if obj(1).readOnly 
-                error("Entity:ReadOnlyModeEnabled",...
-                    "Disable read only mode before making changes");
-            end
-        end
     end
 
     % Loading methods
     methods (Access = protected)
         function loadInfo(obj)
-            % LOADINFO
-            %
-            % Description:
-            %   Load h5info struct and update props accordingly
+            % Load h5info struct and update props accordingly
             %
             % Syntax:
             %   loadInfo(obj)
@@ -770,10 +763,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function a = loadAttribute(obj, name)
-            % LOADATTRIBUTE
-            %
-            % Description:
-            %   Check if an attribute is present and if so, read it
+            % Check if an attribute is present and if so, read it
             %
             % Syntax:
             %   d = loadAttribute(obj, name)
@@ -786,10 +776,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function e = loadLink(obj, name)
-            % LOADLINK
-            %
-            % Description:
-            %   Check if a link is present and if so, read it
+            % Check if a link is present and if so, read it
             %
             % Syntax:
             %   d = loadLink(obj, name)
@@ -805,10 +792,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function d = loadDataset(obj, name, varargin)
-            % LOADDATASET
-            %
-            % Description:
-            %   Check if a dataset is present and if so, read it
+            % Check if a dataset is present and if so, read it
             %
             % Syntax:
             %   d = loadDataset(obj, name, varargin)
@@ -821,10 +805,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function c = loadContainer(obj, containerName)
-            % LOADCONTAINER
-            %
-            % Description:
-            %   Load an entity container
+            % Load an entity container
             %
             % Syntax:
             %   c = loadContainer(obj, containerName)
@@ -837,10 +818,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % Dynamic property methods
     methods (Access = protected)
         function p = createDynProp(obj, propName, propType, propValue)
-            % CREATEDYNPROP
-            % 
-            % Description:
-            %   Add a dynamic property related to an HDF5 link/dataset
+            % Add a dynamic property related to an HDF5 link/dataset
             %
             % Syntax:
             %   p = createDynProp(obj, propName, propType)
@@ -862,10 +840,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function deleteDynProp(obj, propName)
-            % DELETEDYNPROP
-            %
-            % Description:
-            %   Delete a dynamic property from entity and in HDF5 file
+            % Delete a dynamic property from entity and in HDF5 file
             %
             % Syntax:
             %   deleteDynProp(obj, propName)
@@ -875,7 +850,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function setDatasetsToDynProps(obj)
-            % SETDATASETSTODYNPROPS
+            % Creates dynamic properties for all undefined datasets
             %
             % Description:
             %   Creates a dynamic property for all datasets not matching an
@@ -900,7 +875,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function setLinksToDynProps(obj)
-            % SETLINKSTODYNPROPS
+            % Create dynamic properties for undefined links
             %
             % Description:
             %   Creates a dynamic property for all ad hoc links not already
@@ -926,7 +901,35 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % HDF5 edit methods
     methods (Access = protected)
+        function verifyReadOnlyMode(obj)
+            % Throws error if persistent hierarchy is in read only mode
+            %
+            % Syntax:
+            %   verifyReadOnlyMode(obj)
+            % -------------------------------------------------------------
+            if obj(1).readOnly 
+                error("verifyReadOnlyMode:ReadOnlyModeEnabled",...
+                    "Disable read only mode before making changes");
+            end
+        end
+
+        function updateModificationTimestamp(obj)
+            % Updates the value of the "LastModified" attribute
+            %
+            % Syntax:
+            %   updateModificationTimestamp(obj)
+            % ------------------------------------------------------------- 
+            newValue = datetime('now');
+            obj.setAttribute('LastModified', newValue);
+            obj.lastModified = newValue;
+        end
+
         function setLink(obj, linkName, linkValue)
+            % Modify a softlink in entity's HDF5 group
+            %
+            % Syntax:
+            %   setLink(obj, linkName, linkValue)
+            % -------------------------------------------------------------
             arguments
                 obj
                 linkName            char
@@ -946,16 +949,25 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             else
                 obj.(linkName) = obj.loadLink(linkName);
             end
-            obj.loadInfo()
+
+            obj.updateModificationTimestamp();
+            obj.loadInfo();
         end
 
         function setDataset(obj, dsetName, dsetValue)
+            % Modify a dataset in entity's HDF5 group
+            %
+            % Syntax:
+            %   setDataset(obj, dsetName, dsetValue)
+            % -------------------------------------------------------------
+
             arguments
                 obj
                 dsetName            char        = ''
                 dsetValue                       = []
             end
 
+            % Process based on whether dataset exists or not
             newDset = ~obj.ismember(dsetName, obj.dsetNames);
             if newDset
                 evtData = aod.persistent.events.DatasetEvent(dsetName, dsetValue);
@@ -965,6 +977,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
             notify(obj, 'DatasetChanged', evtData);
 
+            % Make the change in MATLAB object
             if newDset
                 obj.addprop(dsetName);
             end
@@ -973,13 +986,55 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             else
                 obj.(dsetName) = dsetValue;
             end
+
+            obj.updateModificationTimestamp();
             obj.loadInfo();
         end
+
+        function setAttribute(obj, paramName, paramValue)
+            % Modify an attribute of the entity's group
+            %
+            % Notes:
+            %   Attributes are used in several locations so updating of 
+            %   the MATLAB object needs to occur in the calling function
+            % -------------------------------------------------------------
+
+            evtData = aod.persistent.events.AttributeEvent(paramName, paramValue);
+            notify(obj, 'AttributeChanged', evtData);
+
+            obj.loadInfo();
+
+            if ~strcmp(paramName, 'LastModified')
+                obj.updateModificationTimestamp();
+            end
+        end
+                
+        function addEntity(obj, entity)
+            % Add a new entity to the persistent hierarchy (back-end)
+            %
+            % Syntax:
+            %   addEntity(obj, entity)
+            % -------------------------------------------------------------
+            evtData = aod.persistent.events.GroupEvent(entity, 'Add');
+            notify(obj, 'GroupChanged', evtData);
+        end
+
+        function deleteEntity(obj)
+            % Delete this entity
+            %
+            % Syntax:
+            %   deleteEntity(obj)
+            % -------------------------------------------------------------
+            obj.verifyReadOnlyMode();
+            evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
+            notify(obj, 'GroupChanged', evtData);
+        end
+
     end
 
     methods (Static)
         function tf = ismember(a, b)
-            % ISMEMBER
+            % Wraps builtin ismember() and mutes error thrown by empty list
             %
             % Description:
             %   Wrapper for MATLAB's ismember that returns false if the
@@ -999,6 +1054,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % CustomDisplay methods
     methods (Access = protected)
         function header = getHeader(obj)
+            % Defines custom header for display
             if ~isscalar(obj)
                 header = getHeader@matlab.mixin.CustomDisplay(obj);
             else
@@ -1009,6 +1065,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end 
 
         function propgrp = getPropertyGroups(obj)
+            % Defines custom property group for dislay
             propgrp = getPropertyGroups@matlab.mixin.CustomDisplay(obj);
             if ~isscalar(obj)
                 return
@@ -1018,6 +1075,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             if isempty(containerNames)
                 return
             end
+            
+            % Change container names to the access function names 
             for i = 1:numel(containerNames)
                 iName = containerNames{i};
                 propgrp.PropertyList.(iName) = propgrp.PropertyList.([iName, 'Container']);
@@ -1025,4 +1084,22 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end  % toc = 2.9 ms
         end
     end
+    
+    % Overloaded MATLAB methods
+    methods
+        function tf = isequal(obj, entity)
+            % Tests whether the UUIDs of two entities are equal
+            %
+            % Syntax:
+            %   tf = isequal(obj, entity)
+            % -------------------------------------------------------------
+            
+            arguments
+                obj
+                entity      {mustBeA(entity, 'aod.persistent.Entity')}
+            end
+            tf = isequal(obj.UUID, entity.UUID);
+        end
+    end
+
 end 
