@@ -34,17 +34,40 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   ne (~=), uminus, uplus, abs, mean, median, std, sum, cumsum, iqr, 
 %   prctile, quantile, sign
 
+%>@file aod.core.Response.m
+%>@brief A response extracted from data acquired during an Epoch
+
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        % Response data (rows are samples)
+        %> Response data (rows are samples) 
         Data                          
-        % Timing of each sample in the Response      
+        %> Timing of each sample in the Response  (*double/duration*)    
         Timing (:,1)         {mustBeA(Timing, ["double", "duration"])} = []                   
     end
 
-    methods
+    methods 
+        % -----------------------------------------------------------------
+        %> @brief Class constructor
+        %>
+        %> @par Syntax
+        %> @code
+        %> obj = aod.core.Response(name, varargin)
+        %> @endcode
+        %>
+        %> @param name  @b string or @b char \n
+        %>      Response name 
+        %>
+        %> @par Optional key/value inputs:
+        %> - @c Data passed to @c setData()
+        %> - @c Timing \n 
+        %>      passed to @c setTiming()
+        %> - @c Parent aod.core.Experiment or aod.persistent.Experiment \n
+        %>      The Parent entity
+        %>
+        %> @return instance of the aod.core.Response class.
+        % -----------------------------------------------------------------
         function obj = Response(name, varargin)
             obj@aod.core.Entity(name, varargin{:});
 
@@ -59,6 +82,29 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Sealed)
+        % -----------------------------------------------------------------
+        %> @brief Set the Data property
+        %>
+        %> @par Syntax
+        %> @code
+        %> setData(obj, data)
+        %> @endcode
+        %>
+        %> @param obj aod.core.Response
+        %> @param data \n
+        %>      The response's data
+        %>
+        %> @par Example
+        %> Set the data
+        %> @code
+        %> obj.setData(data);
+        %> @endcode
+        %>
+        %> Clear the data
+        %> @code
+        %> obj.setData([]);
+        %> @endcode
+        % -----------------------------------------------------------------
         function setData(obj, data)
             % SETDATA
             %
@@ -68,6 +114,32 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Data = data;
         end
 
+        % -----------------------------------------------------------------
+        %> @brief Sets Timing, the time each sample was acquired
+        %>
+        %> @par Syntax
+        %> @code
+        %> addTiming(obj, timing)
+        %> @endcode
+        %>
+        %> @param Timing @b double, @b duration \n 
+        %>      The time of each sample in the Response. If empty, the 
+        %>      Timing property will be cleared.
+        %>
+        %> @par Examples
+        %> Set the timing
+        %> @code
+        %> obj.setTiming(timing);
+        %> @endcode
+        %>
+        %> Clear the timing
+        %> @code
+        %> obj.setTiming([])
+        %> @endcode
+        %>
+        %> @attention If Timing is unset, it will be inherited from 
+        %> the parent Epoch
+        % -----------------------------------------------------------------
         function setTiming(obj, timing)
             % Set Response "Timing", the time each sample was acquired
             %
