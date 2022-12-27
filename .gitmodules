@@ -6,3 +6,6 @@
 	path = lib/h5tools-matlab
 	url = https://github.com/sarastokes/h5tools-matlab
 	
+[submodule "lib/doxymatlab"]
+	path = lib/doxymatlab
+	url = https://github.com/simgunz/doxymatlab.git
