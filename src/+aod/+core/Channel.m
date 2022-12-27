@@ -22,7 +22,8 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Devices                     aod.core.Device = aod.core.Device.empty()
+        % Container for the Channel's Devices
+        Devices         aod.core.Device = aod.core.Device.empty()
     end
 
     methods

@@ -299,8 +299,23 @@ classdef (Abstract) Entity < handle
                 errorType = ErrorTypes.init(errorType);
             end
 
+            
             if ~isscalar(obj)
-                paramValue = arrayfun(@(x) x.getParam(paramName, errorType), obj);
+                paramValue = aod.util.arrayfun(...
+                    @(x) x.getParam(paramName, ErrorTypes.MISSING), obj);
+                if iscell(paramValue)
+                    isMissing = cellfun(@ismissing, paramValue);
+                else
+                    isMissing = ismissing(paramValue);
+                end
+                if all(isMissing)
+                    error('getParam:NotFound',...
+                            'Did not find %s in parameters', paramName);
+                    return
+                end
+                if iscell(paramValue) && any(isMissing)
+                    paramValue = extractCellData(paramValue);
+                end
                 return
             end
 
@@ -316,7 +331,7 @@ classdef (Abstract) Entity < handle
                             'Did not find %s in parameters', paramName);
                         paramValue = [];
                     case ErrorTypes.MISSING
-                        paramValue = NaN;
+                        paramValue = missing;
                     case ErrorTypes.NONE
                         paramValue = [];
                 end
@@ -497,7 +512,8 @@ classdef (Abstract) Entity < handle
             end
 
             if ~isscalar(obj)
-                fileValue = aod.util.arrayfun(@(x) getFile(x, fileName, ErrorTypes.NONE), obj);
+                fileValue = aod.util.arrayfun(@(x) string(getFile(x, fileName, ErrorTypes.NONE)), obj);
+                fileValue = standardizeMissing(fileValue, "");
                 return
             end
 
@@ -509,11 +525,11 @@ classdef (Abstract) Entity < handle
                         error('getFile:NotFound', 'Did not find %s in files', fileName);
                     case ErrorTypes.WARNING 
                         warning('getFile:NotFound', 'Did not find %s in files', fileName);
-                        fileValue = [];
+                        fileValue = char.empty();
                     case ErrorTypes.MISSING
-                        fileValue = NaN;
+                        fileValue = missing;
                     case ErrorTypes.NONE
-                        fileValue = [];
+                        fileValue = char.empty();
                 end
             end
         end
@@ -547,9 +563,7 @@ classdef (Abstract) Entity < handle
             end
             
             fileValue = obj.getFile(fileName, varargin{:});
-            if isempty(fileValue)
-                fileValue = [];
-            else
+            if ~isempty(fileValue) || ~ismissing(fileValue)
                 fileValue = fullfile(fPath, fileValue);
             end
         end
@@ -746,16 +760,7 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   tf = isValidParent(parent)
             % -------------------------------------------------------------
-            try
-                tf = ismember(parent.entityType, obj.entityType.validParentTypes());
-            catch ME
-                if strcmp(ME.identifier, 'MATLAB:index:expected_one_output_from_intermediate_indexing')
-                    assignin('base', 'obj', obj);
-                    assignin('base', 'parent', parent);
-                else
-                    rethrow(ME);
-                end
-            end
+            tf = ismember(parent.entityType, obj.entityType.validParentTypes());
         end
     end
 

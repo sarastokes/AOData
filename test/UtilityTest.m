@@ -74,6 +74,16 @@ classdef UtilityTest < matlab.unittest.TestCase
             % Should produce no error
             aod.util.mustBeEntityType([aod.core.Epoch(1), aod.core.Epoch(2)], 'Epoch');
         end
+
+        function MustBeEpochID(testCase)
+            EXPT = aod.core.Experiment('Test', cd, '20221226');
+            EXPT.add(aod.core.Epoch(6));
+            testCase.verifyError(...
+                @() aod.util.mustBeEpochID(EXPT, 10),...
+                "mustBeEpochID:UnmatchedID");
+            % No error
+            aod.util.mustBeEpochID(EXPT, 6);
+        end
     end
 
     methods (Test, TestTags=["Files", "Utility"])

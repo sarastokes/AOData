@@ -153,6 +153,14 @@ classdef CoreApiTest < matlab.unittest.TestCase
             testCase.verifyNumElements(out, 2);
         end
 
+        function GetParamWithMissing(testCase)
+            % Nonscalar parameter search with missing entities
+            out = testCase.EXPT.Epochs.getParam('PmtGain');
+            testCase.verifyNumElements(out, numel(testCase.EXPT.Epochs));
+            testCase.verifyEqual(nnz(ismissing(out)), 1);
+            % Here because the class setup is good for this test
+        end
+
         function testFileSearch(testCase)
             % Match file presence
             out = aod.core.EntitySearch.go(testCase.EXPT.Epochs,...
@@ -168,6 +176,14 @@ classdef CoreApiTest < matlab.unittest.TestCase
             egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
                 {'File', 'MyFile', 'test.txt'});
             testCase.verifyNumElements(egObj.getMatches(), 4);
+        end
+
+        function GetFileWithMissing(testCase)
+            % Nonscalar file search with missing entities
+            out = testCase.EXPT.Epochs.getFile('MyFile');
+            testCase.verifyNumElements(out, numel(testCase.EXPT.Epochs));
+            testCase.verifyEqual(nnz(ismissing(out)), 2);
+            % Here because the class setup is good for this test
         end
     end
 

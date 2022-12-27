@@ -12,7 +12,7 @@ function mustBeEpochID(obj, epochIDs)
 % -------------------------------------------------------------------------
 
     arguments
-        obj         {aod.util.mustBeEntity(obj)}
+        obj         {aod.util.mustBeEntityType(obj, 'Experiment')}
         epochIDs    {mustBeInteger(epochIDs)}
     end
 

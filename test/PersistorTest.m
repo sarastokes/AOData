@@ -154,14 +154,40 @@ classdef PersistorTest < matlab.unittest.TestCase
 
             % TODO: Remove property
         end
+    end
         
-        function testExperimentIndexing(testCase)
-            %% TODO Add verification
-            out = testCase.EXPT.Epochs(1); 
-            out = testCase.EXPT.Calibrations(0);
-            out = testCase.EXPT.Annotations(0);
-            out = testCase.EXPT.Systems(1);
-            out = testCase.EXPT.Sources(1);
+    methods (Test, TestTags=["Containers", "Persistor"])
+        function EmptyContainer(testCase)
+            testCase.verifyEmpty(aod.persistent.EntityContainer.empty());
+        end
+
+        function ContainerIndexing(testCase)
+            testCase.verifyNumElements(testCase.EXPT.Analyses(0),...
+                numel(testCase.EXPT.Analyses));
+            testCase.verifyNumElements(testCase.EXPT.Epochs(1), 1);
+            testCase.verifyNumElements(testCase.EXPT.Calibrations(0),...
+                numel(testCase.EXPT.Calibrations));
+            testCase.verifyNumElements(testCase.EXPT.Annotations(0),...
+                numel(testCase.EXPT.Annotations));
+            testCase.verifyNumElements(testCase.EXPT.Systems(1), 1);
+            testCase.verifyNumElements(testCase.EXPT.Sources(1), 1);
+        end
+
+        function ContainerErrors(testCase)
+            try
+                testCase.EXPT.EpochsContainer(1) = [];
+            catch ME 
+                disp(ME.identifier)
+                testCase.verifyTrue(strcmp(ME.identifier,...
+                    "EntityContainer:DeleteNotSupported"));
+            end
+
+            try 
+                testCase.EXPT.EpochsContainer(1) = 1;
+            catch ME 
+                testCase.verifyTrue(strcmp(ME.identifier,...
+                    "EntityContainer:AssignNotSupported"));
+            end
         end
     end 
 end

@@ -31,16 +31,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Static)
-        function source = createSource()
-            % Create a source with two sub-sources
-            source = aod.core.Source('MC00851');
-            source1a = aod.core.Source('OS');
-            source1b = aod.core.Source('OD');
-            source.add([source1a, source1b]);
-        end
-    end
-
     % Terribly long methods but test function order isn't guarenteed
     methods (Test, TestTags=["Experiment", "Core", "LevelZero"])
         function ExperimentIO(testCase)
@@ -108,13 +98,12 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 @()testCase.EXPT.getParam('BadParam', ErrorTypes.WARNING),...
                 'getParam:NotFound');
             testCase.verifyTrue(...
-                isnan(testCase.EXPT.getParam('BadParam', ErrorTypes.MISSING)));
+                ismissing(testCase.EXPT.getParam('BadParam', ErrorTypes.MISSING)));
             testCase.verifyEmpty(...
                 testCase.EXPT.getParam('BadParam', ErrorTypes.NONE));
         end
 
         function FileAccess(testCase)
-
             import aod.util.ErrorTypes
 
             testCase.verifyError(...
@@ -124,7 +113,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 @()testCase.EXPT.getFile('BadFile', ErrorTypes.WARNING),...
                 'getFile:NotFound');
             testCase.verifyTrue(...
-                isnan(testCase.EXPT.getFile('BadFile', ErrorTypes.MISSING)));
+                ismissing(testCase.EXPT.getFile('BadFile', ErrorTypes.MISSING)));
             testCase.verifyEmpty(...
                 testCase.EXPT.getFile('BadFile', ErrorTypes.NONE));
 
@@ -132,64 +121,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             epoch.setFile('MyFile', 'test.txt');
             testCase.verifyError(...
                 @()epoch.getExptFile('MyFile'), "getExptFile:NoHomeDirectory");
-        end
-    end
-
-    methods(Test, TestTags=["Source", "Core", "LevelOne"])
-        function SourceIO(testCase)
-            import matlab.unittest.constraints.Throws
-
-            % Create a parent source
-            source1 = aod.core.Source('MC00851');
-            source2 = aod.core.Source('MC00838');
-            testCase.EXPT.add([source1, source2]);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 2);
-
-            % Create second-level source
-            source1a = aod.core.Source('OS');
-            source1b = aod.core.Source('OD');
-            source1.add([source1a, source1b]);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 4);
-            
-            % Check labels
-            testCase.verifyEqual('MC00851_OS', source1a.label);
-
-            % Create third-level source
-            source1a1 = aod.core.Source('Right');
-            source1a2 = aod.core.Source('Left');
-            source1a.add([source1a1, source1a2]);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
-
-            source1b1 = aod.core.Source('Right');
-            source1b.add(source1b1);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 7);
-
-            % Check remove all files
-            source1.setFile('MyFile1', 'test.txt');
-            source1.setFile('MyFile2', 'test2.txt');
-            testCase.verifyEqual(source1.files.Count, uint64(2));
-            source1.removeFile('all');
-            testCase.verifyEmpty(source1.files);
-
-            % Remove a single source
-            testCase.EXPT.remove('Source', 2);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
-
-            % Clear all the sources
-            testCase.EXPT.remove('Source', 'all');
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 0);
-        end
-
-        function RemoveSourceByQuery(testCase)
-            % Create a source with two sub-sources
-            source = testCase.createSource();
-            testCase.verifyNumElements(source.Sources, 2);
-
-            source.remove('Source', {'Name', 'OS'});
-            testCase.verifyNumElements(source.Sources, 1);
-
-            source.remove({'Name', 'OD'});
-            testCase.verifyEmpty(source.Sources);
         end
     end
 
@@ -579,6 +510,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Add timing to one epoch
             epoch1.setTiming(1:4);
+            testCase.verifyEqual(epoch1.Timing, (1:4)');
             
             % Clear timing
             setTiming([epoch1, epoch2], []);

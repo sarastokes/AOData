@@ -11,3 +11,5 @@
     - Creates ```EntityEvent``` data and triggers event ```EntityChanged```
 - ```onEntityChanged``` in ```aod.persistent.EntityFactory```
   - Makes sure change is reflected in entity UUID list
+
+### Removing an entity

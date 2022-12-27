@@ -18,6 +18,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
+        % Container for Source's sub-Sources
         Sources                         = aod.core.Source.empty()
     end
 
@@ -29,10 +30,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Sealed)
         function add(obj, childSource)
-            % ADD
-            %
-            % Description:
-            %   Add a sub-source to the current source
+            % Add a sub-source to the current source
             %
             % Syntax:
             %   add(obj, childSource)
@@ -46,11 +44,45 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Sources = cat(1, obj.Sources, childSource);
         end
 
-        function remove(obj, varargin)
-            % REMOVE
+        function out = get(obj, varargin)
+            % Search and access child Sources
             %
-            % Description:
-            %   Remove a child source, or sources
+            % Syntax:
+            %   out = get(obj, varargin)
+            % -------------------------------------------------------------
+
+            if isempty(obj.Sources)
+                out = aod.core.Source.empty();
+                return
+            end
+        
+            import aod.core.EntityTypes
+
+            try
+                entityType = EntityTypes.get(varargin{1});
+                if entityType ~= EntityTypes.SOURCE
+                    error('get:InvalidEntityType',...
+                        'Entity must be a Source');
+                end
+                startIdx = 2;
+            catch
+                startIdx = 1;
+            end
+
+            if nargin == startIdx
+                out = obj.Sources;
+                return
+            end
+
+            if iscell(varargin{startIdx})
+                out = aod.core.EntitySearch.go(obj.Sources, varargin{startIdx:end});
+            else
+                error('get:InvalidInput', 'Input must be a cell')
+            end
+        end
+
+        function remove(obj, varargin)
+            % Remove child source(s) by ID , query or "all"
             %
             % Syntax:
             %   remove(obj, varargin)
@@ -64,8 +96,8 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 assert(entityType == aod.core.EntityTypes.SOURCE,...
                     'Only Sources can be removed from Source');
             catch
-                    entityType = EntityTypes.SOURCE;
-                    startIdx = 1;
+                entityType = EntityTypes.SOURCE;
+                startIdx = 1;
             end
 
             ID = varargin{startIdx};
@@ -73,7 +105,6 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             if isnumeric(ID)
                 mustBeInteger(ID); 
                 mustBeInRange(ID, 1, numel(obj.Sources));
-                ID = sort(ID, 'descend');
                 obj.Sources(ID) = [];
             elseif istext(ID) && strcmpi(ID, 'all')
                 obj.Sources = aod.core.Source.empty();
@@ -91,10 +122,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function allSources = getAllSources(obj)
-            % GETALLSOURCES
-            %
-            % Description:
-            %   Get all child sources of this source
+            % Get all child sources of this source
             %
             % Syntax:
             %   allSources = getAllSources(obj)
@@ -115,10 +143,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function sources = getParents(obj)
-            % GETPARENTS
-            %
-            % Description:
-            %   Collect all source parents, with top-level listed first
+            % Collect all source parents, with top-level listed first
             %
             % Syntax:
             %   ID = obj.getParents();
@@ -149,6 +174,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Sealed, Access = private)
         function allSources = iterSource(obj, source, allSources)
+            % Used to recursively identify all Sources
             if isempty(source.Sources)
                 return
             end

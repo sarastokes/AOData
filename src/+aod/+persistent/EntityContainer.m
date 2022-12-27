@@ -29,9 +29,11 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 
     methods
         function obj = EntityContainer(hdfPath, entityFactory)
-            obj.hdfPath = hdfPath;
-            obj.entityFactory = entityFactory;
-            obj.populateContents();
+            if nargin > 0
+                obj.hdfPath = hdfPath;
+                obj.entityFactory = entityFactory;
+                obj.populateContents();
+            end
         end
 
         function value = get.contents(obj)
@@ -92,11 +94,6 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
                 return
             end
 
-            if numel(indexOp.Indices) > 2
-                error("EntityContainer:IncorrectDimensions",...
-                    "The number of dimensions should be 1-2");
-            end
-
             if isempty(indexOp.Indices) || ...
                     all(ischar(indexOp.Indices{1}) & strcmp(indexOp.Indices{1}, ':'))...
                     || all(isnumeric(indexOp.Indices{1}) & indexOp.Indices{1} == 0)
@@ -129,11 +126,11 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
     methods (Static)
         function obj = empty(varargin)
             if nargin == 0
-                obj = EntityContainer();
+                obj = aod.persistent.EntityContainer();
                 return
             end
 
-            obj = EntityContainer(varargin{1}, varargin{2});
+            obj = aod.persistent.EntityContainer(varargin{1}, varargin{2});
         end
     end
 end
