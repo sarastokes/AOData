@@ -1,5 +1,5 @@
 classdef DatasetFilter < aod.api.FilterQuery
-% DATASETFILTER
+% Filter entities by datasets/properties
 %
 % Description:
 %   Filter queries on the presence of a dataset or of a dataset matching a
@@ -9,16 +9,18 @@ classdef DatasetFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = DatasetFilter(hdfName, dsetName)
-%   obj = DatasetFilter(hdfName, dsetName, dsetValue)
+%   obj = aod.api.DatasetFilter(hdfName, dsetName)
+%   obj = aod.api.DatasetFilter(hdfName, dsetName, dsetValue)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties
+    properties (SetAccess = private)
         dsetName
         dsetValue
+    end
 
+    properties (SetAccess = protected)
         allDatasetNames
     end
 

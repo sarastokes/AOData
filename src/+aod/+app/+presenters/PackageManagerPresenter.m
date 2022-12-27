@@ -8,12 +8,15 @@ classdef PackageManagerPresenter < appbox.Presenter
 %   appbox.Presenter
 %
 % Constructor:
-%   obj = PackageManagerPresenter()
-%   obj = PackageManagerPresenter(view)
+%   obj = aod.app.presenters.PackageManagerPresenter()
+%   obj = aod.app.presenters.PackageManagerPresenter(view)
 %
 % See also:
 %   AODataManagerApp, aod.app.views.PackageManagerView
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (Access = private)
         isChanged
     end

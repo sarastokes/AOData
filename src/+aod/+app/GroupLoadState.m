@@ -1,5 +1,5 @@
 classdef GroupLoadState 
-% GROUPLOADSTATE
+% Enumeration for load state of an HDF5 group
 %
 % Description:
 %   Defines the information that has been loaded for a specific H5 group
@@ -8,7 +8,10 @@ classdef GroupLoadState
 %   tf = hasName(obj)
 %   tf = hasAttributes(obj)
 %   tf = hasContents(obj)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     enumeration 
         NONE 
         NAME 

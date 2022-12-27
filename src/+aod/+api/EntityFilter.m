@@ -8,7 +8,9 @@ classdef EntityFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = EntityFilter(hdfName, entityName)
+%   obj = aod.api.EntityFilter(hdfName, entityName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

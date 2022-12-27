@@ -1,5 +1,5 @@
 classdef LinkFilter < aod.api.FilterQuery
-% LINKFILTER
+% Filter entities by softlink
 %
 % Description:
 %   Filter entities based on the presence of a specific link
@@ -8,12 +8,16 @@ classdef LinkFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = DatasetFilter(hdfName, linkName)
+%   obj = aod.api.LinkFilter(hdfName, linkName)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         linkName
+    end
 
+    properties (SetAccess = protected)
         allLinkNames
         allLinkParents
     end

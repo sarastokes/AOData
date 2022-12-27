@@ -470,6 +470,10 @@ classdef (Abstract) Entity < handle
             %   % Remove all files
             %   obj.removeFile('all');
             % -------------------------------------------------------------
+            arguments
+                obj
+                fileName            char
+            end
 
             if ~isscalar(obj)
                 arrayfun(@(x) removeFile(x, fileName), obj);
@@ -548,8 +552,6 @@ classdef (Abstract) Entity < handle
             % Notes:
             %   Optional inputs are passed to getFile()
             % -------------------------------------------------------------
-
-            fileName = convertStringsToChars(fileName);
 
             if ~isscalar(obj)
                 fileValue = arrayfun(@(x) getExptFile(x, fileName, varargin{:}), obj);

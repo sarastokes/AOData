@@ -9,12 +9,14 @@ classdef ParameterFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = ParameterFilter(hdfName, paramName)
-%   obj = ParameterFilter(hdfName, paramName, paramValue)
+%   obj = aod.api.ParameterFilter(hdfName, paramName)
+%   obj = aod.api.ParameterFilter(hdfName, paramName, paramValue)
 %
 % Notes:
 %   If paramValue isn't set, entities will be filtered by whether they have
 %   the parameter "paramName" or not
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

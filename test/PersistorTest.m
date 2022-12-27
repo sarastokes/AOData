@@ -35,7 +35,7 @@ classdef PersistorTest < matlab.unittest.TestCase
     end
 
     methods (Test)
-        function testReadOnly(testCase)
+        function ReadOnly(testCase)
             import matlab.unittest.constraints.Throws
 
             % Ensure edits cannot be made when read only mode is true
@@ -45,7 +45,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.EXPT.setReadOnlyMode(false);
         end
 
-        function testHomeDirectory(testCase)
+        function HomeDirectory(testCase)
             % Changing the home directory is also a dataset change test
             oldDirectory = testCase.EXPT.homeDirectory;
             newDirectory = fileparts(testCase.EXPT.homeDirectory);
@@ -57,7 +57,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.EXPT.setHomeDirectory(oldDirectory);
         end
         
-        function testParamRead(testCase)
+        function ParamRead(testCase)
             testCase.verifyTrue(...
                 testCase.EXPT.hasParam('Administrator'));
             testCase.verifyEqual(...
@@ -68,24 +68,24 @@ classdef PersistorTest < matlab.unittest.TestCase
 
         end
 
-        function testFileRead(testCase)
+        function FileRead(testCase)
             testCase.verifyTrue(...
                 testCase.EXPT.Epochs(1).hasFile('PresyncFile'));
             testCase.verifyFalse(...
                 testCase.EXPT.hasFile('PreSyncFile'));
         end
 
-        function testCustomDisplay(testCase)
+        function CustomDisplay(testCase)
             disp(testCase.EXPT)
             disp(testCase.EXPT.Epochs)
         end
 
-        function testAncestor(testCase)
+        function Ancestor(testCase)
             h = ancestor(testCase.EXPT.Epochs(1).Responses(1), 'experiment');
             testCase.verifyEqual(testCase.EXPT.UUID, h.UUID);
         end
 
-        function testGetByPath(testCase)
+        function GetByPath(testCase)
             epochPath = '/Experiment/Epochs/0001';
             h = testCase.EXPT.getByPath(epochPath);
             testCase.verifyEqual(h.UUID, testCase.EXPT.Epochs(1).UUID);
@@ -94,7 +94,7 @@ classdef PersistorTest < matlab.unittest.TestCase
                 'getByPath:InvalidHdfPath');
         end
 
-        function testParamIO(testCase)
+        function ParamIO(testCase)
             import matlab.unittest.constraints.Throws
 
             % Ensure system attributes aren't editable
@@ -115,7 +115,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyFalse(ismember("TestParam", attributeNames));
         end
 
-        function testFileIO(testCase)
+        function FileIO(testCase)
             % Change a file
             testCase.EXPT.Epochs(1).setFile('PostSyncFile', 'test.txt');
             out = h5readatt('ToyExperiment.h5', '/Experiment/Epochs/0001/files', 'PostSyncFile');
@@ -143,7 +143,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, '\PostSyncFile.txt');
         end
 
-        function testPropertyIO(testCase)
+        function PropertyIO(testCase)
             % Add a property
             testCase.EXPT.addProperty('Test', eye(3));
             % Confirm new property is now a dynamic property

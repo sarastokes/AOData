@@ -1,11 +1,11 @@
 classdef QueryManager < handle
-% QUERYMANAGER
+% Handles execution of one or more AOQuery filters
 %
 % Description:
 %   Handles multiple filters and queries
 %
 % Constructor:
-%   obj = QueryManager(hdfName)
+%   obj = aod.api.QueryManager(hdfName)
 %
 % Public methods:
 %   groupNames = getMatches(obj)
@@ -17,6 +17,8 @@ classdef QueryManager < handle
 %   Filters
 %   hdfName
 %   filterIdx
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

@@ -21,6 +21,10 @@ dev/
 deprecated/
 .ipynb_checkpoints/
 
+# Documentation (work in progress)
+docs/doxygen/
+Doxyfile.txt
+
 ## Testing folders and files
 test/coverage_report/
 test/single_report/

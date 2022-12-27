@@ -4,6 +4,9 @@ classdef PackageManagerView < aod.app.UIView
 % Parent:
 %   aod.app.UIView
 %
+% Constructor:
+%   obj = aod.app.views.PackageManagerView()
+%
 % See also:
 %   aod.app.presenters.PackageManagerPresenter, AODataManagerApp
 % -------------------------------------------------------------------------

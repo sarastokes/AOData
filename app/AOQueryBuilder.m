@@ -10,6 +10,11 @@ function app = AOQueryBuilder(hdfName)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    if nargin == 0
+        % Let QueryPresenter open uigetfile
+        hdfName = [];
+    end
+
     p = aod.app.presenters.QueryPresenter(hdfName);
     p.show();
 

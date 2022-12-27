@@ -5,10 +5,12 @@ classdef QueryView < aod.app.UIView
 %   aod.app.UIView
 %
 % Constructor:
-%   obj = QueryView()
+%   obj = aod.app.presenters.QueryView()
 %
 % See also:
-%   QueryPresenter
+%   AOQueryBuilder, aod.app.presenters.QueryPresenter
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     events

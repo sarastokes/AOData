@@ -1,5 +1,5 @@
 classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
-% FILTERQUERY (Abstract)
+% A filter for identifying entities (Abstract)
 %
 % Description:
 %   Parent class for filtering entities in an AOData HDF5 file
@@ -8,7 +8,7 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
 %   handle, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = FilterQuery(hdfName)
+%   obj = aod.api.FilterQuery(hdfName)
 %
 % Abstract methods:
 %   applyFilter(obj)
@@ -20,6 +20,8 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
 %   resetFilterIdx(obj)
 %
 % TODO: Multiple HDF5 files
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

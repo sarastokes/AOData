@@ -1,12 +1,15 @@
 classdef ReturnTypes
-% RETURNTYPES
+% Enumeration for different return types in AOQuery
 % 
 % Description:
 %   Enumeration containing all valid return types for AOQuery
 %
-% Methods:
-%   out = ReturnTypes.init(name)
+% Static Methods:
+%   out = aod.api.ReturnTypes.init(name)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     enumeration
         ENTITY
         PATH

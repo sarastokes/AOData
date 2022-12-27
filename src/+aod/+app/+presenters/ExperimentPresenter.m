@@ -5,7 +5,7 @@ classdef ExperimentPresenter < appbox.Presenter
 %   appbox.Presenter
 %
 % Syntax:
-%   obj = ExperimentPresenter()
+%   obj = aod.app.presenters.ExperimentPresenter()
 %
 % See Also:
 %   aod.app.views.ExperimentView, AODataViewer
@@ -32,7 +32,7 @@ classdef ExperimentPresenter < appbox.Presenter
             end
             obj = obj@appbox.Presenter(view);
 
-            if nargin < 1
+            if nargin < 1 || isempty(experiment)
                 experiment = obj.view.showGetFile('Chose an AOData H5 file', '*.h5');
                 if isempty(experiment)
                     warning("ExperimentPresenter:NoExperiment",...

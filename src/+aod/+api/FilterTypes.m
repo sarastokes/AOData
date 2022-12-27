@@ -1,4 +1,8 @@
 classdef FilterTypes
+% Enumeration for AOQuery entity filters
+
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
 
     enumeration
         ENTITY
@@ -6,7 +10,7 @@ classdef FilterTypes
         DATASET
         LINK
 
-        % Convenience subclasses of the above filters
+        % Specialized cases of the above filters
         CLASS
         NAME
         PARENT

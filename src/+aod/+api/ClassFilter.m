@@ -8,7 +8,9 @@ classdef ClassFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = ClassFilter(hdfName, className)
+%   obj = aod.api.ClassFilter(hdfName, className)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)

@@ -1,5 +1,17 @@
 classdef UIView < handle
+% View using uifigure
+%
+% Description:
+%   A copy of appbox.View that uses uifigure instead of figure
+%
+% Constructor:
+%   obj = aod.app.UIView()
+%
+% See also:
+%   appbox.View
 
+% By Sara Patterson, 2022 (AOData)
+% -------------------------------------------------------------------------
     events
         KeyPress
         Close

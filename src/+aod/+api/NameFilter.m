@@ -1,5 +1,5 @@
 classdef NameFilter < aod.api.FilterQuery
-% NAMEFILTER
+% Filter entities by name
 %
 % Description:
 %   Filters entities based on group name with partial matching
@@ -8,8 +8,8 @@ classdef NameFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = NameFilter(hdfName, name)
-%   obj = NameFilter(hdfName, name, partialMatchFlag)
+%   obj = aod.api.NameFilter(hdfName, name)
+%   obj = aod.api.NameFilter(hdfName, name, partialMatchFlag)
 %
 % Inputs:
 %   hdfName             char/string
@@ -19,11 +19,16 @@ classdef NameFilter < aod.api.FilterQuery
 % Optional inputs:
 %   partialMatchFlag    logical (default = false)
 %       Whether to return groups that partially match name
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties %(SetAccess = private)
+    properties (SetAccess = private)
         Name
         partialMatchFlag        logical
+    end
+
+    properties (SetAccess = protected)
         allNames
     end
 
