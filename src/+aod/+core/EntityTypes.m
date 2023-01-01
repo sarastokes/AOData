@@ -531,7 +531,7 @@ classdef EntityTypes
                     obj = EntityTypes.ANALYSIS;
                 otherwise
                     error('get:UnknownEntity',...
-                        'Entity %s could not be matched to an EntityType');
+                        'Entity %s could not be matched to an EntityType', entityName);
             end
         end
     end

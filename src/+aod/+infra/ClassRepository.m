@@ -1,11 +1,15 @@
 classdef ClassRepository < handle 
-% CLASSREPOSITORY
+% Sorts classes by package
 %
 % Constructor:
 %   obj = ClassRepository(path)
 %
 % Input:
 %   path        Search path(s) split by ';'
+%       If empty, getpref('AOData', 'SearchPaths') will be used
+%
+% References:
+%   Adapted from ClassRespository in Symphony-DAS
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -57,16 +61,6 @@ classdef ClassRepository < handle
     end
 
     methods (Access = private)
-        function searchPaths = getPathPreferences(obj)
-            if ~ispref('AOData', 'SearchPaths')
-                searchPaths = [];
-                warning('getPathPreferences:SearchPathsNotSet',...
-                    'Use AODataManagerApp to set search paths');
-                return
-            end
-            searchPaths = getpref('AOData', 'SearchPaths');
-        end
-
         function loadAll(obj)
             obj.classMap = containers.Map();
 
@@ -115,6 +109,19 @@ classdef ClassRepository < handle
                     obj.classMap(s) = classes;
                 end
             end
+        end
+    end
+
+    methods (Static)
+        function searchPaths = getPathPreferences()
+            if ~ispref('AOData', 'SearchPaths')
+                searchPaths = [];
+                warning('getPathPreferences:SearchPathsNotSet',...
+                    'Use AODataManagerApp to set search paths');
+                return
+            end
+            searchPaths = getpref('AOData', 'SearchPaths');
+            searchPaths = string(strsplit(searchPaths, ';'))';
         end
     end
 end 
