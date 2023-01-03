@@ -1,33 +1,45 @@
-## Resources
+## Icon Resources
 
 Source credit for the free icons used in apps
-
-- Card Icon by <a href="https://freeicons.io/profile/722">Fasil</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Chain Icon by <a href="https://freeicons.io/profile/3">icon king1</a> on <a href="https://freeicons.io">freeicons.io</a>    
+ 
 - Code Icon by <a href="https://freeicons.io/profile/714">Raj Dev</a> on <a href="https://freeicons.io">freeicons.io</a>        
-- Container Icon by <a href="https://freeicons.io/profile/823">Muhammad Haq</a> on <a href="https://freeicons.io">freeicons.io</a>   
-- Data Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Document Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a>  
+- Container Icon by <a href="https://freeicons.io/profile/823">Muhammad Haq</a> on <a href="https://freeicons.io">freeicons.io</a>  
 - File Cabinet Icon by <a href="https://freeicons.io/profile/101154">sripfoto</a> on <a href="https://freeicons.io">freeicons.io</a>
 - FileReader Icon by <a href="https://freeicons.io/profile/3">icon king1</a> on <a href="https://freeicons.io">freeicons.io</a>
 - Folder Icon by <a href="https://freeicons.io/profile/714">Raj Dev</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Home Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a>
 - Info Icon by <a href="https://freeicons.io/profile/8939">Melvin ilham Oktaviansyah</a> on <a href="https://freeicons.io">freeicons.io</a>            
 - License Icon by <a href="https://freeicons.io/profile/3335">MD Badsha Meah</a> on <a href="https://freeicons.io">freeicons.io</a>  
 - List Icon by <a href="https://freeicons.io/profile/714">Raj Dev</a> on <a href="https://freeicons.io">freeicons.io</a>
 - Plus Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>    
 - Minus Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>   
-- Mixer Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>     
-- Notes Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a>  
-- Notepad Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>  
-- Notebook Icon by <a href="https://freeicons.io/profile/823">Muhammad Haq</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Settings Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Structure Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a>
-- System Icon by <a href="https://freeicons.io/profile/122327">Ginkaewicons</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Table Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a> 
-- Terminal Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Text Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Time Icon by <a href="https://freeicons.io/profile/726">Free Preloaders</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Timetable Icon by <a href="https://freeicons.io/profile/101755">Notachai Plukjaisuea</a> on <a href="https://freeicons.io">freeicons.io</a>
-- User Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a> 
-- Written Notes Icon by <a href="https://freeicons.io/profile/823">Muhammad Haq</a> on <a href="https://freeicons.io">freeicons.io</a> 
+- <a href="https://icons8.com/icon/nkplpFWWQEKZ/add">Add</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/38947/binary-file">Binary File</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21064/box">Box</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21461/calendar-4">Calendar 4</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21319/checked-checkbox">Checked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21068/checkmark">Checkmark</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/44484/code">Code</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/22317/color-swatch">Color Swatch</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21145/comments">Comments</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21132/contact-details">Contact Details</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/31483/data-sheet">Data Sheet</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/38006/do-not-disturb">Do Not Disturb</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/32540/documents">Documents</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21079/folder">Folder</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/31496/grid">Grid</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21352/help">Help</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/74811/home-page">Home Page</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21085/info">Info</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/38051/link">Link</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21192/list">List</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/40949/live-folder">Live Folder</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/BDnvEWNeH75f/making-notes">Making Notes</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21168/name-tag">Name Tag</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21777/nas">NAS</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/38107/new-document">New Document</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/38129/note">Note</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21215/planner">Planner</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21100/refresh">Refresh</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21394/save">Save</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21256/tree-structure">Tree Structure</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21430/unchecked-checkbox">Unchecked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>
