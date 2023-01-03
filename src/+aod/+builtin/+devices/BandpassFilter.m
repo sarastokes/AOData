@@ -2,7 +2,10 @@ classdef BandpassFilter < aod.core.Device
 % BANDPASSFILTER
 %
 % Constructor:
-%   obj = BandpassFilter(parent, wavelength, bandwidth, varargin)
+%   obj = aod.builtin.devices.BandpassFilter(wavelength, bandwidth, varargin)
+%
+% Properties:
+%   transmission
 %
 % Parameters:
 %   Wavelength
@@ -11,14 +14,14 @@ classdef BandpassFilter < aod.core.Device
 %   Manufacturer
 %   Model
 %
-% Properties:
-%   transmission
-%
 % Methods:
 %   setWavelength(obj, wavelength)
 %   setBandwidth(obj, bandwidth)
 %   setTransmission(obj, transmission)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (SetAccess = protected)
         transmission
     end
@@ -53,6 +56,15 @@ classdef BandpassFilter < aod.core.Device
             value = sprintf('%ux%unmBandpassFilter',... 
                 obj.getParam('Wavelength'),... 
                 obj.getParam('Bandwidth'));
+        end
+
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Device(obj);
+
+            value.add('Wavelength', [], @isnumeric,...
+                'Wavelength in nm');
+            value.add('Bandwidth', [], @isnumeric,...
+                'Bandwidth in nm');
         end
     end
 end 

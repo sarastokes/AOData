@@ -1,5 +1,5 @@
 classdef Pinhole < aod.core.Device
-% PINHOLE
+% A pinhole with a defined diameter
 %
 % Description:
 %   Represents a pinhole placed within a light path
@@ -8,80 +8,52 @@ classdef Pinhole < aod.core.Device
 %   aod.core.Device
 %
 % Constructor:
-%   obj = Pinhole(parent, diameter, varargin)
+%   obj = aod.builtin.devices.Pinhole(diameter, varargin)
 %
-% Parameters:
-%   Diameter
-%   DiameterUnits           (default = 'micron')
+% Properties:
+%   Diameter            double
+%       Pinhole diameter in microns
+%
 % Inherited Parameters:
 %   Model
 %   Manufacturer
 %
 % Sealed methods:
-%   setDiameter(obj, diameter, diameterUnits)
-%   setDiameterUnits(obj, diameterUnits)
-%
+%   setDiameter(obj, diameter)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
+    properties (SetAccess = protected)
+        % Pinhole diameter in microns
+        diameter        double          
+    end
 
     methods
         function obj = Pinhole(diameter, varargin)
             obj = obj@aod.core.Device([], varargin{:});
             
             obj.setDiameter(diameter);
-            
-            ip = aod.util.InputParser();
-            addParameter(ip, 'DiameterUnits', 'micron', @istext);
-            parse(ip, varargin{:});
-            
-            obj.setDiameterUnits(ip.Results.DiameterUnits);
         end
     end
     
     methods
-        function setDiameter(obj, diameter, diameterUnits)
-            % SETDIAMETER
-            %
-            % Description:
-            %   Set pinhole diameter and optionally, units of diameter
+        function setDiameter(obj, diameter)
+            % Set pinhole diameter in microns
             %
             % Syntax:
-            %   setDiameter(obj, diameter, diameterUnits)
             %   setDiameter(obj, diameter)
             %
-            % Notes:
-            %   Default diameter units is 'microns'
+            % Example:
+            %   obj.setDiameter(25)
             % -------------------------------------------------------------
-            assert(isnumeric(diameter), 'Diameter must be a number');
-
-            obj.setParam('Diameter', diameter);
-            if nargin > 2
-                obj.setParam('DiameterUnits', diameterUnits);
-            end
-        end
-
-        function setDiameterUnits(obj, diameterUnits)
-            % SETDIAMETERUNITS
-            %
-            % Description:
-            %   Set units of pinhole diameter
-            %
-            % Syntax:
-            %   setDiameterUnits(obj, diameterUnits)
-            %
-            % Notes:
-            %   Default diameter units is 'microns'
-            % -------------------------------------------------------------
-            if isempty(diameterUnits)
-                diameterUnits = 'micron';
-            end
-            obj.setParam('DiameterUnits', diameterUnits);
+            obj.diameter = diameter;
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['Pinhole', num2str(obj.getParam('Diameter')),...
-                obj.getParam('DiameterUnits')];
+            value = ['Pinhole_', num2str(obj.diameter), 'microns'];
         end
     end
 end

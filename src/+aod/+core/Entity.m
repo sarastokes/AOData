@@ -20,6 +20,7 @@ classdef (Abstract) Entity < handle
 %
 % Dependent properties:
 %   label                       string      (defined by getLabel)
+%   expectedParameters          aod.util.ParameterManager
 %
 % Public methods:
 %   h = ancestor(obj, className)
@@ -44,6 +45,8 @@ classdef (Abstract) Entity < handle
 %
 % Protected methods:
 %   value = getLabel(obj)
+%   value = getExpectedParameters(obj)
+%   parse(obj, varargin)
 %   sync(obj)
 %   checkGroupNames(obj)
 %
@@ -84,6 +87,8 @@ classdef (Abstract) Entity < handle
     properties (Dependent)
         % Automated name from getLabel(), used for HDF5 group name if the name property is not set
         label
+        % Expected parameter names, optional default values and validation
+        expectedParameters          % aod.util.ParameterManager
     end
 
     methods
@@ -113,14 +118,23 @@ classdef (Abstract) Entity < handle
             obj.files = aod.util.Parameters();
             obj.parameters = aod.util.Parameters();
             
-        end
-
-        function value = get.label(obj)
-            value = obj.getLabel();
+            % Parse unmatched inputs
+            obj.parse(ip.Unmatched);
         end
     end
 
-    methods
+    % Dependent set/get methods
+    methods 
+        function value = get.label(obj)
+            value = obj.getLabel();
+        end
+
+        function value = get.expectedParameters(obj)
+            value = obj.getExpectedParameters();
+        end
+    end
+
+    methods (Sealed)
         function h = ancestor(obj, className)
             % Get parent entity matching a specific entityType
             %
@@ -634,6 +648,26 @@ classdef (Abstract) Entity < handle
             else
                 value = obj.Name;
             end
+        end
+
+        function value = getExpectedParameters(obj)
+            value = aod.util.ParameterManager();
+        end
+    end
+
+    methods (Access = protected)
+        function parse(obj, varargin)
+            % Parses varargin input to constructor with expectedParameters
+            % 
+            % Syntax:
+            %   parse(obj, varargin)
+            %
+            % See also:
+            %   aod.core.Entity.getExpectedParameters, 
+            %   aod.util.ParameterManager
+            % -------------------------------------------------------------
+            ip = obj.expectedParameters.parse(varargin{:});
+            obj.setParam(ip.Results);
         end
 
         function sync(obj)

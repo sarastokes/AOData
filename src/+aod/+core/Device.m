@@ -23,12 +23,21 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
         function obj = Device(name, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
             
-            ip = aod.util.InputParser();
-            addParameter(ip, 'Model', [], @ischar);
-            addParameter(ip, 'Manufacturer', [], @ischar);
-            parse(ip, varargin{:});
-            
-            obj.setParam(ip.Results);
+            %ip = aod.util.InputParser();
+            %addParameter(ip, 'Model', [], @ischar);
+            %addParameter(ip, 'Manufacturer', [], @ischar);
+            %parse(ip, varargin{:});
+            %ip = obj.expectedParameters.parse(varargin{:});
+            %obj.setParam(ip.Results);
+        end
+    end
+
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Entity(obj);
+
+            value.add('Model', [], @ischar);
+            value.add('Manufacturer', [], @ischar);
         end
     end
 end

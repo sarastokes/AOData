@@ -38,10 +38,12 @@ classdef AONodeTypes
         MAP 
         ENUM 
         TRANSFORM
+        LOGICAL
 
         % Specific AOData types
         HOMEDIRECTORY
         FILEREADER
+        DESCRIPTION
         FILES
         NOTES
         NAME
@@ -97,18 +99,46 @@ classdef AONodeTypes
             end
         end
 
-        function out = getDisplayType(obj)
+        function tf = isTextDisplay(obj)
             import aod.app.AONodeTypes;
 
-            switch obj
-                case [AONodeTypes.TEXT, AONodeTypes.DATETIME, AONodeTypes.ENUM, AONodeTypes.NAME, AONodeTypes.DESCRIPTION]
-                    out = 'Text';
-                case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE, AONodeTypes.CODE, AONodeTypes.NOTES]
-                    out = 'Table';
-                case [AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM]
-                    out = 'Table';
-                otherwise
-                    out = [];
+            textNodes = [...
+                AONodeTypes.TEXT,...
+                AONodeTypes.DATETIME,...
+                AONodeTypes.ENUM,...        % TODO: non-scalar
+                AONodeTypes.NAME,...
+                AONodeTypes.DESCRIPTION,...
+                AONodeTypes.HOMEDIRECTORY];
+
+            tf = ismember(obj, textNodes);
+        end
+
+        function tf = isTableDisplay(obj)
+            % Get nodes with non-scalar display
+
+            import aod.app.AONodeTypes;
+
+            tableNodes = [...
+                AONodeTypes.TABLE,...
+                AONodeTypes.TIMETABLE,...
+                AONodeTypes.NUMERIC,...
+                AONodeTypes.NOTES,...       % non-scalar string
+                AONodeTypes.TRANSFORM,...
+                AONodeTypes.CODE];
+            
+            tf = ismember(obj, tableNodes);
+        end
+
+        function out = getDisplayType(obj)
+            % Display type for HDF5 datasets
+            import aod.app.AONodeTypes;
+
+            if obj.isTextDisplay()
+                out = 'Text';
+            elseif obj.isTableDisplay()
+                out = 'Table';
+            else
+                out = [];
             end
         end
 
@@ -117,35 +147,52 @@ classdef AONodeTypes
 
             switch obj 
                 case AONodeTypes.ENTITY 
-                    out = 'folder.png';
+                    out = 'icons8-folder-40.png';
+                    %out = 'folder.png';
                 case AONodeTypes.CONTAINER
-                    out = 'container.png';
+                    %out = 'container.png';
+                    out = 'icons8-box-40.png';
                 case {AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM}
-                    out = 'data.png';
+                    out = 'icons8-grid-40.png';
                 case AONodeTypes.LINK
-                    out = 'chain.png';
+                    out = 'icons8-link-40.png';
+                    %out = 'chain.png';
                 case AONodeTypes.TEXT 
-                    out = 'text.png';
+                    %out = 'text.png';
+                    out = 'icons8-new-document-40.png';
                 case AONodeTypes.DATETIME 
-                    out = 'time.png';
+                    %out = 'time.png';
+                    out = 'icons8-calendar-40.png';
                 case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE]
-                    out = 'table.png';
+                    out = 'icons8-data-sheet-40.png';
+                    % out = 'table.png';
                 case [AONodeTypes.STRUCTURE, AONodeTypes.MAP]
-                    out = 'structure.png';
+                    out = 'icons8-tree-structure-40.png';
+                    %out = 'structure.png';
                 case AONodeTypes.ENUM
-                    out = 'list.png';
+                    % out = 'list.png';
+                    out = 'icons8-list-40.png';
+                case AONodeTypes.LOGICAL
+                    out = 'icon8-binary-file-40.png';
                 case AONodeTypes.FILES 
                     out = 'filecabinet.png';
                 case AONodeTypes.NOTES
-                    out = 'notepad.png';
+                    %out = 'notepad.png';
+                    out = 'icons8-making-notes-40.png';
                 case AONodeTypes.NAME 
-                    out = 'card.png';
+                    out = 'icons8-contact-details-40.png';
+                    % out = 'card.png';
+                case AONodeTypes.DESCRIPTION
+                    out = 'icons8-info-40.png';
                 case AONodeTypes.CODE 
-                    out = 'code.png';
+                    %out = 'code.png';
+                    out = 'icons8-code-40.png';
                 case AONodeTypes.HOMEDIRECTORY 
-                    out = 'home.png';
+                    %out = 'home.png';
+                    out = 'icons8-home-page-40.png';
                 otherwise
-                    out = 'data.png';
+                    out = 'icons8-grid-40.png';
+                    %out = 'data.png';
             end
             out = [obj.ICON_DIR, out];
         end
@@ -175,6 +222,8 @@ classdef AONodeTypes
                         obj = AONodeTypes.NOTES;
                     case 'code'
                         obj = AONodeTypes.CODE;
+                    case 'description'
+                        obj = AONodeTypes.DESCRIPTION;
                     case 'homedirectory'
                         obj = AONodeTypes.HOMEDIRECTORY;
                     case 'filereader'
@@ -196,6 +245,8 @@ classdef AONodeTypes
             % Then try identifying by data type
             if isenum(data)
                 obj = AONodeTypes.ENUM;
+            elseif islogical(data)
+                obj = AONodeTypes.LOGICAL;
             else
                 obj = AONodeTypes.init(class(data));
             end
@@ -210,7 +261,7 @@ classdef AONodeTypes
             import aod.app.AONodeTypes;
 
             switch lower(nodeName)
-                case {'logical', 'double'}
+                case 'double'
                     obj = AONodeTypes.NUMERIC;
                 case {'char', 'string'}
                     obj = AONodeTypes.TEXT;
@@ -234,14 +285,18 @@ classdef AONodeTypes
                     obj = AONodeTypes.MAP;
                 case 'struct'
                     obj = AONodeTypes.STRUCTURE;
+                case 'logical'
+                    obj = AONodeTypes.LOGICAL;
                 case {'aod.util.parameters', 'files'}
                     obj = AONodeTypes.FILES;
-                case 'aod.util.FileReader'
+                case 'aod.util.filereader'
                     obj = AONodeTypes.FILEREADER;
                 case 'affine2d'
                     obj = AONodeTypes.TRANSFORM;
                 case 'notes'
                     obj = AONodeTypes.NOTES;
+                case 'description'
+                    obj = AONodeTypes.DESCRIPTION;
                 case 'homedirectory'
                     obj = AONodeTypes.HOMEDIRECTORY;
                 otherwise

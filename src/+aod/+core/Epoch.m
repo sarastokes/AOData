@@ -41,8 +41,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         startTime           datetime = datetime.empty()                          
         % Timing of samples during Epoch                             
         Timing (:,1)         {mustBeA(Timing, ["double", "duration"])} = []
-        % Sample rate (Hz)
-        sampleRate          double = []
 
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
@@ -350,6 +348,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             else
                 value = sprintf('Epoch%u_%s', obj.ID, obj.Parent.label);
             end
+        end
+
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Entity(obj);
+
+            value.add('SampleRateHz', [], @isnumeric,...
+                'Rate of data acquisition (Hz)');
         end
     end
 end 

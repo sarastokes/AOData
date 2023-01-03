@@ -1,5 +1,5 @@
 function appHandle = AODataViewer(experiment)
-% AODATAVIEWER
+% Open the AODataViewer app
 %
 % Syntax:
 %   AODataViewer(persistedExperiment)
@@ -14,8 +14,8 @@ function appHandle = AODataViewer(experiment)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
-    if nargin < 2
-        % Let ExperimentPresenter open uigetfile
+    if nargin < 1
+        % Let ExperimentPresenter run uigetfile
         experiment = [];
     end
     

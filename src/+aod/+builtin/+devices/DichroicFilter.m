@@ -76,5 +76,12 @@ classdef DichroicFilter < aod.core.Device
             value = [num2str(obj.getParam('Wavelength')), 'nm',...
                 appbox.capitalize(obj.getParam('Pass')), 'Pass', 'Filter'];
         end
+
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Device(obj);
+
+            value.add('Pass', [], @(x) ismember(lower(x), ["low", "high"]));
+            value.add('Wavelength', [], @isnumeric);
+        end
     end
 end

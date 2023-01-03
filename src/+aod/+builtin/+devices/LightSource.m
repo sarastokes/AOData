@@ -1,24 +1,28 @@
 classdef LightSource < aod.core.Device
-% LIGHTSOURCE
+% A light source
 %
 % Description:
-%   A light source within the system
+%   A light source within the system/channel
 %
 % Parent:
 %   aod.core.Device
 %
 % Constructor:
-%   obj = LightSource(wavelength, varargin)
+%   obj = aod.builtin.devices.LightSource(wavelength, varargin)
 %
-% Parameters:
-%   Wavelength
-% Inherited properties:
+% Properties:
+%   wavelength
+%   spectra
+%
+% Inherited parameters:
 %   Manufacturer
 %   Model
 %
 % Methods:
 %   setWavelength(obj, wavelength)
 %   setSpectra(obj, spectra)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
@@ -31,10 +35,6 @@ classdef LightSource < aod.core.Device
     methods
         function obj = LightSource(wavelength, varargin)
             obj = obj@aod.core.Device([], varargin{:});   
-            
-            ip = aod.util.InputParser();
-            addParameter(ip, 'SerialNumber', [], @istext);
-            parse(ip, varargin{:});
             
             obj.setWavelength(wavelength);
         end
@@ -51,7 +51,7 @@ classdef LightSource < aod.core.Device
             %   wavelength      double
             %       The light source wavelength (nm)
             % -------------------------------------------------------------
-            obj.setParam('Wavelength', wavelength);
+            obj.wavelength = wavelength;
         end
         
         function setSpectra(obj, spectra)
@@ -71,9 +71,9 @@ classdef LightSource < aod.core.Device
     methods (Access = protected)
         function value = getLabel(obj)
             if ~isempty(obj.Name)
-                value = [obj.Name, num2str(obj.getParam('Wavelength')), 'nm'];
+                value = [obj.Name, '_', num2str(obj.wavelength), 'nm'];
             else
-                value = [num2str(obj.getParam('Wavelength')), 'nmLightSource'];
+                value = [obj.wavelength, 'nm_LightSource'];
             end
         end
     end

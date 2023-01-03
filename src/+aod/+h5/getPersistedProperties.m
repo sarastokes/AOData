@@ -1,31 +1,44 @@
-function [persistedProps, attributeProps, abandonedProps] = getPersistedProperties(obj, verbose)
+function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
+        = getPersistedProperties(obj, verbose)
 % DISPLAYPERSISTEDPROPERTIES
 %
 % Description:
 %   Check which properties will be persisted and which will not
 %
 % Syntax:
-%   [persisted, attribute, abandoned] = getPersistedProps(obj, verbose)
+%   [persisted, attribute, abandoned, empty] = ...
+%       aod.util.getPersistedProps(obj, verbose)
 %
 % Input:
-%   obj             aod.core.Entity
+%   obj             aod.core.Entity or class name
 %   verbose         logical (default = false)
 %
 % Output:
 %   persistedProps      string
-%       Names of properties that are written as datasets within the entity
+%       Names of properties written as datasets within the entity
 %   attributeProps      string
-%       Names of properties that written as entity attributes
+%       Names of properties written as entity attributes
 %   abandonedProps      string
 %       Names of properties that are not written 
+%   emptyProps          string
+%       Names of properties that are empty (if an object was provided)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
-    
 
     arguments
-        obj                 {mustBeA(obj, 'aod.core.Entity')}
+        obj                 
         verbose             logical                             = false
+    end
+
+    if isSubclass(obj, 'aod.core.Entity')
+        isObject = true;
+        mc = metaclass(obj);
+    else
+        assert(istext(obj) && exist(obj, 'class'),... 
+            'Input must be class name or instance of a class')
+        isObject = false;
+        mc = meta.class.fromName(obj);
     end
 
     entityType = aod.core.EntityTypes.get(obj);
@@ -33,12 +46,11 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
     
     alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
     alwaysAttributeProps = ["UUID", "label", "parameters", "entityType"];
-    alwaysAbandonedProps = "Reader";  %% TODO
+    alwaysAbandonedProps = ["Reader", "expectedParameters"];  %% TODO
     persistedProps = [];
     attributeProps = [];
     abandonedProps = [];
 
-    mc = metaclass(obj);
     for i = 1:numel(mc.PropertyList)
         if ismember(mc.PropertyList(i).Name, alwaysAttributeProps)
             attributeProps = cat(1, attributeProps,...
@@ -76,12 +88,13 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
         end
     end
 
-    % Find empty props
+    % Find empty props, if a object was provided
     emptyProps = false(1, numel(persistedProps));
-    for i = 1:numel(persistedProps)
-        emptyProps(i) = isempty(obj.(persistedProps(i)));
+    if isObject
+        for i = 1:numel(persistedProps)
+            emptyProps(i) = isempty(obj.(persistedProps(i)));
+        end
     end
-    assignin('base', 'emptyProps', emptyProps);
 
     if verbose
         if isempty(persistedProps)
@@ -119,5 +132,7 @@ function [persistedProps, attributeProps, abandonedProps] = getPersistedProperti
         end
     end
 
-    abandonedProps = cat(1, abandonedProps, persistedProps(emptyProps));
-    persistedProps(emptyProps) = [];
+    if ~isempty(emptyProps)
+        abandonedProps = cat(1, abandonedProps, persistedProps(emptyProps));
+        persistedProps(emptyProps) = [];
+    end

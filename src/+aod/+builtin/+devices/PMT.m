@@ -8,26 +8,27 @@ classdef PMT < aod.core.Device
 %   aod.core.Device
 %
 % Constructor:
-%   obj = PMT(name)
-%   obj = PMT(name, 'Manufacturer', value, 'Model', value);
-%
-% Optional Parameters:
-%   Position
-%   Gain
-%
-% Constructor:
-%   obj = PMT(name, varargin)
+%   obj = aod.builtin.devices.PMT(name)
+%   obj = aod.builtin.devices.PMT(name, 'Manufacturer', value, 'Model', value);
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     methods 
         function obj = PMT(name, varargin)
             obj = obj@aod.core.Device(name, varargin{:});
-            
-            ip = aod.util.InputParser();
-            addParameter(ip, 'SerialNumber', [], @ischar);
-            parse(ip, varargin{:});
+        end
+    end
 
-            obj.setParam(ip.Results);
+    
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Device(obj);
+            
+            value.add('SerialNumber', [], [],... 
+                'Serial number of the light source');
+            value.add('Position', [], @(x) numel(x) == 3,...
+                'Optimized XYZ position of the PMT')
         end
     end
 end 

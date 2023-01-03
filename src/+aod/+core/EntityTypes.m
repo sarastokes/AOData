@@ -279,29 +279,23 @@ classdef EntityTypes
         end
 
         function out = getCoreClassName(obj)
-            % GETCORECLASSNAME
-            %
-            % Description:
-            %   Returns the core class name of entityType (aod.core.X)
+            % Returns the core class name (aod.core.X)
             %
             % Syntax:
             %   out = getCoreClassName(obj)
             % -------------------------------------------------------------
 
-            out = ['aod.core.', appbox.capitalize(char(obj))];
+            out = ['aod.core.', char(obj)];
         end
 
         function out = getPersistentClassName(obj)
-            % GETPERSISTENTCLASSNAME
-            %
-            % Description:
-            %   Returns the core class name of entityType (aod.core.X)
+            % Returns the persistent class name (aod.persistent.X)
             %
             % Syntax:
             %   out = getCoreClassName(obj)
             % -------------------------------------------------------------
 
-            out = ['aod.persistent.', appbox.capitalize(char(obj))];
+            out = ['aod.persistent.', char(obj)];
         end
     end
 
@@ -414,6 +408,71 @@ classdef EntityTypes
                  "Epochs", "Registrations", "Stimuli", "EpochDatasets",... 
                 "Systems", "Channels", "Devices", "Responses",... 
                 "Annotations", "Analyses"];
+        end
+    end
+
+
+    % Builtin MATLAB methods
+    methods
+        function out = char(obj)
+            % Returns char of entity type with correct capitalization
+            %
+            % Note: 
+            %   Necessary to avoid calling "string" bc infinite recursion
+            % -------------------------------------------------------------
+
+            if ~isscalar(obj)
+                out = aod.util.arrayfun(@(x) char(x), obj);
+                return
+            end
+
+            import aod.core.EntityTypes
+
+            switch obj
+                case EntityTypes.EXPERIMENT
+                    out = 'Experiment';
+                case EntityTypes.SOURCE
+                    out = 'Source';
+                case EntityTypes.CALIBRATION
+                    out = 'Calibration';
+                case EntityTypes.SYSTEM
+                    out = 'System';
+                case EntityTypes.CHANNEL
+                    out = 'Channel';
+                case EntityTypes.DEVICE
+                    out = 'Device';
+                case EntityTypes.ANNOTATION
+                    out = 'Annotation';
+                case EntityTypes.EXPERIMENTDATASET
+                    out = 'ExperimentDataset';
+                case EntityTypes.EPOCH
+                    out = 'Epoch';
+                case EntityTypes.STIMULUS
+                    out = 'Stimulus';
+                case EntityTypes.RESPONSE
+                    out = 'Response';
+                case EntityTypes.REGISTRATION
+                    out = 'Registration';
+                case EntityTypes.EPOCHDATASET
+                    out = 'EpochDataset';
+                case EntityTypes.ANALYSIS
+                    out = 'Analysis';
+            end
+        end
+
+        function out = string(obj)
+            % Returns string of entity type with correct capitalization
+            %
+            % Note: 
+            %   Necessary to avoid calling "string" bc infinite recursion
+            % -------------------------------------------------------------
+
+            if ~isscalar(obj)
+                out = aod.util.arrayfun(@(x) string(x), obj);
+                return
+            end
+            
+            out = sprintf("%s", char(obj));
         end
     end
 
