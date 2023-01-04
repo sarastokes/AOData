@@ -12,6 +12,7 @@ classdef SubclassGeneratorController < aod.app.Controller
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (Access = private)
         detailBox
         titleBox
@@ -23,8 +24,6 @@ classdef SubclassGeneratorController < aod.app.Controller
             "RowSpacing", 5, "ColumnSpacing", 5};
         ICON_DIR = fullfile(getpref('AOData', 'BasePackage'),... 
             'src', '+aod', '+app', '+icons');
-        %ICON_DIR = [fileparts(fileparts(mfilename('fullpath'))), filesep,...
-        %    '+icons', filesep];
     end
 
     methods
@@ -43,6 +42,7 @@ classdef SubclassGeneratorController < aod.app.Controller
         end
 
         function v = getView(obj)
+            % Access to the figure for test suites
             v = obj.figureHandle;
         end
     end
@@ -456,7 +456,7 @@ classdef SubclassGeneratorController < aod.app.Controller
 
             mainLayout = uigridlayout(obj.figureHandle, [4 2],...
                 "RowHeight", {'fit', '2x', 'fit', '0.15x'},...
-                "ColumnWidth", {'2x', '1.5x'},...
+                "ColumnWidth", {'1x', '1x'},...
                 "RowSpacing", 3);
             
             % Title
@@ -625,7 +625,8 @@ classdef SubclassGeneratorController < aod.app.Controller
             uibutton(g, "Text", "",...
                 "Icon", obj.getIcon('filecabinet.png'),...
                 "ButtonPushedFcn", @obj.onPushFileBrowser);
-            uitextarea(g, "Value", "", "Tag", "FilePath");
+            uitextarea(g, "Value", "",... 
+                "Tag", "FilePath", "Editable", "off");
         end
 
         function makeEntityGroupNamePanel(obj, p)
@@ -633,12 +634,12 @@ classdef SubclassGeneratorController < aod.app.Controller
             h = uidropdown(g,...
                 "Tag", "GroupNameDropdown",...
                 "ValueChangedFcn", @obj.onSelectedGroupNameMode);
-            obj.setLayout(h, 1, [1 2]);
+            obj.setLayout(h, [1 2], 1);
 
             h = uilabel(g,...
-                "Text", "Entity Name:",...
+                "Text", "Default Entity Name:",...
                 "HorizontalAlignment", "left");
-            obj.setLayout(h, 2, 1);
+            obj.setLayout(h, 1, 2);
             h = uieditfield(g,...
                 "Tag", "DefaultGroupName",...
                 "ValueChangedFcn", @obj.onSetDefaultName);
@@ -697,27 +698,33 @@ classdef SubclassGeneratorController < aod.app.Controller
         end
         
         function makeMethodPanel(obj, p)
-            g = uigridlayout(p, [2 2], obj.LAYOUT_PROPS{:},...
-                "RowHeight", {15, "1x"});
+            g = uigridlayout(p, [4 3], obj.LAYOUT_PROPS{:},...
+                "ColumnWidth", {"1x", 30, "1x"},...
+                "RowHeight", {30, "1x", 30, "1x"});
             % - Overloaded methods?
             %   > uidropdown
+            obj.methodListBox = = uilistbox(g,...
+                "Items", "", "Enable", "off",...
+                "Tag", "InheritedMethods");
+            obj.setLayout(obj.methodsListBox, [1 4], 1);
+
             h = uilabel(g, "Text", "Overload");
-            obj.setLayout(h, 1, 1);
+            obj.setLayout(h, 3, 1);
             h = uilistbox(g,...
                 "Items", "", "Multiselect", "on",... 
                 "Enable", "off", "Tag", "OverloadedMethods",...
                 "ValueChangedFcn", @obj.onChangedOverloadedMethods);
-            obj.setLayout(h, 2, 1);
+            obj.setLayout(h, 3, 1);
 
             % - Overwritten methods?
             %   > uidropdown
             h = uilabel(g, "Text", "Overwrite");
-            obj.setLayout(h, 1, 2);
+            obj.setLayout(h, 3, 3);
             h = uilistbox(g,...
                 "Items", "", "Multiselect", "on",... 
                 "Enable", "off", "Tag", "OverwrittenMethods",...
                 "ValueChangedFcn", @obj.onChangedOverwrittenMethods);
-            obj.setLayout(h, 2, 2);
+            obj.setLayout(h, 3, 4);
         end
     end
 

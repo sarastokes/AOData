@@ -36,7 +36,7 @@ classdef ClassFilter < aod.api.FilterQuery
 
     % Implementation of FilterQuery abstract methods
     methods
-        function apply(obj)
+        function apply(obj, filterIdx)
             % APPLYFILTER
             %
             % Description:
@@ -45,7 +45,12 @@ classdef ClassFilter < aod.api.FilterQuery
             % Syntax:
             %   applyFilter(obj)
             % -------------------------------------------------------------
-            obj.resetFilterIdx();
+            if nargin < 2
+                obj.filterIdx = filterIdx;
+            else
+                obj.resetFilterIdx();
+            end
+            
             for i = 1:numel(obj.allClassNames)
                 if obj.filterIdx(i)
                     obj.filterIdx(i) = strcmpi(obj.className, obj.allClassNames(i));

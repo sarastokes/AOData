@@ -1,5 +1,5 @@
-classdef ParameterFilter < aod.api.FilterQuery 
-% PARAMETERFILTER
+classdef ParameterFilter2 < aod.api.FilterQuery
+% Filter entities by their attributes
 %
 % Description:
 %   Filter entities based on the presence of a parameter or matching a 
@@ -9,63 +9,92 @@ classdef ParameterFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = aod.api.ParameterFilter(hdfName, paramName)
-%   obj = aod.api.ParameterFilter(hdfName, paramName, paramValue)
+%   obj = aod.api.ParameterFilter(parent, name)
+%   obj = aod.api.ParameterFilter(parent, name, value)
+%
+% Inputs:
+%   parent          aod.api.QueryManager
+%   name            char/string
+%       Name of the parameter
+%   value           
+%       A value for the parameter or a function handle for custom filtering
 %
 % Notes:
 %   If paramValue isn't set, entities will be filtered by whether they have
 %   the parameter "paramName" or not
+%
+% Examples:
+%   QM = aod.api.QueryManager("MyFile.h5");
+%   % Filter by whether entities have "MyParam"
+%   PF = aod.api.ParameterFilter(QM, "MyParam")
+%   % Get a specific parameter value
+%   PF = aod.api.ParameterFilter(QM, "MyParam", 2)
+%   % Use an anonymous function to find values less than 3
+%   PF = aod.api.ParameterFilter(QM, "MyParam", @(x) x < 3)
+%   % Specifying a value of 2 is equivalent to:
+%   PF = aod.api.ParameterFilter(QM, "MyParam", @(x) isequal(x, 2))
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        paramName
-        paramValue
+    properties (SetAccess = protected)
+        Name            string
+        Value
     end
 
     methods
-        function obj = ParameterFilter(hdfName, paramName, paramValue)
-            if nargin < 3
-                paramValue = [];
-            end
-            obj = obj@aod.api.FilterQuery(hdfName);
-            obj.paramName = char(paramName);
-            obj.paramValue = paramValue;
+        function obj = ParameterFilter2(parent, name, value)
+            obj@aod.api.FilterQuery(parent);
 
-            obj.apply();
+            obj.Name = name;
+
+            if nargin > 2
+                obj.Value = value;
+            end
         end
-    end
 
-    % Implementation of FilterQuery abstract methods
-    methods
-        function apply(obj)
-            % Filter by whether paramName is present
-            for i = 1:numel(obj.allGroupNames)
-                obj.filterIdx(i) = h5tools.hasAttribute(...
-                    obj.hdfName, obj.allGroupNames(i), obj.paramName);
+        function out = apply(obj)
+            % Update local match indices to match those in Query Manager
+            obj.localIdx = obj.Parent.filterIdx;
+
+            % First filter by whether the entities have the parameter
+            for i = 1:numel(obj.Parent.allGroupNames)
+                if obj.localIdx
+                    hdfFile = obj.Parent.getHdfName(i);
+                    obj.filterIdx(i) = h5tools.hasAttribute(...
+                        hdfFile, obj.Parent.allGroupNames(i), obj.Name);
+                end
             end
-            % Throw a warning if nothing matched the filter
-            if nnz(obj.filterIdx) == 0
-                warning('ParameterFilter_apply:NoMatches',...
-                    'No matches were found for paramName %s', obj.paramName);
+            out = obj.localIdx;
+
+            % Exit if additional processing is no longer needed
+            if nnz(obj.localIdx) == 0
+                warning('apply:NoMatches',...
+                    'No matches were found for parameter %s', obj.Name);
                 return  % No need to check paramValue matches
+            elseif isempty(obj.Value)
+                return
             end
 
-            % If necessary, filter by whether paramName matches paramValue
-            if ~isempty(obj.paramValue)
-                for i = 1:numel(obj.allGroupNames)
-                    if obj.filterIdx(i)
-                        attValue = h5readatt(obj.hdfName, obj.allGroupNames(i), obj.paramName);
-                        obj.filterIdx(i) = isequal(attValue, obj.paramValue);
+            % Second, filter by the parameter values
+            for i = 1:numel(obj.Parent.allGroupNames)
+                if obj.localIdx
+                    attValue = h5readatt(obj.hdfName,... 
+                        obj.Parent.allGroupNames(i), obj.Name);
+                    if isa(obj.Value, 'function_handle')
+                        obj.localIdx(i) = obj.Value(attValue);
+                    else
+                        obj.localIdx(i) = isequal(attValue, obj.Value);
                     end
                 end
-                % Throw a warning if nothing matched the filter
-                if nnz(obj.filterIdx) == 0
-                    warning('ParameterFilter_apply:NoMatches',...
-                        'No matches were found for %s =', obj.paramName);
-                    disp(obj.paramValue);
-                end
+            end
+            out = obj.localIdx;
+        
+            % Throw a warning if nothing matched the filter
+            if nnz(obj.filterIdx) == 0
+                warning('apply:NoMatches',...
+                    'No matches were found for %s =', obj.Name);
+                disp(obj.Value);
             end
         end
     end

@@ -1,4 +1,4 @@
-classdef DatasetFilter < aod.api.FilterQuery
+classdef DatasetFilter < aod.api.FilterQuery 
 % Filter entities by datasets/properties
 %
 % Description:
@@ -9,88 +9,102 @@ classdef DatasetFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = aod.api.DatasetFilter(hdfName, dsetName)
-%   obj = aod.api.DatasetFilter(hdfName, dsetName, dsetValue)
+%   obj = aod.api.DatasetFilter(parent, name)
+%   obj = aod.api.DatasetFilter(parent, name, value)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        dsetName
-        dsetValue
+    properties (SetAccess = protected)
+        Name 
+        Value
     end
 
-    properties (SetAccess = protected)
+    properties (SetAccess = private)
         allDatasetNames
     end
 
     methods
-        function obj = DatasetFilter(hdfName, dsetName, dsetValue)
-            obj = obj@aod.api.FilterQuery(hdfName);
-
-            obj.dsetName = dsetName;
+        function obj = DatasetFilter(parent, name, value)
+            obj@aod.api.FilterQuery(parent);
+            
+            obj.Name = name;
             if nargin > 2
-                obj.dsetValue = dsetValue;
+                obj.Value = value;
             end
-            obj.collectDatasets();
-            obj.apply();
-        end
-    end
 
-    % Instantiation of abstract methods from FilterQuery
-    methods
-        function apply(obj)
-            obj.resetFilterIdx();
-            for i = 1:numel(obj.allGroupNames)
-                groupDsets = obj.getGroupDatasets(obj.allGroupNames(i));
-                if ismember(obj.dsetName, groupDsets)
-                    obj.filterIdx(i) = true;
+            obj.collectDatasets();
+        end
+
+        function out = apply(obj)
+            % Update local match indices to match those in Query Manager
+            obj.localIdx = obj.Parent.filterIdx;
+
+            % First filter by whether the entities have the dataset
+            for i = 1:numel(obj.Parent.allGroupNames)
+                groupDsets = obj.getGroupDatasets(obj.Parent.allGroupNames(i));
+                if ismember(obj.Name, groupDsets)
+                    obj.localIdx(i) = true;
                 else
-                    obj.filterIdx(i) = false;
+                    obj.localIdx(i) = false;
                 end
-            end
-            if nnz(obj.filterIdx) == 0
-                warning('DatasetFilter_apply:NoMatches',...
-                    'No groups matched dataset name %s', obj.dsetName);
+            end  
+            out = obj.localIdx;
+            
+            % Determine whether 2nd round of filtering is necessary
+            if nnz(obj.localIdx) == 0
+                warning('apply:NoMatches',...
+                    'No groups matched dataset name %s', obj.Name);
+                return
+            elseif isempty(obj.Value)
                 return
             end
 
-            if ~isempty(obj.dsetValue)
-                for i = 1:numel(obj.allGroupNames)
-                    if obj.filterIdx(i)
-                        out = aod.h5.read(obj.hdfName, obj.allGroupNames(i), obj.dsetName);
-                        if out ~= obj.dsetValue
-                            obj.filterIdx(i) = false;
-                        end
+            % Filter by the dataset value
+            for i = 1:numel(obj.allGroupNames)
+                if obj.localIdx(i)
+                    out = aod.h5.read(obj.hdfName, obj.Parent.allGroupNames(i), obj.Name);
+
+                    if isa(obj.Value, 'function_handle')
+                        obj.localIdx = obj.Value(out);
+                    else
+                        obj.localIdx = isequal(out, obj.Value);
                     end
                 end
             end
+
             if nnz(obj.filterIdx) == 0
-                warning('DatasetFilter_apply:NoMatches',...
-                    'No datasets named %s matched provided dsetValue', obj.dsetName);
+                warning('apply:NoMatches',...
+                    'No datasets named %s matched provided value', obj.dsetName);
             end
+            out = obj.localIdx;
         end
     end
+    
+    methods (Access = protected)
+        function collectDatasets(obj)
+            obj.allDatasetNames = string.empty();
+            for i = 1:numel(obj.Parent.hdfName)
+                obj.allDatasetNames = cat(1, obj.allDatasetNames,...
+                    h5tools.collectDatasets(obj.Parent.hdfName(i)));
+            end
+        end
 
-    methods (Access = private)
         function groupDsets = getGroupDatasets(obj, groupName)
             gOrder = h5tools.util.getPathOrder(groupName);
             groupDsets = string.empty();
             idx = find(startsWith(obj.allDatasetNames, groupName) ...
                 & h5tools.util.getPathOrder(obj.allDatasetNames) == gOrder+1);
-
+            
             if isempty(idx)
-                return
+                return 
             end
-            % Extract just the dataset name from the full HDF5 path
+
+            % Extract just the dataset name from the full HDF5 paths
             for i = 1:numel(idx)
                 iName = h5tools.util.getPathEnd(obj.allDatasetNames(idx(i)));
                 groupDsets = cat(1, groupDsets, iName);
             end
         end
-
-        function collectDatasets(obj)
-            obj.allDatasetNames = h5tools.collectDatasets(obj.hdfName);
-        end
     end
-end
+end 

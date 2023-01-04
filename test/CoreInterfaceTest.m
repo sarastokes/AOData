@@ -171,7 +171,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
     methods (Test, TestTags=["Analysis", "Core", "LevelOne"])
         function AnalysisIO(testCase)
             % Create an analysis and add a description
-            analysis1 = aod.core.Analysis('TestAnalysis1', 'Date', getDateYMD());
+            analysis1 = aod.core.Analysis('TestAnalysis1', getDateYMD());
             analysis1.setDescription('This is a test analysis');
             
             % Add an experiment
@@ -186,12 +186,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Add a date to the analysis
             dateYMD = getDateYMD();
             analysis2.setAnalysisDate(dateYMD);
-            dateParam = getParam(analysis2, 'Date');
-            test.util.verifyDatesEqual(testCase, dateParam, dateYMD);
+            test.util.verifyDatesEqual(testCase, analysis2.analysisDate, dateYMD);
 
             % Add an empty date to the analysis
             testCase.EXPT.Analyses(1).setAnalysisDate();
-            testCase.verifyEmpty(getParam(testCase.EXPT.Analyses(1), 'Date'));
+            testCase.verifyEmpty(testCase.EXPT.Analyses(1).analysisDate);
 
             % Remove analyses one by one
             testCase.EXPT.remove('Analysis', 1);
@@ -200,7 +199,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEmpty(testCase.EXPT.Analyses);
 
             % Create a third analysis with pre-set Parent
-            analysis3 = aod.core.Analysis('TestAnalysis3', 'Parent', testCase.EXPT);
+            analysis3 = aod.core.Analysis('TestAnalysis3',... 
+                'Parent', testCase.EXPT);
             testCase.verifyEqual(testCase.EXPT.UUID, analysis3.Parent.UUID);
             
             % Add all the analyses back

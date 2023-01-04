@@ -11,6 +11,8 @@ function e = loadExperiment(hdfName, entityFactory)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    hdfName = convertStringsToChars(hdfName);
+    
     % We need the full HDF5 file path
     [hdfPath, hdfName, ext] = fileparts(hdfName);
     W = what(hdfPath);

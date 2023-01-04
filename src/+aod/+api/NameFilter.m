@@ -9,68 +9,75 @@ classdef NameFilter < aod.api.FilterQuery
 %
 % Constructor:
 %   obj = aod.api.NameFilter(hdfName, name)
-%   obj = aod.api.NameFilter(hdfName, name, partialMatchFlag)
+%   obj = aod.api.NameFilter(hdfName, name, customFcn)
 %
 % Inputs:
 %   hdfName             char/string
 %       Names of HDF file(s)
-%   name                char/string
-%       Name to search for
-% Optional inputs:
-%   partialMatchFlag    logical (default = false)
-%       Whether to return groups that partially match name
+%   name                char/string/function_handle
+%       Name to search for or a function handle defining a custom filter
+%       for entity group names
+%
+% Examples:
+%   % Returns entities with a group name of "MyGroupName"
+%   NF = aod.api.NameFilter(parent, "MyGroupName")
+%   % Specifying "MyGroupName" is equivalent to:
+%   NF = aod.api.NameFilter(parent, @(x) strcmpi(x, "MyGroupName"));
+%   % For partial-matching (i.e. to get "MyGroupName1" and "MyGroupName2"):
+%   NF = aod.api.NameFilter(parent, @(x) contains(x, "MyGroupName"));
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         Name
-        partialMatchFlag        logical
     end
 
     properties (SetAccess = protected)
         allNames
     end
 
-    methods
-        function obj = NameFilter(hdfName, name, partialMatchFlag)
-            arguments
-                hdfName 
-                name                string
-                partialMatchFlag    logical = true
-            end
-            obj = obj@aod.api.FilterQuery(hdfName);
-
-            obj.Name = name;
-            obj.partialMatchFlag = partialMatchFlag;
+    methods 
+        function obj = NameFilter(parent, name)
+            obj@aod.api.FilterQuery(parent);
             
-            obj.collectNames();
-            obj.apply();
-        end
-    end
+            if ~istext(name) && ~isa(name, 'function_handle')
+                error('NameFilter:InvalidInput',...
+                    'Name must be text or a function handle!');
+            end
+            obj.Name = name;
 
-    % Implementation of FilterQuery abstract methods
-    methods
-        function apply(obj)
-            obj.resetFilterIdx();
-            if obj.partialMatchFlag
+            obj.collectNames();
+        end
+
+        function out = apply(obj)
+            % Update local match indices to match those in Query Manager
+            obj.localIdx = obj.Parent.filterIdx;
+
+            if isa(obj.Name, 'function_handle')
                 for i = 1:numel(obj.allNames)
-                    obj.filterIdx(i) = contains(obj.allNames(i), obj.Name);
+                    if obj.localIdx(i)
+                        obj.localIdx(i) = obj.Name(obj.allNames(i));
+                    end
                 end
             else
                 for i = 1:numel(obj.allNames)
-                    obj.filterIdx(i) = strcmpi(obj.allNames(i), obj.Name);
+                    if obj.localIdx(i)
+                        obj.localIdx(i) = strcmpi(obj.allNames(i), obj.Name);
+                    end
                 end
             end
+
+            out = obj.localIdx;
         end
     end
 
     methods (Access = private)
         function collectNames(obj)
-            obj.allNames = repmat("", [numel(obj.allGroupNames), 1]);
+            obj.allNames = repmat("", [numel(obj.Parent.allGroupNames), 1]);
             for i = 1:numel(obj.allNames)
-                obj.allNames(i) = h5tools.util.getPathEnd(obj.allGroupNames(i));
+                obj.allNames(i) = h5tools.util.getPathEnd(obj.Parent.allGroupNames(i));
             end
         end
     end
-end
+end 

@@ -8,79 +8,75 @@ classdef LinkFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = aod.api.LinkFilter(hdfName, linkName)
+%   obj = aod.api.LinkFilter(parent, name)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        linkName
+    properties (SetAccess = protected)
+        Name
     end
 
-    properties (SetAccess = protected)
+    properties (SetAccess = private)
         allLinkNames
         allLinkParents
     end
 
     methods 
-        function obj = LinkFilter(hdfName, linkName)
-            obj = obj@aod.api.FilterQuery(hdfName);
+        function obj = LinkFilter(parent, name)
+            obj@aod.api.FilterQuery(parent);
 
-            obj.linkName = linkName;
+            obj.Name = name;
             obj.collectLinks();
-            obj.apply();
         end
     end
 
     % Instantiation of abstract methods from FilterQuery
     methods
         function apply(obj)
-            % APPLY
-            %
-            % Description:
-            %   Apply the filter
-            % -------------------------------------------------------------
-            obj.resetFilterIdx();
+            % Update local match indices to match those in Query Manager
+            obj.localIdx = obj.Parent.filterIdx;
 
-            for i = 1:numel(obj.allGroupNames)
-                if ~obj.filterIdx(i)
+            for i = 1:numel(obj.Parent.allGroupNames)
+                if ~obj.localIdx(i)
                     continue
                 end
-                groupIdx = find(obj.allLinkParents == obj.allGroupNames(i));
+
+                groupIdx = find(obj.allLinkParents == obj.Parent.allGroupNames(i));
+
                 if ~isempty(groupIdx)
-                    linkIdx = nnz(endsWith(obj.allLinkNames(groupIdx), obj.linkName,...
+                    linkIdx = nnz(endsWith(obj.allLinkNames(groupIdx), obj.Name,...
                         "IgnoreCase", true));
                     if linkIdx ~= 0
-                        obj.filterIdx(i) = true;
+                        obj.localIdx(i) = true;
                     else
-                        obj.filterIdx(i) = false;
+                        obj.localIdx(i) = false;
                     end
                 else
-                    obj.filterIdx(i) = false;
+                    obj.localIdx(i) = false;
                 end
             end
+            out = obj.localIdx;
         end
     end
 
     methods (Access = private)
         function collectLinks(obj)
-            % COLLECTALLLINKS
-            %
-            % Description:
-            %   Get a list of all soft links in the HDF5 file
+            % Get a list of all soft links in the HDF5 file
             %
             % Syntax:
             %   collectAllLinks(obj)
             % -------------------------------------------------------------
-            obj.allLinkNames = h5tools.collectSoftlinks(obj.hdfName);
+            obj.allLinkNames = string.empty();
+            for i = 1:numel(obj.Parent.hdfName)
+                obj.allLinkNames = cat(1, obj.allLinkNames,...
+                    h5tools.collectSoftlinks(obj.Parent.hdfName(i)));
+            end
             obj.getLinkParentPaths();
         end
 
         function getLinkParentPaths(obj)
-            % GETLINKPARENTPATHS
-            %
-            % Description:
-            %   Get the parent paths for all links in HDF5 file
+            % Get the parent paths for all links in HDF5 file
             %
             % Syntax:
             %   collectAllLinks(obj)
