@@ -1,11 +1,11 @@
-function success = write(fileName, pathName, dsetName, data, description)
+function success = write(hdfName, pathName, dsetName, data, description)
 % Writes MATLAB dataset to an HDF5 dataset 
 %
 % Syntax:
-%   success = write(fileName, pathName, dsetName, data)
+%   success = write(hdfName, pathName, dsetName, data)
 %
 % Inputs:
-%   fileName        char
+%   hdfName         char
 %       The HDF5 file name
 %   pathName        char
 %       The HDF5 path for the group the dataset should be added to
@@ -28,14 +28,14 @@ function success = write(fileName, pathName, dsetName, data, description)
 % AOData also adds support for aod.util.Parameters and aod.util.FileReader
 %
 % See also:
-%   h5tools.write, aod.h5.read, aod.h5.writeFileReader
+%   h5tools.write, aod.h5.read, aod.h5.writeExpectedParameters
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
         % Detailed input checking for first 4 is performed by h5tools
         arguments
-            fileName            char 
+            hdfName            char 
             pathName            char 
             dsetName            char 
             data
@@ -45,17 +45,18 @@ function success = write(fileName, pathName, dsetName, data, description)
         fullPath = h5tools.util.buildPath(pathName, dsetName);
     
         if isa(data, 'aod.util.Parameters')
-            h5tools.datasets.makeTextDataset(fileName, pathName, dsetName, "aod.util.Parameters");
-            h5tools.writeatt(fileName, fullPath, data);
+            h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.util.Parameters");
+            h5tools.writeatt(hdfName, fullPath, data);
             success = true;
-        % elseif isSubclass(data, 'aod.util.FileReader')
-        %     aod.h5.writeFileReader(fileName, pathName, dsetName, data, description);
-        %     success = true;
+        elseif isa(data, 'aod.util.ParameterManager')
+            success = aod.h5.writeExpectedParameters(hdfName, pathName, dsetName, data);
+            h5tools.writeatt(hdfName, fullPath, 'Description',...
+                "Specification of expected metadata for the entity")
         else
-            success = h5tools.write(fileName, pathName, dsetName, data);
+            success = h5tools.write(hdfName, pathName, dsetName, data);
             % Description only written for datasets without mapped params
             if ~isempty(description)
-                h5tools.writeatt(fileName, fullPath, 'Description', description);
+                h5tools.writeatt(hdfName, fullPath, 'Description', description);
             end
         end
         

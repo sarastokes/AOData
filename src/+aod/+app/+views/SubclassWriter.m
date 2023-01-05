@@ -52,18 +52,8 @@ classdef SubclassWriter < handle
             out = obj.getFull();
             out = strsplit(out, '\n');
             for i = 1:numel(out)
-                %if i > 1 && endsWith(out(i-1), 'end')
-                %    if startsWith(out(i), 'methods') || startsWith(out(i), 'function')
-                %        writelines(' \n\r', obj.Model.classFileName,...
-                %            "WriteMode", "append");
-                %    end
-                %end
-
-                %if isempty(out)
-                %else
-                    writelines(out{i}, obj.Model.classFileName,...
-                        "WriteMode", "append");
-                %end
+                writelines(out{i}, obj.Model.classFileName,...
+                    "WriteMode", "append");
             end
             % Open in the editor
             edit(obj.Model.classFileName);
@@ -120,26 +110,32 @@ classdef SubclassWriter < handle
                 if isprop(iProp, 'Default') && ~isempty(iProp.Default)
                     defaultValue = iProp.Default;
                     out = out + " = ";
-                    val = obj.getDefaultValue();
+                    val = obj.getDefaultValue(defaultValue);
                     out = out + val + newline;
                 else
                     out = out + newline;
                 end
             end
             out = out + obj.indent(1) + "end" + newline;
-            out = out + " " + newline;
+            out = out + obj.addLineBreak();
         end
 
         function out = getConstructorBlock(obj)
             out = obj.indent(1) + "methods" + newline;
             out = out + obj.indent(2) + "function ";
             out = out + obj.getConstructor() + newline;
+            if obj.groupNameMode == "UserDefinedWithDefault"
+                out = out + obj.indent(3) + "if nargin == 0 || isempty(name)" + newline;
+                out = out + obj.indent(4) + "name = " + string(sprintf('"%s";', obj.Model.defaultName)) + newline;
+                out = out + obj.indent(3) + "end" + newline;
+                out = out + obj.addLineBreak();
+            end 
             out = out + obj.indent(3) + obj.getSupercall() + newline;
 
             % Direct assignment for required properties
             propAssign = obj.getPropAssignments();
             if ~isempty(propAssign)
-                out = out +  " " + newline;
+                out = out +  obj.addLineBreak();
                 out = out + obj.indent(3) + "% Required input assignment" + newline;
                 for i = 1:numel(propAssign)
                     out = out + obj.indent(3) + propAssign(i) + newline;
@@ -149,14 +145,14 @@ classdef SubclassWriter < handle
             % Input parser for optional inputs
             optionalText = obj.getParser();
             if optionalText ~= ""
-                out = out + " " + newline;
+                out = out + obj.addLineBreak();
                 out = out + optionalText;
             end
 
             % Close out
             out = out + obj.indent(2) + "end" + newline; % function
             out = out + obj.indent(1) + "end" + newline;
-            out = out + " " + newline;
+            out = out + obj.addLineBreak();
         end
 
         function out = getHeader(obj)
@@ -404,6 +400,10 @@ classdef SubclassWriter < handle
             end
             out = repmat('    ', [1, nTabs]);
             out = string(sprintf(out));
+        end
+
+        function out = addLineBreak()
+            out = " " + newline;
         end
     end
 end

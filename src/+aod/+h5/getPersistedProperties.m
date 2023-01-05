@@ -46,7 +46,7 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
     
     alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
     alwaysAttributeProps = ["UUID", "label", "parameters", "entityType"];
-    alwaysAbandonedProps = ["Reader", "expectedParameters"];  %% TODO
+    alwaysAbandonedProps = ["Reader"];  %% TODO
     persistedProps = [];
     attributeProps = [];
     abandonedProps = [];

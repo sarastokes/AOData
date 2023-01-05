@@ -26,8 +26,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Create an experiment
             testCase.EXPT = aod.core.Experiment(...
                 '851_20221117', cd, '20221117',...
-                'Administrator', 'Sara Patterson',... 
-                'Laboratory', '1P Primate');
+                'Administrator', "Sara Patterson",... 
+                'Laboratory', "1P Primate");
         end
     end
 
@@ -171,7 +171,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
     methods (Test, TestTags=["Analysis", "Core", "LevelOne"])
         function AnalysisIO(testCase)
             % Create an analysis and add a description
-            analysis1 = aod.core.Analysis('TestAnalysis1', getDateYMD());
+            analysis1 = aod.core.Analysis('TestAnalysis1',... 
+                "Date", getDateYMD());
             analysis1.setDescription('This is a test analysis');
             
             % Add an experiment
@@ -361,7 +362,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 1);
 
             % Clear all channels
-            testCase.EXPT.Systems(1).remove('Channel', 'all');
+            testCase.EXPT.Systems.remove('Channel', 'all');
             testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 0);
 
             % Remove a system

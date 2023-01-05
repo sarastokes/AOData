@@ -11,8 +11,8 @@ classdef VisualStimulus < aod.core.Stimulus
 % -------------------------------------------------------------------------
 
     methods
-        function obj = VisualStimulus(protocol)
-            obj = obj@aod.core.Stimulus([], protocol);
+        function obj = VisualStimulus(protocol, varargin)
+            obj = obj@aod.core.Stimulus([], protocol, varargin{:});
         end
     end
 

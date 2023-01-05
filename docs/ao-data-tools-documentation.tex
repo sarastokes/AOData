@@ -578,7 +578,7 @@ obj = aod.core.Entity(name)
 		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 obj = aod.core.Experiment('name', experimentDate, 'homeDirectory')
 obj = aod.core.Experiment('name', experimentDate, 'homeDirectory',...
-	'Administrator', 'YourName', 'System', 'Primate1P')
+	'Administrator', "YourName", 'System', "Primate1P")
 		\end{lstlisting}		
 		\docheader{Properties:}
 		\begin{itemize}
@@ -675,7 +675,7 @@ obj = aod.core.Calibration(name, calibrationDate)
 		\begin{itemize}
 			\item \aodclass{aod.builtin.calibrations.PowerMeasurement}
 			\item \aodclass{aod.builtin.calibrations.RoomMeasurement}
-			\item \aodclass{aod.builtin.calibrations.Optimization}
+			\item \aodclass{aod.builtin.calibrations.ChannelOptimization}
 		\end{itemize}
 	\subsection{aod.core.System \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
 		\label{subsection:SystemDoc}
@@ -898,25 +898,25 @@ obj = aod.core.Analysis('name', analysisDate)
 		\noindent A quick overview of classes and constructors:
 		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
 experment = aod.core.Experiment(name, homeFolder, experimentDate);
-experment = aod.core.Experiment(name, homeFolder, experimentDate, 'Administrator', value, 'System', value);
+experment = aod.core.Experiment(name, homeFolder, experimentDate, 'Administrator', "adminName", 'System', "systemName");
 
 obj = aod.core.Source(name)
-obj = aod.core.Source(name, parent)
 
 system = aod.core.System('systemName');
 
 channel = aod.core.Channel('channelName');
 
 device = aod.core.Device('name');
-device = aod.core.Device('name', 'Manufacturer', manufacturerName, 'Model', modelName);
+device = aod.core.Device('name', 'Manufacturer', "manufacturerName", 'Model', "modelName");
 
 calibration = aod.core.Calibration('name', calibrationDate);
+calibration = aod.core.Calibration('name', calibrationDate, "Administrator", "adminName");
 
 epoch = aod.core.Epoch(ID);
 epoch = aod.core.Epoch(ID, 'Source', value, 'System', value);
 
 registration = aod.core.Registration('name', regDate)
-registration = aod.core.Registration('name', regDate, data)
+registration = aod.core.Registration('name', regDate, "Administrator", "adminName")
 
 stimulus = aod.core.Stimulus(name);
 stimulus = aod.core.Stimulus(name, protocol);
@@ -973,6 +973,41 @@ end
 		\textit{More info here.} See \aodclass{aod.core.Devices} for an example on specification of default class parameters.
 		
 		There is one other use for \aodclass{aod.util.Parameters} and that is providing a \aodclass{containers.Map}-like data type to store files associated with an entity (e.g. \aodprop{files} for \aodclass{aod.core.Epoch}). Any property named \aodprop{files} will be written as a group with the contents as attributes. This is a bit odd but it was the best option available as I didn't want to clutter up the entity attributes or datasets with a bunch of file names.
+	
+	\subsection{aod.util.template.ExpectedParameter \myparent{handle}}
+		\label{subsection:ExpectedParameter}
+
+		Expected parameters are provided to the \aodclass{aod.util.ParameterManager} present in \aodprop{expectedParameters} property of every subclass of \aodclass{aod.core.Entity}. 
+
+		AOData users do not need to directly create expected parameters and can instead provide the inputs to the \aodfcn{add} method of \aodclass{aod.util.ParameterManager}. 
+	
+	\subsection{aod.util.ParameterManager \myparent{handle}}
+		\label{subsection:ParameterManager}
+		\noindent The ParameterManager class provides users with an opportunity to specify which parameters the entity should have. 
+		Each AOData class inheriting from \aodclass{aod.core.Entity} has a dependent property called \aodprop{expectedParameters}, which is set by the output of the function \aodfcn{getExpectedParameters}. 
+
+		No parameters are set in \aodclass{aod.core.Entity}; however, several core classes define them. For example, \aodclass{aod.core.Device} has two expected parameters (Manufacturer and Model), which are defined as follows: 
+
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
+function value = getExpectedParameters(obj)
+	% Subclasses should always call the inherited method first, putting their 
+	% superclass after the @. 
+	value = getExpectedParameters@aod.core.Entity(obj)
+	% Add two new parameters 
+	value.add('Manufacturer', [], @ischar, 'Manufacturer of the Device');
+	value.add('Model', [], @ischar, 'Model of the Device');
+end
+		\end{lstlisting}
+		When you create a device, you will see both listed in the \aodprop{expectedParameters} property
+		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
+device = aod.core.Device("TestDevice");
+disp(device.expectedParameters)
+
+ParameterManager with 2 parameters:
+	Model: "Default = [], Validation = @ischar, Description = []"
+	Manufacturer: "Default = [], Validation = @ischar, Description = []"
+		\end{lstlisting}
+
 
 	\subsection{aod.util.Protocol \myparent{handle}}
 		\label{subsection:ProtocolDoc}

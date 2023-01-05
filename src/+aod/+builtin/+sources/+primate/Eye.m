@@ -11,9 +11,12 @@ classdef Eye < aod.core.sources.Eye
 %   obj = Eye(whichEye, varargin)
 %
 % Parameters:
-%   AxialLength                 double, axial length in mm
-%   PupilSize                   double, pupil size in mm
-%   ContactLens
+%   AxialLength                 double
+%       Axial length in mm
+%   PupilSize                   double
+%       Pupil size in mm (default = 6.7 mm)
+%   ContactLens                 string
+%       Contact lens used for the eye
 %
 % Dependent properties:
 %   micronsPerDegree
@@ -24,6 +27,8 @@ classdef Eye < aod.core.sources.Eye
 %   value = micronsPerPixel(obj, fovDegrees)
 %   value = degreesPerPixel(obj, fovDegrees)
 %   otf = getOTF(obj, wavelength, sf)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (Dependent)
@@ -32,15 +37,7 @@ classdef Eye < aod.core.sources.Eye
 
     methods
         function obj = Eye(whichEye, varargin)
-            obj = obj@aod.core.sources.Eye(whichEye);
-
-            ip = aod.util.InputParser();
-            addParameter(ip, 'ContactLens', [], @ischar);
-            addParameter(ip, 'AxialLength', [], @isnumeric);
-            addParameter(ip, 'PupilSize', [], @isnumeric);
-            parse(ip, varargin{:});
-
-            obj.setParam(ip.Results);
+            obj = obj@aod.core.sources.Eye(whichEye, varargin{:});
         end
         
         function value = get.micronsPerDegree(obj)
@@ -104,6 +101,19 @@ classdef Eye < aod.core.sources.Eye
 
             u0 = (obj.getParam('PupilSize') * pi * 10e5) / (wavelength * 180);
             otf = 2/pi * (acos(sf ./ u0) - (sf ./ u0) .* sqrt(1 - (sf./u0).^2));
+        end
+    end
+
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.sources.Eye(obj);
+
+            value.add('ContactLens', [], @isstring,...
+                'Contact lens used for the eye');
+            value.add('AxialLength', [], @isnumeric,...
+                'Axial length of the eye in mm');
+            value.add('PupilSize', 6.7, @isnumeric,...
+                'Pupil size of the eye in mm');
         end
     end
 end

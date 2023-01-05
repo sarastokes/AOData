@@ -14,6 +14,7 @@ classdef SubclassGeneratorController < aod.app.Controller
 % -------------------------------------------------------------------------
 
     properties (Access = private)
+        methodListBox
         detailBox
         titleBox
         helpBox
@@ -703,10 +704,10 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "RowHeight", {30, "1x", 30, "1x"});
             % - Overloaded methods?
             %   > uidropdown
-            obj.methodListBox = = uilistbox(g,...
+            obj.methodListBox = uilistbox(g,...
                 "Items", "", "Enable", "off",...
                 "Tag", "InheritedMethods");
-            obj.setLayout(obj.methodsListBox, [1 4], 1);
+            obj.setLayout(obj.methodListBox, [1 4], 1);
 
             h = uilabel(g, "Text", "Overload");
             obj.setLayout(h, 3, 1);

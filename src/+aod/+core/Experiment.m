@@ -61,22 +61,16 @@ classdef Experiment < aod.core.Entity
 
     properties (Dependent)
         % The IDs of all epochs in the experiment
-        epochIDs    
+        epochIDs                double
         % The total number of epochs in the experiment
         numEpochs (1,1)         double 
     end
     
     methods 
         function obj = Experiment(name, homeFolder, expDate, varargin)
-            obj = obj@aod.core.Entity(name);
+            obj = obj@aod.core.Entity(name, varargin{:});
             obj.setHomeDirectory(homeFolder);
             obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
-
-            ip = aod.util.InputParser();
-            addParameter(ip, 'Administrator', '', @ischar);
-            addParameter(ip, 'Laboratory', '', @ischar);
-            parse(ip, varargin{:});
-            obj.setParam(ip.Results);
 
             obj.appendGitHashes();
         end
@@ -591,6 +585,18 @@ classdef Experiment < aod.core.Entity
             % -------------------------------------------------------------
             RM = aod.infra.RepositoryManager();
             obj.Code = RM.repositoryInfo;
+        end
+    end
+
+    % Overloaded methods
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Entity(obj);
+
+            value.add('Administrator', [], @isstring,... 
+                'Person(s) performed the experiment');
+            value.add('Laboratory', [], @isstring,... 
+                'Lab where the experiment was performed');
         end
     end
 end

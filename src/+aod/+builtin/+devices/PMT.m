@@ -1,15 +1,22 @@
 classdef PMT < aod.core.Device
-% PMT
+% A photomultiplier tube
 %
 % Description:
-%   A PMT within the system
+%   A PMT used to acquire data
 %
 % Parent:
 %   aod.core.Device
 %
 % Constructor:
 %   obj = aod.builtin.devices.PMT(name)
-%   obj = aod.builtin.devices.PMT(name, 'Manufacturer', value, 'Model', value);
+%   obj = aod.builtin.devices.PMT(name, 'SerialNumber', "value",...
+%       'Manufacturer', "value", 'Model', "value");
+%
+% Parameters:
+%   SerialNumber            string
+% Inherited Parameters:
+%   Manufacturer
+%   Model
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -25,10 +32,8 @@ classdef PMT < aod.core.Device
         function value = getExpectedParameters(obj)
             value = getExpectedParameters@aod.core.Device(obj);
             
-            value.add('SerialNumber', [], [],... 
+            value.add('SerialNumber', [], @isstring,... 
                 'Serial number of the light source');
-            value.add('Position', [], @(x) numel(x) == 3,...
-                'Optimized XYZ position of the PMT')
         end
     end
 end 

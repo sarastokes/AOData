@@ -11,9 +11,9 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = Device(varargin)
 %
 % Parameters:
-%   Model                            char   
+%   Model                            string   
 %       Model of the device
-%   Manufacturer                     char  
+%   Manufacturer                     string  
 %       Manufacturer of the device
 
 % By Sara Patterson, 2022 (AOData)
@@ -22,13 +22,6 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
     methods
         function obj = Device(name, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
-            
-            %ip = aod.util.InputParser();
-            %addParameter(ip, 'Model', [], @ischar);
-            %addParameter(ip, 'Manufacturer', [], @ischar);
-            %parse(ip, varargin{:});
-            %ip = obj.expectedParameters.parse(varargin{:});
-            %obj.setParam(ip.Results);
         end
     end
 
@@ -36,8 +29,10 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
         function value = getExpectedParameters(obj)
             value = getExpectedParameters@aod.core.Entity(obj);
 
-            value.add('Model', [], @ischar);
-            value.add('Manufacturer', [], @ischar);
+            value.add('Manufacturer', [], @isstring,... 
+                "The company that made the device");
+            value.add('Model', [], @isstring,... 
+                "The model number of the device");
         end
     end
 end

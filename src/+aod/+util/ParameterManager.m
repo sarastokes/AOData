@@ -17,11 +17,26 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
         ExpectedParameters          % aod.util.template.ExpectedParameter
     end
 
+    properties (Dependent)
+        Count
+    end
+
     methods 
         function obj = ParameterManager()
             % Do nothing
         end
+        
+        function out = get.Count(obj)
+            if isempty(obj.ExpectedParameters)
+                out = 0;
+            else
+                out = numel(obj.ExpectedParameters);
+            end
+        end
 
+    end
+
+    methods
         function add(obj, param, defaultValue, validationFcn, description)
             % Add a new expected parameter
             %
@@ -42,6 +57,14 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             %   obj.add('MyParam', [], @(x) ischar(x), 'A parameter');
             % -------------------------------------------------------------
 
+            arguments
+                obj
+                param               
+                defaultValue                    = []
+                validationFcn                   = []
+                description         string      = string.empty()
+            end
+
             % Single inputs can be ExpectedParameter or ParameterManager
             if nargin == 2
                 if isa(param, 'aod.util.templates.ExpectedParameter')
@@ -58,18 +81,6 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
                     end
                     return
                 end
-            end
-
-            if nargin < 3
-                defaultValue = [];
-            end
-
-            if nargin < 4
-                validationFcn = [];
-            end
-
-            if nargin < 5
-                description = [];
             end
             
             newParam = aod.util.templates.ExpectedParameter(param, defaultValue, validationFcn, description);
@@ -139,17 +150,23 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
                 propList = struct();
 
                 for i = 1:numel(obj.ExpectedParameters)
+                    value = "Default = ";
                     if isempty(obj.ExpectedParameters(i).Default)
-                        value = "Default = [], ";
+                        value = value + "[]";
                     else
-                        value = sprintf("Default = %s, ",... 
-                            strtrim(formattedDisplayText(obj.ExpectedParameters(i).Default)));
+                        value = value + strtrim(formattedDisplayText(obj.ExpectedParameters(i).Default));
                     end
-                    value = value + "Validation = ";
+                    value = value + ", Validation = ";
                     if isempty(obj.ExpectedParameters(i).Validation)
                         value = value + "[]";
                     else
                         value = value + strtrim(formattedDisplayText(obj.ExpectedParameters(i).Validation));
+                    end
+                    value = value + ", Description = ";
+                    if isempty(obj.ExpectedParameters(i).Description)
+                        value = value + "[]";
+                    else
+                        value = value + obj.ExpectedParameters(i).Description;
                     end
                     propList.(obj.ExpectedParameters(i).Name) = value;
                 end
@@ -163,6 +180,38 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
         function tf = isempty(obj)
             tf = isempty(obj.ExpectedParameters);
         end
-    end
+        
+        function T = table(obj)
+            if isempty(obj)
+                T = [];
+                return
+            end
+        
+            names = repmat("", [obj.Count, 1]);
+            defaults = repmat("[]", [obj.Count, 1]);
+            validations = repmat("[]", [obj.Count, 1]);
+            descriptions = repmat("[]", [obj.Count, 1]);
 
+            for i = 1:obj.Count
+                EP = obj.ExpectedParameters(i);
+
+                names(i) = EP.Name;
+
+                if ~isempty(EP.Default)
+                    defaults(i) = value2string(EP.Default);
+                end
+
+                if ~isempty(EP.Validation)
+                    validations(i) = value2string(EP.Validation);
+                end
+
+                if ~isempty(EP.Description)
+                    descriptions(i) = EP.Description;
+                end
+            end
+
+            T = table(names, defaults, validations, descriptions,...
+                'VariableNames', ["Name", "Default", "Validation", "Description"]);
+        end
+    end
 end 

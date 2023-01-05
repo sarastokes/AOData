@@ -5,15 +5,17 @@
 - [x] Implement search by UID
 - [x] Replace duplicated epoch from Creator
 - [x] Decide where allowableParentTypes go
-- [ ] Units to dataset metadata?
+- [x] Units to dataset metadata?
 - [x] Mapping Calibration property of Protocol (can't easily go in parameters)
 - [x] Where should converting files to relative be done?
 - [x] Dependent but not hidden properties should be written (e.g. epochIDs)
 - [x] Abandon Timing core class
 - [x] Remove entity-specific add methods
-- [ ] Remove() method
-- [ ] Fillmissing error type
-- [ ] Consider making channels and devices at the same level
+- [x] Remove() method
+- [x] Fillmissing error type
+- [x] Consider making channels and devices at the same level
+- [x] Expected parameter parsing in setParam
+- [ ] DateCreated, DateLastModified for core interface
 
 ##### Package
 - [x] Add rotation to 1P-specific SpatialProtocol
@@ -30,7 +32,8 @@
   - [x] Overwrite numeric dataset with same dimensions
   - [x] Overwrite numeric dataset with different dimensions
 - [ ] Could copying the file replicate h5repack?
-- [ ] Testing for int and uint
+- [x] Testing for int and uint
+- [ ] Write ParameterManager
 
 ##### Minor
 - [x] Name vs name
@@ -42,3 +45,4 @@
 ##### Documentation
 - [x] Handle class
 - [ ] Date formats
+- [ ] ExpectedParameters

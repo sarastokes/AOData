@@ -1,4 +1,4 @@
-classdef ParameterFilter2 < aod.api.FilterQuery
+classdef ParameterFilter < aod.api.FilterQuery
 % Filter entities by their attributes
 %
 % Description:
@@ -43,7 +43,7 @@ classdef ParameterFilter2 < aod.api.FilterQuery
     end
 
     methods
-        function obj = ParameterFilter2(parent, name, value)
+        function obj = ParameterFilter(parent, name, value)
             obj@aod.api.FilterQuery(parent);
 
             obj.Name = name;

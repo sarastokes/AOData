@@ -10,6 +10,16 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = aod.core.Registration(parent, data)
 %
+% Properties:
+%   registrationDate        datetime
+%       Date registration was performed
+%
+% Parameters:
+%   Administrator           string
+%       Person(s) who performed the registration
+%   Software                string
+%       Software used to perform the registration
+%
 % Sealed methods:
 %   setRegistrationDate(obj, regDate)
 
@@ -31,10 +41,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Sealed)
         function setRegistrationDate(obj, regDate)
-            % SETREGISTRATIONDATE
-            %
-            % Description:
-            %   Set the date where the registration was performed
+            % Set the date where the registration was performed
             % 
             % Syntax:
             %   obj.setRegistrationDate(regDate)
@@ -49,6 +56,17 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 
             regDate = aod.util.validateDate(regDate);
             obj.registrationDate = regDate;
+        end
+    end
+
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Entity(obj);
+
+            value.add('Administrator', [], @isstring,... 
+                "Person(s) who performed the registration");
+            value.add('Software', [], @isstring,...
+                "Software used for the registration")
         end
     end
 end

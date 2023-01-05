@@ -15,10 +15,10 @@ system.add(channel);
 
 % Add devices
 channel.add(aod.builtin.devices.PMT('VisiblePMT',...
-    'Manufacturer', 'Hamamatsu', 'Model', 'H16722'));
+    'Manufacturer', "Hamamatsu", 'Model', "H16722"));
 channel.add(aod.builtin.devices.LightSource(561,...
-    'Manufacturer', 'Toptica', 'Model', 'iChrome MLE'));
+    'Manufacturer', "Toptica", 'Model', "iChrome MLE"));
 channel.add(aod.builtin.devices.BandpassFilter(607, 70,...
-    'Manufacturer', 'Semrock', 'Model', 'FF01-607_70'));
+    'Manufacturer', "Semrock", 'Model', "FF01-607_70"));
 channel.add(aod.builtin.devices.Pinhole(20,...
-    'Manufacturer', 'ThorLabs', 'Model', 'P20K'));
+    'Manufacturer', "ThorLabs", 'Model', "P20K"));

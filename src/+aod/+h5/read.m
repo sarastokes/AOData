@@ -19,14 +19,19 @@ function out = read(hdfName, pathName, dsetName, className)
         hdfName         
         pathName
         dsetName
-        className       char    = [];
+        className       string    = [];
     end
 
     fullPath = h5tools.util.buildPath(pathName, dsetName);
 
     % Deal with AOData-specific classes first
-    if isequal(className, "aod.util.Parameters")
+    if strcmp(className, "aod.util.Parameters")
         out = h5tools.readatt(hdfName, fullPath, 'all');
+        return
+    end
+    
+    if strcmp(dsetName, "expectedParameters")
+        out = aod.h5.readExpectedParameters(hdfName, pathName, dsetName);
         return
     end
     

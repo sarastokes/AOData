@@ -14,8 +14,8 @@ classdef Location < aod.core.Source
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Location(name)
-            obj = obj@aod.core.Source(name);
+        function obj = Location(name, varargin)
+            obj = obj@aod.core.Source(name, varargin{:});
         end
     end
 end

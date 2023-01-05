@@ -11,6 +11,8 @@ classdef GeometricTransformation < aod.core.Registration
 %   transform
 %   reference
 % 
+% Methods to be implemented by subclasses:
+%   dataOut = apply(obj, dataIn)
 % -------------------------------------------------------------------------
     properties
         transform
@@ -18,8 +20,8 @@ classdef GeometricTransformation < aod.core.Registration
     end
 
     methods
-        function obj = GeometricTransformation(name, registrationDate)
-            obj = obj@aod.core.Registration(name, registrationDate);
+        function obj = GeometricTransformation(name, registrationDate, varargin)
+            obj = obj@aod.core.Registration(name, registrationDate, varargin{:});
         end
         
         function data = apply(obj, data) %#ok<INUSD> 

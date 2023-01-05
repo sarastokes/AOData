@@ -36,8 +36,8 @@ classdef RigidRegistration < aod.core.Registration
     end
 
     methods
-        function obj = RigidRegistration(name, registrationDate, data)
-            obj@aod.core.Registration(name, registrationDate);
+        function obj = RigidRegistration(name, registrationDate, data, varargin)
+            obj@aod.core.Registration(name, registrationDate, varargin{:});
 
             if ~isa(data, 'affine2d')
                 try

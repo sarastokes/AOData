@@ -73,7 +73,7 @@ classdef LightSource < aod.core.Device
             if ~isempty(obj.Name)
                 value = [obj.Name, '_', num2str(obj.wavelength), 'nm'];
             else
-                value = [obj.wavelength, 'nm_LightSource'];
+                value = [num2str(obj.wavelength), 'nm_LightSource'];
             end
         end
     end

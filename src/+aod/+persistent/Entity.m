@@ -58,6 +58,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         UUID                    string
         % When the entity's HDF5 group was last modified
         lastModified            datetime
+        % Specification of expected metadata 
+        expectedParameters      = aod.util.ParameterManager
     end
 
     properties (Dependent)
@@ -701,6 +703,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
             obj.files = obj.loadDataset('files', 'aod.util.Parameters');
+            
+            expectedParams = obj.loadDataset('expectedParameters');
+            if ~isempty(expectedParams)
+                obj.expectedParameters = expectedParams;
+            end
 
             % LINKS
             obj.Parent = obj.loadLink('Parent');
@@ -714,7 +721,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.entityClassName = obj.loadAttribute('Class');
             lastModTime = obj.loadAttribute('LastModified');
             if ~isempty(lastModTime)
-                % TODO Improve datetime
+                % TODO Improve datetime!!!
                 lastModTime = extractBefore(lastModTime, " (");
                 obj.lastModified = datetime(lastModTime, ...
                     'Format', 'dd-MMM-uuuu HH:mm:ss');

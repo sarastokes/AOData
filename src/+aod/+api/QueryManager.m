@@ -87,6 +87,7 @@ classdef QueryManager < handle
         end
     end
 
+    % Filter methods
     methods 
         function addFilter(obj, varargin)
             % TODO: Test for equality
@@ -114,6 +115,13 @@ classdef QueryManager < handle
             obj.Filters(idx) = [];
         end
 
+        function clearFilters(obj)
+            obj.Filters = [];
+        end
+    end
+
+    % Utility functions for FilterQuery classes
+    methods
         function out = getHdfName(obj, idx)
             mustBeInRange(idx, 1, numel(obj.allGroupNames));
             out = obj.hdfName(obj.fileIdx(idx));

@@ -1,62 +1,72 @@
 classdef ImagingLight < aod.core.Stimulus
-% IMAGINGLIGHT
+% A constant imaging light
 %
 % Description:
-%   A light source held at a constant value during an epoch
+%   A light source held at a constant value with no protocol
 %
 % Parent:
 %   aod.core.Stimulus
 %
 % Constructor:
-%   obj = ImagingLight(name, value, units)
+%   obj = ImagingLight(name, intensity)
+%   obj = ImagingLight(name, intensity, units)
+%
+% Properties:
+%   Intensity               double
+%       Imaging light intensity
+%
+% Parameters:
+%   IntensityUnits          string
+%       Units for the specified imaging light intensity
 %
 % Methods:
-%   setValue(obj, value, units)
+%   setIntensity(obj, intensity, units)
 %   setUnits(obj, units)
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
     properties (SetAccess = private)
-        value                           double
-        valueUnits                      char
+        % Intensity of the imaging light 
+        intensity                           double
     end
     
     methods
-        function obj = ImagingLight(name, value, units)
-            obj@aod.core.Stimulus(name);
+        function obj = ImagingLight(name, intensity, varargin)
+            obj@aod.core.Stimulus(name, [], varargin{:});
 
-            if nargin > 1
-                obj.setValue(value);
-            end
-            if nargin > 2
-                obj.setUnits(units)
-            end
+            obj.setIntensity(intensity);
         end
 
-        function setValue(obj, value, units)
-            % SETVALUE
-            %
-            % Description:
-            %   Set imaging light value and, optionally, units
+        function setIntensity(obj, intensity, units)
+            % Set imaging light intensity and, optionally, units
             %
             % Syntax:
-            %   obj.setValue(value)
-            %   obj.setValue(value, units)
+            %   obj.setIntensity(intensity)
+            %   obj.setIntensity(intensity, units)
             % -------------------------------------------------------------
-            obj.value = value;
+            obj.intensity = intensity;
             if nargin == 3
                 obj.setUnits(units);
             end
         end
 
         function setUnits(obj, units)
-            % SETUNITS
-            %
-            % Description:
-            %   Set units for imaging light value
+            % Set units for imaging light intensity
             %
             % Syntax:
             %   obj.setUnits(units)
             % -------------------------------------------------------------
-            obj.valueUnits = units;
+            obj.setParam('IntensityUnits', units);
+        end
+    end
+
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Stimulus(obj);
+
+            value.add('IntensityUnits', [], @isstring,...
+                "Units for the imaging light intensity");
         end
     end
 end

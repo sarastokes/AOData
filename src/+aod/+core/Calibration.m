@@ -17,9 +17,9 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Inputs:
 %   name                    char/string
 %       Calibration name
-% Optional key/value inputs:
-%   calibrationDate         datetime or text (format: yyyyMMdd)
+%   calibrationDate         datetime or text in format: yyyyMMdd
 %       Date the calibration was performed
+% Optional key/value inputs:
 %   Administrator           char/string
 %       Who performed the calibration
 %
@@ -29,7 +29,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %       Date calibration was performed (yyyyMMdd)
 %
 % Parameters:
-%   Administrator           char
+%   Administrator           string
 %       Who performed the calibration
 %
 % Sealed methods:
@@ -60,7 +60,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Constructor:
             %   obj = aod.core.Calibration(name, calibrationDate)
             %   obj = aod.core.Calibration(name, calibrationDate,...
-            %       'Administrator', 'AdministratorName')
+            %       'Administrator', "AdministratorName")
             %
             % Inputs:
             %   name                    char/string
@@ -71,18 +71,13 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             %   Administrator           char/string
             %       Who performed the calibration
             % -------------------------------------------------------------
-            obj = obj@aod.core.Entity(name);
+            obj = obj@aod.core.Entity(name, varargin{:});
             
             if nargin > 1 && ~isempty(calibrationDate)
                 obj.setCalibrationDate(calibrationDate);
             end
-
-            ip = aod.util.InputParser();
-            addParameter(ip, 'Administrator', [], @istext);
-            parse(ip, varargin{:})
-            obj.setParam('Administrator', ip.Results.Administrator);
         end
-    end
+    end 
 
     methods (Sealed)
         function setTarget(obj, target)
@@ -124,6 +119,16 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             end
             calDate = aod.util.validateDate(calDate);
             obj.calibrationDate = calDate;
+        end
+    end
+
+    % aod.core.Entity methods
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Entity(obj);
+            
+            value.add('Administrator', [], @isstring,... 
+                'Person(s) who performed the calibration');
         end
     end
 end

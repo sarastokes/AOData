@@ -11,8 +11,10 @@ classdef PowerMeasurement < aod.core.Calibration
 %   obj = PowerMeasurement(name, calibrationDate, wavelength, varargin);
 %
 % Parameters:
-%   settingUnit             char, device setting unit (no default)
-%   valueUnit               char, measurement unit (default = 'uW')
+%   settingUnit             string
+%       Device setting unit (default = "normalized")
+%   valueUnit               string
+%       Measurement unit (default = "microwatt")
 %
 % Methods:
 %   T = table(obj)
@@ -23,6 +25,8 @@ classdef PowerMeasurement < aod.core.Calibration
 %   Subclasses should set light source specific parameters (wavelength, 
 %   settingUnit) in their constructors. If greater flexibility is needed,
 %   use the setValueUnit(), setSettingUnit() and setWavelength() functions
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -37,19 +41,9 @@ classdef PowerMeasurement < aod.core.Calibration
     methods 
         function obj = PowerMeasurement(name, calibrationDate, wavelength, varargin)
             obj = obj@aod.core.Calibration(name, calibrationDate);
-            if numel(wavelength) > 1 && iscol(wavelength)
-                wavelength = wavelength';
-            end
+            
+            % Required input parsing
             obj.setParam('Wavelength', wavelength);
-
-            ip = inputParser();
-            ip.KeepUnmatched = true;
-            ip.CaseSensitive = false;
-            addParameter(ip, 'SettingUnit', '', @ischar);
-            addParameter(ip, 'ValueUnit', 'uW', @ischar);
-            parse(ip, varargin{:});
-
-            obj.setParam(ip.Results);
         end
 
         function T = table(obj)
@@ -66,6 +60,7 @@ classdef PowerMeasurement < aod.core.Calibration
             end
             T = table(obj.Setting, obj.Value,...
                 'VariableNames', {'Setting', 'Power'});
+            T.Properties.VariableUnits = [obj.getParam('SettingUnit'), obj.getParam('ValueUnit')];
         end
 
         function addMeasurement(obj, setting, value)
@@ -111,6 +106,17 @@ classdef PowerMeasurement < aod.core.Calibration
         function value = getLabel(obj)
             value = [char(getClassWithoutPackages(obj)),... 
                 num2str(obj.getParam('Wavelength')), 'nm'];
+        end
+
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Calibration(obj);
+
+            value.add('Wavelength', [], @isdouble,...
+                "The wavelength of the light source being measured");
+            value.add('ValueUnit', "normalized", @isstring,...
+                "The units for the dependent variables");
+            value.add('SettingUnit', "microwatt", @isstring,...
+                "The units for the independent (measured) variables");
         end
     end
 end

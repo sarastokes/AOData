@@ -32,18 +32,21 @@ classdef Rois < aod.core.Annotation
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
+        % The image used to annotate the ROIs
         Image
+        % The size of the image used to annotate ROIs
         Size (1,2)          {mustBeInteger}         = [0 0]
+        % The FileReader used to import ROIs
         Reader
     end
 
-    % Enables quick access to commonly-used parameters
-    properties (Dependent)
-        Count
-        RoiIDs
+    % Properties set internally
+    properties (SetAccess = protected)
+        % The total number of ROIs
+        numRois
+        % The integer identifier of each ROI
+        roiIDs
     end
-
-    % expectedParameters = ["Count", "RoiIDs"]
 
     methods
         function obj = Rois(name, rois, varargin)
@@ -65,22 +68,11 @@ classdef Rois < aod.core.Annotation
 
             obj.load(rois);
         end
-
-        function value = get.Count(obj)
-            value = obj.getParam('Count', aod.util.ErrorTypes.NONE);
-        end
-
-        function value = get.RoiIDs(obj)
-            value = obj.getParam('RoiIDs', aod.util.ErrorTypes.NONE);
-        end
     end
 
     methods
         function load(obj, rois)
-            % Load regions
-            %
-            % Description:
-            %   Obtain data to send to setMap()
+            % Obtain data to send to setMap()
             %
             % Syntax:
             %   load(obj, rois, imSize)
@@ -99,10 +91,7 @@ classdef Rois < aod.core.Annotation
         end
            
         function reload(obj)
-            % RELOAD
-            %
-            % Description:
-            %   Reload ROIs (if loaded from a specific file)
+            % Reload ROIs (if loaded from a specific file)
             %
             % Syntax:
             %   reload(obj)
@@ -131,10 +120,7 @@ classdef Rois < aod.core.Annotation
         end
 
         function setImage(obj, img)
-            % SETIMAGE
-            % 
-            % Description:
-            %   Set an image used for annotation
+            % Set an image used for annotation
             %
             % Syntax
             %   setImage(obj, img)
@@ -156,7 +142,7 @@ classdef Rois < aod.core.Annotation
             if ~isempty(obj.Metadata)
                 % If there were existing ROIs, make sure to append to  
                 % Metadata rather than erasing existing table
-                newROIs = obj.Count - height(obj.Metadata);
+                newROIs = obj.numRois - height(obj.Metadata);
                 newTable = table(height(obj.Metadata) + rangeCol(1, newROIs),...
                     repmat("", [newROIs, 1]), 'VariableNames', {'ID', 'UID'});
                 newTable = [obj.Metadata; newTable];
@@ -171,8 +157,8 @@ classdef Rois < aod.core.Annotation
                 forceOverwrite = false;
             end
             if isempty(obj.Metadata) || forceOverwrite
-                obj.Metadata = table(rangeCol(1, obj.Count), ...
-                    repmat("", [obj.count, 1]),...
+                obj.Metadata = table(rangeCol(1, obj.numRois), ...
+                    repmat("", [obj.numRois, 1]),...
                     'VariableNames', {'ID', 'UID'});
             end
         end
@@ -180,10 +166,7 @@ classdef Rois < aod.core.Annotation
 
     methods (Access = protected)     
         function setMap(obj, map)
-            % SETMAP
-            %
-            % Description:
-            %   Assigns ROI map to Data property and gets derived metadata
+            % Assigns ROI map to Data property and gets derived metadata
             %
             % Syntax:
             %   setMap(obj, data);
@@ -191,11 +174,11 @@ classdef Rois < aod.core.Annotation
             obj.setData(double(map));
 
             IDs = unique(obj.Data);
-            IDs(obj.RoiIDs == 0) = [];
+            IDs(IDs == 0) = [];
             roiCount = nnz(unique(obj.Data));
 
-            obj.setParam('RoiIDs', IDs);
-            obj.setParam('Count', roiCount);
+            obj.roiIDs = IDs;
+            obj.numRois = roiCount;
         end
     end
 end

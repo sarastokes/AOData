@@ -17,9 +17,13 @@ classdef Eye < aod.core.Source
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Eye(name)
-            assert(ismember(name, {'OD', 'OS'}), 'Eye: Must be OS or OD');
-            obj = obj@aod.core.Source(name);
+        function obj = Eye(name, varargin)
+            % Validate user-defined name
+            name = convertCharsToStrings(name);
+            assert(ismember(name, ["OD", "OS"]),... 
+                'Eye name must be OS or OD');
+
+            obj = obj@aod.core.Source(name, varargin{:});
         end
     end
 end

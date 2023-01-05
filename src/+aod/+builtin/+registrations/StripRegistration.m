@@ -10,18 +10,15 @@ classdef StripRegistration < aod.core.Registration
 % Constructor:
 %   obj = StripRegistration(registrationDate)
 %
-% Inputs:
-%   registrationDate                    
+% Parameters:
+%   RegistrationType        "frame" or "strip"
+%       Whether the frame or strip registration was ultimately used                    
 %
 % Properties:
 %   usedFrame (logical; whether strip or frame reg was ultimately used)
 % Derived Properties:
 %   corrCoef regFlag stripX stripY frameXY regDescription rotationAngle
 % -------------------------------------------------------------------------
-
-    properties
-        usedFrame(1,1)       logical = false
-    end
 
     properties (SetAccess = protected)
         corrCoef 
@@ -34,17 +31,19 @@ classdef StripRegistration < aod.core.Registration
     end
 
     methods
-        function obj = StripRegistration(name, registrationDate, usedFrame)
+        function obj = StripRegistration(name, registrationDate, varargin)
             if nargin < 1
+                % There is often only one strip registration per Epoch 
+                % so the class name (default from getLabel) could suffice
                 name = [];
             end
             if nargin < 2
                 registrationDate = [];
             end
-            obj@aod.core.Registration(name, registrationDate);
-            if nargin > 2
-                obj.usedFrame = usedFrame;
-            end
+            obj@aod.core.Registration(name, registrationDate, varargin{:});
+            
+            % Hard-coded parameters
+            obj.setParam('Software', "ImageReg");
         end
 
         function apply(~)
@@ -52,12 +51,8 @@ classdef StripRegistration < aod.core.Registration
                 "Strip Registration is applied offline");
         end
 
-        function setUsedFrame(obj, tf)
-            obj.usedFrame = tf;
-        end
-
         function loadData(obj, fPath, ID)
-            % LOADDATA
+            % Load data from ImageReg strip registration
             % 
             % Syntax:
             %   obj.loadData(fName)
@@ -80,10 +75,18 @@ classdef StripRegistration < aod.core.Registration
             for i = 1:numel(f)
                 obj.(f(i)) = S.(f(i));
             end
+
+            % Record the file name used to extract the data
             obj.setFile('RegistrationOutput', reader.fullFile);
         end
 
         function loadParameters(obj, fPath, ID)
+            % Load parameters from ImageReg strip registration
+            % 
+            % Syntax:
+            %   obj.loadParameters(fName)
+            %   obj.loadParameters(fPath, ID)
+            % -------------------------------------------------------------
             if nargin < 3
                 reader = aod.builtin.readers.RegistrationParameterReader(fPath);
             else
@@ -91,6 +94,16 @@ classdef StripRegistration < aod.core.Registration
             end
             obj.setParam(reader.readFile());
             obj.setFile('RegistrationParameters', reader.fullFile);
+        end
+    end
+
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Registration(obj);
+
+            value.add('RegistrationType', [],... 
+                @(x) ismember(x, ["frame", "strip"]),...
+                "Whether frame or strip registration was used");
         end
     end
 end 

@@ -25,8 +25,8 @@ function experiment = ToyExperiment(writeToHDF)
     end
 
     experiment = aod.core.Experiment('Tester', cd, '20220823',...
-        'Administrator', 'Sara Patterson',...
-        'Laboratory', 'Primate-1P');
+        'Administrator', "Sara Patterson",...
+        'Laboratory', "Primate-1P");
 
     experiment.setDescription('This is a test experiment');
     experiment.addNote('This is the first note');
@@ -52,12 +52,14 @@ function experiment = ToyExperiment(writeToHDF)
     calibration1.addMeasurement(24:26, 16:18);
     experiment.add(calibration1);
 
-    calibration2 = aod.builtin.calibrations.Optimization([],...
-        getDateYMD(), 'xPMT', 6, 'yPMT', 7, 'zPMT', 8, 'SourcePosition', 3);
+    calibration2 = aod.builtin.calibrations.ChannelOptimization([],...
+        getDateYMD(), 'PMT', [6 7 8], 'Source', 3,...
+        'Channel', experiment.get('Channel', {'Name', 'MustangImaging'}));
     experiment.add(calibration2);
 
     % Experiment Datasets
-    dset1 = aod.core.ExperimentDataset('ExpDataset1', 'Data', eye(3));
+    dset1 = aod.core.ExperimentDataset('ExpDataset1',... 
+        'Data', eye(3));
     experiment.add(dset1);
 
     % Epochs
@@ -85,7 +87,8 @@ function experiment = ToyExperiment(writeToHDF)
     epoch.add(response2);
 
     % Stimuli
-    stim = aod.builtin.stimuli.ImagingLight('Mustang', 22, 'Normalized');
+    stim = aod.builtin.stimuli.ImagingLight('Mustang', 22,...
+        'IntensityUnits', "Normalized");
     epoch.add(stim);
 
     % Datasets

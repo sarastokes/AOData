@@ -18,7 +18,7 @@ classdef ExpectedParameter < handle
         % Default value for the parameter
         Default                                                     = []
         % Anonymous function handle for validating input
-        Validation      {mustBeA(Validation, 'function_handle')}    = @(x) x
+        Validation                                                  = []
         % Information about the property such as units
         Description     string                                      = string.empty()
     end
@@ -32,16 +32,25 @@ classdef ExpectedParameter < handle
             end
 
             if nargin > 2 && ~isempty(validationFcn)
-                if ~isa(validationFcn, 'function_handle')
-                    error('ExpectedParameter:InvalidFunction',...
-                        '"validationFcn" must be a function handle');
-                end
                 obj.Validation = validationFcn;
             end
 
             if nargin > 3 && ~isempty(description)
                 obj.Description = description;
             end
+        end
+
+        function set.Validation(obj, value)
+            if isempty(value)
+                obj.Validation = [];
+                return
+            end
+
+            if ~isa(value, 'function_handle')
+                error('ExpectedParameter:InvalidFunction',...
+                    '"validationFcn" must be a function handle');
+            end
+            obj.Validation = value;
         end
 
         function ip = addToParser(obj, ip)

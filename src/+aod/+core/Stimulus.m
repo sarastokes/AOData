@@ -23,8 +23,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods
-        function obj = Stimulus(name, protocol)
-            obj = obj@aod.core.Entity(name);
+        function obj = Stimulus(name, protocol, varargin)
+            obj = obj@aod.core.Entity(name, varargin{:});
             
             if nargin > 1 && ~isempty(protocol)
                 obj.setProtocol(protocol);

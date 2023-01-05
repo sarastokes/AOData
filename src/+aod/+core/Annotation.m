@@ -27,7 +27,11 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Properties:
 %   Data  
-%   Source                  
+%   Source    
+%
+% Parameters
+%   Administrator       string
+%       Who performed the Annotation              
 %
 % Sealed protected methods:
 %   setData(obj, data)
@@ -93,6 +97,14 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
             else
                 obj.Data = data;
             end
+        end
+    end
+    
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Entity(obj);
+
+            value.add('Administrator', [], @isstring, 'Who performed the annotation');
         end
     end
 end

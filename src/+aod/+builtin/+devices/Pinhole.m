@@ -10,11 +10,9 @@ classdef Pinhole < aod.core.Device
 % Constructor:
 %   obj = aod.builtin.devices.Pinhole(diameter, varargin)
 %
-% Properties:
+% Parameters:
 %   Diameter            double
 %       Pinhole diameter in microns
-%
-% Inherited Parameters:
 %   Model
 %   Manufacturer
 %
@@ -23,11 +21,6 @@ classdef Pinhole < aod.core.Device
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
-
-    properties (SetAccess = protected)
-        % Pinhole diameter in microns
-        diameter        double          
-    end
 
     methods
         function obj = Pinhole(diameter, varargin)
@@ -47,13 +40,20 @@ classdef Pinhole < aod.core.Device
             % Example:
             %   obj.setDiameter(25)
             % -------------------------------------------------------------
-            obj.diameter = diameter;
+            obj.setParam('Diameter', diameter);
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['Pinhole_', num2str(obj.diameter), 'microns'];
+            value = ['Pinhole_', num2str(obj.getParam('Diameter')), 'microns'];
+        end
+
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Device(obj);
+            
+            value.add('Diameter', [], @isnumeric,...
+                'Pinhole diameter in microns');
         end
     end
 end
