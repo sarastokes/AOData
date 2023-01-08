@@ -81,7 +81,7 @@ classdef (Abstract) Controller < aod.app.UIView
 
     end
 
-    methods (Access = private)
+    methods (Access = protected)
         function onFigureClose(obj, ~, ~)
             obj.stop();
         end

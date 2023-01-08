@@ -41,6 +41,7 @@ classdef AONodeTypes
         LOGICAL
 
         % Specific AOData types
+        PARAMETERMANAGER
         HOMEDIRECTORY
         FILEREADER
         DESCRIPTION
@@ -85,11 +86,13 @@ classdef AONodeTypes
                     out = char(data);
                 case AONodeTypes.TRANSFORM
                     out = data.T;
+                case AONodeTypes.PARAMETERMANAGER
+                    out = data.table();
                 case AONodeTypes.NUMERIC
                     if ~ismatrix(data)
-                        out = sprintf('Data size = %u', size(data,1));
+                        out = sprintf("Data size = %u", size(data,1));
                         for i = 2:ndims(data)
-                            out = [out, sprintf('x %u', size(data,i))]; %#ok<AGROW> 
+                            out = out + sprintf("x %u", size(data,i)); %#ok<AGROW> 
                         end
                     else
                         out = data;
@@ -124,6 +127,7 @@ classdef AONodeTypes
                 AONodeTypes.NUMERIC,...
                 AONodeTypes.NOTES,...       % non-scalar string
                 AONodeTypes.TRANSFORM,...
+                AONodeTypes.PARAMETERMANAGER,...
                 AONodeTypes.CODE];
             
             tf = ismember(obj, tableNodes);
@@ -148,51 +152,40 @@ classdef AONodeTypes
             switch obj 
                 case AONodeTypes.ENTITY 
                     out = 'icons8-folder-40.png';
-                    %out = 'folder.png';
                 case AONodeTypes.CONTAINER
-                    %out = 'container.png';
-                    out = 'icons8-box-40.png';
+                    out = 'icons8-new-product-40.png';
                 case {AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM}
                     out = 'icons8-grid-40.png';
                 case AONodeTypes.LINK
                     out = 'icons8-link-40.png';
-                    %out = 'chain.png';
                 case AONodeTypes.TEXT 
-                    %out = 'text.png';
                     out = 'icons8-new-document-40.png';
                 case AONodeTypes.DATETIME 
-                    %out = 'time.png';
                     out = 'icons8-calendar-40.png';
                 case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE]
                     out = 'icons8-data-sheet-40.png';
-                    % out = 'table.png';
                 case [AONodeTypes.STRUCTURE, AONodeTypes.MAP]
                     out = 'icons8-tree-structure-40.png';
-                    %out = 'structure.png';
                 case AONodeTypes.ENUM
-                    % out = 'list.png';
                     out = 'icons8-list-40.png';
                 case AONodeTypes.LOGICAL
                     out = 'icon8-binary-file-40.png';
                 case AONodeTypes.FILES 
                     out = 'filecabinet.png';
                 case AONodeTypes.NOTES
-                    %out = 'notepad.png';
                     out = 'icons8-making-notes-40.png';
                 case AONodeTypes.NAME 
                     out = 'icons8-contact-details-40.png';
-                    % out = 'card.png';
                 case AONodeTypes.DESCRIPTION
                     out = 'icons8-info-40.png';
                 case AONodeTypes.CODE 
-                    %out = 'code.png';
                     out = 'icons8-code-40.png';
                 case AONodeTypes.HOMEDIRECTORY 
-                    %out = 'home.png';
                     out = 'icons8-home-page-40.png';
+                case AONodeTypes.PARAMETERMANAGER
+                    out = 'icons8-settings-40.png';
                 otherwise
                     out = 'icons8-grid-40.png';
-                    %out = 'data.png';
             end
             out = [obj.ICON_DIR, out];
         end
@@ -228,6 +221,8 @@ classdef AONodeTypes
                         obj = AONodeTypes.HOMEDIRECTORY;
                     case 'filereader'
                         obj = AONodeTypes.FILEREADER;
+                    case 'expectedparameters'
+                        obj = AONodeTypes.PARAMETERMANAGER;
                 end
             end
 
@@ -299,6 +294,8 @@ classdef AONodeTypes
                     obj = AONodeTypes.DESCRIPTION;
                 case 'homedirectory'
                     obj = AONodeTypes.HOMEDIRECTORY;
+                case 'aod.util.parametermanager'
+                    obj = AONodeTypes.PARAMETERMANAGER;
                 otherwise
                     warning('AONodeTypes_get:UnrecognizedInput',...
                         'Node name %s was not recognized', nodeName);

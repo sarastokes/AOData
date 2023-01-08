@@ -50,7 +50,7 @@ classdef Rois < aod.builtin.annotations.Rois
 
     methods
         function obj = Rois(name, rois, varargin)
-            if istext(rois) && endsWith(rois, '.zip');
+            if istext(rois) && endsWith(rois, '.zip')
                 reader = aod.util.builtin.ImageJRoiReader(rois);
             else
                 reader = [];
@@ -62,6 +62,9 @@ classdef Rois < aod.builtin.annotations.Rois
 
     methods
         function load(obj, rois, imSize)
+            if nargin < 3 && isnumeric(rois)
+                imSize = size(rois);
+            end
             load@aod.builtin.annotations.Rois(obj, rois);
             if nargin < 3 || isempty(imSize)
                 imSize = obj.Size;
@@ -184,7 +187,7 @@ classdef Rois < aod.builtin.annotations.Rois
             if ~isempty(obj.Metadata)
                 % If there were existing ROIs, make sure to append to  
                 % Metadata rather than erasing existing table
-                newROIs = obj.Count - height(obj.Metadata);
+                newROIs = obj.numRois - height(obj.Metadata);
                 newTable = table(height(obj.Metadata) + rangeCol(1, newROIs),...
                     repmat("", [newROIs, 1]), 'VariableNames', {'ID', 'UID'});
                 newTable = [obj.Metadata; newTable];
@@ -199,8 +202,8 @@ classdef Rois < aod.builtin.annotations.Rois
                 forceOverwrite = false;
             end
             if isempty(obj.Metadata) || forceOverwrite
-                obj.Metadata = table(rangeCol(1, obj.Count), ...
-                    repmat("", [obj.Count, 1]),...
+                obj.Metadata = table(rangeCol(1, obj.numRois), ...
+                    repmat("", [obj.numRois, 1]),...
                     'VariableNames', {'ID', 'UID'});
             end
         end

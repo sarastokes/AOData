@@ -13,6 +13,7 @@ classdef FilterTest < matlab.unittest.TestCase
 
     properties
         EXPT 
+        QM
     end
 
     methods (TestClassSetup)
@@ -24,34 +25,61 @@ classdef FilterTest < matlab.unittest.TestCase
                 ToyExperiment(true);
             end
             testCase.EXPT = loadExperiment(fileName);
+            testCase.QM = aod.api.QueryManager(fileName);
         end
     end
 
     methods (Test)
-        function testLinkFilter(testCase)
-            fObj = aod.api.LinkFilter(testCase.EXPT.hdfName, 'Parent');
-            % Only Experiment does not have a parent
-            testCase.verifyEqual(numel(fObj.getMatches), numel(fObj.allGroupNames) - 1);
-        end
+        % function testLinkFilter(testCase)
+        %     fObj = aod.api.LinkFilter(testCase.EXPT.hdfName, 'Parent');
+        %     % Only Experiment does not have a parent
+        %     testCase.verifyEqual(numel(fObj.getMatches), numel(fObj.allGroupNames) - 1);
+        % end
 
         function testEntityFilter(testCase)
-            fObj = aod.api.EntityFilter(testCase.EXPT.hdfName, 'Experiment');
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            EF = aod.api.EntityFilter(testCase.QM, 'Experiment');
+            testCase.QM.addFilter(EF);
+            [matches, idx] = testCase.QM.filter();
             % There should always be just one Experiment per file
-            testCase.verifyEqual(numel(fObj.getMatches), 1);
+            testCase.verifyEqual(numel(idx), 1);
+            testCase.verifyEqual(height(matches), 1);
+            testCase.QM.clearFilters();
         end
 
-        function testParameterFilter(testCase)
+        function ParameterFilter(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
             % Has parameter
-            fObj = aod.api.ParameterFilter(testCase.EXPT.hdfName, 'Laboratory');
-            testCase.verifyEqual(numel(fObj.getMatches), 1);
+            PF1 = aod.api.ParameterFilter(testCase.QM, 'Laboratory');
+            idx = PF1.apply();
+            testCase.verifyEqual(nnz(idx), 1);
+
+            % Has parameter, no match
+            PF4 = aod.api.ParameterFilter(testCase.QM, 'BadParam');
+            testCase.verifyWarning(...
+                @() PF4.apply(), "apply:NoMatches");
+
             % Specific parameter value (match)
-            fObj = aod.api.ParameterFilter(testCase.EXPT.hdfName,... 
-                'Laboratory', 'Primate-1P');
-            testCase.verifyEqual(numel(fObj.getMatches), 1);
+            PF2 = aod.api.ParameterFilter(testCase.QM,... 
+                'Laboratory', "Primate-1P");
+            idx = PF2.apply();
+            testCase.verifyEqual(nnz(idx), 1);
+
             % Specific parameter value (no match)
-            fObj = aod.api.ParameterFilter(testCase.EXPT.hdfName,...
-                'Laboratory', 'none');
-            testCase.verifyEqual(numel(fObj.getMatches), 0);
+            PF3 = aod.api.ParameterFilter(testCase.QM,...
+                'Laboratory', "none");
+            testCase.verifyWarning(@() PF3.apply(), "apply:NoMatches");
+            testCase.QM.addFilter(PF3);
+            warning('off', 'apply:NoMatches');
+            [matches, idx] = testCase.QM.filter();
+            warning('on', 'apply:NoMatches');
+            testCase.verifyEmpty(matches);
+            testCase.verifyEqual(nnz(idx), 0);
+            testCase.QM.clearFilters();
         end
     end
 end

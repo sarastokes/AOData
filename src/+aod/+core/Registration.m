@@ -49,6 +49,12 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   regDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
+            
+            if ~isscalar(obj)
+                arrayfun(@(x) setRegistrationDate(x, regDate), obj);
+                return
+            end
+
             if nargin < 2 || isempty(regDate)
                 obj.registrationDate = datetime.empty();
                 return

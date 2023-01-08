@@ -1,18 +1,18 @@
 classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
-    % SPECTRALSTIMULUS
-    %
-    % Constructor:
-    %   obj = SpectralStimulus(parent, protocol, presentation)
-    %
-    % Properties:
-    %   presentation
-    %   voltages
-    % Inherited properties:
-    %   stimParameters
-    %
-    % Methods:
-    %   importStimulusFiles(obj)
-    % ---------------------------------------------------------------------
+% SPECTRALSTIMULUS
+%
+% Constructor:
+%   obj = SpectralStimulus(parent, protocol, presentation)
+%
+% Properties:
+%   presentation
+%   voltages
+% Inherited properties:
+%   stimParameters
+%
+% Methods:
+%   importStimulusFiles(obj)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         presentation
@@ -40,10 +40,7 @@ classdef SpectralStimulus < aod.builtin.stimuli.VisualStimulus
         end
 
         function loadFrames(obj, fName)
-            % IMPORTPRESENTATION
-            %
-            % Description:
-            %   Get the LED values during each frame
+            % Get the LED values during each frame
             % -------------------------------------------------------------
             reader = sara.readers.LedFrameTableReader(fName);
             obj.setPresentation(reader.readFile());

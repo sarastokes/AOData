@@ -75,7 +75,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end 
 
-    methods
+    methods (Sealed)
         function add(obj, entity)
             % Add an entity to the Epoch 
             %

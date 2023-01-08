@@ -35,10 +35,6 @@ classdef ExperimentView < aod.app.UIView
         LinkPanelText       matlab.ui.control.TextArea
     end
 
-    properties (Access = private)
-        containerIcon
-    end
-
     properties (Hidden, Constant)
         CONTAINER_STYLE = uistyle("FontAngle", "italic");
         SYSTEM_STYLE = uistyle('FontColor', [0.4 0.4 0.4]);
@@ -49,9 +45,6 @@ classdef ExperimentView < aod.app.UIView
     methods
         function obj = ExperimentView()
             obj = obj@aod.app.UIView();
-
-            obj.containerIcon = im2uint8(lighten(im2double(...
-                imread([obj.ICON_DIR, 'folder.png'])), 0.45));
         end
 
         function fh = getFigure(obj)
@@ -114,10 +107,7 @@ classdef ExperimentView < aod.app.UIView
         end
 
         function setAttributeTable(obj, data)
-            % SETATTRIBUTETABLE
-            %
-            % Description:
-            %   Add attributes (as container.Map) to the attribute table
+            % Add attributes (as container.Map) to the attribute table
             % -------------------------------------------------------------
             obj.Attributes.ColumnName = {'Attribute', 'Value'};
             if nargin > 1
@@ -166,7 +156,7 @@ classdef ExperimentView < aod.app.UIView
         function g = makeEntityNode(obj, parent, nodeName, hdfPath, data)
             g = uitreenode(parent,...
                 'Text', nodeName,...
-                'Icon', [obj.ICON_DIR, 'folder.png'],...
+                'Icon', data.AONode.getIconPath(),...
                 'Tag', hdfPath,...
                 'NodeData', data);
         end
@@ -180,20 +170,17 @@ classdef ExperimentView < aod.app.UIView
         end
 
         function makeLinkNode(obj, parentNode, linkName, hdfPath, linkValue)
-            % MAKELINKNODE
-            %
-            % Description:
-            %   Create a new node representing an HDF link
+            % Create a new node representing an HDF link
             % -------------------------------------------------------------
-            linkData = struct('NodeType', 'link', 'LinkPath', linkValue,...
+            data = struct('NodeType', 'link', 'LinkPath', linkValue,...
                 'H5Node', aod.app.H5NodeTypes.LINK,...
                 'AONode', aod.app.AONodeTypes.LINK);
-            
+                
             g = uitreenode(parentNode,...
                 'Text', linkName,...
-                'Icon', [obj.ICON_DIR, 'chain.png'],...
+                'Icon', data.AONode.getIconPath(),...
                 'Tag', hdfPath,...
-                'NodeData', linkData);
+                'NodeData', data);
             obj.addContextMenu(g);
         end
 
@@ -208,10 +195,7 @@ classdef ExperimentView < aod.app.UIView
         end
 
         function addContextMenu(obj, node)
-            % ADDCONTEXTMENU
-            % 
-            % Description:
-            %   Adds context menu to the node
+            % Adds context menu to the node
             % -------------------------------------------------------------
             node.ContextMenu = obj.ContextMenu;
         end
@@ -228,11 +212,8 @@ classdef ExperimentView < aod.app.UIView
         end
 
         function createUi(obj)
-            % CREATEUI
-            %
-            % Description:
-            %   Initialize the components of the view
-            % -------------------------------------------------------------
+            % Initialize the components of the view
+            
             obj.figureHandle.Position(3:4) = [500 450];
             % movegui(obj.figureHandle, 'center'); too slow
 
@@ -277,6 +258,7 @@ classdef ExperimentView < aod.app.UIView
             obj.LinkPanelText = uitextarea(g,...
                 'BackgroundColor', 'w');
             uibutton(g, 'Text', 'Go to link',...
+                'Tag', 'FollowLinkButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'LinkFollowed'));
 
             obj.ContextMenu = uicontextmenu(obj.figureHandle);

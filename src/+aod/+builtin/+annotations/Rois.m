@@ -35,7 +35,7 @@ classdef Rois < aod.core.Annotation
         % The image used to annotate the ROIs
         Image
         % The size of the image used to annotate ROIs
-        Size (1,2)          {mustBeInteger}         = [0 0]
+        Size                {mustBeInteger}
         % The FileReader used to import ROIs
         Reader
     end
@@ -64,6 +64,10 @@ classdef Rois < aod.core.Annotation
             % assumed they represent a file name
             if isempty(obj.Reader) && istext(rois)
                 obj.setReader(aod.util.findFileReader(rois));
+            end
+            % Assign size if numeric
+            if isempty(obj.Size) && isnumeric(rois)
+                obj.Size = size(rois);
             end
 
             obj.load(rois);

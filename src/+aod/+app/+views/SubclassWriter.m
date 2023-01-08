@@ -124,7 +124,7 @@ classdef SubclassWriter < handle
             out = obj.indent(1) + "methods" + newline;
             out = out + obj.indent(2) + "function ";
             out = out + obj.getConstructor() + newline;
-            if obj.groupNameMode == "UserDefinedWithDefault"
+            if obj.Model.groupNameMode == "UserDefinedWithDefault"
                 out = out + obj.indent(3) + "if nargin == 0 || isempty(name)" + newline;
                 out = out + obj.indent(4) + "name = " + string(sprintf('"%s";', obj.Model.defaultName)) + newline;
                 out = out + obj.indent(3) + "end" + newline;
@@ -182,7 +182,7 @@ classdef SubclassWriter < handle
                 iProp = obj.Model.Properties(i);
                 if iProp.isRequired
                     if iProp.makeSetFcn
-                        setLine = sprintf("obj.set%s(%s)",... 
+                        setLine = sprintf("obj.set%s(%s);",... 
                             capFirstChar(iProp.Name),... 
                             camelCase(iProp.Name));
                     else
@@ -199,8 +199,14 @@ classdef SubclassWriter < handle
             setters = "";
             for i = 1:numel(obj.Model.Properties)
                 if obj.Model.Properties(i).isOptional
-                    setFcn = sprintf("addParameter(ip, '%s', []);",...
-                        obj.Model.Properties(i).Name);
+                    setFcn = sprintf("addParameter(ip, '%s', ",...
+                        capFirstChar(obj.Model.Properties(i).Name));
+                    if isempty(obj.Model.Properties(i).Default)
+                        setFcn = setFcn + "[]);";
+                    else
+                        setFcn = setFcn + sprintf('%s);',... 
+                            value2string(obj.Model.Properties(i).Default));
+                    end
                     setters = setters + obj.indent(3) + setFcn + newline;
                 end
             end
@@ -212,6 +218,22 @@ classdef SubclassWriter < handle
             out = obj.indent(3) + "% Optional input parsing" + newline;
             out = out + obj.indent(3) + "ip = aod.util.InputParser();" + newline + setters;
             out = out + obj.indent(3) + "parse(ip, varargin{:});" + newline;
+
+            out = out + obj.addLineBreak();
+            for i = 1:numel(obj.Model.Properties)
+                if obj.Model.Properties(i).isOptional
+                    if obj.Model.Properties(i).makeSetFcn
+                        out = out + obj.indent(3) + sprintf("obj.set%s(ip.Results.%s);",...
+                            capFirstChar(obj.Model.Properties(i).Name),...
+                            capFirstChar(obj.Model.Properties(i).Name));
+                    else
+                        out = out + obj.indent(3) + sprintf("obj.%s = ip.Results.%s;",...
+                            obj.Model.Properties(i).Name,...
+                            capFirstChar(obj.Model.Properties(i).Name));
+                    end
+                    out = out + newline;
+                end
+            end
         end
 
         function out = getConstructor(obj)

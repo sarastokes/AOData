@@ -17,7 +17,7 @@ classdef UtilityTest < matlab.unittest.TestCase
 % -------------------------------------------------------------------------
 
     methods (Test, TestTags=["Utility"])
-        function testParameters(testCase)
+        function Parameters(testCase)
             params = aod.util.Parameters();
             params('A') = 1;
             map = params.toMap();
@@ -29,7 +29,7 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyError(@() obj.create(), "create:NotImplemented");
         end
 
-        function testRepoManager(testCase)
+        function RepoManager(testCase)
             RM = aod.infra.RepositoryManager();
             RM.listPackages();
             RM.update();
@@ -40,6 +40,41 @@ classdef UtilityTest < matlab.unittest.TestCase
             [entity, idx] = aod.util.findByUUID(aod.core.Calibration.empty(), "d18642a3-745a-4d63-ae26-3c8e1d87c944");
             testCase.verifyEmpty(entity);
             testCase.verifyEmpty(idx);
+        end
+    end
+
+    methods (Test, TestTags=["Parameters", "Utility"])
+        function ParamManager(testCase)
+            PM = aod.util.ParameterManager();
+            testCase.verifyEqual(PM.Count, 0);
+            testCase.verifyEmpty(PM.table());
+
+            % Add param info
+            PM.add('MyParam1');
+            testCase.verifyEqual(PM.Count, 1);
+
+            % Error for existing parameter
+            testCase.verifyError(@() PM.add('MyParam1'), "add:ParameterExists");
+
+            % Add an ExpectedParameter
+            EP = aod.util.templates.ExpectedParameter('MyParam2');
+            PM.add(EP);
+            testCase.verifyEqual(PM.Count, 2);
+            testCase.verifyEqual(height(PM.table()), 2);
+
+            % Add a ParameterManager
+            PM2 = aod.util.ParameterManager();
+            PM2.add(PM);
+            testCase.verifyEqual(PM2.Count, 2);
+            
+            % Remove parameters
+            PM.remove('MyParam1');
+            testCase.verifyEqual(PM.Count, 1);
+
+            % Clear parameters
+            PM2.clear();
+            testCase.verifyEqual(PM2.Count, 0);
+
         end
     end
 

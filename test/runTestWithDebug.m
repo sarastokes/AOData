@@ -1,12 +1,19 @@
-function results = runTestWithDebug(testName, coveragePackage)
+function results = runTestWithDebug(testName, coveragePackage, debugFlag)
 % Run test with debugging and optional code coverage
 %
 % Syntax:
 %   results = runTestWithDebug(testName);
-%   results = runTestWithDebug(testName, coveragePackage);
+%   results = runTestWithDebug(testName, coveragePackage, debugFlag);
+%
+% See also:
+%   runAODataTestSuite, runtests
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
+
+    if nargin < 3
+        debugFlag = true;
+    end
 
     import matlab.unittest.plugins.StopOnFailuresPlugin
     import matlab.unittest.plugins.CodeCoveragePlugin
@@ -28,10 +35,12 @@ function results = runTestWithDebug(testName, coveragePackage)
     runner = testrunner("textoutput");
 
     % Debugging plugin
-    runner.addPlugin(StopOnFailuresPlugin);
+    if debugFlag
+        runner.addPlugin(StopOnFailuresPlugin);
+    end
 
     % Code coverage plugin
-    if nargin == 2
+    if nargin > 1 && ~isempty(coveragePackage)
         if ~exist('single_report', 'dir')
             mkdir('single_report');
         end
@@ -46,7 +55,7 @@ function results = runTestWithDebug(testName, coveragePackage)
     % Clean up files produced by tests, if necessary
     test.util.deleteTestFiles();
 
-    if nargin == 2    
+    if nargin > 1 && ~isempty(coveragePackage)
         open(fullfile('single_report', 'index.html'));
     end 
 

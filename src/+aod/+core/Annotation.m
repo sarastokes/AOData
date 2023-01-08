@@ -40,7 +40,10 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
+        % The annotation data
         Data   
+        % The date the annotation was performed or last updated
+        annotationDate          
         % Source associated with the Annotation
         Source                      = aod.core.Source.empty()       
     end
@@ -53,10 +56,12 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
             ip = aod.util.InputParser();
             addOptional(ip, 'Data', []);
             addParameter(ip, 'Source', []);
+            addParameter(ip, 'Date', getDateYMD(), @isdatetime);
             parse(ip, varargin{:});
 
             obj.setData(ip.Results.Data);
             obj.setSource(ip.Results.Source);
+            obj.setDate(ip.Results.Date);
         end
     end
 
@@ -97,6 +102,14 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
             else
                 obj.Data = data;
             end
+        end
+
+        function setDate(obj, annotationDate)
+            if nargin < 2 || isempty(annotationDate)
+                obj.annotationDate = datetime.empty();
+            end
+            annotationDate = aod.util.validateDate(annotationDate);
+            obj.annotationDate = annotationDate;
         end
     end
     

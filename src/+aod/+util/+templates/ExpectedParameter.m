@@ -81,7 +81,7 @@ classdef ExpectedParameter < handle
                 return
             end
 
-            if ~isa(other, 'ExpectedParameter')
+            if ~isa(other, 'aod.util.templates.ExpectedParameter')
                 tf = false;
                 return
             end

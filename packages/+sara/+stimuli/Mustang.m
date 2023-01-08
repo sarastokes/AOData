@@ -13,14 +13,15 @@ classdef Mustang < aod.builtin.stimuli.ImagingLight
 % -------------------------------------------------------------------------
  
     methods
-        function obj = Mustang(value)
-            obj@aod.builtin.stimuli.ImagingLight([], value, '%')
+        function obj = Mustang(intensity)
+            obj@aod.builtin.stimuli.ImagingLight([], intensity,...
+                'IntensityUnits', "%")
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = sprintf('Mustang%u', round(obj.value));
+            value = sprintf('Mustang%u', round(obj.intensity));
         end
     end
 end

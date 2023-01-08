@@ -24,6 +24,9 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 %   coverageTable       table
 %       A table containing the statement/function coverage summary, 
 %       empty if the Coverage parameter was false.
+%
+% See also:
+%   runtests, runTestWithDebug
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

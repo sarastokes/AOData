@@ -59,9 +59,9 @@ classdef ParameterFilter < aod.api.FilterQuery
 
             % First filter by whether the entities have the parameter
             for i = 1:numel(obj.Parent.allGroupNames)
-                if obj.localIdx
+                if obj.localIdx(i)
                     hdfFile = obj.Parent.getHdfName(i);
-                    obj.filterIdx(i) = h5tools.hasAttribute(...
+                    obj.localIdx(i) = h5tools.hasAttribute(...
                         hdfFile, obj.Parent.allGroupNames(i), obj.Name);
                 end
             end
@@ -78,8 +78,8 @@ classdef ParameterFilter < aod.api.FilterQuery
 
             % Second, filter by the parameter values
             for i = 1:numel(obj.Parent.allGroupNames)
-                if obj.localIdx
-                    attValue = h5readatt(obj.hdfName,... 
+                if obj.localIdx(i)
+                    attValue = h5readatt(obj.Parent.hdfName,... 
                         obj.Parent.allGroupNames(i), obj.Name);
                     if isa(obj.Value, 'function_handle')
                         obj.localIdx(i) = obj.Value(attValue);
@@ -91,10 +91,10 @@ classdef ParameterFilter < aod.api.FilterQuery
             out = obj.localIdx;
         
             % Throw a warning if nothing matched the filter
-            if nnz(obj.filterIdx) == 0
+            if nnz(obj.localIdx) == 0
                 warning('apply:NoMatches',...
-                    'No matches were found for %s =', obj.Name);
-                disp(obj.Value);
+                    'No matches were found for %s = %s',... 
+                    obj.Name, value2string(obj.Value));
             end
         end
     end

@@ -31,13 +31,13 @@ classdef Dff < aod.builtin.responses.RegionResponse
             ip = inputParser();
             ip.CaseSensitive = false;
             ip.KeepUnmatched = true;
-            addOptional(ip, 'Bkgd', [], @isnumeric);
+            addOptional(ip, 'Baseline', [], @isnumeric);
             addParameter(ip, 'UseMedian', false, @islogical);
             addParameter(ip, 'Smooth', 0, @isnumeric);
             addParameter(ip, 'HighPass', 0, @isnumeric);
             parse(ip, varargin{:});
             
-            bkgd = ip.Results.Bkgd;
+            bkgd = ip.Results.Baseline;
             smoothFac = ip.Results.Smooth;
             highCut = ip.Results.HighPass;
             useMedian = ip.Results.UseMedian;
@@ -61,20 +61,35 @@ classdef Dff < aod.builtin.responses.RegionResponse
             end
 
             % High pass filter, if necessary            
-            if highCut > 0
+            if ~isempty(highCut)
                 signals = signalHighPassFilter(signals, highCut, obj.Experiment.frameRate);
                 signals = signalBaselineCorrect(signals, bkgd); 
             end
 
             % Smooth, if necessary
-            if smoothFac > 0
+            if ~isempty(smoothFac)
                 signals = mysmooth2(signals, smoothFac);
             end
                      
             % Add to Response
             obj.setData(signals);
             obj.setTiming(F.Timing);
-            obj.addParameter(ip.Results);
+            obj.setParam(ip.Results);
+        end
+    end
+
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.builtin.responses.RegionResponse(obj);
+
+            value.add('Baseline', [], @(x) numel(x) == 2 & isnumeric(x),...
+                'Start and stop frame for baseline region');
+            value.add('UseMedian', false, @islogical,...
+                'Whether the mean or the median was used');
+            value.add('Smooth', [], @isnumeric,...
+                'Sigma used for builtin smooth function, if specified');
+            value.add('HighPass', [], @isnumeric,...
+                'Cutoff for highpass filter in Hz');
         end
     end
 

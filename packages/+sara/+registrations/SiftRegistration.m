@@ -18,30 +18,36 @@ classdef SiftRegistration < aod.builtin.registrations.RigidRegistration
     methods
         function obj = SiftRegistration(registrationDate, data, varargin)
             obj = obj@aod.builtin.registrations.RigidRegistration(...
-                'SIFT', registrationDate, data);
+                'SIFT', registrationDate, data, varargin{:});
            
-            ip = aod.util.InputParser();
-            addRequired(ip, 'ReferenceID', @isnumeric);
-            % Whether stack was bleach-corrected first
-            addParameter(ip, 'DUP', false, @islogical);
-            addParameter(ip, 'WhichStack', 'SUM', @ischar);
+            obj.setParam('Software', 'ImageJ-SIFTRegistrationPlugin');
+        end
+    end
+
+    methods (Access = protected)
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.builtin.registrations.RigidRegistration(obj);
+            
+            value.add('ReferenceID', [], @isnumeric,...
+                'Epoch ID used as template for registration');
+            value.add('HistogramMatching', false, @islogical,...
+                'Whether Histogram Matching was performed first.');
+            value.add('WhichStack', 'SUM', @isstring);
+
             % The default parameters for SIFT, only need to specify if one
             % of the defaults presented in ImageJ is changed
-            addParameter(ip, 'InitialGaussianBlur', 1.6, @isnumeric);
-            addParameter(ip, 'StepsPerScaleOctave', 3, @isnumeric);
-            addParameter(ip, 'MinimumImageSize', 64, @isnumeric);
-            addParameter(ip, 'MaximumImageSize', 1024, @isnumeric);
-            addParameter(ip, 'FeatureDescriptorSize', 4, @isnumeric);
-            addParameter(ip, 'FeatureDescriptorOrientationBins', 8, @isnumeric);
-            addParameter(ip, 'ClosestNextClosestRatio', 4, @isnumeric);
-            addParameter(ip, 'MaximalAlignmentRatio', 25, @isnumeric);
-            addParameter(ip, 'InlierRatio', 0.05, @isnumeric);
-            addParameter(ip, 'ExpectedTransformation', 'rigid',...
-                @(x) ismember(lower(x), {'translation', 'rigid', 'affine', 'similarity'}));
-            addParameter(ip, 'Interpolate', true, @islogical);
-            parse(ip, varargin{:});
-
-            obj.setParam(ip.Results);
+            value.add('InitialGaussianBlur', 1.6, @isnumeric);
+            value.add('StepsPerScaleOctave', 3, @isnumeric);
+            value.add('MinimumImageSize', 64, @isnumeric);
+            value.add('MaximumImageSize', 1024, @isnumeric);
+            value.add('FeatureDescriptorSize', 4, @isnumeric);
+            value.add('FeatureDescriptorOrientationBins', 8, @isnumeric);
+            value.add('ClosestNextClosestRatio', 4, @isnumeric);
+            value.add('MaximalAlignmentRatio', 25, @isnumeric);
+            value.add('InlierRatio', 0.05, @isnumeric);
+            value.add('ExpectedTransformation', 'rigid',...
+                @(x) ismember(lower(x), ["translation", "rigid", "affine", "similarity"]));
+            value.add('Interpolate', true, @islogical);
         end
     end
 end

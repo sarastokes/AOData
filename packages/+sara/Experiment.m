@@ -84,14 +84,14 @@ classdef Experiment < aod.core.Experiment
             end
         end
 
-        function addSiftTransforms(obj, tforms, epochIDs, regDate, refID, varargin)
+        function addSiftTransforms(obj, tforms, epochIDs, regDate, varargin)
             % ADDSIFTTRANSFORMS
             %
             % Syntax:
             %   addSiftTransforms(obj, tforms, epochIDs, varargin)
             % -------------------------------------------------------------
             ip = aod.util.InputParser();
-            addParameter(ip, 'WhichTforms', [], @isnumeric);
+            addParameter(ip, 'WhichTforms', 1:numel(epochIDs), @isnumeric);
             parse(ip, varargin{:});
 
             whichTforms = ip.Results.WhichTforms;
@@ -111,12 +111,7 @@ classdef Experiment < aod.core.Experiment
 
             for i = 1:numel(epochIDs)
                 reg = sara.registrations.SiftRegistration(...
-                    regDate, squeeze(tforms(:,:,i)), refID, varargin{:});
-                if ~isempty(whichTforms)
-                    reg.setParam('WhichTforms', whichTforms);
-                else
-                    reg.setParam('WhichTforms', 1:numel(epochIDs));
-                end
+                    regDate, squeeze(tforms(:,:,i)), varargin{:});
                 obj.Epochs(obj.id2index(epochIDs(i))).add(reg);
             end
         end

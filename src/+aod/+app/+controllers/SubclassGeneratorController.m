@@ -13,7 +13,7 @@ classdef SubclassGeneratorController < aod.app.Controller
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (Access = private)
+    properties (SetAccess = private)
         methodListBox
         detailBox
         titleBox
@@ -75,7 +75,7 @@ classdef SubclassGeneratorController < aod.app.Controller
             end
 
             set(findByTag(obj.figureHandle, "GroupNameDropdown"),...
-                "Items", getEnumMembers('GroupNameType'));
+                "Items", string(enumeration('aod.app.GroupNameType')));
             if ~isempty(obj.Model.groupNameMode)
                 obj.didSetGroupNameMode(true);
             end
@@ -174,7 +174,7 @@ classdef SubclassGeneratorController < aod.app.Controller
     end
 
     % UI callbacks
-    methods (Access = private)
+    methods %(Access = private)
         function onClassNameChanged(obj, src, evt)
             % ONCLASSNAMECHANGED
             [success, ME] = obj.trySetModel('ClassName', evt.Value);
@@ -246,8 +246,6 @@ classdef SubclassGeneratorController < aod.app.Controller
             set(findByTag(obj.figureHandle, "SuperclassPanel"), 'Visible', 'on');
             set(findByTag(obj.figureHandle, "SuperclassDropdown"),...
                 "Items", [""; obj.Model.getAllowableSuperclasses()]);
-            set(findByTag(obj.figureHandle, "UpdateButton"),...
-                "Enable", "on");
             obj.update();
         end
 
@@ -296,7 +294,7 @@ classdef SubclassGeneratorController < aod.app.Controller
                 set(findByTag(obj.figureHandle, "GroupNameDropdown"),...
                     "Value", obj.Model.groupNameMode);
             end
-            if obj.Model.groupNameMode == "HardCoded"
+            if ismember(obj.Model.groupNameMode, ["HardCoded", "UserDefinedWithDefault"])
                 set(findByTag(obj.figureHandle, "DefaultGroupName"),...
                     "Enable", true, "Value", obj.Model.defaultName);
             else
@@ -380,7 +378,7 @@ classdef SubclassGeneratorController < aod.app.Controller
 
         function onPushRemoveLink(obj, ~, ~)
             h = findByTag(obj.figureHandle, "LinkListBox");
-            if isempty(h.Items) || isempty(h.Value)
+            if numel(h.Items) == 0 || isempty(h.Value)
                 return
             end
             out = h.Value;
@@ -469,19 +467,19 @@ classdef SubclassGeneratorController < aod.app.Controller
             % UI Controls
             uiTabGroup = uitabgroup(mainLayout);
             obj.setLayout(uiTabGroup, 2, 1);
+
+            % Basic Tab
             basicTab = uitab(uiTabGroup, "Title", "Basic");
             basicGrid = uigridlayout(basicTab, [3 6],...
                 "RowHeight", {70, 70, 70}, obj.LAYOUT_PROPS{:});
 
+            % Detail Tab
             detailTab = uitab(uiTabGroup, "Title", "Details");
             detailGrid = uigridlayout(detailTab, [1 3], obj.LAYOUT_PROPS{:});
 
+            % Advanced Tab
             advTab = uitab(uiTabGroup, "Title", "Advanced");
             advGrid = uigridlayout(advTab, [1 1], obj.LAYOUT_PROPS{:});
-
-            % uiGrid = uigridlayout(mainLayout, [5 2],...
-            %     "RowHeight", {50, 50, '1.7x', '1.7x', '1.7x'});
-            % obj.setLayout(uiGrid, 2, 1);
 
             % Documentation box
             h = uilabel(mainLayout, "Text", "Documentation:",...
@@ -535,7 +533,7 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "ButtonDownFcn", @obj.onGetHelp);
             obj.setLayout(p, 2, [4 6]);
             uidropdown(uigridlayout(p, [1 1], obj.LAYOUT_PROPS{:}),...
-                "Tag", "SuperclassDropdown",...
+                "Items", "", "Tag", "SuperclassDropdown",...
                 "ValueChangedFcn", @obj.onSuperclassSelected);
 
             % What attributes are expected?
@@ -618,6 +616,7 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "Icon", obj.getIcon('icons8-making-notes-40.png'),...
                 "Enable", "off", "Tag", "WriteButton",...
                 "ButtonPushedFcn", @obj.onPushWrite);
+            obj.setLayout(h, 2, 2);
         end
 
         function makeFilePathPanel(obj, p)
@@ -625,6 +624,7 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "ColumnWidth", {'fit', '4x'}, "Padding", 3);
             uibutton(g, "Text", "",...
                 "Icon", obj.getIcon('filecabinet.png'),...
+                "Tag", "FileBrowserButton",...
                 "ButtonPushedFcn", @obj.onPushFileBrowser);
             uitextarea(g, "Value", "",... 
                 "Tag", "FilePath", "Editable", "off");
@@ -667,9 +667,11 @@ classdef SubclassGeneratorController < aod.app.Controller
             g2 = uigridlayout(g, [3 1], obj.LAYOUT_PROPS{:});
             obj.setLayout(g2, 2, 1);
             [h1, h2, h3] = obj.makeButtons(g2);
-            h1.ButtonPushedFcn = @obj.onPushAddAttribute;
-            h2.ButtonPushedFcn = @obj.onPushRemoveAttribute;
-            % h3.ButtonPushedFcn = @obj.onPushEditAttribute;
+            set(h1, "Tag", "AddAttributeButton",...
+                "ButtonPushedFcn", @obj.onPushAddAttribute);
+            set(h2, "Tag", "RemoveAttributeButton",...
+                "ButtonPushedFcn", @obj.onPushRemoveAttribute);
+            set(h3, "Tag", "EditAttributeButton");
         end
 
         function makeDatasetPanel(obj, p)
@@ -680,9 +682,11 @@ classdef SubclassGeneratorController < aod.app.Controller
             g2 = uigridlayout(g, [3 1], obj.LAYOUT_PROPS{:});
             obj.setLayout(g2, 2, 1);
             [h1, h2, h3] = obj.makeButtons(g2);
-            h1.ButtonPushedFcn = @obj.onPushAddDataset;
-            h2.ButtonPushedFcn = @obj.onPushRemoveDataset;
-            % h3.ButtonPushedFcn = @obj.onPushEditDataset;
+            set(h1, "Tag", "AddDatasetButton",...
+                "ButtonPushedFcn", @obj.onPushAddDataset);
+            set(h2, "Tag", "RemoveDatasetButton",...
+                "ButtonPushedFcn", @obj.onPushRemoveDataset);
+            set(h3, "Tag", "EditDatasetButton");
         end
 
         function makeLinkPanel(obj, p)
@@ -693,9 +697,11 @@ classdef SubclassGeneratorController < aod.app.Controller
             g2 = uigridlayout(g, [3 1], obj.LAYOUT_PROPS{:});
             obj.setLayout(g2, 2, 1);
             [h1, h2, h3] = obj.makeButtons(g2);
-            h1.ButtonPushedFcn = @obj.onPushAddLink;
-            h2.ButtonPushedFcn = @obj.onPushRemoveLink;
-            % h3.ButtonPushedFcn = @obj.onPushEditLink;
+            set(h1, "Tag", "AddLinkButton",...
+                "ButtonPushedFcn", @obj.onPushAddLink);
+            set(h2, "Tag", "RemoveLinkButton",...
+                "ButtonPushedFcn", @obj.onPushRemoveLink);
+            set(h3, "Tag", "EditLinkButton");
         end
         
         function makeMethodPanel(obj, p)

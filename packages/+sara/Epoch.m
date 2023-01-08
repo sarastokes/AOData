@@ -190,6 +190,13 @@ classdef Epoch < aod.core.Epoch
         function value = getLabel(obj)
             value = [obj.Parent.label, '#', int2fixedwidthstr(obj.ID, 4)];
         end
+
+        function value = getExpectedParameters(obj)
+            value = getExpectedParameters@aod.core.Epoch(obj);
+
+            value.add('Defocus', [], @isnumeric,...
+                'The AO defocus during the Epoch');
+        end
     end
 end
 

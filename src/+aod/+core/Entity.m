@@ -134,7 +134,30 @@ classdef (Abstract) Entity < handle
         end
     end
 
+    % Hierarchy methods
     methods (Sealed)
+        function out = getParent(obj)
+            % Get the parent of an entity
+            %
+            % Description:
+            %   Can be accessed through the Parent property, but this 
+            %   method will concatenate parents if more than one entity 
+            %   is provided
+            %
+            % Syntax:
+            %   % Get the parent of one entity (equivalent to obj.Parent)
+            %   h = obj.getParent()
+            %
+            %   % Get the parent epochs of all stimuli matching a query
+            %   h = getParent(expt.get('Stimulus', {'Name', 'BinaryNoise'}))
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                out = aod.util.arrayfun(@(x) getParent(x), obj);
+                return
+            end
+            out = obj.Parent;
+        end
+
         function h = ancestor(obj, className)
             % Get parent entity matching a specific entityType
             %

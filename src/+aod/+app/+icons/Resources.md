@@ -25,7 +25,7 @@ Source credit for the free icons used in apps
 - <a href="https://icons8.com/icon/31483/data-sheet">Data Sheet</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38006/do-not-disturb">Do Not Disturb</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/32540/documents">Documents</a> icon by <a href="https://icons8.com">Icons8</a>
-- <a href="https://icons8.com/icon/21079/folder">Folder</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/41649/folder">Folder</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31496/grid">Grid</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21352/help">Help</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/74811/home-page">Home Page</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -37,9 +37,11 @@ Source credit for the free icons used in apps
 - <a href="https://icons8.com/icon/21168/name-tag">Name Tag</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21777/nas">NAS</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38107/new-document">New Document</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/31150/new-product">New Product</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38129/note">Note</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21215/planner">Planner</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21100/refresh">Refresh</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21394/save">Save</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21103/settings">Settings</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21256/tree-structure">Tree Structure</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21430/unchecked-checkbox">Unchecked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>

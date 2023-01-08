@@ -68,13 +68,13 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             % Single inputs can be ExpectedParameter or ParameterManager
             if nargin == 2
                 if isa(param, 'aod.util.templates.ExpectedParameter')
-                    if isequal(param, obj.ExpectedParameters)
+                    if any(isequal(param, obj.ExpectedParameters))
                         error('add:ParameterExists',...
                             'A parameter already exists named %s', param.Name);     
                     end
                     obj.ExpectedParameters = cat(1, obj.ExpectedParameters, param);
                     return
-                elseif isa(param, 'ParameterManager')
+                elseif isa(param, 'aod.util.ParameterManager')
                     PM = param;
                     for i = 1:numel(PM.ExpectedParameters)
                         obj.add(PM.ExpectedParameters(i));

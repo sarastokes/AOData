@@ -122,7 +122,7 @@ classdef PhysiologyExperiment < sara.Experiment
 
             for i = 1:obj.numEpochs
                 ep = obj.id2epoch(obj.epochIDs(i));
-                stim = ep.getStimulus('aod.builtin.stimuli.VisualStimulus');
+                stim = ep.get('Stimulus', {'Subclass', 'aod.builtin.stimuli.VisualStimulus'});
                 stimNames = cat(1, stimNames, string(stim.label));
                 stimTypes = cat(1, stimTypes, string(ep.epochType));
                 protocols = cat(1, protocols, string(stim.protocolName));
@@ -135,10 +135,10 @@ classdef PhysiologyExperiment < sara.Experiment
         function populateStimTable(obj)
             epochIdx = cell.empty();
             epochIDs = cell.empty();
-            nSpatial = numel(unique(obj.stimLog.Stimulus(obj.stimLog.Type == "Spatial")));
+            nSpatial = numel(unique(obj.stimLog.Stimulus(obj.stimLog.Type == "SPATIAL")));
             stimNames = [...
-                unique(obj.stimLog.Stimulus(obj.stimLog.Type == "Spatial"));...
-                unique(obj.stimLog.Stimulus(obj.stimLog.Type == "Spectral"))];
+                unique(obj.stimLog.Stimulus(obj.stimLog.Type == "SPATIAL"));...
+                unique(obj.stimLog.Stimulus(obj.stimLog.Type == "SPECTRAL"))];
             N = zeros(numel(stimNames), 1);
             stimTypes = string.empty();
 

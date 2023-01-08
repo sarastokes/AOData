@@ -37,25 +37,39 @@ classdef RegistrationReportReader < aod.util.FileReader
             [~, colStripX] = extractMatches(V, "strip-" + digitsPattern + "x");
             if ~isempty(colStripX)                
                 [~, colStripY] = extractMatches(V, "strip-" + digitsPattern + "y");
-                obj.Data.stripX = T{:,colStripX};
-                obj.Data.stripY = T{:,colStripY};
-                obj.Data.hasStrip = true;
+                try
+                    obj.Data.stripX = T{:,colStripX};
+                    obj.Data.stripY = T{:,colStripY};
+                    obj.Data.hasStrip = true;
+                catch 
+                    warning("readFile:StripXYError",...
+                        "Registration data could not be imported");
+                    obj.Data.hasStrip = false;
+                end
             else
                 obj.Data.hasStrip = false;
             end
 
-            frameX = T{:, contains(V, "frame-x")};
-            if isempty(frameX)
+            try
+                frameX = T{:, contains(V, "frame-x")};
+                if isempty(frameX)
+                    obj.Data.hasFrame = false;
+                else
+                    frameY = T{:, contains(V, "frame-y")};
+                    obj.Data.frameXY = [frameX, frameY];
+                    obj.Data.hasFrame = true;
+                end
+            catch
+                warning("readFile:FrameXYError",...
+                    "RegistrationData could not be imported");
                 obj.Data.hasFrame = false;
-            else
-                frameY = T{:, contains(V, "frame-y")};
-                obj.Data.frameXY = [frameX, frameY];
-                obj.Data.hasFrame = true;
             end
 
-            obj.Data.corrCoef = T{:, contains(V, "coef")};
-            obj.Data.regFlag = T{:, contains(V, "flag")};
-            obj.Data.regDescription = string(T{:, contains(V, "description")});
+            if obj.Data.hasStrip || obj.Data.hasFrame
+                obj.Data.corrCoef = T{:, contains(V, "coef")};
+                obj.Data.regFlag = T{:, contains(V, "flag")};
+                obj.Data.regDescription = string(T{:, contains(V, "description")});
+            end
 
             if numel(V) < numel(T)
                 obj.Data.rotationAngle = T{:, end};

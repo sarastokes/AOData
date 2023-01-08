@@ -16,7 +16,7 @@ classdef SubclassGenerator < handle
         SuperClass 
         EntityType 
 
-        groupNameMode           string          = "DefinedInternally"      
+        groupNameMode           string          = "UserDefined"      
         userDefinedName         logical         = true
         defaultName             string          = string.empty()
         defineLabel             logical         = false
@@ -154,6 +154,14 @@ classdef SubclassGenerator < handle
             notify(obj, "ChangedDatasets");
         end
 
+        function clearDatasets(obj)
+            if isempty(obj.Datasets)
+                return
+            end
+            obj.Datasets(:) = [];
+            notify(obj, "ChangedDatasets");
+        end
+
         function addLink(obj, prop)
             arguments
                 obj
@@ -175,6 +183,14 @@ classdef SubclassGenerator < handle
             notify(obj, "ChangedLinks");
         end
 
+        function clearLinks(obj)
+            if isempty(obj.Links)
+                return
+            end
+            obj.Links(:) = [];
+            notify(obj, "ChangedLinks");
+        end
+
         function addAttribute(obj, attr)
             arguments
                 obj
@@ -189,6 +205,14 @@ classdef SubclassGenerator < handle
             out = arrayfun(@(x) x.Name, obj.Attributes);
             idx = find(out == attrName);
             obj.Links(idx) = [];
+            notify(obj, "ChangedAttributes");
+        end
+
+        function clearAttributes(obj)
+            if isempty(obj.Attributes)
+                return
+            end
+            obj.Attributes = aod.util.templates.AttributeSpecification.empty();
             notify(obj, "ChangedAttributes");
         end
     end
@@ -235,9 +259,7 @@ classdef SubclassGenerator < handle
                 'Superclass must be a subclass of aod.core.Entity');
             assert(~isSubclass(className, 'aod.core.Entity'),...
                 'Superclass must be a subclass of aod.core.Entity');
-            obj.SuperClass = className;
-
-            disp('hi')
+            obj.SuperClass = className; 
         end
     end
 
@@ -248,7 +270,7 @@ classdef SubclassGenerator < handle
                 obj
                 value 
             end
-            obj.groupNameMode = GroupNameType.get(value);
+            obj.groupNameMode = aod.app.GroupNameType.get(value);
             % notify(obj, 'SetGroupNameMode');
         end
     end

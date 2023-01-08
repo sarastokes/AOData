@@ -1,11 +1,11 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 26Dec2022, the ```aod``` package report contains **130 files** and has:
-- **62.26%** statement coverage (3758 executable). 
-- **60.67%** function coverage (651 executable).
+As of 8Jan2023, the ```aod``` package report contains **145 files** and has:
+- **66.25%** statement coverage (4753 executable). 
+- **66.17%** function coverage (813 executable).
 
-The apps are the least tested, excluding ```aod.app```, code coverage is **70.28%** for statements and **70.29%** for functions.
+The apps are the least tested, excluding ```aod.app```, code coverage is **70.80%** for statements and **72.28%** for functions.
 
 ## Tests
 The AOData test suite currently contains the following:
@@ -22,6 +22,7 @@ The AOData test suite currently contains the following:
 - ```ProtocolTest``` - tests the protocol class and integration with experimental hierarchy
 - ```ResponseTest``` - tests Response entity in core interface
 - ```SourceTest``` - tests Source entity in core interface
+- ```SubclassGeneratorTest``` - tests the framework and UI for generating template subclasses
 - ```SyncTest``` - tests validation performed when adding an entity to an experiment
 - ```UtilityTest``` - tests the utility functions supporting AOData
 
@@ -40,4 +41,8 @@ A code coverage report for the full ```aod``` package can be run as shown below.
 An individual test can be run as:
 ```matlab
 result = runtests('CoreInterfaceTest');
+```
+or with optional debugging and code coverage through:
+```matlab
+result = runTestWithDebug('CoreInterfaceTest', 'aod', true);
 ```
