@@ -323,8 +323,6 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
     end
 
-    
-
     methods (Test, TestTags=["Links", "SubclassGenerator"])
         function LinkSpecification(testCase)
             model = aod.app.models.SubclassGenerator();
@@ -367,7 +365,6 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
             testCase.closeApp(app);
         end
 
-
         function ModelAddLink(testCase)
             % Setup
             model = aod.app.models.SubclassGenerator();
@@ -383,7 +380,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
             model.addLink(prop);
 
             linkBox = findByTag(fig, "LinkListBox");
-            testCase.verifyTrue(any(ismember("Link1", linkBox.Items)));
+            testCase.verifyTrue(ismember("Link1", linkBox.Items));
 
             model.clearLinks();
             testCase.verifyEqual(linkBox.Items, {char.empty()});
@@ -395,6 +392,88 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
             testCase.choose(linkBox, 'Link1');
             app.onPushRemoveLink();
             testCase.verifyEqual(linkBox.Items, {char.empty()});
+
+            % Close out the app
+            app.delete();
+        end
+    end
+
+    methods (Test, TestTags=["Attributes", "SubclassGenerator"])
+        function AttributeSpecification(testCase)
+            
+            model = aod.app.models.SubclassGenerator();
+            model.ClassName = "ChannelSubclass";
+            model.FilePath = pwd;
+            model.EntityType = 'Channel';
+            model.SuperClass = "aod.core.Channel";
+
+            app = aod.app.controllers.SubclassGeneratorController(model);
+            fig = app.getView();
+
+            % Attribute with a set function and description
+            attr1 = aod.util.templates.AttributeSpecification('Attr1');
+            attr1.makeSetFcn = true;
+            attr1.Description = "The first attribute";
+            model.addAttribute(attr1);
+
+            % Attribute with default, validation and a set fcn
+            attr2 = aod.util.templates.AttributeSpecification('Attr2');
+            attr2.Default = 123;
+            attr2.Validation = {@isnumeric};
+            attr2.makeSetFcn = true;
+            model.addAttribute(attr2);
+
+            % Ensure both are present in the listbox
+            attrBox = findByTag(fig, "AttributeListBox");
+            testCase.verifyNumElements(attrBox.Items, 2);
+            
+            % Update the view
+            testCase.press(findByTag(fig, "UpdateButton"));
+
+            % Confirm expected parameter box is present
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "value = getExpectedParameters@aod.core.Channel(obj)")));
+            % Verify parameter expecification
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "value.add('Attr1', [], [],"))); % has description
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "value.add('Attr2', 123, @isnumeric);"))); 
+            % Verify set functions
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "obj.setParam('Attr1', value);")));
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "obj.setParam('Attr2', value);")));
+            % Verify documentation
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "% Parameters:")));
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "(default = 123)")));
+            
+            % Close out the app
+            app.delete();
+        end
+
+        function ModelAddAttribute(testCase)
+        
+            model = aod.app.models.SubclassGenerator();
+            model.ClassName = "ChannelSubclass";
+            model.FilePath = pwd;
+            model.EntityType = 'Channel';
+            model.SuperClass = "aod.core.Channel";
+
+            app = aod.app.controllers.SubclassGeneratorController(model);
+            fig = app.getView();
+
+            prop = aod.util.templates.AttributeSpecification('Attr1');
+            model.addAttribute(prop);
+
+            attrBox = findByTag(fig, "AttributeListBox");
+            testCase.verifyTrue(ismember("Attr1", attrBox.Items));
+
+            % Remove the attribute
+            testCase.choose(attrBox, 'Attr1');
+            app.onPushRemoveAttribute();
+            testCase.verifyEqual(attrBox.Items, {char.empty()});
 
             % Close out the app
             app.delete();

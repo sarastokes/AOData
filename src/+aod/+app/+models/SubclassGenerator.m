@@ -204,7 +204,7 @@ classdef SubclassGenerator < handle
         function removeAttribute(obj, attrName)
             out = arrayfun(@(x) x.Name, obj.Attributes);
             idx = find(out == attrName);
-            obj.Links(idx) = [];
+            obj.Attributes(idx) = [];
             notify(obj, "ChangedAttributes");
         end
 
