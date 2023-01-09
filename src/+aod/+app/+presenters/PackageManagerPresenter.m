@@ -32,7 +32,13 @@ classdef PackageManagerPresenter < appbox.Presenter
         end
 
         function v = getView(obj)
+            % Get the view (used for testing and debugging)
             v = obj.view;
+        end
+
+        function fh = getFigure(obj)
+            v = obj.getView;
+            fh = v.getFigure();
         end
     end
 
@@ -102,18 +108,18 @@ classdef PackageManagerPresenter < appbox.Presenter
             end
         end
 
-        function hardReset(obj)
-            initializeAOData(true);
-            obj.populateBasePackage();
-            obj.populateSearchPaths();
-            obj.populateGitRepos();
-        end
+        % function hardReset(obj)
+            % initializeAOData('NoApp', false);
+            % obj.populateBasePackage();
+            % obj.populateSearchPaths();
+            % obj.populateGitRepos();
+        % end
     end
 
     % Callback methods
     methods (Access = private)
         function onViewSelectedUpdateBasePackage(obj, ~, ~)
-            initializeAOData();
+            initializeAOData('NoApp', true);
             obj.populateBasePackage();
             obj.populateGitRepos();
         end
@@ -174,7 +180,6 @@ classdef PackageManagerPresenter < appbox.Presenter
                 paths = obj.view.getSearchPaths();
                 if isempty(paths)
                     obj.view.showError('Search Paths must at least include AOData package!');
-                    % obj.hardReset();
                     return
                 else
                     paths = string(paths);

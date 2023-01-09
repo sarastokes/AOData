@@ -29,8 +29,13 @@ classdef PackageManagerView < aod.app.UIView
     end
 
     methods
-        function obj = PackageManagerView()
-            obj = obj@aod.app.UIView();
+        function obj = PackageManagerView(varargin)
+            obj = obj@aod.app.UIView(varargin{:});
+        end
+
+        function fh = getFigure(obj)
+            % Returns figure handle 
+            fh = obj.figureHandle;
         end
     end
 
@@ -99,11 +104,14 @@ classdef PackageManagerView < aod.app.UIView
     methods 
         function obj = createUi(obj)
             g = uigridlayout(obj.figureHandle, [1 1]);
-            tabGroup = uitabgroup(g);
+            tabGroup = uitabgroup(g, 'Tag', 'TabGroup');
 
-            basePackageTab = uitab(tabGroup, 'Title', 'BasePackage');
-            searchPathTab = uitab(tabGroup, 'Title', 'Search Paths');
-            gitRepoTab = uitab(tabGroup, 'Title', 'Git Repos');
+            basePackageTab = uitab(tabGroup, 'Title', 'BasePackage',...
+                'Tag', 'BaseTab');
+            searchPathTab = uitab(tabGroup, 'Title', 'Search Paths',...
+                'Tag', 'SearchTab');
+            gitRepoTab = uitab(tabGroup, 'Title', 'Git Repos',...
+                'Tag', 'RepoTab');
 
             g = uigridlayout(basePackageTab, [3 1],...
                 'RowHeight', {45, 30, 45});
@@ -118,6 +126,7 @@ classdef PackageManagerView < aod.app.UIView
             obj.basePackageText.Layout.Column = 1;
             
             h = uibutton(g, 'Text', 'Update',...
+                'Tag', 'UpdateButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'UpdateBasePackage'));
             h.Layout.Row = 3; h.Layout.Column = 1;
 
@@ -129,9 +138,11 @@ classdef PackageManagerView < aod.app.UIView
                 "FontWeight", "bold");
             h.Layout.Row = 1; h.Layout.Column = [1 2];
             h = uibutton(g, 'Text', 'Add Path',...
+                'Tag', 'AddSearchButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'AddSearchPath'));
             h.Layout.Row = 2; h.Layout.Column = 1;
             h = uibutton(g, 'Text', 'Remove',...
+                'Tag', 'RemoveSearchButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'RemoveSearchPath'));
             h.Layout.Row = 2; h.Layout.Column = 2;
 
@@ -140,9 +151,11 @@ classdef PackageManagerView < aod.app.UIView
             obj.searchPathListbox.Layout.Column = [1 2];
 
             h = uibutton(g, 'Text', 'Save',...
+                'Tag', 'SaveSearchButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'SaveSearchPaths'));
             h.Layout.Row = 4; h.Layout.Column = 1;
             h = uibutton(g, 'Text', 'Cancel',...
+                'Tag', 'CancelSearchButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'Cancel'));
             h.Layout.Row = 4; h.Layout.Column = 2;
 
@@ -154,9 +167,11 @@ classdef PackageManagerView < aod.app.UIView
                 "FontWeight", "bold");
             h.Layout.Row = 1; h.Layout.Column = 1;
             h = uibutton(g, 'Text', 'Add',...
+                'Tag', 'AddRepoButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'AddGitRepo'));
             h.Layout.Row = 2; h.Layout.Column = 1;
             h = uibutton(g, 'Text', 'Remove',...
+                'Tag', 'RemoveRepoButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'RemoveGitRepo'));
             h.Layout.Row = 2; h.Layout.Column = 2;
             
@@ -165,9 +180,11 @@ classdef PackageManagerView < aod.app.UIView
             obj.gitRepoListbox.Layout.Column = [1 2];
 
             h = uibutton(g, 'Text', 'Save',...
+                'Tag', 'SaveRepoButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'SaveGitRepos'));
             h.Layout.Row = 4; h.Layout.Column = 1;
             h = uibutton(g, 'Text', 'Cancel',...
+                'Tag', 'CancelRepoButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'Cancel'));
             h.Layout.Row = 4; h.Layout.Column = 2;
         end

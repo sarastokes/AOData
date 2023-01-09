@@ -8,7 +8,11 @@ classdef EntityFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = aod.api.EntityFilter(hdfName, entityName)
+%   obj = aod.api.EntityFilter(parent, entityType)
+%
+% Inputs:
+%   parent          aod.api.QueryManager
+%   entityType      text name of entity or aod.core.EntityTypes
 %
 % See also:
 %   aod.api.QueryManager
@@ -17,13 +21,13 @@ classdef EntityFilter < aod.api.FilterQuery
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        entityName          
+        EntityName          
     end
 
     methods 
         function obj = EntityFilter(parent, entityType)
             obj@aod.api.FilterQuery(parent);
-            obj.entityName = char(aod.core.EntityTypes.get(entityType));
+            obj.EntityName = char(aod.core.EntityTypes.get(entityType));
         end
 
         function out = apply(obj)
@@ -35,8 +39,13 @@ classdef EntityFilter < aod.api.FilterQuery
                     hdfFile = obj.Parent.getHdfName(i);
                     entityType = h5readatt(hdfFile,...
                         obj.Parent.allGroupNames(i), 'EntityType');
-                    obj.localIdx(i) = strcmpi(entityType, obj.entityName);
+                    obj.localIdx(i) = strcmpi(entityType, obj.EntityName);
                 end
+            end
+
+            if nnz(obj.localIdx)
+                warning('apply:NoMatches',...
+                    'No matches for entity type %s', obj.EntityName);
             end
             
             out = obj.localIdx;

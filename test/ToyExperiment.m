@@ -92,7 +92,8 @@ function experiment = ToyExperiment(writeToHDF)
     epoch.add(stim);
 
     % Datasets
-    epoch.add(aod.core.EpochDataset('Dataset1', magic(5)));
+    epoch.add(aod.core.EpochDataset('Dataset1',...
+        'Data', magic(5)));
 
     % Annotation
     experiment.add(aod.core.Annotation('Annotation1'));

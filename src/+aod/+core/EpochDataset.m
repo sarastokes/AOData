@@ -9,7 +9,7 @@ classdef EpochDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Constructor:
 %   obj = aod.core.EpochDataset(name)
-%   obj = aod.core.EpochDataset(name, data)
+%   obj = aod.core.EpochDataset(name, 'Data', data, varargin)
 %
 % Properties:
 %   Data
@@ -28,11 +28,14 @@ classdef EpochDataset < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = EpochDataset(name, data, varargin)
+        function obj = EpochDataset(name, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
-            if nargin > 1
-                obj.setData(data);
-            end
+
+            ip = aod.util.InputParser();
+            addParameter(ip, 'Data', []);
+            parse(ip, varargin{:});
+
+            obj.setData(ip.Results.Data);
         end
     end
 

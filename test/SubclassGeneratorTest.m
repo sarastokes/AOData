@@ -281,8 +281,8 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
                 "function setProp1(obj, ")));
             % Test assignment
-            testCase.verifyTrue(contains(app.detailBox.Value,...
-                "obj.setProp1(prop1);"));
+            testCase.verifyTrue(any(contains(app.detailBox.Value,...
+                "obj.setProp1(prop1);")));
 
             model.clearDatasets();
             % Close out the app

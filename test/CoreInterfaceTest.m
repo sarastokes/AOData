@@ -616,7 +616,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Create some datasets
             dataset1 = aod.core.EpochDataset('TestDataset1');
-            dataset2 = aod.core.EpochDataset('TestDataset2', eye(3));
+            dataset2 = aod.core.EpochDataset('TestDataset2',...
+                'Data', eye(3));
             dataset2.setDescription('This is a test dataset');
             
             % Add the datasets to the experiment
@@ -696,7 +697,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Add and remove registration dates
             reg1.setRegistrationDate([]);
-            reg2.setRegistrationDate(getDateYMD());
+            regDate = getDateYMD();
+            setRegistrationDate([reg1, reg2], regDate);
+            test.util.verifyDatesEqual(testCase, reg1.registrationDate, dateYMD);
 
             % Add Registrations to an Epoch
             testCase.EXPT.Epochs(1).add([reg1, reg2]);

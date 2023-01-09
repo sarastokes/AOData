@@ -162,17 +162,36 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
             addParameter(ip, 'Plot', false, @islogical);
             addParameter(ip, 'Parent', [], @ishandle);
             addParameter(ip, 'Smooth', [], @isnumeric);
+            addParameter(ip, 'Method', 'df', @(x) ismember(lower(x), ["dff", "df", "zscore"]));
+            addParameter(ip, 'Threshold', [], @isnumeric);
             parse(ip, varargin{:});
             ax = ip.Results.Parent;
+            method = ip.Results.Method;
 
             F1name = obj.stim2prop(whichStim);
             data = obj.(F1name);
             ctrlData = obj.(obj.stim2prop('ctrl'));
 
-            cdata = mean(data, 3) - mean(ctrlData, 3);
             if ~isempty(ip.Results.Smooth)
-                cdata = imgaussfilt(cdata, ip.Results.Smooth);
+                data = imgaussfilt(data, ip.Results.Smooth);
+                ctrlData = imgaussfilt(ctrlData, ip.Results.Smooth);
             end
+
+            switch lower(method)
+                case 'df' 
+                    cdata = mean(data, 3) - mean(ctrlData, 3);
+                case 'dff'
+                    cdata = (mean(data, 3) - mean(ctrlData, 3)) ./ mean(ctrlData, 3);
+                case 'zscore'
+                    cdata = mean(data, 3) - mean(ctrlData, 3) ./ std(ctrlData, [], 3);
+                    cdata(isnan(cdata)) = 0;
+            end
+
+
+            if ~isempty(ip.Results.Threshold)
+                cdata(abs(cdata) < ip.Results.Threshold) = 0;
+            end
+
             if ip.Results.Plot
                 if isempty(ax)
                     ax = axes('Parent', figure());
@@ -191,18 +210,40 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
 
         function F1map = rgbMap(obj, varargin)
             
+            ip = aod.util.InputParser();
+            addParameter(ip, 'Plot', false, @islogical);
+            parse(ip, varargin{:});
+
             F1map = [];
             cones = {'liso', 'miso', 'siso'};
+            stimContrasts = [0.2476, 0.335, 0.9282];
+            scaleFactor = stimContrasts ./ min(stimContrasts);
             for i = 1:3
-                iData = obj.normalize(cones{i}, 'Smooth', 1);
+                iData = obj.normalize(cones{i}, ip.Unmatched);
+                % Scale for stimulus contrast
+                iData = iData ./ scaleFactor(i);
                 F1map = cat(3, F1map, iData);
             end
-            F1map = (F1map-min(F1map(:)) / (max(F1map-min(F1map(:)), [], "all")));
-            F1map = (F1map + 0.5) / 2;
-            figure();
-            image(F1map); hold on;
-            title(obj.Parent.Name, 'Interpreter', 'none');
-            axis equal tight off;
+            F1map(F1map < 0) = 0;
+            %assignin('base', 'F1map', F1map);
+            %for i = 1:3
+            %    iMap = squeeze(F1map(:,:,i));
+            %    fprintf('Cutoff %u = %.2f\n', i, prctile(iMap(:), 50));
+            %    iMap(iMap < prctile(iMap(:), 80)) = 0;
+            %    iMap(iMap > prctile(iMap(:), 99)) = 1;
+            %    F1map(:,:,i) = iMap;
+            %end
+            F1map = F1map ./ max(F1map, [], 1:2);
+            %F1map = (F1map-min(F1map(:)) / (max(F1map-min(F1map(:)), [], "all")));
+            F1map = (1+F1map) / 2;
+
+            if ip.Results.Plot
+                figure('Name', 'RGB Plot');
+                image(F1map); hold on;
+                title(obj.Parent.Name, 'Interpreter', 'none');
+                axis equal tight off;
+                tightfig(gcf);
+            end
         end
     end
 

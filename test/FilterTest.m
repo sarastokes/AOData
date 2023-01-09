@@ -36,6 +36,22 @@ classdef FilterTest < matlab.unittest.TestCase
         %     testCase.verifyEqual(numel(fObj.getMatches), numel(fObj.allGroupNames) - 1);
         % end
 
+        function ClassFilter(testCase)
+            testCase.QM.clearFilters();
+
+            % There should always be just one Experiment per file
+            CF1 = aod.api.ClassFilter(testCase.QM, 'aod.core.Experiment');
+            idx = CF1.apply();
+            testCase.verifyEqual(nnz(idx), 1);
+
+            CF2 = aod.api.ClassFilter(testCase.QM, @(x) endsWith(x, 'Experiment'));
+            idx = CF2.apply();
+            testCase.verifyEqual(nnz(idx), 1);
+
+            CF3 = aod.api.ClassFilter(testCase.QM, 'aod.core.BadClass');
+            testCase.verifyWarning(@() CF3.apply(), 'apply:NoMatches');
+        end
+
         function testEntityFilter(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();

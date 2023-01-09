@@ -44,33 +44,36 @@ classdef Rois < aod.builtin.annotations.Rois
     end
 
     properties (SetAccess = protected)
+        % The size of the image used to annotate ROIs
+        Size                {mustBeInteger}
         % Unique identifiers of ROIs
         Metadata            table            = table.empty()
     end
 
     methods
         function obj = Rois(name, rois, varargin)
+            ip = aod.util.InputParser();
+            addParameter(ip, 'Size', [], @isnumeric);
+            parse(ip, varargin{:});
+
             if istext(rois) && endsWith(rois, '.zip')
-                reader = aod.util.builtin.ImageJRoiReader(rois);
-            else
-                reader = [];
+                if isempty(ip.Results.Size)
+                    error('Rois:NoSizeSpecified',...
+                        'Must specify Size to use ImageJRoiReader');
+                end
+                rois = aod.builtin.readers.ImageJRoiReader(rois, ip.Results.Size);
             end
-            obj = obj@aod.builtin.annotations.Rois(name, rois,...
-                'Reader', reader, varargin{:});
+            obj = obj@aod.builtin.annotations.Rois(name, rois, varargin{:});
+            
+            if ~isempty(ip.Results.Size)
+                obj.Size = ip.Results.Size;
+            end
         end
     end
 
     methods
-        function load(obj, rois, imSize)
-            if nargin < 3 && isnumeric(rois)
-                imSize = size(rois);
-            end
+        function load(obj, rois)
             load@aod.builtin.annotations.Rois(obj, rois);
-            if nargin < 3 || isempty(imSize)
-                imSize = obj.Size;
-            else
-                obj.Size = imSize;
-            end
             obj.setMetadata();
         end
            

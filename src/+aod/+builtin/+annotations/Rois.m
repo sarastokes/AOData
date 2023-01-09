@@ -9,11 +9,9 @@ classdef Rois < aod.core.Annotation
 %
 % Constructor:
 %   obj = Rois(name, rois)
-%   obj = Rois(name, rois, 'Size', value, 'Source', source)
+%   obj = Rois(name, rois, 'Source', source)
 %
-% Optional Parameters:
-%   Size            % needed for loading ImageJRois, otherwise calculated
-% Optional Parameters (inherited from aod.core.Annotation):
+% Optional Properties (inherited from aod.core.Annotation):
 %   Source          aod.core.Source
 %
 % Derived Parameters (automatically calculated from Data):
@@ -34,8 +32,6 @@ classdef Rois < aod.core.Annotation
     properties (SetAccess = protected)
         % The image used to annotate the ROIs
         Image
-        % The size of the image used to annotate ROIs
-        Size                {mustBeInteger}
         % The FileReader used to import ROIs
         Reader
     end
@@ -52,22 +48,27 @@ classdef Rois < aod.core.Annotation
         function obj = Rois(name, rois, varargin)
             obj = obj@aod.core.Annotation(name, varargin{:});
 
+            if isSubclass(rois, 'aod.util.FileReader')
+                obj.Reader = rois;
+                obj.load([]);
+            else
+                
+            end
+
             ip = aod.util.InputParser();
-            addParameter(ip, 'Size', [], @isnumeric);
             addParameter(ip, 'Reader', []);
             parse(ip, varargin{:});
             
-            obj.Size = ip.Results.Size;
-            obj.setReader(ip.Results.Reader);
+            reader = ip.Results.Reader;
+
+            if ~isempty(reader)
+                obj.setReader(@() reader(rois));
+            end
 
             % Assign reader, if necessary. If rois are text, it is 
             % assumed they represent a file name
             if isempty(obj.Reader) && istext(rois)
                 obj.setReader(aod.util.findFileReader(rois));
-            end
-            % Assign size if numeric
-            if isempty(obj.Size) && isnumeric(rois)
-                obj.Size = size(rois);
             end
 
             obj.load(rois);
@@ -81,16 +82,16 @@ classdef Rois < aod.core.Annotation
             % Syntax:
             %   load(obj, rois, imSize)
             % -------------------------------------------------------------
-            if isnumeric(rois)
-                if ~isnumeric(obj.Data)
-                    obj.Data = double(obj.Data);
-                end
-                obj.setMap(rois);
-            else
+            if isSubclass(rois, 'aod.util.FileReader')
                 obj.setMap(obj.Reader.readFile());
                 if ~isa(obj.Data, 'double')
                     obj.Data = im2double(obj.Data);
                 end
+            else
+                if ~isa(obj.Data, 'double')
+                    obj.Data = double(obj.Data);
+                end
+                obj.setMap(rois);
             end
         end
            

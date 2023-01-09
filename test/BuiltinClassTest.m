@@ -1,5 +1,5 @@
 classdef BuiltinClassTest < matlab.unittest.TestCase
-% BUILTINCLASSTEST
+% Test the aod.builtin package
 %
 % Description:
 %   Tests instantiation of builtin classes

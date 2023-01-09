@@ -13,72 +13,59 @@ classdef ClassFilter < aod.api.FilterQuery
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        className
+    properties (SetAccess = protected)
+        Class
     end
     
-    properties (SetAccess = protected)
+    properties (SetAccess = private)
         allClassNames
     end
 
     methods
-        function obj = ClassFilter(hdfName, className)
-            obj = obj@aod.api.FilterQuery(hdfName);
+        function obj = ClassFilter(parent, className)
+            obj = obj@aod.api.FilterQuery(parent);
+            obj.Class = className;
 
             obj.collectClassNames();
-
-            if nargin > 1 && ~isempty(className)
-                obj.className = className;
-                obj.apply();
-            end
         end
     end
 
     % Implementation of FilterQuery abstract methods
     methods
-        function apply(obj, filterIdx)
-            % APPLYFILTER
-            %
-            % Description:
-            %   Apply the filter to all HDF5 groups representing entities
-            %
-            % Syntax:
-            %   applyFilter(obj)
-            % -------------------------------------------------------------
-            if nargin < 2
-                obj.filterIdx = filterIdx;
-            else
-                obj.resetFilterIdx();
-            end
+        function out = apply(obj)
+            % Update local match indices to match those in Query Manager
+            obj.localIdx = obj.Parent.filterIdx;
             
             for i = 1:numel(obj.allClassNames)
-                if obj.filterIdx(i)
-                    obj.filterIdx(i) = strcmpi(obj.className, obj.allClassNames(i));
+                if obj.localIdx(i)
+                    if isa(obj.Class, 'function_handle')
+                        obj.localIdx(i) = obj.Class(obj.allClassNames(i));
+                    else
+                        obj.localIdx(i) = strcmpi(obj.Class, obj.allClassNames(i));
+                    end
                 end
             end
+
             % Throw a warning if nothing matched the filter
-            if nnz(obj.filterIdx) == 0
-                warning('ClassFilter_apply:NoMatches',...
-                    'ClassFilter for %s returned no matches', obj.className);
+            if nnz(obj.localIdx) == 0
+                warning('apply:NoMatches',...
+                    'ClassFilter for %s returned no matches',... 
+                        value2string(obj.Class)); 
             end
+
+            out = obj.localIdx;
         end
     end
 
-    methods (Access = private)
+    methods (Access = protected)
         function collectClassNames(obj)
-            classNames = repmat("", [numel(obj.allGroupNames), 1]);
-            for i = 1:numel(obj.allGroupNames)
-                classNames(i) = h5readatt(obj.hdfName,...
-                    obj.allGroupNames(i), 'Class');
+            classNames = repmat("", [numel(obj.Parent.allGroupNames), 1]);
+            for i = 1:numel(obj.Parent.allGroupNames)
+                hdfFile = obj.Parent.getHdfName(i);
+                classNames(i) = string(h5readatt(hdfFile,...
+                    obj.Parent.allGroupNames(i), 'Class'));
             end
             obj.allClassNames = classNames;
-        end
-    end
-
-    methods (Static)
-        function names = summarize(hdfName)
-            obj = aod.api.ClassFilter(hdfName);
-            names = unique(obj.allClassNames);
         end
     end
 end 

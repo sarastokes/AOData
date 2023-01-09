@@ -27,6 +27,7 @@ classdef UIView < handle
 
     properties (Access = protected)
         figureHandle
+        folderChooser
     end
 
     methods (Abstract)
@@ -35,7 +36,13 @@ classdef UIView < handle
 
     methods
 
-        function obj = UIView()
+        function obj = UIView(varargin)
+
+            ip = inputParser();
+            addParameter(ip, 'FolderChooser', aod.app.util.DefaultFolderChooser);
+            parse(ip, varargin{:});
+            obj.folderChooser = ip.Results.FolderChooser;
+
             warning('off', 'MATLAB:ui:javacomponent:FunctionToBeRemoved');
             obj.figureHandle = uifigure(...
                 'NumberTitle', 'off',...
@@ -131,16 +138,18 @@ classdef UIView < handle
             web(url, varargin{:});
         end
 
-        function p = showGetDirectory(obj, title, startPath) %#ok<INUSL>
-            if nargin < 3
-                startPath = pwd();
-            end
-            folderName = uigetdir(startPath, title);
-            if folderName == 0
-                p = [];
-                return;
-            end
-            p = folderName;
+        function p = showGetDirectory(obj, varargin) %#ok<INUSL>
+            
+            p = obj.folderChooser.chooseFolder(varargin{:});
+            %if nargin < 3
+            %    startPath = pwd();
+            %end
+            %folderName = uigetdir(startPath, title);
+            %if folderName == 0
+            %    p = [];
+            %    return;
+            %end
+            %p = folderName;
         end
 
         function p = showGetFile(obj, title, filter, defaultName) %#ok<INUSL>

@@ -1,14 +1,15 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 8Jan2023, the ```aod``` package report contains **145 files** and has:
-- **66.25%** statement coverage (4753 executable). 
-- **66.17%** function coverage (813 executable).
+As of 8Jan2023, the ```aod``` package report contains **146 files** and has:
+- **69.51%** statement coverage (4749 executable). 
+- **69.78%** function coverage (814 executable).
 
 The apps are the least tested, excluding ```aod.app```, code coverage is **70.80%** for statements and **72.28%** for functions.
 
 ## Tests
 The AOData test suite currently contains the following:
+- ```AODataManagerTest``` - tests display, preference setting and interaction with AODataManagerApp
 - ```AODataViewerTest``` - tests display and user interaction with the AODataViewer app
 - ```BuiltinClassTest``` - tests operation of builtin subclasses
 - ```CoreApiTest``` - tests core interface queries

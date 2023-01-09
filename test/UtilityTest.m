@@ -16,6 +16,22 @@ classdef UtilityTest < matlab.unittest.TestCase
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    properties
+        EXPT 
+    end
+
+    methods (TestClassSetup)
+        function methodSetup(testCase)
+            % Creates an experiment, writes to HDF5 and reads back in  
+            fileName = fullfile(getpref('AOData', 'BasePackage'), ...
+                'test', 'ToyExperiment.h5');            
+            if ~exist(fileName, 'file')
+                ToyExperiment(true);
+            end
+            testCase.EXPT = loadExperiment(fileName);
+        end
+    end
+
     methods (Test, TestTags=["Utility"])
         function Parameters(testCase)
             params = aod.util.Parameters();
@@ -29,7 +45,7 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyError(@() obj.create(), "create:NotImplemented");
         end
 
-        function RepoManager(testCase)
+        function RepoManager(testCase) %#ok<MANU> 
             RM = aod.infra.RepositoryManager();
             RM.listPackages();
             RM.update();
@@ -92,6 +108,17 @@ classdef UtilityTest < matlab.unittest.TestCase
                 @()aod.util.validateDate('BadDate'),... 
                 "validateDate:FailedDatetimeConversion");
         end
+
+        function IsEntity(testCase)
+            testCase.verifyFalse(aod.util.isEntity(123));
+            [tf, persisted] = aod.util.isEntity(testCase.EXPT);
+            testCase.verifyTrue(tf);
+            testCase.verifyTrue(persisted);
+
+            [tf, persisted] = aod.util.isEntity(aod.core.Device('MyDevice'));
+            testCase.verifyTrue(tf);
+            testCase.verifyFalse(persisted);
+        end
     end
 
     methods (Test, TestTags=["Argument", "Utility"])
@@ -111,13 +138,13 @@ classdef UtilityTest < matlab.unittest.TestCase
         end
 
         function MustBeEpochID(testCase)
-            EXPT = aod.core.Experiment('Test', cd, '20221226');
-            EXPT.add(aod.core.Epoch(6));
+            expt = aod.core.Experiment('Test', cd, '20221226');
+            expt.add(aod.core.Epoch(6));
             testCase.verifyError(...
-                @() aod.util.mustBeEpochID(EXPT, 10),...
+                @() aod.util.mustBeEpochID(expt, 10),...
                 "mustBeEpochID:UnmatchedID");
             % No error
-            aod.util.mustBeEpochID(EXPT, 6);
+            aod.util.mustBeEpochID(expt, 6);
         end
     end
 
@@ -137,14 +164,6 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyError(...
                 @() aod.util.findFileReader('test.zip'),...
                 "findFileReader:UnknownExtension");
-        end
-
-        function FileManagerClass(testCase)
-            %obj1 = test.FileManager(pwd);
-            %obj2 = test.FileManager([pwd, filesep]);
-
-            % Check trailing filesep handling
-            %testCase.verifyEqual(obj1.baseFolderPath, obj2.baseFolderPath);
         end
     end 
 

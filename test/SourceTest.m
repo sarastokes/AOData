@@ -77,6 +77,8 @@ classdef SourceTest < matlab.unittest.TestCase
 
             source = testCase.createSource();
             testCase.verifyNumElements(source.get('Source', {'Name', 'OS'}), 1);
+
+            testCase.verifyNumElements(source.get('Source'), 2);
         end
         
         function RemoveSourceByQuery(testCase)
@@ -88,6 +90,12 @@ classdef SourceTest < matlab.unittest.TestCase
             testCase.verifyNumElements(source.Sources, 1);
 
             source.remove({'Name', 'OD'});
+            testCase.verifyEmpty(source.Sources);
+        end
+
+        function RemoveSourceByAll(testCase)
+            source = testCase.createSource();
+            source.remove('all');
             testCase.verifyEmpty(source.Sources);
         end
         
@@ -119,8 +127,14 @@ classdef SourceTest < matlab.unittest.TestCase
         function SourceErrors(testCase)
             % Misc errors not covered in other tests
             source = testCase.createSource();
-            testCase.verifyError(...
-                @() source.get('Source', "badID"), "get:InvalidInput");
+            testCase.verifyError(@() source.get('Source', "badID"),... 
+                "get:InvalidInput");
+            
+            testCase.verifyError(source.get('Epoch'),...
+                "get:InvalidEntityType");
+
+            testCase.verifyError(source.remove('Source', struct('A', 1)),...
+                "remove:InvalidID")
         end
     end
 end 
