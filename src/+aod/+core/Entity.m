@@ -193,7 +193,15 @@ classdef (Abstract) Entity < handle
             %
             % Syntax:
             %   setName(obj, name)
+            %
+            % Inputs:
+            %   name        Set Entity name 
             % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) setName(x, name), obj);
+                return
+            end
+            
             obj.Name = name;
         end
 

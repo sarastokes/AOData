@@ -10,6 +10,9 @@ classdef EntitySearch < handle
 %
 % Constructor:
 %   obj = aod.core.EntitySearch(entityGroup, varargin)
+%
+% Single line execution:
+%   [matches, idx] = aod.core.EntitySearch.go(entityGroup, varargin)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -55,7 +58,46 @@ classdef EntitySearch < handle
         end
     end
 
-    
+    methods (Static)
+        function [out, ID] = go(entityGroup, varargin)
+            % Create EntitySearch object and return query matches
+            %
+            % Description:
+            %   A shortcut method for skipping the instantiation of the
+            %   EntitySearch object and directly returning the matches
+            %
+            % Syntax:
+            %   [out, ID] = aod.core.EntitySearch.go(entityGroup, varargin)
+            %
+            % Inputs:
+            %   entityGroup         array of core entities
+            %       A group of entities of one type from the core interface
+            %   varargin            one or more queries
+            %       Queries within cells (TODO)
+            %
+            % Outputs:
+            %   out                 array of entities
+            %       The entities from entityGroup matching query criteria
+            %   ID                  integers
+            %       The indices of the matching entities in entityGroup 
+            % -------------------------------------------------------------
+
+            if isempty(entityGroup)
+                out = [];
+                return
+            end
+
+            if nargin < 2
+                warning('go:NoQueries',... 
+                    'EntitySearch was not provided a query, returning full group');
+                out = entityGroup;
+                return
+            end
+            obj = aod.core.EntitySearch(entityGroup, varargin{:});
+            [out, ID] = obj.getMatches();
+        end
+    end
+
     methods (Access = protected)
         function queryByType(obj, query)
             % Determine the query to perform 
@@ -77,8 +119,8 @@ classdef EntitySearch < handle
                     obj.fileQuery(query{2:end});
             end
 
-            fprintf('\t%s query returned %u of %u entities\n',... 
-                queryType, nnz(obj.filterIdx), numel(obj.Group));
+            % fprintf('\t%s query returned %u of %u entities\n',... 
+            %     queryType, nnz(obj.filterIdx), numel(obj.Group));
         end
     end 
 
@@ -250,46 +292,6 @@ classdef EntitySearch < handle
                     obj.filterIdx(i) = isequal(obj.Group(i).getParam(paramName), paramSpec);
                 end
             end
-        end
-    end
-
-    methods (Static)
-        function [out, ID] = go(entityGroup, varargin)
-            % Create EntitySearch object and return query matches
-            %
-            % Description:
-            %   A shortcut method for skipping the instantiation of the
-            %   EntitySearch object and directly returning the matches
-            %
-            % Syntax:
-            %   [out, ID] = aod.core.EntitySearch.go(entityGroup, varargin)
-            %
-            % Inputs:
-            %   entityGroup         array of core entities
-            %       A group of entities of one type from the core interface
-            %   varargin            one or more queries
-            %       Queries within cells (TODO)
-            %
-            % Outputs:
-            %   out                 array of entities
-            %       The entities from entityGroup matching query criteria
-            %   ID                  integers
-            %       The indices of the matching entities in entityGroup 
-            % -------------------------------------------------------------
-
-            if isempty(entityGroup)
-                out = [];
-                return
-            end
-
-            if nargin < 2
-                warning('go:NoQueries',... 
-                    'EntitySearch was not provided a query, returning full group');
-                out = entityGroup;
-                return
-            end
-            obj = aod.core.EntitySearch(entityGroup, varargin{:});
-            [out, ID] = obj.getMatches();
         end
     end
 end

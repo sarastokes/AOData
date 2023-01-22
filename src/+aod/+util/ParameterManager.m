@@ -117,6 +117,18 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
     end
 
     methods
+        function [tf, name] = hasParam(obj, paramName)
+            if isempty(obj.ExpectedParameters)
+                tf = false;
+            end
+
+            allParamNames = arrayfun(@(x) x.Name, obj.ExpectedParameters);
+
+
+            tf = ismember(paramName, allParamNames, 'CaseSensitive', false);
+            name = allParamNames(strfind(allParamNames == paramName));
+        end
+
         function ip = parse(obj, varargin)
             ip = obj.getParser();
             parse(ip, varargin{:});

@@ -14,6 +14,13 @@ classdef EntityFilter < aod.api.FilterQuery
 %   parent          aod.api.QueryManager
 %   entityType      text name of entity or aod.core.EntityTypes
 %
+% Examples:
+%   QM = aod.api.EntityManager("MyFile.h5")
+%   % Initialize by entity name
+%   EF1 = aod.api.FilterQuery(QM, 'Response')
+%   % Initialize by entity type
+%   EF2 = aod.api.FilterQuery(QM, aod.core.EntityTypes.RESPONSE)
+%
 % See also:
 %   aod.api.QueryManager
 

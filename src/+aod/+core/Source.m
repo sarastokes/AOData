@@ -44,11 +44,39 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.Sources = cat(1, obj.Sources, childSource);
         end
 
+        function tf = has(obj, entityType, varargin)
+            % Search Source's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries
+            %
+            % See also:
+            %   aod.core.Source/get
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
+
         function out = get(obj, varargin)
             % Search and access child Sources
             %
             % Syntax:
             %   out = get(obj, varargin)
+            %
+            % Notes:
+            %   - Queries are documented in aod.core.EntitySearch
+            %
+            % See Also:
+            %   aod.core.EntitySearch
             % -------------------------------------------------------------
 
             if isempty(obj.Sources)
@@ -60,13 +88,15 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
             try
                 entityType = EntityTypes.get(varargin{1});
-                if entityType ~= EntityTypes.SOURCE
-                    error('get:InvalidEntityType',...
-                        'Entity must be a Source');
-                end
                 startIdx = 2;
             catch
+                entityType = EntityTypes.SOURCE;
                 startIdx = 1;
+            end
+   
+            if entityType ~= EntityTypes.SOURCE
+                error('get:InvalidEntityType',...
+                    'Entity must be a Source');
             end
 
             if nargin == startIdx
@@ -82,10 +112,29 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function remove(obj, varargin)
-            % Remove child source(s) by ID , query or "all"
+            % Remove child source(s) by ID, query or "all"
+            %
+            % Description:
+            %   Remove all child Sources, a specific Source or Sources 
+            %   that match a specific query. Entity type specification 
+            %   isn't necessary (but can be done) because 
             %
             % Syntax:
             %   remove(obj, varargin)
+            %
+            % Examples:
+            %   % Remove all child sources
+            %   obj.remove('all')
+            %
+            %   % Entity type input isn't needed as only Sources can be 
+            %   % child entities of a Source. It's allowed though
+            %   obj.remove('Source', 'all')
+            %
+            %   % Remove the 2nd child source
+            %   obj.remove(2)
+            %
+            %   % Remove Sources by query (those named 'Right')
+            %   obj.remove({'Name', 'Right'}) 
             % -------------------------------------------------------------
 
             import aod.core.EntityTypes
@@ -93,12 +142,13 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             try 
                 entityType = EntityTypes.get(varargin{1});
                 startIdx = 2;
-                assert(entityType == aod.core.EntityTypes.SOURCE,...
-                    'Only Sources can be removed from Source');
             catch
                 entityType = EntityTypes.SOURCE;
                 startIdx = 1;
             end
+
+            assert(entityType == aod.core.EntityTypes.SOURCE,...
+                'Only Sources can be removed from Source');
 
             ID = varargin{startIdx};
 
@@ -126,6 +176,13 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             % Syntax:
             %   allSources = getAllSources(obj)
+            %
+            % Examples:
+            %   source = aod.core.Source('MySource');
+            %   source.add(aod.core.Source('OS'))
+            %   source.add(aod.core.Source('OD'))
+            %   allSources = source.getAllSources();
+            %   >> Returns OD and OS
             % -------------------------------------------------------------
             if ~isscalar(obj)
                 allSources = uncell(aod.util.arrayfun(@(x) getAllSources(x), obj));

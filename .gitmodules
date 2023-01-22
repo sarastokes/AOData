@@ -9,3 +9,6 @@
 [submodule "lib/doxymatlab"]
 	path = lib/doxymatlab
 	url = https://github.com/simgunz/doxymatlab.git
+[submodule "lib/superbar"]
+	path = lib/superbar
+	url = https://github.com/scottclowe/superbar.git

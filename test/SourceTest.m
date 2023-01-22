@@ -44,6 +44,11 @@ classdef SourceTest < matlab.unittest.TestCase
             % Check labels
             testCase.verifyEqual('MC00851_OS', source1a.label);
 
+            % Check has functionality
+            testCase.verifyTrue(source1.has({'Name', 'OS'}));
+            testCase.verifyFalse(source1.has({'Name', 'OU'}));
+            testCase.verifyTrue(source1.has({'Class', 'aod.core.Source'}));
+
             % Create third-level source
             source1a1 = aod.core.Source('Right');
             source1a2 = aod.core.Source('Left');

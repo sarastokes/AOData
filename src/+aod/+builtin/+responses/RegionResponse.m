@@ -107,10 +107,10 @@ classdef RegionResponse < aod.core.Response
             imStack = obj.loadData();
 
             roiMask = double(obj.Annotation.Data);
-            roiList = obj.Annotation.RoiIDs;
+            roiList = obj.Annotation.roiIDs;
         
             A = [];
-            for i = 1:obj.Annotation.Count
+            for i = 1:obj.Annotation.numRois
                 [a, b] = find(roiMask == roiList(i));
                 % Look for ROIs exceeding image size
                 a(b > size(imStack,2)) = [];

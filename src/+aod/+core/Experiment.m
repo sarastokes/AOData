@@ -48,12 +48,12 @@ classdef Experiment < aod.core.Entity
         experimentDate (1,1)    datetime
 
         Analyses                aod.core.Analysis       
-        Epochs                  aod.core.Epoch          
+        Epochs                  aod.core.Epoch         
+        ExperimentDatasets      aod.core.ExperimentDataset  
         Sources                 aod.core.Source         
         Annotations             aod.core.Annotation     
         Calibrations            aod.core.Calibration    
         Systems                 aod.core.System         
-        ExperimentDatasets      aod.core.ExperimentDataset 
 
         % A table containing all git repositories and their current status
         Code                          
@@ -294,6 +294,28 @@ classdef Experiment < aod.core.Entity
                 otherwise
             end
         end
+        
+        function tf = has(obj, entityType, varargin)
+            % Search Experiment's child entities & return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria & return if matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries
+            %
+            % See also:
+            %   aod.core.Experiment/get
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
 
         function out = get(obj, entityType, varargin)
             % Search all entities of a specific type within experiment
@@ -384,7 +406,28 @@ classdef Experiment < aod.core.Entity
     methods
         function out = getFromEpoch(obj, ID, entityType, varargin)
             % Get entities from one, multiple or all epochs
-            % TODO: Is ID useful here?
+            %
+            % Syntax:
+            %   out = getFromEpoch(obj, ID, entityType, varargin)
+            %
+            % Inputs:
+            %   ID          integer or empty
+            %       Epoch ID(s). For all epochs, set to 'all' or []
+            %   entityType      aod.core.EntityTypes or char
+            %       Entity type to get (epoch dataset, registration,  
+            %       stimulus or response)
+            % Optional inputs:
+            %   varargin    queries, IDs or 'all'
+            %
+            % Examples:
+            %   % Get all epoch datasets for all epochs
+            %   out = obj.getFromEpoch('all', 'EpochDataset')
+            %
+            %   % Get responses from epoch #1
+            %   out = obj.getFromEpoch(1, 'Responses')
+            %
+            %   % Get stimuli from epochs 1:3 matching a query
+            %   out = obj.getFromEpoch(1:3, 'Stimulus', {'Name', 'Mustang'})
             % -------------------------------------------------------------
             
             import aod.core.EntityTypes

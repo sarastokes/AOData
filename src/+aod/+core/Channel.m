@@ -38,6 +38,28 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
+        function tf = has(obj, entityType, varargin)
+            % Search Channel's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries (TODO: doc)
+            %
+            % See also:
+            %   aod.core.Channel/get
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
+
         function out = get(obj, entityType, varargin)
             % Search Channel's child entities
             %
@@ -56,7 +78,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %       One or more queries within cells
             %
             % Notes:
-            %   query specification is documented in aod.core.EntitySearch
+            %   - Queries are documented in aod.core.EntitySearch
             %
             % See Also:
             %   aod.core.EntitySearch
@@ -64,28 +86,35 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 
             import aod.core.EntityTypes
 
-            entityType = EntityTypes.get(entityType);
-            
-            if entityType ~= EntityTypes.DEVICE 
-                error('get:InvalidEntityType',...
-                    'Only Devices can be searched from Channel');
+            try
+                entityType = EntityTypes.get(varargin{1});           
+                if entityType ~= EntityTypes.DEVICE 
+                    error('get:InvalidEntityType',...
+                        'Only Devices can be searched from Channel');
+                end
+                startIdx = 2;
+            catch 
+                startIdx = 1;
             end
 
             if nargin > 2
-                out = aod.core.EntitySearch.go(obj.Devices, varargin{:});
+                out = aod.core.EntitySearch.go(obj.Devices,... 
+                    varargin{startIdx:end});
             else
                 out = obj.Devices;
             end
         end
     
         function add(obj, device)
-            % ADD
-            %
-            % Description:
-            %   Add a Device to the Channel
+            % Add a Device to the Channel
             %
             % Syntax:
             %   add(obj, device)
+            %
+            % Examples:
+            %   channel = aod.core.Channel('MyChannel');
+            %   device = aod.core.Device('MyDevice');
+            %   channel.add(device)
             % -------------------------------------------------------------
             arguments
                 obj
@@ -102,18 +131,15 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
         end
         
         function remove(obj, varargin)
-            % Remove an entity (device)
-            %
-            % Description:
-            %   Remove a Device from the channel
+            % Remove a Device from the Channel
             %
             % Syntax:
-            %   remove(obj, ID)
-            %   remove(obj, entityType, ID)
+            %   remove(obj, varargin)
+            %   remove(obj, entityType, varargin)
             %
             % Notes:
-            %   entityType argument is optional as only Device can be  
-            %   removed from a Channel 
+            %   - entityType argument is optional as only Device can be  
+            %     removed from a Channel 
             % -------------------------------------------------------------
             
             if nargin == 3

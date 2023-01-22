@@ -107,13 +107,6 @@ classdef PackageManagerPresenter < appbox.Presenter
                 obj.view.addGitRepo(path(i));
             end
         end
-
-        % function hardReset(obj)
-            % initializeAOData('NoApp', false);
-            % obj.populateBasePackage();
-            % obj.populateSearchPaths();
-            % obj.populateGitRepos();
-        % end
     end
 
     % Callback methods
@@ -131,7 +124,8 @@ classdef PackageManagerPresenter < appbox.Presenter
             end
             [~, name] = fileparts(path);
             if strncmp(name, '+', 1)
-                obj.view.showError(['Cannot add package directories (directories starting with +) to the ' ...
+                obj.view.showError([...
+                    'Cannot add package directories (directories starting with +) to the ' ...
                     'search path. Add the root directory containing the package instead.']);
                 return;
             end

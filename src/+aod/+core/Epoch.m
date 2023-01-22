@@ -174,7 +174,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function out = get(obj, entityType, varargin)
-            % Search Epoch's child entities
+            % Search Epoch's child entities and return matches
             %
             % Description:
             %   Search all entities of a specific type that match the given
@@ -182,6 +182,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             % Inputs:
             %   entityType          char or aod.core.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries (TODO: doc)
             % -------------------------------------------------------------
             
             import aod.core.EntityTypes
@@ -199,6 +201,25 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             else
                 out = group;
             end
+        end
+
+        function tf = has(obj, entityType, varargin)
+            % Search Epoch's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (see Epoch.get) and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries (TODO: doc)
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
         end
     end
 

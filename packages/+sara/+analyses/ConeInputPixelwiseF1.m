@@ -1,5 +1,11 @@
 classdef ConeInputPixelwiseF1 < aod.core.Analysis
+% Computes pixelwise cycle-averaged F1 amplitude at modulation frequency 
+%
+% See also:
+%   sara.analyses.ConeInputPixelwiseSNR
 
+% By Sara Patterson, 2023 (sara-aodata-package)
+% -------------------------------------------------------------------------
     properties (SetAccess = protected)
         % F1 amplitudes during epochs with l-cone modulation
         lConeF1
@@ -35,6 +41,12 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
     methods
         function obj = ConeInputPixelwiseF1(varargin)
             obj@aod.core.Analysis('ConeInputPixelwiseF1', varargin{:});
+            
+            % If parent Epoch has SampleRate parameter set, override
+            if obj.Parent.hasParam('SampleRate') ...
+                    && ~isempty(obj.Parent.getParam('SampleRate'))
+                obj.setParam('SampleRate', obj.Parent.getParam('SampleRate'));
+            end
         end
 
         function go(obj)
@@ -52,8 +64,8 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
                 case 'siso' 
                     stimuli = obj.Parent.get('Stimulus',... 
                         {'Param', 'spectralClass', sara.SpectralTypes.Siso});
-                        traces = arrayfun(@(x) x.presentation.B, stimuli, ...
-                            'UniformOutput', false);
+                    traces = arrayfun(@(x) x.presentation.B, stimuli, ...
+                        'UniformOutput', false);
                 case 'miso'
                     stimuli = obj.Parent.get('Stimulus',... 
                         {'Param', 'spectralClass', sara.SpectralTypes.Miso});
@@ -97,23 +109,49 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
             [epochs, traces] = obj.findEpochsAndStimuli(whichStim);
             fprintf('Beginning analysis of %s\n', whichStim);
 
-            imStack = aod.util.readers.TiffReader.read(...
-                epochs(1).getExptFile('AnalysisVideo')); 
-
-            stackF1 = zeros(size(imStack,1), size(imStack,2), numel(epochs));
-            stackP1 = size(stackF1);
-            stackF2 = size(stackF1);
+            
+            % Get the relevant parameters
+            sampleRate = obj.getParam('SampleRate');
+            highPassCutoff = obj.getParam('HighPass');
+            
+            % Use the first video to determine sizing for preallocation
+            imStack = sara.util.loadEpochVideo(epochs(1));
+            stackF1 = NaN(size(imStack,1), size(imStack,2), numel(epochs));
+            stackP1 = stackF1;
+            stackF2 = stackF1;
 
             for i = 1:numel(epochs)
                 tic
                 if i > 1
-                    imStack = aod.util.readers.TiffReader.read(epochs(i).getExptFile('AnalysisVideo'));
+                    imStack = sara.util.loadEpochVideo(epochs(i),...
+                        'SmoothEdges', true);
                 end
+
+                epd = epochs(i).get('EpochDataset', {'Name', 'ArtifactDetection'});
+                if isempty(epd)
+                    omitMask = zeros(size(imStack,1), size(imStack,2));
+                else
+                    omitMask = epd.omissionMask;
+                end
+
+                if ~isempty(highPassCutoff)
+                    for x = 1:size(imStack,2)
+                        for y = 1:size(imStack,1)
+                            if omitMask(y, x) == 0
+                                imStack(y,x,:) = signalHighPassFilter( ...
+                                    squeeze(imStack(y,x,:))', highPassCutoff, sampleRate);
+                            end
+                        end
+                    end
+                end
+
                 for x = 1:size(imStack,2)
                     for y = 1:size(imStack,1)
-                        avgCycle = cycleAverageFromStim(squeeze(imStack(y, x, :)), traces{i});
-                        [stackF1(y, x, i), stackP1(y, x, i)] = getFourierComponents(avgCycle, 1);
-                        [stackF2(y, x, i), ~] = getFourierComponents(avgCycle, 2);
+                        if omitMask(y, x) == 0
+                            avgCycle = cycleAverageFromStim(squeeze(imStack(y, x, :)), traces{i});
+                            [stackF1(y, x, i), stackP1(y, x, i)] = getFourierComponents(avgCycle, 1);
+                            [stackF2(y, x, i), ~] = getFourierComponents(avgCycle, 2);
+                        end
                     end
                 end
                 fprintf('Time elapsed %.2f\n', toc);
@@ -125,10 +163,10 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
         function value = getExpectedParameters(obj)
             value = getExpectedParameters@aod.core.Analysis(obj);
 
-            value.add('HighPass', 0.01, @isnumeric,...
+            value.add('HighPass', 0.1, @isnumeric,...
                 'Cutoff for optional highpass filter in Hz');
-            value.add('Smooth', [], @isnumeric,...
-                'Sigma for optional smoothing function'); 
+            value.add('SampleRate', 25.3, @isnumeric,...
+                'Sample rate for data acquisition, in Hz');
         end
     end
 
@@ -162,7 +200,8 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
             addParameter(ip, 'Plot', false, @islogical);
             addParameter(ip, 'Parent', [], @ishandle);
             addParameter(ip, 'Smooth', [], @isnumeric);
-            addParameter(ip, 'Method', 'df', @(x) ismember(lower(x), ["dff", "df", "zscore"]));
+            addParameter(ip, 'Method', 'df',... 
+                @(x) ismember(lower(x), ["dff", "df", "zscore"]));
             addParameter(ip, 'Threshold', [], @isnumeric);
             parse(ip, varargin{:});
             ax = ip.Results.Parent;
@@ -179,13 +218,13 @@ classdef ConeInputPixelwiseF1 < aod.core.Analysis
 
             switch lower(method)
                 case 'df' 
-                    cdata = mean(data, 3) - mean(ctrlData, 3);
+                    cdata = nanmean(data, 3) - nanmean(ctrlData, 3);
                 case 'dff'
-                    cdata = (mean(data, 3) - mean(ctrlData, 3)) ./ mean(ctrlData, 3);
+                    cdata = (nanmean(data, 3) - nanmean(ctrlData, 3)) ./ nanmean(ctrlData, 3);
                 case 'zscore'
-                    cdata = mean(data, 3) - mean(ctrlData, 3) ./ std(ctrlData, [], 3);
-                    cdata(isnan(cdata)) = 0;
+                    cdata = nanmean(data, 3) - nanmean(ctrlData, 3) ./ nanstd(ctrlData, [], 3);
             end
+            cdata(isnan(cdata)) = 0;
 
 
             if ~isempty(ip.Results.Threshold)

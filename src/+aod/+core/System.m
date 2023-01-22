@@ -32,7 +32,42 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
-        function out = get(obj, entityType, queries)
+        function tf = has(obj, entityType, varargin)
+            % Search Systems's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries 
+            %
+            % See also:
+            %   aod.core.System/get
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
+
+        function out = get(obj, entityType, varargin)
+            % Get System's channels and devices
+            %
+            % Description:
+            %   Return all the channels or devices within the system or 
+            %   just the ones that match the one or more queries
+            %
+            % Syntax:
+            %   out = get(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.core.EntityTypes
+            % -------------------------------------------------------------
+
             import aod.core.EntityTypes
             entityType = EntityTypes.get(entityType);
 
@@ -47,7 +82,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             end
             
             if nargin > 2
-                out = aod.core.EntitySearch.go(group, queries);
+                out = aod.core.EntitySearch.go(group, varargin{:});
             else
                 out = group;
             end
@@ -58,6 +93,11 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             % Syntax:
             %   add(obj, channel)
+            %
+            % Examples:
+            %   system = aod.core.System('MySystem');
+            %   channel = aod.core.Channel('MyChannel');
+            %   system.add(channel)
             % -------------------------------------------------------------
             assert(isSubclass(channel, 'aod.core.Channel'),...
                 'Invalid type: must be a subclass of aod.core.Channel');
@@ -70,7 +110,8 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % Remove a channel
             %
             % Description:
-            %   Remove the specfied channel
+            %   Remove the specfied channel, all channels or channels that 
+            %   match a specific query
             %
             % Syntax:
             %   remove(obj, ID)
@@ -80,6 +121,17 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %   Because System has only one child entity, remove() can be 
             %   called without specifying the entityType (assumed to be 
             %   Channel). It will also work if entityType is specified
+            %
+            % Example:
+            %   % Remove all channels (entity type optional)
+            %   obj.remove('all')
+            %   obj.remove('Channel', 'all')
+            %
+            %   % Remove the 2nd channel
+            %   obj.remove(2)
+            %
+            %   % Remove channels matching a query
+            %   obj.remove({'Name', 'MyChannel'})
             % -------------------------------------------------------------
 
             if nargin == 2

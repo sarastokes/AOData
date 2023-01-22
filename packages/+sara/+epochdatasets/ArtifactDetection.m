@@ -35,10 +35,10 @@ classdef ArtifactDetection < aod.core.EpochDataset
 
     methods
         function obj = ArtifactDetection(varargin)
-            obj@aod.core.EpochDataset("MotionArtifactDetection", varargin{:});
+            obj@aod.core.EpochDataset("ArtifactDetection", varargin{:});
 
             if isempty(obj.Parent)
-                error('MotionArtifactDetection:NoParent',...
+                error('ArtifactDetection:NoParent',...
                     'Optional input "Parent" must be provided');
             end
 
@@ -102,6 +102,8 @@ classdef ArtifactDetection < aod.core.EpochDataset
                 obj.Parent.getExptFile('AnalysisVideo'));
             imStack = reader.readFile();
             imStack = im2double(imStack);
+            % Record the video used 
+            obj.setFile('Video', obj.Parent.getExptFile('AnalysisVideo'));
         end
     end
 

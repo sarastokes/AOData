@@ -52,7 +52,7 @@ classdef RigidRegistration < aod.core.Registration
             obj.tform = data;
         end
 
-        function data = apply(obj, data)
+        function data = apply(obj, data, varargin)
             if ismatrix(data)
                 refObj = imref2d([size(data, 1), size(data, 2)]);
                 data = imwarp(data, refObj, obj.tform,...
@@ -63,7 +63,11 @@ classdef RigidRegistration < aod.core.Registration
             tForm = obj.affine2d_to_3d(obj.tform);
             viewObj = affineOutputView(size(data), tForm,...
                 'BoundsStyle', 'SameAsInput');
-            data = imwarp(data, tForm, 'OutputView', viewObj);
+            data = imwarp(data, tForm, 'OutputView', viewObj, varargin{:});
+            % Add optional key/value inputs to imwarp to parameters
+            if nargin > 2
+                obj.setParam(varargin{:});
+            end
         end
     end
 
