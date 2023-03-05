@@ -120,29 +120,34 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
         function [tf, name] = hasParam(obj, paramName)
             if isempty(obj.ExpectedParameters)
                 tf = false;
+                return
             end
 
             allParamNames = arrayfun(@(x) x.Name, obj.ExpectedParameters);
 
-
             tf = ismember(paramName, allParamNames, 'CaseSensitive', false);
             name = allParamNames(strfind(allParamNames == paramName));
+        end
+        
+        function ip = getParser(obj)
+            % Populate an inputParser with parameters
+            %
+            % Syntax:
+            %   ip = getParser(obj)
+            % -------------------------------------------------------------
+            ip = aod.util.InputParser;
+            for i = 1:numel(obj.ExpectedParameters)
+                ip = addToParser(obj.ExpectedParameters(i), ip);
+            end
         end
 
         function ip = parse(obj, varargin)
             ip = obj.getParser();
             parse(ip, varargin{:});
         end
-
-        function ip = getParser(obj)
-            ip = aod.util.InputParser;
-            for i = 1:numel(obj.ExpectedParameters)
-                ip = addToParser(obj.ExpectedParameters(i), ip);
-            end
-        end
     end
     
-    % matlab.mixin.CustomDisplay
+    % matlab.mixin.CustomDisplay methods
     methods (Access = protected)
         function header = getHeader(obj)
             if isempty(obj)

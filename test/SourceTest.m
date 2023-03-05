@@ -1,5 +1,8 @@
 classdef SourceTest < matlab.unittest.TestCase 
 
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
+
     properties
         EXPT
     end
@@ -135,10 +138,10 @@ classdef SourceTest < matlab.unittest.TestCase
             testCase.verifyError(@() source.get('Source', "badID"),... 
                 "get:InvalidInput");
             
-            testCase.verifyError(source.get('Epoch'),...
+            testCase.verifyError(@() source.get('Epoch'),...
                 "get:InvalidEntityType");
 
-            testCase.verifyError(source.remove('Source', struct('A', 1)),...
+            testCase.verifyError(@() source.remove('Source', struct('A', 1)),...
                 "remove:InvalidID")
         end
     end

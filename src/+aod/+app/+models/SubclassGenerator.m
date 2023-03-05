@@ -335,7 +335,7 @@ classdef SubclassGenerator < handle
             end
             out = logical.empty();
             for i = 1:numel(obj.Properties)
-                out = cat(1, out, obj.Properties(i).makeSetFcn)
+                out = cat(1, out, obj.Properties(i).makeSetFcn);
             end
             out = find(out);
         end 

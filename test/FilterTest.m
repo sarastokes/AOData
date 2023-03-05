@@ -1,17 +1,20 @@
 classdef FilterTest < matlab.unittest.TestCase
-% FILTERTEST
+% Test AOQuery filters
 %
 % Description:
-%   Tests AOQuery filters
+%   Tests AOQuery filters for identifying entities in a persisted dataset
 %
 % Parent:
 %    matlab.unittest.TestCase
 %
 % Use:
 %   result = runtests('FilterTest.m')
+
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
+        FILENAME
         EXPT 
         QM
     end
@@ -19,24 +22,46 @@ classdef FilterTest < matlab.unittest.TestCase
     methods (TestClassSetup)
         function methodSetup(testCase)
             % Creates an experiment, writes to HDF5 and reads back in
-            fileName = fullfile(getpref('AOData', 'BasePackage'), ...
+            testCase.FILENAME = fullfile(getpref('AOData', 'BasePackage'), ...
                 'test', 'ToyExperiment.h5');
-            if ~exist(fileName, 'file')
+            if ~exist(testCase.FILENAME, 'file')
                 ToyExperiment(true);
             end
-            testCase.EXPT = loadExperiment(fileName);
-            testCase.QM = aod.api.QueryManager(fileName);
+            testCase.EXPT = loadExperiment(testCase.FILENAME);
+            testCase.QM = aod.api.QueryManager(testCase.FILENAME);
+        end
+    end
+
+    methods (Test, TestTags="QueryManager")
+        function QueryManager(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            testCase.verifyNumElements(1, testCase.QM.numFiles);
+
+            testCase.verifyError(...
+                @() testCase.QM.filter(), "go:NoFiltersSet");
         end
     end
 
     methods (Test)
-        % function testLinkFilter(testCase)
-        %     fObj = aod.api.LinkFilter(testCase.EXPT.hdfName, 'Parent');
-        %     % Only Experiment does not have a parent
-        %     testCase.verifyEqual(numel(fObj.getMatches), numel(fObj.allGroupNames) - 1);
-        % end
+        function NameFilter(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            NF1 = aod.api.NameFilter(testCase.QM, 'ChannelOptimization');
+            testCase.verifyEqual(nnz(NF1.apply()),1);
+
+            NF2 = aod.api.NameFilter(testCase.QM, @(x) endsWith(x, 'Optimization'));
+            testCase.verifyEqual(nnz(NF2.apply()),1);
+
+            NF3 = aod.api.NameFilter(testCase.QM, 'BadName');
+            testCase.verifyWarning(...
+                @(x) NF3.apply(), "apply:NoMatches");
+        end
 
         function ClassFilter(testCase)
+            % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
             % There should always be just one Experiment per file
@@ -52,17 +77,37 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyWarning(@() CF3.apply(), 'apply:NoMatches');
         end
 
-        function testEntityFilter(testCase)
+        function DatasetFilter(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
+            DF1 = aod.api.DatasetFilter(testCase.QM, 'epochIDs');
+            idx = DF1.apply();
+            testCase.verifyEqual(nnz(idx), 1);
+
+            DF2 = aod.api.DatasetFilter(testCase.QM, 'epochIDs', [1 2]);
+            idx = DF2.apply();
+            testCase.verifyEqual(nnz(idx), 1);
+
+            DF3 = aod.api.DatasetFilter(testCase.QM, 'epochIDs', [1 3]);
+            testCase.verifyWarning(...
+                @() DF3.apply(), 'apply:NoMatches');
+        end
+
+        function EntityFilter(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            % There should always be just one Experiment per file
             EF = aod.api.EntityFilter(testCase.QM, 'Experiment');
             testCase.QM.addFilter(EF);
             [matches, idx] = testCase.QM.filter();
-            % There should always be just one Experiment per file
             testCase.verifyEqual(numel(idx), 1);
             testCase.verifyEqual(height(matches), 1);
-            testCase.QM.clearFilters();
+
+            % Test filter removal
+            testCase.QM.removeFilter(1);
+            testCase.verifyEqual(0, testCase.QM.numFilters);
         end
 
         function ParameterFilter(testCase)

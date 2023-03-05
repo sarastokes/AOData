@@ -19,7 +19,7 @@ classdef TemporalAverage < aod.core.Response
             obj.extractResponse(varargin{:});
         end
 
-        function out = loadData(obj)
+        function out = loadData(obj) %#ok<MANU,STOUT> 
             error('loadData:NotYetImplemented',...
                 'Subclasses must define how data is loaded')
         end

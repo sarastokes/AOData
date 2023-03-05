@@ -68,6 +68,7 @@ classdef UtilityTest < matlab.unittest.TestCase
             % Add param info
             PM.add('MyParam1');
             testCase.verifyEqual(PM.Count, 1);
+            testCase.verifyTrue(PM.hasParam('MyParam1'));
 
             % Error for existing parameter
             testCase.verifyError(@() PM.add('MyParam1'), "add:ParameterExists");
@@ -86,6 +87,14 @@ classdef UtilityTest < matlab.unittest.TestCase
             % Remove parameters
             PM.remove('MyParam1');
             testCase.verifyEqual(PM.Count, 1);
+            testCase.verifyFalse(PM.hasParam('MyParam1'));
+
+            % No error for empty remove
+            PM.remove();
+
+            % Warning for wrong parameter name
+            testCase.verifyWarning(...
+                @() PM.remove('BadParamName'), "remove:ParamNotFound");
 
             % Clear parameters
             PM2.clear();

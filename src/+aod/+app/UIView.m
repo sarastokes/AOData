@@ -76,10 +76,6 @@ classdef UIView < handle
             end
         end
 
-        function setWindowStyle(obj, s)
-            set(obj.figureHandle, 'WindowStyle', s);
-        end
-
         function show(obj)
             figure(obj.figureHandle);
         end
@@ -138,18 +134,9 @@ classdef UIView < handle
             web(url, varargin{:});
         end
 
-        function p = showGetDirectory(obj, varargin) %#ok<INUSL>
-            
+        function p = showGetDirectory(obj, varargin)
+            % Show uigetdir through helper class made for testing
             p = obj.folderChooser.chooseFolder(varargin{:});
-            %if nargin < 3
-            %    startPath = pwd();
-            %end
-            %folderName = uigetdir(startPath, title);
-            %if folderName == 0
-            %    p = [];
-            %    return;
-            %end
-            %p = folderName;
         end
 
         function p = showGetFile(obj, title, filter, defaultName) %#ok<INUSL>
@@ -181,14 +168,5 @@ classdef UIView < handle
             end
             p = fullfile(pathname, filename);
         end
-
-        function p = get.position(obj)
-            p = get(obj.figureHandle, 'Position');
-        end
-
-        function set.position(obj, p)
-            set(obj.figureHandle, 'Position', p); %#ok<MCSUP>
-        end
-
     end
 end

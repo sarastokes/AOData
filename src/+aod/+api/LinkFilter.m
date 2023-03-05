@@ -33,7 +33,7 @@ classdef LinkFilter < aod.api.FilterQuery
 
     % Instantiation of abstract methods from FilterQuery
     methods
-        function apply(obj)
+        function out = apply(obj)
             % Update local match indices to match those in Query Manager
             obj.localIdx = obj.Parent.filterIdx;
 

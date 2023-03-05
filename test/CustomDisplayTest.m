@@ -13,6 +13,8 @@ classdef CustomDisplayTest < matlab.unittest.TestCase
 %
 % See also:
 %   runAODataTestSuite
+
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
 %#ok<*MANU> 

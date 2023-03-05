@@ -106,8 +106,6 @@ classdef RepositoryManager < handle
         end
 
         function findPackages(obj)
-            S = getpref('AOData'); 
-            f = fieldnames(S);
             obj.basePackage = getpref('AOData', 'BasePackage');
         end
 

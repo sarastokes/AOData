@@ -681,7 +681,13 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function value = getExpectedParameters(obj)
+        function value = getExpectedParameters(obj) %#ok<MANU> 
+            % Initializes ParameterManager, subclasses can extend
+            %
+            % Syntax:
+            %   value = getExpectedParameters(obj)
+            % -------------------------------------------------------------
+
             value = aod.util.ParameterManager();
         end
     end

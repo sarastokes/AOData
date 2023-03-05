@@ -38,7 +38,7 @@ classdef GroupNameType
                 case 'definedinternally'
                     out = GroupNameType.DefinedInternally;
                 otherwise
-                    out = GroupNameType.Undefined;
+                    error("get:UnknownType", "GroupNameType not defined!");
             end
         end
     end

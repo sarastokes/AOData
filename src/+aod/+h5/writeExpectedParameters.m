@@ -31,7 +31,6 @@ function success = writeExpectedParameters(hdfName, pathName, dsetName, PM)
         PM          {mustBeA(PM, 'aod.util.ParameterManager')}
     end
 
-    fullPath = h5tools.util.buildPath(pathName, dsetName);
     if isempty(PM)
         warning('writeExpectedParameters:Empty',...
             'Empty ParameterManager not written to %s', fullpath);
@@ -41,5 +40,4 @@ function success = writeExpectedParameters(hdfName, pathName, dsetName, PM)
 
     T = PM.table();
     h5tools.write(hdfName, pathName, dsetName, T);
-    % h5tools.writeatt(hdfName, fullPath, 'Class', 'aod.util.ParameterManager');
     success = true;

@@ -60,7 +60,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             tf = ~isempty(out);
         end
 
-        function out = get(obj, entityType, varargin)
+        function out = get(obj, varargin)
             % Search Channel's child entities
             %
             % Description:

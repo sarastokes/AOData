@@ -13,7 +13,7 @@ function out = semicolonchar2string(txt)
     % ---------------------------------------------------------------------
 
     assert(ischar(txt), 'Input must be char');
-    if isempty(strfind(txt, ';'))
+    if ~contains(txt, ';')
         out = string(txt);
     else
         out = string(strsplit(txt, ';'));

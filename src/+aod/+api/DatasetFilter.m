@@ -61,21 +61,22 @@ classdef DatasetFilter < aod.api.FilterQuery
             end
 
             % Filter by the dataset value
-            for i = 1:numel(obj.allGroupNames)
+            for i = 1:numel(obj.Parent.allGroupNames)
                 if obj.localIdx(i)
-                    out = aod.h5.read(obj.hdfName, obj.Parent.allGroupNames(i), obj.Name);
+                    out = aod.h5.read(obj.Parent.hdfName, ...
+                        obj.Parent.allGroupNames(i), obj.Name);
 
                     if isa(obj.Value, 'function_handle')
-                        obj.localIdx = obj.Value(out);
+                        obj.localIdx(i) = obj.Value(out);
                     else
-                        obj.localIdx = isequal(out, obj.Value);
+                        obj.localIdx(i) = isequal(out, obj.Value);
                     end
                 end
             end
 
-            if nnz(obj.filterIdx) == 0
+            if nnz(obj.localIdx) == 0
                 warning('apply:NoMatches',...
-                    'No datasets named %s matched provided value', obj.dsetName);
+                    'No datasets named %s matched provided value', obj.Name);
             end
             out = obj.localIdx;
         end

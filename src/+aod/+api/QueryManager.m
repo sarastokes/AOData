@@ -173,7 +173,7 @@ classdef QueryManager < handle
 
     % Instantiate and run in one line
     methods (Static)
-        function out = go(hdfName, varargin)
+        function [matches, idx] = go(hdfName, varargin)
             QM = aod.api.QueryManager(hdfName);
             QM.addFilter(varargin{:});
             [matches, idx] = QM.filter();

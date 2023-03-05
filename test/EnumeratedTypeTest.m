@@ -107,6 +107,26 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
     end
     
+    methods (Test, TestTags=["GroupNameType"])
+        function GroupNameTypeInit(testCase)
+            import aod.app.GroupNameType
+
+            out = GroupNameType.get('UserDefined');
+            testCase.verifyEqual(out, GroupNameType.UserDefined);
+            out = GroupNameType.get('UserDefinedWithDefault');
+            testCase.verifyEqual(out, GroupNameType.UserDefinedWithDefault);
+            out = GroupNameType.get('HardCoded');
+            testCase.verifyEqual(out, GroupNameType.HardCoded);
+            out = GroupNameType.get('DefinedInternally');
+            testCase.verifyEqual(out, GroupNameType.DefinedInternally);
+            out = GroupNameType.get('ClassName');
+            testCase.verifyEqual(out, GroupNameType.ClassName);
+            testCase.verifyEqual(GroupNameType.get(out), GroupNameType.ClassName);
+            testCase.verifyError(...
+                @() GroupNameType.get('BadName'), "get:UnknownType");
+        end
+    end
+
     methods (Test, TestTags={'GroupLoadState'})
         function GroupLoadStateInit(testCase)
             import matlab.unittest.constraints.Throws

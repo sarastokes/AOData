@@ -122,7 +122,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         %> addTiming(obj, timing)
         %> @endcode
         %>
-        %> @param Timing @b double, @b duration \n 
+        %> @param Timing @b double or @b duration \n 
         %>      The time of each sample in the Response. If empty, the 
         %>      Timing property will be cleared.
         %>
@@ -131,7 +131,6 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         %> @code
         %> obj.setTiming(timing);
         %> @endcode
-        %>
         %> Clear the timing
         %> @code
         %> obj.setTiming([])

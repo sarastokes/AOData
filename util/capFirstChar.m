@@ -20,7 +20,7 @@ function txt = capFirstChar(txt)
     assert(istext(txt), 'Input must be char or string');
 
     if ~isscalar(txt)
-        out = aod.util.arrayfun(@(x) capFirstChar(x), txt);
+        txt = aod.util.arrayfun(@(x) capFirstChar(x), txt);
         return
     end
 

@@ -5,11 +5,18 @@ function results = runTestWithDebug(testName, coveragePackage, debugFlag)
 %   results = runTestWithDebug(testName);
 %   results = runTestWithDebug(testName, coveragePackage, debugFlag);
 %
+% Example:
+%   results = runTestWithDebug('FilterTest', 'aod.api', true);
+%
 % See also:
 %   runAODataTestSuite, runtests
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+
+    if nargin < 2
+        coveragePackage = [];
+    end
 
     if nargin < 3
         debugFlag = true;

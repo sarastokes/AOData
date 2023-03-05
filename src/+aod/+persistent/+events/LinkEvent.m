@@ -26,7 +26,7 @@ classdef (ConstructOnLoad) LinkEvent < event.EventData
             end
 
             obj.Name = name;
-            obj.Value = value
+            obj.Value = value;
         end
     end
 end

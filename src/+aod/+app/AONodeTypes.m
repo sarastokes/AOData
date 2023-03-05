@@ -92,7 +92,7 @@ classdef AONodeTypes
                     if ~ismatrix(data)
                         out = sprintf("Data size = %u", size(data,1));
                         for i = 2:ndims(data)
-                            out = out + sprintf("x %u", size(data,i)); %#ok<AGROW> 
+                            out = out + sprintf("x %u", size(data,i));
                         end
                     else
                         out = data;

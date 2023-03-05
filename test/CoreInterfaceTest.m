@@ -14,7 +14,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 % See also:
 %   runAODataTestSuite
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
@@ -215,6 +215,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["Annotation", "Core", "LevelOne"])
         function AnnotationIO(testCase)
+
+            testCase.verifyFalse(testCase.EXPT.has('Annotation'));
             
             % Create a few annotations
             annotation1 = aod.core.Annotation('Annotation1');
@@ -223,6 +225,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Add multiple annotations to the experiment at once
             testCase.EXPT.add([annotation1, annotation2]);
             testCase.verifyNumElements(testCase.EXPT.Annotations, 2);
+            testCase.verifyTrue(testCase.EXPT.has('Annotation'));
 
             % Query from Experiment by name
             out = testCase.EXPT.get('Annotation', {'Name', 'Annotation1'});
@@ -230,6 +233,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Query from Experiment by parameter presence
             annotation2.setParam('MyParam', 1);
+            testCase.verifyTrue(...
+                testCase.EXPT.has('Annotation', {'Param', 'MyParam'}));
             out = testCase.EXPT.get('Annotation', {'Param', 'MyParam'});
             testCase.verifyNumElements(out, 1);
             testCase.verifyTrue(strcmpi(out.Name, 'Annotation2'));
@@ -311,6 +316,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyNumElements(channel2.Devices, 1);
             testCase.verifyEqual(numel(system.get('Device')), 3);
             testCase.verifyEqual(numel(testCase.EXPT.get('Device')), 3);
+            testCase.verifyTrue(channel1.has('Device'));
 
             % Check device ancestor
             testCase.verifyEqual(...
@@ -349,6 +355,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Clear the devices (channel-specific)
             channel1.remove('Device', 'all');
+            testCase.verifyFalse(channel1.has('Device'));
             testCase.verifyEqual(numel(testCase.EXPT.Systems(1).Channels(1).Devices), 0);
 
             % Clear the devices (all)
@@ -382,176 +389,6 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % No error even though device is empty
             system2 = aod.core.System('System2');
             clearAllDevices([system1, system2]);
-        end
-    end
-
-    methods (Test, TestTags=["Epoch", "Core", "LevelOne"])
-        function EpochIO(testCase)
-            import matlab.unittest.constraints.Throws
-
-            % If previous functions errored, epochs may still be present
-            testCase.EXPT.remove('Epoch', 'all');
-
-            % Create some epochs
-            epoch1 = aod.core.Epoch(1);
-            epoch2 = aod.core.Epoch(2);
-
-            % Add a date to one of them
-            epoch1.setStartTime(datetime('now'));
-
-            % Test default label
-            testCase.verifyEqual(epoch1.label, 'Epoch0001');
-
-            % Add to an experiment
-            testCase.EXPT.add(epoch1);
-            testCase.verifyNumElements(testCase.EXPT.Epochs, 1);
-            testCase.verifyEqual(testCase.EXPT.numEpochs, 1);
-            testCase.verifyEqual(testCase.EXPT.epochIDs, 1);
-
-            % Add a second epoch
-            testCase.EXPT.add(epoch2);
-            testCase.verifyNumElements(testCase.EXPT.Epochs, 2);
-            testCase.verifyEqual(testCase.EXPT.numEpochs, 2);
-            testCase.verifyEqual(testCase.EXPT.epochIDs, [1 2]);
-
-            % Clear all the epochs
-            testCase.EXPT.remove('Epoch', 'all');
-            testCase.verifyNumElements(testCase.EXPT.Epochs, 0);
-            testCase.verifyEqual(testCase.EXPT.numEpochs, 0);
-
-            % Create an epoch with a non-consecutive ID
-            epoch3 = aod.core.Epoch(4);
-
-            % Add the epochs back, together
-            testCase.EXPT.add([epoch1, epoch2, epoch3]);
-            testCase.verifyNumElements(testCase.EXPT.Epochs, 3);
-
-            % Check epoch indexing
-            testCase.verifyEqual(testCase.EXPT.id2index(4), 3);
-            testCase.verifyEqual(testCase.EXPT.id2index([1 2 4]), [1 2 3]);
-            testCase.verifyNumElements(testCase.EXPT.id2epoch([1 2 4]), 3);
-
-            % Add a parameter to all
-            setParam(testCase.EXPT.Epochs, 'TestParam1', 0);
-            testCase.verifyTrue(all(hasParam(testCase.EXPT.Epochs, 'TestParam1')));
-            testCase.verifyEqual(testCase.EXPT.Epochs.getParam('TestParam1'), [0;0;0]);
-
-            % Remove a parameter from all
-            testCase.EXPT.Epochs.removeParam('TestParam1');
-            testCase.verifyFalse(any(hasParam(testCase.EXPT.Epochs, 'TestParam1')));
-
-            % Add a file to all
-            testCase.EXPT.Epochs.setFile('TestFile1', 'test.txt');
-            testCase.verifyTrue(all(testCase.EXPT.Epochs.hasFile('TestFile1')));
-            testCase.verifyTrue(strcmp(testCase.EXPT.Epochs(1).getFile('TestFile1'), 'test.txt'));
-            testCase.verifyTrue(startsWith(testCase.EXPT.Epochs(1).getExptFile('TestFile1'),...
-                testCase.EXPT.homeDirectory));
-
-            % Remove a file from all
-            testCase.EXPT.Epochs.removeFile('TestFile1');
-            testCase.verifyFalse(any(hasFile(testCase.EXPT.Epochs, 'TestFile1')));
-
-            % Try to add an epoch with the same ID
-            badEpoch = aod.core.Epoch(1);
-            testCase.verifyError(@() testCase.EXPT.add(badEpoch), ?MException);
-
-            % Try to add a calibration to an epoch
-            % Try to remove a calibration from an epoch
-            testCase.verifyThat(...
-                @()testCase.EXPT.removeByEpoch('all', 'Calibration'),...
-                Throws("removeByEpoch:InvalidEntityType"));
-
-            % Remove an epoch (by non-consecutive ID)
-            testCase.EXPT.remove('Epoch', 4);
-            testCase.verifyNumElements(testCase.EXPT.Epochs, 2);
-
-            % Clear all the epochs
-            testCase.EXPT.remove('Epoch', 'all');
-            testCase.verifyNumElements(testCase.EXPT.Epochs, 0);
-        end
-
-        function EpochLinks(testCase)
-            % If previous functions errored, epochs may still be present
-            testCase.EXPT.remove('Epoch', 'all');
-
-            % Create some epochs
-            epoch1 = aod.core.Epoch(1);
-            epoch2 = aod.core.Epoch(2);
-
-            % Create some associated entities
-            source1 = aod.core.Source('Source1');
-            system1 = aod.core.System('System1');
-
-            % Try to add an invalid entity to the epoch
-            cal1 = aod.core.Calibration('PowerMeasurement', '20220823');
-            testCase.verifyError(@() epoch1.add(cal1), "add:InvalidEntityType");
-            
-            % Test group assignment
-            testCase.verifyEmpty(epoch1.System);
-            testCase.verifyEmpty(epoch1.Source);
-            setSource([epoch1, epoch2], source1);
-            setSystem([epoch1, epoch2], system1);
-            testCase.verifyTrue(strcmp(epoch1.System.Name, 'System1'));
-            testCase.verifyTrue(strcmp(epoch1.Source.Name, 'Source1'));
-
-            % Try to set invalid Source
-            testCase.verifyError(@()epoch1.setSource(cal1), "setSource:InvalidEntityType");
-            
-            % Try to set invalid System
-            testCase.verifyError(@()epoch1.setSystem(cal1), "setSystem:InvalidEntityType");
-        end
-
-        function EpochTiming(testCase)
-            % Create some epochs
-            epoch1 = aod.core.Epoch(1);
-            epoch2 = aod.core.Epoch(2);
-
-            % Check whether they have Timing
-            testCase.verifyEqual(hasTiming([epoch1, epoch2]), [false, false]);
-
-            % Add timing to one epoch
-            epoch1.setTiming(1:4);
-            testCase.verifyEqual(epoch1.Timing, (1:4)');
-            
-            % Clear timing
-            setTiming([epoch1, epoch2], []);
-            testCase.verifyEqual(hasTiming([epoch1, epoch2]), [false, false]);
-        end
-
-        function EpochRemove(testCase)
-
-            epoch1 = aod.core.Epoch(1);
-            epoch2 = aod.core.Epoch(2);
-            
-            % Test removal specification with response
-            epoch1.add(aod.core.Response('Response1'));
-            epoch2.add(aod.core.Response('Response2a'));
-            epoch2.add(aod.core.Response('Response2b'));
-
-            remove([epoch1, epoch2], 'Response', 1);
-            testCase.verifyNumElements(epoch2.Responses, 1);
-
-            testCase.verifyWarning(...
-                @() epoch2.remove('Response', {'Name', 'Response1'}),...
-                "remove:NoQueryMatches");
-
-            testCase.verifyError(@() epoch1.remove('Response', 'badID'),...
-                "remove:InvalidID");
-            testCase.verifyError(@() epoch1.remove('Calibration'),...
-                "remove:InvalidEntityType");
-
-            % Test additional entities, remove from Epoch
-            epoch1.add(aod.core.Stimulus('Stim1'));
-            epoch1.remove('Stimulus', 'all');
-            testCase.verifyEmpty(epoch1.Stimuli);
-
-            epoch1.add(aod.core.EpochDataset('Dataset1'));
-            epoch1.remove('EpochDataset', 'all');
-            testCase.verifyEmpty(epoch1.EpochDatasets);
-
-            epoch1.add(aod.core.Registration('Reg1', getDateYMD()));
-            epoch1.remove('Registration', 'all');
-            testCase.verifyEmpty(epoch1.Registrations);
         end
     end
 
@@ -606,8 +443,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Dataset", "Core", "LevelTwo"])
-        function DatasetIO(testCase)
+    methods (Test, TestTags=["EpochDataset", "Core", "LevelTwo"])
+        function EpochDatasetIO(testCase)
             import matlab.unittest.constraints.Throws
 
             % Add an epoch
@@ -636,7 +473,14 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Check dataset data
             testCase.verifyEqual(testCase.EXPT.Epochs(1).EpochDatasets(2).Data, eye(3));
             testCase.verifyNumElements(testCase.EXPT.Epochs(1).get(...
-                'EpochDataset', {'Dataset', 'Data', eye(3)}),1);
+                'EpochDataset', {'Dataset', 'Data', eye(3)}), 1);
+            testCase.verifyTrue(testCase.EXPT.Epochs(1).has(...
+                'EpochDataset', {'Dataset', 'Data', eye(3)}));
+
+            % Remove datasets by query
+            testCase.EXPT.Epochs(1).remove('EpochDataset', {'Dataset', 'Data', eye(3)});
+            testCase.verifyFalse(testCase.EXPT.Epochs(1).has(...
+                'EpochDataset', {'Dataset', 'Data', eye(3)}));
             
             % Clear all the datasets
             testCase.EXPT.removeByEpoch('all', 'EpochDataset');
@@ -699,7 +543,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             reg1.setRegistrationDate([]);
             regDate = getDateYMD();
             setRegistrationDate([reg1, reg2], regDate);
-            test.util.verifyDatesEqual(testCase, reg1.registrationDate, dateYMD);
+            test.util.verifyDatesEqual(testCase, reg1.registrationDate, regDate);
 
             % Add Registrations to an Epoch
             testCase.EXPT.Epochs(1).add([reg1, reg2]);

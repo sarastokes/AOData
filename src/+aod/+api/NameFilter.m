@@ -69,6 +69,11 @@ classdef NameFilter < aod.api.FilterQuery
             end
 
             out = obj.localIdx;
+
+            if nnz(obj.localIdx) == 0
+                warning("apply:NoMatches",...
+                    "No matches for Name %s", char(obj.Name));
+            end
         end
     end
 

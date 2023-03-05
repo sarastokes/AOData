@@ -13,6 +13,9 @@ classdef EntitySearch < handle
 %
 % Single line execution:
 %   [matches, idx] = aod.core.EntitySearch.go(entityGroup, varargin)
+%
+% Examples:
+%   A comprehensive list of examples is provided in AOQuery's documentation 
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

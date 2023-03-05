@@ -38,3 +38,4 @@ test/DeviceSubclass.m
 
 test/BaseCoverage.xlsx
 test/~$BaseCoverage.xlsx
+test/PackageCoverage.txt

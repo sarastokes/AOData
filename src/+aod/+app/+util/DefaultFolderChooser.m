@@ -2,7 +2,7 @@ classdef DefaultFolderChooser < aod.app.util.FolderChooser
 % Wrapper for uigetfile for use with testsuite
 
     methods 
-        function folderName = chooseFolder(obj, title, startPath)
+        function folderName = chooseFolder(~, title, startPath)
             if nargin < 2
                 title = [];
             end

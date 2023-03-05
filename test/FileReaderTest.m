@@ -12,6 +12,8 @@ classdef FileReaderTest < matlab.unittest.TestCase
 %
 % See also:
 %   runAODataTestSuite
+
+% By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties
