@@ -87,14 +87,16 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             import aod.core.EntityTypes
 
             try
-                entityType = EntityTypes.get(varargin{1});           
-                if entityType ~= EntityTypes.DEVICE 
-                    error('get:InvalidEntityType',...
-                        'Only Devices can be searched from Channel');
-                end
+                entityType = EntityTypes.get(varargin{1}); 
                 startIdx = 2;
             catch 
                 startIdx = 1;
+            end
+
+            % If entity type provided, make sure it's valid
+            if startIdx == 2 && entityType ~= EntityTypes.DEVICE 
+                error('get:InvalidEntityType',...
+                    'Only Devices can be searched from Channel');
             end
 
             if nargin > 2

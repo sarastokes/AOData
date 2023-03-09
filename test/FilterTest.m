@@ -25,7 +25,7 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.FILENAME = fullfile(getpref('AOData', 'BasePackage'), ...
                 'test', 'ToyExperiment.h5');
             if ~exist(testCase.FILENAME, 'file')
-                ToyExperiment(true);
+                ToyExperiment(true, true);
             end
             testCase.EXPT = loadExperiment(testCase.FILENAME);
             testCase.QM = aod.api.QueryManager(testCase.FILENAME);

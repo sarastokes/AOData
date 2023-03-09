@@ -1,29 +1,38 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 4Mar2023, the ```aod``` package report contains **147 files** and has:
-- **71.68%** statement coverage (4805 executable). 
-- **72.30%** function coverage (816 executable).
+As of 9Mar2023, the ```aod``` package report contains **147 files** and has:
+- **73.91%** statement coverage (4884 executable). 
+- **75.00%** function coverage (820 executable).
 
 ## Tests
 The AOData test suite currently contains the following:
-- ```AODataManagerTest``` - tests display, preference setting and interaction with AODataManagerApp
-- ```AODataViewerTest``` - tests display and user interaction with the AODataViewer app
-- ```BuiltinClassTest``` - tests operation of builtin subclasses
-- ```CoreApiTest``` - tests core interface queries
-- ```CoreInterfaceTest``` - tests basic functions of the core interface
-- ```CustomDisplayTest``` - ensures custom displays do not throw errors
-- ```EnumeratedTypeTest``` - tests basic functioning of enumeration classes not covered elsewhere
-- ```HDFTest``` - tests I/O accuracy for MATLAB data types to HDF5 datasets and attributes
-- ```FileReaderTest``` - tests builtin file readers
-- ```FilterTest``` - tests AOQuery filters
-- ```PersistorTest``` - tests modification of HDF5 files from persistent interface
-- ```ProtocolTest``` - tests the protocol class and integration with experimental hierarchy
-- ```ResponseTest``` - tests Response entity in core interface
-- ```SourceTest``` - tests Source entity in core interface
-- ```SubclassGeneratorTest``` - tests the framework and UI for generating template subclasses
-- ```SyncTest``` - tests validation performed when adding an entity to an experiment
-- ```UtilityTest``` - tests the utility functions supporting AOData
+- User interfaces:
+  - ```AODataManagerTest``` - tests display, preference setting and interaction with AODataManagerApp
+  - ```AODataViewerTest``` - tests display and user interaction with the AODataViewer app
+  - ```SubclassGeneratorTest``` - tests the framework and UI for generating template subclasses
+- Built-in classes:
+  - ```BuiltinClassTest``` - tests operation of builtin subclasses. 
+  - ```FileReaderTest``` - tests builtin file readers
+- Core interface  
+  - ```CoreInterfaceTest``` - tests basic functions of the core interface not covered in dedicated tests. 
+  - ```CoreApiTest``` - tests core interface queries
+  - ```EpochTest``` - tests core Epoch interface
+  - ```ResponseTest``` - tests core Response interface
+  - ```SourceTest``` - tests core Source interface
+  - ```SyncTest``` - tests validation performed when adding an entity to an experiment
+- Persistant interface
+  - ```FilterTest``` - tests AOQuery filters
+  - ```InterfaceTest``` - tests equality between persistent and core interfaces
+  - ```PersistorTest``` - tests modification of HDF5 files from persistent interface
+- HDF5 tests
+  - ```HDFTest``` - tests I/O accuracy for MATLAB data types to HDF5 datasets and attributes
+  - All other tests can be found in the h5tools-matlab package
+- Miscellaneous tests
+  - ```CustomDisplayTest``` - ensures custom displays do not throw errors
+  - ```EnumeratedTypeTest``` - tests basic functioning of enumeration classes not covered elsewhere
+  - ```ProtocolTest``` - tests the protocol class and integration with experimental hierarchy
+  - ```UtilityTest``` - tests the AOData's util package. Some components have dedicated tests:
 
 
 ## Use
@@ -43,5 +52,6 @@ result = runtests('CoreInterfaceTest');
 ```
 or with optional debugging and code coverage through:
 ```matlab
-result = runTestWithDebug('CoreInterfaceTest', 'aod', true);
+result = runAODataTest('CoreInterfaceTest',... 
+    'Package', 'aod.core', 'Debug', true, 'KeepFiles', false);
 ```

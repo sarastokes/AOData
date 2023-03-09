@@ -28,6 +28,7 @@ classdef QueryManager < handle
 
     properties (Dependent)
         numFiles
+        numFilters
     end
 
     properties (Hidden, Dependent)
@@ -50,6 +51,14 @@ classdef QueryManager < handle
                 out = 0;
             else
                 out = numel(obj.hdfName);
+            end
+        end
+
+        function out = get.numFilters(obj)
+            if isempty(obj.Filters)
+                out = 0;
+            else
+                out = numel(obj.Filters);
             end
         end
 

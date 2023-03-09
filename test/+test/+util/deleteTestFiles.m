@@ -8,15 +8,26 @@ function deleteTestFiles()
 % -------------------------------------------------------------------------
     currentPWD = pwd;
 
-    cd(fullfile(getpref('AOData', 'BasePackage'), 'test'));
+    cd(test.util.getAODataTestFolder());
 
     if exist('ToyExperiment.h5', 'file')
         delete('ToyExperiment.h5');
     end
+
+    if exist('ToyExperiment.mat', 'file')
+        delete('ToyExperiment.mat');
+    end
+
     if exist('HdfTest.h5', 'file')
         delete('HdfTest.h5');
     end
+
+    if exist('DeviceSubclass.m', 'file')
+        delete('DeviceSubclass.m');
+    end
+
     if exist('Demo2.m', 'file')
         delete('Demo2.m');
     end
+    
     cd(currentPWD);

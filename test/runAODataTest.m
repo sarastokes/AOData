@@ -1,12 +1,10 @@
-function results = runTestWithDebug(testName, coveragePackage, debugFlag)
+function results = runAODataTest(testName, varargin)
 % Run test with debugging and optional code coverage
 %
 % Syntax:
-%   results = runTestWithDebug(testName);
-%   results = runTestWithDebug(testName, coveragePackage, debugFlag);
-%
-% Example:
-%   results = runTestWithDebug('FilterTest', 'aod.api', true);
+%   results = runAODataTest(testName);
+%   results = runAODataTest(testName, 'Debug', true',...
+%       'Package', 'aod.core', 'KeepFiles', false);
 %
 % See also:
 %   runAODataTestSuite, runtests
@@ -14,13 +12,16 @@ function results = runTestWithDebug(testName, coveragePackage, debugFlag)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    if nargin < 2
-        coveragePackage = [];
-    end
+    ip = inputParser();
+    ip.CaseSensitive = false;
+    addParameter(ip, 'Package', [], @istext);
+    addParameter(ip, 'Debug', false, @islogical);
+    addParameter(ip, 'KeepFiles', false, @islogical);
+    parse(ip, varargin{:});
 
-    if nargin < 3
-        debugFlag = true;
-    end
+    keepFiles = ip.Results.KeepFiles;
+    coveragePackage = ip.Results.Package;
+    debugFlag = ip.Results.Debug;
 
     import matlab.unittest.plugins.StopOnFailuresPlugin
     import matlab.unittest.plugins.CodeCoveragePlugin
@@ -60,7 +61,9 @@ function results = runTestWithDebug(testName, coveragePackage, debugFlag)
     results = runner.run(suite);
 
     % Clean up files produced by tests, if necessary
-    test.util.deleteTestFiles();
+    if ~keepFiles
+        test.util.deleteTestFiles();
+    end
 
     if nargin > 1 && ~isempty(coveragePackage)
         open(fullfile('single_report', 'index.html'));

@@ -714,7 +714,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             % ATTRIBUTES
             % Universial attributes that map to properties, not parameters
-            specialAttributes = ["UUID", "Class", "EntityType", "LastModified"];
+            specialAttributes = ["UUID", "Class", "EntityType", "LastModified", "label"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.core.EntityTypes.get(obj.loadAttribute('EntityType'));

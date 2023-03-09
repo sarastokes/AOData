@@ -44,7 +44,7 @@ classdef EpochTest < matlab.unittest.TestCase
             epoch1.setStartTime(datetime('now'));
 
             % Test default label
-            testCase.verifyEqual(epoch1.label, 'Epoch0001');
+            testCase.verifyEqual(epoch1.label, '0001');
 
             % Add to an experiment
             testCase.EXPT.add(epoch1);
@@ -184,8 +184,13 @@ classdef EpochTest < matlab.unittest.TestCase
             testCase.verifyError(@() epoch1.remove('Calibration'),...
                 "remove:InvalidEntityType");
 
-            % Test additional entities, remove from Epoch
+            % Test Stimulus additions
             epoch1.add(aod.core.Stimulus('Stim1'));
+            epoch1.add(aod.core.Stimulus('Stim2'));
+            testCase.verifyNumElements(epoch1.Stimuli, 2);
+            % Test methods for removing Stimuli
+            epoch1.remove('Stimulus', {'Name', 'Stim2'});
+            testCase.verifyNumElements(epoch1.Stimuli, 1);
             epoch1.remove('Stimulus', 'all');
             testCase.verifyEmpty(epoch1.Stimuli);
 
@@ -193,7 +198,13 @@ classdef EpochTest < matlab.unittest.TestCase
             epoch1.remove('EpochDataset', 'all');
             testCase.verifyEmpty(epoch1.EpochDatasets);
 
+            % Test methods for adding registrations
             epoch1.add(aod.core.Registration('Reg1', getDateYMD()));
+            epoch1.add(aod.core.Registration('Reg2', getDateYMD()));
+            testCase.verifyNumElements(epoch1.Registrations, 2);
+            % Test methods for removing Registrations
+            epoch1.remove('Registration', {'Name', 'Reg2'});
+            testCase.verifyNumElements(epoch1.Registrations, 1);
             epoch1.remove('Registration', 'all');
             testCase.verifyEmpty(epoch1.Registrations);
         end

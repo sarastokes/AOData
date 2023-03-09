@@ -10,10 +10,10 @@ function out = displayHierarchy(expt)
     
     
     if ~isempty(expt.Calibrations)
-        out = out + indent(1) + sprintf("CALIBRATIONS (%u)",...
+        out = out + indent(1) + sprintf("- CALIBRATIONS (%u)",...
             numel(expt.Calibrations)) + newline;
         for i = 1:numel(expt.Calibrations)
-            out = out + indent(1) + "* " + expt.Calibrations(i).label + newline;
+            out = out + indent(2) + "* " + expt.Calibrations(i).label + newline;
         end
     end
 
@@ -63,7 +63,7 @@ function out = displayHierarchy(expt)
             end
         end
         if ~isempty(expt.Epochs(i).Responses)
-            out = out + indent(3) + sprintf("RESPONSES (%u)",...
+            out = out + indent(3) + sprintf("- RESPONSES (%u)",...
                 numel(expt.Epochs(i).Responses)) + newline;
             for j = 1:numel(expt.Epochs(i).Responses)
                 out = out + indent(4) + "* "...
@@ -71,7 +71,7 @@ function out = displayHierarchy(expt)
             end
         end
         if ~isempty(expt.Epochs(i).Stimuli)
-            out = out + indent(3) + sprintf("STIMULI (%u)",...
+            out = out + indent(3) + sprintf("- STIMULI (%u)",...
                 numel(expt.Epochs(i).Stimuli)) + newline;
             for j = 1:numel(expt.Epochs(i).Stimuli)
                 out = out + indent(4) + "* "...
@@ -81,26 +81,26 @@ function out = displayHierarchy(expt)
     end
 
     if ~isempty(expt.ExperimentDatasets)
-        out = out + indent(1) + sprintf("EXPERIMENTDATASETS (%u)",...
+        out = out + indent(1) + sprintf("- EXPERIMENTDATASETS (%u)",...
             numel(expt.ExperimentDatasets)) + newline;
         for i = 1:numel(expt.ExperimentDatasets)
-            out = out + indent(1) + "* " + expt.ExperimentDatasets(i).label + newline;
+            out = out + indent(2) + "* " + expt.ExperimentDatasets(i).label + newline;
         end
     end
 
     if ~isempty(expt.Annotations)
-        out = out + indent(1) + sprintf("ANNOTATIONS (%u)",...
+        out = out + indent(1) + sprintf("- ANNOTATIONS (%u)",...
             numel(expt.Annotations)) + newline;
         for i = 1:numel(expt.Annotations)
-            out = out + indent(1) + "* " + expt.Annotations(i).label + newline;
+            out = out + indent(2) + "* " + expt.Annotations(i).label + newline;
         end
     end
 
     if ~isempty(expt.Analyses)
-        out = out + indent(1) + sprintf("ANALYSES (%u)",...
+        out = out + indent(1) + sprintf("- ANALYSES (%u)",...
             numel(expt.Analyses)) + newline;
         for i = 1:numel(expt.Analyses)
-            out = out + indent(1) + "* " + expt.Analyses(i).label + newline;
+            out = out + indent(2) + "* " + expt.Analyses(i).label + newline;
         end
     end
 end

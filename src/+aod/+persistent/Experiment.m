@@ -114,9 +114,10 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 
             % Containers
             obj.AnalysesContainer = obj.loadContainer('Analyses');
+            obj.AnnotationsContainer = obj.loadContainer('Annotations');
             obj.CalibrationsContainer = obj.loadContainer('Calibrations');
             obj.EpochsContainer = obj.loadContainer('Epochs');
-            obj.AnnotationsContainer = obj.loadContainer('Annotations');
+            obj.ExperimentDatasetsContainer = obj.loadContainer('ExperimentDatasets');
             obj.SourcesContainer = obj.loadContainer('Sources');
             obj.SystemsContainer = obj.loadContainer('Systems');
         end

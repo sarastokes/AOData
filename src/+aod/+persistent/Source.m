@@ -49,7 +49,8 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
             populate@aod.persistent.Entity(obj);
             
             obj.setDatasetsToDynProps();
-            obj.setLinksToDynProps();           
+            obj.setLinksToDynProps();
+                       
             obj.SourcesContainer = obj.loadContainer('Sources');
         end
     end

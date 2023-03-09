@@ -101,7 +101,7 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             idx = [];
             for i = 1:numel(obj.ExpectedParameters)
                 if strcmpi(obj.ExpectedParameters(i).Name, paramName)
-                    idx = 1;
+                    idx = i;
                 end
             end
             if isempty(idx)
@@ -117,16 +117,18 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
     end
 
     methods
-        function [tf, name] = hasParam(obj, paramName)
+        function [tf, idx] = hasParam(obj, paramName)
             if isempty(obj.ExpectedParameters)
                 tf = false;
                 return
             end
+            
+            paramName = convertCharsToStrings(paramName);
 
-            allParamNames = arrayfun(@(x) x.Name, obj.ExpectedParameters);
+            allParamNames = arrayfun(@(x) string(x.Name), obj.ExpectedParameters);
 
-            tf = ismember(paramName, allParamNames, 'CaseSensitive', false);
-            name = allParamNames(strfind(allParamNames == paramName));
+            idx = find(allParamNames == paramName);
+            tf = ~isempty(idx);
         end
         
         function ip = getParser(obj)
@@ -196,6 +198,53 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
     methods
         function tf = isempty(obj)
             tf = isempty(obj.ExpectedParameters);
+        end
+
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.util.ParameterManager')
+                tf = false;
+                return
+            end
+
+            if obj.Count ~= other.Count 
+                tf = false;
+                return 
+            end
+
+            for i = 1:obj.Count 
+                iParam = obj.ExpectedParameters(i);
+                [tfParam, idx] = other.hasParam(iParam.Name);
+                if ~tfParam
+                    tf = false; 
+                    return
+                end
+                oParam = other.ExpectedParameters(idx);
+                if any([isempty(iParam.Validation), isempty(oParam.Validation)])
+                    if ~isequal(iParam.Validation, oParam.Validation)
+                        disp(iParam.Name)
+                        tf = false;
+                        return
+                    end
+                end
+                
+                if any([isempty(iParam.Default), isempty(oParam.Default)])
+                    if ~isequal(iParam.Default, oParam.Default)
+                        disp(['Default - ', iParam.Name])
+                        tf = false;
+                        return
+                    end
+                end
+
+                
+                if any([isempty(iParam.Description), isempty(oParam.Description)])
+                    if ~isequal(iParam.Description, oParam.Description)
+                        disp(['Description - ', iParam.Name])
+                        tf = false;
+                        return
+                    end
+                end
+            end
+            tf = true;
         end
         
         function T = table(obj)

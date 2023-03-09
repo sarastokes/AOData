@@ -12,7 +12,7 @@ classdef AODataViewerTest < matlab.uitest.TestCase
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
                 'test', 'ToyExperiment.h5');            
             if ~exist(fileName, 'file')
-                ToyExperiment(true);
+                ToyExperiment(true, true);
             end
             testCase.EXPT = loadExperiment(fileName);
             testCase.APP = aod.app.presenters.ExperimentPresenter(testCase.EXPT);

@@ -26,7 +26,7 @@ classdef UtilityTest < matlab.unittest.TestCase
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
                 'test', 'ToyExperiment.h5');            
             if ~exist(fileName, 'file')
-                ToyExperiment(true);
+                ToyExperiment(true, true);
             end
             testCase.EXPT = loadExperiment(fileName);
         end
@@ -89,9 +89,6 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyEqual(PM.Count, 1);
             testCase.verifyFalse(PM.hasParam('MyParam1'));
 
-            % No error for empty remove
-            PM.remove();
-
             % Warning for wrong parameter name
             testCase.verifyWarning(...
                 @() PM.remove('BadParamName'), "remove:ParamNotFound");
@@ -100,6 +97,8 @@ classdef UtilityTest < matlab.unittest.TestCase
             PM2.clear();
             testCase.verifyEqual(PM2.Count, 0);
 
+            % No error for empty parameter manager
+            PM2.remove('MyParam1');
         end
     end
 

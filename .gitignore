@@ -36,6 +36,8 @@ test/HdfTest.h5
 
 test/DeviceSubclass.m
 
+test/ToyExperiment.mat
+
 test/BaseCoverage.xlsx
 test/~$BaseCoverage.xlsx
 test/PackageCoverage.txt

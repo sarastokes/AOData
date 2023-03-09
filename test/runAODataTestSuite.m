@@ -1,5 +1,5 @@
 function [results, packageTable] = runAODataTestSuite(varargin)
-% RUNAODATATESTSUITE
+% Customized unit testing for AOData
 %
 % Description:
 %   Runs the full test suite with options for code coverage reports, 

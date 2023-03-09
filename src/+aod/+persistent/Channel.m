@@ -51,17 +51,21 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
+            
             obj.DevicesContainer = obj.loadContainer('Devices');
         end
     end
 
     % Container abstraction methods
     methods (Sealed)
-        function obj = Devices(obj, idx)
+        function out = Devices(obj, idx)
+
             if nargin < 2
                 idx = 0;
             end
+
             out = [];
+
             for i = 1:numel(obj)
                 out = cat(1, out, obj(i).DevicesContainer(idx));
             end

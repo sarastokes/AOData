@@ -27,6 +27,7 @@ function out = read(hdfName, pathName, dsetName, className)
     % Deal with AOData-specific classes first
     if strcmp(className, "aod.util.Parameters")
         out = h5tools.readatt(hdfName, fullPath, 'all');
+        out = map2parameters(out);
         return
     end
     

@@ -1,15 +1,17 @@
-function experiment = ToyExperiment(writeToHDF)
+function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 % Create a toy experiment for testing
 %
 % Description:
 %   Builds a quick experiment to serve as a basis for testing
 %
 % Syntax:
-%   experiment = ToyExperiment(writeToHDF)
+%   [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 %
 % Inputs:
 %   writeToHDF          logical (default=false)
 %       Whether to persist the experiment to an HDF5 file
+%   saveAsMat           logical (default=false)
+%       Whether to save the core experiment as a .mat file
 %
 % Output:
 %   experiment          aod.core.Experiment
@@ -20,8 +22,11 @@ function experiment = ToyExperiment(writeToHDF)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    if nargin < 1
+    if nargin < 1 || isempty(writeToHDF)
         writeToHDF = false;
+    end
+    if nargin < 2
+        saveAsMat = false;
     end
 
     experiment = aod.core.Experiment('Tester', cd, '20220823',...
@@ -104,4 +109,21 @@ function experiment = ToyExperiment(writeToHDF)
     if writeToHDF
         fileName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'ToyExperiment.h5');
         aod.h5.writeExperimentToFile(fileName, experiment, true);
+    end
+
+    if saveAsMat
+        matName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'ToyExperiment.mat');
+        ToyExperiment = experiment;
+        save(matName, 'ToyExperiment');
+    end
+
+    coreExpt = experiment;
+    if nargout == 2 
+        if writeToHDF
+            persistentExpt = loadExperiment(fileName);
+        else
+            warning('ToyExperiment:NotPersisted',...
+                'Cannot return persistent experiment because it was not written');
+            persistentExpt = [];
+        end
     end
