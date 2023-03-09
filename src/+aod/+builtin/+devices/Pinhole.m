@@ -13,8 +13,10 @@ classdef Pinhole < aod.core.Device
 % Parameters:
 %   Diameter            double
 %       Pinhole diameter in microns
-%   Model
-%   Manufacturer
+%   Model               string
+%       Model name/number
+%   Manufacturer        string
+%       Manufacturer
 %
 % Sealed methods:
 %   setDiameter(obj, diameter)

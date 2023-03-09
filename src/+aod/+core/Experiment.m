@@ -47,12 +47,19 @@ classdef Experiment < aod.core.Entity
         % The date the experiment was performed (yyyyMMdd)
         experimentDate (1,1)    datetime
 
-        Analyses                aod.core.Analysis       
+        % Container for Experiment's Analyses
+        Analyses                aod.core.Analysis  
+        % Container for Experiment's Annotations     
+        Annotations             aod.core.Annotation  
+        % Container for Experiment's Calibrations   
+        Calibrations            aod.core.Calibration  
+        % Container for Experiment's Epochs
         Epochs                  aod.core.Epoch         
+        % Container for Experiment's ExperimentDatasets
         ExperimentDatasets      aod.core.ExperimentDataset  
-        Sources                 aod.core.Source         
-        Annotations             aod.core.Annotation     
-        Calibrations            aod.core.Calibration    
+        % Container for Experiment's Sources
+        Sources                 aod.core.Source      
+        % Container for Experiment's Systems 
         Systems                 aod.core.System         
 
         % A table containing all git repositories and their current status
@@ -277,21 +284,27 @@ classdef Experiment < aod.core.Entity
 
             switch entityType
                 case EntityTypes.ANALYSIS
+                    removeParent(obj.Analyses(ID));
                     obj.Analyses(ID) = [];
                 case EntityTypes.ANNOTATION 
+                    removeParent(obj.Annotations(ID));
                     obj.Annotations(ID) = [];
                 case EntityTypes.CALIBRATION
+                    removeParent(obj.Calibrations(ID));
                     obj.Calibrations(ID) = [];
                 case EntityTypes.EPOCH 
                     aod.util.mustBeEpochID(obj, ID);
+                    removeParent(obj.Epochs(obj.id2index(ID)));
                     obj.Epochs(obj.id2index(ID)) = [];
                 case EntityTypes.EXPERIMENTDATASET
+                    removeParent(obj.ExperimentDatasets(ID));
                     obj.ExperimentDatasets(ID) = [];
                 case EntityTypes.SOURCE
+                    removeParent(obj.Sources(ID));
                     obj.Sources(ID) = [];
                 case EntityTypes.SYSTEM
+                    removeParent(obj.Systems(ID));
                     obj.Systems(ID) = [];
-                otherwise
             end
         end
         
@@ -435,7 +448,7 @@ classdef Experiment < aod.core.Entity
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
                 error('getFromEpoch:NonChildEntityType',...
-                    'Entity must be a Dataset, Registration, Response or Stimulus');
+                    'Can only access child entities of Epoch');
             end
 
             if isempty(obj.Epochs)
@@ -521,12 +534,12 @@ classdef Experiment < aod.core.Entity
 
             import aod.core.EntityTypes
             entityType = aod.core.EntityTypes.get(entityType);
-            if ~ismember(entityType, [EntityTypes.EPOCHDATASET, EntityTypes.STIMULUS,...
-                    EntityTypes.RESPONSE, EntityTypes.REGISTRATION])
+            if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
                 error('removeByEpoch:InvalidEntityType',...
-                    'Only Dataset, Stimulus, Registration and Response can be removed from an Epoch');
+                    'Only child entities of Epoch can be removed');
             end
 
+            % Use the remove method defined by Epoch
             for i = 1:numel(ID)
                 remove(obj.id2epoch(ID(i)), entityType, entityID);
             end

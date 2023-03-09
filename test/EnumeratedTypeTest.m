@@ -230,7 +230,6 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             expType = aod.core.EntityTypes.EXPERIMENT;
             testCase.verifyEmpty(expType.validParentTypes());
             testCase.verifyEmpty(expType.parentContainer());
-            testCase.verifyEqual(expType.getGroupName(testCase.EXPT), 'Experiment');
         end
     end
 end 

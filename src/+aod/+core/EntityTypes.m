@@ -328,7 +328,7 @@ classdef EntityTypes
             if nargin < 4
                 parentPath = obj.parentPath(entity, manager);
             end
-            groupName = obj.getGroupName(entity);
+            groupName = entity.groupName();
 
             hdfPath = h5tools.util.buildPath(...
                 parentPath, obj.parentContainer(), groupName);
@@ -367,37 +367,6 @@ classdef EntityTypes
     end
 
     methods (Static)
-        function out = getGroupName(entity)
-            % GETGROUPNAME
-            %
-            % Description:
-            %   Determines the name of an entity's HDF group
-            %
-            % Syntax:
-            %   out = getGroupName(entity)
-            % -------------------------------------------------------------
-            import aod.core.EntityTypes
-
-            if ~isa(entity, 'aod.core.EntityTypes')
-                obj = aod.core.EntityTypes.get(entity);
-            end
-
-            switch obj
-                case EntityTypes.EXPERIMENT
-                    out = 'Experiment';
-                case EntityTypes.EPOCH
-                    %% TODO: Put this back in Epoch
-                    if ~isempty(entity.Name)
-                        out = entity.Name;
-                    else
-                        out = int2fixedwidthstr(entity.ID, 4);
-                    end
-                otherwise
-                    % Default label is Name, if set, className if not
-                    out = entity.label;
-            end
-        end
-
         function out = allContainerNames(obj) %#ok<INUSD> 
             % Returns a list of all container names
             %

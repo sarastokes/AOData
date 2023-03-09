@@ -48,7 +48,6 @@ function writeEntity(hdfName, obj)
     % Unlike parentPath, basePath includes the container 
     [basePath, groupName] = h5tools.util.splitPath(hdfPath);
 
-
     fprintf('Writing %s\n', hdfPath);
 
     % Create the new group

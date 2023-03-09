@@ -153,14 +153,16 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             ID = varargin{startIdx};
 
             if isnumeric(ID)
-                mustBeInteger(ID); 
-                mustBeInRange(ID, 1, numel(obj.Sources));
+                mustBeInteger(ID); mustBeInRange(ID, 1, numel(obj.Sources));
+                removeParent(obj.Sources(ID));
                 obj.Sources(ID) = [];
             elseif istext(ID) && strcmpi(ID, 'all')
+                removeParent(obj.Sources);
                 obj.Sources = aod.core.Source.empty();
             elseif iscell(ID)
                 [~, ID] = aod.core.EntitySearch.go(obj.Sources, varargin{startIdx:end});
                 if ~isempty(ID)
+                    removeParent(obj.Sources(ID));
                     obj.Sources(ID) = [];
                 else
                     warning('remove:NoQueryMatches',...

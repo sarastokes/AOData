@@ -40,7 +40,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         % Time the Epoch (i.e. data acquisition) began
         startTime           datetime = datetime.empty()                          
         % Timing of samples during Epoch                             
-        Timing (:,1)         {mustBeA(Timing, ["double", "duration"])} = []
+        Timing (:,1)        {mustBeA(Timing, ["double", "duration"])} = []
 
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
@@ -163,12 +163,16 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     
             switch entityType 
                 case EntityTypes.EPOCHDATASET
+                    removeParent(obj.EpochDatasets(idx));
                     obj.EpochDatasets(idx) = []; 
                 case EntityTypes.REGISTRATION
+                    removeParent(obj.Registrations(idx));
                     obj.Registrations(idx) = [];
                 case EntityTypes.RESPONSE
+                    removeParent(obj.Responses(idx));
                     obj.Responses(idx) = [];
                 case EntityTypes.STIMULUS 
+                    removeParent(obj.Stimuli(idx));
                     obj.Stimuli(idx) = [];
             end
         end
@@ -363,12 +367,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Access = protected)
         function value = getLabel(obj) 
-            %% TODO: Assign group name here 
-            if isempty(obj.Parent)
-                value = ['Epoch', int2fixedwidthstr(obj.ID, 4)];
-            else
-                value = sprintf('Epoch%u_%s', obj.ID, obj.Parent.label);
-            end
+            % Set the label to the epochID (with up to 3 leading zeros to
+            % ensure alphabetical sorting doesn't get it out of order)
+            value = ['Epoch', int2fixedwidthstr(obj.ID, 4)];
         end
 
         function value = getExpectedParameters(obj)

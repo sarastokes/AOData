@@ -91,6 +91,11 @@ classdef (Abstract) Entity < handle
         expectedParameters          % aod.util.ParameterManager
     end
 
+    properties (Hidden, Dependent)
+        % The name that will be used for the HDF5 group
+        groupName
+    end
+
     methods
         function obj = Entity(varargin)
             % Input parsing and processing
@@ -131,6 +136,10 @@ classdef (Abstract) Entity < handle
 
         function value = get.expectedParameters(obj)
             value = obj.getExpectedParameters();
+        end
+
+        function value = get.groupName(obj)
+            value = obj.getHdfGroupName();
         end
     end
 
@@ -681,6 +690,23 @@ classdef (Abstract) Entity < handle
             end
         end
 
+        function value = getHdfGroupName(obj)
+            % Determines what to call the entity's HDF5 group
+            %
+            % Syntax:
+            %   value = getHdfGroupName(obj)
+            %
+            % Notes:
+            %   "Name" property takes precedence and "label" will only be
+            %   used if "Name" is empty
+            % -------------------------------------------------------------
+            if isempty(obj.Name)
+                value = obj.label;
+            else
+                value = obj.Name;
+            end
+        end
+
         function value = getExpectedParameters(obj) %#ok<MANU> 
             % Initializes ParameterManager, subclasses can extend
             %
@@ -821,6 +847,23 @@ classdef (Abstract) Entity < handle
 
             obj.sync();
             obj.checkGroupNames();
+        end
+
+        function removeParent(obj)
+            % Remove the parent property of an entity
+            %
+            % Syntax:
+            %   removeParent(obj)
+            %
+            % Notes:
+            %   Only do this when removing an entity from the experiment
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                arrayfun(@(x) removeParent(x), obj);
+                return;
+            end
+            
+            obj.Parent = [];
         end
     end
 

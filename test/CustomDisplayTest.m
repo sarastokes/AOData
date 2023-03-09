@@ -36,5 +36,10 @@ classdef CustomDisplayTest < matlab.unittest.TestCase
             PM.add('Bandwidth', 20, @isnumeric, 'Description');
             disp(PM);
         end
+
+        function HierarchyDisplay(testCase)
+            cEXP = ToyExperiment(false);
+            aod.util.displayHierarchy(cEXP);
+        end
     end
 end

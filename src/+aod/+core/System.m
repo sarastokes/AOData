@@ -150,8 +150,10 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 
             if isnumeric(ID)
                 mustBeInteger(ID); mustBeInRange(ID, 1, numel(obj.Channels));
+                removeParent(obj.Channels(ID));
                 obj.Channels(ID) = [];
             elseif istext(ID) && strcmpi(ID, 'all')
+                removeParent(obj.Channels);
                 obj.Channels = aod.core.Channel.empty();
             else
                 error('remove:InvalidID', 'ID must be integer indices or "all"');
