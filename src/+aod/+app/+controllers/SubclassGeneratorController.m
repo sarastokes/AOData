@@ -13,7 +13,7 @@ classdef SubclassGeneratorController < aod.app.Controller
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties %(SetAccess = private)
         methodListBox
         detailBox
         titleBox
@@ -408,6 +408,18 @@ classdef SubclassGeneratorController < aod.app.Controller
             end
         end
 
+        function onMenuChangeFont(obj, ~, ~)
+            uisetfont(obj.detailBox);
+        end
+
+        function onMenuIncreaseFontSize(obj, ~, ~)
+            fontsize(obj.detailBox, "increase");
+        end
+
+        function onMenuDecreaseFontSize(obj, ~, ~)
+            fontsize(obj.detailBox, "decrease");
+        end
+
         function onPushUpdate(obj, ~, ~)
             % ONPUSHUPDATE
             if ~obj.Model.isViewable
@@ -617,6 +629,16 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "Enable", "off", "Tag", "WriteButton",...
                 "ButtonPushedFcn", @obj.onPushWrite);
             obj.setLayout(h, 2, 2);
+
+            % Add a context menu to change font
+            cm = uicontextmenu(obj.figureHandle);
+            uimenu(cm, "Text", "Change Font",...
+                "MenuSelectedFcn", @obj.onMenuChangeFont);
+            uimenu(cm, "Text", "Increase FontSize",...
+                "MenuSelectedFcn", @obj.onMenuIncreaseFontSize);
+            uimenu(cm, "Text", "Decrease FontSize",...
+                "MenuSelectedFcn", @obj.onMenuDecreaseFontSize);
+            obj.detailBox.ContextMenu = cm;
         end
 
         function makeFilePathPanel(obj, p)

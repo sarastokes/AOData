@@ -38,19 +38,20 @@ classdef EntityFilter < aod.api.FilterQuery
         end
 
         function out = apply(obj)
-            % Update local match indices to match those in Query Manager
-            obj.localIdx = obj.Parent.filterIdx;
+            obj.localIdx = obj.getQueryIdx();
+            groupNames = obj.getAllGroupNames();
+            hdfFiles = obj.getFileNames();
+            fileIdx = obj.getFileIdx();
         
-            for i = 1:numel(obj.Parent.allGroupNames)
+            for i = 1:numel(groupNames)
                 if obj.localIdx(i)
-                    hdfFile = obj.Parent.getHdfName(i);
-                    entityType = h5readatt(hdfFile,...
-                        obj.Parent.allGroupNames(i), 'EntityType');
+                    entityType = h5readatt(hdfFiles(fileIdx(i)),...
+                        groupNames(i), 'EntityType');
                     obj.localIdx(i) = strcmpi(entityType, obj.EntityName);
                 end
             end
 
-            if nnz(obj.localIdx)
+            if nnz(obj.localIdx) == 0
                 warning('apply:NoMatches',...
                     'No matches for entity type %s', obj.EntityName);
             end

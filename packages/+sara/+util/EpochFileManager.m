@@ -1,5 +1,22 @@
 classdef EpochFileManager < aod.util.FileManager
+% Identify epoch files
+%
+% Parent:
+%   aod.util.FileManager
+%
+% Constructor:
+%   obj = sara.util.EpochFileManager(experimentFolder)
+%
+% Methods:
+%   ep = populateFileNames(obj, ep)
+%
+% Support methods:
+%   ep = populateChannelOne(obj, ep, chanFolderName)
+%   ep = populateChannelTwo(obj, ep, chanFolderName)
+%   ep = populateAnalysisFiles(obj, ep)
 
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
     methods
         function obj = EpochFileManager(baseFolderPath)
             obj = obj@aod.util.FileManager(baseFolderPath);
@@ -11,18 +28,19 @@ classdef EpochFileManager < aod.util.FileManager
             ep = obj.populateAnalysisFiles(ep);
 
             % Display the files identified
-            fprintf('Epoch %u - %u files found\n', ep.ID, numel(ep.files.keys));
+            fprintf('Epoch %u - %u files found\n',... 
+                ep.ID, numel(ep.files.keys));
         end
     end
 
     methods
-        function ep = populateChannelOne(obj, ep, chnlFolderName)
+        function ep = populateChannelOne(obj, ep, chanFolder)
             if nargin < 3
-                chnlFolderName = 'Ref';
+                chanFolder = 'Ref';
             end 
 
             % Collect all the files from the channel folder
-            files = obj.collectFiles(chnlFolderName);
+            files = obj.collectFiles(chanFolder);
 
             % Assumptions:
             % - Video IDs are 4 digits long (e.g. 0004 for #4)
@@ -35,11 +53,11 @@ classdef EpochFileManager < aod.util.FileManager
             if isempty(epochFiles)
                 error("EpochFileManager:NoFilesFound",...
                     "No files found in %s for ID %u", ...
-                    fullfile(obj.baseFolderPath, chnlFolderName), ID);
+                    fullfile(obj.baseFolderPath, chanFolder), ID);
             end
             % Add back in the channel folder name
             for i = 1:numel(epochFiles)
-                epochFiles(i) = fullfile(chnlFolderName, epochFiles(i));
+                epochFiles(i) = fullfile(chanFolder, epochFiles(i));
             end
 
             % Assumption:
@@ -137,13 +155,13 @@ classdef EpochFileManager < aod.util.FileManager
             end
         end
 
-        function ep = populateChannelTwo(obj, ep, chnlFolderName)
+        function ep = populateChannelTwo(obj, ep, chanFolder)
             if nargin < 3
-                chnlFolderName = 'Vis';
+                chanFolder = 'Vis';
             end
 
             % Collect all the files from the channel folder
-            files = obj.collectFiles(chnlFolderName);
+            files = obj.collectFiles(chanFolder);
 
             
             % Assumptions:
@@ -157,11 +175,11 @@ classdef EpochFileManager < aod.util.FileManager
             if isempty(epochFiles)
                 error("EpochFileManager:NoFilesFound",...
                     "No files found in %s for ID %u", ...
-                    fullfile(obj.baseFolderPath, chnlFolderName), ID);
+                    fullfile(obj.baseFolderPath, chanFolder), ID);
             end
             % Add back in the channel folder name
             for i = 1:numel(epochFiles)
-                epochFiles(i) = fullfile(chnlFolderName, epochFiles(i));
+                epochFiles(i) = fullfile(chanFolder, epochFiles(i));
             end
 
             % Assumption:

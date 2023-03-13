@@ -1,4 +1,4 @@
-classdef LinkFilter < aod.api.FilterQuery
+classdef LinkFilter < aod.api.StackedFilterQuery
 % Filter entities by softlink
 %
 % Description:
@@ -23,8 +23,14 @@ classdef LinkFilter < aod.api.FilterQuery
     end
 
     methods 
-        function obj = LinkFilter(parent, name)
-            obj@aod.api.FilterQuery(parent);
+        function obj = LinkFilter(parent, name, varargin)
+            obj@aod.api.StackedFilterQuery(parent, varargin{:});
+
+            name = convertCharsToStrings(name);
+            if name == "Parent"
+                error('LinkFilter:ParentInvalid',...
+                    'Use aod.api.ParentFilter for "Parent" links');
+            end
 
             obj.Name = name;
             obj.collectLinks();
@@ -35,28 +41,58 @@ classdef LinkFilter < aod.api.FilterQuery
     methods
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
-            obj.localIdx = obj.Parent.filterIdx;
+            obj.localIdx = obj.getQueryIdx();
+            obj.filterIdx = false(size(obj.localIdx));
+            groupNames = obj.getAllGroupNames();
 
-            for i = 1:numel(obj.Parent.allGroupNames)
+            if ~isempty(obj.Filters)
+                for i = 1:numel(obj.Filters)
+                    out = obj.Filters(i).apply();
+                    obj.filterIdx = out;
+                end
+            end
+
+            for i = 1:numel(groupNames)
                 if ~obj.localIdx(i)
                     continue
                 end
 
-                groupIdx = find(obj.allLinkParents == obj.Parent.allGroupNames(i));
+                % Get all the links within the group
+                groupIdx = find(obj.allLinkParents == groupNames(i));
 
                 if ~isempty(groupIdx)
+                    % See whether one has the correct name
                     linkIdx = nnz(endsWith(obj.allLinkNames(groupIdx), obj.Name,...
                         "IgnoreCase", true));
-                    if linkIdx ~= 0
-                        obj.localIdx(i) = true;
-                    else
-                        obj.localIdx(i) = false;
-                    end
+                    obj.localIdx(i) = linkIdx > 0;
                 else
                     obj.localIdx(i) = false;
                 end
             end
+
             out = obj.localIdx;
+
+            if nnz(obj.localIdx) == 0
+                warning('apply:NoMatches',...
+                    'No links found with name %s', obj.Name);
+                return
+            end
+            
+            if isempty(obj.Filters)
+                return
+            end
+
+            for i = 1:numel(obj.localIdx)
+                if ~obj.localIdx
+                    continue
+                end
+
+                % Get the linked path
+                linkedPath = h5tools.readlink(obj.getHdfName(i),...
+                    groupNames(i), obj.Name);
+                idx = find(groupNames == linkedPath); %% TODO
+                obj.localIdx(i) = obj.filterIdx(idx);
+            end
         end
     end
 
@@ -67,16 +103,19 @@ classdef LinkFilter < aod.api.FilterQuery
             % Syntax:
             %   collectAllLinks(obj)
             % -------------------------------------------------------------
+            fileNames = obj.getFileNames();
             obj.allLinkNames = string.empty();
-            for i = 1:numel(obj.Parent.hdfName)
+            for i = 1:numel(fileNames)
                 obj.allLinkNames = cat(1, obj.allLinkNames,...
-                    h5tools.collectSoftlinks(obj.Parent.hdfName(i)));
+                    h5tools.collectSoftlinks(fileNames(i)));
             end
+            % Remove "Parent" links
+            obj.allLinkNames(endsWith(obj.allLinkNames, "Parent")) = [];
             obj.getLinkParentPaths();
         end
 
         function getLinkParentPaths(obj)
-            % Get the parent paths for all links in HDF5 file
+            % Get the parent paths for all softlinks in HDF5 file
             %
             % Syntax:
             %   collectAllLinks(obj)

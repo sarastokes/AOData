@@ -12,7 +12,7 @@
 *.log
 *.out
 
-## Dev
+## Environments
 *.DS_Store
 *.vscode
 
@@ -33,11 +33,16 @@ test/test.h5
 test/ExperimentTest.h5
 test/ToyExperiment.h5
 test/HdfTest.h5
-
-test/DeviceSubclass.m
+test/SmallExperiment.h5
 
 test/ToyExperiment.mat
+
+test/DeviceSubclass.m
 
 test/BaseCoverage.xlsx
 test/~$BaseCoverage.xlsx
 test/PackageCoverage.txt
+
+## Tutorial files
+tutorials/Tutorial_JustTheExperiment.h5
+tutorials/Tutorial_WithSystem.h5

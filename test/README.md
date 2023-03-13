@@ -1,9 +1,9 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 9Mar2023, the ```aod``` package report contains **147 files** and has:
-- **73.91%** statement coverage (4884 executable). 
-- **75.00%** function coverage (820 executable).
+As of 12Mar2023, the ```aod``` package report contains **150 files** and has:
+- **75.55%** statement coverage (5044 executable). 
+- **76.33%** function coverage (841 executable).
 
 ## Tests
 The AOData test suite currently contains the following:
@@ -21,7 +21,7 @@ The AOData test suite currently contains the following:
   - ```ResponseTest``` - tests core Response interface
   - ```SourceTest``` - tests core Source interface
   - ```SyncTest``` - tests validation performed when adding an entity to an experiment
-- Persistant interface
+- Persistent interface
   - ```FilterTest``` - tests AOQuery filters
   - ```InterfaceTest``` - tests equality between persistent and core interfaces
   - ```PersistorTest``` - tests modification of HDF5 files from persistent interface
@@ -53,5 +53,6 @@ result = runtests('CoreInterfaceTest');
 or with optional debugging and code coverage through:
 ```matlab
 result = runAODataTest('CoreInterfaceTest',... 
-    'Package', 'aod.core', 'Debug', true, 'KeepFiles', false);
+    'Package', 'aod.core', 'Debug', true,... 
+    'KeepFiles', false. 'ResetFiles', true);
 ```

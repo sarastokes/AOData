@@ -13,11 +13,16 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
 %       file will be written to the current directory
 %   obj                 aod.core.Experiment
 %       Experiment to write
+% Optional inputs:
 %   overwriteFlag       logical (default = false)
 %       Whether to overwrite existing HDF5 file with same name/location
 %
 % Outputs:
 %   N/A
+%
+% Examples:
+%   EXPT = aod.core.Experiment('Test', cd, '20230312');
+%   aod.h5.writeExperimentToFile('MyExperiment.h5', EXPT);
 %
 % See Also:
 %   loadExperiment, aod.h5.writeEntity

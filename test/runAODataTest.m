@@ -4,7 +4,7 @@ function results = runAODataTest(testName, varargin)
 % Syntax:
 %   results = runAODataTest(testName);
 %   results = runAODataTest(testName, 'Debug', true',...
-%       'Package', 'aod.core', 'KeepFiles', false);
+%       'Package', 'aod.core', 'KeepFiles', false, 'ResetFiles', true);
 %
 % See also:
 %   runAODataTestSuite, runtests
@@ -12,23 +12,27 @@ function results = runAODataTest(testName, varargin)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    import matlab.unittest.plugins.StopOnFailuresPlugin
+    import matlab.unittest.plugins.CodeCoveragePlugin
+    import matlab.unittest.plugins.codecoverage.CoverageReport    
+
     ip = inputParser();
     ip.CaseSensitive = false;
     addParameter(ip, 'Package', [], @istext);
     addParameter(ip, 'Debug', false, @islogical);
     addParameter(ip, 'KeepFiles', false, @islogical);
+    addParameter(ip, 'ResetFiles', true, @islogical);
     parse(ip, varargin{:});
 
-    keepFiles = ip.Results.KeepFiles;
     coveragePackage = ip.Results.Package;
     debugFlag = ip.Results.Debug;
-
-    import matlab.unittest.plugins.StopOnFailuresPlugin
-    import matlab.unittest.plugins.CodeCoveragePlugin
-    import matlab.unittest.plugins.codecoverage.CoverageReport    
+    resetFiles = ip.Results.ResetFiles;
+    keepFiles = ip.Results.KeepFiles;
     
     % Delete pre-existing test HDF5 files, if necessary
-    test.util.deleteTestFiles();
+    if resetFiles
+        test.util.deleteTestFiles();
+    end
 
     % Run the suite in this function's directory ('test')
     if ~ispref('AOData', 'BasePackage')

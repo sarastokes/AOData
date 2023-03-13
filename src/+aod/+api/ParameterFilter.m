@@ -55,14 +55,16 @@ classdef ParameterFilter < aod.api.FilterQuery
 
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
-            obj.localIdx = obj.Parent.filterIdx;
+            obj.localIdx = obj.getQueryIdx();
+            hdfNames = obj.getFileNames();
+            fileIdx = obj.getFileIdx();
+            groupNames = obj.getAllGroupNames();
 
             % First filter by whether the entities have the parameter
-            for i = 1:numel(obj.Parent.allGroupNames)
+            for i = 1:numel(groupNames)
                 if obj.localIdx(i)
-                    hdfFile = obj.Parent.getHdfName(i);
                     obj.localIdx(i) = h5tools.hasAttribute(...
-                        hdfFile, obj.Parent.allGroupNames(i), obj.Name);
+                        obj.getHdfName(i), groupNames(i), obj.Name);
                 end
             end
             out = obj.localIdx;
@@ -77,10 +79,10 @@ classdef ParameterFilter < aod.api.FilterQuery
             end
 
             % Second, filter by the parameter values
-            for i = 1:numel(obj.Parent.allGroupNames)
+            for i = 1:numel(groupNames)
                 if obj.localIdx(i)
-                    attValue = h5readatt(obj.Parent.hdfName,... 
-                        obj.Parent.allGroupNames(i), obj.Name);
+                    attValue = h5readatt(obj.getHdfName(i),... 
+                        groupNames(i), obj.Name);
                     if isa(obj.Value, 'function_handle')
                         obj.localIdx(i) = obj.Value(attValue);
                     else

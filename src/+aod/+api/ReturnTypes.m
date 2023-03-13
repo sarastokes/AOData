@@ -35,7 +35,7 @@ classdef ReturnTypes
                 case 'dataset'
                     out = ReturnTypes.DATASET;
                 otherwise
-                    error("ReturnTypes_init:UnrecognizedReturnType",...
+                    error("init:InvalidInput",...
                         "Unrecognized return type %s", txt);
             end
         end

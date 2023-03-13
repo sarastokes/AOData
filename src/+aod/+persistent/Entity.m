@@ -65,6 +65,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     properties (Dependent)
         % Whether the file is in read-only mode or not
         readOnly
+        % The HDF5 file name
+        hdfFileName
     end
 
     properties (Hidden, SetAccess = private)
@@ -122,6 +124,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
         function value = get.readOnly(obj)
             value = obj.factory.persistor.readOnly;
+        end
+        
+        function value = get.hdfFileName(obj)
+            value = obj.factory.hdfName;
         end
 
         function setReadOnlyMode(obj, tf)

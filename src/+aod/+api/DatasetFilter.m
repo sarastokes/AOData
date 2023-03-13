@@ -38,11 +38,18 @@ classdef DatasetFilter < aod.api.FilterQuery
 
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
-            obj.localIdx = obj.Parent.filterIdx;
+            obj.localIdx = obj.getQueryIdx();
+            % Extract relevant information
+            groupNames = obj.getAllGroupNames();
+            hdfNames = obj.getFileNames();
+            fileIdx = obj.getFileIdx();
 
             % First filter by whether the entities have the dataset
-            for i = 1:numel(obj.Parent.allGroupNames)
-                groupDsets = obj.getGroupDatasets(obj.Parent.allGroupNames(i));
+            for i = 1:numel(groupNames)
+                if ~obj.localIdx(i)
+                    continue
+                end
+                groupDsets = obj.getGroupDatasets(groupNames(i));
                 if ismember(obj.Name, groupDsets)
                     obj.localIdx(i) = true;
                 else
@@ -61,16 +68,17 @@ classdef DatasetFilter < aod.api.FilterQuery
             end
 
             % Filter by the dataset value
-            for i = 1:numel(obj.Parent.allGroupNames)
-                if obj.localIdx(i)
-                    out = aod.h5.read(obj.Parent.hdfName, ...
-                        obj.Parent.allGroupNames(i), obj.Name);
+            for i = 1:numel(groupNames)
+                if ~obj.localIdx(i)
+                    continue
+                end
+                out = aod.h5.read(hdfNames(fileIdx(i)), ...
+                    groupNames(i), obj.Name);
 
-                    if isa(obj.Value, 'function_handle')
-                        obj.localIdx(i) = obj.Value(out);
-                    else
-                        obj.localIdx(i) = isequal(out, obj.Value);
-                    end
+                if isa(obj.Value, 'function_handle')
+                    obj.localIdx(i) = obj.Value(out);
+                else
+                    obj.localIdx(i) = isequal(out, obj.Value);
                 end
             end
 
@@ -84,10 +92,11 @@ classdef DatasetFilter < aod.api.FilterQuery
     
     methods (Access = protected)
         function collectDatasets(obj)
+            hdfNames = obj.getFileNames();
             obj.allDatasetNames = string.empty();
-            for i = 1:numel(obj.Parent.hdfName)
+            for i = 1:numel(hdfNames)
                 obj.allDatasetNames = cat(1, obj.allDatasetNames,...
-                    h5tools.collectDatasets(obj.Parent.hdfName(i)));
+                    h5tools.collectDatasets(hdfNames(i)));
             end
         end
 

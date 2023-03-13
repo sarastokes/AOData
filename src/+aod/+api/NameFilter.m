@@ -52,7 +52,7 @@ classdef NameFilter < aod.api.FilterQuery
 
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
-            obj.localIdx = obj.Parent.filterIdx;
+            obj.localIdx = obj.getQueryIdx();
 
             if isa(obj.Name, 'function_handle')
                 for i = 1:numel(obj.allNames)
@@ -79,9 +79,11 @@ classdef NameFilter < aod.api.FilterQuery
 
     methods (Access = private)
         function collectNames(obj)
-            obj.allNames = repmat("", [numel(obj.Parent.allGroupNames), 1]);
+            groupNames = obj.getAllGroupNames();
+            
+            obj.allNames = repmat("", [numel(groupNames), 1]);
             for i = 1:numel(obj.allNames)
-                obj.allNames(i) = h5tools.util.getPathEnd(obj.Parent.allGroupNames(i));
+                obj.allNames(i) = h5tools.util.getPathEnd(groupNames(i));
             end
         end
     end

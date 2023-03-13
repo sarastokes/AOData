@@ -1,22 +1,48 @@
 function out = displayHierarchy(expt)
+% Display the full experiment hierarchy to the command line
+%
+% Syntax:
+%   aod.util.displayHierarchy(expt)
+%   out = aod.util.displayHierarchy(expt)
+%
+% Inputs:
+%   expt            aod.core.Experiment, aod.persistent.Experiment
+%
+% Optional outputs:
+%   out             string
+%       The text printed to the command line
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     arguments
         expt        {mustBeEntityType(expt, 'Experiment')}
     end
 
     out = "EXPERIMENT: " + expt.label + newline;
-    nEpochs = numel(expt.Epochs);
-    % out = out + indent(1) + sprintf("EPOCHS: %u", nEpochs) + newline;
     
-    
-    if ~isempty(expt.Calibrations)
-        out = out + indent(1) + sprintf("- CALIBRATIONS (%u)",...
-            numel(expt.Calibrations)) + newline;
-        for i = 1:numel(expt.Calibrations)
-            out = out + indent(2) + "* " + expt.Calibrations(i).label + newline;
+    % Source hierarchy
+    if ~isempty(expt.Sources)
+        out = out + indent(1) + sprintf("- SOURCES (%u)", numel(expt.Sources)) + newline;
+        for i = 1:numel(expt.Sources)
+            out = out + indent(2) + "* " + expt.Sources(i).label + newline;
+            if ~isempty(expt.Sources(i).Sources)
+                out = out + indent(3) + sprintf("- SOURCES, Secondary (%u)", numel(expt.Sources(i).Sources)) + newline;
+                for j = 1:numel(expt.Sources(i).Sources)
+                    out = out + indent(4) + "* " + expt.Sources(i).Sources(j).label + newline;
+                    if ~isempty(expt.Sources(i).Sources(j).Sources)
+                        out = out + indent(5) + sprintf("- SOURCES, Tertiary (%u)",...
+                            numel(expt.Sources(i).Sources(j).Sources)) + newline;
+                        for k = 1:numel(expt.Sources(i).Sources(j).Sources)
+                            out = out + indent(6) + "* " + expt.Sources(i).Sources(j).Sources(k).label + newline;
+                        end
+                    end
+                end
+            end
         end
     end
 
+    % System hierarchy
     if ~isempty(expt.Systems)
         out = out + indent(1) + sprintf("- SYSTEMS (%u)",...
             numel(expt.Systems)) + newline;
@@ -41,9 +67,19 @@ function out = displayHierarchy(expt)
         end
     end
 
+    
+    if ~isempty(expt.Calibrations)
+        out = out + indent(1) + sprintf("- CALIBRATIONS (%u)",...
+            numel(expt.Calibrations)) + newline;
+        for i = 1:numel(expt.Calibrations)
+            out = out + indent(2) + "* " + expt.Calibrations(i).label + newline;
+        end
+    end
+
+    % Epoch hierarchy
     out = out + indent(1) + sprintf("- EPOCHS (%u)",...
         numel(expt.Epochs)) + newline;
-    for i = 1:nEpochs 
+    for i = 1:expt.numEpochs 
         out = out + indent(2) + "* " + expt.Epochs(i).label + newline;
         if ~isempty(expt.Epochs(i).EpochDatasets)
             out = out + indent(3) + sprintf("- EPOCHDATASETS (%u)",...

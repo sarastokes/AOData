@@ -1,4 +1,11 @@
-classdef FileManager < handle 
+classdef (Abstract) FileManager < handle 
+% FileManager (abstract)
+%
+% Description:
+%   A class to encapsulate identfication of files related to a specific 
+%   entity and assignment to the "files" property
+
+
 
     properties (SetAccess = protected)
         baseFolderPath
@@ -7,7 +14,8 @@ classdef FileManager < handle
     end
 
     methods (Abstract)
-        ep = populateFileNames(obj, ep, varargin)
+        % This method implements assigning file names to an entity
+        entity = populateFileNames(obj, entity, varargin)
     end
 
     methods 
@@ -43,13 +51,33 @@ classdef FileManager < handle
                 fPath = obj.baseFolderPath;
             end
 
+            % Create a string array of files
             files = ls(fPath);
             files = deblank(string(files));
+
+            % Remove non-file names
+            files(files == ".") = [];
+            files(files == "..") = [];
         end
     end
 
     methods (Static)
         function matches = checkFilesFound(matches, whichToKeep)
+            % Determines which files to keep if more than 1 match is found
+            %
+            % Syntax:
+            %   matches = checkFilesFound(matches)
+            %   matches = checkFilesFound(matches, whichToKeep)
+            %
+            % Examples:
+            %   % Keep the first if >1 match found
+            %   matches = checkFilesFound(matches, 1)
+            %
+            % Notes:
+            %   - If only one file is found, it will be returned
+            %   - By default the last file found will be chosen as this is
+            %   usually the most recent, if file names include dates
+            % -------------------------------------------------------------
             if nargin < 2
                 whichToKeep = numel(matches);
             end

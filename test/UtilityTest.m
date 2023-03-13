@@ -186,4 +186,25 @@ classdef UtilityTest < matlab.unittest.TestCase
                 "getClassPropDescription:PropertyNotFound");
         end
     end
+
+    methods (Test, TestTags=["FileManager", "Utility"])
+        function FileManager(testCase)
+            FM = test.TestFileManager(fullfile(...
+                test.util.getAODataTestFolder(), 'test_data'));
+            
+            files = FM.getFilesFound();
+            % ! This will change with # of test data files
+            testCase.verifyNumElements(files, 6);
+            testCase.verifyFalse(contains(files, "."));
+
+            out = FM.checkFilesFound(files, 1);
+            testCase.verifyEqual(out, files(1));
+            out = FM.checkFilesFound(files);
+            testCase.verifyEqual(out, files(end));
+
+            FM.setErrorType(aod.util.ErrorTypes.ERROR);
+            testCase.verifyEqual(...
+                FM.messageLevel, aod.util.ErrorTypes.ERROR);
+        end
+    end
 end 

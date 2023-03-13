@@ -1,5 +1,5 @@
 classdef ClassFilter < aod.api.FilterQuery 
-% CLASSFILTER
+% Filter entities based on original MATLAB class
 %
 % Description:
 %   Filter entities in an AOData HDF5 file based on MATLAB class name
@@ -8,13 +8,14 @@ classdef ClassFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = aod.api.ClassFilter(hdfName, className)
+%   obj = aod.api.ClassFilter(parent, className)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Class
+        % Name of target class
+        Name
     end
     
     properties (SetAccess = private)
@@ -24,7 +25,8 @@ classdef ClassFilter < aod.api.FilterQuery
     methods
         function obj = ClassFilter(parent, className)
             obj = obj@aod.api.FilterQuery(parent);
-            obj.Class = className;
+
+            obj.Name = className;
 
             obj.collectClassNames();
         end
@@ -34,14 +36,14 @@ classdef ClassFilter < aod.api.FilterQuery
     methods
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
-            obj.localIdx = obj.Parent.filterIdx;
+            obj.localIdx = obj.getQueryIdx();
             
             for i = 1:numel(obj.allClassNames)
                 if obj.localIdx(i)
-                    if isa(obj.Class, 'function_handle')
-                        obj.localIdx(i) = obj.Class(obj.allClassNames(i));
+                    if isa(obj.Name, 'function_handle')
+                        obj.localIdx(i) = obj.Name(obj.allClassNames(i));
                     else
-                        obj.localIdx(i) = strcmpi(obj.Class, obj.allClassNames(i));
+                        obj.localIdx(i) = strcmpi(obj.Name, obj.allClassNames(i));
                     end
                 end
             end
@@ -50,7 +52,7 @@ classdef ClassFilter < aod.api.FilterQuery
             if nnz(obj.localIdx) == 0
                 warning('apply:NoMatches',...
                     'ClassFilter for %s returned no matches',... 
-                        value2string(obj.Class)); 
+                        value2string(obj.Name)); 
             end
 
             out = obj.localIdx;
@@ -59,11 +61,15 @@ classdef ClassFilter < aod.api.FilterQuery
 
     methods (Access = protected)
         function collectClassNames(obj)
-            classNames = repmat("", [numel(obj.Parent.allGroupNames), 1]);
-            for i = 1:numel(obj.Parent.allGroupNames)
-                hdfFile = obj.Parent.getHdfName(i);
-                classNames(i) = string(h5readatt(hdfFile,...
-                    obj.Parent.allGroupNames(i), 'Class'));
+            groupNames = obj.getAllGroupNames();
+            hdfFiles = obj.getFileNames();
+            fileIdx = obj.getFileIdx();
+
+            classNames = repmat("", [numel(groupNames), 1]);
+
+            for i = 1:numel(groupNames)
+                classNames(i) = string(h5readatt(...
+                    hdfFiles(fileIdx(i)), groupNames(i), 'Class'));
             end
             obj.allClassNames = classNames;
         end

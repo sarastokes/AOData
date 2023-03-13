@@ -11,18 +11,26 @@ classdef QueryManager < handle
 %   groupNames = getMatches(obj)
 %   addFilter(obj, varargin)
 %   removeFilter(obj, filterID)
+%
+% Notes:
+% - Create QueryManager with HDF5 file input
+% - QM.addFilter({'Name', 'Right'})
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Filters             
+        Filters             % aod.api.FilterQuery
+        Experiments
         filterIdx           logical
     end
 
     properties (SetAccess = private)
+        % The HDF5 file name(s) being queried
         hdfName             string 
+        % All entity group names in the HDF5 file(s)
         allGroupNames       string
+        % Which file each group name came from
         fileIdx             double 
     end
 
@@ -38,14 +46,32 @@ classdef QueryManager < handle
 
     methods
         function obj = QueryManager(hdfName)
-            arguments
-                hdfName         string
+            if nargin < 1
+                [hdfName, hdfPath] = uigetfile('*.h5',...
+                    'Pick AOData HDF5 file(s)',...
+                    'MultiSelect', 'on');
+                if isequal(hdfName, 0)
+                    return
+                end
+                hdfName = fileparts(hdfPath, hdfName);
             end
 
-            obj.hdfName = getFullFile(hdfName);
+            if isa(hdfName, 'aod.persistent.Experiment')
+                obj.hdfName = hdfName.hdfFileName;
+                obj.Experiments = cat(1, obj.Experiments, hdfName);
+            elseif istext(hdfName)
+                obj.hdfName = getFullFile(hdfName);
+            else
+                error('QueryManager:InvalidInput',...
+                    'Input must be HDF file name(s) or aod.persistent.Experiment');
+            end
+
             obj.populateGroupNames();
         end
+    end
 
+    % Dependent set/get methods
+    methods 
         function out = get.numFiles(obj)
             if isempty(obj.hdfName)
                 out = 0;
@@ -82,7 +108,9 @@ classdef QueryManager < handle
                 error("go:NoFiltersSet", "Add filters first");
             end
 
-            for i = 1:numel(obj.Filters)
+            obj.filterIdx = true(numel(obj.allGroupNames), 1);
+            
+            for i = 1:obj.numFilters
                 obj.Filters(i).apply();
                 obj.filterIdx = obj.Filters(i).localIdx;
             end
@@ -99,13 +127,12 @@ classdef QueryManager < handle
     % Filter methods
     methods 
         function addFilter(obj, varargin)
-            % TODO: Test for equality
             for i = 1:numel(varargin)
                 if isSubclass(varargin{i}, 'aod.api.FilterQuery')
                     obj.Filters = cat(1, obj.Filters, varargin{i});
                 elseif iscell(varargin{i})
                     input = varargin{i};
-                    newFilter = obj.makeNewFilter(input{i});
+                    newFilter = aod.api.FilterTypes.makeNewFilter(obj, input);
                     obj.Filters = cat(1, obj.Filters, newFilter);
                 else 
                     error('addFilter:InvalidInput',...
@@ -126,6 +153,8 @@ classdef QueryManager < handle
 
         function clearFilters(obj)
             obj.Filters = [];
+            % All groups begin as true until determined otherwise
+            obj.filterIdx = true(numel(obj.allGroupNames), 1);
         end
     end
 

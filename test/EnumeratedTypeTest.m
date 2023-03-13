@@ -59,6 +59,8 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, FilterTypes.CLASS);
             out = FilterTypes.init('name');
             testCase.verifyEqual(out, FilterTypes.NAME);
+            out = FilterTypes.init('parent');
+            testCase.verifyEqual(out, FilterTypes.PARENT);
         end
 
         function H5NodeTypesInit(testCase)
@@ -94,6 +96,24 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, AONodeTypes.TEXT);
             out = AONodeTypes.init('char');
             testCase.verifyEqual(out, AONodeTypes.TEXT);
+            out = AONodeTypes.init('table');
+            testCase.verifyEqual(out, AONodeTypes.TABLE);
+            out = AONodeTypes.init('enum');
+            testCase.verifyEqual(out, AONodeTypes.ENUM);
+            out = AONodeTypes.init('logical');
+            testCase.verifyEqual(out, AONodeTypes.LOGICAL);
+            out = AONodeTypes.init('aod.util.filereader');
+            testCase.verifyEqual(out, AONodeTypes.FILEREADER);
+            out = AONodeTypes.init('notes');
+            testCase.verifyEqual(out, AONodeTypes.NOTES);
+            out = AONodeTypes.init('parametermanager');
+            testCase.verifyEqual(out, AONodeTypes.PARAMETERMANAGER);
+            out = AONodeTypes.init('description');
+            testCase.verifyEqual(out, AONodeTypes.DESCRIPTION);
+            out = AONodeTypes.init('homedirectory');
+            testCase.verifyEqual(out, AONodeTypes.HOMEDIRECTORY);
+            out = AONodeTypes.init('affine2d');
+            testCase.verifyEqual(out, AONodeTypes.TRANSFORM);
             out = AONodeTypes.init('timetable');
             testCase.verifyEqual(out, AONodeTypes.TIMETABLE);
             out = AONodeTypes.init('datetime');
@@ -104,6 +124,29 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, AONodeTypes.FILES);
             out = AONodeTypes.init('randominput');
             testCase.verifyEqual(out, AONodeTypes.UNKNOWN);
+
+            testCase.verifyEqual(out, AONodeTypes.init(out));
+
+            testCase.verifyEmpty(out.processDataForDisplay());
+        end
+    end
+
+    methods (Test, TestTags=["ReturnTypes"])
+        function ReturnTypesInit(testCase)
+            import aod.api.ReturnTypes
+
+            out = ReturnTypes.init('entity');
+            testCase.verifyEqual(out, ReturnTypes.ENTITY);
+            out = ReturnTypes.init('path');
+            testCase.verifyEqual(out, ReturnTypes.PATH);
+            out = ReturnTypes.init('parameter');
+            testCase.verifyEqual(out, ReturnTypes.PARAMETER);
+            out = ReturnTypes.init('dataset');
+            testCase.verifyEqual(out, ReturnTypes.DATASET);
+            testCase.verifyEqual(ReturnTypes.init(out), ReturnTypes.DATASET);
+
+            testCase.verifyError(...
+                @() ReturnTypes.init('Bad'), "init:InvalidInput");
         end
     end
     

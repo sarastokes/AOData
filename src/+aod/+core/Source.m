@@ -14,7 +14,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 % Methods:
 %   sources = getParents(obj)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -173,6 +173,25 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
 
+        function value = getLevel(obj)
+            % Get source level within Source hierarchy
+            %
+            % Syntax:
+            %   value = getLevel(obj)
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                value = arrayfun(@(x) x.getLevel, obj);
+                return
+            end
+
+            value = 1;
+            parent = obj.Parent;
+            while isSubclass(parent, 'aod.core.Source')
+                value = value + 1;
+                parent = parent.Parent;
+            end
+        end
+
         function allSources = getAllSources(obj)
             % Get all child sources of this source
             %
@@ -186,6 +205,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   allSources = source.getAllSources();
             %   >> Returns OD and OS
             % -------------------------------------------------------------
+            
             if ~isscalar(obj)
                 allSources = uncell(aod.util.arrayfun(@(x) getAllSources(x), obj));
                 return
@@ -207,6 +227,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   ID = obj.getParents();
             % -------------------------------------------------------------
+            
             sources = [];
             parent = obj.Parent;
             while ~isempty(parent) && isSubclass(parent, 'aod.core.Source')

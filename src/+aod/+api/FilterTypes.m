@@ -9,8 +9,6 @@ classdef FilterTypes
         PARAMETER
         DATASET
         LINK
-
-        % Specialized cases of the above filters
         CLASS
         NAME
         PARENT
@@ -22,7 +20,7 @@ classdef FilterTypes
 
             switch obj
                 case FilterTypes.ENTITY
-                    out = str2func('aod.api.EntityFitler');
+                    out = str2func('aod.api.EntityFilter');
                 case FilterTypes.PARAMETER
                     out = str2func('aod.api.ParameterFilter');
                 case FilterTypes.DATASET
@@ -38,16 +36,11 @@ classdef FilterTypes
     end
     
     methods (Static)
-        function out = get(filterType, varargin)
-
-            obj = aod.api.FilterTypes.init(filterType);
-
-            if nargin > 1
-                fcn = obj.getFcn();
-                out = fcn(varargin{:});
-            else
-                out = obj;
-            end
+        function out = makeNewFilter(QM, filterSpec)
+            % Creates a new filter
+            obj = aod.api.FilterTypes.init(filterSpec{1});
+            fcn = obj.getFcn();
+            out = fcn(QM, filterSpec{2:end});
         end
 
         function obj = init(filterType)
