@@ -133,6 +133,8 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
     end
 
     if ~isempty(emptyProps)
-        abandonedProps = cat(1, abandonedProps, persistedProps(emptyProps));
-        persistedProps(emptyProps) = [];
+        idx = emptyProps;
+        abandonedProps = cat(1, abandonedProps, persistedProps(idx));
+        emptyProps = persistedProps(idx);
+        persistedProps(idx) = [];
     end

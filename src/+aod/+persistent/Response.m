@@ -45,11 +45,4 @@ classdef Response < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
             obj.setLinksToDynProps();
         end
     end
-
-    % Heterogeneous methods
-    methods (Static, Sealed)
-        function obj = empty()
-            obj = aod.persistent.Response([], [], []);
-        end
-    end
 end 

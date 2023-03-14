@@ -1,4 +1,4 @@
-classdef Experiment < aod.persistent.Entity & dynamicprops
+classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicprops
 % An Experiment in an HDF5 file
 %
 % Description:
@@ -13,7 +13,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
 % See also:
 %   aod.core.Experiment
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -47,7 +47,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
     end
 
     % Core methods
-    methods
+    methods (Sealed)
         function setHomeDirectory(obj, homeDirectory)
             % SETHOMEDIRECTORY
             %
@@ -98,7 +98,7 @@ classdef Experiment < aod.persistent.Entity & dynamicprops
         end
     end
 
-    methods (Access = protected)
+    methods (Sealed, Access = protected)
         function populate(obj)
             populate@aod.persistent.Entity(obj);
  

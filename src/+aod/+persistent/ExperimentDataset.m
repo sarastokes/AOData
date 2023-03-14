@@ -31,11 +31,4 @@ classdef ExperimentDataset < aod.persistent.Entity & matlab.mixin.Heterogeneous 
             obj.setLinksToDynProps();
         end
     end
-
-    % Heterogenous methods
-    methods (Static, Sealed)
-        function obj = empty()
-            obj = aod.persistent.ExperimentDataset([], [], []);
-        end
-    end
 end 

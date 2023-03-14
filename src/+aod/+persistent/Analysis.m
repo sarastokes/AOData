@@ -33,11 +33,4 @@ classdef Analysis < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
             obj.setLinksToDynProps();
         end 
     end
-    
-    % Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Analysis([], [], []);
-        end
-    end
 end 

@@ -39,6 +39,8 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
         error('writeExperimentToFile:FileExists',...
             'File %s exists, set overwriteFlag to true to rewrite', hdfName);
     end
+
+    warning('off', 'writeAttributeByType:Cellstr');
     
     % Create the file
     h5tools.createFile(hdfName, overwriteFlag);

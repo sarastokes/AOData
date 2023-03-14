@@ -67,11 +67,4 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
             end
         end
     end
-    
-    % Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Source([], [], []);
-        end
-    end
 end 

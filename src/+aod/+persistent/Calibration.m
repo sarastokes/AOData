@@ -38,11 +38,4 @@ classdef Calibration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyna
             obj.setLinksToDynProps();
         end
     end
-
-    % Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Calibration([], [], []);
-        end
-    end
 end

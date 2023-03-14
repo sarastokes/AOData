@@ -44,9 +44,9 @@ function X = makeLEDStimulusFile(fName, X, ledObj)
     fprintf(fid, 'functionality    = 1\r\n');
     
     if isempty(ledObj)
-        fprintf(fid, 'lut1 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\LUT_660nm_20230118_1ndf.txt\r\n');
-        fprintf(fid, 'lut2 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\LUT_530nm_20220118_1ndf.txt\r\n');
-        fprintf(fid, 'lut3 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\LUT_420nm_20220118_1ndf.txt\r\n');
+        fprintf(fid, 'lut1 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\LUT_660nm_20230313_1ndf.txt\r\n');
+        fprintf(fid, 'lut2 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\LUT_530nm_20220313_1ndf.txt\r\n');
+        fprintf(fid, 'lut3 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\LUT_420nm_20220313_1ndf.txt\r\n');
     else
         fprintf(fid, 'lut1 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\%s.txt\r\n', ledObj.files('LUT1'));
         fprintf(fid, 'lut2 		= F:\\FunctionalImaging\\ExperimentParameters\\LUTs\\%s.txt\r\n', ledObj.files('LUT2'));

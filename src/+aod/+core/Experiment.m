@@ -76,9 +76,11 @@ classdef Experiment < aod.core.Entity
     methods 
         function obj = Experiment(name, homeFolder, expDate, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
-            obj.setHomeDirectory(homeFolder);
-            obj.experimentDate = datetime(expDate, 'Format', 'yyyyMMdd');
 
+            obj.setHomeDirectory(homeFolder);
+            obj.setExperimentDate(expDate);
+
+            % Create a table of current status of all associated repos
             obj.appendGitHashes();
         end
     end
@@ -115,6 +117,19 @@ classdef Experiment < aod.core.Entity
             end
             obj.homeDirectory = filePath;
         end
+        
+        function setExperimentDate(obj, expDate)
+            % Change the experiment's date
+            %
+            % Syntax:
+            %   setExperimentDate(obj, expDate)
+            %
+            % Inputs:
+            %   expDate         datetime or text in format 'YYYYMMdd'
+            % -------------------------------------------------------------
+            obj.experimentDate = aod.util.validateDate(expDate);
+        end
+        
         
         function epoch = id2epoch(obj, IDs)
             % ID2EPOCH
@@ -409,10 +424,6 @@ classdef Experiment < aod.core.Entity
                 out = group;
             end
         end
-    end
-
-    % Source methods
-    methods
     end
 
     % Epoch methods

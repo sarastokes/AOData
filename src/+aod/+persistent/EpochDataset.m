@@ -30,11 +30,4 @@ classdef EpochDataset < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyn
             obj.setLinksToDynProps();
         end
     end
-
-    % Heterogeneous methods
-    methods (Static, Sealed)
-        function obj = empty()
-            obj = aod.persistent.EpochDataset([], [], []);
-        end
-    end
 end

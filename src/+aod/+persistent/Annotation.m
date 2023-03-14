@@ -56,11 +56,4 @@ classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             obj.Source = obj.loadLink("Source");
         end
     end
-
-    % Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Annotation([], [], []);
-        end
-    end
 end

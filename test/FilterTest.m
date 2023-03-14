@@ -33,11 +33,8 @@ classdef FilterTest < matlab.unittest.TestCase
             end
             testCase.QM = aod.api.QueryManager(testCase.FILENAME);
 
-            % Make a small experiment with missing entity types
-            expt = aod.core.Experiment('SmallExperiment', testDir, getDateYMD());
-            aod.h5.writeExperimentToFile(...
-                fullfile(testDir, 'SmallExperiment.h5'), expt, true);
-            testCase.SMALL_EXPT = loadExperiment(fullfile(testDir, 'SmallExperiment.h5'));
+            % Make a smaller experiment to test for empty entities
+            testCase.SMALL_EXPT = test.util.makeSmallExperiment(true);
             testCase.SMALL_QM = aod.api.QueryManager(testCase.SMALL_EXPT);
         end
     end

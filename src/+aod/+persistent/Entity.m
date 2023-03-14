@@ -1,5 +1,5 @@
 classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
-% ENTITY
+% The base class for all AOData persistent objects
 %
 % Description:
 %   Parent class for all persistent entities read from an HDF5 file
@@ -137,20 +137,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   setReadOnlyMode(obj, tf)
             %
             % Inputs:
-            %   tf          read only status (default = true)
+            %   tf          logical (default = true)
+            %       Whether changes can be made to underlying HDF5 file 
             % -------------------------------------------------------------
             arguments
                 obj
-                tf      {mustBeA(tf, ["logical", "string", "char"])} = true
+                tf      logical = true
             end
 
-            if istext(tf)
-                if strcmpi(tf, 'on')
-                    tf = true;
-                elseif strcmpi(tf, 'off')
-                    tf = false;
-                end
-            end
             obj.factory.persistor.setReadOnly(tf);
         end
     end
@@ -1080,7 +1074,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         function propgrp = getPropertyGroups(obj)
             % Defines custom property group for dislay
             propgrp = getPropertyGroups@matlab.mixin.CustomDisplay(obj);
-            if ~isscalar(obj)
+            if ~isscalar(obj) || isempty(obj)
                 return
             end
 

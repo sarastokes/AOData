@@ -30,11 +30,4 @@ classdef Device < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
             obj.setLinksToDynProps();
         end
     end
-    
-    % Heterogeneous methods
-    methods (Static, Sealed)
-        function obj = empty()
-            obj = aod.persistent.Device([], [], []);
-        end
-    end
 end

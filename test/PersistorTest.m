@@ -20,6 +20,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 
     properties
         EXPT 
+        SMALL_EXPT
     end
 
     methods (TestClassSetup)
@@ -31,12 +32,43 @@ classdef PersistorTest < matlab.unittest.TestCase
                 ToyExperiment(true, true);
             end
             testCase.EXPT = loadExperiment(fileName);
+
+            % Make a smaller experiment for testing empty entities
+            testCase.SMALL_EXPT = test.util.makeSmallExperiment(true);
         end
     end
 
-    methods (Test)
-        function ReadOnly(testCase)
+    methods (Test, TestTags=["MixedEntitySet", "Persistent"])
+        function MixedEntitySet(testCase)
+            ME = aod.persistent.MixedEntitySet();
+            disp(ME);
+            testCase.verifyEmpty(ME);
+
+            ME.add(testCase.EXPT.Epochs);
+            testCase.verifyEqual(ME.whichEntities(),aod.core.EntityTypes.EPOCH);
+            testCase.verifyEqual(numel(ME.Epochs), testCase.EXPT.numEpochs);
+            disp(ME);
+
+            ME.add(testCase.EXPT.Sources);
+            testCase.verifyNumElements(ME.whichEntities, 2);
+            testCase.verifyTrue(...
+                ismember(aod.core.EntityTypes.EPOCH, ME.whichEntities()));
+            testCase.verifyTrue(...
+                ismember(aod.core.EntityTypes.SOURCE, ME.whichEntities()));
+        end
+
+        function MixedEntitySetErrors(testCase)
+            ME = aod.persistent.MixedEntitySet();
+
+            testCase.verifyError(@() ME.add(1), "add:InvalidInput");
+        end
+    end
+
+    methods (Test, TestTags = ["ReadOnly", "Persistent"])
+        function ReadOnlyEnforcement(testCase)
             import matlab.unittest.constraints.Throws
+
+            testCase.EXPT.setReadOnlyMode(true);
 
             % Ensure edits cannot be made when read only mode is true
             testCase.verifyThat( ...
@@ -44,8 +76,18 @@ classdef PersistorTest < matlab.unittest.TestCase
                 Throws("verifyReadOnlyMode:ReadOnlyModeEnabled"));
             testCase.EXPT.setReadOnlyMode(false);
         end
+    end
 
+    methods (Test, TestTags=["HomeDirectory", "Persistent"])
         function HomeDirectory(testCase)
+            testCase.verifyEqual(...
+                testCase.EXPT.getHomeDirectory(),...
+                testCase.EXPT.Epochs(1).getHomeDirectory());
+        end
+
+        function HomeDirectoryChanges(testCase)
+            testCase.EXPT.setReadOnlyMode(false);
+
             % Changing the home directory is also a dataset change test
             oldDirectory = testCase.EXPT.homeDirectory;
             newDirectory = fileparts(testCase.EXPT.homeDirectory);
@@ -56,7 +98,9 @@ classdef PersistorTest < matlab.unittest.TestCase
             % Reset the homeDirectory
             testCase.EXPT.setHomeDirectory(oldDirectory);
         end
-        
+    end
+
+    methods (Test)
         function ParamRead(testCase)
             testCase.verifyTrue(...
                 testCase.EXPT.hasParam('Administrator'));
@@ -65,7 +109,6 @@ classdef PersistorTest < matlab.unittest.TestCase
 
             testCase.verifyFalse(...
                 testCase.EXPT.hasParam('BadParam'));
-
         end
 
         function FileRead(testCase)
@@ -96,7 +139,9 @@ classdef PersistorTest < matlab.unittest.TestCase
 
         function ParamIO(testCase)
             import matlab.unittest.constraints.Throws
-
+            
+            testCase.EXPT.setReadOnlyMode(false);
+            
             % Ensure system attributes aren't editable
             testCase.verifyThat( ...
                 @() testCase.EXPT.setParam('Class', 'TestValue'),...
@@ -116,6 +161,9 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
 
         function FileIO(testCase)
+
+            testCase.EXPT.setReadOnlyMode(false);
+
             % Change a file
             testCase.EXPT.Epochs(1).setFile('PostSyncFile', 'test.txt');
             out = h5readatt('ToyExperiment.h5', '/Experiment/Epochs/0001/files', 'PostSyncFile');
@@ -144,6 +192,9 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
 
         function PropertyIO(testCase)
+            
+            testCase.EXPT.setReadOnlyMode(false);
+
             % Add a property
             testCase.EXPT.addDataset('Test', eye(3));
             % Confirm new property is now a dynamic property
@@ -152,16 +203,31 @@ classdef PersistorTest < matlab.unittest.TestCase
             out = h5read('ToyExperiment.h5', '/Experiment/Test');
             testCase.verifyEqual(eye(3), out);
 
+            % Test for errors with unwritten links
+            testCase.verifyError(...
+                @() testCase.EXPT.addDataset('BadLink', aod.core.Analysis('Test')),...
+                "addDataset:UnpersistedLink");
+
             % TODO: Remove property
         end
     end
         
     methods (Test, TestTags=["Containers", "Persistor"])
-        function EmptyContainer(testCase)
-            testCase.verifyEmpty(aod.persistent.EntityContainer.empty());
+        function EntityContainerContents(testCase)
+            EC1 = testCase.EXPT.EpochsContainer;
+            ECcontents = EC1.contents;
+            testCase.verifyEqual(numel(ECcontents), testCase.EXPT.numEpochs);
+            testCase.verifyClass(ECcontents, 'aod.persistent.Epoch');
         end
 
-        function ContainerIndexing(testCase)
+        function EmptyContainer(testCase)
+            testCase.verifyEmpty(aod.persistent.EntityContainer.empty());
+
+            EC2 = testCase.SMALL_EXPT.ExperimentDatasetsContainer;
+            testCase.verifyEmpty(EC2(1));
+        end
+
+        function EntityContainerIndexing(testCase)
             testCase.verifyNumElements(testCase.EXPT.Analyses(0),...
                 numel(testCase.EXPT.Analyses));
             testCase.verifyNumElements(testCase.EXPT.Epochs(1), 1);
@@ -173,7 +239,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyNumElements(testCase.EXPT.Sources(1), 1);
         end
 
-        function ContainerErrors(testCase)
+        function EntityContainerErrors(testCase)
             try
                 testCase.EXPT.EpochsContainer(1) = [];
             catch ME 
@@ -188,6 +254,10 @@ classdef PersistorTest < matlab.unittest.TestCase
                 testCase.verifyTrue(strcmp(ME.identifier,...
                     "EntityContainer:AssignNotSupported"));
             end
+
+            EC1 = testCase.EXPT.EpochsContainer;
+            testCase.verifyError( ...
+                @() [EC1, EC1], "EntityContainer:ConcatenationNotSupported");
         end
     end 
 end

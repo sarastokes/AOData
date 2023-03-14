@@ -36,11 +36,4 @@ classdef Registration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyn
             obj.setLinksToDynProps();
         end
     end
-
-    % Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Registration([], [], []);
-        end
-    end
 end

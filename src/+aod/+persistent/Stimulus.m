@@ -11,7 +11,7 @@ classdef Stimulus < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
 %   obj = aod.persistent.Stimulus(hdfFile, hdfPath, factory)
 %
 % See also:
-%   aod.core.Stimulus
+%   aod.core.Stimulus, aod.util.Protocol
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -34,13 +34,6 @@ classdef Stimulus < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
 
             obj.Calibration = obj.loadLink("Calibration");
             obj.setLinksToDynProps();
-        end
-    end
-
-    % Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Stimulus([], [], []);
         end
     end
 end 

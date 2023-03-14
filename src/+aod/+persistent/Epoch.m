@@ -136,11 +136,4 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
             end
         end
     end
-
-    % matlab.mixin.Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Epoch([], [], []);
-        end
-    end
 end 

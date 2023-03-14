@@ -1,5 +1,5 @@
 classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
-% ENTITYCONTAINER
+% Container for entities of a specific type within an HDF5 file
 %
 % Description:
 %   A container for entities that enables lazy loading (entity in HDF5
@@ -9,22 +9,23 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 %   handle, matlab.mixin.indexing.RedefinesParam
 %
 % Constructor:
-%   obj = EntityContainer(hdfPath, entityFactory)
+%   obj = aod.persistent.EntityContainer(hdfPath, entityFactory)
 %
 % Notes:
 %   EntityContainer(0) returns all entities
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-
-    properties (Hidden, Dependent)
-        contents            % All child entities
-    end
 
     properties (SetAccess = private)
         hdfPath
         entityFactory
         memberPaths                 string = string.empty()
+    end
+
+    properties (Hidden, Dependent)
+        % All child entities, fully loaded
+        contents 
     end
 
     methods
@@ -48,12 +49,6 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
         end
     end
 
-    methods
-        function out = getClassNames(obj)
-            out = cat(1, obj.contents.classNames);
-        end
-    end
-    
     methods (Access = ?aod.persistent.Persistor)
         function refresh(obj)
             obj.memberPaths = [];
@@ -87,6 +82,7 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
         end
     end
 
+    % matlab.mixin.indexing.RedefinesParen methods
     methods (Access = protected)
         function entities = parenReference(obj, indexOp)
             if isempty(obj.memberPaths)
@@ -125,12 +121,7 @@ classdef EntityContainer < handle & matlab.mixin.indexing.RedefinesParen
 
     methods (Static)
         function obj = empty(varargin)
-            if nargin == 0
-                obj = aod.persistent.EntityContainer();
-                return
-            end
-
-            obj = aod.persistent.EntityContainer(varargin{1}, varargin{2});
+            obj = aod.persistent.EntityContainer();
         end
     end
 end

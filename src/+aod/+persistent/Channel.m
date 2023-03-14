@@ -71,11 +71,4 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
             end
         end
     end
-
-    % Heterogeneous methods
-    methods (Sealed, Static)
-        function obj = empty()
-            obj = aod.persistent.Channel([], [], []);
-        end
-    end
 end 

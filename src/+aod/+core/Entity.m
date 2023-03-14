@@ -70,6 +70,8 @@ classdef (Abstract) Entity < handle
         description                 string = string.empty() 
         % Notes about the entity
         notes                       string = string.empty()
+        % The date the entity was created
+        dateCreated                 datetime = datetime.empty()
     end
 
     properties (Hidden, SetAccess = private)
@@ -113,6 +115,8 @@ classdef (Abstract) Entity < handle
 
             % Generate a random unique identifier to distinguish the class
             obj.UUID = aod.util.generateUUID();
+            % Get current time for dateCreated
+            obj.dateCreated = datetime("now");
 
             % Set the Parent, if necessary
             if ~isempty(ip.Results.Parent)
@@ -209,6 +213,10 @@ classdef (Abstract) Entity < handle
             if ~isscalar(obj)
                 arrayfun(@(x) setName(x, name), obj);
                 return
+            end
+
+            if nargin < 2
+                name = [];
             end
             
             obj.Name = name;
