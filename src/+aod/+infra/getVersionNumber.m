@@ -2,7 +2,7 @@ function aodataVersion = getVersionNumber()
 % Returns AOData version number
 %
 % Syntax:
-%   out = getVersionNumber();
+%   out = aod.infra.getVersionNumber();
 %
 % Inputs:
 %   N/A
