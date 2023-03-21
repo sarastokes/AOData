@@ -38,15 +38,11 @@ classdef Eye < aod.core.sources.Eye
     methods
         function obj = Eye(whichEye, varargin)
             obj = obj@aod.core.sources.Eye(whichEye, varargin{:});
+
+            obj.setParam('MicronsPerDegree', obj.micronsPerDegree());
         end
         
-        function value = get.micronsPerDegree(obj)
-            if ~obj.hasParam('AxialLength')
-                value = [];
-            else
-                value = 291.2 * (obj.getParam('AxialLength') / 24.2);
-            end
-        end
+        
     end
 
     
@@ -57,6 +53,15 @@ classdef Eye < aod.core.sources.Eye
 
         function value = um2deg(obj, um)
             value = um ./ obj.micronsPerDegree;
+        end
+
+        function value = get.micronsPerDegree(obj)
+
+            if ~obj.hasParam('AxialLength')
+                value = [];
+            else
+                value = 291.2 * (obj.getParam('AxialLength') / 24.2);
+            end
         end
 
         function value = micronsPerPixel(obj, fovDegrees)
@@ -114,6 +119,8 @@ classdef Eye < aod.core.sources.Eye
                 'Axial length of the eye in mm');
             value.add('PupilSize', 6.7, @isnumeric,...
                 'Pupil size of the eye in mm');
+            value.add('MicronsPerDegree', [], @isnumeric,...
+                'Microns per degree of visual angle, from axial length');
         end
     end
 end

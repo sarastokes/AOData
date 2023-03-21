@@ -7,6 +7,9 @@ function out = value2string(input)
 %
 % Syntax:
 %   out = value2string(input)
+%
+% Notes:
+%   Supports string, char, enum and all numeric types
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -20,7 +23,15 @@ function out = value2string(input)
         out = "'" + out + "'";
     elseif isstring(input)
         out = string(sprintf('"%s"', out));
-    elseif isnumeric(input) && numel(input) > 1
-        out = "[" + out + "]";
+    elseif isenum(input)
+        mc = metaclass(input);
+        out = sprintf("%s.%s")
+    elseif isnumeric(input) 
+        if numel(input) > 1
+            out = "[" + out + "]";
+        end
+        if ~isa(input, 'double')
+            out = sprintf("%s(%s)", class(input), out);
+        end 
     end
     

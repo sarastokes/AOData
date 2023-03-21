@@ -37,7 +37,9 @@ classdef ExperimentView < aod.app.UIView
 
     properties (Hidden, Constant)
         CONTAINER_STYLE = uistyle("FontAngle", "italic");
+        % Style for system attributes
         SYSTEM_STYLE = uistyle('FontColor', [0.4 0.4 0.4]);
+        % Location of icon files
         ICON_DIR = [fileparts(fileparts(mfilename('fullpath'))), filesep,...
             '+icons', filesep];
     end
@@ -55,6 +57,14 @@ classdef ExperimentView < aod.app.UIView
 
     methods 
         function resetDisplay(obj)
+            % Reset display before processing a newly clicked node
+            % -------------------------------------------------------------
+
+            % Empty the table but keep visible (all nodes can have atts)
+            removeStyle(obj.Attributes);
+            obj.Attributes.Data = [];
+
+            % Clear and hide the various data displays
             cla(obj.AxesPanel, 'reset');
             obj.AxesPanel.Visible = 'off';
 
@@ -67,12 +77,10 @@ classdef ExperimentView < aod.app.UIView
             obj.LinkPanelText.Value = "";
             obj.LinkPanel.Visible = 'off';
 
-            removeStyle(obj.Attributes);
-            obj.Attributes.Data = [];
         end
 
         function node = getSelectedNode(obj)
-            % GETSELECTEDNODES
+            % Get currently selected node in view
             %
             % Description:
             %   Convenience function for accessing selected node without
@@ -82,17 +90,41 @@ classdef ExperimentView < aod.app.UIView
         end
 
         function selectNode(obj, node)
+            % Select a specific node 
+
             obj.Tree.SelectedNodes = node;
             notify(obj, 'NodeSelected');
         end
 
         function node = path2node(obj, hdfPath)
-            node = findobj(obj.Tree, 'Tag', hdfPath);
+            % Get the node corresponding to a specific HDF5 path
+            if strcmp(hdfPath, '/')
+                node = obj.Tree;
+            else
+                node = findobj(obj.Tree, 'Tag', hdfPath);
+            end
         end
 
         function showNode(obj, node)
+            % Scroll to a specific node
             scroll(obj.Tree, node);
         end
+    end
+
+    methods
+        function changeFontSize(obj, modifier)
+            obj.Tree.FontSize = obj.Tree.FontSize + modifier;
+            obj.Attributes.FontSize = obj.Attributes.FontSize + modifier;
+            obj.TextPanel.FontSize = obj.TextPanel.FontSize + modifier;
+            obj.TablePanel.FontSize = obj.TablePanel.FontSize + modifier;
+            obj.LinkPanelText.FontSize = obj.LinkPanelText.FontSize + modifier;
+        end
+
+        function resizeFigure(obj, x, y)
+            obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + x;
+            obj.figureHandle.Position(4) = obj.figureHandle.Position(4) + y;
+        end
+            
     end
 
     % Node-specific display methods
@@ -110,13 +142,17 @@ classdef ExperimentView < aod.app.UIView
             % Add attributes (as container.Map) to the attribute table
             % -------------------------------------------------------------
             obj.Attributes.ColumnName = {'Attribute', 'Value'};
-            if nargin > 1
-                obj.Attributes.Data = data;
-                systemAttributes = aod.h5.getSystemAttributes();
-                rowIdx = find(cellfun(@(x) ismember(x, systemAttributes), data{:, 1}));
-                if ~isempty(rowIdx)
-                    addStyle(obj.Attributes, obj.SYSTEM_STYLE, 'Row', rowIdx);
-                end
+            if nargin == 1
+                return
+            end
+
+            % Gray out system attributes and sort to be last in table
+            systemAttributes = aod.h5.getSystemAttributes();
+            rowIdx = find(cellfun(@(x) ismember(x, systemAttributes), data{:, 1}));
+            [rowIdx, idx] = sort(rowIdx);
+            obj.Attributes.Data = data(idx,:);
+            if ~isempty(rowIdx)
+                addStyle(obj.Attributes, obj.SYSTEM_STYLE, 'Row', rowIdx);
             end
         end
 
@@ -136,7 +172,7 @@ classdef ExperimentView < aod.app.UIView
                 data = double(data);
             end
             obj.TablePanel.Data = data;
-            if isnumeric(obj.TablePanel.Data)
+            if isnumeric(obj.TablePanel.Data) || istext(obj.TablePanel.Data)
                 set(obj.TablePanel, "RowName", "numbered", ...
                     "ColumnName", "numbered");
             else
@@ -153,28 +189,44 @@ classdef ExperimentView < aod.app.UIView
 
     % New node methods
     methods 
-        function g = makeEntityNode(obj, parent, nodeName, hdfPath, data) %#ok<INUSD> 
+        function g = makeEntityNode(obj, parent, nodeName, hdfPath, data)  
+            if istext(parent)
+                parent = obj.path2node(parent);
+            end
+
             g = uitreenode(parent,...
                 'Text', nodeName,...
                 'Icon', data.AONode.getIconPath(),...
                 'Tag', hdfPath,...
                 'NodeData', data);
+            if data.AONode == aod.app.AONodeTypes.CONTAINER 
+                addStyle(obj.Tree, obj.CONTAINER_STYLE, "node", g);
+            elseif data.AONode == aod.app.AONodeTypes.ENTITY 
+                obj.addContextMenu(g);        
+                % Leave a placeholder so node can be expanded, but don't
+                % load the entity's datasets and links until requested
+                obj.makePlaceholderNode(g);
+            end
         end
 
-        function g = makeDatasetNode(obj, parent, dsetName, hdfPath, data) %#ok<INUSD> 
+        function g = makeDatasetNode(obj, parent, dsetName, hdfPath, data)   
             g = uitreenode(parent,...
                 'Text', dsetName,...
                 'Icon', data.AONode.getIconPath(),...
                 'Tag', hdfPath,...
                 'NodeData', data);
+            obj.addContextMenu(g);
         end
 
-        function makeLinkNode(obj, parentNode, linkName, hdfPath, linkValue)
+        function makeLinkNode(obj, parentNode, linkName, hdfPath, data)
             % Create a new node representing an HDF link
+            %
+            % Inputs:
+            %   parentNode          uitreenode
+            %   linkName            char
+            %   hdfPath             char
+            %   nodeData            struct
             % -------------------------------------------------------------
-            data = struct('NodeType', 'link', 'LinkPath', linkValue,...
-                'H5Node', aod.app.H5NodeTypes.LINK,...
-                'AONode', aod.app.AONodeTypes.LINK);
                 
             g = uitreenode(parentNode,...
                 'Text', linkName,...
@@ -184,19 +236,14 @@ classdef ExperimentView < aod.app.UIView
             obj.addContextMenu(g);
         end
 
-        function makePlaceholderNode(obj, parent) %#ok<INUSD> 
+        function makePlaceholderNode(obj, parent)  %#ok<INUSL> 
+            % Ensures groups with unloaded content are expandable
             uitreenode(parent,...
-                'Text', 'Placeholder');
-        end
-
-        function node = formatContainerNode(obj, node)
-            node.Icon = aod.app.AONodeTypes.CONTAINER.getIconPath();
-            addStyle(obj.Tree, obj.CONTAINER_STYLE, "node", node);
+                'Text', 'Loading...');
         end
 
         function addContextMenu(obj, node)
             % Adds context menu to the node
-            % -------------------------------------------------------------
             node.ContextMenu = obj.ContextMenu;
         end
     end
@@ -217,9 +264,13 @@ classdef ExperimentView < aod.app.UIView
             obj.figureHandle.Position(3:4) = [500 450];
             % movegui(obj.figureHandle, 'center'); too slow
 
+            %uit = uitoolbar(obj.figureHandle);
+            %pt = uipushtool(uit);
+
             mainLayout = uigridlayout(obj.figureHandle);
             mainLayout.RowHeight = {'1.5x', '1x'};
             mainLayout.ColumnWidth = {'1x', '1.25x'};
+            
 
             obj.Tree = uitree(mainLayout,...
                 'SelectionChangedFcn', @(h,d)notify(obj, 'NodeSelected'),...
@@ -238,6 +289,7 @@ classdef ExperimentView < aod.app.UIView
             obj.AxesPanel.Layout.Row = 1;
     
             obj.TextPanel = uitextarea(mainLayout,...
+                'Editable', 'off',...
                 'Visible', 'off',...
                 'BackgroundColor', 'w');
             obj.TextPanel.Layout.Column = 2;
@@ -256,6 +308,7 @@ classdef ExperimentView < aod.app.UIView
             g = uigridlayout(obj.LinkPanel, [2 1]);
             g.RowHeight = {'1x', 35};
             obj.LinkPanelText = uitextarea(g,...
+                'Editable', 'off',...
                 'BackgroundColor', 'w');
             uibutton(g, 'Text', 'Go to link',...
                 'Tag', 'FollowLinkButton',...

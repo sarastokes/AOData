@@ -43,6 +43,11 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 
     % System
     system = aod.core.System('Base');
+    %channel1 = aod.core.Channel('CalciumImaging');
+    %channel1.add(aod.core.builtin.devices.Pinhole(25));
+    %channel1.add(aod.core.builtin.devices.LightSource(488));
+    %channel2 = aod.core.Channel('ReflectanceImaging');
+    %channel2.add(aod.builtin.devices.Pinhole(20));
     [~, system] = sara.factories.ChannelFactory.create(...
         'MustangImaging', system, 'Pinhole', 25);
     [~, system] = sara.factories.ChannelFactory.create(...

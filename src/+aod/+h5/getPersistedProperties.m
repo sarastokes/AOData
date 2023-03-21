@@ -1,9 +1,6 @@
 function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
         = getPersistedProperties(obj, verbose)
-% DISPLAYPERSISTEDPROPERTIES
-%
-% Description:
-%   Check which properties will be persisted and which will not
+% Determine which properties will be persisted and which will not
 %
 % Syntax:
 %   [persisted, attribute, abandoned, empty] = ...
@@ -22,6 +19,9 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
 %       Names of properties that are not written 
 %   emptyProps          string
 %       Names of properties that are empty (if an object was provided)
+%
+% See also:
+%   aod.h5.getSystemAttributes
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -45,7 +45,7 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
     containerProps = entityType.childContainers();
     
     alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
-    alwaysAttributeProps = ["UUID", "label", "parameters", "entityType"];
+    alwaysAttributeProps = ["UUID", "label", "parameters", "entityType", "dateCreated"];
     alwaysAbandonedProps = "Reader";  %% TODO
     persistedProps = [];
     attributeProps = [];

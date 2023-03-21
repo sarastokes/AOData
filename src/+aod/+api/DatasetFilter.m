@@ -16,7 +16,7 @@ classdef DatasetFilter < aod.api.FilterQuery
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Name 
+        Name            string
         Value
     end
 
@@ -34,6 +34,14 @@ classdef DatasetFilter < aod.api.FilterQuery
             end
 
             obj.collectDatasets();
+        end
+    end
+
+    methods
+        
+        function out = describe(obj)
+            tag = sprintf("DatasetFilter: Name=%s, Value=%s",... 
+                value2string(obj.Name), value2string(obj.Value));
         end
 
         function out = apply(obj)

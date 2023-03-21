@@ -52,6 +52,13 @@ classdef ParameterFilter < aod.api.FilterQuery
                 obj.Value = value;
             end
         end
+    end
+
+    methods
+        function out = describe(obj)
+            tag = sprintf("ParameterFilter: Name=%s, Value=%s",... 
+                value2string(obj.Name), value2string(obj.Value));
+        end
 
         function out = apply(obj)
             % Update local match indices to match those in Query Manager

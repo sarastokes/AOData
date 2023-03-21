@@ -117,10 +117,7 @@ classdef EntityTypes
         end
 
         function out = parentContainer(obj)
-            % PARENTCONTAINER
-            %
-            % Description:
-            %   Returns the name of the container for an entity type
+            % Returns the container name for an entity type
             % 
             % Syntax:
             %   out = parentContainer(obj)
@@ -178,10 +175,7 @@ classdef EntityTypes
         end
 
         function out = childContainers(obj, fullVariableName)
-            % CONTAINERS
-            %
-            % Description:
-            %   Defines and returns the containers within an entity
+            % Defines and returns the containers within an entity
             %
             % Syntax:
             %   containers = childContainers(obj, fullVariableName)

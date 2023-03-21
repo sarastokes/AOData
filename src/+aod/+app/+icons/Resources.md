@@ -42,6 +42,7 @@ Source credit for the free icons used in apps
 - <a href="https://icons8.com/icon/21215/planner">Planner</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21100/refresh">Refresh</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21394/save">Save</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/VKNnbtYRlG_o/search">Search</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21103/settings">Settings</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21256/tree-structure">Tree Structure</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21430/unchecked-checkbox">Unchecked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>

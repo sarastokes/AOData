@@ -43,6 +43,7 @@ classdef AONodeTypes
         % Specific AOData types
         PARAMETERMANAGER
         HOMEDIRECTORY
+        QUERYMANAGER
         FILEREADER
         DESCRIPTION
         FILES
@@ -111,7 +112,8 @@ classdef AONodeTypes
                 AONodeTypes.ENUM,...        % TODO: non-scalar
                 AONodeTypes.NAME,...
                 AONodeTypes.DESCRIPTION,...
-                AONodeTypes.HOMEDIRECTORY];
+                AONodeTypes.HOMEDIRECTORY,...
+                AONodeTypes.QUERYMANAGER];
 
             tf = ismember(obj, textNodes);
         end
@@ -184,6 +186,8 @@ classdef AONodeTypes
                     out = 'icons8-home-page-40.png';
                 case AONodeTypes.PARAMETERMANAGER
                     out = 'icons8-settings-40.png';
+                case AONodeTypes.QUERYMANAGER
+                    out = 'icons8-search-40.png';
                 otherwise
                     out = 'icons8-grid-40.png';
             end
@@ -296,6 +300,8 @@ classdef AONodeTypes
                     obj = AONodeTypes.HOMEDIRECTORY;
                 case 'aod.util.parametermanager'
                     obj = AONodeTypes.PARAMETERMANAGER;
+                case 'aod.api.QueryManager'
+                    obj = AONodeTypes.QUERYMANAGER;
                 otherwise
                     warning('AONodeTypes_get:UnrecognizedInput',...
                         'Node name %s was not recognized', nodeName);

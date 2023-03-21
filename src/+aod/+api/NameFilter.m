@@ -49,6 +49,12 @@ classdef NameFilter < aod.api.FilterQuery
 
             obj.collectNames();
         end
+    end
+
+    methods
+        function out = describe(obj)
+            tag = sprintf("NameFilter: Name=%s", value2string(obj.Name));
+        end
 
         function out = apply(obj)
             % Update local match indices to match those in Query Manager

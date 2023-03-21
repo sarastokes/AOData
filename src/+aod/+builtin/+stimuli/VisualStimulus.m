@@ -1,13 +1,13 @@
 classdef VisualStimulus < aod.core.Stimulus 
-% VISUALSTIMULUS
+% A visual stimulus presented during an AO imaging trial
 %
 % Parent:
 %   aod.core.Stimulus
 %
 % Constructor:
-%   obj = VisualStimulus(protocol)
+%   obj = aod.builtin.stimuli.VisualStimulus(protocol)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     methods

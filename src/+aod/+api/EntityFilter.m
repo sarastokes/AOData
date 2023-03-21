@@ -36,7 +36,15 @@ classdef EntityFilter < aod.api.FilterQuery
             obj@aod.api.FilterQuery(parent);
             obj.EntityName = char(aod.core.EntityTypes.get(entityType));
         end
+    end
 
+    methods
+        
+        function out = describe(obj)
+            tag = sprintf("ParameterFilter: Name=%s, Value=%s",... 
+                value2string(obj.Name), value2string(obj.Value));
+        end
+        
         function out = apply(obj)
             obj.localIdx = obj.getQueryIdx();
             groupNames = obj.getAllGroupNames();

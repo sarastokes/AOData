@@ -17,10 +17,6 @@ classdef UIView < handle
         Close
     end
 
-    properties
-        position
-    end
-
     properties (SetAccess = private)
         isClosed
     end

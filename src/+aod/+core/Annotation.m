@@ -42,8 +42,6 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         % The annotation data
         Data   
-        % The date the annotation was performed or last updated
-        annotationDate          
         % Source associated with the Annotation
         Source                      = aod.core.Source.empty()       
     end
@@ -105,8 +103,19 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function setDate(obj, annotationDate)
+            % Sets the AnnotationDate parameter
+            %
+            % Syntax:
+            %   setAnnotationDate(obj, annotationDate)
+            %
+            % Inputs:
+            %   annotationDate      datetime, char/string in YYYYMMDD form
+            %
+            % Examples:
+            %   obj.setAnnotationDate('20230318')
+            % -------------------------------------------------------------
             if nargin < 2 || isempty(annotationDate)
-                obj.annotationDate = datetime.empty();
+                obj.setParam('AnnotationDate', datetime.empty());
             end
             annotationDate = aod.util.validateDate(annotationDate);
             obj.annotationDate = annotationDate;
@@ -117,7 +126,10 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
         function value = getExpectedParameters(obj)
             value = getExpectedParameters@aod.core.Entity(obj);
 
-            value.add('Administrator', [], @isstring, 'Who performed the annotation');
+            value.add('Administrator', [], @isstring,... 
+                'Who performed the annotation');
+            value.add('AnnotationDate', [], @isdatetime,...
+                'Date annotation was performed');
         end
     end
 end
