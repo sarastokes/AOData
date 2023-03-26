@@ -59,7 +59,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
         results = testWithCoverageReport(debugFlag);
         [coverageTable, detailTable] = test.readCoverageReport(fullfile(pwd, 'coverage_report'));
         % Summarize the results by package
-        packageNames = ["+api", "+app", "+builtin", "+core", "+h5", "+persistent", "+util"];
+        packageNames = ["+api", "+app", "+builtin", "+core", "+infra", "+h5", "+persistent", "+util"];
         packageCoverage = struct();
         for i = 1:numel(packageNames)
             idx = startsWith(detailTable.Name, packageNames(i));

@@ -19,6 +19,7 @@ classdef ReturnTypes
 
     methods (Static)
         function out = init(txt)
+            import aod.api.ReturnTypes
             
             if isa(txt, 'aod.api.ReturnTypes')
                 out = txt;

@@ -38,6 +38,7 @@ test/SmallExperiment.h5
 test/ToyExperiment.mat
 
 test/DeviceSubclass.m
+test/MyDevice.m
 
 test/BaseCoverage.xlsx
 test/~$BaseCoverage.xlsx

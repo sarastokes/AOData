@@ -28,9 +28,13 @@ classdef InterfaceTest < matlab.unittest.TestCase
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
                 'test', 'ToyExperiment.h5');            
             if ~exist(fileName, 'file')
-                testCase.cEXPT = ToyExperiment(true, true);
+                ToyExperiment(true, true);
             end
-            S = load(strrep(fileName, '.h5', '.mat'));
+            matFileName = strrep(fileName, '.h5', '.mat');
+            if ~exist(matFileName, 'file')
+                ToyExperiment(false, true);
+            end
+            S = load(matFileName);
             testCase.cEXPT = S.ToyExperiment;
             testCase.pEXPT = loadExperiment(fileName);
         end

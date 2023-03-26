@@ -1,9 +1,9 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 14Mar2023, the ```aod``` package report contains **151 files** and has:
-- **76.19%** statement coverage (5058 executable). 
-- **78.29%** function coverage (834 executable).
+As of 25Mar2023, the ```aod``` package report contains **150 files** and has:
+- **77.90%** statement coverage (4965 executable). 
+- **81.22%** function coverage (815 executable).
 
 ## Tests
 The AOData test suite currently contains the following:

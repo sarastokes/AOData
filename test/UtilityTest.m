@@ -195,7 +195,7 @@ classdef UtilityTest < matlab.unittest.TestCase
             files = FM.getFilesFound();
             % ! This will change with # of test data files
             testCase.verifyNumElements(files, 6);
-            testCase.verifyFalse(contains(files, "."));
+            testCase.verifyFalse(all(contains(files, ".")));
 
             out = FM.checkFilesFound(files, 1);
             testCase.verifyEqual(out, files(1));

@@ -298,9 +298,9 @@ classdef AONodeTypes
                     obj = AONodeTypes.DESCRIPTION;
                 case 'homedirectory'
                     obj = AONodeTypes.HOMEDIRECTORY;
-                case 'aod.util.parametermanager'
+                case {'parametermanager', 'aod.util.parametermanager'}
                     obj = AONodeTypes.PARAMETERMANAGER;
-                case 'aod.api.QueryManager'
+                case {'querymanager', 'aod.api.querymanager'}
                     obj = AONodeTypes.QUERYMANAGER;
                 otherwise
                     warning('AONodeTypes_get:UnrecognizedInput',...
