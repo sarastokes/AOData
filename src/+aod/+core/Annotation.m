@@ -118,7 +118,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
                 obj.setParam('AnnotationDate', datetime.empty());
             end
             annotationDate = aod.util.validateDate(annotationDate);
-            obj.annotationDate = annotationDate;
+            obj.setParam('AnnotationDate', annotationDate);
         end
     end
     

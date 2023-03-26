@@ -72,6 +72,8 @@ classdef (Abstract) Entity < handle
         notes                       string = string.empty()
         % The date the entity was created
         dateCreated                 datetime = datetime.empty()
+        % The date and time the entity was last modified
+        lastModified                datetime = datetime.empty()
     end
 
     properties (Hidden, SetAccess = private)
@@ -79,7 +81,7 @@ classdef (Abstract) Entity < handle
         entityType                  %aod.core.EntityTypes
     end
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         % Files associated with the entity
         files                       % aod.util.Parameters
         % Metadata for the entity which maps to HDF5 attributes
@@ -115,8 +117,9 @@ classdef (Abstract) Entity < handle
 
             % Generate a random unique identifier to distinguish the class
             obj.UUID = aod.util.generateUUID();
-            % Get current time for dateCreated
+            % Get current time for dateCreated and lastModified
             obj.dateCreated = datetime("now");
+            obj.lastModified = obj.dateCreated;
 
             % Set the Parent, if necessary
             if ~isempty(ip.Results.Parent)
@@ -129,6 +132,9 @@ classdef (Abstract) Entity < handle
             
             % Parse unmatched inputs
             obj.parse(ip.Unmatched);
+
+            % Set listeners for any SetObservable properties
+            obj.setListeners();
         end
     end
 
@@ -883,6 +889,41 @@ classdef (Abstract) Entity < handle
             %   tf = isValidParent(parent)
             % -------------------------------------------------------------
             tf = ismember(parent.entityType, obj.entityType.validParentTypes());
+        end
+
+        function setListeners(obj)
+            % Create PostSet listeners for SetObservable properties
+            %
+            % Description:
+            %   Any property marked SetObservable will be assigned a 
+            %   'PostSet' listener with a callback to update the 
+            %   lastChanged property. Useful when a property change might 
+            %   impact the properties of other objects
+            %
+            % Syntax:
+            %   setListeners(obj)
+            % -------------------------------------------------------------
+            mc = metaclass(obj);
+            idx = find(arrayfun(@(x) x.SetObservable, mc.PropertyList));
+
+            if isempty(idx)
+                return
+            end
+
+            for i = 1:numel(idx)
+                addlistener(obj, mc.PropertyList(idx(i)).Name, 'PostSet', @obj.onPropertyChange);
+            end
+
+        end
+
+        function onPropertyChange(obj, ~, ~)
+            % Callback to update lastModified when property changes
+            %
+            % Description:
+            %   Triggered by the setting of a "SetObservable" property and 
+            %   updated the lastModified property to current date/time
+            % -------------------------------------------------------------
+            obj.lastModified = datetime("now");
         end
     end
 

@@ -12,12 +12,13 @@ classdef ExperimentPresenter < appbox.Presenter
 %   experiment          char/string or aod.persistent.Experiment
 %
 % Optional inputs:
-%   
+%   view                aod.app.UIView
+%       Use if you want to create a modified version of ExperimentView 
 %
-% See Also:
+% See also:
 %   aod.app.views.ExperimentView, AODataViewer
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties 
@@ -96,13 +97,6 @@ classdef ExperimentPresenter < appbox.Presenter
                 obj.parseEntityGroup(...
                     obj.EntityTable.Path(i), obj.EntityTable.Entity(i));
             end
-
-            % S = h5info(obj.Experiment.hdfName);
-            % if ~isempty(S.Groups)
-            %     for i = 1:numel(S.Groups)
-            %         obj.parseGroup(S.Groups(i), obj.view.Tree);
-            %     end
-            % end
         end
 
         function bind(obj)
@@ -127,6 +121,7 @@ classdef ExperimentPresenter < appbox.Presenter
 
             % Create the node data
             S = struct(...
+                'HdfFile', obj.hdfName,...
                 'AONode', aod.app.AONodeTypes.ENTITY,...
                 'H5Node', aod.app.H5NodeTypes.GROUP,...
                 'LoadState', aod.app.GroupLoadState.ATTRIBUTES,...
@@ -145,6 +140,7 @@ classdef ExperimentPresenter < appbox.Presenter
                     containerAttrs = obj.att2display(h5tools.readatt(...
                         obj.hdfName, containerPath, "all"));
                     S = struct(...
+                        'HdfFile', obj.hdfName,...
                         'AONode', aod.app.AONodeTypes.CONTAINER,...
                         'H5Node', aod.app.H5NodeTypes.GROUP,...
                         'LoadState', aod.app.GroupLoadState.CONTENTS,...
@@ -153,46 +149,7 @@ classdef ExperimentPresenter < appbox.Presenter
                         childTypes(i), containerPath, S);
                 end
             end
-        end
-
-        function parseGroup(obj, group, parentNode)
-            % Create group node and recursively call for all subgroups
-            %
-            % Syntax:
-            %   parseGroup(obj, group, parentNode)
-            % -------------------------------------------------------------
-
-            nodeParams = obj.attributes2map(group.Attributes);
-            if nodeParams.isKey('Class') && strcmpi(nodeParams('Class'), 'container')
-                nodeType = aod.app.AONodeTypes.CONTAINER;
-            else
-                nodeType = aod.app.AONodeTypes.ENTITY;
-            end
-
-            S = struct(...
-                'AONode', nodeType, ...
-                'H5Node', aod.app.H5NodeTypes.GROUP,...
-                'LoadState', aod.app.GroupLoadState.ATTRIBUTES,...
-                'Attributes', nodeParams);
-
-            g = obj.view.makeEntityNode(parentNode, ...
-                h5tools.util.getPathEnd(group.Name), group.Name, S);
-
-            % Container/Entity-specific actions
-            if nodeType == aod.app.AONodeTypes.CONTAINER
-                obj.view.formatContainerNode(g);
-            else
-                obj.view.makePlaceholderNode(g);
-            end
-
-            % Get child groups and process if necessary
-            S = h5info(obj.Experiment.hdfName, group.Name);
-            if ~isempty(S.Groups)
-                for i = 1:numel(S.Groups)
-                    obj.parseGroup(S.Groups(i), g);
-                end
-            end
-        end
+        end 
 
         function processEntityDatasets(obj, parentNode, entity)
             % Create nodes for all datasets within an entity
@@ -217,6 +174,7 @@ classdef ExperimentPresenter < appbox.Presenter
 
                 % Create the nodeData struct
                 nodeData = struct(...
+                    'HdfFile', obj.hdfName,...
                     'H5Node', aod.app.H5NodeTypes.DATASET,...
                     'AONode', aod.app.AONodeTypes.get(entity.(dsetNames(i)), dsetNames(i)),...
                     'LoadState', aod.app.GroupLoadState.ATTRIBUTES,...
@@ -248,6 +206,7 @@ classdef ExperimentPresenter < appbox.Presenter
                 
                 % Create the nodeData struct
                 nodeData = struct(...
+                    'HdfFile', obj.hdfName,...
                     'LinkPath', linkedEntity.hdfPath,...
                     'H5Node', aod.app.H5NodeTypes.LINK,...
                     'AONode', aod.app.AONodeTypes.LINK,...
@@ -411,19 +370,6 @@ classdef ExperimentPresenter < appbox.Presenter
                 elseif isnumeric(iValue) && numel(iValue) == 1
                     attributes(k{i}) = num2str(iValue);
                 end
-            end
-        end
-        
-        function S = attributes2map(attributes)
-            S = containers.Map();
-            for i = 1:numel(attributes)
-                value = attributes(i).Value;
-                if isnumeric(value)
-                    value = num2str(value);
-                elseif iscell(value) && numel(value) == 1
-                    value = value{:};
-                end
-                S(attributes(i).Name) = value;
             end
         end
     end

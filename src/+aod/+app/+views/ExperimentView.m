@@ -10,7 +10,7 @@ classdef ExperimentView < aod.app.UIView
 % See Also:
 %   aod.app.presenters.ExperimentPresenter, AODataViewer
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     events 
@@ -36,12 +36,10 @@ classdef ExperimentView < aod.app.UIView
     end
 
     properties (Hidden, Constant)
+        % Style for groups that act as entity containers
         CONTAINER_STYLE = uistyle("FontAngle", "italic");
         % Style for system attributes
         SYSTEM_STYLE = uistyle('FontColor', [0.4 0.4 0.4]);
-        % Location of icon files
-        ICON_DIR = [fileparts(fileparts(mfilename('fullpath'))), filesep,...
-            '+icons', filesep];
     end
 
     methods
@@ -50,7 +48,7 @@ classdef ExperimentView < aod.app.UIView
         end
 
         function fh = getFigure(obj)
-            % For development, remove later
+            % Useful for development, remove later
             fh = obj.figureHandle;
         end
     end
@@ -64,17 +62,16 @@ classdef ExperimentView < aod.app.UIView
             removeStyle(obj.Attributes);
             obj.Attributes.Data = [];
 
-            % Clear and hide the various data displays
+            % Clear contents of data displays
             cla(obj.AxesPanel, 'reset');
-            obj.AxesPanel.Visible = 'off';
-
             obj.TextPanel.Value = '';
-            obj.TextPanel.Visible = 'off';
-
             obj.TablePanel.Data = [];
-            obj.TablePanel.Visible = 'off';
-
             obj.LinkPanelText.Value = "";
+
+            % Hide the various data displays
+            obj.AxesPanel.Visible = 'off';
+            obj.TextPanel.Visible = 'off';
+            obj.TablePanel.Visible = 'off';
             obj.LinkPanel.Visible = 'off';
 
         end
@@ -89,13 +86,6 @@ classdef ExperimentView < aod.app.UIView
             node = obj.Tree.SelectedNodes;
         end
 
-        function selectNode(obj, node)
-            % Select a specific node 
-
-            obj.Tree.SelectedNodes = node;
-            notify(obj, 'NodeSelected');
-        end
-
         function node = path2node(obj, hdfPath)
             % Get the node corresponding to a specific HDF5 path
             if strcmp(hdfPath, '/')
@@ -105,13 +95,22 @@ classdef ExperimentView < aod.app.UIView
             end
         end
 
+    end
+
+    % Generic display modification
+    methods
+        function selectNode(obj, node)
+            % Select a specific node 
+
+            obj.Tree.SelectedNodes = node;
+            notify(obj, 'NodeSelected');
+        end
+
         function showNode(obj, node)
             % Scroll to a specific node
             scroll(obj.Tree, node);
         end
-    end
 
-    methods
         function changeFontSize(obj, modifier)
             obj.Tree.FontSize = obj.Tree.FontSize + modifier;
             obj.Attributes.FontSize = obj.Attributes.FontSize + modifier;
@@ -121,10 +120,10 @@ classdef ExperimentView < aod.app.UIView
         end
 
         function resizeFigure(obj, x, y)
+            % Resize the length or width of the figure window
             obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + x;
             obj.figureHandle.Position(4) = obj.figureHandle.Position(4) + y;
         end
-            
     end
 
     % Node-specific display methods
@@ -249,7 +248,7 @@ classdef ExperimentView < aod.app.UIView
     end
 
     % Initialization methods
-    methods
+    methods 
         function setTitle(obj, str)
             arguments
                 obj
@@ -263,9 +262,6 @@ classdef ExperimentView < aod.app.UIView
             
             obj.figureHandle.Position(3:4) = [500 450];
             % movegui(obj.figureHandle, 'center'); too slow
-
-            %uit = uitoolbar(obj.figureHandle);
-            %pt = uipushtool(uit);
 
             mainLayout = uigridlayout(obj.figureHandle);
             mainLayout.RowHeight = {'1.5x', '1x'};
@@ -283,28 +279,65 @@ classdef ExperimentView < aod.app.UIView
             obj.Attributes.Layout.Column = 2;
             obj.Attributes.Layout.Row = 2;
 
-            obj.AxesPanel = uiaxes(mainLayout, 'Visible', 'off');
+            obj.initDataDisplayPanels(mainLayout, 1, 2);
+            obj.initContextMenu();
+        end
+
+        function initDataDisplayPanels(obj, parent, row, col)
+            obj.initAxesPanel(parent, row, col);
+            obj.initTextPanel(parent, row, col);
+            obj.initTablePanel(parent, row, col);
+            obj.initLinkPanel(parent, row, col);
+        end
+        
+        function initContextMenu(obj)
+            obj.ContextMenu = uicontextmenu(obj.figureHandle);
+            uimenu(obj.ContextMenu,...
+                'Label', 'Send to workspace',...
+                'Callback', @(h, d)notify(obj, 'SendNodeToBase'));
+            uimenu(obj.ContextMenu,...
+                'Label', 'Copy hdf address',...
+                'Callback', @(h,d)notify(obj, 'CopyHdfAddress'));
+        end
+    end
+
+    methods (Access = private)
+        function initAxesPanel(obj, parent, row, col)
+            obj.AxesPanel = uiaxes(parent,... 
+                'Visible', 'off',...
+                'Tag', 'DataPanel');
             obj.AxesPanel.Toolbar.Visible = 'off';
-            obj.AxesPanel.Layout.Column = 2;
-            obj.AxesPanel.Layout.Row = 1;
-    
-            obj.TextPanel = uitextarea(mainLayout,...
+            obj.AxesPanel.Layout.Column = col;
+            obj.AxesPanel.Layout.Row = row;
+        end
+
+        function initTextPanel(obj, parent, row, col)
+            obj.TextPanel = uitextarea(parent,...
                 'Editable', 'off',...
+                'Tag', 'DataPanel',...
                 'Visible', 'off',...
                 'BackgroundColor', 'w');
-            obj.TextPanel.Layout.Column = 2;
-            obj.TextPanel.Layout.Row = 1;
+            obj.TextPanel.Layout.Column = col;
+            obj.TextPanel.Layout.Row = row;
+        end
 
-            obj.TablePanel = uitable(mainLayout,...
-                "FontSize", 12, "Visible", "off");
+        function initTablePanel(obj, parent, row, col)
+            obj.TablePanel = uitable(parent,...
+                "FontSize", 12,... 
+                "Tag", "DataPanel",... 
+                "Visible", "off");
             addStyle(obj.TablePanel, uistyle("HorizontalAlignment", "center"));
-            obj.TablePanel.Layout.Column = 2;
-            obj.TablePanel.Layout.Row = 1;
+            obj.TablePanel.Layout.Column = col;
+            obj.TablePanel.Layout.Row = row;
+        end
 
-            obj.LinkPanel = uipanel(mainLayout,...
+        function initLinkPanel(obj, parent, row, col)
+            obj.LinkPanel = uipanel(parent,...
+                'Tag', 'DataPanel',... 
                 'Visible', 'off');
-            obj.LinkPanel.Layout.Column = 2;
-            obj.LinkPanel.Layout.Row = 1;
+            obj.LinkPanel.Layout.Column = col;
+            obj.LinkPanel.Layout.Row = row;
+
             g = uigridlayout(obj.LinkPanel, [2 1]);
             g.RowHeight = {'1x', 35};
             obj.LinkPanelText = uitextarea(g,...
@@ -313,14 +346,6 @@ classdef ExperimentView < aod.app.UIView
             uibutton(g, 'Text', 'Go to link',...
                 'Tag', 'FollowLinkButton',...
                 'ButtonPushedFcn', @(h,d)notify(obj, 'LinkFollowed'));
-
-            obj.ContextMenu = uicontextmenu(obj.figureHandle);
-            uimenu(obj.ContextMenu,...
-                'Label', 'Send to workspace',...
-                'Callback', @(h, d)notify(obj, 'SendNodeToBase'));
-            uimenu(obj.ContextMenu,...
-                'Label', 'Copy hdf address',...
-                'Callback', @(h,d)notify(obj, 'CopyHdfAddress'));
         end
     end
 

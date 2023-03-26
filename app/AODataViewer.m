@@ -3,9 +3,14 @@ function appHandle = AODataViewer(experiment)
 %
 % Syntax:
 %   AODataViewer(persistedExperiment)
+%   appHandle = AODataViewer(persistedExperiment)
 %
 % Inputs:
 %   persistedExperiment     aod.persistent.Experiment or HDF5 file name
+%
+% Optional outputs:
+%   appHandle               aod.app.presenters.ExperimentPresenter
+%       The object controlling AODataViewer, useful for dev or debugging
 %
 % See also:
 %   aod.app.presenters.ExperimentPresenter, aod.app.views.ExperimentView

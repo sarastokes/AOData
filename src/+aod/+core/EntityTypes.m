@@ -160,10 +160,7 @@ classdef EntityTypes
         end
 
         function out = persistentParentContainer(obj)
-            % PERSISTENTPARENTCONTAINER
-            % 
-            % Description:
-            %   Defines the back-end container name for persistent entity
+            % Defines the back-end container name for persistent entity
             %
             % Syntax:
             %   out = persistentParentContainer(obj)
@@ -212,10 +209,7 @@ classdef EntityTypes
     % Object methods
     methods
         function out = collectAll(obj, expt)
-            % COLLECTALL
-            %
-            % Description:
-            %   Returns all members of an entity type within an experiment
+            % Returns all members of an entity type within an experiment
             %
             % Syntax:
             %   out = collectAll(obj, experiment)
@@ -227,10 +221,7 @@ classdef EntityTypes
         end 
 
         function out = empty(obj)
-            % Return an empty instance of the entity type 
-            %
-            % Description:
-            %   Returns an empty instance of the entity type
+            % Returns an empty instance of the entity type
             %
             % Syntax:
             %   out = empty(obj)
@@ -296,10 +287,7 @@ classdef EntityTypes
     % HDF5 methods
     methods 
         function hdfPath = getPath(obj, entity, manager, parentPath)
-            % Returns HDF5 path for core entity
-            %
-            % Description:
-            %   Determines core entity's HDF5 path
+            % Returns HDF5 path for core interface entity
             %
             % Syntax:
             %   hdfPath = getPath(obj, entity, manager, parentPath)
@@ -442,11 +430,7 @@ classdef EntityTypes
     % Creation methods
     methods (Static)
         function out = getByClass(obj)
-            % GET
-            %
-            % Description:
-            %   Returns the entity type of any subclass of aod.core.Entity
-            %   or aod.persistent.Entity
+            % Returns the entity type of any subclass from either interface
             %
             % Syntax:
             %   out = getByClass(obj)
@@ -489,7 +473,7 @@ classdef EntityTypes
         end
 
         function obj = get(entityName)
-            % INIT
+            % Initialize
             %
             % Description:
             %   Initialize from entity name as text (string or char) or 
