@@ -61,6 +61,12 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, FilterTypes.NAME);
             out = FilterTypes.init('parent');
             testCase.verifyEqual(out, FilterTypes.PARENT);
+            out = FilterTypes.init('child');
+            testCase.verifyEqual(out, FilterTypes.CHILD);
+            
+            testCase.verifyError(...
+                @() FilterTypes.init('BadInput'),...
+                "init:UnknownType");
         end
 
         function H5NodeTypesInit(testCase)
@@ -235,6 +241,13 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEmpty(EntityTypes.CHANNEL.empty());
             testCase.verifyClass(EntityTypes.DEVICE.empty(), 'aod.core.Device');
             testCase.verifyClass(EntityTypes.EXPERIMENT.empty(), 'double');
+        end
+
+        function Text(testCase)
+            import aod.core.EntityTypes
+
+            testCase.verifyEqual(char(EntityTypes.EXPERIMENTDATASET), 'ExperimentDataset');
+            testCase.verifyEqual(string(EntityTypes.STIMULUS), "Stimulus");
         end
 
         function HdfPaths(testCase)

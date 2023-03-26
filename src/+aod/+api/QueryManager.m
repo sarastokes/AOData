@@ -9,6 +9,7 @@ classdef QueryManager < handle
 %
 % Public methods:
 %   groupNames = getMatches(obj)
+%   tag = describe(obj)
 %   addFilter(obj, varargin)
 %   removeFilter(obj, filterID)
 %
@@ -20,28 +21,23 @@ classdef QueryManager < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Filters             % aod.api.FilterQuery
-        Experiments
+        Filters             aod.api.FilterQuery
+        Experiments         aod.persistent.Experiment
         filterIdx           logical
     end
 
     properties (SetAccess = private)
         % The HDF5 file name(s) being queried
         hdfName             string 
-        % All entity group names in the HDF5 file(s)
-        allGroupNames       string
-        % Which file each group name came from
-        fileIdx             double 
+        % Table of entities from experiment EntityManager
+        entityTable 
     end
 
     properties (Dependent)
+        % Number of AOData HDF5 files
         numFiles
+        % Number of filters
         numFilters
-    end
-
-    properties (Hidden, Dependent)
-        % allGroupNames with file name appended
-        fullGroupNames
     end
 
     methods
@@ -55,18 +51,8 @@ classdef QueryManager < handle
                 end
                 hdfName = fileparts(hdfPath, hdfName);
             end
+            obj.addExperiment(hdfName);
 
-            if isa(hdfName, 'aod.persistent.Experiment')
-                obj.hdfName = hdfName.hdfFileName;
-                obj.Experiments = cat(1, obj.Experiments, hdfName);
-            elseif istext(hdfName)
-                obj.hdfName = getFullFile(hdfName);
-            else
-                error('QueryManager:InvalidInput',...
-                    'Input must be HDF file name(s) or aod.persistent.Experiment');
-            end
-
-            obj.populateGroupNames();
         end
     end
 
@@ -87,28 +73,22 @@ classdef QueryManager < handle
                 out = numel(obj.Filters);
             end
         end
-
-        function out = get.fullGroupNames(obj)
-            if isempty(obj.allGroupNames)
-                out = string.empty();
-                return
-            end
-
-            fileNames = arrayfun(@(x) fileparts(x), obj.hdfName);
-            out = repmat("", [numel(obj.allGroupNames), 1]);
-            for i = 1:numel(obj.allGroupNames)
-                out(i) = fileNames(obj.fileIdx(i)) + "/" + obj.allGroupNames(i);
-            end
-        end
     end
 
     methods 
         function [matches, idx] = filter(obj)
+            % Filter entities and return the matches
+            %
+            % Syntax:
+            %   [matches, idx] = filter(obj)
+            % -------------------------------------------------------------
+
             if isempty(obj.Filters)
                 error("go:NoFiltersSet", "Add filters first");
             end
 
-            obj.filterIdx = true(numel(obj.allGroupNames), 1);
+            % Reset match indices
+            obj.filterIdx = true(height(obj.entityTable), 1);
             
             for i = 1:obj.numFilters
                 obj.Filters(i).apply();
@@ -117,16 +97,68 @@ classdef QueryManager < handle
 
             idx = find(obj.filterIdx);
 
-            matches = table(...
-                obj.hdfName(obj.fileIdx(idx)),...
-                obj.allGroupNames(idx),...
-                'VariableNames', {'FileName', 'GroupName'});
+            matches = obj.entityTable(idx,:);
+        end
+
+        function tag = describe(obj)
+            % Describe the filters in the QueryManager
+            %
+            % Syntax:
+            %   tag = describe(obj)
+            % -------------------------------------------------------------
+
+            if isempty(obj.Filters)
+                tag = "Empty QueryManager";
+                return 
+            end
+
+            tag = string.empty();
+            for i = 1:numel(obj.Filters)
+                tag = tag + obj.Filters(i).describe();
+                tag = tag + newline;
+            end
         end
     end
 
+    % Experiment methods
+    methods
+        function addExperiment(obj, expt)
+            % Add one or more new experiments to the QueryManager
+            %
+            % Syntax:
+            %   addExperiment(obj, expt)
+            %
+            % Inputs:
+            %   expt        string array or aod.persistent.Experiment
+            %       One or more experiments or HDF5 file names
+            % -------------------------------------------------------------
+            expt = convertCharsToStrings(expt);
+            
+            for i = 1:numel(expt)
+                if isa(expt(i), 'aod.persistent.Experiment')
+                    obj.hdfName = cat(1, obj.hdfName, expt(i).hdfFileName);
+                    obj.Experiments = cat(1, obj.Experiments, expt(i));
+                elseif istext(expt(i))
+                    obj.hdfName = cat(1, obj.hdfName, getFullFile(expt(i)));
+                    obj.Experiments = cat(1, obj.Experiments, loadExperiment(obj.hdfName(end)));
+                else
+                    error('QueryManager:InvalidInput',...
+                        'Input must be string of HDF file name(s) or array of aod.persistent.Experiment');
+                end
+            end
+            
+            obj.populateEntityTable();
+        end
+    end
     % Filter methods
     methods 
         function addFilter(obj, varargin)
+            % Add new filters to the QueryManager
+            %
+            % Syntax:
+            %   addFilter(obj, varargin)
+            % -------------------------------------------------------------
+
             for i = 1:numel(varargin)
                 if isSubclass(varargin{i}, 'aod.api.FilterQuery')
                     obj.Filters = cat(1, obj.Filters, varargin{i});
@@ -142,6 +174,11 @@ classdef QueryManager < handle
         end
 
         function removeFilter(obj, idx)
+            % Remove a filter by index
+            %
+            % Syntax:
+            %   removeFilter(obj, idx)
+            % -------------------------------------------------------------
             arguments 
                 obj 
                 idx         {mustBeInteger}
@@ -152,47 +189,26 @@ classdef QueryManager < handle
         end
 
         function clearFilters(obj)
-            obj.Filters = [];
+            % Clear all filters
+            %
+            % Syntax:
+            %   clearFilters(obj)
+            % -------------------------------------------------------------
+            obj.Filters = aod.api.FilterQuery.empty();
             % All groups begin as true until determined otherwise
-            obj.filterIdx = true(numel(obj.allGroupNames), 1);
-        end
-    end
-
-    % Utility functions for FilterQuery classes
-    methods
-        function out = getHdfName(obj, idx)
-            mustBeInRange(idx, 1, numel(obj.allGroupNames));
-            out = obj.hdfName(obj.fileIdx(idx));
+            obj.filterIdx = true(height(obj.entityTable), 1);
         end
     end
 
     methods (Access = private)
-        function populateGroupNames(obj)
-            % Creates a string array of all groups in the HDF5 file(s)
-            %
-            % Syntax:
-            %   populateGroupNames(obj)
-            %
-            % Assigns:
-            %   allGroupNames - HDF5 path names of all non-container groups
-            %   filterIdx - all false, size of allGroupNames
-            %   fileIdx - integer array indicating which file each group 
-            %       name belongs to.
-            % -------------------------------------------------------------
-
-            containerNames = aod.core.EntityTypes.allContainerNames();
-
-            obj.allGroupNames = string.empty();
-            for i = 1:numel(obj.hdfName)
-                names = h5tools.collectGroups(obj.hdfName(i));
-                for j = 1:numel(containerNames)
-                    names = names(~endsWith(names, containerNames(j)));
-                end
-                obj.allGroupNames = cat(1, obj.allGroupNames, names);
-                obj.fileIdx = cat(1, obj.fileIdx, repmat(i, [numel(names), 1]));
+        function populateEntityTable(obj)
+            obj.entityTable = [];
+            for i = 1:numel(obj.Experiments)
+                T = obj.Experiments(i).factory.entityManager.table;
+                T.File = repmat(string(obj.Experiments(i).hdfName), [height(T), 1]);
+                obj.entityTable = [obj.entityTable; T];
+                obj.filterIdx = true(height(obj.entityTable), 1);
             end
-            % All groups begin as true until determined otherwise
-            obj.filterIdx = true(numel(obj.allGroupNames), 1);
         end
     end
 
@@ -212,6 +228,11 @@ classdef QueryManager < handle
     % Instantiate and run in one line
     methods (Static)
         function [matches, idx] = go(hdfName, varargin)
+            % Create the manager and run the filters in one step
+            %
+            % Syntax:
+            %   [matches, idx] = aod.api.QueryManager(hdfName, varargin)
+            % -------------------------------------------------------------
             QM = aod.api.QueryManager(hdfName);
             QM.addFilter(varargin{:});
             [matches, idx] = QM.filter();

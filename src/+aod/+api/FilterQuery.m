@@ -11,14 +11,14 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
 %   obj = aod.api.FilterQuery(queryManager)
 %
 % Abstract methods:
-%   applyFilter(obj)
+%   out = apply(obj)
+%   tag = describe(obj)
 %
 % Public methods:
 %   names = getMatches(obj)
 %
 % Protected methods:
 %   idx = getQueryIdx(obj)
-%   names = getAllGroupNames(obj)
 %   hdfName = getFileNames(obj)
 
 % By Sara Patterson, 2023 (AOData)
@@ -28,11 +28,11 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
         % Filter parent (aod.api.QueryManager, aod.api.StackedFilterQuery)
         Parent
         % Whether query is nested (within another query)
-        isNested    logical 
+        isNested        logical 
     end
 
     properties (SetAccess = protected)
-        localIdx
+        localIdx        logical
     end
 
     properties (Dependent)
@@ -41,6 +41,7 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
 
     methods (Abstract)
         out = apply(obj)
+        tag = describe(obj)
     end
 
     methods
@@ -61,9 +62,9 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
 
     methods
         function groupNames = getMatchedGroups(obj)
-            groupNames = obj.getAllGroupNames();
+            entities = obj.getEntityTable();
             if obj.didFilter
-                groupNames = groupNames(obj.localIdx);
+                groupNames = entities.Path(obj.localIdx);
             end
         end
     end
@@ -81,24 +82,12 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
             end
         end
 
-        function fileIdx = getFileIdx(obj)
-            if obj.isNested
-                fileIdx = obj.Parent.getFileIdx();
+        function out = getEntityTable(obj)
+            if obj.isNested 
+                out = obj.Parent.getEntityTable();
             else
-                fileIdx = obj.Parent.fileIdx;
+                out = obj.Parent.entityTable;
             end
-        end
-
-        function names = getAllGroupNames(obj)
-            if obj.isNested
-                names = obj.Parent.getAllGroupNames();
-            else
-                names = obj.Parent.allGroupNames;
-            end
-        end
-
-        function out = getHdfName(obj, idx)
-            out = obj.Parent.getHdfName(idx);
         end
     end
 

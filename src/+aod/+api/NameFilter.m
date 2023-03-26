@@ -52,7 +52,7 @@ classdef NameFilter < aod.api.FilterQuery
     end
 
     methods
-        function out = describe(obj)
+        function tag = describe(obj)
             tag = sprintf("NameFilter: Name=%s", value2string(obj.Name));
         end
 
@@ -85,11 +85,10 @@ classdef NameFilter < aod.api.FilterQuery
 
     methods (Access = private)
         function collectNames(obj)
-            groupNames = obj.getAllGroupNames();
-            
-            obj.allNames = repmat("", [numel(groupNames), 1]);
+            entities = obj.getEntityTable();
+            obj.allNames = repmat("", [height(entities), 1]);
             for i = 1:numel(obj.allNames)
-                obj.allNames(i) = h5tools.util.getPathEnd(groupNames(i));
+                obj.allNames(i) = h5tools.util.getPathEnd(entities.Path(i));
             end
         end
     end

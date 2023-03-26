@@ -12,6 +12,7 @@ classdef ChildFilter < aod.api.StackedFilterQuery
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+
     properties
         % Child entity type
         childType 
@@ -25,12 +26,21 @@ classdef ChildFilter < aod.api.StackedFilterQuery
 
             obj.childType = aod.core.EntityTypes.get(childType);
         end
+    end
+
+    methods
+        function tag = describe(obj)
+            childTags = describe@aod.api.StackedFilterQuery(obj);
+            tag = sprintf("ChildFilter: Type=%s", char(obj.childType));
+            tag = tag + newline + childTags;
+        end
 
         function out = apply(obj)
             obj.localIdx = obj.getQueryIdx();
             obj.filterIdx = true(size(obj.localIdx));
             
-            groupNames = obj.getAllGroupNames();
+            entities = obj.getEntityTable();
+            groupNames = entities.Path;
             containerName = obj.childType.parentContainer();
 
             obj.childGroupings = zeros(size(obj.localIdx));
@@ -65,8 +75,8 @@ classdef ChildFilter < aod.api.StackedFilterQuery
                 pathOrder = h5tools.util.getPathOrder(groupNames(i));
                 childGroups(h5tools.util.getPathOrder(childGroups) ~= pathOrder + 2) = [];
 
-                % Locate the child groups
-                idx = find(ismember(groupNames, childGroups));
+                % Locate the child groups within the same file
+                idx = find(entities.File == entities.File(i) & ismember(groupNames, childGroups));
                 obj.childGroupings(idx) = i;
 
                 % Determine if any matched the Filters

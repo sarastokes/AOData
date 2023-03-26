@@ -18,8 +18,12 @@ classdef LinkFilter < aod.api.StackedFilterQuery
     end
 
     properties (SetAccess = private)
-        allLinkNames
-        allLinkParents
+        % Softlinks in the file (excluding "Parent")
+        allLinkNames                string
+        % Entity paths containing the softlinks
+        allLinkParents              string
+        % The file names for each link
+        linkFileNames               string
     end
 
     methods 
@@ -39,11 +43,17 @@ classdef LinkFilter < aod.api.StackedFilterQuery
 
     % Instantiation of abstract methods from FilterQuery
     methods
+        function tag = describe(obj)
+            childTags = describe@aod.api.StackedFilterQuery(obj);
+            tag = sprintf("LinkFilter: Name=%s", value2string(obj.Name));
+            tag = tag + newline + childTags;
+        end
+
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
             obj.localIdx = obj.getQueryIdx();
             obj.filterIdx = false(size(obj.localIdx));
-            groupNames = obj.getAllGroupNames();
+            entities = obj.getEntityTable();
 
             if ~isempty(obj.Filters)
                 for i = 1:numel(obj.Filters)
@@ -52,13 +62,14 @@ classdef LinkFilter < aod.api.StackedFilterQuery
                 end
             end
 
-            for i = 1:numel(groupNames)
+            for i = 1:height(entities)
                 if ~obj.localIdx(i)
                     continue
                 end
 
                 % Get all the links within the group
-                groupIdx = find(obj.allLinkParents == groupNames(i));
+                groupIdx = find(obj.linkFileNames == entities.File(i) & ...
+                    obj.allLinkParents == entities.Path(i));
 
                 if ~isempty(groupIdx)
                     % See whether one has the correct name
@@ -88,9 +99,11 @@ classdef LinkFilter < aod.api.StackedFilterQuery
                 end
 
                 % Get the linked path
-                linkedPath = h5tools.readlink(obj.getHdfName(i),...
-                    groupNames(i), obj.Name);
-                idx = find(groupNames == linkedPath); %% TODO
+                linkedPath = h5tools.readlink(entities.File(i),...
+                    entities.Path(i), obj.Name);
+                % Find the linked entity within the same file
+                idx = find(entities.File == entities.File(i) & ...
+                    entities.Path(i) == linkedPath); 
                 obj.localIdx(i) = obj.filterIdx(idx);
             end
         end
@@ -105,9 +118,15 @@ classdef LinkFilter < aod.api.StackedFilterQuery
             % -------------------------------------------------------------
             fileNames = obj.getFileNames();
             obj.allLinkNames = string.empty();
+            obj.linkFileNames = string.empty();
             for i = 1:numel(fileNames)
-                obj.allLinkNames = cat(1, obj.allLinkNames,...
-                    h5tools.collectSoftlinks(fileNames(i)));
+                % Collect all links in file except the "Parent" links
+                linkNames = h5tools.collectSoftlinks(fileNames(i));
+                linkNames(endsWith(linkNames, "Parent")) = [];
+                obj.allLinkNames = cat(1, obj.allLinkNames, linkNames);
+                % Track the files links come from
+                obj.linkFileNames = cat(1, obj.linkFileNames,...
+                    repmat(fileNames(i), [numel(linkNames), 1]));
             end
             % Remove "Parent" links
             obj.allLinkNames(endsWith(obj.allLinkNames, "Parent")) = [];

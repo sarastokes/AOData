@@ -33,7 +33,10 @@ classdef (Abstract) StackedFilterQuery < aod.api.FilterQuery
                 obj.addFilter(varargin{:});
             end
         end
+    end
 
+    % Dependent set/get methods
+    methods 
         function value = get.isStacked(obj)
             value = ~isempty(obj.Filters);
         end
@@ -45,7 +48,9 @@ classdef (Abstract) StackedFilterQuery < aod.api.FilterQuery
                 value = numel(obj.Filters);
             end
         end
+    end
 
+    methods
         function addFilter(obj, varargin)
             for i = 1:numel(varargin)
                 if isSubclass(varargin{i}, 'aod.api.FilterQuery')
@@ -64,6 +69,16 @@ classdef (Abstract) StackedFilterQuery < aod.api.FilterQuery
                     end
                 end
                 obj.Filters = cat(1, obj.Filters, newFilter);
+            end
+        end
+        
+        function tag = describe(obj)
+            tag = string.empty();
+            for i = 1:numel(obj.Filters)
+                tag = "   " + obj.Filters(i).describe();
+                if i < numel(obj.Filters)
+                    tag = tag + newline;
+                end
             end
         end
     end

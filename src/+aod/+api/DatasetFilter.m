@@ -39,7 +39,7 @@ classdef DatasetFilter < aod.api.FilterQuery
 
     methods
         
-        function out = describe(obj)
+        function tag = describe(obj)
             tag = sprintf("DatasetFilter: Name=%s, Value=%s",... 
                 value2string(obj.Name), value2string(obj.Value));
         end
@@ -47,17 +47,15 @@ classdef DatasetFilter < aod.api.FilterQuery
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
             obj.localIdx = obj.getQueryIdx();
-            % Extract relevant information
-            groupNames = obj.getAllGroupNames();
-            hdfNames = obj.getFileNames();
-            fileIdx = obj.getFileIdx();
+            
+            entities = obj.getEntityTable();
 
             % First filter by whether the entities have the dataset
-            for i = 1:numel(groupNames)
+            for i = 1:height(entities)
                 if ~obj.localIdx(i)
                     continue
                 end
-                groupDsets = obj.getGroupDatasets(groupNames(i));
+                groupDsets = obj.getGroupDatasets(entities.Path(i));
                 if ismember(obj.Name, groupDsets)
                     obj.localIdx(i) = true;
                 else
@@ -76,12 +74,12 @@ classdef DatasetFilter < aod.api.FilterQuery
             end
 
             % Filter by the dataset value
-            for i = 1:numel(groupNames)
+            for i = 1:height(entities)
                 if ~obj.localIdx(i)
                     continue
                 end
-                out = aod.h5.read(hdfNames(fileIdx(i)), ...
-                    groupNames(i), obj.Name);
+                out = aod.h5.read(entities.File(i),...
+                    entities.Path(i), obj.Name);
 
                 if isa(obj.Value, 'function_handle')
                     obj.localIdx(i) = obj.Value(out);

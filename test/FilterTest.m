@@ -48,7 +48,8 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["QueryManager", "AOQuery"])
         function QueryManagerErrors(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             testCase.verifyError(...
                 @() testCase.QM.filter(), "go:NoFiltersSet");
@@ -62,7 +63,9 @@ classdef FilterTest < matlab.unittest.TestCase
         end
 
         function QueryFiles(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
             testCase.verifyNumElements(1, testCase.QM.numFiles);
         end
 
@@ -78,12 +81,14 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["NameFilter", "AOQuery"])
         function NameFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             NF1 = aod.api.NameFilter(testCase.QM, 'ChannelOptimization');
             testCase.verifyFalse(NF1.didFilter);
             testCase.verifyEqual(nnz(NF1.apply()),1);
             testCase.verifyTrue(NF1.didFilter);
+            NF1.describe();
 
             NF2 = aod.api.NameFilter(testCase.QM, @(x) endsWith(x, 'Optimization'));
             testCase.verifyEqual(nnz(NF2.apply()),1);
@@ -93,7 +98,8 @@ classdef FilterTest < matlab.unittest.TestCase
         end
 
         function NameFilterWarnings(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             NF3 = aod.api.NameFilter(testCase.QM, 'BadName');
             testCase.verifyWarning(...
@@ -103,23 +109,28 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["ClassFilter", "AOQuery"])
         function ClassFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             % There should always be just one Experiment per file
             CF1 = aod.api.ClassFilter(testCase.QM, 'aod.core.Experiment');
             idx = CF1.apply();
             testCase.verifyEqual(nnz(idx), 1);
+            CF1.describe();
 
             CF2 = aod.api.ClassFilter(testCase.QM, @(x) endsWith(x, 'Experiment'));
             idx = CF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
+            CF2.describe();
             % Alt initialization
             testCase.QM.addFilter({'Class', @(x) endsWith(x, 'Experiment')});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
+            testCase.QM.describe();
         end
 
         function ClassFilterWarnings(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             CF3 = aod.api.ClassFilter(testCase.QM, 'aod.core.BadClass');
             testCase.verifyWarning(@() CF3.apply(), 'apply:NoMatches');
@@ -128,15 +139,18 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["DatasetFilter", "AOQuery"])
         function DatasetFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             DF1 = aod.api.DatasetFilter(testCase.QM, 'epochIDs');
             idx = DF1.apply();
             testCase.verifyEqual(nnz(idx), 1);
+            DF1.describe();
 
             DF2 = aod.api.DatasetFilter(testCase.QM, 'epochIDs', [1 2]);
             idx = DF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
+            DF2.describe();
             % Alt initialization
             testCase.QM.addFilter({'Dataset', 'epochIDs', [1 2]});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
@@ -144,7 +158,8 @@ classdef FilterTest < matlab.unittest.TestCase
         end
 
         function DatasetFilterWarnings(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             DF3 = aod.api.DatasetFilter(testCase.QM, 'epochIDs', [1 3]);
             testCase.verifyWarning(...
@@ -155,7 +170,8 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["EntityFilter", "AOQuery"])
         function EntityFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             % There should always be just one Experiment per file
             EF = aod.api.EntityFilter(testCase.QM, 'Experiment');
@@ -163,6 +179,7 @@ classdef FilterTest < matlab.unittest.TestCase
             [matches, idx] = testCase.QM.filter();
             testCase.verifyEqual(numel(idx), 1);
             testCase.verifyEqual(height(matches), 1);
+            EF.describe();
             % Alt initialization
             testCase.QM.addFilter({'Entity', 'Experiment'});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
@@ -178,7 +195,8 @@ classdef FilterTest < matlab.unittest.TestCase
         end
 
         function EntityFilterWarnings(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             EF = aod.api.EntityFilter(testCase.SMALL_QM, 'Epoch');
             testCase.verifyWarning(...
@@ -188,17 +206,20 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["ChildFilter", "AOQuery"])
         function ChildFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
             
             CF = aod.api.ChildFilter(testCase.QM, 'Response',... 
                 {'Dataset', 'Data', [2 4 6 8]});
             idx = CF.apply();
             testCase.verifyEqual(nnz(idx), 1);
             testCase.verifyTrue(endsWith(CF.getMatchedGroups(), "0001"));
+            CF.describe();
         end
 
         function ChildFilterWarnings(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             CF = aod.api.ChildFilter(testCase.QM, 'Analysis',...
                 {'Name', 'BadAnalysisName'});
@@ -209,14 +230,17 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["LinkFilter", "AOQuery"])
         function LinkFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             LF = aod.api.LinkFilter(testCase.QM, 'Source');
             testCase.verifyEqual(nnz(LF.apply()), 2);
+            LF.describe();
         end
 
         function LinkFilterWarnings(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             LF = aod.api.LinkFilter(testCase.QM, 'BadLink');
             testCase.verifyWarning(...
@@ -224,7 +248,8 @@ classdef FilterTest < matlab.unittest.TestCase
         end
 
         function LinkFilterErrors(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             testCase.verifyError(...
                 @() aod.api.LinkFilter(testCase.QM, 'Parent'),...
@@ -234,12 +259,14 @@ classdef FilterTest < matlab.unittest.TestCase
     
     methods (Test, TestTags=["ParentFilter", "AOQuery"])
         function ParentFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             % Get responses with parent Epoch that has Epoch ID 1
             PF = aod.api.ParentFilter(testCase.QM, 'Response', 'Epoch',...
                 {'Dataset', 'ID', 1});
             testCase.verifyEqual(nnz(PF.apply()), 2);
+            PF.describe();
 
             % Get Sources with Parent Source that has name ending in OS
             PF2 = aod.api.ParentFilter(testCase.QM, 'Source',...
@@ -250,7 +277,8 @@ classdef FilterTest < matlab.unittest.TestCase
         end
 
         function ParentFilterErrors(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             testCase.verifyError(...
                 @() aod.api.ParentFilter(testCase.QM, 'Epoch', 'Source'),...
@@ -260,12 +288,14 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["ParameterFilter", "AOQuery"])
         function ParameterFilter(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             % Has parameter
             PF1 = aod.api.ParameterFilter(testCase.QM, 'Laboratory');
             idx = PF1.apply();
             testCase.verifyEqual(nnz(idx), 1);
+            PF1.describe();
 
 
             % Specific parameter value (match)
@@ -273,13 +303,15 @@ classdef FilterTest < matlab.unittest.TestCase
                 'Laboratory', "Primate-1P");
             idx = PF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
+            PF2.describe();
             % Alt initialization
             testCase.QM.addFilter({'Parameter', 'Laboratory', 'Primate-1P'});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
         end
 
         function ParamterFilterWarnings(testCase)
-            testCase.reset();
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
             % Has parameter, no match
             PF4 = aod.api.ParameterFilter(testCase.QM, 'BadParam');

@@ -40,22 +40,17 @@ classdef EntityFilter < aod.api.FilterQuery
 
     methods
         
-        function out = describe(obj)
-            tag = sprintf("ParameterFilter: Name=%s, Value=%s",... 
-                value2string(obj.Name), value2string(obj.Value));
+        function tag = describe(obj)
+            tag = sprintf("EntityFilter: Type=%s", char(obj.EntityName));
         end
         
         function out = apply(obj)
             obj.localIdx = obj.getQueryIdx();
-            groupNames = obj.getAllGroupNames();
-            hdfFiles = obj.getFileNames();
-            fileIdx = obj.getFileIdx();
+            entities = obj.getEntityTable();
         
-            for i = 1:numel(groupNames)
+            for i = 1:height(entities)
                 if obj.localIdx(i)
-                    entityType = h5readatt(hdfFiles(fileIdx(i)),...
-                        groupNames(i), 'EntityType');
-                    obj.localIdx(i) = strcmpi(entityType, obj.EntityName);
+                    obj.localIdx(i) = strcmpi(entities.Entity(i), obj.EntityName);
                 end
             end
 

@@ -34,6 +34,10 @@ classdef ClassFilter < aod.api.FilterQuery
 
     % Implementation of FilterQuery abstract methods
     methods
+        function tag = describe(obj)
+            tag = sprintf("ClassFilter: Name=%s", value2string(obj.Name));
+        end
+
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
             obj.localIdx = obj.getQueryIdx();
@@ -61,17 +65,8 @@ classdef ClassFilter < aod.api.FilterQuery
 
     methods (Access = protected)
         function collectClassNames(obj)
-            groupNames = obj.getAllGroupNames();
-            hdfFiles = obj.getFileNames();
-            fileIdx = obj.getFileIdx();
-
-            classNames = repmat("", [numel(groupNames), 1]);
-
-            for i = 1:numel(groupNames)
-                classNames(i) = string(h5readatt(...
-                    hdfFiles(fileIdx(i)), groupNames(i), 'Class'));
-            end
-            obj.allClassNames = classNames;
+            entities = obj.getEntityTable();
+            obj.allClassNames = entities.Class;
         end
     end
 end 

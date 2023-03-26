@@ -55,24 +55,26 @@ classdef ParameterFilter < aod.api.FilterQuery
     end
 
     methods
-        function out = describe(obj)
-            tag = sprintf("ParameterFilter: Name=%s, Value=%s",... 
-                value2string(obj.Name), value2string(obj.Value));
+        function tag = describe(obj)
+            tag = sprintf("ParameterFilter: Name=%s",... 
+                value2string(obj.Name));
+            if ~isempty(obj.Value)
+                tag = tag + sprintf(", Value=%s", value2string(obj.Value));
+            end
         end
 
         function out = apply(obj)
             % Update local match indices to match those in Query Manager
             obj.localIdx = obj.getQueryIdx();
-            hdfNames = obj.getFileNames();
-            fileIdx = obj.getFileIdx();
-            groupNames = obj.getAllGroupNames();
+            entities = obj.getEntityTable();
 
             % First filter by whether the entities have the parameter
-            for i = 1:numel(groupNames)
-                if obj.localIdx(i)
-                    obj.localIdx(i) = h5tools.hasAttribute(...
-                        obj.getHdfName(i), groupNames(i), obj.Name);
+            for i = 1:height(entities)
+                if ~obj.localIdx(i)
+                    continue
                 end
+                obj.localIdx(i) = h5tools.hasAttribute(...
+                    entities.File(i), entities.Path(i), obj.Name);
             end
             out = obj.localIdx;
 
@@ -86,15 +88,16 @@ classdef ParameterFilter < aod.api.FilterQuery
             end
 
             % Second, filter by the parameter values
-            for i = 1:numel(groupNames)
-                if obj.localIdx(i)
-                    attValue = h5readatt(obj.getHdfName(i),... 
-                        groupNames(i), obj.Name);
-                    if isa(obj.Value, 'function_handle')
-                        obj.localIdx(i) = obj.Value(attValue);
-                    else
-                        obj.localIdx(i) = isequal(attValue, obj.Value);
-                    end
+            for i = 1:height(entities)
+                if ~obj.localIdx(i)
+                    continue
+                end
+                attValue = h5readatt(entities.File(i),...
+                    entities.Path(i), obj.Name);
+                if isa(obj.Value, 'function_handle')
+                    obj.localIdx(i) = obj.Value(attValue);
+                else
+                    obj.localIdx(i) = isequal(attValue, obj.Value);
                 end
             end
             out = obj.localIdx;

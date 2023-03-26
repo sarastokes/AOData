@@ -37,10 +37,18 @@ classdef ParentFilter < aod.api.StackedFilterQuery
     end
 
     methods
+        function tag = describe(obj)
+            childTags = describe@aod.api.StackedFilterQuery(obj);
+            tag = sprintf("ParentFilter: Target=%s, Parent=%s",... 
+                char(obj.targetEntityType), char(obj.parentEntityType));
+            tag = tag + newline + childTags;
+        end
+
         function out = apply(obj)
             obj.localIdx = obj.getQueryIdx();
             obj.filterIdx = true(size(obj.localIdx));
-            groupNames = obj.getAllGroupNames();
+            entities = obj.getEntityTable();
+            groupNames = entities.Path;
 
             % Get the entities matching the query
             for i = 1:obj.numFilters
@@ -62,7 +70,9 @@ classdef ParentFilter < aod.api.StackedFilterQuery
                 % the container name
                 parentPath = h5tools.util.getPathParent(...
                     h5tools.util.getPathParent(groupNames(i)));
-                idx = find(groupNames == parentPath);
+                % Find entities matching parent path in same file
+                idx = find(entities.File == entities.File(i) &...
+                     groupNames == parentPath);
                 % Set to the value in filterIdx
                 obj.localIdx(i) = obj.filterIdx(idx);
             end
