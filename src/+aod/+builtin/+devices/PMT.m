@@ -29,8 +29,8 @@ classdef PMT < aod.core.Device
 
     
     methods (Access = protected)
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Device(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Device(obj);
             
             value.add('SerialNumber', [], @isstring,... 
                 'Serial number of the light source');

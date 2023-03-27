@@ -58,8 +58,8 @@ classdef BandpassFilter < aod.core.Device
                 obj.getParam('Bandwidth'));
         end
 
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Device(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Device(obj);
 
             value.add('Wavelength', [], @isnumeric,...
                 'Wavelength in nm');

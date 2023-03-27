@@ -433,7 +433,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
 
             % Confirm expected parameter box is present
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
-                "value = getExpectedParameters@aod.core.Channel(obj)")));
+                "value = specifyParameters@aod.core.Channel(obj)")));
             % Verify parameter expecification
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
                 "value.add('Attr1', [], [],"))); % has description

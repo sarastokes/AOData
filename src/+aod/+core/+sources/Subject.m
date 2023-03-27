@@ -33,8 +33,8 @@ classdef Subject < aod.core.Source
     end
     
     methods (Access = protected)
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Entity(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Entity(obj);
 
             value.add('Species', [], @isstring,...
                 'Species of the subject');

@@ -110,8 +110,8 @@ classdef Eye < aod.core.sources.Eye
     end
 
     methods (Access = protected)
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.sources.Eye(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.sources.Eye(obj);
 
             value.add('ContactLens', [], @isstring,...
                 'Contact lens used for the eye');

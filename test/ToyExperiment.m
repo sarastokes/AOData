@@ -34,8 +34,8 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
         'Laboratory', "Primate-1P");
 
     experiment.setDescription('This is a test experiment');
-    experiment.addNote('This is the first note');
-    experiment.addNote('This is the second note');
+    experiment.setNote('This is the first note');
+    experiment.setNote('This is the second note');
 
     % Add a source
     source = sara.factories.SubjectFactory.create(851, 'OS', 'Right');

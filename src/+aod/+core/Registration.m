@@ -66,8 +66,8 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Access = protected)
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Entity(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Entity(obj);
 
             value.add('Administrator', [], @isstring,... 
                 "Person(s) who performed the registration");

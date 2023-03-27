@@ -657,8 +657,8 @@ classdef Experiment < aod.core.Entity
 
     % Overloaded methods
     methods (Access = protected)
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Entity(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Entity(obj);
 
             value.add('Administrator', [], @isstring,... 
                 'Person(s) performed the experiment');

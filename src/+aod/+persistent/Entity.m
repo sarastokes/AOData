@@ -326,15 +326,24 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.description = txt;
         end
 
-        function addNote(obj, newNote)
+        function setNote(obj, newNote, noteID)
             arguments
                 obj 
                 newNote         string
+                ID              {mustBeInteger} = 0
             end
 
             obj.verifyReadOnlyMode();
 
-            newValue = cat(1, obj.notes, newNote);
+            if ID > 0
+                % Replace a specific note
+                mustBeInRange(1,numel(obj.notes));
+                newValue = obj.notes;
+                newValue(ID) = newNote;
+            else
+                % Append a new note
+                newValue = cat(1, obj.notes, newNote);
+            end
 
             % Make the change in the HDF5 file
             obj.setDataset('notes', newValue);

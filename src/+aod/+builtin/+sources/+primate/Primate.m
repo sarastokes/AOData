@@ -36,8 +36,8 @@ classdef Primate < aod.core.sources.Subject
     end
 
     methods (Access = protected)
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.sources.Subject(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.sources.Subject(obj);
 
             value.add('DateOfBirth', [], @isdatetime,...
                 'Date of birth of the subject');

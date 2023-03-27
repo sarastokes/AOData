@@ -52,8 +52,8 @@ classdef NeutralDensityFilter < aod.core.Device
             value = sprintf('%u_NDF', 10*obj.getParam('Attenuation'));
         end
 
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Device(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Device(obj);
 
             value.add('Attenuation', 0, @isnumeric,...
                 "Attenuation of the NDF");

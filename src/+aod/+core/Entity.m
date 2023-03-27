@@ -27,7 +27,7 @@ classdef (Abstract) Entity < handle
 %   setName(obj, name)
 %   setDescription(obj, txt, overwrite)
 %
-%   addNote(obj, txt)
+%   setNote(obj, txt)
 %   removeNote(obj, ID)
 %
 %   tf = hasParam(obj, paramName)
@@ -45,10 +45,10 @@ classdef (Abstract) Entity < handle
 %
 % Protected methods:
 %   value = getLabel(obj)
-%   value = getExpectedParameters(obj)
-%   parse(obj, varargin)
+%   value = specifyParameters(obj)
+%   parseParameters(obj, varargin)
 %   sync(obj)
-%   checkGroupNames(obj)
+%   validateName(obj)
 %
 % Protected methods (with aod.persistent.Entity subclass access allowed):
 %   addParent(obj, parent)
@@ -131,10 +131,10 @@ classdef (Abstract) Entity < handle
             obj.parameters = aod.util.Parameters();
             
             % Parse unmatched inputs
-            obj.parse(ip.Unmatched);
+            obj.parseParameters(ip.Unmatched);
 
             % Set listeners for any SetObservable properties
-            obj.setListeners();
+            obj.assignListeners();
         end
     end
 
@@ -145,11 +145,15 @@ classdef (Abstract) Entity < handle
         end
 
         function value = get.expectedParameters(obj)
-            value = obj.getExpectedParameters();
+            value = obj.specifyParameters();
         end
 
         function value = get.groupName(obj)
-            value = obj.getHdfGroupName();
+            if isempty(obj.Name)
+                value = obj.label;
+            else
+                value = obj.Name;
+            end
         end
     end
 
@@ -253,19 +257,25 @@ classdef (Abstract) Entity < handle
             obj.description = txt;
         end
         
-        function addNote(obj, txt)
+        function setNote(obj, txt, ID)
             % Append a note to the entity
             % 
             % Syntax:
-            %   obj.addNote(txt)
+            %   obj.setNote(txt)
             % -------------------------------------------------------------
             arguments
                 obj
                 txt             string
+                ID              {mustBeInteger} = 0
             end
 
             if ~isscalar(obj)
-                arrayfun(@(x) addNote(x, txt), obj);
+                arrayfun(@(x) setNote(x, txt, ID), obj);
+                return
+            end
+
+            if ID > 0
+                obj.notes(ID) = txt;
                 return
             end
 
@@ -704,28 +714,11 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function value = getHdfGroupName(obj)
-            % Determines what to call the entity's HDF5 group
-            %
-            % Syntax:
-            %   value = getHdfGroupName(obj)
-            %
-            % Notes:
-            %   "Name" property takes precedence and "label" will only be
-            %   used if "Name" is empty
-            % -------------------------------------------------------------
-            if isempty(obj.Name)
-                value = obj.label;
-            else
-                value = obj.Name;
-            end
-        end
-
-        function value = getExpectedParameters(obj) %#ok<MANU> 
+        function value = specifyParameters(obj) %#ok<MANU> 
             % Initializes ParameterManager, subclasses can extend
             %
             % Syntax:
-            %   value = getExpectedParameters(obj)
+            %   value = specifyParameters(obj)
             % -------------------------------------------------------------
 
             value = aod.util.ParameterManager();
@@ -733,14 +726,14 @@ classdef (Abstract) Entity < handle
     end
 
     methods (Access = protected)
-        function parse(obj, varargin)
+        function parseParameters(obj, varargin)
             % Parses varargin input to constructor with expectedParameters
             % 
             % Syntax:
-            %   parse(obj, varargin)
+            %   parseParameters(obj, varargin)
             %
             % See also:
-            %   aod.core.Entity.getExpectedParameters, 
+            %   aod.core.Entity.specifyParameters,
             %   aod.util.ParameterManager
             % -------------------------------------------------------------
             ip = obj.expectedParameters.parse(varargin{:});
@@ -806,7 +799,7 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function isUnique = checkGroupNames(obj)
+        function isUnique = validateGroupNames(obj)
             % Check whether an entity group name is unique
             % 
             % Description:
@@ -817,7 +810,7 @@ classdef (Abstract) Entity < handle
             %   duplicates, such as overwriting the existing entity.
             %
             % Syntax:
-            %   isUnique = checkGroupNames(obj)
+            %   isUnique = validateGroupNames(obj)
             % -------------------------------------------------------------
             containerName = obj.entityType.parentContainer();
             isUnique = true;
@@ -827,7 +820,7 @@ classdef (Abstract) Entity < handle
             end
 
             existingEntities = obj.Parent.(containerName);
-            groupNames = string({existingEntities.Name});
+            groupNames = string({existingEntities.groupName});
             if ismember(obj.label, groupNames)
                 isUnique = false;
                 warning("Entity:DuplicateGroupName",...
@@ -860,7 +853,7 @@ classdef (Abstract) Entity < handle
             end
 
             obj.sync();
-            obj.checkGroupNames();
+            obj.validateGroupNames();
         end
 
         function removeParent(obj)
@@ -891,7 +884,7 @@ classdef (Abstract) Entity < handle
             tf = ismember(parent.entityType, obj.entityType.validParentTypes());
         end
 
-        function setListeners(obj)
+        function assignListeners(obj)
             % Create PostSet listeners for SetObservable properties
             %
             % Description:
@@ -901,7 +894,7 @@ classdef (Abstract) Entity < handle
             %   impact the properties of other objects
             %
             % Syntax:
-            %   setListeners(obj)
+            %   assignListeners(obj)
             % -------------------------------------------------------------
             mc = metaclass(obj);
             idx = find(arrayfun(@(x) x.SetObservable, mc.PropertyList));

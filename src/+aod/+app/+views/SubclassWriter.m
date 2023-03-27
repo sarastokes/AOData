@@ -219,9 +219,9 @@ classdef SubclassWriter < handle
 
             % ExpectedParameters
             if ~isempty(obj.Model.Attributes)
-                out = out + obj.indent(2) + "function value = getExpectedParameters(obj)" + newline;
+                out = out + obj.indent(2) + "function value = specifyParameters(obj)" + newline;
                 out = out + obj.indent(3) + sprintf(...
-                    "value = getExpectedParameters@%s(obj);",...
+                    "value = specifyParameters@%s(obj);", ...
                     obj.Model.SuperClass);
                 out = out + newline + " " + newline;
                 out = out + obj.indent(3) + "% Add new parameters" + newline;

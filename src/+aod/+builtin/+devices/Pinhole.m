@@ -51,8 +51,8 @@ classdef Pinhole < aod.core.Device
             value = ['Pinhole_', num2str(obj.getParam('Diameter')), 'microns'];
         end
 
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Device(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Device(obj);
             
             value.add('Diameter', [], @isnumeric,...
                 'Pinhole diameter in microns');

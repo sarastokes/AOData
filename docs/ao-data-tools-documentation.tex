@@ -545,7 +545,7 @@ obj = aod.core.Entity(name)
 		\docheader{Public methods:}
 		\begin{itemize}
 			\item \aodfcn{setDescription(obj, txt)}
-			\item \aodfcn{addNote(obj, txt)}
+			\item \aodfcn{setNote(obj, txt)}
 			\item \aodfcn{removeNote(obj, ID), \aodfcn{removeNote(obj, 'all')}}\\
 			%
 			\item \aodfcn{add(obj, entity)} - Add an entity\\
@@ -984,15 +984,15 @@ end
 	\subsection{aod.util.ParameterManager \myparent{handle}}
 		\label{subsection:ParameterManager}
 		\noindent The ParameterManager class provides users with an opportunity to specify which parameters the entity should have. 
-		Each AOData class inheriting from \aodclass{aod.core.Entity} has a dependent property called \aodprop{expectedParameters}, which is set by the output of the function \aodfcn{getExpectedParameters}. 
+		Each AOData class inheriting from \aodclass{aod.core.Entity} has a dependent property called \aodprop{expectedParameters}, which is set by the output of the function \aodfcn{specifyParameters}. 
 
 		No parameters are set in \aodclass{aod.core.Entity}; however, several core classes define them. For example, \aodclass{aod.core.Device} has two expected parameters (Manufacturer and Model), which are defined as follows: 
 
 		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
-function value = getExpectedParameters(obj)
+function value = specifyParameters(obj)
 	% Subclasses should always call the inherited method first, putting their 
 	% superclass after the @. 
-	value = getExpectedParameters@aod.core.Entity(obj)
+	value = specifyParameters@aod.core.Entity(obj)
 	% Add two new parameters 
 	value.add('Manufacturer', [], @ischar, 'Manufacturer of the Device');
 	value.add('Model', [], @ischar, 'Model of the Device');

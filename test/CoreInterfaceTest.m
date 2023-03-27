@@ -330,13 +330,17 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Work with device array
             allDevices = testCase.EXPT.get('Device');
             % Add notes to all the devices, then remove them
-            allDevices.addNote("This is a note");
+            allDevices.setNote("This is a note");
             testCase.verifyEqual(numel(device1.notes), 1);
             allDevices.removeNote(1);
             testCase.verifyEqual(numel(device1.notes), 0);
 
-            % Clear notes from all the devices, then clear them
-            addNote([device1,device2,device3], "This is a note");
+            % Add notes from all the devices
+            setNote([device1,device2,device3], "This is a note");
+            % Change a specific note
+            device2.setNote("New note", 1);
+            testCase.verifyEqual(device2.notes(1), "New note");
+            % Remove note from all devices
             removeNote([device1, device2, device3], 'all');
             
             % Remove a device

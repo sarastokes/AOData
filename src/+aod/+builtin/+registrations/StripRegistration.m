@@ -98,8 +98,8 @@ classdef StripRegistration < aod.core.Registration
     end
 
     methods (Access = protected)
-        function value = getExpectedParameters(obj)
-            value = getExpectedParameters@aod.core.Registration(obj);
+        function value = specifyParameters(obj)
+            value = specifyParameters@aod.core.Registration(obj);
 
             value.add('RegistrationType', [],... 
                 @(x) ismember(x, ["frame", "strip"]),...
