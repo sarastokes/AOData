@@ -54,7 +54,7 @@ classdef (Abstract) Entity < handle
 %   addParent(obj, parent)
 %
 % Private methods:
-%   tf = isValidParent(obj, parent)
+%   tf = validateParent(obj, parent)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -845,7 +845,7 @@ classdef (Abstract) Entity < handle
                 return
             end
             
-            if obj.isValidParent(parent)
+            if obj.validateParent(parent)
                 obj.Parent = parent;
             else
                 error("setParent:InvalidParentType",...
@@ -875,11 +875,11 @@ classdef (Abstract) Entity < handle
     end
 
     methods (Access = private)
-        function tf = isValidParent(obj, parent)
+        function tf = validateParent(obj, parent)
             % Determine if parent is in or subclass of allowable parents
             %
             % Syntax:
-            %   tf = isValidParent(parent)
+            %   tf = validateParent(parent)
             % -------------------------------------------------------------
             tf = ismember(parent.entityType, obj.entityType.validParentTypes());
         end

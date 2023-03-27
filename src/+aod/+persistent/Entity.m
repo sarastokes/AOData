@@ -326,7 +326,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.description = txt;
         end
 
-        function setNote(obj, newNote, noteID)
+        function setNote(obj, newNote, ID)
             arguments
                 obj 
                 newNote         string
