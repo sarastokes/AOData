@@ -1,21 +1,14 @@
 ## Icon Resources
 
-Source credit for the free icons used in apps
- 
-- Code Icon by <a href="https://freeicons.io/profile/714">Raj Dev</a> on <a href="https://freeicons.io">freeicons.io</a>        
-- Container Icon by <a href="https://freeicons.io/profile/823">Muhammad Haq</a> on <a href="https://freeicons.io">freeicons.io</a>  
+Source credit for the free icons used in apps:
 - File Cabinet Icon by <a href="https://freeicons.io/profile/101154">sripfoto</a> on <a href="https://freeicons.io">freeicons.io</a>
-- FileReader Icon by <a href="https://freeicons.io/profile/3">icon king1</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Folder Icon by <a href="https://freeicons.io/profile/714">Raj Dev</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Info Icon by <a href="https://freeicons.io/profile/8939">Melvin ilham Oktaviansyah</a> on <a href="https://freeicons.io">freeicons.io</a>            
-- License Icon by <a href="https://freeicons.io/profile/3335">MD Badsha Meah</a> on <a href="https://freeicons.io">freeicons.io</a>  
-- List Icon by <a href="https://freeicons.io/profile/714">Raj Dev</a> on <a href="https://freeicons.io">freeicons.io</a>
-- Plus Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>    
-- Minus Icon by <a href="https://freeicons.io/profile/730">Anu Rocks</a> on <a href="https://freeicons.io">freeicons.io</a>   
 - <a href="https://icons8.com/icon/nkplpFWWQEKZ/add">Add</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/31462/add-row">Add Row</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38947/binary-file">Binary File</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21064/box">Box</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/23154/calculator">Calculator</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21461/calendar-4">Calendar 4</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21067/cancel">Cancel</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21319/checked-checkbox">Checked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21068/checkmark">Checkmark</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/44484/code">Code</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -23,9 +16,13 @@ Source credit for the free icons used in apps
 - <a href="https://icons8.com/icon/21145/comments">Comments</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21132/contact-details">Contact Details</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31483/data-sheet">Data Sheet</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/31486/delete-row">Delete Row</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38006/do-not-disturb">Do Not Disturb</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/32540/documents">Documents</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/x9hi54t8czIw/dropdown-field">Dropdown Field</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/31490/edit-row">Edit Row</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/41649/folder">Folder</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21349/form">Form</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31496/grid">Grid</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21352/help">Help</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/74811/home-page">Home Page</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -41,6 +38,7 @@ Source credit for the free icons used in apps
 - <a href="https://icons8.com/icon/38129/note">Note</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21215/planner">Planner</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21100/refresh">Refresh</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/22312/rename">Rename</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21394/save">Save</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/VKNnbtYRlG_o/search">Search</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21103/settings">Settings</a> icon by <a href="https://icons8.com">Icons8</a>

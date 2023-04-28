@@ -153,43 +153,43 @@ classdef AONodeTypes
 
             switch obj 
                 case AONodeTypes.ENTITY 
-                    out = 'icons8-folder-40.png';
+                    out = 'folder.png';
                 case AONodeTypes.CONTAINER
-                    out = 'icons8-new-product-40.png';
+                    out = 'new-product.png';
                 case {AONodeTypes.NUMERIC, AONodeTypes.TRANSFORM}
-                    out = 'icons8-grid-40.png';
+                    out = 'grid.png';
                 case AONodeTypes.LINK
-                    out = 'icons8-link-40.png';
+                    out = 'link.png';
                 case AONodeTypes.TEXT 
-                    out = 'icons8-new-document-40.png';
+                    out = 'new-document.png';
                 case AONodeTypes.DATETIME 
-                    out = 'icons8-calendar-40.png';
+                    out = 'calendar.png';
                 case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE]
-                    out = 'icons8-data-sheet-40.png';
+                    out = 'data-sheet.png';
                 case [AONodeTypes.STRUCTURE, AONodeTypes.MAP]
-                    out = 'icons8-tree-structure-40.png';
+                    out = 'tree-structure.png';
                 case AONodeTypes.ENUM
-                    out = 'icons8-list-40.png';
+                    out = 'list.png';
                 case AONodeTypes.LOGICAL
-                    out = 'icon8-binary-file-40.png';
+                    out = 'icon8-binary-file.png';
                 case AONodeTypes.FILES 
                     out = 'filecabinet.png';
                 case AONodeTypes.NOTES
-                    out = 'icons8-making-notes-40.png';
+                    out = 'making-notes.png';
                 case AONodeTypes.NAME 
-                    out = 'icons8-contact-details-40.png';
+                    out = 'contact-details.png';
                 case AONodeTypes.DESCRIPTION
-                    out = 'icons8-info-40.png';
+                    out = 'info.png';
                 case AONodeTypes.CODE 
-                    out = 'icons8-code-40.png';
+                    out = 'code.png';
                 case AONodeTypes.HOMEDIRECTORY 
-                    out = 'icons8-home-page-40.png';
+                    out = 'home-page.png';
                 case AONodeTypes.PARAMETERMANAGER
-                    out = 'icons8-settings-40.png';
+                    out = 'settings.png';
                 case AONodeTypes.QUERYMANAGER
-                    out = 'icons8-search-40.png';
+                    out = 'search.png';
                 otherwise
-                    out = 'icons8-grid-40.png';
+                    out = 'grid.png';
             end
             out = [obj.ICON_DIR, out];
         end
