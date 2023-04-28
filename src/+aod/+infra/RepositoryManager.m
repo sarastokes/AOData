@@ -107,6 +107,13 @@ classdef RepositoryManager < handle
 
         function findPackages(obj)
             obj.basePackage = getpref('AOData', 'BasePackage');
+
+            allPackages = string(getpref('AOData', 'GitRepos'));
+            allPackages = strsplit(allPackages, ";");
+            idx = find(allPackages ~= obj.basePackage);
+            if ~isempty(idx)
+                obj.userPackages = allPackages(idx);
+            end
         end
 
         function checkBasePackage(obj)
