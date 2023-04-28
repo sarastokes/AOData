@@ -2,17 +2,17 @@ classdef PropertySpecification < aod.util.templates.Specification
 % Specification of a new property (HDF5 dataset)
 %
 % Parent:
-%   aod.util.templates.Specification
+%   aod.util.templates.Specification, matlab.mixin.SetGet
 %
 % Constructor:
 %   obj = aod.util.templates.PropertySpecification(name)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
         % Property name (required)
-        Name                string  {mustBeValidVariableName}
+        Name             string  {mustBeValidVariableName}
         % Class type requirements for the property (default = none)
         Class            string          = string.empty()
         % Default value for the property (default = none)
@@ -53,7 +53,7 @@ classdef PropertySpecification < aod.util.templates.Specification
                 obj.Class = goodClass;
             end
             if ~isempty(badClass)
-                error("setClass:InvalidClass",...
+                error("PropertySpecification:InvalidClassName",...
                     "Unrecognized class %s", badClass);
             end
         end

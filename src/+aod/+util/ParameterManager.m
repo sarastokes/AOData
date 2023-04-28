@@ -7,14 +7,32 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
 % Constructor:
 %   obj = aod.util.ParameterManager()
 %
+% Properties:
+%   ExpectedParameters
+%   Count
+%
+% Methods:
+%   add(obj, paramName, defaultValue, validationFcn, description)
+%   remove(obj, paramName)
+%   clear(obj)
+%
+%   ip = getParser(obj)
+%   ip = parse(obj, varargin)
+%   [tf, idx] = hasParam(obj, paramName)
+%
+% Overloaded methods:
+%   tf = isempty(obj)
+%   tf = isequal(obj, other)
+%   T = table(obj)
+%
 % See also:
-%   aod.util.ExpectedParameter, aod.util.Parameter
+%   aod.util.ExpectedParameter, aod.util.Parameters
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        ExpectedParameters          % aod.util.template.ExpectedParameter
+        ExpectedParameters          % aod.util.templates.ExpectedParameter
     end
 
     properties (Dependent)
@@ -41,8 +59,8 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             % Add a new expected parameter
             %
             % Syntax:
-            %   add(obj, param)
-            %   add(obj, param, defaultValue, validationFcn, description)
+            %   add(obj, name)
+            %   add(obj, name, defaultValue, validationFcn, description)
             % 
             % Inputs:
             %   param       char, ExpectedParameter, ParameterManager
@@ -94,16 +112,26 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
         end
 
         function remove(obj, paramName)
+            % Remove a parameter by name
+            %
+            % Syntax:
+            %   remove(obj, paramName)
+            %
+            % Inputs:
+            %   paramName           string/char
+            %       Parameter name to remove
+            %
+            % Examples:
+            %   PM = aod.util.ParameterManager();
+            %   PM.add('MyParam', [], @(x) ischar(x), 'A parameter');
+            %   PM.remove('MyParam');
+            % ----------------------------------------------------------
+
             if isempty(obj.ExpectedParameters)
                 return
             end
 
-            idx = [];
-            for i = 1:numel(obj.ExpectedParameters)
-                if strcmpi(obj.ExpectedParameters(i).Name, paramName)
-                    idx = i;
-                end
-            end
+            [~, idx] = obj.hasParam(paramName);
             if isempty(idx)
                 warning('remove:ParamNotFound', 'Parameter %s not found', paramName);
             else
@@ -112,12 +140,23 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
         end
 
         function clear(obj)
+            % Clear all parameters
+            %
+            % Syntax:
+            %   clear(obj)
+            % ----------------------------------------------------------
             obj.ExpectedParameters = [];
         end
     end
 
     methods
         function [tf, idx] = hasParam(obj, paramName)
+            % Check whether parameter exists and optionally, get index
+            %
+            % Syntax:
+            %   [tf, idx] = hasParam(obj, paramName)
+            % ----------------------------------------------------------
+
             if isempty(obj.ExpectedParameters)
                 tf = false;
                 return
@@ -136,7 +175,8 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             %
             % Syntax:
             %   ip = getParser(obj)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
+
             ip = aod.util.InputParser;
             for i = 1:numel(obj.ExpectedParameters)
                 ip = addToParser(obj.ExpectedParameters(i), ip);
@@ -144,6 +184,12 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
         end
 
         function ip = parse(obj, varargin)
+            % Create inputParser and parse variable input
+            %
+            % Syntax:
+            %   ip = parse(obj, varargin)
+            % ----------------------------------------------------------
+
             ip = obj.getParser();
             parse(ip, varargin{:});
         end

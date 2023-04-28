@@ -1,10 +1,10 @@
-classdef Specification < handle & matlab.mixin.Heterogeneous
+classdef Specification < handle & matlab.mixin.Heterogeneous & matlab.mixin.SetGet
 % Parent class for all property, link and parameter specifications
 %
 % Parent:
-%   handle, matlab.mixin.Heterogeneous
+%   handle, matlab.mixin.Heterogeneous, matlab.mixin.SetGet
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
