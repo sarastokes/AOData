@@ -170,7 +170,7 @@ classdef UtilityTest < matlab.unittest.TestCase
                 'aod.util.readers.ImageReader');
             
             testCase.verifyError(...
-                @() aod.util.findFileReader('test.zip'),...
+                @() aod.util.findFileReader('RoiSet.zip'),...
                 "findFileReader:UnknownExtension");
         end
     end 
@@ -194,8 +194,7 @@ classdef UtilityTest < matlab.unittest.TestCase
             
             files = FM.getFilesFound();
             % ! This will change with # of test data files
-            testCase.verifyNumElements(files, 6);
-            testCase.verifyFalse(all(contains(files, ".")));
+            testCase.verifyNumElements(files, 8);
 
             out = FM.checkFilesFound(files, 1);
             testCase.verifyEqual(out, files(1));

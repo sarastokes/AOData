@@ -96,9 +96,14 @@ classdef PowerMeasurement < aod.core.Calibration
             % Description:
             %   loadTable(obj, measurementTable)
             % -------------------------------------------------------------
-            assert(istable(measurementTable), 'Must be a table!');
-            obj.Setting = measurementTable.Setting;
-            obj.Value = measurementTable.Value;
+            
+            if istext(measurementTable)
+                T = readmatrix(measurementTable);
+                obj.setFile('Calibration', measurementTable);
+            elseif istable(measurementTable)
+                obj.Setting = measurementTable.Setting;
+                obj.Value = measurementTable.Value;
+            end
         end
     end
 

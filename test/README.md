@@ -32,6 +32,7 @@ The AOData test suite currently contains the following:
   - ```CustomDisplayTest``` - ensures custom displays do not throw errors
   - ```EnumeratedTypeTest``` - tests basic functioning of enumeration classes not covered elsewhere
   - ```ProtocolTest``` - tests the protocol class and integration with experimental hierarchy
+  - ```SpecificationTest``` - tests templates and methods for specifying AOData subclasses
   - ```UtilityTest``` - tests the AOData's util package. Some components have dedicated tests:
 
 

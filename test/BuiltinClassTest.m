@@ -16,7 +16,8 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-% #ok<*MANU>  #ok<*NASGU>
+%#ok<*MANU>  
+%#ok<*NASGU>
 
     methods (Test, TestTags = {'Devices'})
         function Pinhole(testCase) 
@@ -27,7 +28,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             testCase.verifyEqual(paramValue, 20);
         end
 
-        function PMT(testCase)
+        function PMT(testCase) 
             obj = aod.builtin.devices.PMT('VisiblePMT',...
                 'Manufacturer', "Hamamatsu", 'Model', "H16722");
         end
@@ -38,7 +39,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj.setSpectra([1:10; 11:20]);
         end
 
-        function testDichroicFilter(testCase)
+        function DichroicFilter(testCase)
             obj = aod.builtin.devices.DichroicFilter(470, 'high',...
                 'Manufacturer', "Semrock", 'Model', "FF470-Di01");
             obj.setTransmission(sara.resources.getResource('FF470_Di01.txt'));
@@ -48,6 +49,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.devices.NeutralDensityFilter(0.6,...
                 'Manufacturer', "ThorLabs", 'Model', "NE06A-A");
             obj.setTransmission([400:700; zeros(size(400:700))]);
+            testCase.verifyTrue(strcmp(obj.label, '0.6NDF'));
         end
 
         function BandpassFilter(testCase)
@@ -74,6 +76,30 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.registrations.RigidRegistration(...
                 'SIFT', '20220822', eye(3));
             testCase.verifyClass(obj.affine2d_to_3d(eye(3)), 'affine3d');
+            testCase.verifyClass(obj.affine2d_to_3d(affine2d(eye(3))), 'affine3d');
+        end
+
+        function RigidRegistrationErrors(testCase)
+            testCase.verifyError(...
+                @() aod.builtin.registrations.RigidRegistration('Reg', getDateYMD(), [2 2; 2 2]),...
+                "RigidRegistration:IncorrectSize");
+        end
+
+        function RigidRegistrationApply(testCase)
+            tform = affine2d([2 0 0; 0.33 1 0; 0 0 1]);
+            I = imread('pout.tif');
+            refObj = imref2d(size(I));
+            J = imwarp(I, refObj, tform, ...
+                'OutputView', refObj, 'SmoothEdges', true);
+
+            % Make pseudovideo
+            V = cat(3, I, I, I);
+
+            obj = aod.builtin.registrations.RigidRegistration( ...
+                'Reg', getDateYMD(), tform);
+            out = obj.apply(I, 'SmoothEdges', true);
+            testCase.verifyEqual(out, J);
+            testCase.verifyTrue(obj.hasParam('SmoothEdges'));
         end
 
         function StripRegistration(testCase)

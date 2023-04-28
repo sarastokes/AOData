@@ -1,5 +1,5 @@
-classdef GeometricTransformation < aod.core.Registration
-% GEOMETRICTRANSFORMATION
+classdef (Abstract) GeometricTransformation < aod.core.Registration
+% GEOMETRICTRANSFORMATION (Abstract)
 %
 % Description:
 %   Any geometric transformation applied to register the data
@@ -12,7 +12,7 @@ classdef GeometricTransformation < aod.core.Registration
 %   reference
 % 
 % Methods to be implemented by subclasses:
-%   dataOut = apply(obj, dataIn)
+%   dataOut = apply(obj, dataIn, varargin)
 % -------------------------------------------------------------------------
     properties
         transform
@@ -24,7 +24,7 @@ classdef GeometricTransformation < aod.core.Registration
             obj = obj@aod.core.Registration(name, registrationDate, varargin{:});
         end
         
-        function data = apply(obj, data) %#ok<INUSD> 
+        function data = apply(obj, data, varargin) %#ok<INUSD> 
             error('Apply:NotYetImplemented',...
                 'GeometricTransformation/apply must be implemented by subclasses');
         end

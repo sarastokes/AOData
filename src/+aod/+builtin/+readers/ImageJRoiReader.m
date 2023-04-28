@@ -2,8 +2,8 @@ classdef ImageJRoiReader < aod.util.FileReader
 % IMAGEJROIREADER
 %
 % Description:
-%   Wrapper for ImageJ ROI import functions with improvements to
-%   polygon ROI processing
+%   Wrapper for ImageJ ROI import functions with improvements to polygon
+%   ROI import
 %
 % Syntax:
 %   obj = aod.builtin.readers.ImageJRoiReader(fullFilePath, imSize)
@@ -14,10 +14,16 @@ classdef ImageJRoiReader < aod.util.FileReader
 %   imSize      vector [1 x 2]
 %       Image X and Y dimensions
 %
+% Quick data access:
+%   data = aod.builtin.readers.ImageJROIReader.read(fullFilePath, imSize)
+%
+% Notes:
+%   Mixed polygon and oval ROIs not supported. 
+%
 % See also:
 %   roiImportImageJ, ReadImageJROI, ROIs2Regions, poly2mask
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -34,7 +40,8 @@ classdef ImageJRoiReader < aod.util.FileReader
             sROI = ReadImageJROI(obj.fullFile);
 
             if strcmp(sROI{1}.strType, 'Polygon')
-                regions.Connectivity = 8; %#ok<*PROP> 
+                regions = struct();
+                regions.Connectivity = 8; 
                 regions.ImageSize = fliplr(obj.Size);
                 regions.NumObjects = numel(sROI);
                 regions.PixelIdxList = {};
@@ -50,6 +57,7 @@ classdef ImageJRoiReader < aod.util.FileReader
                 regions = ROIs2Regions(sROI, obj.Size);
                 obj.Data = labelmatrix(regions)';
             end
+
             out = obj.Data;
         end
     end

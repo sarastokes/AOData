@@ -11,9 +11,9 @@ classdef PersistorTest < matlab.unittest.TestCase
 %   result = runtests('PersistorTest.m')
 %
 % See also:
-%   runAODataTestSuite
+%   runAODataTestSuite, ToyExperiment, aod.util.test.makeSmallExperiment
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
 %#ok<*NASGU> 
@@ -34,7 +34,8 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.EXPT = loadExperiment(fileName);
 
             % Make a smaller experiment for testing empty entities
-            testCase.SMALL_EXPT = test.util.makeSmallExperiment(true);
+            testCase.SMALL_EXPT = test.util.makeSmallExperiment(...
+                true, 'ShellExperiment.h5');
         end
     end
 
@@ -106,7 +107,6 @@ classdef PersistorTest < matlab.unittest.TestCase
                 testCase.EXPT.hasParam('Administrator'));
             testCase.verifyEqual(...
                 testCase.EXPT.getParam('Administrator'), "Sara Patterson");
-
             testCase.verifyFalse(...
                 testCase.EXPT.hasParam('BadParam'));
         end
@@ -136,7 +136,9 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyWarning(@()testCase.EXPT.getByPath('badpath'),...
                 'getByPath:InvalidHdfPath');
         end
+    end
 
+    methods (Test, TestTags="Modification")
         function ParamIO(testCase)
             import matlab.unittest.constraints.Throws
             
@@ -209,6 +211,33 @@ classdef PersistorTest < matlab.unittest.TestCase
                 "addDataset:UnpersistedLink");
 
             % TODO: Remove property
+        end
+
+        function addEntity(testCase)
+            analysis = aod.core.Analysis("TestAnalysis");
+            testCase.SMALL_EXPT.add(analysis);
+            testCase.verifyNumElements(testCase.SMALL_EXPT.Analyses, 1);
+
+            system = aod.core.System("TestSystem");
+            testCase.SMALL_EXPT.add(system);
+            testCase.verifyNumElements(testCase.SMALL_EXPT.Systems, 1);
+
+            channel = aod.core.Channel("TestChannel",... 
+                "Parent", testCase.SMALL_EXPT.Systems(1));
+            % Confirm interoperability of core/persistent
+            testCase.verifyClass(channel.ancestor('experiment'),... 
+                "aod.persistent.Experiment");
+            % Add the new channel
+            testCase.SMALL_EXPT.Systems(1).add(channel);
+            testCase.verifyNumElements(testCase.SMALL_EXPT.Systems(1).Channels, 1);
+            % Swap interfaces
+            channel0 = aod.util.swapInterfaces(channel); 
+            testCase.verifyEqual(channel0.UUID, channel.UUID);
+
+            % Add a device
+            device = aod.core.Device("TestDevice", "Parent", channel);     
+            channel0.add(device);
+            testCase.verifyNumElements(channel0.Devices, 1);      
         end
     end
         

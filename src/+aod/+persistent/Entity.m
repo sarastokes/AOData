@@ -67,6 +67,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         readOnly
         % The HDF5 file name
         hdfFileName
+        % The entity's HDF5 group name
+        groupName
     end
 
     properties (Hidden, SetAccess = private)
@@ -128,6 +130,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         
         function value = get.hdfFileName(obj)
             value = obj.factory.hdfName;
+        end
+
+        function value = get.groupName(obj)
+            value = h5tools.util.getPathEnd(obj.hdfPath);
         end
 
         function setReadOnlyMode(obj, tf)

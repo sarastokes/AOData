@@ -42,17 +42,7 @@ classdef QueryManager < handle
 
     methods
         function obj = QueryManager(hdfName)
-            if nargin < 1
-                [hdfName, hdfPath] = uigetfile('*.h5',...
-                    'Pick AOData HDF5 file(s)',...
-                    'MultiSelect', 'on');
-                if isequal(hdfName, 0)
-                    return
-                end
-                hdfName = fileparts(hdfPath, hdfName);
-            end
             obj.addExperiment(hdfName);
-
         end
     end
 

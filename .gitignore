@@ -34,6 +34,7 @@ test/ExperimentTest.h5
 test/ToyExperiment.h5
 test/HdfTest.h5
 test/SmallExperiment.h5
+test/ShellExperiment.h5
 
 test/ToyExperiment.mat
 

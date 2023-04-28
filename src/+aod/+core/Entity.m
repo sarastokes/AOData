@@ -2,7 +2,7 @@ classdef (Abstract) Entity < handle
 % ENTITY (Abstract)
 %
 % Description:
-%   Base class for information related to an experiment
+%   Parent class for all entities in AOData's object model (core)
 %
 % Constructor:
 %   obj = aod.core.Entity()
@@ -56,11 +56,11 @@ classdef (Abstract) Entity < handle
 % Private methods:
 %   tf = validateParent(obj, parent)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        % The Entity's parent Entity (aod.core.Entity subclass)
+        % The Entity's parent Entity, aod.core.Entity subclass
         Parent                      % aod.core.Entity
         % User-defined name for the entity, defines the HDF5 group name
         Name(1,:)                   char = char.empty()
@@ -77,7 +77,7 @@ classdef (Abstract) Entity < handle
     end
 
     properties (Hidden, SetAccess = private)
-        % The entity's type (aod.core.EntityTypes)
+        % The entity's type, aod.core.EntityTypes
         entityType                  %aod.core.EntityTypes
     end
 
@@ -170,10 +170,8 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   % Get the parent of one entity (equivalent to obj.Parent)
             %   h = obj.getParent()
-            %
-            %   % Get the parent epochs of all stimuli matching a query
-            %   h = getParent(expt.get('Stimulus', {'Name', 'BinaryNoise'}))
             % -------------------------------------------------------------
+
             if ~isscalar(obj)
                 out = aod.util.arrayfun(@(x) getParent(x), obj);
                 return
@@ -185,12 +183,32 @@ classdef (Abstract) Entity < handle
             % Get parent entity matching a specific entityType
             %
             % Description:
-            %   Recursively search 'Parent' property for an entity matching
-            %   or subclassing className
+            %   Recursively search 'Parent' property for an entity 
+            %   matching or subclassing className. Or of a specific 
+            %   entity type.
             %
             % Syntax:
             %   h = obj.ancestor(className)
+            %
+            % Inputs:
+            %   className           char, aod.core.EntityTypes
+            %       Class name or entity type to search for
+            %
+            % Examples:
+            %   p = obj.ancestor('Experiment')
+            %   p = obj.ancestor(aod.core.EntityTypes.EXPERIMENT)
+            %   p = obj.ancestor('aod.core.Experiment')
             % -------------------------------------------------------------
+
+            % See whether input is an entity type
+            try
+                className = aod.core.EntityTypes.get(className);
+            catch ME
+                if ~strcmp(ME.identifier, "get:UnknownEntity")
+                    rethrow(ME);
+                end
+            end
+
             h = obj;
             if isa(className, 'aod.core.EntityTypes')
                 while h.entityType ~= className
@@ -218,7 +236,8 @@ classdef (Abstract) Entity < handle
             %   setName(obj, name)
             %
             % Inputs:
-            %   name        Set Entity name 
+            %   name            string
+            %       Name of entity 
             % -------------------------------------------------------------
             if ~isscalar(obj)
                 arrayfun(@(x) setName(x, name), obj);
@@ -262,6 +281,14 @@ classdef (Abstract) Entity < handle
             % 
             % Syntax:
             %   obj.setNote(txt)
+            %   obj.setNote(txt, ID)
+            %
+            % Examples:
+            %   % Append a new note
+            %   obj.setNote("This is a note");
+            %
+            %   % Overwrite the 2nd note
+            %   obj.setNote("New note content", 2);
             % -------------------------------------------------------------
             arguments
                 obj
@@ -680,6 +707,9 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   obj.assignUUID(UUID)
             %
+            % Notes:
+            %   Not recommended!
+            %
             % See also:
             %   aod.util.generateUUID
             % -------------------------------------------------------------
@@ -799,6 +829,15 @@ classdef (Abstract) Entity < handle
             end
         end
 
+        function isValid = validateUUIDs(obj)
+            % Ensure UUID is unique among full experiment
+
+            if isSubclass(obj.Parent, 'aod.persistent.Entity')
+                allUUIDs = obj.Parent.factory.entityManager.Table.UUID;
+                isValid = ~ismember(obj.UUID, allUUIDs);
+            end
+        end
+
         function isUnique = validateGroupNames(obj)
             % Check whether an entity group name is unique
             % 
@@ -852,7 +891,10 @@ classdef (Abstract) Entity < handle
                     '%s is not a valid parent', class(parent));
             end
 
+            % Ensure linked entities are present and clean up files
             obj.sync();
+            % Ensure UUID and group name is unique among container
+            obj.validateUUIDs();
             obj.validateGroupNames();
         end
 

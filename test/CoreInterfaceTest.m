@@ -296,6 +296,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(system.Channels), 3);
             testCase.verifyEqual(numel(testCase.EXPT.get('Channel')), 3);
 
+            % Test has query
+            testCase.verifyTrue(system.has('Channel', {'Name', 'TestChannel1'}));
+
             % Test get access
             testCase.verifyNumElements(system.get('Channel'), 3);
             testCase.verifyNumElements( ...

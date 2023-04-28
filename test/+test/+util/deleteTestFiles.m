@@ -2,9 +2,9 @@ function deleteTestFiles()
 % Delete the HDF5 and .m files created while running the test suite
 %
 % Syntax:
-%   deleteTestFiles()
+%   aod.util.deleteTestFiles()
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     currentPWD = pwd;
 
@@ -20,6 +20,10 @@ function deleteTestFiles()
 
     if exist('SmallExperiment.h5', 'file')
         delete('SmallExperiment.h5');
+    end
+
+    if exist('ShellExperiment.h5', 'file')
+        delete('ShellExperiment.h5');
     end
     
     if exist('HdfTest.h5', 'file')

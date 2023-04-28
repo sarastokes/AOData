@@ -10,10 +10,16 @@ classdef SubclassGenerator < handle
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    events 
+        ChangedLinks
+        ChangedDatasets
+        ChangedAttributes 
+    end
+
     properties 
-        ClassName               {mustBeValidVariableName} = "Undefined"  
-        FilePath
-        SuperClass 
+        ClassName               string          {mustBeValidVariableName} = "Undefined"  
+        FilePath                string
+        SuperClass              string
         EntityType 
 
         groupNameMode           string          = "UserDefined"      
@@ -25,9 +31,7 @@ classdef SubclassGenerator < handle
         overwrittenMethods      string          = string.empty()
     end
 
-    properties (SetAccess = protected)  
-        Methods
-
+    properties (SetAccess = protected) 
         Datasets    aod.util.templates.PropertySpecification   = aod.util.templates.PropertySpecification.empty()
         Links       aod.util.templates.LinkSpecification       = aod.util.templates.LinkSpecification.empty()
         Attributes  aod.util.templates.AttributeSpecification  = aod.util.templates.AttributeSpecification.empty()
@@ -40,12 +44,6 @@ classdef SubclassGenerator < handle
         isWriteable
         isViewable
         Properties
-    end
-
-    events 
-        ChangedLinks
-        ChangedDatasets
-        ChangedAttributes 
     end
 
     methods
@@ -102,7 +100,7 @@ classdef SubclassGenerator < handle
             
             out = obj.ClassName + ".m";
 
-            if isempty(obj.FilePath)
+            if isempty(obj.FilePath) || obj.FilePath == ""
                 out = fullfile(pwd, out);
             else
                 out = fullfile(obj.FilePath, out);
@@ -135,13 +133,26 @@ classdef SubclassGenerator < handle
         end
 
         function addDataset(obj, prop)
+            % Add a property specification to the subclass
+            %
+            % Syntax:
+            %   addDataset(obj, dset)
+            %
+            % Inputs:
+            %   dset        aod.util.templates.PropertySpecification
+            %       One or more property specifications
+            % -------------------------------------------------------------
             arguments
                 obj 
                 prop        {mustBeA(prop, 'aod.util.templates.PropertySpecification')}
             end
+
             if isempty(obj.Datasets)
                 obj.Datasets = prop;
             else
+                if isrow(prop)
+                    prop = prop';
+                end
                 obj.Datasets = cat(1, obj.Datasets, prop);
             end
             notify(obj, "ChangedDatasets");
@@ -255,8 +266,6 @@ classdef SubclassGenerator < handle
                 className       string
             end
             
-            assert(~isa(className, 'aod.core.Entity'),...
-                'Superclass must be a subclass of aod.core.Entity');
             assert(~isSubclass(className, 'aod.core.Entity'),...
                 'Superclass must be a subclass of aod.core.Entity');
             obj.SuperClass = className; 

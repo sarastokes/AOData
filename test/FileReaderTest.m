@@ -35,8 +35,8 @@ classdef FileReaderTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test)
-        function testCSV(testCase)
+    methods (Test, TestTags="Formats")
+        function CSV(testCase)
             reader = aod.util.readers.CsvReader(...
                 fullfile(testCase.dataFolder, 'test.csv'));
             output = reader.readFile();
@@ -50,7 +50,7 @@ classdef FileReaderTest < matlab.unittest.TestCase
                 'AbsTol', 0.001);
         end
 
-        function testTXT(testCase)
+        function TXT(testCase)
             reader = test.TestTxtReader(...
                 fullfile(testCase.dataFolder, 'test.txt'));
             testCase.verifyEqual(reader.Data.PMTGain, 0.541);
@@ -61,7 +61,7 @@ classdef FileReaderTest < matlab.unittest.TestCase
             testCase.verifyTrue(reader.Data.ClosedLoop);
         end
 
-        function testAVI(testCase)
+        function AVI(testCase)
             out = aod.util.readers.AviReader.read(...
                 fullfile(testCase.dataFolder, 'test.avi'));
             testCase.verifyEqual(size(out), [256, 256, 5]);
@@ -69,12 +69,40 @@ classdef FileReaderTest < matlab.unittest.TestCase
                 "RelTol", 0.01);
         end
 
-        function testJSON(testCase)
+        function JSON(testCase)
             out = aod.util.readers.JsonReader.read(...
                 fullfile(testCase.dataFolder, 'test.json'));
             testCase.verifyEqual(numel(fieldnames(out)), 4);
             testCase.verifyEqual(out.data, 1);
             testCase.verifyEqual(out.machine, '1P-PRIMATE');
+        end
+
+        function PNG(testCase)
+            data = aod.util.readers.ImageReader.read(...
+                fullfile(testCase.dataFolder, 'test.png'));
+            testCase.verifyEqual(size(data), [360 242]);
+        end
+    end
+
+    methods (Test, TestTags=["Formats", "Builtin"])
+        function ImageJRois(testCase)
+            % Circle ROIs
+            out1 = aod.builtin.readers.ImageJRoiReader.read(...
+                fullfile(testCase.dataFolder, 'RoiSet.zip'), [242, 360]);
+            testCase.verifyEqual(numel(unique(out1)), 5);
+
+            % Polygon ROIs
+            out2 = aod.builtin.readers.ImageJRoiReader.read(...
+                fullfile(testCase.dataFolder, 'Polygon_RoiSet.zip'), [242, 360]);
+            testCase.verifyEqual(numel(unique(out2)), 4);
+        end
+    end
+
+    methods (Test, TestTags="Local")
+        function IconFolder(testCase)
+            testCase.verifyEqual(...
+                aod.app.util.getIconFolder(),...
+                string(fullfile(getAOData(), 'src', '+aod', '+app', "+icons")) + filesep);
         end
     end
 end

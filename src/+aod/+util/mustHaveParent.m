@@ -24,5 +24,6 @@ function mustHaveParent(obj)
     if isempty(obj.Parent)
         eidType = 'mustHaveParent:NoParent';
         msgType = sprintf('Entity %u does not have parent', obj.groupName);
+        throwAsCaller(MException(eidType, msgType));
     end
     

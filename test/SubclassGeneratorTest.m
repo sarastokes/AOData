@@ -55,6 +55,23 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
     end
 
+    methods (Test, TestTags=["Model"])
+        function SubclassGenerator(testCase)
+            M = aod.app.models.SubclassGenerator('MyNewClass');
+            testCase.verifyEqual(M.ClassName, "MyNewClass");
+
+            D1 = aod.util.templates.PropertySpecification('Dset1');
+            D2 = aod.util.templates.PropertySpecification('Dset2');
+            D3 = aod.util.templates.PropertySpecification('Dset3');
+
+            M.addDataset([D1 D2]);
+            M.addDataset(D3);
+            [out, idx] = M.getDataset('Dset2');
+            testCase.verifyEqual(out.Name, D2.Name);
+            testCase.verifyEqual(idx, 2);
+            testCase.verifyEmpty(M.hasSetMethod());
+        end
+    end
 
     methods (Test, TestTags=["Controller", "SubclassGenerator"])
         function AppOpenClose(testCase)

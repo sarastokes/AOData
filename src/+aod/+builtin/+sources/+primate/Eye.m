@@ -1,5 +1,5 @@
 classdef Eye < aod.core.sources.Eye 
-% EYE
+% Primate eye
 %
 % Description:
 %   Primate eye
@@ -20,12 +20,11 @@ classdef Eye < aod.core.sources.Eye
 %
 % Dependent properties:
 %   micronsPerDegree
+%       Microns per degree of visual angle
 %
 % Methods:
 %   value = deg2um(obj, deg)
 %   value = um2deg(obj, um)
-%   value = micronsPerPixel(obj, fovDegrees)
-%   value = degreesPerPixel(obj, fovDegrees)
 %   otf = getOTF(obj, wavelength, sf)
 
 % By Sara Patterson, 2022 (AOData)
@@ -39,69 +38,52 @@ classdef Eye < aod.core.sources.Eye
         function obj = Eye(whichEye, varargin)
             obj = obj@aod.core.sources.Eye(whichEye, varargin{:});
 
-            obj.setParam('MicronsPerDegree', obj.micronsPerDegree());
-        end
-        
-        
-    end
-
-    
-    methods
-        function value = deg2um(obj, deg)
-            value = obj.micronsPerDegree * deg;
-        end
-
-        function value = um2deg(obj, um)
-            value = um ./ obj.micronsPerDegree;
+            if obj.hasParam('AxialLength')
+                obj.setParam('MicronsPerDegree', obj.micronsPerDegree());
+            end
         end
 
         function value = get.micronsPerDegree(obj)
-
-            if ~obj.hasParam('AxialLength')
+            if isempty(obj.getParam('AxialLength'))
                 value = [];
             else
                 value = 291.2 * (obj.getParam('AxialLength') / 24.2);
             end
         end
+    end
 
-        function value = micronsPerPixel(obj, fovDegrees)
-            % MICRONSPERPIXEL
+    
+    methods
+        function value = deg2um(obj, deg)
+            % Convert degrees to microns
             %
             % Syntax:
-            %   umPerPixel = obj.micronsPerPixel(fovDegrees)
-            % 
-            % Input:
-            %   fovDegrees      numeric [1 x 2]
-            %       Field of view in degrees
-            %
-            % Notes:
-            %   Assumes 256 lines 
+            %   value = deg2um(obj, um)
             % -------------------------------------------------------------
-            value = obj.deg2um(fovDegrees) / 256;
+            obj.checkAxialLength();
+            value = obj.micronsPerDegree * deg;
         end
 
-        function value = degreesPerPixel(obj, fovDegrees)
-            % DEGREESPERPIXEL
+        function value = um2deg(obj, um)
+            % Convert microns to degrees
             %
             % Syntax:
-            %   value = obj.degreesPerPixel(fovDegrees)
-            % 
-            % Input:
-            %   fovDegrees      numeric [1 x 2]
-            %       Field of view in degrees
+            %   value = um2deg(obj, um)
             % -------------------------------------------------------------
-            umPerPix = obj.micronsPerPixel(fovDegrees);
-            value = obj.um2deg(umPerPix);
+
+            obj.checkAxialLength();
+            value = um ./ obj.micronsPerDegree;
         end
 
         function otf = getOTF(obj, wavelength, sf)
-            % GETOTF
+            % Calculate the OTF
             %
             % Syntax:
             %   otf = getOTF(obj, wavelength, sf)
             % -------------------------------------------------------------
-            if ~obj.hasParam('PupilSize')
-                error('OTF calculation requires pupilSize property!');
+            if ~isempty(obj.getParam('PupilSize'))
+                error('getOTF:NoPupilSize',...
+                    'OTF calculation requires pupilSize property!');
             end
 
             u0 = (obj.getParam('PupilSize') * pi * 10e5) / (wavelength * 180);
@@ -120,7 +102,16 @@ classdef Eye < aod.core.sources.Eye
             value.add('PupilSize', 6.7, @isnumeric,...
                 'Pupil size of the eye in mm');
             value.add('MicronsPerDegree', [], @isnumeric,...
-                'Microns per degree of visual angle, from axial length');
+                'Microns per degree of visual angle calculated from axial length');
+        end
+    end
+
+    methods (Access = private)
+        function checkAxialLength(obj)
+            if isempty(obj.getParam('AxialLength'))
+                error('checkAxialLength:NoValue',...
+                    'Axial length must be set for this calculation');
+            end
         end
     end
 end

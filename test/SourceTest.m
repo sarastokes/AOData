@@ -145,4 +145,18 @@ classdef SourceTest < matlab.unittest.TestCase
                 "remove:InvalidID")
         end
     end
+
+    methods (Test, TestTags="Primate")
+        function PrimateEye(testCase)
+            OS = aod.builtin.sources.primate.Eye('OS',...
+                'AxialLength', 17);
+            testCase.verifyEqual(OS.micronsPerDegree,... 
+                291.2 * (17/24.2));
+            testCase.verifyEqual(OS.um2deg(1), 1/OS.micronsPerDegree);
+            testCase.verifyEqual(OS.deg2um(1), OS.micronsPerDegree * 1);
+
+            OD = aod.builtin.sources.primate.Eye('OD');
+            testCase.verifyEmpty(OD.micronsPerDegree);
+        end
+    end
 end 

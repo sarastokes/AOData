@@ -35,6 +35,10 @@ classdef ReturnTypes
                     out = ReturnTypes.PARAMETER;
                 case 'dataset'
                     out = ReturnTypes.DATASET;
+                case 'parent'
+                    out = ReturnTypes.PARENT;
+                case 'child'
+                    out = ReturnTyimes.CHILD;
                 otherwise
                     error("init:InvalidInput",...
                         "Unrecognized return type %s", txt);
