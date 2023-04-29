@@ -19,7 +19,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 % Notes:
 %   HDF file will write to current directory as 'ToyExperiment.h5'
     
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     if nargin < 1 || isempty(writeToHDF)
@@ -38,22 +38,43 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     experiment.setNote('This is the second note');
 
     % Add a source
-    source = sara.factories.SubjectFactory.create(851, 'OS', 'Right');
+    source = aod.builtin.sources.primate.Primate('MC00851',...
+        "Species", "macaca fascicularis",...
+        "Sex", "male",...
+        "Demographics", "GCaMP6s; rhodamine (right SC)");
+    source.add(aod.builtin.sources.primate.Eye(...
+        'OD', "AxialLength", 18.47, "PupilSize", 6.7));
+    source.Sources(1).add(aod.core.sources.Location("Right"));
+
     experiment.add(source);
 
     % System
     system = aod.core.System('Base');
-    %channel1 = aod.core.Channel('CalciumImaging');
-    %channel1.add(aod.core.builtin.devices.Pinhole(25));
-    %channel1.add(aod.core.builtin.devices.LightSource(488));
-    %channel2 = aod.core.Channel('ReflectanceImaging');
-    %channel2.add(aod.builtin.devices.Pinhole(20));
-    [~, system] = sara.factories.ChannelFactory.create(...
-        'MustangImaging', system, 'Pinhole', 25);
-    [~, system] = sara.factories.ChannelFactory.create(...
-        'ReflectanceImaging', system);
-    [~, system] = sara.factories.ChannelFactory.create(...
-        'WavefrontSensing', system);
+    channel1 = aod.core.Channel('WavefrontSensing');
+    channel1.add(aod.builtin.devices.LightSource(847,...
+        "Manufacturer", "QPhotonics"));
+    
+    channel2 = aod.core.Channel("ReflectanceImaging");
+    channel2.add(aod.builtin.devices.LightSource(796,...
+        "Manufacturer", "SuperLum"));
+    channel2.add(aod.builtin.devices.Pinhole(20,...
+        "Manufacturer", "ThorLabs", "Model", "P20K"));
+    channel2.add(aod.builtin.devices.PMT("ReflectancePMT"));
+    
+    channel3 = aod.core.Channel("FluorescenceImaging");
+    channel3.add(aod.builtin.devices.LightSource(561,...
+        "Manufacturer", "Qioptiq"));
+    channel3.add(aod.builtin.devices.Pinhole(25,...
+        "Manufacturer", "ThorLabs", "Model", "P25K"));
+    channel3.add(aod.builtin.devices.PMT("VisiblePMT",...
+        "Manufacturer", "Hamamatsu", "Model", "H16722"));
+    dichroic = aod.builtin.devices.BandpassFilter(607, 70,...
+        "Manufacturer", "Semrock", "Model", "FF01-590/20"); 
+    dichroic.setTransmission(fullfile(...
+        test.util.getAODataTestFolder(), "test_data", "FF01-607_70.txt"));
+    channel3.add(dichroic);
+
+    system.add([channel1, channel2, channel3]);
     experiment.add(system);
 
     % Calibrations

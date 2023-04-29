@@ -6,8 +6,11 @@ function writeEntity(hdfName, obj)
 %
 % Syntax:
 %   aod.h5.writeEntity(hdfName, entity)
+%
+% See also:
+%   aod.h5.writeExperimentToFile, aod.h5.write
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     arguments
         hdfName             {mustBeHdfFile(hdfName)}
@@ -68,7 +71,8 @@ function writeEntity(hdfName, obj)
     h5tools.writeatt(hdfName, hdfPath,...
         'UUID', obj.UUID, 'Class', class(obj),... 
         'EntityType', char(entityType),...
-        'LastModified', string(datetime('now')));
+        'LastModified', obj.LastModified,...
+        'DateCreated', obj.DateCreated);
 
     % Write parent link, if necessary
     if ~isequal(parentPath, '/')

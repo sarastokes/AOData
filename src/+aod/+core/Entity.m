@@ -71,9 +71,9 @@ classdef (Abstract) Entity < handle
         % Notes about the entity
         notes                       string = string.empty()
         % The date the entity was created
-        dateCreated                 datetime = datetime.empty()
+        DateCreated                 datetime = datetime.empty()
         % The date and time the entity was last modified
-        lastModified                datetime = datetime.empty()
+        LastModified                datetime = datetime.empty()
     end
 
     properties (Hidden, SetAccess = private)
@@ -117,9 +117,9 @@ classdef (Abstract) Entity < handle
 
             % Generate a random unique identifier to distinguish the class
             obj.UUID = aod.util.generateUUID();
-            % Get current time for dateCreated and lastModified
-            obj.dateCreated = datetime("now");
-            obj.lastModified = obj.dateCreated;
+            % Get current time for DateCreated and LastModified
+            obj.DateCreated = datetime("now");
+            obj.LastModified = obj.DateCreated;
 
             % Set the Parent, if necessary
             if ~isempty(ip.Results.Parent)
@@ -952,13 +952,13 @@ classdef (Abstract) Entity < handle
         end
 
         function onPropertyChange(obj, ~, ~)
-            % Callback to update lastModified when property changes
+            % Callback to update LastModified when property changes
             %
             % Description:
             %   Triggered by the setting of a "SetObservable" property and 
-            %   updated the lastModified property to current date/time
+            %   updated the LastModified property to current date/time
             % -------------------------------------------------------------
-            obj.lastModified = datetime("now");
+            obj.LastModified = datetime("now");
         end
     end
 

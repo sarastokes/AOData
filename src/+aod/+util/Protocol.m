@@ -17,7 +17,7 @@ classdef (Abstract) Protocol < handle
 %
 % Properties:
 %   calibration         aod.core.Calibration (optional)
-%   dateCreated         datetime, when the protocol was created
+%   DateCreated         datetime, when the protocol was created
 %
 % Dependent properties:
 %   totalTime           total stimulus time (from calculateTotalTime)
@@ -41,7 +41,7 @@ classdef (Abstract) Protocol < handle
 
     properties  
         Calibration     aod.core.Calibration    = aod.core.Calibration.empty()
-        dateCreated     datetime                = datetime.empty()
+        DateCreated     datetime                = datetime.empty()
     end
 
     properties (Abstract, SetAccess = protected)
@@ -64,7 +64,7 @@ classdef (Abstract) Protocol < handle
                 obj.Calibration = aod.core.empty.Calibration();
             end
 
-            obj.dateCreated = getDateYMD();
+            obj.DateCreated = getDateYMD();
         end
 
         function setCalibration(obj, calibration)

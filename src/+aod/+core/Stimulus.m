@@ -11,15 +11,15 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = aod.core.Stimulus(name)
 %   obj = aod.core.Stimulus(name, protocol)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Calibration                 aod.core.Calibration
+        Calibration                 {aod.util.mustBeEntityType(Calibration, 'Calibration')} = aod.core.Calibration.empty()
 
         protocolClass               char = char.empty()
         protocolName                char = char.empty()
-        dateProtocolCreated         datetime = datetime.empty()
+        DateProtocolCreated         datetime = datetime.empty()
     end
     
     methods
@@ -64,7 +64,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             end 
             
             obj.protocolClass = class(protocol);
-            obj.dateProtocolCreated = protocol.dateCreated;
+            obj.DateProtocolCreated = protocol.DateCreated;
             obj.setFile('Protocol', fileparts(protocol.getFileName()));
             [~, obj.protocolName, ~] = fileparts(protocol.getFileName());
             obj.getProtocolParameters(protocol);
@@ -111,8 +111,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
                     end
                     if strcmpi(propName, 'Calibration')
                         obj.setCalibration(protocol.(propName));
-                    elseif strcmpi(propName, 'dateCreated')
-                        obj.dateProtocolCreated = protocol.(propName);
+                    elseif strcmpi(propName, 'DateCreated')
+                        obj.DateProtocolCreated = protocol.(propName);
                     else
                         obj.setParam(propName, protocol.(propName));
                     end

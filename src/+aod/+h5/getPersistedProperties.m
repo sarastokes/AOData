@@ -45,8 +45,8 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
     containerProps = entityType.childContainers();
     
     alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
-    alwaysAttributeProps = ["UUID", "label", "parameters", "entityType", "dateCreated"];
-    alwaysAbandonedProps = "Reader";  %% TODO
+    alwaysAttributeProps = ["UUID", "label", "parameters", "entityType", "DateCreated", "LastModified"];
+    alwaysAbandonedProps = "Reader";  %! TODO
     persistedProps = [];
     attributeProps = [];
     abandonedProps = [];

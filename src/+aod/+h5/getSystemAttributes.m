@@ -12,9 +12,9 @@ function out = getSystemAttributes()
 % See also:
 %   aod.h5.getPersistedProperties
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     out = ["Class", "UUID", "EntityType",... 
         "EnumClass", "Format", "ColumnClass",...
-        "LastModified", "label", "dateCreated"];
+        "LastModified", "label", "DateCreated"];

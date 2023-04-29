@@ -218,6 +218,16 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.SMALL_EXPT.add(analysis);
             testCase.verifyNumElements(testCase.SMALL_EXPT.Analyses, 1);
 
+            % Source
+            source = aod.core.Source("SourceA");
+            testCase.SMALL_EXPT.add(source);
+            testCase.verifyNumElements(testCase.SMALL_EXPT.Sources(1), 1);
+            testCase.SMALL_EXPT.Sources(1).add(aod.core.Source("SourceB"));
+            % Check with output of persistent get function
+            matches = testCase.SMALL_EXPT.search('Source');
+            testCase.verifyNumElements(matches, 2);
+
+            % System
             system = aod.core.System("TestSystem");
             testCase.SMALL_EXPT.add(system);
             testCase.verifyNumElements(testCase.SMALL_EXPT.Systems, 1);
