@@ -8,13 +8,12 @@ classdef QueryManager < handle
 %   obj = aod.api.QueryManager(hdfName)
 %
 % Public methods:
-%   groupNames = getMatches(obj)
+%   [matches, entityInfo] = filter(obj)
 %   tag = describe(obj)
 %   addFilter(obj, varargin)
 %   removeFilter(obj, filterID)
 %
 % Notes:
-% - Create QueryManager with HDF5 file input
 % - QM.addFilter({'Name', 'Right'})
 
 % By Sara Patterson, 2023 (AOData)
@@ -66,11 +65,11 @@ classdef QueryManager < handle
     end
 
     methods 
-        function [matches, idx] = filter(obj)
+        function [matches, entityInfo] = filter(obj)
             % Filter entities and return the matches
             %
             % Syntax:
-            %   [matches, idx] = filter(obj)
+            %   [matches, entityInfo] = filter(obj)
             % -------------------------------------------------------------
 
             if isempty(obj.Filters)
@@ -86,8 +85,8 @@ classdef QueryManager < handle
             end
 
             idx = find(obj.filterIdx);
-
-            matches = obj.entityTable(idx,:);
+            entityInfo = obj.entityTable(idx,:);
+            matches = obj.row2entity(idx);
         end
 
         function tag = describe(obj)
@@ -200,6 +199,20 @@ classdef QueryManager < handle
                 obj.filterIdx = true(height(obj.entityTable), 1);
             end
         end
+
+        function entity = row2entity(obj, rowIdx)
+            % Get persistent entity correspondng to row in entityTable
+            %
+            % Syntax:
+            %   rowIdx          integer
+            %       Row in entityTable
+            % ----------------------------------------------------------
+
+            hdfPath = obj.entityTable.Path(rowIdx);
+            exptName = obj.entityTable.File(rowIdx);
+            expt = obj.Experiments(ismember(obj.hdfName, exptName));
+            entity = expt.getByPath(hdfPath);
+        end
     end
 
     % Utility functions
@@ -217,15 +230,16 @@ classdef QueryManager < handle
 
     % Instantiate and run in one line
     methods (Static)
-        function [matches, idx] = go(hdfName, varargin)
+        function [matches, entityInfo] = go(expt, varargin)
             % Create the manager and run the filters in one step
             %
             % Syntax:
             %   [matches, idx] = aod.api.QueryManager(hdfName, varargin)
             % -------------------------------------------------------------
-            QM = aod.api.QueryManager(hdfName);
+
+            QM = aod.api.QueryManager(expt);
             QM.addFilter(varargin{:});
-            [matches, idx] = QM.filter();
+            [matches, entityInfo] = QM.filter();
         end
     end
 end 

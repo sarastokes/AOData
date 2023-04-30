@@ -10,23 +10,26 @@ classdef (ConstructOnLoad) LinkEvent < event.EventData
 % Constructor:
 %   obj = aod.persistent.events.LinkEvent(name, value)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
-        Name
+        Name                char
         Value
+        NewLink             logical 
     end
 
     methods
-        function obj = LinkEvent(name, value)
+        function obj = LinkEvent(name, value, newLink)
             arguments
                 name            char
                 value           = []
+                newLink         logical = false
             end
 
             obj.Name = name;
             obj.Value = value;
+            obj.NewLink = newLink;
         end
     end
 end

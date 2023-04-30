@@ -11,11 +11,25 @@ classdef Persistor < handle
 %   hdfName         char
 %       AOData HDF5 file name and path
 %
+% Properties:
+%   readOnly            logical
+%       Whether persisted experiment is read-only or not
+%
 % Events:
 %   EntityChanged       --> aod.persistent.EntityFactory
+% Subscriptions:
+%   AttributeChanged    <-- aod.persistent.Entity
+%   DatasetChanged      <-- aod.persistent.Entity
+%   FileChanged         <-- aod.persistent.Entity
+%   GroupChanged        <-- aod.persistent.Entity
+%   LinkChanged         <-- aod.persistent.Entity
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+
+    events
+        EntityChanged
+    end
 
     properties (SetAccess = private)
         readOnly        logical
@@ -24,10 +38,6 @@ classdef Persistor < handle
     properties (Access = private)
         hdfName
         UUIDs
-    end
-
-    events
-        EntityChanged
     end
 
     methods
@@ -77,9 +87,28 @@ classdef Persistor < handle
             % Syntax:
             %   onLinkChanged(obj, src, evt)
             % ----------------------------------------------------------
+            linkPath = h5tools.util.buildPath(src.hdfPath, evt.Name);
+            fprintf('onLinkChanged: processing %s\n', linkPath);
+
             if isempty(evt.Value)
                 % Link removed
-                h5tools.deleteObject(obj.hdfName, char(src.hdfPath));
+                h5tools.deleteObject(obj.hdfName, h5tools.util.buildPath(... 
+                    src.hdfPath, evt.Name));
+            else
+                try 
+                    %! Use exists instead of try/catch
+                    h5tools.writelink(obj.hdfName,...
+                        src.hdfPath, evt.Name, evt.Value.hdfPath);
+                catch
+                    % As far as I can find, there's no way to change an 
+                    % existing softlink so pull metadata, delete, recreate
+                    linkAttr = h5tools.readatt(obj.hdfName, linkPath, 'all');
+                    h5tools.deleteObject(obj.hdfName, linkPath);
+                    % Recreate the link and add original attributes
+                    h5tools.writelink(obj.hdfName,...
+                        src.hdfPath, evt.Name, evt.Value.hdfPath);
+                    h5tools.writeatt(obj.hdfName, linkPath, linkAttr);
+                end
             end
         end
 

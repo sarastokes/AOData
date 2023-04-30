@@ -56,8 +56,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         Parent                  % aod.persistent.Entity
         % A unique identifier for the entity
         UUID                    string
+        % When the entity was first created
+        DateCreated             datetime 
         % When the entity's HDF5 group was last modified
-        lastModified            datetime
+        LastModified            datetime
         % Specification of expected metadata 
         expectedParameters      = aod.util.ParameterManager
     end
@@ -158,9 +160,27 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
     % Navigation methods
     methods
         function out = getHomeDirectory(obj)
+            % Get home directory from parent Experiment
+            %
+            % Syntax:
+            %   out = getHomeDirectory(obj)
+            % -------------------------------------------------------------
         
             h = obj.ancestor('Experiment');
             out = h.homeDirectory;
+        end
+
+        function [entity, entityInfo] = query(obj, varargin)
+            % Query existing entities throughout the experiment
+            %
+            % Syntax:
+            %   out = query(obj, varargin)
+            %
+            % Inputs:
+            %   See QueryTutorial.md for input information
+            % -------------------------------------------------------------
+
+            [entity, entityInfo] = aod.api.QueryManager.go(obj, varargin{:});
         end
 
         function h = ancestor(obj, entityType)
@@ -196,6 +216,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             arguments
                 obj
                 hdfPath     string 
+            end
+
+            if ~isscalar(hdfPath)
+                e = aod.util.arrayfun(@(x) getByPath(obj, x), hdfPath);
+                return
             end
 
             try
@@ -282,8 +307,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     "No link/dataset matches %s", propName);
             end
 
-            % Make the change in the MATLAB object
-            delete(p);
+            % Core class properties are not removed
+            % TODO: Keep empty prop while MATLAB obj is up???
+            if isa(p, 'meta.DynamicProperty')
+                delete(p);
+            end
         end
         
     end
@@ -736,10 +764,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.entityClassName = obj.loadAttribute('Class');
             lastModTime = obj.loadAttribute('LastModified');
             if ~isempty(lastModTime)
-                % TODO Improve datetime!!!
-                lastModTime = extractBefore(lastModTime, " (");
-                obj.lastModified = datetime(lastModTime, ...
-                    'Format', 'dd-MMM-uuuu HH:mm:ss');
+                obj.LastModified = datetime(lastModTime);
             end
 
             % Parse the remaining attributes
@@ -794,7 +819,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 a = [];
                 return
             end
-            a = h5readatt(obj.hdfName, obj.hdfPath, name);
+            a = h5tools.readatt(obj.hdfName, obj.hdfPath, name);
         end
 
         function e = loadLink(obj, name)
@@ -943,7 +968,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % ------------------------------------------------------------- 
             newValue = datetime('now');
             obj.setAttribute('LastModified', newValue);
-            obj.lastModified = newValue;
+            obj.LastModified = newValue;
         end
 
         function setLink(obj, linkName, linkValue)

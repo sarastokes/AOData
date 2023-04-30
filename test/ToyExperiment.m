@@ -43,7 +43,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
         "Sex", "male",...
         "Demographics", "GCaMP6s; rhodamine (right SC)");
     source.add(aod.builtin.sources.primate.Eye(...
-        'OD', "AxialLength", 18.47, "PupilSize", 6.7));
+        'OS', "AxialLength", 18.47, "PupilSize", 6.7));
     source.Sources(1).add(aod.core.sources.Location("Right"));
 
     experiment.add(source);
@@ -94,13 +94,14 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     experiment.add(dset1);
 
     % Epochs
-    epoch = aod.core.Epoch(1, 'Source', source, 'System', system);
+    epoch = aod.core.Epoch(1, 'System', system,...
+        'Source', experiment.get('Source', {'Name', 'Right'}));
     epoch.setFile('PresyncFile', fullfile(cd, 'PresyncFile.txt'));
     experiment.add(epoch);
     epoch.setTiming(1:5);
     epoch.setFile('PostSyncFile', fullfile(cd, 'PostSyncFile.txt'));
     
-    experiment.add(aod.core.Epoch(2, 'Source', source));
+    experiment.add(aod.core.Epoch(2, 'Source', epoch.Source));
     setParam(experiment.Epochs, 'RefPmtGain', 0.51);
 
     % Registrations

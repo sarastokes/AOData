@@ -213,6 +213,19 @@ classdef PersistorTest < matlab.unittest.TestCase
             % TODO: Remove property
         end
 
+        function Links(testCase)
+            % Edit a link
+            newTargetPath = testCase.EXPT.Sources(1).hdfPath;
+            testCase.EXPT.Epochs(1).addDataset('Source', testCase.EXPT.Sources(1));
+            links = aod.h5.collectExperimentLinks(testCase.EXPT);
+            testCase.verifyTrue(ismember(newTargetPath, links.Target));
+            % Restore the original link
+            oldTarget = testCase.EXPT.Sources(1).Sources(1).Sources(1);
+            testCase.EXPT.Epochs(1).addDataset('Source', oldTarget);
+            links = aod.h5.collectExperimentLinks(testCase.EXPT);
+            testCase.verifyTrue(strcmp(oldTarget.hdfPath, links.Target(1)));
+        end
+
         function addEntity(testCase)
             analysis = aod.core.Analysis("TestAnalysis");
             testCase.SMALL_EXPT.add(analysis);
@@ -224,7 +237,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyNumElements(testCase.SMALL_EXPT.Sources(1), 1);
             testCase.SMALL_EXPT.Sources(1).add(aod.core.Source("SourceB"));
             % Check with output of persistent get function
-            matches = testCase.SMALL_EXPT.search('Source');
+            matches = testCase.SMALL_EXPT.query({'Entity', 'Source'});
             testCase.verifyNumElements(matches, 2);
 
             % System

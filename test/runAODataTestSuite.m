@@ -31,6 +31,8 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
+    tic 
+
     ip = inputParser();
     addParameter(ip, 'Coverage', false, @islogical);
     addParameter(ip, 'KeepFiles', false, @islogical);
@@ -57,7 +59,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
     % Run the test suite
     if coverageFlag
         results = testWithCoverageReport(debugFlag);
-        [coverageTable, detailTable] = test.readCoverageReport(fullfile(pwd, 'coverage_report'));
+        [coverageTable, detailTable] = test.util.readCoverageReport(fullfile(pwd, 'coverage_report'));
         % Summarize the results by package
         packageNames = ["+api", "+app", "+builtin", "+core", "+infra", "+h5", "+persistent", "+util"];
         packageCoverage = struct();
@@ -91,6 +93,8 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 
     % Return to user's previous working directory
     cd(currentCD);
+
+    fprintf('TOTAL TEST TIME = %.2f\n', toc);
 end
 
 function results = testWithoutCoverageReport(debugFlag)
