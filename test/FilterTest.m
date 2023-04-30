@@ -30,6 +30,8 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.FILENAME = fullfile(testDir, 'ToyExperiment.h5');
             if ~exist(testCase.FILENAME, 'file')
                 [~, testCase.EXPT] = ToyExperiment(true, true);
+            else
+                testCase.EXPT = loadExperiment(testCase.FILENAME);
             end
             testCase.QM = aod.api.QueryManager(testCase.FILENAME);
 
@@ -107,6 +109,53 @@ classdef FilterTest < matlab.unittest.TestCase
         end
     end
 
+    methods (Test, TestTags=["PathFilter", "AOQuery"])
+        function PathFilter(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            PF1 = aod.api.PathFilter(testCase.QM, "/Experiment");
+            idx = PF1.apply();
+            testCase.verifyNumElements(find(idx), 1);
+            testCase.verifyEqual(PF1.describe(),... 
+                string('PathFilter: Path="/Experiment"')); %#ok<STRQUOT>
+            
+            PF2 = aod.api.PathFilter(testCase.QM, @(x) endsWith(x, "Experiment"));
+            idx = PF2.apply();
+            testCase.verifyNumElements(find(idx), 1);
+        end
+
+        function PathFilterWarning(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            PF = aod.api.PathFilter(testCase.QM, "/BadPath");
+            testCase.verifyWarning(...
+                @() PF.apply(), "apply:NoMatches");
+        end
+    end
+
+    methods (Test, TestTags=["UuidFilter", "AOQuery"])
+        function UuidFilter(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            UF = aod.api.UuidFilter(testCase.QM, testCase.EXPT.UUID);
+            idx = UF.apply();
+            testCase.verifyEqual(nnz(idx), 1);
+            testCase.verifyTrue(contains(UF.describe(), testCase.EXPT.UUID));
+        end
+
+        function UuidFilterWarning(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            UF = aod.api.UuidFilter(testCase.QM, aod.util.generateUUID());
+            testCase.verifyWarning(...
+                @()UF.apply(), "apply:NoMatches");
+        end
+    end
+
     methods (Test, TestTags=["ClassFilter", "AOQuery"])
         function ClassFilter(testCase)
             % Clear filters in case prior method errored
@@ -176,9 +225,9 @@ classdef FilterTest < matlab.unittest.TestCase
             % There should always be just one Experiment per file
             EF = aod.api.EntityFilter(testCase.QM, 'Experiment');
             testCase.QM.addFilter(EF);
-            [matches, idx] = testCase.QM.filter();
-            testCase.verifyEqual(numel(idx), 1);
-            testCase.verifyEqual(height(matches), 1);
+            [matches, entityInfo] = testCase.QM.filter();
+            testCase.verifyEqual(numel(matches), 1);
+            testCase.verifyEqual(height(entityInfo), 1);
             EF.describe();
             % Alt initialization
             testCase.QM.addFilter({'Entity', 'Experiment'});
@@ -327,7 +376,7 @@ classdef FilterTest < matlab.unittest.TestCase
             [matches, idx] = testCase.QM.filter();
             warning('on', 'apply:NoMatches');
             testCase.verifyEmpty(matches);
-            testCase.verifyEqual(nnz(idx), 0);
+            testCase.verifyEmpty(idx);
             testCase.QM.clearFilters();
         end
     end

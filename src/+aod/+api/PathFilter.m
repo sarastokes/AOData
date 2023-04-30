@@ -1,4 +1,4 @@
-classdef ClassFilter < aod.api.FilterQuery 
+classdef PathFilter < aod.api.FilterQuery 
 % Filter entities based on original MATLAB class
 %
 % Description:
@@ -8,66 +8,65 @@ classdef ClassFilter < aod.api.FilterQuery
 %   aod.api.FilterQuery
 %
 % Constructor:
-%   obj = aod.api.ClassFilter(parent, className)
+%   obj = aod.api.PathFilter(parent, pathName)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        % Name of target class
-        Name
+        PathName         
     end
-    
+
     properties (SetAccess = private)
-        allClassNames
+        allPathNames    string 
     end
 
-    methods
-        function obj = ClassFilter(parent, className)
-            obj = obj@aod.api.FilterQuery(parent);
+    methods 
+        function obj = PathFilter(parent, pathName)
+            obj@aod.api.FilterQuery(parent);
 
-            obj.Name = className;
+            obj.PathName = pathName;
 
-            obj.collectClassNames();
+            obj.collectPathNames();
         end
     end
 
     % Implementation of FilterQuery abstract methods
-    methods
+    methods 
         function tag = describe(obj)
-            tag = sprintf("ClassFilter: Name=%s", value2string(obj.Name));
+            tag = sprintf("PathFilter: Path=%s", value2string(obj.PathName));
         end
 
         function out = apply(obj)
+            
             % Update local match indices to match those in Query Manager
             obj.localIdx = obj.getQueryIdx();
-            
-            if isa(obj.Name, 'function_handle')
-                for i = 1:numel(obj.allClassNames)
+
+            if isa(obj.PathName, 'function_handle')
+                for i = 1:numel(obj.allPathNames)
                     if obj.localIdx(i)
-                        obj.localIdx(i) = obj.Name(obj.allClassNames(i));
+                        obj.localIdx(i) = obj.PathName(obj.allPathNames(i));
                     end
                 end
             else
-                idx = strcmpi(obj.Name, obj.allClassNames) & obj.localIdx;
+                idx = strcmpi(obj.allPathNames, obj.PathName) & obj.localIdx;
                 obj.localIdx = idx;
             end
 
             % Throw a warning if nothing matched the filter
             if nnz(obj.localIdx) == 0
                 warning('apply:NoMatches',...
-                    'ClassFilter for %s returned no matches',... 
-                        value2string(obj.Name)); 
+                    'PathFilter for %s returned no matches', value2string(obj.PathName));
             end
 
             out = obj.localIdx;
         end
     end
 
-    methods (Access = protected)
-        function collectClassNames(obj)
+    methods (Access = private)
+        function collectPathNames(obj)
             entities = obj.getEntityTable();
-            obj.allClassNames = entities.Class;
+            obj.allPathNames = entities.Path;
         end
     end
 end 
