@@ -17,7 +17,7 @@ classdef ProtocolTest < matlab.unittest.TestCase
         function DateCreated(testCase)
             protocol1 = test.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
-                'BaseIntensity', 0.5, 'Contrast', 1);
+                'BaseIntensity', 0, 'Contrast', 1);
             test.util.verifyDatesEqual(testCase, protocol1.DateCreated, getDateYMD());
         end
 

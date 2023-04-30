@@ -63,6 +63,10 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, FilterTypes.PARENT);
             out = FilterTypes.init('child');
             testCase.verifyEqual(out, FilterTypes.CHILD);
+            out = FilterTypes.init('path');
+            testCase.verifyEqual(out, FilterTypes.PATH);
+            out = FilterTypes.init('uuid');
+            testCase.verifyEqual(out, FilterTypes.UUID);
             
             testCase.verifyError(...
                 @() FilterTypes.init('BadInput'),...

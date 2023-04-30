@@ -42,7 +42,7 @@ The persistent interface offers extended capabilities for viewing the contents o
 In addition to managing metadata, AOData provides a standardized framework for the code used to  design, represent and analyze experiments. Support for tracking git repositories is included with AOData and information about the underlying git repositories is written to each file.  
 
 ### Timeline
-AOData is largely stable and well-documented within the code. Current development is focused on improving AOQuery, creating useful tutorials and expanding the test suite. As of March, code coverage is >75%. Over the next few months, AOData will be tested within the Williams lab, then formally released. In the meantime, reach out if your group is interested in learning more about AOData. 
+AOData is largely stable and well-documented within the code. Current development is focused on improving AOQuery, creating useful tutorials and expanding the test suite. As of April, code coverage is >80%. Over the next few months, AOData will be tested within the Williams lab, then formally released. In the meantime, reach out if your group is interested in learning more about AOData. 
 
 The hope is that AOData will become useful to all adaptive optics imaging labs and continue to develop to meet the community's needs.
 

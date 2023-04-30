@@ -1,4 +1,14 @@
 classdef AODataViewerTest < matlab.uitest.TestCase
+% Test AODataViewer
+%
+% Syntax:
+%   results = runtests('AODataViewerTest');
+%
+% See also:
+%   runAODataTestSuite
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     properties 
         EXPT
@@ -29,8 +39,17 @@ classdef AODataViewerTest < matlab.uitest.TestCase
     end
 
     methods (Test)
+        function Appearance(testCase)
+            fh1 = testCase.APP.getFigure(); %#ok<NASGU>
+            fh = testCase.VIEW.getFigure();
+            pos = fh.Position(3:4);
+            testCase.VIEW.changeFontSize(2);
+            testCase.VIEW.resizeFigure(100, 0);
+            testCase.verifyEqual(fh.Position(3:4), pos);
+        end
+
         function SelectAndExpandExperiment(testCase)
-            
+            % Make sure all nodes are de-selected
             testCase.VIEW.Tree.SelectedNodes = [];
 
             % Select Experiment
@@ -38,6 +57,10 @@ classdef AODataViewerTest < matlab.uitest.TestCase
             testCase.choose(h);
             testCase.verifyTrue(...
                 any(contains(testCase.VIEW.Attributes.Data{:,1}, 'Administrator')));
+            % Test node identification methods
+            entity = testCase.VIEW.node2entity(h);
+            testCase.verifyEqual(entity.UUID, testCase.EXPT.UUID);
+            testCase.verifyTrue(strcmp(testCase.APP.getNodePath(h), "/Experiment"));
             
             % Expand Experiment
             expand(h);
@@ -123,7 +146,10 @@ classdef AODataViewerTest < matlab.uitest.TestCase
             testCase.press(b);
 
             selectedNode = testCase.VIEW.Tree.SelectedNodes;
-            testCase.verifyEqual(selectedNode.Text, 'MC00851_OSR');
+            testCase.verifyEqual(selectedNode.Text, 'Right');
+
+            % Return to experiment
+            testCase.scroll(h);
         end
     end
 end

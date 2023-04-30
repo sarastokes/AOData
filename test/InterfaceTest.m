@@ -32,7 +32,7 @@ classdef InterfaceTest < matlab.unittest.TestCase
             end
             matFileName = strrep(fileName, '.h5', '.mat');
             if ~exist(matFileName, 'file')
-                ToyExperiment(false, true);
+                ToyExperiment(true, true);
             end
             S = load(matFileName);
             testCase.cEXPT = S.ToyExperiment;
@@ -120,7 +120,8 @@ classdef InterfaceTest < matlab.unittest.TestCase
         
         function DeviceProperties(testCase)
             cDevice = testCase.cEXPT.Systems(1).Channels(1).Devices(1);
-            pDevice = testCase.pEXPT.Systems(1).Channels(1).Devices(1);
+            pDevice = testCase.pEXPT.query({'UUID', cDevice.UUID});
+            %pDevice = testCase.pEXPT.Systems(1).Channels(1).Devices(1);
 
             testCase.verifyEqual(cDevice.wavelength, pDevice.wavelength);
             testCase.verifyEqual(cDevice.label, pDevice.label);

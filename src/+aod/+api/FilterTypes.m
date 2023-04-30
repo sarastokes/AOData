@@ -13,6 +13,8 @@ classdef FilterTypes
         NAME
         PARENT
         CHILD
+        UUID 
+        PATH 
     end
 
     methods
@@ -36,6 +38,10 @@ classdef FilterTypes
                     out = str2func('aod.api.ParentFilter');
                 case FilterTypes.CHILD 
                     out = str2func('aod.api.ChildFilter');
+                case FilterTypes.UUID 
+                    out = str2func('aod.api.UuidFilter');
+                case FilterTypes.PATH
+                    out = str2func('aod.api.PathFilter');
             end
         end
     end
@@ -68,6 +74,10 @@ classdef FilterTypes
                     obj = FilterTypes.PARENT;
                 case 'child'
                     obj = FilterTypes.CHILD;
+                case 'path'
+                    obj = FilterTypes.PATH;
+                case 'uuid'
+                    obj = FilterTypes.UUID;
                 otherwise
                     error("init:UnknownType",...
                         'FilterType %s not recognized', filterType);

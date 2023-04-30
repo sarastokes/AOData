@@ -1,11 +1,15 @@
 classdef VisualStimulus < aod.core.Stimulus 
-% A visual stimulus presented during an AO imaging trial
+% A visual stimulus built from a Protocol
 %
 % Parent:
 %   aod.core.Stimulus
 %
 % Constructor:
 %   obj = aod.builtin.stimuli.VisualStimulus(protocol)
+%   obj = aod.builtin.stimuli.VisualStimulus 
+%
+% See also:
+%   aod.util.Protocol
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -19,7 +23,14 @@ classdef VisualStimulus < aod.core.Stimulus
     methods (Access = protected)
         function value = getLabel(obj)
             value = [];
-            txt = strsplit(obj.protocolName, '_');
+            if contains(obj.protocolName, '_')
+                txt = strsplit(obj.protocolName, '_');
+            elseif contains(obj.protocolName, '.')
+                txt = strsplit(obj.protocolName, '.');
+            else
+                value = obj.protocolName;
+                return
+            end
             for i = 1:numel(txt)
                 value = [value, appbox.capitalize(txt{i})]; %#ok<AGROW> 
             end

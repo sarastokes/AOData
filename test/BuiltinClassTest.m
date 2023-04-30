@@ -13,7 +13,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 % See also:
 %   runAODataTestSuite
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
 %#ok<*MANU>  
@@ -114,6 +114,14 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.intensity, 22);
             obj.setIntensity(23, "%");
             testCase.verifyEqual(obj.intensity, 23);
+        end
+
+        function VisualStimulus(testCase)
+            protocol1 = test.TestStimProtocol([],...
+                'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
+                'BaseIntensity', 0.5, 'Contrast', 1);
+            obj = aod.builtin.stimuli.VisualStimulus(protocol);
+            testCase.verifyTrue(strcmp(obj.label, 'TestStimProtocol'));
         end
     end
 

@@ -56,12 +56,12 @@ classdef SpecificationTest < matlab.unittest.TestCase
             % Populated DatasetManager
             cEXPT = ToyExperiment(false);
             DM = aod.util.DatasetManager.populate(cEXPT);
-            testCase.verifyEqual(DM.Count, 12);
-            testCase.verifyNumElements(DM.list, 12);
+            testCase.verifyEqual(DM.Count, 11);
+            testCase.verifyNumElements(DM.list, 11);
 
             % Remove a parameter
             DM.remove('Code');
-            testCase.verifyEqual(DM.Count, 11);
+            testCase.verifyEqual(DM.Count, 10);
 
             % Clear all parameters
             DM.clear();
