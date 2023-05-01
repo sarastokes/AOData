@@ -55,6 +55,20 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
     end
 
     methods
+        function p = get(obj, paramName)
+            % Get an ExpectedParameter, if it exists
+            %
+            % Syntax:
+            %   p = get(obj, paramName)
+            % -------------------------------------------------------------
+            [tf, idx] = obj.hasParam(paramName);
+            if tf 
+                p = obj.ExpectedParameters(idx);
+            else
+                p = [];
+            end
+        end
+
         function add(obj, param, defaultValue, validationFcn, description)
             % Add a new expected parameter
             %
@@ -158,7 +172,7 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             % ----------------------------------------------------------
 
             if isempty(obj.ExpectedParameters)
-                tf = false;
+                tf = false; idx = [];
                 return
             end
             

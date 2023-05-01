@@ -16,6 +16,26 @@ classdef SpecificationTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    methods (Test, TestTags="Parameter")
+        function ParameterFunctions(testCase)
+            obj = aod.builtin.devices.BandpassFilter(510, 20);
+            p = obj.expectedParameters.get('Bandwidth');
+            testCase.verifyEqual(p.Name, 'Bandwidth');
+
+            % Set/remove expected parameter
+            obj.setParam('Bandwidth', 30);
+            testCase.verifyEqual(obj.parameters('Bandwidth'), 30);
+            obj.removeParam('Bandwidth');
+            testCase.verifyTrue(obj.parameters.isKey('Bandwidth'));
+            testCase.verifyEmpty(obj.parameters('Bandwidth'));
+
+            % Set/remove adhoc parameter
+            obj.setParam('RandomParam', true);
+            obj.removeParam('RandomParam');
+            testCase.verifyFalse(obj.parameters.isKey('RandomParam'));
+        end
+    end
+
     methods (Test, TestTags="Property")
         function PropertySpecification(testCase)
             prop = aod.util.templates.PropertySpecification("Test");

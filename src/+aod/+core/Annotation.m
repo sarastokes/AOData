@@ -36,7 +36,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 % Sealed protected methods:
 %   setData(obj, data)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -126,9 +126,9 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
         function value = specifyParameters(obj)
             value = specifyParameters@aod.core.Entity(obj);
 
-            value.add('Administrator', [], @isstring,... 
+            value.add('Administrator', string.empty(), @isstring,... 
                 'Who performed the annotation');
-            value.add('AnnotationDate', [], @isdatetime,...
+            value.add('AnnotationDate', datetime.empty(), @isdatetime,...
                 'Date annotation was performed');
         end
     end

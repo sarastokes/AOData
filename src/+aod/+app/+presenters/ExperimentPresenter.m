@@ -77,6 +77,7 @@ classdef ExperimentPresenter < appbox.Presenter
         end
 
         function e = node2entity(obj, node)
+            % Extract entity from a node
             e = obj.Experiment.getByPath(node.Tag);
         end
     end

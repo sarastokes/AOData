@@ -450,6 +450,16 @@ classdef (Abstract) Entity < handle
             %   obj.setParam(paramName, value)
             %   obj.setParam(paramName1, value1, paramName2, value2)
             %   obj.setParam(struct)
+            %
+            % Examples:
+            %   obj = aod.builtin.devices.BandpassFilter(607, 70);
+            %   % Single parameter
+            %   obj.setParam('Bandwidth', 20)
+            %   % Multiple parameters
+            %   obj.setParam('Bandwidth', 20, 'Wavelength', 510)
+            %   % From structure
+            %   S = struct('Bandwidth', 20, 'Wavelength', 510)
+            %   obj.setParam(S);
             % -------------------------------------------------------------
 
             if ~isscalar(obj)
@@ -457,15 +467,22 @@ classdef (Abstract) Entity < handle
                 return
             end
 
-            if nargin == 2 && isstruct(varargin{1})
-                S = varargin{1};
-                k = fieldnames(S);
-                for i = 1:numel(k)
-                    obj.parameters(k{i}) = S.(k{i});
+            % Run through expectedParameters parser
+            ip = obj.expectedParameters.getParser();
+            ip.parse(varargin{:});
+
+            % Set expected parameters, if needed
+            k1 = setdiff(ip.Parameters, ip.UsingDefaults);
+            if ~isempty(k1)
+                for i = 1:numel(k1)
+                    obj.parameters(k1{i}) = ip.Results.(k1{i});
                 end
-            else
-                for i = 1:(nargin - 1)/2
-                    obj.parameters(varargin{(2*i)-1}) = varargin{2*i};
+            end
+            % Set adhoc parameters, if needed
+            k2 = fieldnames(ip.Unmatched);
+            if ~isempty(k2)
+                for i = 1:numel(ip.Unmatched)
+                    obj.parameters(k2{i}) = ip.Unmatched.(k2{i});
                 end
             end
         end
@@ -478,6 +495,9 @@ classdef (Abstract) Entity < handle
             %
             % Syntax:
             %   removeParam(obj, paramName)
+            %
+            % Examples:
+            %   obj.removeParam('Bandwidth')
             % -------------------------------------------------------------
             arguments
                 obj
@@ -489,7 +509,12 @@ classdef (Abstract) Entity < handle
             end
 
             if obj.hasParam(paramName)
-                remove(obj.parameters, paramName);
+                % Set to empty if expected, remove if ad-hoc
+                if obj.expectedParameters.hasParam(paramName)
+                    obj.parameters(paramName) = [];
+                else
+                    remove(obj.parameters, paramName);
+                end
             end
         end
     end
@@ -767,7 +792,12 @@ classdef (Abstract) Entity < handle
             %   aod.util.ParameterManager
             % -------------------------------------------------------------
             ip = obj.expectedParameters.parse(varargin{:});
-            obj.setParam(ip.Results);
+            f = fieldnames(ip.Results);
+            for i = 1:numel(f)
+                if ~isempty(ip.Results.(f{i}))
+                    obj.setParam(f{i}, ip.Results.(f{i}));
+                end
+            end
         end
 
         function sync(obj)
@@ -948,7 +978,6 @@ classdef (Abstract) Entity < handle
             for i = 1:numel(idx)
                 addlistener(obj, mc.PropertyList(idx(i)).Name, 'PostSet', @obj.onPropertyChange);
             end
-
         end
 
         function onPropertyChange(obj, ~, ~)

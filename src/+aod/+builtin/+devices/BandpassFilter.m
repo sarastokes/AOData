@@ -1,5 +1,5 @@
 classdef BandpassFilter < aod.core.Device
-% BANDPASSFILTER
+% Represents a bandpass filter within a system/channel
 %
 % Constructor:
 %   obj = aod.builtin.devices.BandpassFilter(wavelength, bandwidth, varargin)
@@ -19,7 +19,7 @@ classdef BandpassFilter < aod.core.Device
 %   setBandwidth(obj, bandwidth)
 %   setTransmission(obj, transmission)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -37,16 +37,19 @@ classdef BandpassFilter < aod.core.Device
 
     methods 
         function setWavelength(obj, wavelength)
-            assert(isnumeric(wavelength), 'Wavelength must be a number');
             obj.setParam('Wavelength', wavelength);
         end
         
         function setBandwidth(obj, bandwidth)
-            assert(isnumeric(bandwidth), 'Bandwidth must be a number');
             obj.setParam('Bandwidth', bandwidth);
         end
         
         function setTransmission(obj, transmission)
+            % Set filter transmission
+            %
+            % Syntax:
+            %   setTransmission(obj, transmission)
+            % -------------------------------------------------------------
             obj.transmission = transmission;
         end
     end
@@ -61,10 +64,8 @@ classdef BandpassFilter < aod.core.Device
         function value = specifyParameters(obj)
             value = specifyParameters@aod.core.Device(obj);
 
-            value.add('Wavelength', [], @isnumeric,...
-                'Wavelength in nm');
-            value.add('Bandwidth', [], @isnumeric,...
-                'Bandwidth in nm');
+            value.add('Wavelength', [], @isnumeric, 'Wavelength in nm');
+            value.add('Bandwidth', [], @isnumeric, 'Bandwidth in nm');
         end
     end
 end 

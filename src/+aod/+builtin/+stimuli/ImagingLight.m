@@ -65,7 +65,7 @@ classdef ImagingLight < aod.core.Stimulus
         function value = specifyParameters(obj)
             value = specifyParameters@aod.core.Stimulus(obj);
 
-            value.add('IntensityUnits', [], @isstring,...
+            value.add('IntensityUnits', [], @istext,...
                 "Units for the imaging light intensity");
         end
     end

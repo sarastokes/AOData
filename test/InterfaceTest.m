@@ -121,7 +121,6 @@ classdef InterfaceTest < matlab.unittest.TestCase
         function DeviceProperties(testCase)
             cDevice = testCase.cEXPT.Systems(1).Channels(1).Devices(1);
             pDevice = testCase.pEXPT.query({'UUID', cDevice.UUID});
-            %pDevice = testCase.pEXPT.Systems(1).Channels(1).Devices(1);
 
             testCase.verifyEqual(cDevice.wavelength, pDevice.wavelength);
             testCase.verifyEqual(cDevice.label, pDevice.label);
@@ -129,7 +128,7 @@ classdef InterfaceTest < matlab.unittest.TestCase
 
         function SourceProperties(testCase)
             cSource = testCase.cEXPT.Sources(1).Sources(1);
-            pSource = testCase.pEXPT.Sources(1).Sources(1);
+            pSource = testCase.pEXPT.query({'UUID', cSource.UUID});
 
             testCase.verifyEqual(pSource.Name, cSource.Name);
             testCase.verifyEqual(pSource.micronsPerDegree, cSource.micronsPerDegree);

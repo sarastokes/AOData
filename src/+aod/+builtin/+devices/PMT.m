@@ -32,7 +32,7 @@ classdef PMT < aod.core.Device
         function value = specifyParameters(obj)
             value = specifyParameters@aod.core.Device(obj);
             
-            value.add('SerialNumber', [], @isstring,... 
+            value.add('SerialNumber', string.empty(), @isstring,... 
                 'Serial number of the light source');
         end
     end

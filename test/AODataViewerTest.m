@@ -45,7 +45,7 @@ classdef AODataViewerTest < matlab.uitest.TestCase
             pos = fh.Position(3:4);
             testCase.VIEW.changeFontSize(2);
             testCase.VIEW.resizeFigure(100, 0);
-            testCase.verifyEqual(fh.Position(3:4), pos);
+            testCase.verifyEqual(fh.Position(3:4), pos + [100 0]);
         end
 
         function SelectAndExpandExperiment(testCase)
@@ -58,7 +58,7 @@ classdef AODataViewerTest < matlab.uitest.TestCase
             testCase.verifyTrue(...
                 any(contains(testCase.VIEW.Attributes.Data{:,1}, 'Administrator')));
             % Test node identification methods
-            entity = testCase.VIEW.node2entity(h);
+            entity = testCase.APP.node2entity(h);
             testCase.verifyEqual(entity.UUID, testCase.EXPT.UUID);
             testCase.verifyTrue(strcmp(testCase.APP.getNodePath(h), "/Experiment"));
             
@@ -149,7 +149,7 @@ classdef AODataViewerTest < matlab.uitest.TestCase
             testCase.verifyEqual(selectedNode.Text, 'Right');
 
             % Return to experiment
-            testCase.scroll(h);
+            testCase.VIEW.scroll(h);
         end
     end
 end
