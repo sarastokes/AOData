@@ -9,10 +9,10 @@ classdef ExperimentPresenter < appbox.Presenter
 %   obj = aod.app.presenters.ExperimentPresenter(experiment, view)
 %
 % Inputs:
-%   experiment          char/string or aod.persistent.Experiment
+%   experiment      char/string or aod.persistent.Experiment
 %
 % Optional inputs:
-%   view                aod.app.UIView
+%   view            aod.app.UIView (default=aod.app.views.ExperimentView)
 %       Use if you want to create a modified version of ExperimentView 
 %
 % See also:
@@ -22,7 +22,7 @@ classdef ExperimentPresenter < appbox.Presenter
 % -------------------------------------------------------------------------
 
     properties 
-        Experiment
+        Experiment              aod.persistent.Experiment 
         EntityTable
         hdfName
     end
@@ -222,6 +222,7 @@ classdef ExperimentPresenter < appbox.Presenter
     % Callbacks
     methods (Access = private)
         function onViewSelectedNode(obj, ~, ~)
+            % Set up view based on contents of selected node
             obj.view.resetDisplay();
             node = obj.view.getSelectedNode();
 

@@ -36,12 +36,14 @@ function [results, packageTable] = runAODataTestSuite(varargin)
     ip = inputParser();
     addParameter(ip, 'Coverage', false, @islogical);
     addParameter(ip, 'KeepFiles', false, @islogical);
+    addParameter(ip, 'Report', false, @islogical);
     addParameter(ip, 'Debug', false, @islogical);
     parse(ip, varargin{:});
 
     coverageFlag = ip.Results.Coverage;
     fileFlag = ip.Results.KeepFiles;
     debugFlag = ip.Results.Debug;
+    reportFlag = ip.Results.Report;
 
     % Initialization
     if ~ispref('AOData', 'BasePackage')
@@ -58,7 +60,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 
     % Run the test suite
     if coverageFlag
-        results = testWithCoverageReport(debugFlag);
+        results = testWithCoverageReport(debugFlag, reportFlag);
         [coverageTable, detailTable] = test.util.readCoverageReport(fullfile(pwd, 'coverage_report'));
         % Summarize the results by package
         packageNames = ["+api", "+app", "+builtin", "+core", "+infra", "+h5", "+persistent", "+util"];
@@ -82,7 +84,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
             baseCode(1), baseCode(2), round(baseCode(1)/baseCode(2)*100,2),...
             baseCode(4), baseCode(5), round(baseCode(4)/baseCode(5)*100,2));
     else
-        results = testWithoutCoverageReport(debugFlag);
+        results = testWithoutCoverageReport(debugFlag, reportFlag);
         packageTable = [];
     end
 
@@ -97,20 +99,34 @@ function [results, packageTable] = runAODataTestSuite(varargin)
     fprintf('TOTAL TEST TIME = %.2f\n', toc);
 end
 
-function results = testWithoutCoverageReport(debugFlag)
+function results = testWithoutCoverageReport(debugFlag, reportFlag)
     import matlab.unittest.plugins.StopOnFailuresPlugin
+    import matlab.unittest.plugins.TestReportPlugin 
     suite = testsuite(pwd);
     runner = testrunner("textoutput");
+
+    % Optional plugins
     if debugFlag
         runner.addPlugin(StopOnFailuresPlugin);
     end
+
+    if reportFlag
+        plugin = TestReportPlugin.producingPDF(...
+            fullfile(pwd, 'AODataTestReport.pdf'),...
+            'IncludingPassingDiagnostics', true,...
+            'IncludingCommandWindowTest', true);
+        runner.addPlugin(plugin);
+    end
+
+    % Run the test suite
     results = runner.run(suite);
 end
 
-function results = testWithCoverageReport(debugFlag)
+function results = testWithCoverageReport(debugFlag, reportFlag)
     import matlab.unittest.plugins.CodeCoveragePlugin
     import matlab.unittest.plugins.codecoverage.CoverageReport    
     import matlab.unittest.plugins.StopOnFailuresPlugin
+    import matlab.unittest.plugins.TestReportPlugin 
     
     if ~exist('coverage_report', 'dir')
         mkdir('coverage_report');
@@ -118,14 +134,26 @@ function results = testWithCoverageReport(debugFlag)
 
     suite = testsuite(pwd);
     runner = testrunner("textoutput");
+
+    % Optional plugins
     if debugFlag
         runner.addPlugin(StopOnFailuresPlugin);
     end
 
-    p = CodeCoveragePlugin.forPackage("aod",...
+    if reportFlag
+        plugin = TestReportPlugin.producingPDF(...
+            fullfile(pwd, 'AODataTestReport.pdf'),...
+            'IncludingPassingDiagnostics', true,...
+            'IncludingCommandWindowTest', true);
+        runner.addPlugin(plugin);
+    end
+
+    plugin = CodeCoveragePlugin.forPackage("aod",...
         'IncludingSubpackages', true,...
         'Producing', CoverageReport(fullfile(pwd, 'coverage_report')));
-    runner.addPlugin(p);
+    runner.addPlugin(plugin);
+
+    % Run the test suite
     results = runner.run(suite);
     open(fullfile('coverage_report', 'index.html'));
 end

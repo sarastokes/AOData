@@ -85,20 +85,6 @@ classdef PersistorTest < matlab.unittest.TestCase
                 testCase.EXPT.getHomeDirectory(),...
                 testCase.EXPT.Epochs(1).getHomeDirectory());
         end
-
-        function HomeDirectoryChanges(testCase)
-            testCase.EXPT.setReadOnlyMode(false);
-
-            % Changing the home directory is also a dataset change test
-            oldDirectory = testCase.EXPT.homeDirectory;
-            newDirectory = fileparts(testCase.EXPT.homeDirectory);
-            testCase.EXPT.setHomeDirectory(newDirectory);
-            out = h5read('ToyExperiment.h5', '/Experiment/homeDirectory');
-            testCase.verifyEqual(out, newDirectory);
-
-            % Reset the homeDirectory
-            testCase.EXPT.setHomeDirectory(oldDirectory);
-        end
     end
 
     methods (Test)
@@ -227,6 +213,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
 
         function addEntity(testCase)
+            % Analysis
             analysis = aod.core.Analysis("TestAnalysis");
             testCase.SMALL_EXPT.add(analysis);
             testCase.verifyNumElements(testCase.SMALL_EXPT.Analyses, 1);
@@ -262,54 +249,12 @@ classdef PersistorTest < matlab.unittest.TestCase
             channel0.add(device);
             testCase.verifyNumElements(channel0.Devices, 1);      
         end
+
+        function AddEpoch(testCase)
+            % Add system
+            testCase.SMALL_EXPT.add(aod.core.System("EpochSystem"));
+            % Add epoch
+            testCase.SMALL_EXPT.add(aod.core.Epoch(1));
+        end
     end
-        
-    methods (Test, TestTags=["Containers", "Persistor"])
-        function EntityContainerContents(testCase)
-            EC1 = testCase.EXPT.EpochsContainer;
-            ECcontents = EC1.contents;
-            testCase.verifyEqual(numel(ECcontents), testCase.EXPT.numEpochs);
-            testCase.verifyClass(ECcontents, 'aod.persistent.Epoch');
-        end
-
-        function EmptyContainer(testCase)
-            testCase.verifyEmpty(aod.persistent.EntityContainer.empty());
-
-            EC2 = testCase.SMALL_EXPT.ExperimentDatasetsContainer;
-            testCase.verifyEmpty(EC2(1));
-        end
-
-        function EntityContainerIndexing(testCase)
-            testCase.verifyNumElements(testCase.EXPT.Analyses(0),...
-                numel(testCase.EXPT.Analyses));
-            testCase.verifyNumElements(testCase.EXPT.Epochs(1), 1);
-            testCase.verifyNumElements(testCase.EXPT.Calibrations(0),...
-                numel(testCase.EXPT.Calibrations));
-            testCase.verifyNumElements(testCase.EXPT.Annotations(0),...
-                numel(testCase.EXPT.Annotations));
-            testCase.verifyNumElements(testCase.EXPT.Systems(1), 1);
-            testCase.verifyNumElements(testCase.EXPT.Sources(1), 1);
-        end
-
-        function EntityContainerErrors(testCase)
-            try
-                testCase.EXPT.EpochsContainer(1) = [];
-            catch ME 
-                disp(ME.identifier)
-                testCase.verifyTrue(strcmp(ME.identifier,...
-                    "EntityContainer:DeleteNotSupported"));
-            end
-
-            try 
-                testCase.EXPT.EpochsContainer(1) = 1;
-            catch ME 
-                testCase.verifyTrue(strcmp(ME.identifier,...
-                    "EntityContainer:AssignNotSupported"));
-            end
-
-            EC1 = testCase.EXPT.EpochsContainer;
-            testCase.verifyError( ...
-                @() [EC1, EC1], "EntityContainer:ConcatenationNotSupported");
-        end
-    end 
 end

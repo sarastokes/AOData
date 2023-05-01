@@ -25,6 +25,10 @@ function deleteTestFiles()
     if exist('ShellExperiment.h5', 'file')
         delete('ShellExperiment.h5');
     end
+
+    if exist('PersistentInterface.h5')
+        delete('PersistentInterface.h5');
+    end
     
     if exist('HdfTest.h5', 'file')
         delete('HdfTest.h5');
