@@ -11,7 +11,7 @@ function out = read(hdfName, pathName, dsetName, className)
 % See Also: 
 %   h5tools.read
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     
     % No need for argument checking that occurs in h5tools.read
@@ -34,6 +34,11 @@ function out = read(hdfName, pathName, dsetName, className)
     if strcmp(dsetName, "expectedParameters")
         out = aod.h5.readExpectedParameters(hdfName, pathName, dsetName);
         return
+    end
+
+    if strcmp(dsetName, "expectedDatasets")
+        out = aod.h5.readExpectedDatasets(hdfName, pathName, dsetName);
+        return 
     end
     
     % Generic HDF5 datasets

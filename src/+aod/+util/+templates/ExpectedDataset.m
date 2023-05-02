@@ -16,8 +16,8 @@ classdef ExpectedDataset < handle & matlab.mixin.SetGet
 
     properties
         Name                string      = string.empty()
-        ClassName           string      = string.empty()
-        DefaultValue    
+        Class               string      = string.empty()
+        Default    
         Validation          cell        = cell.empty()
         Description         string      = string.empty()
         Units               string      = string.empty()
@@ -28,11 +28,11 @@ classdef ExpectedDataset < handle & matlab.mixin.SetGet
             obj.Name = convertCharsToStrings(name);
 
             if nargin > 1 && ~isempty(className)
-                obj.ClassName = obj.parseClassName(className);
+                obj.Class = obj.parseClassName(className);
             end
 
             if nargin > 2 && ~isempty(defaultValue)
-                obj.DefaultValue = defaultValue;
+                obj.Default = defaultValue;
             end
 
             if nargin > 3 && ~isempty(validator)
@@ -48,8 +48,8 @@ classdef ExpectedDataset < handle & matlab.mixin.SetGet
             end
         end
 
-        function set.ClassName(obj, value)
-            obj.ClassName = obj.parseClassName(value);
+        function set.Class(obj, value)
+            obj.Class = obj.parseClassName(value);
         end
 
         function set.Validation(obj, value)
@@ -95,20 +95,24 @@ classdef ExpectedDataset < handle & matlab.mixin.SetGet
                 value = strsplit(value, ",");
             end
             
-            goodClass = string.empty();
-            badClass = string.empty();
-            for i = 1:numel(value)
-                if ~exist(value(i), 'class')
-                    badClass = cat(1, badClass, value(i));
-                else
-                    goodClass = cat(1, goodClass, value(i));
-                end
-            end
-            if ~isempty(badClass)
-                error("parseClassName:InvalidClass",...
-                    "Class %s is not identified on MATLAB path", badClass);
-            end
-            value = goodClass;
+            % Ensure the classes exist on MATLAB path
+            %goodClass = string.empty();
+            %badClass = string.empty();
+            %for i = 1:numel(value)
+            %    iValue = value(i);
+                
+                %if ~exist(extractBetween(iValue, '"', '"'), 'class') ... 
+                %        && ~exist(extractBetween(iValue, '"','"'), 'builtin')
+                %    badClass = cat(1, badClass, iValue);
+                %else
+                %    goodClass = cat(1, goodClass, iValue);
+                %end
+            %end
+            %if ~isempty(badClass)
+            %    error("parseClassName:InvalidClass",...
+            %        "Class %s is not identified on MATLAB path", badClass);
+            %end
+            %value = goodClass;
         end
     end
 end 

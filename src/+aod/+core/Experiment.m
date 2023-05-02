@@ -70,7 +70,7 @@ classdef Experiment < aod.core.Entity
         % The IDs of all epochs in the experiment
         epochIDs                double
         % The total number of epochs in the experiment
-        numEpochs (1,1)         double 
+        numEpochs (1,1)         double      {mustBeInteger}
     end
     
     methods 

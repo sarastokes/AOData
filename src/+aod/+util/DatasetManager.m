@@ -147,17 +147,17 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
 
                 for i = 1:numel(obj.ExpectedDatasets)
                     value = "";
-                    if isempty(obj.ExpectedDatasets(i).ClassName)
+                    if isempty(obj.ExpectedDatasets(i).Class)                        
                         value = value + "[]";
                     else
-                        value = value + strtrim(formattedDisplayText(obj.ExpectedDatasets(i).ClassName));
+                        value = value + strtrim(formattedDisplayText(obj.ExpectedDatasets(i).Class));
                     end
 
                     value = value + ", ";
-                    if isempty(obj.ExpectedDatasets(i).DefaultValue)
+                    if isempty(obj.ExpectedDatasets(i).Default)
                         value = value + "[]";
                     else
-                        value = value + strtrim(formattedDisplayText(obj.ExpectedDatasets(i).DefaultValue));
+                        value = value + strtrim(formattedDisplayText(obj.ExpectedDatasets(i).Default));
                     end
 
                     value = value + ", ";
@@ -183,6 +183,56 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
         end
     end
 
+    % Builtin methods
+    methods 
+        function tf = isempty(obj)
+            tf = (obj.Count == 0);
+        end
+
+        function T = table(obj)
+            if isempty(obj)
+                T = [];
+                return
+            end
+
+            names = repmat("", [obj.Count, 1]);
+            classes = names;
+            defaults = names;
+            validations= names;
+            descriptions = names;
+            units = names;
+
+            for i = 1:obj.Count 
+                ED = obj.ExpectedDatasets(i);
+
+                names(i) = ED.Name;
+
+                if ~isempty(ED.Class)
+                    classes(i) = value2string(ED.Class);
+                end
+
+                if ~isempty(ED.Default)
+                    defaults(i) = value2string(ED.Default);
+                end
+
+                if ~isempty(ED.Validation)
+                    validations(i) = value2string(ED.Validation);
+                end
+
+                if ~isempty(ED.Description)
+                    descriptions(i) = ED.Description;
+                end
+
+                if ~isempty(ED.Units)
+                    units(i) = ED.Units;
+                end
+            end
+
+            T = table(names, classes, defaults, validations, descriptions, units,...
+                'VariableNames', ["Name", "Class", "Default", "Validation", "Description", "Units"]);
+        end
+    end
+
     methods (Static)
         function DM = populate(obj)
             
@@ -195,9 +245,15 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
 
             [props, ~, ~, emptyProps] = aod.h5.getPersistedProperties(obj);
             classProps = [props; emptyProps];
+            systemProps = aod.h5.getSystemProperties();
 
-            ED = [];
+            ED = []; numProps = 0;
             for i = 1:numel(propList)
+                % Skip system properties
+                if ismember(propList(i).Name, systemProps)
+                    continue
+                end
+                % Skip properties that will not be persisted
                 if ~ismember(propList(i).Name, classProps)
                     continue
                 end
@@ -223,10 +279,11 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
                     propList(i).Name, className, defaultValue,...
                     validator, description, units);
                 ED = cat(1, ED, iDataset);
+                numProps = numProps+1;
             end
             
             DM = aod.util.DatasetManager();
-            if ~isempty(propList)
+            if ~isempty(propList) && numProps > 0
                 DM.add(ED);
             end
         end

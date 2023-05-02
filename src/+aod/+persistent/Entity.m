@@ -38,7 +38,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   DatasetChanged
 %   AttributeChanged
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -62,6 +62,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         LastModified            datetime
         % Specification of expected metadata 
         expectedParameters      = aod.util.ParameterManager
+        % Specification of expected datasets
+        expectedDatasets        = aod.util.DatasetManager
     end
 
     properties (Dependent)
@@ -69,6 +71,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         readOnly
         % The HDF5 file name
         hdfFileName
+    end
+
+    properties (Hidden, Dependent)
         % The entity's HDF5 group name
         groupName
     end
@@ -750,6 +755,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             expectedParams = obj.loadDataset('expectedParameters');
             if ~isempty(expectedParams)
                 obj.expectedParameters = expectedParams;
+            end
+
+            expectedDsets = obj.loadDataset('expectedDatasets');
+            if ~isempty(expectedDsets)
+                obj.expectedDatasets = expectedDsets;
             end
 
             % LINKS

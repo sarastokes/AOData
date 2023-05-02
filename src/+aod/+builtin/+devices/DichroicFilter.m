@@ -26,7 +26,8 @@ classdef DichroicFilter < aod.core.Device
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        transmission
+        % Filter transmission (nm, [])
+        transmission        double 
     end
     
     methods

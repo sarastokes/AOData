@@ -23,7 +23,8 @@ classdef BandpassFilter < aod.core.Device
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        transmission
+        % Filter transmission (nm, [])
+        transmission        double
     end
 
     methods 

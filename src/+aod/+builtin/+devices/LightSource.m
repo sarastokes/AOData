@@ -22,13 +22,13 @@ classdef LightSource < aod.core.Device
 %   setWavelength(obj, wavelength)
 %   setSpectra(obj, spectra)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
         % The peak wavelength of the light source (nm)
         wavelength      double
-        % The spectra of the light source
+        % The spectra of the light source (nm, [])
         spectra         double 
     end 
 

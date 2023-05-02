@@ -93,11 +93,17 @@ classdef (Abstract) Entity < handle
         label
         % Expected parameter names, optional default values and validation
         expectedParameters          % aod.util.ParameterManager
+        % Expected dataset names
+        expectedDatasets            % aod.util.DatasetManager
     end
 
     properties (Hidden, Dependent)
         % The name that will be used for the HDF5 group
         groupName
+    end
+
+    properties (Hidden, Access = private)
+        DatasetManager
     end
 
     methods
@@ -135,6 +141,9 @@ classdef (Abstract) Entity < handle
 
             % Set listeners for any SetObservable properties
             obj.assignListeners();
+
+            % Initialize DatasetManager for basis of expectedDatasets
+            obj.DatasetManager = aod.util.DatasetManager.populate(obj);
         end
     end
 
@@ -146,6 +155,10 @@ classdef (Abstract) Entity < handle
 
         function value = get.expectedParameters(obj)
             value = obj.specifyParameters();
+        end
+
+        function value = get.expectedDatasets(obj)
+            value = obj.specifyDatasets();
         end
 
         function value = get.groupName(obj)
@@ -777,6 +790,21 @@ classdef (Abstract) Entity < handle
             % -------------------------------------------------------------
 
             value = aod.util.ParameterManager();
+        end
+
+        function value = specifyDatasets(obj)
+            value = obj.DatasetManager;
+        end
+
+        function value = populateDatasetManager(obj)
+            % Initializes DatasetManager, subclasses can extend
+            %
+            % Syntax:
+            %   value = specifyDatasets(obj)
+            % -------------------------------------------------------------
+            tic
+            value = aod.util.DatasetManager.populate(obj);
+            fprintf("Dataset time = %.2f\n", toc);
         end
     end
 

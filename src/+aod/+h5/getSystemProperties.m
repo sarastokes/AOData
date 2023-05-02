@@ -12,4 +12,5 @@ function specialProps = getSystemProperties()
 % -------------------------------------------------------------------------
     
     specialProps = ["Parent", "notes", "Name", "files",...
-        "UUID", "description", "parameters", "Timing", "Code"];
+        "UUID", "description", "parameters", "Timing", "Code",...
+        "expectedDatasets", "expectedParameters"];

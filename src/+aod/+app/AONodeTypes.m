@@ -42,6 +42,7 @@ classdef AONodeTypes
 
         % Specific AOData types
         PARAMETERMANAGER
+        DATASETMANAGER
         HOMEDIRECTORY
         QUERYMANAGER
         FILEREADER
@@ -186,6 +187,8 @@ classdef AONodeTypes
                     out = 'home-page.png';
                 case AONodeTypes.PARAMETERMANAGER
                     out = 'settings.png';
+                case AONodeTypes.DATASETMANAGER 
+                    out = 'settings.png';
                 case AONodeTypes.QUERYMANAGER
                     out = 'search.png';
                 otherwise
@@ -227,6 +230,8 @@ classdef AONodeTypes
                         obj = AONodeTypes.FILEREADER;
                     case 'expectedparameters'
                         obj = AONodeTypes.PARAMETERMANAGER;
+                    case 'expecteddatasets'
+                        obj = AONodeTypes.DATASETMANAGER;
                 end
             end
 
@@ -300,6 +305,8 @@ classdef AONodeTypes
                     obj = AONodeTypes.HOMEDIRECTORY;
                 case {'parametermanager', 'aod.util.parametermanager'}
                     obj = AONodeTypes.PARAMETERMANAGER;
+                case {'datasetmanager', 'aod.util.datasetmanager'}
+                    obj = AONodeTypes.DATASETMANAGER;
                 case {'querymanager', 'aod.api.querymanager'}
                     obj = AONodeTypes.QUERYMANAGER;
                 otherwise

@@ -128,6 +128,16 @@ function writeEntity(hdfName, obj)
     if isprop(obj, 'Code') && ~isempty(obj.Code)
         h5tools.write(hdfName, hdfPath, 'Code', obj.Code);
     end
+
+    % Write expected parameters and datasets
+    if ~isempty(obj.expectedParameters)
+        aod.h5.writeExpectedParameters(hdfName, hdfPath,... 
+            'expectedParameters', obj.expectedParameters);
+    end
+    if ~isempty(obj.expectedDatasets)
+        aod.h5.writeExpectedDatasets(hdfName, hdfPath,...
+            'expectedDatasets', obj.expectedDatasets);
+    end
     
     % Write remaining properties as datasets
     for i = 1:numel(persistedProps)
