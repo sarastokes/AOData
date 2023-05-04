@@ -111,6 +111,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         DatasetChanged
         % Occurs when an attribute is added, removed or modified
         AttributeChanged
+        % Occurs when group name is changed
+        NameChanged
     end
 
     methods
@@ -278,6 +280,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             obj.verifyReadOnlyMode();
 
+            % Check in expectedDatasets
+            descriptor = obj.expectedDatasets.get(propName);
+            %! Add descriptors
+
             [isEntity, isPersisted] = aod.util.isEntity(propValue);
 
             % Make the change in the HDF5 file
@@ -303,22 +309,32 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             p = findprop(obj, propName);
 
-            if ismember(propName, obj.dsetNames)
-                obj.setDataset(propName, []);
-            elseif ismember(propName, obj.linkNames)
-                obj.setLink(propName, []);
-            else
+            % Ensure the property exists
+            if isempty(p)
                 error("removeDataset:PropertyDoesNotExist",...
                     "No link/dataset matches %s", propName);
             end
 
-            % Core class properties are not removed
-            % TODO: Keep empty prop while MATLAB obj is up???
+            % Ensure the property isn't system-defined
+            mc = meta.class.fromName("aod.persistent.Entity");
+            entityProps = arrayfun(@(x) string(x.Name), mc.PropertyList);
+            if ismember(propName, entityProps)
+                error("removeDataset:EntityProperty",...
+                    "Entity properties cannot be removed, use set methods.");
+            end
+
+            % Process as HDF5 link or dataset
+            if ismember(propName, obj.dsetNames)
+                obj.setDataset(propName, []);
+            elseif ismember(propName, obj.linkNames)
+                obj.setLink(propName, []);
+            end
+
+            %! Keep empty prop while MATLAB obj is up???
             if isa(p, 'meta.DynamicProperty')
                 delete(p);
             end
-        end
-        
+        end  
     end
 
     % Special property methods
@@ -338,8 +354,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
             obj.verifyReadOnlyMode();
 
+            %answer = aod.app.diglogs.NameChangeDialog();
+
+            evtData = aod.persistent.events.NameEvent(name, obj.Name);
+            notify(obj, 'NameChanged', evtData);
             % Make the change in the HDF5 file
-            obj.setDataset('Name', obj, name);
+            obj.setDataset('Name', name);
 
             % Make the change in the MATLAB object
             obj.Name = name;
@@ -784,6 +804,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                         h5readatt(obj.hdfName, obj.hdfPath, obj.attNames(i));
                 end
             end
+
+            obj.populateContainers();
+        end
+
+        function populateContainers(obj)
+            % Implemented by subclasses
         end
     end
 
@@ -921,12 +947,17 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             for i = 1:numel(obj.dsetNames)
-                if ~isprop(obj, obj.dsetNames(i))
+                p = findprop(obj, obj.dsetNames(i));
+                if isempty(p)
+                %if ~isprop(obj, obj.dsetNames(i))
                     p = obj.addprop(obj.dsetNames(i));
                     p.Description = 'Dataset';
                     dsetValue = aod.h5.read(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                     obj.(obj.dsetNames(i)) = dsetValue;
+                elseif isa(p, 'meta.DynamicProperty')
+                    dsetValue = aod.h5.read(...
+                        obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                 end
             end
         end
@@ -946,9 +977,16 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             for i = 1:numel(obj.linkNames)
-                if ~isprop(obj, obj.linkNames(i))
+                p = findprop(obj, obj.linkNames(i));
+                if isempty(p)
+                %if ~isprop(obj, obj.linkNames(i))
+                    % Create new dynamic property
                     p = obj.addprop(obj.linkNames(i));
                     p.Description = 'Link';
+                    linkValue = obj.loadLink(obj.linkNames(i));
+                    obj.(obj.linkNames(i)) = linkValue;
+                elseif isa(p, 'meta.DynamicProperty')
+                    % Update existing dynamic property
                     linkValue = obj.loadLink(obj.linkNames(i));
                     obj.(obj.linkNames(i)) = linkValue;
                 end
@@ -1086,7 +1124,32 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
             notify(obj, 'GroupChanged', evtData);
         end
+    end
 
+    methods (Access = private)
+        function validateGroupNames(obj, groupName)
+            
+        end
+    end
+
+    methods (Access = {?aod.persistent.EntityFactory})
+        function changeHdfPath(obj, newPath)
+            obj.hdfPath = newPath;
+            obj.populateContainers();
+            % Containers depend on hdfPath property so recreate those
+            %containerNames = obj.entityType.childContainers();
+            %persistentContainerNames = obj.entityType.childContainers(true);
+            %if isempty(containerNames)
+            %    return
+            %end
+            %for i = 1:numel(containerNames)
+            %    obj.(persistentContainerNames(i)) = obj.loadContainer(containerNames(i));
+            %end
+        end
+
+        function reload(obj)
+            obj.populate();
+        end
     end
 
     methods (Static)

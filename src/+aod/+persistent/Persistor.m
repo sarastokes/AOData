@@ -17,6 +17,7 @@ classdef Persistor < handle
 %
 % Events:
 %   EntityChanged       --> aod.persistent.EntityFactory
+%   HdfPathChanged      --> aod.persistent.EntityFactory
 % Subscriptions:
 %   AttributeChanged    <-- aod.persistent.Entity
 %   DatasetChanged      <-- aod.persistent.Entity
@@ -29,15 +30,14 @@ classdef Persistor < handle
 
     events
         EntityChanged
+        HdfPathChanged
     end
 
     properties (SetAccess = private)
-        readOnly        logical
-    end
-
-    properties (Access = private)
-        hdfName
-        UUIDs
+        hdfName             string
+        readOnly            logical
+        listeners           event.listener
+        UUIDs               string
     end
 
     methods
@@ -45,7 +45,7 @@ classdef Persistor < handle
             obj.hdfName = hdfName;
             obj.readOnly = true;
         end
-        
+
         function setReadOnly(obj, value)
             arguments
                 obj
@@ -58,11 +58,21 @@ classdef Persistor < handle
     methods
         function bind(obj, entity)
             obj.UUIDs = cat(1, obj.UUIDs, string(entity.UUID));
-            addlistener(entity, 'AttributeChanged', @obj.onAttChanged);
-            addlistener(entity, 'DatasetChanged', @obj.onDatasetChanged);
-            addlistener(entity, 'GroupChanged', @obj.onGroupChanged);
-            addlistener(entity, 'LinkChanged', @obj.onLinkChanged);
-            addlistener(entity, 'FileChanged', @obj.onFileChanged);
+            obj.listeners = cat(1, obj.listeners, [...
+                addlistener(entity, 'AttributeChanged', @obj.onAttChanged),...
+                addlistener(entity, 'DatasetChanged', @obj.onDatasetChanged),...
+                addlistener(entity, 'GroupChanged', @obj.onGroupChanged),...
+                addlistener(entity, 'LinkChanged', @obj.onLinkChanged),...
+                addlistener(entity, 'FileChanged', @obj.onFileChanged),...
+                addlistener(entity, 'NameChanged', @obj.onNameChanged)]);
+        end
+
+        function unbind(obj, entity)
+            idx = find(obj.UUIDs == entity.UUID);
+            % Remove the entity's listeners
+            delete(obj.listeners(idx, :))
+            % Remove the UUID from the UUID list
+            obj.UUIDs(idx) = [];
         end
     end
 
@@ -79,6 +89,20 @@ classdef Persistor < handle
             else % Add/change attribute
                 h5tools.writeatt(obj.hdfName, src.hdfPath, evt.Name, evt.Value);
             end
+        end
+
+        function onNameChanged(obj, src, evt)
+            oldPath = src.hdfPath;
+            parentPath = h5tools.util.getPathParent(src.hdfPath);
+            newPath = h5tools.util.buildPath(parentPath, evt.Name);
+
+            % Change the entity name
+            h5tools.move(obj.hdfName, oldPath, newPath);
+            
+            % Ensure the change is reflected in EntityFactory
+            evtData = aod.persistent.events.HdfPathEvent(...
+                src, oldPath, newPath);
+            notify(obj, 'HdfPathChanged', evtData);
         end
 
         function onLinkChanged(obj, src, evt)
@@ -123,6 +147,7 @@ classdef Persistor < handle
             containerName = evt.Entity.entityType.persistentParentContainer();
             hdfPath = char(src.hdfPath);
             parent = evt.Source;
+
             if ~isempty(evt.OldEntity)
                 previousUUID = evt.OldEntity.UUID;
             else
@@ -133,8 +158,21 @@ classdef Persistor < handle
             if strcmp(evt.Action, 'Add')
                 aod.h5.writeEntity(obj.hdfName, evt.Entity);
             elseif strcmp(evt.Action, 'Remove')
+                % Check for links to the group
+                linkLocations = obj.checkGroupLinks(hdfPath);
+                if ~isempty(linkLocations)
+                    error("onGroupChanged:EntityIsALinkTarget",...
+                    "Group to be removed has a link at %s", linkLocations(1));
+                end
+                % Remove if safe
                 h5tools.deleteObject(obj.hdfName, hdfPath);
             elseif strcmp(evt.Action, 'Replace')
+                %! Check whether group names are the same
+                newName = ~strcmp(evt.Entity.groupName, evt.OldEntity.groupName);
+                
+                %! Replace links if group name is different
+                linkLocations = obj.checkGroupLinks(hdfPath);
+                %! Check child links too (overwrite Parent)
                 h5tools.deleteObject(obj.hdfName, parent.hdfPath,...
                     h5tools.util.getPathEnd(hdfPath));
                 aod.h5.writeEntity(obj.hdfName, evt.NewEntity);
@@ -148,6 +186,12 @@ classdef Persistor < handle
 
             % Refresh the associated EntityContainer
             parent.(containerName).refresh();
+
+            % Warn user to close out of applications that do not update
+            %if strcmp(evt.Action, 'Add')
+            %    warning('onGroupChanged:AdditionWarning',...
+            %        'Entity added - changes will not be reflected in existing AODataViewer apps');
+            %end
         end
 
         function onDatasetChanged(obj, src, evt)
@@ -181,6 +225,17 @@ classdef Persistor < handle
                 h5tools.deleteAttribute(obj.hdfName, filePath, evt.Name);
             else % Add/change file
                 h5tools.writeatt(obj.hdfName, filePath, evt.Name, evt.Value);
+            end
+        end
+    end
+
+    methods (Access = private)
+        function linkLocations = checkGroupLinks(obj, hdfPath)
+            T = aod.h5.collectExperimentLinks(obj.hdfName);
+            if ismember(T.Target, hdfPath)
+                linkLocations = T{T.Target == hdfPath, "Location"};
+            else
+                linkLocations = [];
             end
         end
     end

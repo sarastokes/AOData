@@ -13,9 +13,10 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
 % See Also:
 %   aod.core.Channel
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    properties (SetAccess = protected)
+
+    properties (SetAccess = {?aod.persistent.Entity})
         DevicesContainer
     end
 
@@ -51,7 +52,9 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
-            
+        end
+
+        function populateContainers(obj)
             obj.DevicesContainer = obj.loadContainer('Devices');
         end
     end

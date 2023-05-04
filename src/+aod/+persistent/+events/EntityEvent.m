@@ -16,23 +16,29 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
 %   oldUUID         string (default = "")
 %       UUID of existing persisted entity involved in change
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
-        UUID
         Action 
+        UUID 
+        NewPath 
+        OldPath
     end
 
     methods
-        function obj = EntityEvent(action, oldUUID)
+        function obj = EntityEvent(action, oldUUID, hdfPath, oldPath)
             arguments
-                action          {mustBeMember(action, {'Add', 'Remove'})}
+                action          {mustBeMember(action, {'Add', 'Remove', 'Rename'})}
                 oldUUID         string = string.empty()
+                hdfPath         string = string.empty()
+                oldPath         string = string.empty()
             end
             
             obj.Action = action;
             obj.UUID = oldUUID;
+            obj.NewPath = hdfPath;
+            obj.OldPath = oldPath;
         end
     end
 end 

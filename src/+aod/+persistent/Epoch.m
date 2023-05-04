@@ -80,8 +80,9 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
             obj.Source = obj.loadLink("Source");
             obj.System = obj.loadLink("System");
             obj.setLinksToDynProps();
+        end
 
-            % CONTAINERS
+        function populateContainers(obj)
             obj.EpochDatasetsContainer = obj.loadContainer('EpochDatasets');
             obj.RegistrationsContainer = obj.loadContainer('Registrations');
             obj.ResponsesContainer = obj.loadContainer('Responses');

@@ -125,6 +125,28 @@ classdef PersistorTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags="Modification")
+        function EntityRename(testCase)
+            testCase.EXPT.setReadOnlyMode(false);
+            
+            % Change the group name of a source
+            testCase.EXPT.Sources(1).Sources(1).setName("OD")
+            links = aod.h5.collectExperimentLinks(testCase.EXPT.hdfName);
+            % Confirm softlink updates
+            testCase.verifyEmpty(find(contains(links.Location, "/OS/")));
+            testCase.verifyEmpty(find(contains(links.Target, "/OS/")));
+            % Confirm updates to hdf paths
+            testCase.verifyTrue(contains(...
+                testCase.EXPT.Sources(1).Sources(1).hdfPath, "/OD/"));
+            testCase.verifyTrue(contains(...
+                testCase.EXPT.Sources(1).Sources(1).Sources(1).hdfPath, "/OD/"));
+            % Confirm persistent interface registers softlink updates
+            epochSource = testCase.EXPT.Epochs(1).Source;
+            testCase.verifyTrue(contains(epochSource.hdfPath, "/OD/"));
+
+            % Return to original source
+            testCase.EXPT.Sources(1).Sources(1).setName("OS");
+        end
+
         function ParamIO(testCase)
             import matlab.unittest.constraints.Throws
             
@@ -179,7 +201,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, '\PostSyncFile.txt');
         end
 
-        function PropertyIO(testCase)
+        function DatasetAddition(testCase)
             
             testCase.EXPT.setReadOnlyMode(false);
 
@@ -190,26 +212,40 @@ classdef PersistorTest < matlab.unittest.TestCase
             % Confirm new property correctly wrote to HDF5
             out = h5read('ToyExperiment.h5', '/Experiment/Test');
             testCase.verifyEqual(eye(3), out);
+        end
 
-            % Test for errors with unwritten links
+        function RemoveDatasetWarnings(testCase)
+            
+            testCase.EXPT.setReadOnlyMode(false);
+
             testCase.verifyError(...
-                @() testCase.EXPT.addDataset('BadLink', aod.core.Analysis('Test')),...
-                "addDataset:UnpersistedLink");
+                @() testCase.EXPT.removeDataset("UUID"),...
+                "removeDataset:EntityProperty");
 
-            % TODO: Remove property
+            testCase.verifyError(...
+                @() testCase.EXPT.removeDataset("BadProp"),...
+                "removeDataset:PropertyDoesNotExist");
         end
 
         function Links(testCase)
+            testCase.EXPT.setReadOnlyMode(false);
+
             % Edit a link
             newTargetPath = testCase.EXPT.Sources(1).hdfPath;
             testCase.EXPT.Epochs(1).addDataset('Source', testCase.EXPT.Sources(1));
             links = aod.h5.collectExperimentLinks(testCase.EXPT);
             testCase.verifyTrue(ismember(newTargetPath, links.Target));
+            
             % Restore the original link
             oldTarget = testCase.EXPT.Sources(1).Sources(1).Sources(1);
             testCase.EXPT.Epochs(1).addDataset('Source', oldTarget);
             links = aod.h5.collectExperimentLinks(testCase.EXPT);
             testCase.verifyTrue(strcmp(oldTarget.hdfPath, links.Target(1)));
+     
+            % Test for errors with unwritten links
+            testCase.verifyError(...
+                @() testCase.EXPT.addDataset('BadLink', aod.core.Analysis('Test')),...
+                "addDataset:UnpersistedLink");
         end
 
         function addEntity(testCase)

@@ -1,4 +1,4 @@
-function T = collectExperimentLinks(hdfName)
+function T = collectExperimentLinks(hdfName, includeParent)
 % Get a list of all softlinks & targets in AOData HDF5 file
 %
 % Syntax:
@@ -17,12 +17,18 @@ function T = collectExperimentLinks(hdfName)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    if nargin < 2
+        includeParent = false;
+    end
+
     if isa(hdfName, 'aod.persistent.Experiment')
         hdfName = hdfName.hdfFileName;
     end
 
     out = h5tools.collectSoftlinks(hdfName);
-    out = out(~endsWith(out, "Parent"));
+    if ~includeParent
+        out = out(~endsWith(out, "Parent"));
+    end
 
     targets = string.empty();
 

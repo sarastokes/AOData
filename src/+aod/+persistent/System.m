@@ -13,10 +13,10 @@ classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
 % See also:
 %   aod.core.System
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = {?aod.persistent.Entity})
         ChannelsContainer
     end
 
@@ -52,6 +52,9 @@ classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
 
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
+        end
+
+        function populateContainers(obj)
             obj.ChannelsContainer = obj.loadContainer('Channels');
         end
     end

@@ -15,7 +15,6 @@ function mirrorClass = findMirror(entityType, entityClass, classManager)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
-    
     arguments
         entityType      {mustBeA(entityType, 'aod.core.EntityTypes')}
         entityClass     string 
@@ -31,28 +30,30 @@ function mirrorClass = findMirror(entityType, entityClass, classManager)
     % Default condition is that there is no mirror class
     mirrorClass = persistentClass;
 
-    % Check for custom subclasses of default persistent class
-    customClassNames = classManager.get(persistentClass);
-    if isempty(customClassNames)
-        mirrorClass = persistentClass;
-        return
-    end
+    if getpref('AOData', 'SearchForMirrors')
+        % Check for custom subclasses of default persistent class
+        customClassNames = classManager.get(persistentClass);
+        if isempty(customClassNames)
+            mirrorClass = persistentClass;
+            return
+        end
 
-    mirroredClasses = erase(customClassNames, "persistent.");
+        mirroredClasses = erase(customClassNames, "persistent.");
 
-    % Check whether class has persistent mirror
-    idx = find(contains(mirroredClasses, entityClass));
-    if ~isempty(idx)
-        mirrorClass = customClassNames(idx);
-        return
-    end
-
-    % Check whether superclasses have persistent mirror
-    x = string(superclasses(entityClass));
-    for i = 1:numel(x)
-        idx = find(contains(mirroredClasses, x(i)));
+        % Check whether class has persistent mirror
+        idx = find(contains(mirroredClasses, entityClass));
         if ~isempty(idx)
             mirrorClass = customClassNames(idx);
             return
+        end
+
+        % Check whether superclasses have persistent mirror
+        x = string(superclasses(entityClass));
+        for i = 1:numel(x)
+            idx = find(contains(mirroredClasses, x(i)));
+            if ~isempty(idx)
+                mirrorClass = customClassNames(idx);
+                return
+            end
         end
     end

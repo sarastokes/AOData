@@ -131,11 +131,11 @@ function writeEntity(hdfName, obj)
 
     % Write expected parameters and datasets
     if ~isempty(obj.expectedParameters)
-        aod.h5.writeExpectedParameters(hdfName, hdfPath,... 
+        aod.h5.write(hdfName, hdfPath,... 
             'expectedParameters', obj.expectedParameters);
     end
     if ~isempty(obj.expectedDatasets)
-        aod.h5.writeExpectedDatasets(hdfName, hdfPath,...
+        aod.h5.write(hdfName, hdfPath,...
             'expectedDatasets', obj.expectedDatasets);
     end
     
@@ -163,6 +163,7 @@ function writeEntity(hdfName, obj)
         end
 
         % Write dataset description, if exists
+        % TODO: Switch in expectedDataset descriptors
         dsetDescription = aod.util.getClassPropDescription(mc, persistedProps(i));
         % Write dataset
         success = aod.h5.write(hdfName, hdfPath, persistedProps(i), prop, dsetDescription);

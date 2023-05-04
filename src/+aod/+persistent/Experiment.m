@@ -19,17 +19,18 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
     properties (SetAccess = protected)
         homeDirectory               char
         experimentDate (1,1)        datetime
-        epochIDs (1,:)              
-
+        epochIDs (1,:)              double
+        Code                        table
+    end
+    
+    properties (SetAccess = {?aod.persistent.Entity})
         AnalysesContainer         
         EpochsContainer   
         ExperimentDatasetsContainer
         SourcesContainer                 
         AnnotationsContainer                 
         CalibrationsContainer            
-        SystemsContainer      
-        
-        Code                        table
+        SystemsContainer
     end
 
     properties (Dependent)
@@ -96,6 +97,18 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             entity.setParent(obj);
             obj.addEntity(entity);
         end
+
+        function remove(obj, varargin)
+            % Remove an 
+            error('remove:NotYetImplemented',... 
+                'This function is under development');
+
+            import aod.core.EntityTypes
+            entityType = EntityTypes.get(entityType);
+
+            if ~ismember(entityType, obj.entityTypes.validChildTypes())
+            end
+        end
     end
 
     methods (Sealed, Access = protected)
@@ -111,7 +124,9 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
             % Links
             obj.setLinksToDynProps();
+        end
 
+        function populateContainers(obj)
             % Containers
             obj.AnalysesContainer = obj.loadContainer('Analyses');
             obj.AnnotationsContainer = obj.loadContainer('Annotations');

@@ -18,7 +18,7 @@ function initializeAOData(varargin)
 %   NoApp               logical (default = false)
 %       Suppresses opening of AODataManagerApp 
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     ip = aod.util.InputParser();
@@ -35,6 +35,7 @@ function initializeAOData(varargin)
     if ~hasAODataPref || resetFlag
         setpref('AOData', 'BasePackage', thisDir);
         setpref('AOData', 'SearchPaths', string(thisDir));
+        setpref('AOData', 'SearchForMirrors', false);
         % TODO: Check if .git is present
         setpref('AOData', 'GitRepos', thisDir);
         fprintf('AOData is already initialized, add custom packages in AODataManagerApp\n');

@@ -35,7 +35,7 @@ function success = write(hdfName, pathName, dsetName, data, description)
     
         % Detailed input checking for first 4 is performed by h5tools
         arguments
-            hdfName            char 
+            hdfName             char 
             pathName            char 
             dsetName            char 
             data
@@ -52,6 +52,10 @@ function success = write(hdfName, pathName, dsetName, data, description)
             success = aod.h5.writeExpectedParameters(hdfName, pathName, dsetName, data);
             h5tools.writeatt(hdfName, fullPath, 'Description',...
                 "Specification of expected metadata for the entity")
+        elseif isa(data, 'aod.util.DatasetManager')
+            success = aod.h5.writeExpectedDatasets(hdfName, pathName, dsetName, data);
+            h5tools.writeatt(hdfName, fullPath, 'Description',...
+                "Specification of expected data for the entity");
         else
             success = h5tools.write(hdfName, pathName, dsetName, data);
             % Description only written for datasets without mapped params
