@@ -52,7 +52,7 @@ classdef QueryView < aod.app.Component
         function obj = QueryView()
             obj = obj@aod.app.Component([], []);
 
-            obj.setHandler(aod.app.query.QueryViewHandler(obj));
+            obj.setHandler(aod.app.query.handlers.QueryView(obj));
             obj.isInverted = false;
         end
 

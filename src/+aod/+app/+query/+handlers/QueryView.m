@@ -1,11 +1,11 @@
-classdef QueryViewHandler < aod.app.EventHandler
+classdef QueryView < aod.app.EventHandler
 % Event handler for main AOQuery user interface
 %
 % Superclass:
 %   aod.app.EventHandler
 % 
 % Constructor:
-%   obj = aod.app.query.QueryViewHandler(parent)
+%   obj = aod.app.query.handlers.QueryView(parent)
 %
 % See also:
 %   aod.app.query.QueryView
@@ -15,7 +15,7 @@ classdef QueryViewHandler < aod.app.EventHandler
 % -------------------------------------------------------------------------
 
     methods 
-        function obj = QueryViewHandler(parent)
+        function obj = QueryView(parent)
             obj = obj@aod.app.EventHandler(parent);
         end
 

@@ -1,16 +1,16 @@
-classdef InputBoxHandler < aod.app.EventHandler 
+classdef InputBox < aod.app.EventHandler 
 %
 % Parent:
-%   EventHandler
+%   aod.app.EventHandler
 %
 % Constructor:
-%   obj = aod.app.query.InputBoxHandler(parent)
+%   obj = aod.app.query.InputBox(parent)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     methods 
-        function obj = InputBoxHandler(parent)
+        function obj = InputBox(parent)
             obj = obj@aod.app.EventHandler(parent, []);
         end
     end

@@ -41,7 +41,7 @@ classdef FilterBox < aod.app.Component
             obj = obj@aod.app.Component(parent, canvas);
             obj.ID = ID;
 
-            obj.setHandler(aod.app.query.FilterBoxHandler(obj, []));
+            obj.setHandler(aod.app.query.handlers.FilterBox(obj, []));
         end
 
         function setFilterID(obj, newID)

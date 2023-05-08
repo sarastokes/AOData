@@ -1,16 +1,16 @@
-classdef SubfilterBoxHandler < aod.app.EventHandler 
+classdef SubfilterBox < aod.app.EventHandler 
 %
 % Parent:
 %   EventHandler
 %
 % Constructor:
-%   obj = aod.app.query.SubfilterBoxHandler(parent)
+%   obj = aod.app.query.handlers.SubfilterBox(parent)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     methods 
-        function obj = SubfilterBoxHandler(parent)
+        function obj = SubfilterBox(parent)
             obj = obj@aod.app.EventHandler(parent, []);
         end
     end

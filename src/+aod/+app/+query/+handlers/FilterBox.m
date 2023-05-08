@@ -1,7 +1,7 @@
-classdef FilterBoxHandler < aod.app.EventHandler 
+classdef FilterBox < aod.app.EventHandler 
 
     methods
-        function obj = FilterBoxHandler(parent, publisher)
+        function obj = FilterBox(parent, publisher)
             obj = obj@aod.app.EventHandler(parent, publisher);
         end
 

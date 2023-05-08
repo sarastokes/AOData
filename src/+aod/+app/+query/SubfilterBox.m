@@ -30,7 +30,7 @@ classdef SubfilterBox < aod.app.Component
     methods
         function obj = SubfilterBox(parent, canvas, ID)
             obj = obj@aod.app.Component(parent, canvas);
-            obj.setHandler(aod.app.query.SubfilterBoxHandler(obj));
+            obj.setHandler(aod.app.query.handlers.SubfilterBox(obj));
             obj.subID = ID;
             obj.gridLayout.Layout.Row = obj.subID + 1;
         end

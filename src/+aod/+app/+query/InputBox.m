@@ -44,7 +44,7 @@ classdef InputBox < Component
         function obj = InputBox(parent, canvas)
             obj = obj@Component(parent, canvas);
 
-            obj.setHandler(aod.app.query.InputBoxHandler(obj));
+            obj.setHandler(aod.app.query.handlers.InputBox(obj));
 
             obj.nameProvided = false;
             obj.valueProvided = false;
