@@ -1,10 +1,15 @@
 classdef FilterTypes
-% Enumeration for AOQuery entity filters
+% Enumeration for AOQuery filters
+%
+% Static methods:
+%   obj = aod.api.FilterTypes.init(filterName)
+%   F = aod.api.FilterTypes.makeNewFilter(filterName, varargin)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration
+        UNDEFINED
         ENTITY
         PARAMETER
         DATASET
@@ -55,6 +60,12 @@ classdef FilterTypes
         end
 
         function obj = init(filterType)
+
+            if isa(filterType, "aod.api.FilterTypes")
+                obj = filterType;
+                return 
+            end
+            
             import aod.api.FilterTypes
 
             switch lower(filterType)

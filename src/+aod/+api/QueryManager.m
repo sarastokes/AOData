@@ -80,6 +80,9 @@ classdef QueryManager < handle
             obj.filterIdx = true(height(obj.entityTable), 1);
             
             for i = 1:obj.numFilters
+                if ~obj.Filters(i).isEnabled
+                    continue 
+                end
                 obj.Filters(i).apply();
                 obj.filterIdx = obj.Filters(i).localIdx;
             end

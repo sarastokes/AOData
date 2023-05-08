@@ -29,6 +29,8 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
         Parent
         % Whether query is nested (within another query)
         isNested        logical 
+        % Whether to run the filter
+        isEnabled       logical 
     end
 
     properties (SetAccess = protected)
@@ -53,6 +55,7 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
             obj.Parent = parent;
 
             obj.isNested = ~isSubclass(obj.Parent, 'aod.api.QueryManager');
+            obj.isEnabled = true;
         end
         
         function value = get.didFilter(obj)
@@ -61,6 +64,14 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
     end
 
     methods
+        function enableFilter(obj)
+            obj.isEnabled = true;
+        end
+
+        function disableFilter(obj)
+            obj.isEnabled = false;
+        end
+        
         function groupNames = getMatchedGroups(obj)
             entities = obj.getEntityTable();
             if obj.didFilter

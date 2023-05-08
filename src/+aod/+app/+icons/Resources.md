@@ -19,14 +19,18 @@ Source credit for the free icons used in apps:
 - <a href="https://icons8.com/icon/31486/delete-row">Delete Row</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38006/do-not-disturb">Do Not Disturb</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/32540/documents">Documents</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21339/download">Download</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/x9hi54t8czIw/dropdown-field">Dropdown Field</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31490/edit-row">Edit Row</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/31494/filter">Filter</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/41649/folder">Folder</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21349/form">Form</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/-fcp7PY7LOpz/graph">Graph</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31496/grid">Grid</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21352/help">Help</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/74811/home-page">Home Page</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21085/info">Info</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/DBKD0EAaNuG_/invert-colors">Invert Colors</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38051/link">Link</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21192/list">List</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/40949/live-folder">Live Folder</a> icon by <a href="https://icons8.com">Icons8</a>
