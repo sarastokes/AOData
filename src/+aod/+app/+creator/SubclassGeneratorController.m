@@ -5,10 +5,10 @@ classdef SubclassGeneratorController < aod.app.Controller
 %   aod.app.Controller
 %
 % Constructor:
-%   obj = aod.app.controllers.SubclassGeneratorController(model)
+%   obj = aod.app.creator.SubclassGeneratorController(model)
 %
 % See also:
-%   aod.app.models.SubclassGenerator, aod.app.views.SubclassWriter
+%   aod.app.creator.SubclassGenerator, aod.app.creator.SubclassWriter
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -30,7 +30,7 @@ classdef SubclassGeneratorController < aod.app.Controller
     methods
         function obj = SubclassGeneratorController(model)
             arguments
-                model   {mustBeA(model, "aod.app.models.SubclassGenerator")} = SubclassGenerator();
+                model   {mustBeA(model, "aod.app.creator.SubclassGenerator")} = SubclassGenerator();
             end
             
             obj@aod.app.Controller(model);
@@ -427,14 +427,14 @@ classdef SubclassGeneratorController < aod.app.Controller
             end
             set(obj.detailBox, "Value", "");
             obj.update();
-            writer = aod.app.views.SubclassWriter(obj.Model);
+            writer = aod.app.creator.SubclassWriter(obj.Model);
             out = writer.getFull();
             set(obj.detailBox, "Value", out);
             obj.update();
         end
 
         function onPushWrite(obj, ~, ~)
-            writer = aod.app.views.SubclassWriter(obj.Model);
+            writer = aod.app.creator.SubclassWriter(obj.Model);
             writer.write();
         end
 

@@ -5,10 +5,10 @@ classdef ExperimentView < aod.app.UIView
 %   aod.app.UIView
 %
 % Syntax:
-%   obj = aod.app.views.ExperimentView()
+%   obj = aod.app.viewer.ExperimentView()
 %
 % See Also:
-%   aod.app.presenters.ExperimentPresenter, AODataViewer
+%   aod.app.viewer.ExperimentPresenter, AODataViewer
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

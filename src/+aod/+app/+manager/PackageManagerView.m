@@ -5,10 +5,10 @@ classdef PackageManagerView < aod.app.UIView
 %   aod.app.UIView
 %
 % Constructor:
-%   obj = aod.app.views.PackageManagerView()
+%   obj = aod.app.manager.PackageManagerView()
 %
 % See also:
-%   aod.app.presenters.PackageManagerPresenter, AODataManagerApp
+%   aod.app.manager.PackageManagerPresenter, AODataManagerApp
 % -------------------------------------------------------------------------
 
     events

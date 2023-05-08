@@ -60,8 +60,8 @@ classdef AONodeTypes
     end
 
     properties (Hidden, Constant)
-        ICON_DIR = [fileparts(mfilename('fullpath')), filesep, ...
-                    '+icons', filesep];
+        ICON_DIR = [fileparts(fileparts(mfilename('fullpath'))), ...
+                    filesep, '+icons', filesep];
     end
     
     methods 

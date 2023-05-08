@@ -56,7 +56,7 @@ classdef AODataManagerTest < matlab.uitest.TestCase & matlab.mock.TestCase
 
     methods (Test)
         function DisplayAccuracy(testCase)
-            app = aod.app.presenters.PackageManagerPresenter();
+            app = aod.app.manager.PackageManagerPresenter();
             view = app.getView();
 
             % Ensure app displays preferences correctly
@@ -88,9 +88,9 @@ classdef AODataManagerTest < matlab.uitest.TestCase & matlab.mock.TestCase
             testCase.assignOutputsWhen(withAnyInputs(behavior.chooseFolder),...
                 testCase.FOLDER);
         
-            view = aod.app.views.PackageManagerView(...
+            view = aod.app.manager.PackageManagerView(...
                 'FolderChooser', mock);
-            app = aod.app.presenters.PackageManagerPresenter(view);
+            app = aod.app.manager.PackageManagerPresenter(view);
 
             % Access components of UI
             fig = app.getFigure();

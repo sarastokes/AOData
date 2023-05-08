@@ -8,11 +8,11 @@ classdef PackageManagerPresenter < appbox.Presenter
 %   appbox.Presenter
 %
 % Constructor:
-%   obj = aod.app.presenters.PackageManagerPresenter()
-%   obj = aod.app.presenters.PackageManagerPresenter(view)
+%   obj = aod.app.manager.PackageManagerPresenter()
+%   obj = aod.app.manager.PackageManagerPresenter(view)
 %
 % See also:
-%   AODataManagerApp, aod.app.views.PackageManagerView
+%   AODataManagerApp, aod.app.manager.PackageManagerView
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -24,7 +24,7 @@ classdef PackageManagerPresenter < appbox.Presenter
     methods
         function obj = PackageManagerPresenter(view)
             if nargin < 1
-                view = aod.app.views.PackageManagerView();
+                view = aod.app.manager.PackageManagerView();
             end
             obj = obj@appbox.Presenter(view);
             obj.isChanged = false;

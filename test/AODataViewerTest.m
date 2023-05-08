@@ -25,7 +25,7 @@ classdef AODataViewerTest < matlab.uitest.TestCase
                 ToyExperiment(true, true);
             end
             testCase.EXPT = loadExperiment(fileName);
-            testCase.APP = aod.app.presenters.ExperimentPresenter(testCase.EXPT);
+            testCase.APP = aod.app.viewer.ExperimentPresenter(testCase.EXPT);
             testCase.APP.show();
             testCase.VIEW = testCase.APP.getView();
             drawnow;

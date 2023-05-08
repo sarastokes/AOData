@@ -8,13 +8,13 @@ function p = AODataManagerApp()
 %   AODataManagerApp()
 %
 % See also:
-%   aod.app.views.PackageManagerView,
-%   aod.app.presenters.PackageManagerPresenter
+%   aod.app.manager.PackageManagerView,
+%   aod.app.manager.PackageManagerPresenter
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    p = aod.app.presenters.PackageManagerPresenter();
+    p = aod.app.manager.PackageManagerPresenter();
     p.show();
 
     if nargout > 0

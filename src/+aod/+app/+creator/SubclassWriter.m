@@ -2,12 +2,12 @@ classdef SubclassWriter < handle
 % Write an AOData subclass
 %
 % Constructor:
-%   obj = aod.app.views.SubclassWriter(model)
+%   obj = aod.app.creator.SubclassWriter(model)
 %
 % See also:
-%    SubclassGenerator, SubclassGeneratorController
+%    aod.app.creator.SubclassGenerator
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
 %#ok<*AGROW> 

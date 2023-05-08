@@ -2,10 +2,10 @@ classdef SubclassGenerator < handle
 % Model for generating template subclass files
 %
 % Constructor:
-%   obj = aod.app.models.SubclassGenerator(name)
+%   obj = aod.app.creator.SubclassGenerator(name)
 %
 % See also:
-%   AODataSubclassCreator, aod.app.controllers.SubclassGeneratorController
+%   AODataSubclassCreator, aod.app.creator.SubclassGeneratorController
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

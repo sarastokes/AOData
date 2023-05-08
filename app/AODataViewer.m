@@ -9,14 +9,14 @@ function appHandle = AODataViewer(experiment)
 %   persistedExperiment     aod.persistent.Experiment or HDF5 file name
 %
 % Optional outputs:
-%   appHandle               aod.app.presenters.ExperimentPresenter
+%   appHandle               aod.app.viewer.ExperimentPresenter
 %       The object controlling AODataViewer, useful for dev or debugging
 %
 % See also:
-%   aod.app.presenters.ExperimentPresenter, aod.app.views.ExperimentView
+%   aod.app.viewer.ExperimentPresenter, aod.app.viewer.ExperimentView
 
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     
     if nargin < 1
@@ -24,7 +24,7 @@ function appHandle = AODataViewer(experiment)
         experiment = [];
     end
     
-    p = aod.app.presenters.ExperimentPresenter(experiment);
+    p = aod.app.viewers.ExperimentPresenter(experiment);
     p.show();
     if nargout > 0
         appHandle = p;

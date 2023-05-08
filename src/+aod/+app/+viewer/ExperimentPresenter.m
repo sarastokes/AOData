@@ -5,18 +5,18 @@ classdef ExperimentPresenter < appbox.Presenter
 %   appbox.Presenter
 %
 % Syntax:
-%   obj = aod.app.presenters.ExperimentPresenter(experiment)
-%   obj = aod.app.presenters.ExperimentPresenter(experiment, view)
+%   obj = aod.app.viewer.ExperimentPresenter(experiment)
+%   obj = aod.app.viewer.ExperimentPresenter(experiment, view)
 %
 % Inputs:
 %   experiment      char/string or aod.persistent.Experiment
 %
 % Optional inputs:
-%   view            aod.app.UIView (default=aod.app.views.ExperimentView)
+%   view            aod.app.UIView (default=aod.app.viewer.ExperimentView)
 %       Use if you want to create a modified version of ExperimentView 
 %
 % See also:
-%   aod.app.views.ExperimentView, AODataViewer
+%   aod.app.viewer.ExperimentView, AODataViewer
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -43,7 +43,7 @@ classdef ExperimentPresenter < appbox.Presenter
             %   
             % -------------------------------------------------------------
             if nargin < 2
-                view = aod.app.views.ExperimentView();
+                view = aod.app.viewer.ExperimentView();
             end
             obj = obj@appbox.Presenter(view);
 
