@@ -5,9 +5,9 @@ classdef H5NodeTypes
 %   Enumerated type for HDF5 file components
 %
 % Static methods:
-%   obj = aod.app.H5NodeTypes.get(txt)
+%   obj = aod.app.util.H5NodeTypes.get(txt)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration
@@ -19,12 +19,12 @@ classdef H5NodeTypes
 
     methods (Static)
         function obj = get(nodeType)
-            if isa(nodeType, 'aod.app.H5NodeTypes')
+            if isa(nodeType, 'aod.app.util.H5NodeTypes')
                 obj = nodeType;
                 return
             end
 
-            import aod.app.H5NodeTypes
+            import aod.app.util.H5NodeTypes
 
             switch lower(nodeType)
                 case 'none'

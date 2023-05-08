@@ -2,9 +2,9 @@ classdef GroupNameType
 % Enumeration for different group name assignment approaches
 %
 % Static methods:
-%   out = aod.app.GroupNameType.get('name')
+%   out = aod.app.util.GroupNameType.get('name')
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration
@@ -19,12 +19,12 @@ classdef GroupNameType
     methods (Static)
         function out = get(txt)
             % Return the GroupNameType from text input of name
-            if isa(txt, 'aod.app.GroupNameType')
+            if isa(txt, 'aod.app.util.GroupNameType')
                 out = txt;
                 return
             end
 
-            import aod.app.GroupNameType
+            import aod.app.util.GroupNameType
 
             switch lower(txt)
                 case 'userdefined'

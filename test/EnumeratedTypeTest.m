@@ -74,7 +74,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
 
         function H5NodeTypesInit(testCase)
-            import aod.app.H5NodeTypes
+            import aod.app.util.H5NodeTypes
 
             out = H5NodeTypes.get('none');
             testCase.verifyEqual(out, H5NodeTypes.NONE);
@@ -94,7 +94,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
 
         function AODataNodesInit(testCase)
-            import aod.app.AONodeTypes
+            import aod.app.util.AONodeTypes
             
             out = AONodeTypes.init('Link');
             testCase.verifyEqual(out, AONodeTypes.LINK);
@@ -162,7 +162,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
     
     methods (Test, TestTags=["GroupNameType"])
         function GroupNameTypeInit(testCase)
-            import aod.app.GroupNameType
+            import aod.app.util.GroupNameType
 
             out = GroupNameType.get('UserDefined');
             testCase.verifyEqual(out, GroupNameType.UserDefined);
@@ -183,7 +183,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
     methods (Test, TestTags={'GroupLoadState'})
         function GroupLoadStateInit(testCase)
             import matlab.unittest.constraints.Throws
-            import aod.app.GroupLoadState
+            import aod.app.util.GroupLoadState
 
             % Initialize by name
             out = GroupLoadState.init('none');
@@ -206,7 +206,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
 
         function GroupLoadStateProps(testCase)
-            import aod.app.GroupLoadState
+            import aod.app.util.GroupLoadState
             testCase.verifyTrue(GroupLoadState.CONTENTS.hasAttributes());
             testCase.verifyFalse(GroupLoadState.NAME.hasAttributes());
 

@@ -10,7 +10,7 @@ classdef SubclassGeneratorController < aod.app.Controller
 % See also:
 %   aod.app.models.SubclassGenerator, aod.app.views.SubclassWriter
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties %(SetAccess = private)
@@ -75,7 +75,7 @@ classdef SubclassGeneratorController < aod.app.Controller
             end
 
             set(findByTag(obj.figureHandle, "GroupNameDropdown"),...
-                "Items", string(enumeration('aod.app.GroupNameType')));
+                "Items", string(enumeration('aod.app.util.GroupNameType')));
             if ~isempty(obj.Model.groupNameMode)
                 obj.didSetGroupNameMode(true);
             end

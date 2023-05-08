@@ -7,7 +7,7 @@ classdef SubclassGenerator < handle
 % See also:
 %   AODataSubclassCreator, aod.app.controllers.SubclassGeneratorController
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     events 
@@ -279,7 +279,7 @@ classdef SubclassGenerator < handle
                 obj
                 value 
             end
-            obj.groupNameMode = aod.app.GroupNameType.get(value);
+            obj.groupNameMode = aod.app.util.GroupNameType.get(value);
             % notify(obj, 'SetGroupNameMode');
         end
     end

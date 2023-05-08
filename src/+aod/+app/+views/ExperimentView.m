@@ -198,9 +198,9 @@ classdef ExperimentView < aod.app.UIView
                 'Icon', data.AONode.getIconPath(),...
                 'Tag', hdfPath,...
                 'NodeData', data);
-            if data.AONode == aod.app.AONodeTypes.CONTAINER 
+            if data.AONode == aod.app.util.AONodeTypes.CONTAINER 
                 addStyle(obj.Tree, obj.CONTAINER_STYLE, "node", g);
-            elseif data.AONode == aod.app.AONodeTypes.ENTITY 
+            elseif data.AONode == aod.app.util.AONodeTypes.ENTITY 
                 obj.addContextMenu(g);        
                 % Leave a placeholder so node can be expanded, but don't
                 % load the entity's datasets and links until requested

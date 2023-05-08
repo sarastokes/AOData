@@ -5,21 +5,21 @@ classdef AONodeTypes
 %   Enumerated type for uitreenodes representing specific AOData components
 %
 % Methods:
-%   out = aod.app.AONodeTypes.getIconPath(obj)
+%   out = aod.app.util.AONodeTypes.getIconPath(obj)
 %       Gets the node-specific icon type
 %
 % Static methods:
-%   obj = aod.app.AONodeTypes.get(data, datasetName)
+%   obj = aod.app.util.AONodeTypes.get(data, datasetName)
 %       Matches AOData system names if dataset name is provided, then 
 %       passes the data to init()
-%   obj = aod.app.AONodeTypes.init(nodeName);
+%   obj = aod.app.util.AONodeTypes.init(nodeName);
 %       Returns the node type given the text name which can often be 
 %       extracted from the data with class()
 %
 % Notes:
 %   Might have gone a bit overboard with the icons but it looks cool
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration
@@ -68,7 +68,7 @@ classdef AONodeTypes
         function [displayType, data] = displayInfo(obj, data)
             displayType = obj.getDisplayType();
             data = obj.processDataForDisplay(data);
-            if obj == aod.app.AONodeTypes.NUMERIC && ischar(data)
+            if obj == aod.app.util.AONodeTypes.NUMERIC && ischar(data)
                 displayType = 'Text';
             end
         end
@@ -79,7 +79,7 @@ classdef AONodeTypes
                 return;
             end
 
-            import aod.app.AONodeTypes;
+            import aod.app.util.AONodeTypes;
 
             switch obj
                 case AONodeTypes.DATETIME
@@ -105,7 +105,7 @@ classdef AONodeTypes
         end
 
         function tf = isTextDisplay(obj)
-            import aod.app.AONodeTypes;
+            import aod.app.util.AONodeTypes;
 
             textNodes = [...
                 AONodeTypes.TEXT,...
@@ -122,7 +122,7 @@ classdef AONodeTypes
         function tf = isTableDisplay(obj)
             % Get nodes with non-scalar display
 
-            import aod.app.AONodeTypes;
+            import aod.app.util.AONodeTypes;
 
             tableNodes = [...
                 AONodeTypes.TABLE,...
@@ -138,7 +138,7 @@ classdef AONodeTypes
 
         function out = getDisplayType(obj)
             % Display type for HDF5 datasets
-            import aod.app.AONodeTypes;
+            import aod.app.util.AONodeTypes;
 
             if obj.isTextDisplay()
                 out = 'Text';
@@ -150,7 +150,7 @@ classdef AONodeTypes
         end
 
         function out = getIconPath(obj)
-            import aod.app.AONodeTypes;
+            import aod.app.util.AONodeTypes;
 
             switch obj 
                 case AONodeTypes.ENTITY 
@@ -203,10 +203,10 @@ classdef AONodeTypes
             % Get AONodeType by data class or dataset name
             %
             % Syntax:
-            %   obj = aod.app.AONodeTypes.get(data, name)
+            %   obj = aod.app.util.AONodeTypes.get(data, name)
             % -------------------------------------------------------------
             
-            import aod.app.AONodeTypes
+            import aod.app.util.AONodeTypes
 
             obj = [];
 
@@ -257,12 +257,12 @@ classdef AONodeTypes
         end
 
         function obj = init(nodeName)
-            if isa(nodeName, 'aod.app.AONodeTypes')
+            if isa(nodeName, 'aod.app.util.AONodeTypes')
                 obj = nodeName;
                 return 
             end
 
-            import aod.app.AONodeTypes;
+            import aod.app.util.AONodeTypes;
 
             switch lower(nodeName)
                 case 'double'

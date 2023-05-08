@@ -9,7 +9,7 @@ classdef GroupLoadState
 %   tf = hasAttributes(obj)
 %   tf = hasContents(obj)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     enumeration 
@@ -21,7 +21,7 @@ classdef GroupLoadState
 
     methods 
         function tf = hasName(obj)
-            import aod.app.GroupLoadState
+            import aod.app.util.GroupLoadState
 
             if obj == GroupLoadState.NONE 
                 tf = false;
@@ -31,7 +31,7 @@ classdef GroupLoadState
         end
 
         function tf = hasContents(obj)
-            import aod.app.GroupLoadState
+            import aod.app.util.GroupLoadState
             
             if obj == GroupLoadState.CONTENTS 
                 tf = true;
@@ -41,7 +41,7 @@ classdef GroupLoadState
         end
 
         function tf = hasAttributes(obj)
-            import aod.app.GroupLoadState
+            import aod.app.util.GroupLoadState
             
             switch obj
                 case {GroupLoadState.NONE, GroupLoadState.NAME}
@@ -54,12 +54,12 @@ classdef GroupLoadState
 
     methods (Static)
         function obj = init(input)
-            if isa(input, 'aod.app.GroupLoadState')
+            if isa(input, 'aod.app.util.GroupLoadState')
                 obj = input;
                 return
             end
 
-            import aod.app.GroupLoadState 
+            import aod.app.util.GroupLoadState 
             
             switch lower(input)
                 case 'none'
