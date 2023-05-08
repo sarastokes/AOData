@@ -1,5 +1,5 @@
 classdef (ConstructOnLoad) LinkEvent < event.EventData
-% LINKEVENT
+% Event involving an HDF5 softlink
 %
 % Description:
 %   An event triggered when an HDF5 softlink is added/changed/removed

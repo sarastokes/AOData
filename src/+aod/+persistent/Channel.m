@@ -16,7 +16,7 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = {?aod.persistent.Entity})
+    properties (SetAccess = private)
         DevicesContainer
     end
 

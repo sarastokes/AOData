@@ -14,7 +14,7 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
 %   aod.core.Source
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = {?aod.persistent.Entity})
+    properties (SetAccess = private)
         SourcesContainer
     end
 

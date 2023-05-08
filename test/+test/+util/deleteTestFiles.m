@@ -18,6 +18,10 @@ function deleteTestFiles()
         delete('ToyExperiment.mat');
     end
 
+    if exist('EntityRenameTest.h5', 'file')
+        delete('EntityRenameTest.h5');
+    end
+
     if exist('SmallExperiment.h5', 'file')
         delete('SmallExperiment.h5');
     end

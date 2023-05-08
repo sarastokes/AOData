@@ -124,7 +124,7 @@ classdef Persistor < handle
                     h5tools.writelink(obj.hdfName,...
                         src.hdfPath, evt.Name, evt.Value.hdfPath);
                 catch
-                    % As far as I can find, there's no way to change an 
+                    % As far as` I can find, there's no way to change an 
                     % existing softlink so pull metadata, delete, recreate
                     linkAttr = h5tools.readatt(obj.hdfName, linkPath, 'all');
                     h5tools.deleteObject(obj.hdfName, linkPath);

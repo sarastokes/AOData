@@ -1,4 +1,17 @@
 classdef PersistentInterfaceTest < matlab.unittest.TestCase 
+% Test access through the persistent interface
+%
+% Parent:
+%    matlab.unittest.TestCase
+%
+% Use:
+%   result = runtests('PersistentInterfaceTest')
+%
+% See also:
+%   runAODataTestSuite, ToyExperiment, aod.util.test.makeSmallExperiment
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     properties
         FILE
@@ -21,24 +34,45 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Experiment"])
-        function HomeDirectoryChanges(testCase)
-            testCase.EXPT.setReadOnlyMode(false);
+    methods (Test, TestTags=["Entity"])
+        function ParamRead(testCase)
+            testCase.verifyTrue(...
+                testCase.EXPT.hasParam('Administrator'));
+            testCase.verifyEqual(...
+                testCase.EXPT.getParam('Administrator'), "Sara Patterson");
+            testCase.verifyFalse(...
+                testCase.EXPT.hasParam('BadParam'));
+        end
 
-            % Changing the home directory is also a dataset change test
-            oldDirectory = testCase.EXPT.homeDirectory;
-            newDirectory = fileparts(testCase.EXPT.homeDirectory);
-            testCase.EXPT.setHomeDirectory(newDirectory);
-            out = h5read(testCase.EXPT.hdfName, '/Experiment/homeDirectory');
-            testCase.verifyEqual(out, newDirectory);
+        function FileRead(testCase)
+            testCase.verifyTrue(...
+                testCase.EXPT.Epochs(1).hasFile('PresyncFile'));
+            testCase.verifyFalse(...
+                testCase.EXPT.hasFile('PreSyncFile'));
+        end
 
-            % Reset the homeDirectory
-            testCase.EXPT.setHomeDirectory(oldDirectory);
+        function GetByPath(testCase)
+            epochPath = '/Experiment/Epochs/0001';
+            h = testCase.EXPT.getByPath(epochPath);
+            testCase.verifyEqual(h.UUID, testCase.EXPT.Epochs(1).UUID);
+
+            testCase.verifyWarning(@()testCase.EXPT.getByPath('badpath'),...
+                'getByPath:InvalidHdfPath');
+        end
+
+        function Ancestor(testCase)
+            h = ancestor(testCase.EXPT.Epochs(1).Responses(1), 'experiment');
+            testCase.verifyEqual(testCase.EXPT.UUID, h.UUID);
+        end
+
+        function CustomDisplay(testCase)
+            disp(testCase.EXPT)
+            disp(testCase.EXPT.Epochs)
         end
     end
 
     
-    methods (Test, TestTags=["Containers", "Persistor"])
+    methods (Test, TestTags="Containers")
         function EntityContainerContents(testCase)
             EC1 = testCase.EXPT.EpochsContainer;
             ECcontents = EC1.contents;

@@ -23,7 +23,7 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
         Code                        table
     end
     
-    properties (SetAccess = {?aod.persistent.Entity})
+    properties (SetAccess = private)
         AnalysesContainer         
         EpochsContainer   
         ExperimentDatasetsContainer

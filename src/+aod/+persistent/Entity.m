@@ -96,10 +96,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         factory                 % aod.persistent.EntityFactory
     end
 
-    properties (Access = private)
-        isInitializing
-    end
-
     events
         % Occurs when "files" property is changed
         FileChanged
@@ -126,11 +122,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.parameters = aod.util.Parameters();
 
             % Create entity from file
-            obj.isInitializing = true;
             if ~isempty(obj.hdfName)
                 obj.populate();
             end
-            obj.isInitializing = false;
         end
 
         function value = get.readOnly(obj)
@@ -339,6 +333,48 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Special property methods
     methods
+
+        function setGroupName(obj, name)
+            % Change the entity's group name and HDF5 path
+            %
+            % Syntax:
+            %   changeGroupName(obj, name)
+            %
+            % See also:
+            %   aod.persistent.Entity/setName
+            % -------------------------------------------------------------
+        
+            arguments 
+                obj 
+                name            string
+            end
+            
+            % Don't proceed if name does not need to change
+            if strcmp(name, obj.groupName)
+                return 
+            end
+
+            obj.verifyReadOnlyMode();
+
+            % Ensure new name will be unique
+            cohortNames = aod.h5.getEntityGroupCohort(obj.hdfPath);
+            if ismember(lower(name), lower(cohortNames))
+                error('changeGroupName:NameConflict',...
+                    'The name %s matches an existing group in same location', name);
+            end
+            fprintf('Changing group name from %s to %s\n', obj.groupName, name);
+
+            % answer = aod.app.dialogs.NameChangeDialog()
+
+            evtData = aod.persistent.events.NameEvent(name, obj.Name);
+            notify(obj, 'NameChanged', evtData);
+
+            parentPath = h5tools.util.getPathParent(obj.hdfName);
+            obj.changeHdfPath(h5tools.util.buildPath(parentPath, name));
+
+            %! obj.setName(name);
+        end
+
         function setName(obj, name)
             % Set, change or clear the entity's name
             %
@@ -356,8 +392,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             %answer = aod.app.diglogs.NameChangeDialog();
 
-            evtData = aod.persistent.events.NameEvent(name, obj.Name);
-            notify(obj, 'NameChanged', evtData);
             % Make the change in the HDF5 file
             obj.setDataset('Name', name);
 
@@ -809,7 +843,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function populateContainers(obj)
-            % Implemented by subclasses
+            % Implemented by subclasses, if needed
         end
     end
 
@@ -1136,15 +1170,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         function changeHdfPath(obj, newPath)
             obj.hdfPath = newPath;
             obj.populateContainers();
-            % Containers depend on hdfPath property so recreate those
-            %containerNames = obj.entityType.childContainers();
-            %persistentContainerNames = obj.entityType.childContainers(true);
-            %if isempty(containerNames)
-            %    return
-            %end
-            %for i = 1:numel(containerNames)
-            %    obj.(persistentContainerNames(i)) = obj.loadContainer(containerNames(i));
-            %end
         end
 
         function reload(obj)

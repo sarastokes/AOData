@@ -260,7 +260,6 @@ classdef (Abstract) Entity < handle
             if nargin < 2
                 name = [];
             end
-            
             obj.Name = name;
         end
 

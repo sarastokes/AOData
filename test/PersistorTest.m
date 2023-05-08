@@ -1,5 +1,5 @@
 classdef PersistorTest < matlab.unittest.TestCase 
-% PERSISTORTEST
+% Test interactions between persistent interface and HDF5 files
 %
 % Description:
 %   Tests modification of HDF5 files from persistent interface
@@ -16,7 +16,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-%#ok<*NASGU> 
+%#ok<*NASGU,*MANU>
 
     properties
         EXPT 
@@ -32,6 +32,9 @@ classdef PersistorTest < matlab.unittest.TestCase
                 ToyExperiment(true, true);
             end
             testCase.EXPT = loadExperiment(fileName);
+
+            % Copy experiment for EntityRename
+            h5tools.files.copyFile(fileName, "EntityRenameTest.h5");
 
             % Make a smaller experiment for testing empty entities
             testCase.SMALL_EXPT = test.util.makeSmallExperiment(...
@@ -87,64 +90,42 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test)
-        function ParamRead(testCase)
-            testCase.verifyTrue(...
-                testCase.EXPT.hasParam('Administrator'));
-            testCase.verifyEqual(...
-                testCase.EXPT.getParam('Administrator'), "Sara Patterson");
-            testCase.verifyFalse(...
-                testCase.EXPT.hasParam('BadParam'));
-        end
+    
+    methods (Test, TestTags=["Experiment"])
+        function HomeDirectoryChanges(testCase)
+            testCase.EXPT.setReadOnlyMode(false);
 
-        function FileRead(testCase)
-            testCase.verifyTrue(...
-                testCase.EXPT.Epochs(1).hasFile('PresyncFile'));
-            testCase.verifyFalse(...
-                testCase.EXPT.hasFile('PreSyncFile'));
-        end
+            % Changing the home directory is also a dataset change test
+            oldDirectory = testCase.EXPT.homeDirectory;
+            newDirectory = fileparts(testCase.EXPT.homeDirectory);
+            testCase.EXPT.setHomeDirectory(newDirectory);
+            out = h5read(testCase.EXPT.hdfName, '/Experiment/homeDirectory');
+            testCase.verifyEqual(out, newDirectory);
 
-        function CustomDisplay(testCase)
-            disp(testCase.EXPT)
-            disp(testCase.EXPT.Epochs)
-        end
-
-        function Ancestor(testCase)
-            h = ancestor(testCase.EXPT.Epochs(1).Responses(1), 'experiment');
-            testCase.verifyEqual(testCase.EXPT.UUID, h.UUID);
-        end
-
-        function GetByPath(testCase)
-            epochPath = '/Experiment/Epochs/0001';
-            h = testCase.EXPT.getByPath(epochPath);
-            testCase.verifyEqual(h.UUID, testCase.EXPT.Epochs(1).UUID);
-
-            testCase.verifyWarning(@()testCase.EXPT.getByPath('badpath'),...
-                'getByPath:InvalidHdfPath');
+            % Reset the homeDirectory
+            testCase.EXPT.setHomeDirectory(oldDirectory);
         end
     end
 
     methods (Test, TestTags="Modification")
         function EntityRename(testCase)
-            testCase.EXPT.setReadOnlyMode(false);
+            pEXPT = loadExperiment("EntityRenameTest.h5");
+            pEXPT.setReadOnlyMode(false);
             
             % Change the group name of a source
-            testCase.EXPT.Sources(1).Sources(1).setName("OD")
-            links = aod.h5.collectExperimentLinks(testCase.EXPT.hdfName);
+            pEXPT.Sources(1).Sources(1).setName("OD")
+            links = aod.h5.collectExperimentLinks(pEXPT.hdfName);
             % Confirm softlink updates
             testCase.verifyEmpty(find(contains(links.Location, "/OS/")));
             testCase.verifyEmpty(find(contains(links.Target, "/OS/")));
             % Confirm updates to hdf paths
             testCase.verifyTrue(contains(...
-                testCase.EXPT.Sources(1).Sources(1).hdfPath, "/OD/"));
+                pEXPT.Sources(1).Sources(1).hdfPath, "/OD"));
             testCase.verifyTrue(contains(...
-                testCase.EXPT.Sources(1).Sources(1).Sources(1).hdfPath, "/OD/"));
+                pEXPT.Sources(1).Sources(1).Sources(1).hdfPath, "/OD"));
             % Confirm persistent interface registers softlink updates
-            epochSource = testCase.EXPT.Epochs(1).Source;
+            epochSource = pEXPT.Epochs(1).Source;
             testCase.verifyTrue(contains(epochSource.hdfPath, "/OD/"));
-
-            % Return to original source
-            testCase.EXPT.Sources(1).Sources(1).setName("OS");
         end
 
         function ParamIO(testCase)
