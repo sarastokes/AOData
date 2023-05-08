@@ -82,7 +82,7 @@ classdef FilterPanel < aod.app.Component
         end
 
         function onPush_AddNewFilter(obj, ~, ~)
-            %evtData = Event('AddNewFilter', []);
+            %evtData = aod.app.Event('AddNewFilter', []);
             %notify(obj, 'NewEvent', evtData);
             obj.addFilter();
         end

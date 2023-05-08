@@ -40,6 +40,25 @@ classdef FilterControls < aod.app.Component
     end
 
     methods
+        function update(obj, varargin)
+            if nargin == 2
+                evt = varargin{1};
+            end
+
+            if strcmp(evt.EventType, "ChangedFilterInput")
+                if evt.Data.Ready
+                    obj.checkButton.Enable = "on";
+                    obj.addButton.Enable = "on";
+                else
+                    obj.checkButton.Enable = "off";
+                    obj.addButton.Enable = "off";
+                end
+            elseif strcmp(evt.EventType, "ChangeFilterType")
+                obj.checkButton.Enable = "off";
+                obj.addButton.Enable = "off";
+            end
+        end
+
         function filterAdded(obj)
             obj.addButton.Enable = "off";
             obj.editButton.Enable = "on";
@@ -63,6 +82,7 @@ classdef FilterControls < aod.app.Component
             obj.addButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "AddFilter",...
                 "Icon", obj.getIcon("add"),...
+                "Enable", "off",...
                 "ButtonPushedFcn", @obj.onButtonPushed);
             obj.removeButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "RemoveFilter",...
@@ -76,6 +96,7 @@ classdef FilterControls < aod.app.Component
             obj.checkButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "CheckFilter",...
                 "Icon", obj.getIcon('check'),...
+                "Enable", "off",...
                 "ButtonPushedFcn", @obj.onButtonPushed);
         end
 
@@ -85,7 +106,7 @@ classdef FilterControls < aod.app.Component
             else
                 eventName = src.Tag;
             end
-            evtData = Event(eventName, obj);
+            evtData = aod.app.Event(eventName, obj);
         end
     end
 end 

@@ -1,10 +1,11 @@
 classdef FilterBox < aod.app.Component 
+% Interface for a single AOQuery filter
 %
 % Parent:
 %   aod.app.Component
 %
 % Constructor:
-%   obj = FilterBox(parent, canvas, ID)
+%   obj = aod.app.query.FilterBox(parent, canvas, ID)
 %
 % Children:
 %   InputBox, FilterControls, SubfilterBox (optional)
@@ -20,17 +21,16 @@ classdef FilterBox < aod.app.Component
 
     properties 
         ID                  double
-        filterType 
     end
 
     properties (Dependent)
-        numSubfilters
-        isReady
+        isReady             logical
+        filterType
+        numSubfilters       double      {mustBeInteger}
     end
 
     properties
         gridLayout          matlab.ui.container.GridLayout
-        filterDropdown      matlab.ui.control.DropDown
         inputBox 
         filterControls 
         Subfilters
@@ -49,11 +49,11 @@ classdef FilterBox < aod.app.Component
         end
 
         function value = get.isReady(obj)
-            if obj.filterDropdown.Value == "UNDEFINED"
-                value = false;
-            else            
-                value = obj.inputBox.isReady;
-            end 
+            value = obj.inputBox.isReady;
+        end
+
+        function value = get.filterType(obj)
+            value = obj.inputBox.filterType;
         end
 
         function value = get.numSubfilters(obj)
@@ -71,7 +71,7 @@ classdef FilterBox < aod.app.Component
             obj.gridLayout.RowHeight = repmat(obj.FILTER_HEIGHT, [1, 1 + subfilterID]);
             newSubfilter = aod.app.query.SubfilterBox(obj, obj.gridLayout, subfilterID);
             obj.Subfilters = cat(1, obj.Subfilters, newSubfilter);
-            obj.Subfilters(end).gridLayout.Layout.Column = [1 3];
+            obj.Subfilters(end).gridLayout.Layout.Column = [1 2];
             obj.Subfilters(end).gridLayout.Layout.Row = subfilterID + 1;
         end
 
@@ -91,35 +91,13 @@ classdef FilterBox < aod.app.Component
         
         function createUi(obj)
             obj.gridLayout = uigridlayout(obj.Canvas, [1,3],...
-                "ColumnWidth", {"1x", "2x", 70},...
+                "ColumnWidth", {"1x", 70},...
                 "Padding", [0 0 0 0],...
                 "RowHeight", obj.FILTER_HEIGHT,...
                 "BackgroundColor", rgb('light blue'));
 
-            filterLayout = uigridlayout(obj.gridLayout, [2 1],...
-                "RowHeight", {obj.TEXT_HEIGHT, "1x"}, "RowSpacing", 2,...
-                "Padding", [0 5 0 0],...
-                "BackgroundColor", rgb('light teal'));
-            uilabel(filterLayout, "Text", "Filter Type",...
-                "FontWeight", "bold", "FontSize", 12,... 
-                "HorizontalAlignment", "center",...
-                "VerticalAlignment", "center");
-            obj.filterDropdown = uidropdown(filterLayout,...
-                "Items", [""; getEnumMembers("aod.api.FilterTypes")]',...
-                "ValueChangedFcn", @obj.onSelected_FilterDropdown);
-
-            obj.inputBox = aod.app.query.InputBox(obj, obj.gridLayout);
+            obj.inputBox = aod.app.query.InputBox(obj, obj.gridLayout, false);
             obj.filterControls = aod.app.query.FilterControls(obj, obj.gridLayout);
-        end
-
-        function onSelected_FilterDropdown(obj, src, evt)
-            if strcmp(evt.Value, evt.PreviousValue)
-                return
-            end
-            obj.filterType = aod.api.FilterTypes.(upper(src.Value));
-            evtData = Event('ChangeFilterType', obj,... 
-                'FilterType', src.Value);
-            notify(obj, 'NewEvent', evtData);
         end
     end
 

@@ -1,7 +1,11 @@
-classdef InputBox < Component 
+classdef InputBox < aod.app.Component 
+% Interface for specification of filter properties
 %
 % Parent:
-%   Component
+%   aod.app.Component
+%
+% Constructor:
+%   obj = aod.app.query.InputBox(parent, canvas, isSubfilter)
 %
 % Children:
 %   N/A
@@ -20,14 +24,18 @@ classdef InputBox < Component
     properties (SetAccess = private)
         filterType              = aod.api.FilterTypes.UNDEFINED
         nameProvided            logical
-        valueProvided           logical 
+        valueProvided           logical
+        isSubfilter             logical 
     end
 
     properties (Dependent)
-        isReady
+        isReady                 logical
     end
 
     properties
+        filterDropdown          matlab.ui.control.DropDown
+        filterLabel             matlab.ui.control.Label
+
         nameLayout              matlab.ui.container.GridLayout
         nameEditfield           matlab.ui.control.EditField
         nameDropdown            matlab.ui.control.DropDown
@@ -41,8 +49,14 @@ classdef InputBox < Component
     end
 
     methods
-        function obj = InputBox(parent, canvas)
-            obj = obj@Component(parent, canvas);
+        function obj = InputBox(parent, canvas, isSubfilter)
+            obj = obj@aod.app.Component(parent, canvas);
+
+            if nargin < 3
+                obj.isSubfilter = false;
+            else
+                obj.isSubfilter = isSubfilter;
+            end
 
             obj.setHandler(aod.app.query.handlers.InputBox(obj));
 
@@ -53,12 +67,10 @@ classdef InputBox < Component
         function value = get.isReady(obj)
             import aod.api.FilterTypes 
 
-            if isempty(obj.filterType) || obj.filterType == FilterTypes.UNDEFINED 
+            if obj.filterType == FilterTypes.UNDEFINED || ~obj.nameProvided
                 value = false;
-            elseif obj.nameProvided
-                value = true; 
             else
-                value = false;
+                value = true;
             end
         end
 
@@ -92,18 +104,17 @@ classdef InputBox < Component
             obj.valueProvided = false;
         end
 
-        function changeFilterType(obj, filterType)
+        function changeFilterType(obj)
             
             obj.reset();
 
-            if isempty(filterType)
-                obj.filterType = aod.api.FilterTypes.UNDEFINED;
+            if obj.filterType == aod.api.FilterTypes.UNDEFINED
                 return
             end
 
             import aod.api.FilterTypes
 
-            switch filterType 
+            switch obj.filterType 
                 case FilterTypes.ENTITY
                     obj.setNameLabel("Entity Type");
                     obj.showOneInput();
@@ -152,8 +163,6 @@ classdef InputBox < Component
                     error('changeFilterType:UnknownFilterType',...
                         'Filter %s not recognized', char(filterType));
             end
-
-            obj.filterType = filterType;
         end
     end
 
@@ -216,22 +225,41 @@ classdef InputBox < Component
     methods (Access = protected)
         function createUi(obj)
             mainLayout = uigridlayout(obj.Canvas, [1 2],...
-                "ColumnWidth", {"1x", "1x"}, "RowHeight",  {"1x"},...
+                "ColumnWidth", {"1x", "1x", "1x"}, "RowHeight",  {"1x"},...
                 "Padding", [0 0 0 0], "ColumnSpacing", 2);
 
-            % INPUT ONE ---------------------------------------------------
-            obj.nameLayout = uigridlayout(mainLayout, [2 2],...
-                "RowHeight", {obj.TEXT_HEIGHT, "1x"},...
+            % All parameters for input gridlayouts
+            gridSpecs = {"RowHeight", {obj.TEXT_HEIGHT, "1x"},...
                 "ColumnWidth", {"1x", obj.BUTTON_WIDTH},...
-                "RowSpacing", 2, "ColumnSpacing", 2,...
-                "Padding", [0 5 0 0],...
-                "BackgroundColor", rgb('mint'));
-            obj.nameLayout.Layout.Column = 1;
-            obj.nameLayout.Layout.Row = 1;
-            obj.nameLabel = uilabel(obj.nameLayout,... 
-                "Text", "", "FontWeight", "bold", "FontSize", 12,...
+                "RowSpacing", 2, "ColumnSpacing", 2, "Padding", [0 5 0 0]};
+            labelSpecs = {"FontSize", 12, "FontWeight", "bold",...
                 "HorizontalAlignment", "center",...
-                "VerticalAlignment", "center");
+                "VerticalAlignment", "center"};
+
+            % INPUT ONE ---------------------------------------------------
+            filterLayout = uigridlayout(mainLayout, [2 2],...
+                "BackgroundColor", rgb('light teal'), gridSpecs{:});
+            filterLayout.Layout.Row = 1;
+            filterLayout.Layout.Column = 1;
+            
+            obj.filterLabel = uilabel(filterLayout,... 
+                "Text", "Filter Type", labelSpecs{:});
+            obj.filterLabel.Layout.Column = [1 2];
+
+            obj.filterDropdown = uidropdown(filterLayout, ...
+                "Items", getEnumMembers("aod.api.FilterTypes")', ...
+                "ValueChangedFcn", @obj.onSelected_FilterDropdown);
+            %! Add option for isSubfilter=true
+            obj.filterDropdown.Layout.Column = [1 2];
+
+            % INPUT TWO ---------------------------------------------------
+            obj.nameLayout = uigridlayout(mainLayout, [2 2],...
+                "BackgroundColor", rgb('mint'), gridSpecs{:});
+            obj.nameLayout.Layout.Column = 2;
+            obj.nameLayout.Layout.Row = 1;
+
+            obj.nameLabel = uilabel(obj.nameLayout,... 
+                "Text", "", labelSpecs{:});
             obj.nameLabel.Layout.Row = 1;
             obj.nameLabel.Layout.Column = [1 2];
 
@@ -240,6 +268,7 @@ classdef InputBox < Component
                 "ValueChangedFcn", @obj.onSelect_Name);
             obj.nameDropdown.Layout.Row = 2;
             obj.nameDropdown.Layout.Column = 1;
+
             obj.nameEditfield = uieditfield(obj.nameLayout,...
                 "Value", "", "Visible", "off",...
                 "ValueChangedFcn", @obj.onEdit_Name);
@@ -253,39 +282,62 @@ classdef InputBox < Component
             obj.searchButton.Layout.Row = 2;
             obj.searchButton.Layout.Column = 2;
 
-            % INPUT TWO ---------------------------------------------------
-            obj.valueLayout = uigridlayout(mainLayout, [2 1],...
-                "RowHeight", {obj.TEXT_HEIGHT, "1x"},...
-                "RowSpacing", 2,...
-                "Padding", [0 5 0 0],...
-                "BackgroundColor", rgb('light red'));
-            obj.valueLayout.Layout.Column = 2;
+            % INPUT THREE -------------------------------------------------
+            obj.valueLayout = uigridlayout(mainLayout, [2 2],...
+                "BackgroundColor", rgb('light red'), gridSpecs{:});
             obj.valueLayout.Layout.Row = 1;
+            obj.valueLayout.Layout.Column = 3;
 
             obj.valueLabel = uilabel(obj.valueLayout,... 
-                "Text", " ", "FontSize", 12, "FontWeight", "bold",...
-                "HorizontalAlignment", "center",...
-                "VerticalAlignment", "center");
+                "Text", " ", labelSpecs{:});
+            obj.valueLabel.Layout.Row = 1;
+            obj.valueLabel.Layout.Column = [1 2];
 
             obj.valueEditfield = uieditfield(obj.valueLayout,...
                 "Value", "", "Visible", "off",...
                 "ValueChangedFcn", @obj.onEdit_Value);
+            obj.valueEditfield.Layout.Column = [1 2];
             obj.valueEditfield.Layout.Row = 2;
 
             obj.subfilterButton = uibutton(obj.valueLayout,...
                 "Text", "Add subfilter", "Visible", "off",...
                 "Icon", obj.getIcon('tree'),...
                 "ButtonPushedFcn", @obj.onPush_AddSubfilter);
+            obj.subfilterButton.Layout.Column = [1 2];
             obj.subfilterButton.Layout.Row = 2;
+
+            % Make a few modifications if this is part of a subfilter
+            if obj.isSubfilter
+                obj.filterLabel.Text = "Subfilter Type";
+                obj.filterDropdown.Items = setdiff(obj.filterDropdown.Items,...
+                    [FilterTypes.LINK, FilterTypes.PARENT, FilterTypes.CHILD]);
+            end
+        end
+
+        function onSelected_FilterDropdown(obj, src, evt)
+            if strcmp(evt.Value, evt.PreviousValue)
+                return
+            end
+            obj.filterType = aod.api.FilterTypes.(upper(src.Value));
+            obj.changeFilterType();
+            evtData = aod.app.Event('ChangedFilterInput', obj, ...
+                'Ready', obj.isReady);
+            notify(obj, 'NewEvent', evtData);
+            % evtData = Event('ChangeFilterType', obj, ...
+            %     'FilterType', src.Value);
+            % notify(obj, 'NewEvent', evtData);
         end
 
         function onPush_AddSubfilter(obj, src, evt)
-            evtData = Event('AddSubfilter', obj);
+            evtData = aod.app.Event('AddSubfilter', obj);
             notify(obj, 'NewEvent', evtData);
         end
 
         function onSelect_Name(obj, src, evt)
             obj.nameProvided = true;
+            evtData = aod.app.Event('ChangedFilterInput', obj, ...
+                'Ready', obj.isReady);
+            notify(obj, 'NewEvent', evtData);
         end
 
         function onEdit_Name(obj, src, evt)
@@ -294,6 +346,9 @@ classdef InputBox < Component
             else
                 obj.nameProvided = true;
             end
+            evtData = Event('ChangedFilterInput', obj, ...
+                'Ready', obj.isReady);
+            notify(obj, 'NewEvent', evtData);
         end
 
         function onEdit_Value(obj, src, evt)
@@ -302,6 +357,13 @@ classdef InputBox < Component
             else
                 obj.valueProvided = true;
             end
+            evtType = "ChangedFilterInput";
+            if obj.isSubfilter
+                evtType = strrep(evtType, "Filter", "Subfilter");
+            end 
+            evtData = Event(evtType, obj,...
+                'Ready', obj.isReady);
+            notify(obj, 'NewEvent', evtData);
         end
 
         function onPush_SearchNames(obj, src, evt)
