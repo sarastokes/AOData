@@ -71,11 +71,6 @@ classdef QueryView < aod.app.Component
         end
     end
 
-    methods
-        function refilter(obj)
-        end
-    end
-
     methods (Access = protected)
         function value = specifyChildren(obj)
             value = [obj.exptPanel; obj.filterPanel;...
@@ -84,12 +79,14 @@ classdef QueryView < aod.app.Component
         
         function createUi(obj)
             obj.figureHandle = uifigure();
-            obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + 250;
-            %! Development
-            obj.figureHandle.Position(1:2) = [10 392];
+            obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + 300;
+            if ispref('AOData', 'Development') && getpref('AOData', 'Development')
+                %! Development
+                obj.figureHandle.Position(1:2) = [10 392];
+            end
 
             mainLayout = uigridlayout(obj.figureHandle, [1 2],...
-                "ColumnWidth", {"1.8x", "1x"}, "ColumnSpacing", 3,...
+                "ColumnWidth", {"1.6x", "1x"}, "ColumnSpacing", 2,...
                 "Padding", [3 3 3 3]);
 
             obj.dataGroup = uitabgroup(mainLayout);

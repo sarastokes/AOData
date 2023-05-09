@@ -13,13 +13,6 @@ classdef FilterControls < aod.app.Component
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    events 
-        AddFilter
-        CheckFilter
-        EditFilter
-        RemoveFilter 
-    end
-
     properties
         isSubfilter         logical 
 
@@ -36,6 +29,8 @@ classdef FilterControls < aod.app.Component
                 isSubfilter = false;
             end
             obj.isSubfilter = isSubfilter;
+
+            obj.setHandler(aod.app.query.handlers.FilterControls(obj));
         end
     end
 
@@ -80,13 +75,13 @@ classdef FilterControls < aod.app.Component
                 "RowSpacing", 2, "ColumnSpacing", 2,...
                 "Padding", [5 5 5 5]);
             obj.addButton = uibutton(buttonLayout,...
-                "Text", "", "Tag", "AddFilter",...
+                "Text", "", "Tag", "PushFilter",...
                 "Icon", obj.getIcon("add"),...
                 "Enable", "off",...
                 "ButtonPushedFcn", @obj.onButtonPushed);
             obj.removeButton = uibutton(buttonLayout,...
-                "Text", "", "Tag", "RemoveFilter",...
-                "Icon", obj.getIcon('remove'),...
+                "Text", "", "Tag", "PullFilter",...
+                "Icon", obj.getIcon('cancel'),...
                 "ButtonPushedFcn", @obj.onButtonPushed);
             obj.editButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "EditFilter",...
@@ -107,6 +102,7 @@ classdef FilterControls < aod.app.Component
                 eventName = src.Tag;
             end
             evtData = aod.app.Event(eventName, obj);
+            notify(obj, 'NewEvent', evtData);
         end
     end
 end 

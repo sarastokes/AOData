@@ -1,5 +1,5 @@
 classdef MatchPanel < aod.app.Component 
-% Container for navigating query matches
+% Container for exploring entities that match the query
 %
 % Superclass:
 %   Component
@@ -13,13 +13,8 @@ classdef MatchPanel < aod.app.Component
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    events 
-        PanelExpanded
-        PanelMinimized
-    end
-
-    properties 
-        isExpanded          logical
+    properties (SetAccess = private)
+        isExpanded
     end
 
     properties
@@ -34,6 +29,30 @@ classdef MatchPanel < aod.app.Component
     methods 
         function obj = MatchPanel(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
+            obj.isExpanded = false;
+        end
+    end
+
+    methods
+        function expand(obj)
+            if obj.isExpanded
+                return
+            end
+            set(obj.expandButton,... 
+                "Text", "Expand", "Icon", obj.getIcon("collapse"));
+            obj.entityBox.entityLayout.Scrollable = "off";
+            obj.matchLayout.RowHeight = {"1x", "fit", 0.1};
+            obj.isExpanded = false;
+        end
+
+        function collapse(obj)
+            if ~obj.isExpanded
+                return 
+            end
+            set(obj.expandButton,...
+                "Text", "Collapse", "Icon", obj.getIcon("expand"));
+            obj.matchLayout.RowHeight = {"1x", "fit", "0.5x"};
+            obj.entityBox.entityLayout.Scrollable = "on";
             obj.isExpanded = true;
         end
     end
@@ -46,7 +65,7 @@ classdef MatchPanel < aod.app.Component
         function createUi(obj)
             obj.matchLayout = uigridlayout(...
                 aod.app.util.uilayoutfill(obj.Canvas), [3 1],...
-                "RowHeight", {"1x", "fit", "0.5x"},...
+                "RowHeight", {"1x", "fit", 0.1},...
                 "RowSpacing", 3,...
                 "Padding", [5 5 5 5]);
             obj.entityTree = aod.app.query.EntityTree(obj, obj.matchLayout);
@@ -54,7 +73,7 @@ classdef MatchPanel < aod.app.Component
                 "ColumnWidth", {"fit", "1x"}, "RowHeight", {"fit"},...
                 "Padding", [0 0 0 0]);
             obj.expandButton = uibutton(expandLayout,...
-                "Text", "Minimize", "Icon", [],...
+                "Text", "Expand", "Icon", obj.getIcon("collapse"),...
                 "ButtonPushedFcn", @obj.onPush_Expand);
             obj.entityLabel = uilabel(expandLayout,...
                 "Text", "0 matched entities",...
@@ -64,13 +83,9 @@ classdef MatchPanel < aod.app.Component
 
         function onPush_Expand(obj, src, ~)
             if src.Text == "Minimize"
-                src.Text = "Expand";
-                obj.matchLayout.RowHeight = {"1x", 30, 0.1};
-                obj.entityBox.entityLayout.Scrollable = "off";
+                obj.collapse();
             else
-                obj.matchLayout.RowHeight = {"1x", obj.TEXT_HEIGHT, "0.5x"};
-                src.Text = "Minimize";
-                obj.entityBox.entityLayout.Scrollable = "on";
+                obj.expand();
             end
         end
     end

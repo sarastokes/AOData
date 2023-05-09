@@ -1,5 +1,5 @@
 classdef EventHandler < handle 
-% Handles events with implementation of Chain Of Responsibility pattern
+% Handles events with approximation of the Chain Of Responsibility pattern
 %
 % Constructor:
 %   obj = aod.app.EventHandler(parent, publisher)
@@ -10,7 +10,7 @@ classdef EventHandler < handle
 
     properties (SetAccess = private)
         Parent          
-        Listeners       
+        Listeners       event.listener    
     end
 
     methods
@@ -41,24 +41,25 @@ classdef EventHandler < handle
 
         function l = addListener(obj, varargin)
             l = addlistener(varargin{:});
-            obj.Listeners{end + 1} = l;
+            obj.Listeners = cat(1, obj.Listeners, l);
+            %obj.Listeners{end + 1} = l;
         end
 
         function removeListener(obj, listener)
-            index = cellfun(@(l) l == listener, obj.Listeners);
+            index = arrayfun(@(l) l == listener, obj.Listeners);
             delete(listener);
             obj.Listeners(index) = [];
         end
 
         function removeAllListeners(obj)
             while ~isempty(obj.Listeners)
-                delete(obj.Listeners{1});
+                delete(obj.Listeners(1));
                 obj.Listeners(1) = [];
             end
         end
     end
 
-    methods %(Access = private)
+    methods (Access = private)
         function p = getParentHandler(obj)
             p = [];
             if isprop(obj.Parent, 'Parent') 

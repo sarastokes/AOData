@@ -44,11 +44,7 @@ classdef FilterBox < aod.app.Component
             obj = obj@aod.app.Component(parent, canvas);
             obj.ID = ID;
 
-            obj.setHandler(aod.app.query.handlers.FilterBox(obj, []));
-        end
-
-        function setFilterID(obj, newID)
-            obj.ID = newID;
+            obj.setHandler(aod.app.query.handlers.FilterBox(obj));
         end
 
         function value = get.isReady(obj)
@@ -64,6 +60,20 @@ classdef FilterBox < aod.app.Component
                 value = 0;
             else
                 value = numel(obj.Subfilters);
+            end
+        end
+    end
+
+    methods       
+        function setFilterID(obj, newID)
+            obj.ID = newID;
+        end
+        
+        function F = getFilter(obj)
+            if ~obj.isReady
+                F = [];
+            else
+                F = obj.buildFilter();
             end
         end
     end
@@ -93,7 +103,7 @@ classdef FilterBox < aod.app.Component
         end 
         
         function createUi(obj)
-            obj.gridLayout = uigridlayout(obj.Canvas, [1,3],...
+            obj.gridLayout = uigridlayout(obj.Canvas, [1,2],...
                 "ColumnWidth", {"1x", 70},...
                 "Padding", [0 0 0 0],...
                 "RowHeight", obj.FILTER_HEIGHT,...

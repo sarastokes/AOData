@@ -11,6 +11,9 @@ classdef Component < handle & matlab.mixin.Heterogeneous
 %   - update(obj, varargin)
 %   - value = specifyChildren(obj)
 %   - createUi(obj)
+%
+% See also:
+%   aod.app.EventHandler, aod.app.Event
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -36,7 +39,7 @@ classdef Component < handle & matlab.mixin.Heterogeneous
     properties (Hidden, Constant)
         TEXT_HEIGHT = 20;
         BUTTON_WIDTH = 30;
-        FILTER_HEIGHT = 60;
+        FILTER_HEIGHT = 55;
     end
 
     methods (Abstract, Access = protected)
@@ -105,18 +108,30 @@ classdef Component < handle & matlab.mixin.Heterogeneous
             switch name 
                 case "add"
                     icon = "add.png";
+                case "cancel"
+                    icon = "cancel.png";
                 case "check"
                     icon = "checked-checkbox.png";
+                case "collapse"
+                    icon = "collapse-arrow.png";
+                case "copy"
+                    icon = "copy.png";
                 case "dropdown"
                     icon = "dropdown-field.png";
                 case "edit"
                     icon = "edit.png";
                 case {"editfield", "editbox"}
                     icon = "rename.png";
+                case "expand"
+                    icon = "expand-arrow.png";
                 case 'filter'
                     icon = 'filter.png';
                 case "folder"
                     icon = "folder.png";
+                case "home"
+                    icon = "home-page.png";
+                case "puzzle"
+                    icon = "puzzle.png";
                 case "refresh"
                     icon = "refresh.png";
                 case "remove"

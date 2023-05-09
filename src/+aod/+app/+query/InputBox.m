@@ -190,7 +190,7 @@ classdef InputBox < aod.app.Component
             end
             obj.nameDropdown.Visible = "off";
             obj.nameEditfield.Visible = "on";
-            obj.searchButton.Icon = obj.getIcon("dropdown");
+            obj.searchButton.Icon = obj.getIcon("search");
         end
 
         function showValueEditfield(obj, label)
@@ -222,7 +222,7 @@ classdef InputBox < aod.app.Component
     methods (Access = protected)
         function createUi(obj)
             mainLayout = uigridlayout(obj.Canvas, [1 2],...
-                "ColumnWidth", {"1x", "1x", "1x"}, "RowHeight",  {"1x"},...
+                "ColumnWidth", {"fit", "1x", "1x"}, "RowHeight",  {"1x"},...
                 "Padding", [0 0 0 0], "ColumnSpacing", 2);
 
             % All parameters for input gridlayouts
@@ -272,7 +272,7 @@ classdef InputBox < aod.app.Component
             obj.nameEditfield.Layout.Column = 1;
 
             obj.searchButton = uibutton(obj.nameLayout,...
-                "Text", "", "Icon", obj.getIcon("dropdown"),...
+                "Text", "", "Icon", obj.getIcon("search"),...
                 "Visible", "off",...
                 "ButtonPushedFcn", @obj.onPush_SearchNames);
             obj.searchButton.Layout.Row = 2;
@@ -359,6 +359,7 @@ classdef InputBox < aod.app.Component
                 evtType = "ChangedFilterInput";
             end
             evtData = aod.app.Event(evtType, obj, 'Ready', obj.isReady);
+            notify(obj, 'NewEvent', evtData);
         end
     end
 

@@ -1,7 +1,24 @@
 ## Icon Resources
 
-Source credit for the free icons used in apps:
-- File Cabinet Icon by <a href="https://freeicons.io/profile/101154">sripfoto</a> on <a href="https://freeicons.io">freeicons.io</a>
+Source credit for the free icons used in AOData's apps.
+
+Entity icons:
+- Experiment: <a target="_blank" href="https://icons8.com/icon/32693/experiment">Experiment</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Source: <a target="_blank" href="https://icons8.com/icon/21132/contact-details">Contact Details</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- System: <a target="_blank" href="https://icons8.com/icon/vAO5Zjhw9pP2/test-bench">Test Bench</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Channel: <a target="_blank" href="https://icons8.com/icon/26321/microscope">Microscope</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Device: <a target="_blank" href="https://icons8.com/icon/26286/engineering">Engineering</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Calibration: <a target="_blank" href="https://icons8.com/icon/wMJHTUbxz9KQ/energy-meter">Energy Meter</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- ExperimentDataset: <a target="_blank" href="https://icons8.com/icon/31496/grid">Grid</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Epoch: <a target="_blank" href="https://icons8.com/icon/24405/movie">Movie</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Response: <a target="_blank" href="https://icons8.com/icon/32596/ecg">ECG</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Registration: <a target="_blank" href="https://icons8.com/icon/26236/motion-detector">Motion Detector</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- EpochDataset: <a target="_blank" href="https://icons8.com/icon/31500/hashtag-activity-grid">Hashtag Activity Grid</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Stimulus: <a target="_blank" href="https://icons8.com/icon/26335/spotlight">Spotlight</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Annotation: <a target="_blank" href="https://icons8.com/icon/21145/comments">Comments</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Analysis: <a target="_blank" href="https://icons8.com/icon/38502/accounting">Accounting</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+
+Other icons:
 - <a href="https://icons8.com/icon/nkplpFWWQEKZ/add">Add</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31462/add-row">Add Row</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38947/binary-file">Binary File</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -12,9 +29,11 @@ Source credit for the free icons used in apps:
 - <a href="https://icons8.com/icon/21319/checked-checkbox">Checked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21068/checkmark">Checkmark</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/44484/code">Code</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/47100/collapse-arrow">Collapse Arrow</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/22317/color-swatch">Color Swatch</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21145/comments">Comments</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21132/contact-details">Contact Details</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/22248/copy">Copy</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31483/data-sheet">Data Sheet</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31486/delete-row">Delete Row</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38006/do-not-disturb">Do Not Disturb</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -22,6 +41,7 @@ Source credit for the free icons used in apps:
 - <a href="https://icons8.com/icon/21339/download">Download</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/x9hi54t8czIw/dropdown-field">Dropdown Field</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31490/edit-row">Edit Row</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/47114/expand-arrow">Expand Arrow</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31494/filter">Filter</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/41649/folder">Folder</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21349/form">Form</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -41,6 +61,7 @@ Source credit for the free icons used in apps:
 - <a href="https://icons8.com/icon/31150/new-product">New Product</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38129/note">Note</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21215/planner">Planner</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a href="https://icons8.com/icon/21098/puzzle">Puzzle</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21100/refresh">Refresh</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/22312/rename">Rename</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21394/save">Save</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -48,3 +69,4 @@ Source credit for the free icons used in apps:
 - <a href="https://icons8.com/icon/21103/settings">Settings</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21256/tree-structure">Tree Structure</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21430/unchecked-checkbox">Unchecked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>
+- File Cabinet Icon by <a href="https://freeicons.io/profile/101154">sripfoto</a> on <a href="https://freeicons.io">freeicons.io</a>
