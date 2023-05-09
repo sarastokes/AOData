@@ -1,7 +1,7 @@
 classdef InputBox < aod.app.Component 
 % Interface for specification of filter properties
 %
-% Parent:
+% Superclass:
 %   aod.app.Component
 %
 % Constructor:
@@ -15,10 +15,7 @@ classdef InputBox < aod.app.Component
 
     events 
         AddSubfilter 
-        NameProvided
         SearchNames
-        NameInterfaceChanged
-        ValueProvided
     end
 
     properties (SetAccess = private)
@@ -249,7 +246,6 @@ classdef InputBox < aod.app.Component
             obj.filterDropdown = uidropdown(filterLayout, ...
                 "Items", getEnumMembers("aod.api.FilterTypes")', ...
                 "ValueChangedFcn", @obj.onSelected_FilterDropdown);
-            %! Add option for isSubfilter=true
             obj.filterDropdown.Layout.Column = [1 2];
 
             % INPUT TWO ---------------------------------------------------
@@ -320,12 +316,7 @@ classdef InputBox < aod.app.Component
             end
             obj.filterType = aod.api.FilterTypes.(upper(src.Value));
             obj.changeFilterType();
-            evtData = aod.app.Event('ChangedFilterInput', obj, ...
-                'Ready', obj.isReady);
-            notify(obj, 'NewEvent', evtData);
-            % evtData = Event('ChangeFilterType', obj, ...
-            %     'FilterType', src.Value);
-            % notify(obj, 'NewEvent', evtData);
+            obj.onChange_Anything();
         end
 
         function onPush_AddSubfilter(obj, src, evt)
@@ -335,9 +326,7 @@ classdef InputBox < aod.app.Component
 
         function onSelect_Name(obj, src, evt)
             obj.nameProvided = true;
-            evtData = aod.app.Event('ChangedFilterInput', obj, ...
-                'Ready', obj.isReady);
-            notify(obj, 'NewEvent', evtData);
+            obj.onChange_Anything();
         end
 
         function onEdit_Name(obj, src, evt)
@@ -346,9 +335,7 @@ classdef InputBox < aod.app.Component
             else
                 obj.nameProvided = true;
             end
-            evtData = Event('ChangedFilterInput', obj, ...
-                'Ready', obj.isReady);
-            notify(obj, 'NewEvent', evtData);
+            obj.onChange_Anything();
         end
 
         function onEdit_Value(obj, src, evt)
@@ -357,17 +344,21 @@ classdef InputBox < aod.app.Component
             else
                 obj.valueProvided = true;
             end
-            evtType = "ChangedFilterInput";
-            if obj.isSubfilter
-                evtType = strrep(evtType, "Filter", "Subfilter");
-            end 
-            evtData = Event(evtType, obj,...
-                'Ready', obj.isReady);
-            notify(obj, 'NewEvent', evtData);
+            obj.onChange_Anything();
         end
 
         function onPush_SearchNames(obj, src, evt)
-            notify(obj, 'SearchNames')
+            evtData = aod.app.Event('AddSubfilter', obj);
+            notify(obj, 'SearchNames', evtData);
+        end
+
+        function onChange_Anything(obj)
+            if obj.isSubfilter
+                evtType = "ChangedSubfilterInput";
+            else
+                evtType = "ChangedFilterInput";
+            end
+            evtData = aod.app.Event(evtType, obj, 'Ready', obj.isReady);
         end
     end
 

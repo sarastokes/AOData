@@ -1,0 +1,78 @@
+classdef CodePanel2 < aod.app.Component
+
+    properties
+        codeEditor
+        copyButton          matlab.ui.control.Button 
+        exportButton        matlab.ui.control.Button 
+    end
+
+    methods 
+        function obj = CodePanel2(parent, canvas)
+            obj = obj@aod.app.Component(parent, canvas);
+        end
+    end
+
+    methods
+        function update(obj, varargin)
+            obj.createCode();
+        end
+    end
+
+    methods (Access = protected)
+        function createUi(obj)
+            mainLayout = uigridlayout(obj.Canvas, [2, 1],...
+                "RowHeight", {"1x", 30}, "RowSpacing", 5);
+
+            obj.codeEditor = weblab.components.CodeEditor();
+            f = weblab.internal.Frame("Parent", mainLayout);
+            f.insert(obj.codeEditor);
+            obj.codeEditor.style('fontSize', '12px');
+
+            buttonLayout = uigridlayout(mainLayout, [1 2],...
+                "ColumnSpacing", 5, "Padding", [0 0 0 0]);
+            obj.copyButton = uibutton(buttonLayout,...
+                "Text", "Copy Code", "Icon", []);
+            obj.exportButton = uibutton(buttonLayout,...
+                "Text", "Export Code", "Icon", []);
+
+            obj.createCode();
+        end
+    end
+
+    methods (Access = private)
+        function createCode(obj)
+            obj.codeEditor.Value = "% AOQuery: " + string(datetime("now")) + newline;
+            obj.codeEditor.insertText(newline + "% Identify experiment files" + newline, "end");
+            obj.codeExperiments();
+            obj.codeEditor.insertText(newline + "% Create QueryManager" + newline, "end");
+            obj.codeEditor.insertText("QM = aod.api.QueryManager(exptFiles);" + newline, "end");
+            obj.codeEditor.insertText(newline + "% Add filters" + newline, "end");
+            obj.codeEditor.insertText(newline + "% Filter" + newline, "end");
+            obj.codeEditor.insertText("[matches, entityInfo] = QM.filter();" + newline, "end");
+        end
+
+        function codeExperiments(obj)
+            if isempty(obj.Root.Experiments)
+                str = "exptFiles = [];" + newline;
+                obj.codeEditor.insertText(str, "end");
+                return
+            end
+
+            if obj.Root.numExperiments == 1
+                str = "exptFiles = " + value2string(obj.Root.Experiments(1).hdfName) + ";" + newline;
+                obj.codeEditor.insertText(str, "end");
+                return
+            end
+
+            str = "exptFiles = [..." + newline;
+            for i = 1:obj.Root.numExperiments
+                str = str + "    " + value2string(obj.Root.Experiments(i).hdfName);
+                if i < obj.Root.numExperiments
+                    str = str + ";..." + newline;
+                end
+            end
+            str = str + "];" + newline;
+            obj.codeEditor.insertText(str, "end");
+        end
+    end
+end

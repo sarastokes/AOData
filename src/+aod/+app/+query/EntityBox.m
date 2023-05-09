@@ -1,4 +1,5 @@
 classdef EntityBox < aod.app.Component
+% Interface for viewing entity-specific information
 %
 % Parent:
 %   Component
@@ -15,7 +16,7 @@ classdef EntityBox < aod.app.Component
     properties
         entityLayout        matlab.ui.container.GridLayout
         datasetText         matlab.ui.control.TextArea
-        attrTable
+        attrTable           matlab.ui.control.Table
         linkText            matlab.ui.control.TextArea
     end
 

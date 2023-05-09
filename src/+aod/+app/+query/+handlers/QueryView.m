@@ -10,7 +10,6 @@ classdef QueryView < aod.app.EventHandler
 % See also:
 %   aod.app.query.QueryView
 
-
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
@@ -34,7 +33,7 @@ classdef QueryView < aod.app.EventHandler
                     else
                         obj.Parent.QueryManager.addExperiment(newExperiments);
                     end
-                    evt = aod.app.query.ExperimentEvent("Added", newExperiments);
+                    %evt = aod.app.query.ExperimentEvent("Added", newExperiments);
                     %! Not sure about this
                     obj.Parent.update(evt);
                 case "RemoveExperiment"

@@ -1,7 +1,7 @@
 classdef FilterBox < aod.app.Component 
 % Interface for a single AOQuery filter
 %
-% Parent:
+% Superclass:
 %   aod.app.Component
 %
 % Constructor:
@@ -9,6 +9,9 @@ classdef FilterBox < aod.app.Component
 %
 % Children:
 %   InputBox, FilterControls, SubfilterBox (optional)
+%
+% See also:
+%   aod.app.query.SubfilterBox, aod.app.query.FilterPanel
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

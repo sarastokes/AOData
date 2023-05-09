@@ -1,8 +1,8 @@
 classdef FilterControls < aod.app.Component 
 % Buttons for adding, removing, editing and checking filters
 %
-% Parent:
-%   Component
+% Superclass:
+%   aod.app.Component
 %
 % Constructor:
 %   obj = aod.app.query.FilterControls(parent, canvas, isSubfilter)

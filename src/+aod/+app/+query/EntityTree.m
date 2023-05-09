@@ -1,7 +1,7 @@
 classdef EntityTree < aod.app.Component 
 % Tree displaying experiments and matched entities
 %
-% Parent:
+% Superclass:
 %   aod.app.Component
 %
 % Constructor:
@@ -18,7 +18,7 @@ classdef EntityTree < aod.app.Component
     end
 
     properties
-        Tree 
+        Tree            matlab.ui.container.Tree
     end
 
     methods
@@ -26,16 +26,23 @@ classdef EntityTree < aod.app.Component
             obj = obj@aod.app.Component(parent, canvas);
         end
 
-        function update(obj, updateType)
-            if nargin < 2
-                return
+        function update(obj, varargin)
+
+            if nargin == 2
+                evt = varargin{1};
             end
-            switch updateType 
+
+            switch evt.EventType
+                case "AddExperiment"
+                    expt = obj.Root.Experiments(evt.Data.Index);
+                    for i = 1:numel(expt)
+                        obj.addExperiment(expt.Name, expt.hdfPath);
+                    end 
                 case "RemoveExperiment"
                     if isempty(obj.Root.Experiments)
                         obj.reset();
                     else
-                        
+                        % TODO: Remove specific experiments
                     end
                 case "Filter"
             end
@@ -55,24 +62,23 @@ classdef EntityTree < aod.app.Component
     end
 
     methods 
-        function addExperiment(obj, exptName)
-            if ~isscalar(exptName)
-                arrayfun(@(x) addExperiment(obj, x), exptName);
-                return
-            end
+        function addExperiment(obj, exptName, exptPath)
+            %if ~isscalar(exptName)
+            %    arrayfun(@(x) addExperiment(obj, x), exptName);
+            %    return
+            %end
 
             uitreenode(obj.Tree, "Text", exptName,...
                 "Icon", obj.getIcon("folder"),...
-                "Tag", "Experiment");
+                "Tag", exptPath);
         end
 
-        function removeExperiment(obj, exptName)
-            if ~isscalar(exptName)
-                arrayfun(@(x) removeExperiment(obj, x), exptName);
-                return
-            end
-
-            h = findobj(obj.Tree, "Text", exptName);
+        function removeExperiment(obj, exptPath)
+            %if ~isscalar(exptName)
+            %    arrayfun(@(x) removeExperiment(obj, x), exptPath);
+            %    return
+            %end
+            h = findobj(obj.Tree, "Tag", exptPath);
             delete(h);
         end
     end

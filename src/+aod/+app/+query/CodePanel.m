@@ -1,4 +1,5 @@
 classdef CodePanel < aod.app.Component 
+% Interface for conversion of user input to MATLAB code
 %
 % Parent:
 %   Component
@@ -59,14 +60,19 @@ classdef CodePanel < aod.app.Component
         function createCode(obj)
             txt = "%% AOQuery: " + string(datetime("now")) + newline;
             txt = txt + newline;
+            
             txt = txt + "%% Identify experiment files" + newline;
             txt = obj.codeExperiments(txt);
+
             txt = txt + "%% Create Query Manager" + newline;
-            txt = obj.codeQueryManager(txt);
+            txt = txt + "QM = aod.api.QueryManager(exptFiles);";
+            txt = txt + newline + newline;
+
             txt = txt + "%% Add filters" + newline;
             txt = obj.codeFilters(txt);
+
             txt = txt + "%% Filter" + newline;
-            txt = obj.codeFiltering(txt);
+            txt = txt + "[matches, entityInfo] = QM.filter();" + newline;
             obj.codeBox.Value = txt;
         end
 
@@ -81,17 +87,8 @@ classdef CodePanel < aod.app.Component
             txt = txt + str + "];" + newline + newline;
         end
 
-        function txt = codeQueryManager(obj, txt)
-            txt = txt + "QM = aod.api.QueryManager(exptFiles);";
-            txt = txt + newline + newline;
-        end
-
         function txt = codeFilters(obj, txt)
             txt = txt + newline;
-        end
-
-        function txt = codeFiltering(obj, txt)
-            txt = txt + "[matches, entityInfo] = QM.filter();" + newline;
         end
     end
 end 

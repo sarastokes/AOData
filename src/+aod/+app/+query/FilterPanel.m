@@ -1,4 +1,11 @@
 classdef FilterPanel < aod.app.Component
+% Container for managing multiple AOQuery filters
+%
+% Superclass:
+%   aod.app.Component
+%
+% Syntax:
+%   obj = aod.app.query.FilterPanel(parent, canvas)
 %
 % Children:
 %   FilterBox

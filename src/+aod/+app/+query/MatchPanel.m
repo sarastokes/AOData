@@ -1,6 +1,7 @@
 classdef MatchPanel < aod.app.Component 
+% Container for navigating query matches
 %
-% Parent:
+% Superclass:
 %   Component
 %
 % Constructor:

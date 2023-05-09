@@ -60,16 +60,31 @@ classdef ExperimentPanel < aod.app.Component
                 return
             end
             exptFile = string(fullfile(pathName, fName));
+            numExpts = numel(obj.exptListbox.Items);
+            if numel(exptFile) > 1
+                index = numExpts-numel(exptFile)+1:numExpts+numel(exptFile);
+            else
+                index = numel(exptFile);
+            end
             evtData = aod.app.Event("AddExperiment",... 
-                obj.exptListbox, 'FileName', exptFile);
+                obj.exptListbox, 'FileName', exptFile,...
+                "Index",  index);
             notify(obj, 'NewEvent', evtData);
         end
 
         function onPush_RemoveButton(obj, ~, ~)
             value = obj.exptListbox.Value;
-            disp(value);
-            evtData = aod.app.Event("RemoveExperiment",... 
-                obj.exptListbox, 'FileName', value);
+            numExpts = numel(obj.exptListbox.Items);
+            if numel(value) > 1
+                index = [numExpts-numel(value)+1, numExpts];
+            else
+                index = numExpts;
+            end
+            evtData = aod.app.Event(...
+                "RemoveExperiment", obj.exptListbox,... 
+                'FileName', value,...
+                'ExperimentIndex', index);
+            notify(obj, 'NewEvent', evtData);
         end
     end
 end

@@ -69,7 +69,9 @@ classdef QueryView < aod.app.Component
             idx = arrayfun(@(x) x.isReady, obj.filterPanel.Filters);
             value = obj.filterPanel.Filters(idx);
         end
+    end
 
+    methods
         function refilter(obj)
         end
     end
@@ -105,7 +107,7 @@ classdef QueryView < aod.app.Component
             obj.matchPanel = aod.app.query.MatchPanel(obj, obj.matchTab);
             obj.codeTab = uitab(obj.resultGroup, ...
                 "Title", "Code");
-            obj.codePanel = aod.app.query.CodePanel(obj, obj.codeTab);
+            obj.codePanel = aod.app.query.CodePanel2(obj, obj.codeTab);
         end
 
         function onTab_Changed(obj, ~, evt)
