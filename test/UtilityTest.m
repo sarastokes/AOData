@@ -1,5 +1,5 @@
 classdef UtilityTest < matlab.unittest.TestCase
-% UTILITYTEST
+% Test miscellaneous utility functions 
 %
 % Description:
 %   Tests AOData utility functions
@@ -13,7 +13,7 @@ classdef UtilityTest < matlab.unittest.TestCase
 % See also:
 %   runAODataTestSuite
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
@@ -33,6 +33,13 @@ classdef UtilityTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags=["Utility"])
+        function Cohort(testCase)
+            groupNames = aod.h5.getEntityGroupCohort(testCase.EXPT.Epochs(1));
+            testCase.verifyNumElements(groupNames,2);
+            testCase.verifyTrue(any(contains(groupNames, "0001")));
+            testCase.verifyTrue(any(contains(groupNames, "0002")));
+        end
+
         function Parameters(testCase)
             params = aod.util.Parameters();
             params('A') = 1;

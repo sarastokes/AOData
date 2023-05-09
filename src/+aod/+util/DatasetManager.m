@@ -5,7 +5,8 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
 %   obj = aod.util.DatasetManager()
 %
 % Properties:
-%   ExpectedDatasets
+%   ExpectedDatasets            aod.util.templates.ExpectedDataset
+%
 % Dependent Properties:
 %   Count
 %
@@ -37,6 +38,21 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
     end
 
     methods 
+        function p = get(obj, dsetName)
+            % Get an ExpectedDataset, if it exists
+            %
+            % Syntax:
+            %   p = get(obj, dsetName)
+            % -------------------------------------------------------------
+
+            [tf, idx] = obj.hasDataset(dsetName);
+            if tf 
+                p = obj.ExpectedDatasets(idx);
+            else
+                p = [];
+            end
+        end
+
         function add(obj, name, className, defaultValue, validator, description, units)
             % Add a dataset
             %
@@ -55,12 +71,29 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
             end
 
             if isa(name, 'aod.util.templates.ExpectedDataset')
-                obj.ExpectedDatasets = cat(1, obj.ExpectedDatasets, name);
+                for i = 1:numel(name)
+                    [datasetExists, idx] = obj.hasDataset(name(i).Name);
+                    if datasetExists
+                        warning("add:OverwroteDataset",...
+                            "Overwriting expected dataset %s", name(i).Name);
+                        obj.ExpectedDatasets(idx) = name;
+                    else
+                        obj.ExpectedDatasets = cat(1, obj.ExpectedDatasets, name(i));
+                    end
+                end
                 return
             end
             ED = aod.util.templates.ExpectedDataset(name, className,... 
                 defaultValue, validator, description, units);
-            obj.ExpectedDatasets = cat(1, obj.ExpectedDatasets, ED);
+
+            [datasetExists, idx] = obj.hasDataset(name);
+            if datasetExists 
+                warning("add:OverwroteDataset",...
+                    "Overwriting expected dataset %s", name);
+                obj.ExpectedDatasets(idx) = ED;
+            else
+                obj.ExpectedDatasets = cat(1, obj.ExpectedDatasets, ED);
+            end
         end
 
         function remove(obj, name)
@@ -90,6 +123,7 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
             % Syntax:
             %   clear(obj)
             % ----------------------------------------------------------
+
             obj.ExpectedDatasets = [];
         end
     end
@@ -105,6 +139,7 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
                 names = [];
                 return
             end
+
             names = arrayfun(@(x) x.Name, obj.ExpectedDatasets);
         end
 
@@ -115,7 +150,7 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
             %   [tf, idx] = hasDataset(obj, name)
             % ----------------------------------------------------------
             if isempty(obj.ExpectedDatasets)
-                tf = false;
+                tf = false; idx = [];
                 return
             end
 

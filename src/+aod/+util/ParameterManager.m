@@ -51,21 +51,38 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
                 out = numel(obj.ExpectedParameters);
             end
         end
-
     end
 
     methods
-        function p = get(obj, paramName)
+        function p = get(obj, paramName, errorType)
             % Get an ExpectedParameter, if it exists
             %
             % Syntax:
             %   p = get(obj, paramName)
             % -------------------------------------------------------------
+
+            import aod.util.ErrorTypes 
+
+            if nargin < 3
+                errorType = ErrorTypes.WARNING;
+            else
+                errorType = ErrorTypes.get(errorType);
+            end
+
             [tf, idx] = obj.hasParam(paramName);
+
             if tf 
                 p = obj.ExpectedParameters(idx);
             else
                 p = [];
+                switch errorType 
+                    case ErrorTypes.ERROR 
+                        error('get:ParameterNotFound',...
+                            'Parameter named %s does not exist', paramName);
+                    case ErrorTypes.WARNING
+                        warning('get:ParameterNotFound',...
+                            'Parameter named %s does not exist', paramName);
+                end
             end
         end
 
@@ -102,7 +119,7 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
                 if isa(param, 'aod.util.templates.ExpectedParameter')
                     if any(isequal(param, obj.ExpectedParameters))
                         error('add:ParameterExists',...
-                            'A parameter already exists named %s', param.Name);     
+                            'A parameter already exists named %s, use remove first', param.Name);     
                     end
                     obj.ExpectedParameters = cat(1, obj.ExpectedParameters, param);
                     return
@@ -115,7 +132,8 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
                 end
             end
             
-            newParam = aod.util.templates.ExpectedParameter(param, defaultValue, validationFcn, description);
+            newParam = aod.util.templates.ExpectedParameter(...
+                param, defaultValue, validationFcn, description);
 
             % Confirm 
             if any(isequal(newParam, obj.ExpectedParameters))
