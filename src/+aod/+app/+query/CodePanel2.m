@@ -19,15 +19,32 @@ classdef CodePanel2 < aod.app.Component
         exportButton        matlab.ui.control.Button 
     end
 
+    properties (SetAccess = private)
+        isVisible 
+    end
+
     methods 
         function obj = CodePanel2(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
+            obj.isVisible = false;
         end
     end
 
     methods
         function update(obj, varargin)
-            obj.createCode();
+            if nargin > 1
+                evt = varargin{1};
+                if evt.EventType == "TabHidden"
+                    obj.isVisible = false;
+                elseif evt.EventType == "TabActive"
+                    obj.isVisible = true;
+                %elseif ismember(evt.EventType, ["AddExperiment", "AddNewFilter"])
+                end
+            end
+
+            if obj.isVisible
+                obj.createCode();
+            end
         end
     end
 
@@ -93,9 +110,11 @@ classdef CodePanel2 < aod.app.Component
             if isempty(obj.Root.Filters)
                 return
             end
-            for i = 1:numel(obj.Root.Filters)
+            for i = 1:numel(obj.Root.QueryManager.Filters)
+                obj.codeEditor.insertText(...
+                    sprintf("QM.addFilter(%s);",obj.Root.QueryManager.Filters(i).code()) + newline, "end");
                 % TODO: Add filter inputs
-                obj.codeEditor.insertText("QM.addFilter();" + newline, "end");
+                %obj.codeEditor.insertText("QM.addFilter();" + newline, "end");
             end
         end
     end

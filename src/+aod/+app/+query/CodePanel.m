@@ -24,16 +24,32 @@ classdef CodePanel < aod.app.Component
         exportButton        matlab.ui.control.Button 
     end
 
+    properties (SetAccess = private)
+        isVisible           logical
+    end
+
     methods
         function obj = CodePanel(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
+            obj.isVisible = false;
         end
         
     end
 
     methods
         function update(obj, varargin)
-            obj.createCode();
+            if nargin > 1
+                evt = varargin{1};
+                if evt.EventType == "TabHidden"
+                    obj.isVisible = false;
+                elseif evt.EventType == "TabActive"
+                    obj.isVisible = true;
+                end
+            end
+
+            if obj.isVisible
+                obj.createCode();
+            end
         end
     end
 
