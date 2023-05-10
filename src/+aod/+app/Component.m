@@ -28,7 +28,7 @@ classdef Component < handle & matlab.mixin.Heterogeneous
         % Graphics container for creating UI
         Canvas    
         % EventHandler for passing actions to other components
-        Handler             
+        Handler         aod.app.EventHandler        
     end
 
     properties (Dependent)
@@ -48,6 +48,10 @@ classdef Component < handle & matlab.mixin.Heterogeneous
 
     methods
         function obj = Component(parent, canvas)
+            if nargin == 0
+                return
+            end
+            
             obj.Parent = parent;
             obj.Canvas = canvas;
 

@@ -10,17 +10,14 @@ classdef FilterBox < aod.app.Component
 % Children:
 %   InputBox, FilterControls, SubfilterBox (optional)
 %
+% Events:
+%   N/A
+%
 % See also:
 %   aod.app.query.SubfilterBox, aod.app.query.FilterPanel
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-
-    events 
-        ChangeFilterType
-        GrowLayout
-        ShrinkLayout
-    end
 
     properties 
         ID                  double
@@ -34,6 +31,7 @@ classdef FilterBox < aod.app.Component
 
     properties
         gridLayout          matlab.ui.container.GridLayout
+        fillLayout          matlab.ui.container.GridLayout
         inputBox 
         filterControls 
         Subfilters
@@ -43,6 +41,9 @@ classdef FilterBox < aod.app.Component
         function obj = FilterBox(parent, canvas, ID)
             obj = obj@aod.app.Component(parent, canvas);
             obj.ID = ID;
+
+            obj.fillLayout.Layout.Row = obj.ID; 
+            obj.fillLayout.Layout.Column = 1;
 
             obj.setHandler(aod.app.query.handlers.FilterBox(obj));
         end
@@ -82,10 +83,12 @@ classdef FilterBox < aod.app.Component
         function addNewSubfilter(obj)
             subfilterID = obj.numSubfilters + 1;
             obj.gridLayout.RowHeight = repmat(obj.FILTER_HEIGHT, [1, 1 + subfilterID]);
+            obj.fillLayout.RowHeight = {"fit"};
+            obj.Canvas.RowHeight = {"fit"};
             newSubfilter = aod.app.query.SubfilterBox(obj, obj.gridLayout, subfilterID);
+            newSubfilter.gridLayout.Layout.Column = [1 2];
+            newSubfilter.gridLayout.Layout.Row = subfilterID + 1;
             obj.Subfilters = cat(1, obj.Subfilters, newSubfilter);
-            obj.Subfilters(end).gridLayout.Layout.Column = [1 2];
-            obj.Subfilters(end).gridLayout.Layout.Row = subfilterID + 1;
         end
 
         function removeSubfilter(obj, idx)
@@ -103,14 +106,17 @@ classdef FilterBox < aod.app.Component
         end 
         
         function createUi(obj)
-            obj.gridLayout = uigridlayout(obj.Canvas, [1,2],...
-                "ColumnWidth", {"1x", 70},...
-                "Padding", [0 0 0 0],...
-                "RowHeight", obj.FILTER_HEIGHT,...
-                "BackgroundColor", rgb('light blue'));
+            obj.fillLayout = aod.app.util.uilayoutfill(obj.Canvas, 0);
+            p = uipanel(obj.fillLayout);
+            obj.gridLayout = uigridlayout(p, [1,2],...
+                "ColumnWidth", {"1x", 60},...
+                "Padding", [7 2 2 2],...
+                "RowHeight", obj.FILTER_HEIGHT);
 
-            obj.inputBox = aod.app.query.InputBox(obj, obj.gridLayout, false);
-            obj.filterControls = aod.app.query.FilterControls(obj, obj.gridLayout);
+            obj.inputBox = aod.app.query.InputBox(...
+                obj, obj.gridLayout, false);
+            obj.filterControls = aod.app.query.FilterControls(...
+                obj, obj.gridLayout);
         end
     end
 

@@ -9,14 +9,12 @@ classdef InputBox < aod.app.Component
 %
 % Children:
 %   N/A
+%
+% Events:
+%   AddSubfilter, SearchRequest, ChangedFilterInput, ChangedSubfilterInput
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-
-    events 
-        AddSubfilter 
-        SearchNames
-    end
 
     properties (SetAccess = private)
         filterType              = aod.api.FilterTypes.UNDEFINED
@@ -113,49 +111,44 @@ classdef InputBox < aod.app.Component
 
             switch obj.filterType 
                 case FilterTypes.ENTITY
-                    obj.setNameLabel("Entity Type");
-                    obj.showOneInput();
+                    obj.nameLabel.Text = "Entity Type";
+                    obj.hideValueInput();
                     obj.showNameDropdown();
                     obj.nameDropdown.Items = ... 
                         [""; getEnumMembers('aod.core.EntityTypes')]';
                     obj.searchButton.Visible = "off";
                 case FilterTypes.NAME 
-                    obj.setNameLabel("Entity Name");
+                    obj.nameLabel.Text = "Entity Name";
                     obj.showNameEditfield();
-                    obj.hideSearchButton();
-                    obj.showOneInput();
+                    obj.hideValueInput();
                 case FilterTypes.CLASS
-                    obj.setNameLabel("Class Name")
+                    obj.nameLabel.Text = "Class Name";
                     obj.showNameEditfield();
                     obj.showSearchButton();
-                    obj.showOneInput();
+                    obj.hideValueInput();
                 case {FilterTypes.PARAMETER, FilterTypes.DATASET}
-                    obj.setNameLabel("Name");
-                    obj.hideSearchButton();
-                    obj.setValueLabel("Value");
+                    obj.nameLabel.Text = "Name";
+                    obj.valueLabel.Text = "Value";
                     obj.showValueEditfield("Value");
                 case FilterTypes.LINK
-                    obj.setNameLabel("Link Name");
+                    obj.nameLabel.Text = "Link Name (optional)";
                     obj.showSubfilterButton();
                 case FilterTypes.PARENT
-                    obj.setNameLabel("Parent Type");
+                    obj.nameLabel.Text = "Parent Type";
                     obj.nameDropdown.Items = ... 
                         [""; getEnumMembers('aod.api.FilterTypes')]';
                     obj.showSubfilterButton();
                 case FilterTypes.CHILD
-                    obj.setNameLabel("Child Type");
+                    obj.nameLabel.Text = "Child Type";
                     obj.nameDropdown.Items = ... 
                         [""; getEnumMembers('aod.api.FilterTypes')]';
                     obj.showSubfilterButton();
-                    obj.hideSearchButton();
                 case FilterTypes.UUID
-                    obj.setNameLabel("UUID");
-                    obj.hideSearchButton();
-                    obj.showOneInput();
+                    obj.nameLabel.Text = "UUID";
+                    obj.hideValueInput();
                 case FilterTypes.PATH
-                    obj.setNameLabel("HDF5 Path");
-                    obj.hideSearchButton();
-                    obj.showOneInput();
+                    obj.nameLabel.Text = "HDF5 Path";
+                    obj.hideValueInput();
                 otherwise
                     error('changeFilterType:UnknownFilterType',...
                         'Filter %s not recognized', char(filterType));
@@ -164,16 +157,12 @@ classdef InputBox < aod.app.Component
     end
 
     methods
-        function setNameLabel(obj, txt)
-            obj.nameLabel.Text = txt;
-        end
-    
         function setValueLabel(obj, txt)
             obj.valueLabel.Text = txt;
         end
 
         function showSubfilterButton(obj)
-            obj.setValueLabel("(optional)");
+            obj.valueLabel.Text = "(optional)";
             obj.valueEditfield.Visible = "off";
             obj.subfilterButton.Visible = "on";
         end
@@ -186,7 +175,7 @@ classdef InputBox < aod.app.Component
 
         function showNameEditfield(obj, lbl)
             if nargin == 2
-                obj.setNameLabel(lbl);
+                obj.nameLabel.Text = lbl;
             end
             obj.nameDropdown.Visible = "off";
             obj.nameEditfield.Visible = "on";
@@ -197,7 +186,7 @@ classdef InputBox < aod.app.Component
             if nargin < 2
                 label = "";
             end
-            obj.setValueLabel(label);  % Rearrange layout
+            obj.valueLabel.Text = label;  
             obj.subfilterButton.Visible = "off";
             obj.valueEditfield.Visible = "on";
         end
@@ -212,7 +201,7 @@ classdef InputBox < aod.app.Component
             obj.nameLayout.ColumnWidth = {"1x", 1};
         end
 
-        function showOneInput(obj)
+        function hideValueInput(obj)
             obj.valueLabel.Visible = "off";
             obj.subfilterButton.Visible = "off";
             obj.valueEditfield.Visible = "off";
@@ -234,8 +223,7 @@ classdef InputBox < aod.app.Component
                 "VerticalAlignment", "center"};
 
             % INPUT ONE ---------------------------------------------------
-            filterLayout = uigridlayout(mainLayout, [2 2],...
-                "BackgroundColor", rgb('light teal'), gridSpecs{:});
+            filterLayout = uigridlayout(mainLayout, [2 2], gridSpecs{:});
             filterLayout.Layout.Row = 1;
             filterLayout.Layout.Column = 1;
             
@@ -249,8 +237,7 @@ classdef InputBox < aod.app.Component
             obj.filterDropdown.Layout.Column = [1 2];
 
             % INPUT TWO ---------------------------------------------------
-            obj.nameLayout = uigridlayout(mainLayout, [2 2],...
-                "BackgroundColor", rgb('mint'), gridSpecs{:});
+            obj.nameLayout = uigridlayout(mainLayout, [2 2], gridSpecs{:});
             obj.nameLayout.Layout.Column = 2;
             obj.nameLayout.Layout.Row = 1;
 
@@ -279,8 +266,7 @@ classdef InputBox < aod.app.Component
             obj.searchButton.Layout.Column = 2;
 
             % INPUT THREE -------------------------------------------------
-            obj.valueLayout = uigridlayout(mainLayout, [2 2],...
-                "BackgroundColor", rgb('light red'), gridSpecs{:});
+            obj.valueLayout = uigridlayout(mainLayout, [2 2], gridSpecs{:});
             obj.valueLayout.Layout.Row = 1;
             obj.valueLayout.Layout.Column = 3;
 
@@ -320,8 +306,7 @@ classdef InputBox < aod.app.Component
         end
 
         function onPush_AddSubfilter(obj, src, evt)
-            evtData = aod.app.Event('AddSubfilter', obj);
-            notify(obj, 'NewEvent', evtData);
+            obj.publish("AddSubfilter", obj);
         end
 
         function onSelect_Name(obj, src, evt)
@@ -348,8 +333,8 @@ classdef InputBox < aod.app.Component
         end
 
         function onPush_SearchNames(obj, src, evt)
-            evtData = aod.app.Event('AddSubfilter', obj);
-            notify(obj, 'SearchNames', evtData);
+            obj.publish("SearchRequest", obj,...
+                "ListBox", obj.nameDropdown);
         end
 
         function onChange_Anything(obj)
@@ -358,8 +343,8 @@ classdef InputBox < aod.app.Component
             else
                 evtType = "ChangedFilterInput";
             end
-            evtData = aod.app.Event(evtType, obj, 'Ready', obj.isReady);
-            notify(obj, 'NewEvent', evtData);
+            obj.publish(evtType, obj,...
+                "Ready", obj.isReady);
         end
     end
 

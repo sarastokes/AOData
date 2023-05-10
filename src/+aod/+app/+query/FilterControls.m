@@ -9,13 +9,20 @@ classdef FilterControls < aod.app.Component
 %
 % Children:
 %   N/A
+%
+% Events:
+%   PushFilter, PullFilter, CheckFilter, EditFilter,...
+%   PushSubfilter, PullSubfilter, CheckSubfilter, EditSubfilter
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties
+    %% TODO: Needs filterID
+    properties (SetAccess = private)
         isSubfilter         logical 
+    end
 
+    properties 
         addButton           matlab.ui.control.Button
         checkButton         matlab.ui.control.Button
         editButton          matlab.ui.control.Button
@@ -78,31 +85,35 @@ classdef FilterControls < aod.app.Component
                 "Text", "", "Tag", "PushFilter",...
                 "Icon", obj.getIcon("add"),...
                 "Enable", "off",...
-                "ButtonPushedFcn", @obj.onButtonPushed);
+                "ButtonPushedFcn", @obj.onPush_Button);
             obj.removeButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "PullFilter",...
                 "Icon", obj.getIcon('cancel'),...
-                "ButtonPushedFcn", @obj.onButtonPushed);
+                "ButtonPushedFcn", @obj.onPush_Button);
             obj.editButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "EditFilter",...
                 "Icon", obj.getIcon('edit'),...
                 "Enable", "off",...
-                "ButtonPushedFcn", @obj.onButtonPushed);
+                "ButtonPushedFcn", @obj.onPush_Button);
             obj.checkButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "CheckFilter",...
                 "Icon", obj.getIcon('check'),...
                 "Enable", "off",...
-                "ButtonPushedFcn", @obj.onButtonPushed);
+                "ButtonPushedFcn", @obj.onPush_Button);
         end
 
-        function onButtonPushed(obj, src, evt)
+        function onPush_Button(obj, src, evt)
             if obj.isSubfilter
                 eventName = strrep(src.Tag, "Filter", "Subfilter");
+                subID = obj.Parent.subID;
             else
                 eventName = src.Tag;
+                subID = [];
             end
-            evtData = aod.app.Event(eventName, obj);
-            notify(obj, 'NewEvent', evtData);
+            disp(eventName);
+            
+            obj.publish(eventName, obj,...
+                "ID", obj.Parent.ID, "SubID", subID);
         end
     end
 end 

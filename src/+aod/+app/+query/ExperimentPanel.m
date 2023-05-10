@@ -13,11 +13,6 @@ classdef ExperimentPanel < aod.app.Component
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    events
-        AddExperiment
-        RemoveExperiment
-    end
-
     properties
         exptListbox         matlab.ui.control.ListBox 
         addButton           matlab.ui.control.Button 
@@ -41,6 +36,9 @@ classdef ExperimentPanel < aod.app.Component
                 "HorizontalAlignment", "center");
             obj.exptListbox = uilistbox(layout,...
                 "Items", {});
+            if obj.Root.numExperiments ~= 0
+                obj.exptListbox.Items = obj.Root.hdfFiles;
+            end
             buttonLayout = uigridlayout(layout, [1 2],...
                 "ColumnSpacing", 5, "Padding", [0 0 0 0]);
             obj.addButton = uibutton(buttonLayout,...

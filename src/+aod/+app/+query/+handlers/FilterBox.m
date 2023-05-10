@@ -6,7 +6,7 @@ classdef FilterBox < aod.app.EventHandler
         end
 
         function handleRequest(obj, ~, evt)
-            assignin('base', 'evt', evt);
+            assignin('base', 'FilterBoxRequest', evt);
             switch evt.EventType 
                 case "ChangeFilterType"
                     obj.Parent.update(evt);
@@ -14,13 +14,7 @@ classdef FilterBox < aod.app.EventHandler
                     obj.Parent.addNewSubfilter();
                 case "RemoveSubfilter"
                 case "ChangedFilterInput"
-                    obj.Parent.update(evt);    
-                case "PushFilter"
-                    obj.Parent.Root.QueryManager.addFilter(...
-                        obj.Parent.getFilter());
-                    obj.Parent.Root.update(evt);
-                case "PullFilter"
-                case "CheckFilter"
+                    obj.Parent.update(evt); 
             end
 
             obj.passRequest(evt);

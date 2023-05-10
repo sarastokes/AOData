@@ -13,11 +13,6 @@ classdef FilterPanel < aod.app.Component
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    events
-        AddNewFilter
-        ClearAllFilters
-    end
-
     properties
         Filters 
     end
@@ -36,6 +31,8 @@ classdef FilterPanel < aod.app.Component
     methods
         function obj = FilterPanel(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
+
+            obj.setHandler(aod.app.query.handlers.FilterPanel(obj));
         end
 
         function value = get.numFilters(obj)
@@ -49,13 +46,13 @@ classdef FilterPanel < aod.app.Component
 
     methods
         function filterID = addFilter(obj)
-            filterID = numel(obj.Filters) + 1;
+            filterID = obj.numFilters + 1;
             newFilter = aod.app.query.FilterBox(obj, obj.filterLayout, filterID);
+            %newFilter.gridLayout.Layout.Row = filterID;
+            %newFilter.gridLayout.Layout.Column = 1;
             obj.Filters = cat(1, obj.Filters, newFilter);
-            obj.Filters(end).gridLayout.Layout.Row = filterID;
-            obj.Filters(end).gridLayout.Layout.Column = 1;
-            %obj.filterLayout.RowHeight = ... 
-            %    repmat(obj.FILTER_HEIGHT, [1 obj.numFilters]);
+            obj.filterLayout.RowHeight = ... 
+                repmat("fit", [1 obj.numFilters]);
         end
     end
 
@@ -68,8 +65,8 @@ classdef FilterPanel < aod.app.Component
             obj.gridLayout = uigridlayout(obj.Canvas, [2 2],...
                 "RowHeight", {"1x", 30}, "ColumnWidth", {"1x", "1x"});
             obj.filterLayout = uigridlayout(obj.gridLayout,...
-                "ColumnWidth", {"1x"}, "RowHeight", {"fit"}, "RowSpacing", 5,...
-                "Scrollable", "on");
+                "ColumnWidth", {"1x"}, "RowHeight", {"fit"},... 
+                "RowSpacing", 3, "Scrollable", "on");
             obj.filterLayout.Layout.Row = 1;
             obj.filterLayout.Layout.Column = [1 2];
             
@@ -89,8 +86,6 @@ classdef FilterPanel < aod.app.Component
         end
 
         function onPush_AddNewFilter(obj, ~, ~)
-            %evtData = aod.app.Event('AddNewFilter', []);
-            %notify(obj, 'NewEvent', evtData);
             obj.addFilter();
         end
 

@@ -19,6 +19,7 @@ classdef QueryView < aod.app.EventHandler
         end
 
         function handleRequest(obj, ~, evt)
+            assignin('base', 'QueryViewRequest', evt);
             switch evt.EventType 
                 case "AddExperiment"
                     newExperiments = [];
@@ -26,13 +27,16 @@ classdef QueryView < aod.app.EventHandler
                         pEXPT = loadExperiment(evt.Data.FileName(i));
                         newExperiments = cat(1, newExperiments, pEXPT);
                     end 
-                    %obj.Parent.Experiments = cat(1, obj.Parent.Experiments, newExperiments);
-                    %expt = evt.Trigger.Items;
                     obj.Parent.QueryManager.addExperiment(newExperiments);
                     obj.Parent.update(evt);
                 case "RemoveExperiment"
                     obj.Parent.QueryManager.removeExperiment(evt.Data.FileName);
                     obj.Parent.update(evt);
+                case "PushFilter"
+                    obj.Parent.QueryManager.addFilter( ...
+                        obj.Parent.Filters(evt.Data.ID).getFilter());
+                    obj.Parent.update(evt);
+                case "SearchRequest"
             end
         end
     end

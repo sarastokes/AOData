@@ -9,6 +9,9 @@ classdef MatchPanel < aod.app.Component
 %
 % Children:
 %   EntityTree, EntityBox
+%
+% Events:
+%   N/A
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

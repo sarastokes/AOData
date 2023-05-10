@@ -50,10 +50,10 @@ classdef QueryManager < handle
     % Dependent set/get methods
     methods 
         function out = get.numFiles(obj)
-            if isempty(obj.hdfName)
+            if isempty(obj.Experiments)
                 out = 0;
             else
-                out = numel(obj.hdfName);
+                out = numel(obj.Experiments);
             end
         end
 
@@ -79,7 +79,9 @@ classdef QueryManager < handle
             end
 
             if obj.numFilters == 0
-                error("go:NoFiltersSet", "Add filters first");
+                matches = [];  % TODO
+                entityInfo = obj.entityTable;
+                warning("go:NoFiltersSet", "Add filters first");
             end
 
             % Reset match indices
@@ -144,12 +146,12 @@ classdef QueryManager < handle
                         'Input must be string of HDF file name(s) or array of aod.persistent.Experiment');
                 end
                 %! Make hdfName dependent?
-                if isempty(obj.hdfName)
-                    obj.hdfName = newName;
-                else
-                    obj.hdfName = cat(1, obj.hdfName, newName);
-                end
-                obj.Experiments = cat(1, obj.Experiments, newExpt);
+                %if isempty(obj.hdfName)
+                %    obj.hdfName = newName;
+                %else
+                    obj.hdfName = [obj.hdfName; newName];
+                %end
+                obj.Experiments = [obj.Experiments; newExpt];
             end
             
             obj.populateEntityTable();

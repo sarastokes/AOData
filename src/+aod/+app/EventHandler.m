@@ -9,13 +9,18 @@ classdef EventHandler < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent          
+        Parent          aod.app.Component
         Listeners       event.listener    
     end
 
     methods
         function obj = EventHandler(parent, publisher)
+            if nargin == 0
+                return
+            end
+
             obj.Parent = parent;
+            
             if nargin < 2 || isempty(publisher)
                 publisher = obj.Parent;
             end

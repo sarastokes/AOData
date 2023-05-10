@@ -1,4 +1,5 @@
 classdef SubfilterBox < aod.app.Component
+% Interface for specifying subfilter inputs
 %
 % Parent:
 %   aod.app.Component
@@ -8,6 +9,9 @@ classdef SubfilterBox < aod.app.Component
 %
 % Children:
 %   InputBox, FilterControls
+%
+% Events:
+%   N/A
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -54,27 +58,11 @@ classdef SubfilterBox < aod.app.Component
             obj.gridLayout = uigridlayout(obj.Canvas, [1 2],...
                 "ColumnWidth", {"1x", 70},...
                 "Padding", [0 0 0 0],...
-                "RowHeight", obj.FILTER_HEIGHT,...
-                "BackgroundColor", rgb("peach"));
+                "RowHeight", obj.FILTER_HEIGHT);
             obj.gridLayout.Layout.Column = 1;
-            
-            % filterLayout = uigridlayout(obj.gridLayout, [2 1],...
-            %     "RowHeight", {obj.TEXT_HEIGHT, "1x"}, "RowSpacing", 2,...
-            %     "Padding", [0 5 0 0]);
-            % uilabel(filterLayout, "Text", "Filter Type",...
-            %     "FontWeight", "bold", "FontSize", 12,... 
-            %     "HorizontalAlignment", "center",...
-            %     "VerticalAlignment", "center");
-            % obj.filterDropdown = uidropdown(filterLayout,...
-            %     "Items", [""; getEnumMembers("aod.api.FilterTypes")]',...
-            %     "ValueChangedFcn", @obj.onSelected_FilterDropdown);
-            % obj.filterDropdown.Items = obj.filterDropdown.Items(...
-            %     ~ismember(obj.filterDropdown.Items, ["LINK", "CHILD", "PARENT"]));
+
             obj.inputBox = aod.app.query.InputBox(obj, obj.gridLayout, true);
             obj.filterControls = aod.app.query.FilterControls(obj, obj.gridLayout, true);
-        end
-
-        function onSelected_FilterDropdown(obj, src, evt)
         end
     end
 end 

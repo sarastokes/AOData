@@ -9,16 +9,14 @@ classdef QueryView < aod.app.Component
 %
 % Children:
 %   CodePanel, ExperimentPanel, MatchPanel, FilterPanel
+%
+% Events:
+%   N/A
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    events
-        ChangedFilters
-    end
-
     properties 
-        %Experiments         aod.persistent.Experiment
         QueryManager        aod.api.QueryManager = aod.api.QueryManager([]);
     end
 
@@ -31,10 +29,12 @@ classdef QueryView < aod.app.Component
         matchPanel
     end
 
+    % QueryManager interface
     properties (Dependent)
         Experiments         aod.persistent.Experiment
         numExperiments      double  {mustBeInteger}
         numFilters          double  {mustBeInteger}
+        hdfFiles            string 
     end
 
     properties (Hidden)
@@ -45,8 +45,6 @@ classdef QueryView < aod.app.Component
         resultGroup         matlab.ui.container.TabGroup
         codeTab             matlab.ui.container.Tab 
         matchTab            matlab.ui.container.Tab
-
-        isInverted          logical
     end
 
     methods
@@ -54,8 +52,6 @@ classdef QueryView < aod.app.Component
             obj = obj@aod.app.Component([], []);
 
             obj.setHandler(aod.app.query.handlers.QueryView(obj));
-
-            obj.isInverted = false;
         end
 
         function value = get.Experiments(obj)
@@ -68,6 +64,30 @@ classdef QueryView < aod.app.Component
 
         function value = get.numExperiments(obj)
             value = obj.QueryManager.numFiles;
+        end
+
+        function value = get.hdfFiles(obj)
+            value = obj.QueryManager.hdfName;
+        end
+    end
+
+    methods
+        %function update(obj, evt)
+        %    if nargin < 0
+        %        obj.updateChildren();
+        %    end
+
+        %    switch evt.EventType 
+        %        case "AddExperiment"
+        %        case "RemoveExperiment"
+        %        case "AddNewFilter"
+        %    end
+        %end
+
+        function filterEntities(obj)
+            if obj.numExperiments == 0
+                return 
+            end
         end
     end
 
@@ -91,7 +111,7 @@ classdef QueryView < aod.app.Component
 
             obj.dataGroup = uitabgroup(mainLayout);
             obj.exptTab = uitab(obj.dataGroup,...
-                "Title", "Expt");
+                "Title", "Experiments");
             obj.exptPanel = aod.app.query.ExperimentPanel(obj, obj.exptTab);
             obj.filterTab = uitab(obj.dataGroup,...
                 "Title", "Filters");
@@ -100,7 +120,7 @@ classdef QueryView < aod.app.Component
             obj.resultGroup = uitabgroup(mainLayout, ...
                 "SelectionChangedFcn", @obj.onTab_Changed);
             obj.matchTab = uitab(obj.resultGroup,... 
-                "Title", "Matches");
+                "Title", "Entities");
             obj.matchPanel = aod.app.query.MatchPanel(obj, obj.matchTab);
             obj.codeTab = uitab(obj.resultGroup, ...
                 "Title", "Code");
@@ -118,38 +138,6 @@ classdef QueryView < aod.app.Component
                 obj.matchPanel.update(evtActive);
                 obj.codePanel.update(evtHidden);
             end
-            
-        end
-    end
-
-    methods 
-        function invert(obj)
-            obj.isInverted = ~obj.isInverted;
-
-            if obj.isInverted
-                bkgd = [0.1 0.1 0.15]-0.05;
-                button = [0.14 0.14 0.19]-0.05;
-                grid = [0.16 0.16 0.21]-0.05;
-                text = [0.94 0.94 0.94];
-                
-            else
-                bkgd = [1 1 1];
-                button = [0.96 0.96 0.96];
-                grid = [0.94 0.94 0.94];
-                text = [0 0 0];
-            end
-
-            obj.figureHandle.Color = bkgd;
-            set(findall(obj.figureHandle, 'Type', 'uitab'),...
-                'BackgroundColor', grid, 'ForegroundColor', text);
-            set(findall(obj.figureHandle, 'Type', 'uigridlayout'),...
-                'BackgroundColor', grid);
-            set(findall(obj.figureHandle, 'Type', 'uitextarea'),...
-                'BackgroundColor', bkgd, 'FontColor', text);
-            set(findall(obj.figureHandle, 'Type', 'uibutton'),...
-                'BackgroundColor', button, 'FontColor', text);
-            set(findall(obj.figureHandle, 'Type', 'uilabel'),...
-                'BackgroundColor', 'none', 'FontColor', text);
         end
     end
 end 

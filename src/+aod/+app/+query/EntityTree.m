@@ -13,10 +13,6 @@ classdef EntityTree < aod.app.Component
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    events
-        SelectedNode
-    end
-
     properties
         Tree            matlab.ui.container.Tree
         UnmatchedNode   matlab.ui.container.TreeNode
@@ -96,18 +92,12 @@ classdef EntityTree < aod.app.Component
             entityTable = entityTable(entityTable.File == exptFile, :);
             entityTable = sortrows(entityTable, "Path", "ascend");
 
-            % Identifiy top-level nodes
-            isBold = ismember(entityTable.Entity, ["Epoch", "Experiment"]);
             % Create the entity nodes
             for i = 1:height(entityTable)
                 iNode = uitreenode(exptFolder,... 
                     "Text", h5tools.util.getPathEnd(entityTable.Path(i)),...
-                    "Icon", obj.Icons(entityTable.Entity(i)),...
                     "Tag", entityTable.Path(i));
-                % Emphasize experiment and epoch
-                if isBold(i)
-                    addStyle(obj.Tree, obj.BOLD_STYLE, "node", iNode);
-                end
+                addStyle(obj.Tree, obj.Icons(entityTable.Entity(i)), "Node", iNode);
             end
             fprintf('Entity Tree Time = %.2f\n', toc);
         end
@@ -125,8 +115,10 @@ classdef EntityTree < aod.app.Component
                 "SelectionChangedFcn", @obj.onSelected_Node);
             obj.UnmatchedNode = uitreenode(obj.Tree,...
                 "Text", "Unmatched entities");
-            if ~isempty(obj.Root.Experiments)
-                %! Add experiments, if present
+            if obj.Root.numExperiments ~= 0
+                for i = 1:obj.Root.numExperiments
+                    obj.addExperiment(obj.Root.hdfFiles(i));
+                end
             end
         end
 
@@ -136,8 +128,7 @@ classdef EntityTree < aod.app.Component
             else
                 eventName = 'EntitySelected';
             end
-            evtData = aod.app.Event(eventName, src);
-            notify(obj, 'NewEvent', evtData);
+            obj.publish(eventName, src);
         end
     end
 
@@ -146,22 +137,36 @@ classdef EntityTree < aod.app.Component
             obj.Icons = containers.Map();
 
             iconPath = fullfile(aod.app.util.getIconFolder(), "+entity");
+            iconPath = iconPath + filesep;
 
-            obj.Icons('Experiment') = fullfile(iconPath, "experiment.png");
-            obj.Icons('Source') = fullfile(iconPath, "contact-details.png");
-            obj.Icons('System') = fullfile(iconPath, "telescope.png");
-            obj.Icons('Channel') = fullfile(iconPath, "journey.png");
-            obj.Icons('Device') = fullfile(iconPath, "led-diode.png");
-            obj.Icons('Calibration') = fullfile(iconPath, "accuracy.png");
-            obj.Icons('ExperimentDataset') = fullfile(iconPath, "grid.png");
-            obj.Icons('Epoch') = fullfile(iconPath, "iris-scan.png");
-            obj.Icons('Stimulus') = fullfile(iconPath, "spotlight.png");
-            obj.Icons('Registration') = fullfile(iconPath, "motion-detector.png");
-            obj.Icons('Response') = fullfile(iconPath, "electrical-threshold.png");
-            obj.Icons('EpochDataset') = fullfile(iconPath, "hashtag-activity-grid.png");
-            obj.Icons('Annotation') = fullfile(iconPath, "comments.png");
-            obj.Icons('Analysis') = fullfile(iconPath, "graph.png");
-
+            obj.Icons('Experiment') = uistyle("FontWeight", "bold",...
+                "Icon", iconPath + "experiment.png");
+            obj.Icons('Source') = uistyle(...
+                "Icon", iconPath + "contact-details.png");
+            obj.Icons('System') = uistyle("FontWeight", "bold",...
+                "Icon", iconPath + "telescope.png");
+            obj.Icons('Channel') = uistyle(...
+                "Icon", iconPath + "journey.png");
+            obj.Icons('Device') = uistyle(...
+                "Icon", iconPath + "led-diode.png");
+            obj.Icons('Calibration') = uistyle(...
+                "Icon", iconPath + "accuracy.png");
+            obj.Icons('ExperimentDataset') = uistyle(...
+                "Icon", iconPath + "grid.png");
+            obj.Icons('Epoch') = uistyle("FontWeight", "bold",...
+                "Icon", iconPath + "iris-scan.png");
+            obj.Icons('Stimulus') = uistyle(...
+                "Icon", iconPath + "spotlight.png");
+            obj.Icons('Registration') = uistyle(...
+                "Icon", iconPath + "motion-detector.png");
+            obj.Icons('Response') = uistyle(...
+                "Icon", iconPath + "electrical-threshold.png");
+            obj.Icons('EpochDataset') = uistyle(...
+                "Icon", iconPath + "hashtag-activity-grid.png");
+            obj.Icons('Annotation') = uistyle(...
+                "Icon", iconPath + "comments.png");
+            obj.Icons('Analysis') = uistyle(...
+                "Icon", iconPath + "graph.png");
         end
     end
 end 

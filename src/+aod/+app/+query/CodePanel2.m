@@ -2,12 +2,15 @@ classdef CodePanel2 < aod.app.Component
 % Interface for conversion of user input to MATLAB code
 %
 % Parent:
-%   Component
+%   aod.app.Component
 %
 % Constructor:
 %   obj = aod.app.query.CodePanel(parent, canvas)
 %
 % Children:
+%   N/A
+%
+% Events:
 %   N/A
 
 % By Sara Patterson, 2023 (AOData)
@@ -38,7 +41,6 @@ classdef CodePanel2 < aod.app.Component
                     obj.isVisible = false;
                 elseif evt.EventType == "TabActive"
                     obj.isVisible = true;
-                %elseif ismember(evt.EventType, ["AddExperiment", "AddNewFilter"])
                 end
             end
 
@@ -61,11 +63,21 @@ classdef CodePanel2 < aod.app.Component
             buttonLayout = uigridlayout(mainLayout, [1 2],...
                 "ColumnSpacing", 5, "Padding", [0 0 0 0]);
             obj.copyButton = uibutton(buttonLayout,...
-                "Text", "Copy Code", "Icon", obj.getIcon("copy"));
+                "Text", "Copy Code", "Icon", obj.getIcon("copy"),...
+                "ButtonPushedFcn", @obj.onPush_CopyCode);
             obj.exportButton = uibutton(buttonLayout,...
-                "Text", "Export Code", "Icon", obj.getIcon("save"));
+                "Text", "Export Code", "Icon", obj.getIcon("save"),...
+                "ButtonPushedFcn", @obj.onPush_ExportCode);
 
             obj.createCode();
+        end
+
+        function onPush_CopyCode(obj, ~, ~)
+            clipboard('copy', obj.codeBox.Value);
+        end
+
+        function onPush_ExportCode(~, ~, ~)
+            % TODO: Export code interface
         end
     end
 
@@ -90,14 +102,14 @@ classdef CodePanel2 < aod.app.Component
             end
 
             if obj.Root.numExperiments == 1
-                str = "exptFiles = " + value2string(obj.Root.Experiments(1).hdfName) + ";" + newline;
+                str = "exptFiles = " + value2string(obj.Root.hdfFiles) + ";" + newline;
                 obj.codeEditor.insertText(str, "end");
                 return
             end
 
             str = "exptFiles = [..." + newline;
             for i = 1:obj.Root.numExperiments
-                str = str + "    " + value2string(obj.Root.Experiments(i).hdfName);
+                str = str + "    " + value2string(obj.Root.hdfFiles(i));
                 if i < obj.Root.numExperiments
                     str = str + ";..." + newline;
                 end

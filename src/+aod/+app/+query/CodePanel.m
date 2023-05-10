@@ -2,21 +2,19 @@ classdef CodePanel < aod.app.Component
 % Interface for conversion of user input to MATLAB code
 %
 % Parent:
-%   Component
+%   aod.app.Component
 %
 % Constructor:
 %   obj = aod.app.query.CodePanel(parent, canvas)
 %
 % Children:
 %   N/A
+%
+% Events:
+%   N/A
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-
-    events 
-        CopyCode
-        ExportCode
-    end
 
     properties 
         codeBox             matlab.ui.control.TextArea
@@ -64,11 +62,21 @@ classdef CodePanel < aod.app.Component
             buttonLayout = uigridlayout(mainLayout, [1 2],...
                 "ColumnSpacing", 5, "Padding", [0 0 0 0]);
             obj.copyButton = uibutton(buttonLayout,...
-                "Text", "Copy Code", "Icon", []);
+                "Text", "Copy Code", "Icon", [],...
+                "ButtonPushedFcn", @obj.onPush_CopyCode);
             obj.exportButton = uibutton(buttonLayout,...
-                "Text", "Export Code", "Icon", []);
+                "Text", "Export Code", "Icon", [],...
+                "ButtonPushedFcn", @obj.onPush_ExportCode);
 
             obj.createCode();
+        end
+
+        function onPush_CopyCode(obj, ~, ~)
+            clipboard('copy', obj.codeBox.Value);
+        end
+
+        function onPush_ExportCode(~, ~, ~)
+            % TODO: Export code interface
         end
     end
 
@@ -95,7 +103,7 @@ classdef CodePanel < aod.app.Component
         function txt = codeExperiments(obj, txt)
             str = "exptFiles = [..." + newline;
             for i = 1:obj.Root.numExperiments
-                str = str + "    " + value2string(obj.Root.Experiments(i).hdfName);
+                str = str + "    " + value2string(obj.Root.hdfFiles(i));
                 if i < obj.Root.numExperiments
                     str = str + ";..." + newline;
                 end

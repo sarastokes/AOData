@@ -19,6 +19,7 @@
 
 ##### AOQuery App
 - [ ] Code for subfilters
+- [ ] Decide on weblab submodule addition (see CodePanel and CodePanel2)
 
 ##### HDF5
 - Write data from persistent interface

@@ -9,6 +9,9 @@ classdef EntityBox < aod.app.Component
 %
 % Children:
 %   N/A
+%
+% Events:
+%   N/A
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
