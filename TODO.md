@@ -17,13 +17,8 @@
 - [x] Expected parameter parsing in setParam
 - [ ] DateCreated, DateLastModified for core interface
 
-##### Package
-- [x] Add rotation to 1P-specific SpatialProtocol
-- [ ] Test SpatialProtocol file writer 
-- [x] Dates for SpectralProtocol file names
-- [x] Add Location to SubjectFactory
-- [x] Ensure eye-specific parameters go to Eye, not subject
-- [x] Get specific Calibration (at Dataset) from Stimulus in Epoch
+##### AOQuery App
+- [ ] Code for subfilters
 
 ##### HDF5
 - Write data from persistent interface

@@ -26,23 +26,13 @@ classdef QueryView < aod.app.EventHandler
                         pEXPT = loadExperiment(evt.Data.FileName(i));
                         newExperiments = cat(1, newExperiments, pEXPT);
                     end 
-                    obj.Parent.Experiments = cat(1, obj.Parent.Experiments, newExperiments);
-                    expt = evt.Trigger.Items;
-                    if isempty(obj.Parent.QueryManager)
-                        obj.Parent.QueryManager = aod.api.QueryManager(expt);
-                    else
-                        obj.Parent.QueryManager.addExperiment(newExperiments);
-                    end
-                    %evt = aod.app.query.ExperimentEvent("Added", newExperiments);
-                    %! Not sure about this
+                    %obj.Parent.Experiments = cat(1, obj.Parent.Experiments, newExperiments);
+                    %expt = evt.Trigger.Items;
+                    obj.Parent.QueryManager.addExperiment(newExperiments);
                     obj.Parent.update(evt);
                 case "RemoveExperiment"
-                    if isempty(evt.Trigger.Items)
-                        obj.Parent.QueryManager = [];
-                        %! Clear filter results
-                    else
-                        %! Trigger refilter
-                    end 
+                    obj.Parent.QueryManager.removeExperiment(evt.Data.FileName);
+                    obj.Parent.update(evt);
             end
         end
     end

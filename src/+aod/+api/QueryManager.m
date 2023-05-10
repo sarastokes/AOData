@@ -27,7 +27,7 @@ classdef QueryManager < handle
 
     properties (SetAccess = private)
         % The HDF5 file name(s) being queried
-        hdfName             string 
+        hdfName             string
         % Table of entities from experiment EntityManager
         entityTable 
     end
@@ -41,7 +41,9 @@ classdef QueryManager < handle
 
     methods
         function obj = QueryManager(hdfName)
-            obj.addExperiment(hdfName);
+            if nargin > 0 && ~isempty(hdfName)
+                obj.addExperiment(hdfName);
+            end
         end
     end
 
@@ -72,7 +74,11 @@ classdef QueryManager < handle
             %   [matches, entityInfo] = filter(obj)
             % -------------------------------------------------------------
 
-            if isempty(obj.Filters)
+            if obj.numFiles == 0
+                error("filter:NoExperiments", "Add experiments first");
+            end
+
+            if obj.numFilters == 0
                 error("go:NoFiltersSet", "Add filters first");
             end
 
@@ -128,20 +134,41 @@ classdef QueryManager < handle
             
             for i = 1:numel(expt)
                 if isa(expt(i), 'aod.persistent.Experiment')
-                    obj.hdfName = cat(1, obj.hdfName, expt(i).hdfFileName);
-                    obj.Experiments = cat(1, obj.Experiments, expt(i));
-                elseif istext(expt(i))
-                    obj.hdfName = cat(1, obj.hdfName, getFullFile(expt(i)));
-                    obj.Experiments = cat(1, obj.Experiments, loadExperiment(obj.hdfName(end)));
+                    newName = expt(i).hdfFileName;
+                    newExpt = expt;
+                elseif istext(expt)
+                    newName = getFullFile(expt(i));
+                    newExpt = loadExperiment(newName);
                 else
                     error('QueryManager:InvalidInput',...
                         'Input must be string of HDF file name(s) or array of aod.persistent.Experiment');
                 end
+                %! Make hdfName dependent?
+                if isempty(obj.hdfName)
+                    obj.hdfName = newName;
+                else
+                    obj.hdfName = cat(1, obj.hdfName, newName);
+                end
+                obj.Experiments = cat(1, obj.Experiments, newExpt);
             end
             
             obj.populateEntityTable();
         end
+
+        function removeExperiment(obj, expt)
+            if isnumeric(expt)
+                ID = expt;
+            elseif istext(expt)
+                ID = find(obj.hdfName == string(expt));
+            end
+            % Remove the experiment
+            obj.Experiments(ID) = [];
+            obj.hdfName(ID) = [];
+            % Update the entity table
+            obj.populateEntityTable();
+        end
     end
+
     % Filter methods
     methods 
         function addFilter(obj, varargin)
@@ -195,7 +222,13 @@ classdef QueryManager < handle
     methods (Access = private)
         function populateEntityTable(obj)
             obj.entityTable = [];
-            for i = 1:numel(obj.Experiments)
+
+            if obj.numFiles == 0
+                obj.filterIdx = logical.empty();
+                return
+            end
+            
+            for i = 1:obj.numFiles
                 T = obj.Experiments(i).factory.entityManager.table;
                 T.File = repmat(string(obj.Experiments(i).hdfName), [height(T), 1]);
                 obj.entityTable = [obj.entityTable; T];

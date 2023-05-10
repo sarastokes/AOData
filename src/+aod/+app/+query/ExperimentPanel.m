@@ -50,7 +50,8 @@ classdef ExperimentPanel < aod.app.Component
             obj.removeButton = uibutton(buttonLayout,...
                 "Text", "Remove Experiment",... 
                 "Icon", obj.getIcon("remove"),...
-                "Enable", "off");
+                "Enable", "off",...
+                "ButtonPushedFcn", @obj.onPush_RemoveButton);
         end
 
         function onPush_AddButton(obj, ~, ~)
@@ -59,6 +60,7 @@ classdef ExperimentPanel < aod.app.Component
             if filterIdx == 0
                 return
             end
+            % Collect information about the new experiment
             exptFile = string(fullfile(pathName, fName));
             numExpts = numel(obj.exptListbox.Items);
             if numel(exptFile) > 1
@@ -66,10 +68,8 @@ classdef ExperimentPanel < aod.app.Component
             else
                 index = numel(exptFile);
             end
-            evtData = aod.app.Event("AddExperiment",... 
-                obj.exptListbox, 'FileName', exptFile,...
-                "Index",  index);
-            notify(obj, 'NewEvent', evtData);
+            obj.publish("AddExperiment", obj.exptListbox,...
+                "FileName", exptFile, "Index", index);
         end
 
         function onPush_RemoveButton(obj, ~, ~)
@@ -80,11 +80,8 @@ classdef ExperimentPanel < aod.app.Component
             else
                 index = numExpts;
             end
-            evtData = aod.app.Event(...
-                "RemoveExperiment", obj.exptListbox,... 
-                'FileName', value,...
-                'ExperimentIndex', index);
-            notify(obj, 'NewEvent', evtData);
+            obj.publish("RemoveExperiment", obj.exptListbox,... 
+                "FileName", value, "ExperimentIndex", index);
         end
     end
 end

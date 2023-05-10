@@ -18,8 +18,8 @@ classdef QueryView < aod.app.Component
     end
 
     properties 
-        Experiments         aod.persistent.Experiment
-        QueryManager
+        %Experiments         aod.persistent.Experiment
+        QueryManager        aod.api.QueryManager = aod.api.QueryManager([]);
     end
 
     properties
@@ -32,8 +32,9 @@ classdef QueryView < aod.app.Component
     end
 
     properties (Dependent)
+        Experiments         aod.persistent.Experiment
         numExperiments      double  {mustBeInteger}
-        Filters 
+        numFilters          double  {mustBeInteger}
     end
 
     properties (Hidden)
@@ -53,21 +54,20 @@ classdef QueryView < aod.app.Component
             obj = obj@aod.app.Component([], []);
 
             obj.setHandler(aod.app.query.handlers.QueryView(obj));
+
             obj.isInverted = false;
         end
 
-        function value = get.numExperiments(obj)
-            value = numel(obj.Experiments);
+        function value = get.Experiments(obj)
+            value = obj.QueryManager.Experiments;
         end
 
-        function value = get.Filters(obj)
-            if isempty(obj.filterPanel.Filters)
-                value = [];
-                return 
-            end
+        function value = get.numFilters(obj)
+            value = obj.QueryManager.numFilters;
+        end
 
-            idx = arrayfun(@(x) x.isReady, obj.filterPanel.Filters);
-            value = obj.filterPanel.Filters(idx);
+        function value = get.numExperiments(obj)
+            value = obj.QueryManager.numFiles;
         end
     end
 
@@ -107,12 +107,16 @@ classdef QueryView < aod.app.Component
             obj.codePanel = aod.app.query.CodePanel2(obj, obj.codeTab);
         end
 
-        function onTab_Changed(obj, ~, evt)
-            assignin('base', 'evt', evt);
+        function onTab_Changed(obj, src, evt)
+            evtHidden = aod.app.Event("TabHidden", src);
+            evtActive = aod.app.Event("TabActive", src);
+            
             if strcmp(evt.NewValue.Title, 'Code')
-                obj.codePanel.update();
+                obj.codePanel.update(evtActive);
+                obj.matchPanel.update(evtHidden);
             elseif strcmp(evt.NewValue.Title, 'Matches')
-                obj.matchPanel.update();
+                obj.matchPanel.update(evtActive);
+                obj.codePanel.update(evtHidden);
             end
             
         end

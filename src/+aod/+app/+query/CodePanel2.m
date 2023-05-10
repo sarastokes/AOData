@@ -83,7 +83,7 @@ classdef CodePanel2 < aod.app.Component
         end
 
         function codeExperiments(obj)
-            if isempty(obj.Root.Experiments)
+            if obj.Root.numExperiments == 0
                 str = "exptFiles = [];" + newline;
                 obj.codeEditor.insertText(str, "end");
                 return
@@ -107,14 +107,12 @@ classdef CodePanel2 < aod.app.Component
         end
 
         function codeFilters(obj)
-            if isempty(obj.Root.Filters)
+            if isempty(obj.Root.numFilters)
                 return
             end
-            for i = 1:numel(obj.Root.QueryManager.Filters)
+            for i = 1:obj.Root.numFilters
                 obj.codeEditor.insertText(...
                     sprintf("QM.addFilter(%s);",obj.Root.QueryManager.Filters(i).code()) + newline, "end");
-                % TODO: Add filter inputs
-                %obj.codeEditor.insertText("QM.addFilter();" + newline, "end");
             end
         end
     end

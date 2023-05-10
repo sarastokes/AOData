@@ -42,7 +42,6 @@ classdef EventHandler < handle
         function l = addListener(obj, varargin)
             l = addlistener(varargin{:});
             obj.Listeners = cat(1, obj.Listeners, l);
-            %obj.Listeners{end + 1} = l;
         end
 
         function removeListener(obj, listener)

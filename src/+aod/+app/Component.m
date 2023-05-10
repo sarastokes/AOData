@@ -74,18 +74,7 @@ classdef Component < handle & matlab.mixin.Heterogeneous
     methods
         function update(obj, varargin)
             % Top-down information flow
-            if ~isempty(obj.Children)
-                arrayfun(@(x) x.update(varargin{:}), obj.Children);
-            end
-        end
-
-        function setHandler(obj, evtHandler)
-            arguments
-                obj
-                evtHandler      aod.app.EventHandler 
-            end
-
-            obj.Handler = evtHandler;
+            obj.updateChildren(varargin{:});
         end
 
         function publish(obj, eventName, varargin)
@@ -97,6 +86,25 @@ classdef Component < handle & matlab.mixin.Heterogeneous
     methods (Access = protected)
         function value = specifyChildren(obj)
             value = [];
+        end
+    end
+
+    methods (Sealed, Access = protected)
+        function updateChildren(obj, varargin)
+            if ~isempty(obj.Children)
+                arrayfun(@(x) x.update(varargin{:}), obj.Children);
+            end
+        end
+    end
+
+    methods (Access = ?aod.app.Component)
+        function setHandler(obj, evtHandler)
+            arguments
+                obj
+                evtHandler aod.app.EventHandler
+            end
+
+            obj.Handler = evtHandler;
         end
     end
 

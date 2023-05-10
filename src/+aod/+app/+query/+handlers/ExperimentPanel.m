@@ -16,7 +16,6 @@ classdef ExperimentPanel < aod.app.EventHandler
         end
 
         function handleRequest(obj, ~, evt)
-            assignin('base', 'evt_ExptHandler', evt);
             switch evt.EventType 
                 case "AddExperiment"
                     expt = string(evt.Trigger.Items)';

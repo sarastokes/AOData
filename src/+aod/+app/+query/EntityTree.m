@@ -30,6 +30,10 @@ classdef EntityTree < aod.app.Component
         isDirty         logical = false
     end
 
+    properties (Hidden, Constant)
+        BOLD_STYLE = uistyle("FontWeight", "bold");
+    end
+
     methods
         function obj = EntityTree(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
@@ -53,9 +57,7 @@ classdef EntityTree < aod.app.Component
                         obj.addExperiment(evt.Data.FileName(i));
                     end 
                 case "RemoveExperiment"
-                    for i = 1:numel(evt.Data.FileName)
-                        obj.removeExperiment(evt.Data.FileName(i));
-                    end
+                    obj.removeExperiment(evt.Data.FileName);
                 case "Filter"
             end
         end
@@ -93,17 +95,19 @@ classdef EntityTree < aod.app.Component
             entityTable = obj.Root.QueryManager.entityTable;
             entityTable = entityTable(entityTable.File == exptFile, :);
             entityTable = sortrows(entityTable, "Path", "ascend");
+
+            % Identifiy top-level nodes
+            isBold = ismember(entityTable.Entity, ["Epoch", "Experiment"]);
             % Create the entity nodes
-            %emphStyle = uistyle("FontWeight", "bold");
             for i = 1:height(entityTable)
-                uitreenode(exptFolder,... 
+                iNode = uitreenode(exptFolder,... 
                     "Text", h5tools.util.getPathEnd(entityTable.Path(i)),...
                     "Icon", obj.Icons(entityTable.Entity(i)),...
                     "Tag", entityTable.Path(i));
                 % Emphasize experiment and epoch
-                %if ismember(entityTable.Entity(i), ["Epoch", "Experiment"])
-                %    addstyle(obj.Tree, emphStyle, "node", iNode);
-                %end
+                if isBold(i)
+                    addStyle(obj.Tree, obj.BOLD_STYLE, "node", iNode);
+                end
             end
             fprintf('Entity Tree Time = %.2f\n', toc);
         end

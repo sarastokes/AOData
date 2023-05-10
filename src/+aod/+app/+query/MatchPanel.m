@@ -14,7 +14,8 @@ classdef MatchPanel < aod.app.Component
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        isExpanded
+        isExpanded          logical
+        isVisible           logical
     end
 
     properties
@@ -30,6 +31,24 @@ classdef MatchPanel < aod.app.Component
         function obj = MatchPanel(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
             obj.isExpanded = false;
+            obj.isVisible = true;
+        end
+    end
+
+    methods
+        function update(obj, varargin)
+            if nargin > 1
+                evt = varargin{1};
+                if evt.EventType == "TabHidden"
+                    obj.isVisible = false;
+                elseif evt.EventType == "TabActive"
+                    obj.isVisible = true;
+                end
+            end
+
+            if obj.isVisible
+                obj.updateChildren(varargin{:});
+            end
         end
     end
 
@@ -39,10 +58,10 @@ classdef MatchPanel < aod.app.Component
                 return
             end
             set(obj.expandButton,... 
-                "Text", "Expand", "Icon", obj.getIcon("collapse"));
-            obj.entityBox.entityLayout.Scrollable = "off";
-            obj.matchLayout.RowHeight = {"1x", "fit", 0.1};
-            obj.isExpanded = false;
+                "Text", "Minimize", "Icon", obj.getIcon("expand"));
+            obj.matchLayout.RowHeight = {"1x", "fit", "0.5x"};
+            obj.entityBox.entityLayout.Scrollable = "on";
+            obj.isExpanded = true;
         end
 
         function collapse(obj)
@@ -50,10 +69,10 @@ classdef MatchPanel < aod.app.Component
                 return 
             end
             set(obj.expandButton,...
-                "Text", "Collapse", "Icon", obj.getIcon("expand"));
-            obj.matchLayout.RowHeight = {"1x", "fit", "0.5x"};
-            obj.entityBox.entityLayout.Scrollable = "on";
-            obj.isExpanded = true;
+                "Text", "Expand", "Icon", obj.getIcon("collapse"));
+            obj.matchLayout.RowHeight = {"1x", "fit", 0.1};
+            obj.entityBox.entityLayout.Scrollable = "off";
+            obj.isExpanded = false;
         end
     end
 
@@ -82,10 +101,10 @@ classdef MatchPanel < aod.app.Component
         end
 
         function onPush_Expand(obj, src, ~)
-            if src.Text == "Minimize"
-                obj.collapse();
-            else
+            if src.Text == "Expand"
                 obj.expand();
+            else
+                obj.collapse();
             end
         end
     end
