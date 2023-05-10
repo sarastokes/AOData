@@ -44,6 +44,7 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
     methods (Abstract)
         out = apply(obj)
         tag = describe(obj)
+        out = code(obj, input, output)
     end
 
     methods

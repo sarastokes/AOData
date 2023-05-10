@@ -38,7 +38,6 @@ classdef DatasetFilter < aod.api.FilterQuery
     end
 
     methods
-        
         function tag = describe(obj)
             tag = sprintf("DatasetFilter: Name=%s, Value=%s",... 
                 value2string(obj.Name), value2string(obj.Value));
@@ -93,6 +92,25 @@ classdef DatasetFilter < aod.api.FilterQuery
                     'No datasets named %s matched provided value', obj.Name);
             end
             out = obj.localIdx;
+        end
+
+        function txt = code(obj, input, output)
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = []
+            end
+
+            if isempty(obj.Value)
+                txt = sprintf("aod.api.DatasetFilter(%s, %s)",... 
+                    input, value2string(obj.Name));
+            else
+                txt = sprintf("aod.api.DatasetFilter(%s, %s, %s)",...
+                    input, value2string(obj.Name), value2string(obj.Value));
+            end 
+            if ~isempty(output)
+                txt = sprintf("%s = %s;", output, txt);
+            end
         end
     end
     

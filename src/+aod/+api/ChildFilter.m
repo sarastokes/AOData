@@ -35,6 +35,18 @@ classdef ChildFilter < aod.api.StackedFilterQuery
             tag = tag + newline + childTags;
         end
 
+        
+        function out = code(obj, input, output)
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = "F"
+            end
+
+            out = sprintf("%s = aod.api.ChildFilter(%s, %s);",... 
+                output, input, char(obj.childType));
+        end
+
         function out = apply(obj)
             obj.localIdx = obj.getQueryIdx();
             obj.filterIdx = true(size(obj.localIdx));

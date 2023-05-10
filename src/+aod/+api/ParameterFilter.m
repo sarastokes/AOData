@@ -109,5 +109,27 @@ classdef ParameterFilter < aod.api.FilterQuery
                     obj.Name, value2string(obj.Value));
             end
         end
+                
+        function txt = code(obj, input, output)
+            
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = []
+            end
+
+            if isempty(obj.Value)
+                txt = sprintf("aod.api.ParameterFilter(%s, %s)",... 
+                    input, value2string(obj.Name));
+            else
+                txt = sprintf("aod.api.ParameterFilter(%s, %s, %s)",...
+                    input, value2string(obj.Name), value2string(obj.Value));
+            end
+
+            if ~isempty(output)
+                txt = sprintf("%s = %s;", output, txt);
+            end
+        end
+
     end
 end 

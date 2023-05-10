@@ -107,6 +107,20 @@ classdef LinkFilter < aod.api.StackedFilterQuery
                 obj.localIdx(i) = obj.filterIdx(idx);
             end
         end
+        
+        function txt = code(obj, input, output)
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = []
+            end
+
+            txt = sprintf("aod.api.LinkFilter(%s, %s)",... 
+                input, obj.Name);
+            if ~isempty(output)
+                txt = sprintf("%s = %s;", output, txt);
+            end
+        end
     end
 
     methods (Access = private)

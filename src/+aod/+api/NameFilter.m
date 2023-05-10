@@ -81,6 +81,20 @@ classdef NameFilter < aod.api.FilterQuery
                     "No matches for Name %s", char(obj.Name));
             end
         end
+
+        function txt = code(obj, input, output)
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = []
+            end
+
+            txt = sprintf("aod.api.NameFilter(%s, %s)",... 
+                input, value2string(obj.Name));
+            if ~isempty(output)
+                txt = sprintf("%s = %s;", output, txt);
+            end
+        end
     end
 
     methods (Access = private)

@@ -3,20 +3,20 @@
 Source credit for the free icons used in AOData's apps.
 
 Entity icons:
-- Experiment: <a target="_blank" href="https://icons8.com/icon/32693/experiment">Experiment</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Experiment**: <a target="_blank" href="https://icons8.com/icon/32693/experiment">Experiment</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - Source: <a target="_blank" href="https://icons8.com/icon/21132/contact-details">Contact Details</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- System: <a target="_blank" href="https://icons8.com/icon/vAO5Zjhw9pP2/test-bench">Test Bench</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Channel: <a target="_blank" href="https://icons8.com/icon/26321/microscope">Microscope</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Device: <a target="_blank" href="https://icons8.com/icon/26286/engineering">Engineering</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Calibration: <a target="_blank" href="https://icons8.com/icon/wMJHTUbxz9KQ/energy-meter">Energy Meter</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- ExperimentDataset: <a target="_blank" href="https://icons8.com/icon/31496/grid">Grid</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Epoch: <a target="_blank" href="https://icons8.com/icon/24405/movie">Movie</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Response: <a target="_blank" href="https://icons8.com/icon/32596/ecg">ECG</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **System**: <a target="_blank" href="https://icons8.com/icon/34771/telescope">Telescope</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Channel**: <a target="_blank" href="https://icons8.com/icon/40616/journey">Journey</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Device**: <a target="_blank" href="https://icons8.com/icon/26305/led-diode">LED Diode</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Calibration**: <a target="_blank" href="https://icons8.com/icon/99003/accuracy">Accuracy</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **ExperimentDataset**: <a target="_blank" href="https://icons8.com/icon/31496/grid">Grid</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Epoch**: <a target="_blank" href="https://icons8.com/icon/40061/iris-scan">Iris Scan</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- Response: <a target="_blank" href="https://icons8.com/icon/26284/electrical-threshold">Electrical Threshold</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - Registration: <a target="_blank" href="https://icons8.com/icon/26236/motion-detector">Motion Detector</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- EpochDataset: <a target="_blank" href="https://icons8.com/icon/31500/hashtag-activity-grid">Hashtag Activity Grid</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **EpochDataset**: <a target="_blank" href="https://icons8.com/icon/31500/hashtag-activity-grid">Hashtag Activity Grid</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - Stimulus: <a target="_blank" href="https://icons8.com/icon/26335/spotlight">Spotlight</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Annotation: <a target="_blank" href="https://icons8.com/icon/21145/comments">Comments</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Analysis: <a target="_blank" href="https://icons8.com/icon/38502/accounting">Accounting</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Annotation**: <a target="_blank" href="https://icons8.com/icon/21145/comments">Comments</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Analysis**: <a target="_blank" href="https://icons8.com/icon/-fcp7PY7LOpz/graph">Graph</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 
 Other icons:
 - <a href="https://icons8.com/icon/nkplpFWWQEKZ/add">Add</a> icon by <a href="https://icons8.com">Icons8</a>

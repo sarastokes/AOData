@@ -43,7 +43,7 @@ classdef EntityFilter < aod.api.FilterQuery
         function tag = describe(obj)
             tag = sprintf("EntityFilter: Type=%s", char(obj.EntityName));
         end
-        
+
         function out = apply(obj)
             obj.localIdx = obj.getQueryIdx();
             entities = obj.getEntityTable();
@@ -61,5 +61,19 @@ classdef EntityFilter < aod.api.FilterQuery
             
             out = obj.localIdx;
         end
+
+        function txt = code(obj, input, output)
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = []
+            end
+
+            txt = sprintf("aod.api.EntityFilter(%s, %s)",... 
+                input, value2string(obj.EntityName));
+            if ~isempty(output)
+                txt = sprintf("%s = %s;", output);
+            end
+        end        
     end
 end 

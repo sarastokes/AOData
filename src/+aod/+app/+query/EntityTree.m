@@ -19,7 +19,15 @@ classdef EntityTree < aod.app.Component
 
     properties
         Tree            matlab.ui.container.Tree
+        UnmatchedNode   matlab.ui.container.TreeNode
         Icons
+    end
+
+    properties (SetAccess = private)
+        % Whether entity tree currently has the focus
+        isActive        logical = true
+        % Whether tree needs an update when next focused
+        isDirty         logical = false
     end
 
     methods
@@ -28,24 +36,25 @@ classdef EntityTree < aod.app.Component
 
             obj.loadIcons();
         end
+    end
 
+    methods 
         function update(obj, varargin)
 
-            if nargin == 2
-                evt = varargin{1};
+            if nargin < 2
+                return
             end
+
+            evt = varargin{1};
 
             switch evt.EventType
                 case "AddExperiment"
-                    expt = obj.Root.Experiments(evt.Data.Index);
-                    for i = 1:numel(expt)
-                        obj.addExperiment(expt.Name, expt.hdfName);
+                    for i = 1:numel(evt.Data.FileName)
+                        obj.addExperiment(evt.Data.FileName(i));
                     end 
                 case "RemoveExperiment"
-                    if isempty(obj.Root.Experiments)
-                        obj.reset();
-                    else
-                        % TODO: Remove specific experiments
+                    for i = 1:numel(evt.Data.FileName)
+                        obj.removeExperiment(evt.Data.FileName(i));
                     end
                 case "Filter"
             end
@@ -65,33 +74,43 @@ classdef EntityTree < aod.app.Component
     end
 
     methods 
-        function addExperiment(obj, exptName, exptFile)
+        function addExperiment(obj, exptFile)
             arguments
                 obj 
-                exptName        string 
                 exptFile        string 
             end
 
             tic
+            % Create the experiment node
             [~, fName, ~] = fileparts(exptFile);
-            exptFolder = uitreenode(obj.Tree, "Text", [char(fName), '.h5'],...
+            exptFolder = uitreenode(obj.Tree,... 
+                "Text", [char(fName), '.h5'],...
                 "Tag", exptFile);
-            uitreenode(exptFolder, "Text", exptName,...
-                "Icon", obj.Icons('Experiment'),...
-                "Tag", "/Experiment");
+            uitreenode(obj.UnmatchedNode,...
+                "Text", [char(fName), '.h5'],...
+                "Tag", exptFile);
+            % Collect the entity information
             entityTable = obj.Root.QueryManager.entityTable;
             entityTable = entityTable(entityTable.File == exptFile, :);
+            entityTable = sortrows(entityTable, "Path", "ascend");
+            % Create the entity nodes
+            %emphStyle = uistyle("FontWeight", "bold");
             for i = 1:height(entityTable)
                 uitreenode(exptFolder,... 
                     "Text", h5tools.util.getPathEnd(entityTable.Path(i)),...
                     "Icon", obj.Icons(entityTable.Entity(i)),...
                     "Tag", entityTable.Path(i));
+                % Emphasize experiment and epoch
+                %if ismember(entityTable.Entity(i), ["Epoch", "Experiment"])
+                %    addstyle(obj.Tree, emphStyle, "node", iNode);
+                %end
             end
-            fprintf('Time = %.2f\n', toc);
+            fprintf('Entity Tree Time = %.2f\n', toc);
         end
 
-        function removeExperiment(obj, exptPath)
-            h = findobj(obj.Tree, "Tag", exptPath);
+        function removeExperiment(obj, exptFile)
+            % Delete the experiment from the main tree and unmatched
+            h = findobj(obj.Tree, "Tag", exptFile);
             delete(h);
         end
     end
@@ -100,8 +119,10 @@ classdef EntityTree < aod.app.Component
         function createUi(obj)
             obj.Tree = uitree(aod.app.util.uilayoutfill(obj.Canvas),...
                 "SelectionChangedFcn", @obj.onSelected_Node);
+            obj.UnmatchedNode = uitreenode(obj.Tree,...
+                "Text", "Unmatched entities");
             if ~isempty(obj.Root.Experiments)
-                %! Add experiments
+                %! Add experiments, if present
             end
         end
 
@@ -124,18 +145,18 @@ classdef EntityTree < aod.app.Component
 
             obj.Icons('Experiment') = fullfile(iconPath, "experiment.png");
             obj.Icons('Source') = fullfile(iconPath, "contact-details.png");
-            obj.Icons('System') = fullfile(iconPath, "test-bench.png");
-            obj.Icons('Channel') = fullfile(iconPath, "microscope.png");
-            obj.Icons('Device') = fullfile(iconPath, "engineering.png");
-            obj.Icons('Calibration') = fullfile(iconPath, "energy-meter.png");
+            obj.Icons('System') = fullfile(iconPath, "telescope.png");
+            obj.Icons('Channel') = fullfile(iconPath, "journey.png");
+            obj.Icons('Device') = fullfile(iconPath, "led-diode.png");
+            obj.Icons('Calibration') = fullfile(iconPath, "accuracy.png");
             obj.Icons('ExperimentDataset') = fullfile(iconPath, "grid.png");
-            obj.Icons('Epoch') = fullfile(iconPath, "movie.png");
+            obj.Icons('Epoch') = fullfile(iconPath, "iris-scan.png");
             obj.Icons('Stimulus') = fullfile(iconPath, "spotlight.png");
             obj.Icons('Registration') = fullfile(iconPath, "motion-detector.png");
-            obj.Icons('Response') = fullfile(iconPath, "ecg.png");
+            obj.Icons('Response') = fullfile(iconPath, "electrical-threshold.png");
             obj.Icons('EpochDataset') = fullfile(iconPath, "hashtag-activity-grid.png");
             obj.Icons('Annotation') = fullfile(iconPath, "comments.png");
-            obj.Icons('Analysis') = fullfile(iconPath, "accounting.png");
+            obj.Icons('Analysis') = fullfile(iconPath, "graph.png");
 
         end
     end

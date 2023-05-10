@@ -62,6 +62,20 @@ classdef ClassFilter < aod.api.FilterQuery
 
             out = obj.localIdx;
         end
+
+        function txt = code(obj, input, output)
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = []
+            end
+
+            txt = sprintf("aod.api.ClassFilter(%s, %s)",... 
+                input, value2string(obj.Name));
+            if ~isempty(output)
+                txt = sprintf("%s = %s;", output);
+            end
+        end
     end
 
     methods (Access = protected)
