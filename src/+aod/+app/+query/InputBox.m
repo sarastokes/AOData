@@ -28,6 +28,9 @@ classdef InputBox < aod.app.Component
     end
 
     properties
+        gridLayout              matlab.ui.container.GridLayout 
+
+        filterLayout            matlab.ui.container.GridLayout
         filterDropdown          matlab.ui.control.DropDown
         filterLabel             matlab.ui.control.Label
 
@@ -87,6 +90,30 @@ classdef InputBox < aod.app.Component
     end
 
     methods 
+
+        function update(obj, evt)
+
+            switch evt.EventType
+                case "PushFilter"
+                    obj.toggleEnable("off");
+                case "PullFilter"
+                    obj.toggleEnable("on");
+            end
+
+            obj.updateChildren(evt);
+        end
+
+        function toggleEnable(obj, flag)
+            arguments
+                obj
+                flag        string {mustBeMember(flag, ["on" ,"off"])}
+            end
+
+            set(obj.filterLayout.Children, "Enable", flag);
+            set(obj.nameLayout.Children, "Enable", flag);
+            set(obj.valueLayout.Children, "Enable", flag);
+        end
+
         function reset(obj)
             obj.showNameEditfield(" ");
             obj.showValueEditfield();
@@ -114,8 +141,7 @@ classdef InputBox < aod.app.Component
                     obj.nameLabel.Text = "Entity Type";
                     obj.hideValueInput();
                     obj.showNameDropdown();
-                    obj.nameDropdown.Items = ... 
-                        [""; getEnumMembers('aod.core.EntityTypes')]';
+                    obj.nameDropdown.Items = string(aod.core.EntityTypes.all());
                     obj.searchButton.Visible = "off";
                 case FilterTypes.NAME 
                     obj.nameLabel.Text = "Entity Name";
@@ -149,9 +175,6 @@ classdef InputBox < aod.app.Component
                 case FilterTypes.PATH
                     obj.nameLabel.Text = "HDF5 Path";
                     obj.hideValueInput();
-                otherwise
-                    error('changeFilterType:UnknownFilterType',...
-                        'Filter %s not recognized', char(filterType));
             end
         end
     end
@@ -210,7 +233,7 @@ classdef InputBox < aod.app.Component
 
     methods (Access = protected)
         function createUi(obj)
-            mainLayout = uigridlayout(obj.Canvas, [1 2],...
+            obj.gridLayout = uigridlayout(obj.Canvas, [1 2],...
                 "ColumnWidth", {"fit", "1x", "1x"}, "RowHeight",  {"1x"},...
                 "Padding", [0 0 0 0], "ColumnSpacing", 2);
 
@@ -223,21 +246,21 @@ classdef InputBox < aod.app.Component
                 "VerticalAlignment", "center"};
 
             % INPUT ONE ---------------------------------------------------
-            filterLayout = uigridlayout(mainLayout, [2 2], gridSpecs{:});
-            filterLayout.Layout.Row = 1;
-            filterLayout.Layout.Column = 1;
+            obj.filterLayout = uigridlayout(obj.gridLayout, [2 2], gridSpecs{:});
+            obj.filterLayout.Layout.Row = 1;
+            obj.filterLayout.Layout.Column = 1;
             
-            obj.filterLabel = uilabel(filterLayout,... 
+            obj.filterLabel = uilabel(obj.filterLayout,... 
                 "Text", "Filter Type", labelSpecs{:});
             obj.filterLabel.Layout.Column = [1 2];
 
-            obj.filterDropdown = uidropdown(filterLayout, ...
+            obj.filterDropdown = uidropdown(obj.filterLayout, ...
                 "Items", getEnumMembers("aod.api.FilterTypes")', ...
                 "ValueChangedFcn", @obj.onSelected_FilterDropdown);
             obj.filterDropdown.Layout.Column = [1 2];
 
             % INPUT TWO ---------------------------------------------------
-            obj.nameLayout = uigridlayout(mainLayout, [2 2], gridSpecs{:});
+            obj.nameLayout = uigridlayout(obj.gridLayout, [2 2], gridSpecs{:});
             obj.nameLayout.Layout.Column = 2;
             obj.nameLayout.Layout.Row = 1;
 
@@ -266,7 +289,7 @@ classdef InputBox < aod.app.Component
             obj.searchButton.Layout.Column = 2;
 
             % INPUT THREE -------------------------------------------------
-            obj.valueLayout = uigridlayout(mainLayout, [2 2], gridSpecs{:});
+            obj.valueLayout = uigridlayout(obj.gridLayout, [2 2], gridSpecs{:});
             obj.valueLayout.Layout.Row = 1;
             obj.valueLayout.Layout.Column = 3;
 
@@ -305,16 +328,16 @@ classdef InputBox < aod.app.Component
             obj.onChange_Anything();
         end
 
-        function onPush_AddSubfilter(obj, src, evt)
+        function onPush_AddSubfilter(obj, ~, ~)
             obj.publish("AddSubfilter", obj);
         end
 
-        function onSelect_Name(obj, src, evt)
+        function onSelect_Name(obj, ~, ~)
             obj.nameProvided = true;
             obj.onChange_Anything();
         end
 
-        function onEdit_Name(obj, src, evt)
+        function onEdit_Name(obj, src, ~)
             if isempty(src.Value) || src.Value == ""
                 obj.nameProvided = false;
             else
@@ -323,7 +346,7 @@ classdef InputBox < aod.app.Component
             obj.onChange_Anything();
         end
 
-        function onEdit_Value(obj, src, evt)
+        function onEdit_Value(obj, src, ~)
             if isempty(src.Value) || src.Value == ""
                 obj.valueProvided = false;
             else
@@ -332,7 +355,7 @@ classdef InputBox < aod.app.Component
             obj.onChange_Anything();
         end
 
-        function onPush_SearchNames(obj, src, evt)
+        function onPush_SearchNames(obj, ~, ~)
             obj.publish("SearchRequest", obj.Parent,...
                 "ListBox", obj.nameDropdown);
         end

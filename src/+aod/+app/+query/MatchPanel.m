@@ -19,7 +19,6 @@ classdef MatchPanel < aod.app.Component
     properties (SetAccess = private)
         isExpanded          logical
         isVisible           logical
-        isDirty             logical
     end
 
     properties
@@ -40,29 +39,19 @@ classdef MatchPanel < aod.app.Component
     end
 
     methods
-        function update(obj, varargin)
-            if nargin > 1
-                evt = varargin{1};
-                if evt.EventType == "TabHidden"
-                    obj.isVisible = false;
-                elseif evt.EventType == "TabActive"
-                    obj.isVisible = true;
-                    if obj.isDirty
-                        disp('Switch to un-updated panel');
-                    end
-                end
+        function update(obj, evt)
+            if evt.EventType == "TabHidden"
+                obj.isVisible = false;
+            elseif evt.EventType == "TabActive"
+                obj.isVisible = true;
             end
 
-            if ~obj.isVisible
-                obj.isDirty = true;
-                obj.updateChildren(varargin{:});
-                return 
-            end
-
+            % This isn't costly, do it regardless of whether the component
+            % is active and then let child components implement isDirty
             if ismember(evt.EventType, ["AddExperiment", "RemoveExperiment"])
                 obj.showEntityCount();
             end
-            obj.updateChildren(varargin{:});
+            obj.updateChildren(evt);
         end
     end
 
@@ -113,6 +102,9 @@ classdef MatchPanel < aod.app.Component
             obj.entityLabel = uilabel(expandLayout,...
                 "Text", "0 matched entities (0 total)",...
                 "HorizontalAlignment", "left");
+            if obj.Root.numExperiments ~= 0
+                obj.showEntityCount();
+            end
             
             obj.entityBox = aod.app.query.EntityBox(obj, obj.matchLayout);
         end

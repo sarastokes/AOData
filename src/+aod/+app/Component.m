@@ -79,9 +79,12 @@ classdef Component < handle & matlab.mixin.Heterogeneous
     end
 
     methods
-        function update(obj, varargin)
+        function update(obj, evt)
             % Top-down information flow
-            obj.updateChildren(varargin{:});
+            if nargin < 1
+                evt = [];
+            end
+            obj.updateChildren(evt);
         end
 
         function publish(obj, eventName, varargin)

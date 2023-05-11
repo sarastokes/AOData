@@ -540,5 +540,23 @@ classdef EntityTypes
                         'Entity %s could not be matched to an EntityType', entityName);
             end
         end
+
+        function entityTypes = all()
+            % Return all entity types
+            %
+            % Syntax:
+            %   entityTypes = aod.core.EntityTypes.all()
+            % -------------------------------------------------------------
+
+            import aod.core.EntityTypes
+
+            entityTypes = [EntityTypes.EXPERIMENT, EntityTypes.SOURCE,...
+                EntityTypes.SYSTEM, EntityTypes.CHANNEL, EntityTypes.DEVICE,...
+                EntityTypes.CALIBRATION, EntityTypes.EXPERIMENTDATASET,...
+                EntityTypes.EPOCH, EntityTypes.STIMULUS, EntityTypes.RESPONSE,...
+                EntityTypes.REGISTRATION, EntityTypes.EPOCHDATASET,...
+                EntityTypes.ANNOTATION, EntityTypes.ANALYSIS]';
+        end
+
     end
 end

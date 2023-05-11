@@ -13,6 +13,10 @@ classdef FilterControls < aod.app.Component
 % Events:
 %   PushFilter, PullFilter, CheckFilter, EditFilter,...
 %   PushSubfilter, PullSubfilter, CheckSubfilter, EditSubfilter
+%
+% Notes:
+%   FilterControls are a separate class for clarity but communicate with  
+%   the larger UI as their parent FilterBox or SubfilterBox.
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -31,20 +35,17 @@ classdef FilterControls < aod.app.Component
 
     methods 
         function obj = FilterControls(parent, canvas, isSubfilter)
-            obj = obj@aod.app.Component(parent, canvas);
             if nargin < 3
                 isSubfilter = false;
             end
-            obj.isSubfilter = isSubfilter;
+            obj = obj@aod.app.Component(parent, canvas, isSubfilter);
 
             obj.setHandler(aod.app.query.handlers.FilterControls(obj));
         end
     end
 
     methods
-        function update(obj, varargin)
-            evt = varargin{1};
-
+        function update(obj, evt)
             switch evt.EventType 
                 case "ChangedFilterInput"
                     if evt.Data.Ready
@@ -62,12 +63,16 @@ classdef FilterControls < aod.app.Component
                     obj.addButton.Enable = "off";
                     obj.editButton.Enable = "on";
                     obj.checkButton.Enable = "off";
+                case "EditButton"
+                    obj.editButton.Enable = "off";
+                    obj.removeButton.Enable = "on";
+                    obj.addButon.Enable = "on";
+                    obj.checkButton.Enable = "off";
             end
         end
     end
 
     methods 
-
         function filterAdded(obj)
             obj.addButton.Enable = "off";
             obj.editButton.Enable = "on";
@@ -84,6 +89,10 @@ classdef FilterControls < aod.app.Component
     end
 
     methods (Access = protected)
+        function willGo(obj, varargin)
+            obj.isSubfilter = varargin{1};
+        end
+
         function createUi(obj)
             buttonLayout = uigridlayout(obj.Canvas, [2 2],...
                 "RowSpacing", 2, "ColumnSpacing", 2,...

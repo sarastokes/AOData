@@ -84,9 +84,6 @@ classdef QueryView < aod.app.Component
 
     methods
         function update(obj, evt)
-            if nargin == 0
-                obj.updateChildren();
-            end
 
             switch evt.EventType 
                 case "AddExperiment"
@@ -97,6 +94,7 @@ classdef QueryView < aod.app.Component
                 case "PushFilter"
                     obj.collectMatchedEntities();
             end
+
             obj.updateChildren(evt);
         end
 
@@ -136,7 +134,7 @@ classdef QueryView < aod.app.Component
             obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + 300;
             if ispref('AOData', 'Development') && getpref('AOData', 'Development')
                 %! Development
-                obj.figureHandle.Position(1:2) = [10 392];
+                obj.figureHandle.Position(1:2) = [-1000 127];
             end
 
             mainLayout = uigridlayout(obj.figureHandle, [1 2],...
@@ -158,7 +156,7 @@ classdef QueryView < aod.app.Component
             obj.matchPanel = aod.app.query.MatchPanel(obj, obj.matchTab);
             obj.codeTab = uitab(obj.resultGroup, ...
                 "Title", "Code");
-            obj.codePanel = aod.app.query.CodePanel2(obj, obj.codeTab);
+            obj.codePanel = aod.app.query.CodePanel(obj, obj.codeTab);
         end
 
         function onTab_Changed(obj, src, evt)

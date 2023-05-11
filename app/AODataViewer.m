@@ -15,7 +15,6 @@ function appHandle = AODataViewer(experiment)
 % See also:
 %   aod.app.viewer.ExperimentPresenter, aod.app.viewer.ExperimentView
 
-
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     

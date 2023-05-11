@@ -50,6 +50,18 @@ classdef SubfilterBox < aod.app.Component
         end
     end
 
+    methods
+        function update(obj, evt)
+            switch evt.EventType
+                case "PushFilter"
+                    obj.inputBox.Enable = "off";
+                case "PullFilter"
+                    obj.inputBox.Enable = "on";
+            end
+            obj.updateChildren(evt);
+        end
+    end
+
     methods (Access = protected)
         function value = specifyChildren(obj)
             value = [obj.inputBox; obj.filterControls];

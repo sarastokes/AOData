@@ -86,11 +86,7 @@ classdef EntityTree < aod.app.Component
             delete(exptNodes(2).Children);
         end
 
-        function update(obj, varargin)
-            if nargin < 2
-                return
-            end
-            evt = varargin{1};
+        function update(obj, evt)
 
             switch evt.EventType
                 case "TabHidden"
@@ -109,6 +105,7 @@ classdef EntityTree < aod.app.Component
         end
 
         function reset(obj)
+            obj.deselectNode();
             if isempty(obj.Root.Experiments)
                 delete(obj.Tree.Children)
             else
@@ -118,6 +115,11 @@ classdef EntityTree < aod.app.Component
                 end
             end
             %! Populate matches
+        end
+
+        function deselectNode(obj)
+            obj.Tree.SelectedNodes = [];
+            obj.publish("DeselectedNode", obj);
         end
     end
 

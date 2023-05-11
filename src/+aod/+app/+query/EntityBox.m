@@ -12,9 +12,12 @@ classdef EntityBox < aod.app.Component
 %
 % Events:
 %   N/A
+%
+% TODO: Entity information display
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+
 
     properties
         entityLayout        matlab.ui.container.GridLayout
@@ -23,13 +26,30 @@ classdef EntityBox < aod.app.Component
         linkText            matlab.ui.control.ListBox
     end
 
+    properties (Dependent)
+        isVisible           logical
+    end
+
     methods
         function obj = EntityBox(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
         end
+
+        function value = get.isVisible(obj)
+            value = obj.Parent.isExpanded && obj.Parent.isVisible;
+        end
     end
 
     methods
+        function update(obj, evt)
+            switch evt.EventType
+                case "SelectedNode"
+                    % TODO: Decide what entity info to show
+                case "DeselectedNode"
+                    obj.reset();
+            end
+        end
+
         function reset(obj)
             obj.datasetText.Items = {};
             obj.linkText.Items = {};

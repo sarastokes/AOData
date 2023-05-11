@@ -80,6 +80,7 @@ classdef FilterBox < aod.app.Component
     end
 
     methods
+
         function addNewSubfilter(obj)
             subfilterID = obj.numSubfilters + 1;
             obj.gridLayout.RowHeight = ...

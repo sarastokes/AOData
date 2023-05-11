@@ -45,14 +45,13 @@ classdef FilterPanel < aod.app.Component
     end
 
     methods
-        function update(obj, varargin)
-            evt = varargin{1};
-
+        function update(obj, evt)
             filterEvents = ["PushFilter", "PullFilter",...
                 "EditFilter", "CheckFilter"];
             
+            % Only send update to caller filterBox
             if ismember(evt.EventType, filterEvents)
-                obj.Filters(evt.Data.ID).update(varargin{:});
+                obj.Filters(evt.Data.ID).update(evt);
             end
         end
     end
