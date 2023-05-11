@@ -32,6 +32,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 % -------------------------------------------------------------------------
 
     tic 
+    setpref('AOData', 'TestMode', true);
 
     ip = inputParser();
     addParameter(ip, 'Coverage', false, @islogical);
@@ -95,6 +96,9 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 
     % Return to user's previous working directory
     cd(currentCD);
+
+    % Turn off test mode
+    setpref('AOData', 'TestMode', false);
 
     fprintf('TOTAL TEST TIME = %.2f\n', toc);
 end

@@ -73,8 +73,14 @@ classdef ExperimentPanel < aod.app.Component
         end
 
         function onPush_AddButton(obj, ~, ~)
-            [fName, pathName, filterIdx] = uigetfile("*.h5",...
-                "Choose an AOData HDF5 file", "MultiSelect", "on");
+            if ispref('AOData', 'TestMode') && getpref('AOData', 'TestMode')
+                fName = "ToyExperiment.h5";
+                pathName = fullfile(getpref('AOData', 'BasePackage'), 'test');
+                filterIdx = 1;
+            else
+                [fName, pathName, filterIdx] = uigetfile("*.h5",...
+                    "Choose an AOData HDF5 file", "MultiSelect", "on");
+            end
             if filterIdx == 0
                 return
             end

@@ -51,10 +51,6 @@ classdef Component < handle & matlab.mixin.Heterogeneous
 
     methods
         function obj = Component(parent, canvas, varargin)
-            if nargin == 0
-                return
-            end
-            
             obj.Parent = parent;
             obj.Canvas = canvas;
 
@@ -82,9 +78,6 @@ classdef Component < handle & matlab.mixin.Heterogeneous
     methods
         function update(obj, evt)
             % Top-down information flow
-            if nargin < 1
-                evt = [];
-            end
             obj.updateChildren(evt);
         end
 

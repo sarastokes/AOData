@@ -28,7 +28,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyTrue(strcmp(p0.Name, "NewParam"));
             
             % Search for parameter that exists
-            p1 = PM.getParam('BadParam', ErrorTypes.NONE);
+            p1 = PM.get('BadParam', ErrorTypes.NONE);
             testCase.verifyEmpty(p1);
             testCase.verifyError(...
                 @() PM.getParam('BadParam', ErrorTypes.ERROR),...

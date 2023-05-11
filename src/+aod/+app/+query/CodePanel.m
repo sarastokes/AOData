@@ -91,7 +91,7 @@ classdef CodePanel < aod.app.Component
         end
 
         function onPush_CopyCode(obj, ~, ~)
-            clipboard('copy', obj.codeBox.Value);
+            clipboard('copy', obj.codeEditor.Value);
         end
 
         function onPush_ExportCode(~, ~, ~)

@@ -31,7 +31,6 @@ classdef AODataManagerTest < matlab.uitest.TestCase & matlab.mock.TestCase
     methods (TestClassSetup)
         function StoreAndClearPreferences(testCase)
             testCase.PREFS = getpref('AOData');
-            assignin('base', 'PREFS', getpref('AOData'));
             % This will only work on my computer...
             testCase.FOLDER = fullfile(testCase.PREFS.BasePackage,...
                 'lib', 'h5tools-matlab');

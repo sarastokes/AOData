@@ -17,10 +17,6 @@ classdef EventHandler < handle
 
     methods
         function obj = EventHandler(parent, publisher)
-            if nargin == 0
-                return
-            end
-
             obj.Parent = parent;
             
             if nargin < 2 || isempty(publisher)
@@ -53,12 +49,6 @@ classdef EventHandler < handle
         function l = addListener(obj, varargin)
             l = addlistener(varargin{:});
             obj.Listeners = cat(1, obj.Listeners, l);
-        end
-
-        function removeListener(obj, listener)
-            index = arrayfun(@(l) l == listener, obj.Listeners);
-            delete(listener);
-            obj.Listeners(index) = [];
         end
 
         function removeAllListeners(obj)

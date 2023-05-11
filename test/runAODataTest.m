@@ -62,7 +62,9 @@ function results = runAODataTest(testName, varargin)
         runner.addPlugin(p);
     end
 
+    setpref('AOData', 'TestMode', true);
     results = runner.run(suite);
+    setpref('AOData', 'TestMode', false);
 
     % Clean up files produced by tests, if necessary
     if ~keepFiles
