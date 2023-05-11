@@ -29,6 +29,14 @@ classdef EntityBox < aod.app.Component
         end
     end
 
+    methods
+        function reset(obj)
+            obj.datasetText.Items = {};
+            obj.linkText.Items = {};
+            obj.attrTable.Data = [];
+        end
+    end
+
     methods (Access = protected)
         function createUi(obj)
             obj.entityLayout = uigridlayout(obj.Canvas, [2, 1],...
@@ -36,6 +44,7 @@ classdef EntityBox < aod.app.Component
                 "RowSpacing", 3, "Padding", [0 0 0 0],...
                 "Scrollable", "on");
             
+            % Datasets
             datasetLayout = uigridlayout(obj.entityLayout, [2 2],...
                 "RowHeight", {obj.TEXT_HEIGHT, "1x"},...
                 "Padding", [0 0 0 0], "RowSpacing", 1,...
@@ -48,7 +57,6 @@ classdef EntityBox < aod.app.Component
                 "VerticalAlignment", "bottom");
             lbl1.Layout.Row = 1; lbl1.Layout.Column = 1;
 
-            % Datasets
             obj.datasetText = uilistbox(datasetLayout,...
                 "Items", {});
             obj.datasetText.Layout.Row = 2;

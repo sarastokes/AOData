@@ -33,28 +33,78 @@ classdef EntityTree < aod.app.Component
     methods
         function obj = EntityTree(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
-
-            obj.loadIcons();
         end
     end
 
     methods 
-        function update(obj, varargin)
+        function filterNodes(obj, exptFile)
 
             if nargin < 2
+                if obj.Root.numExperiments > 0
+                    arrayfun(@(x) obj.filterNodes(x), obj.Root.hdfFiles); 
+                end
                 return
             end
 
+            % Clear existing nodes
+            obj.resetExperimentNodes(exptFile);
+
+            % Collect experiment entity information
+            idx = obj.Root.matchedEntities.File == exptFile;
+            matchedEntities = obj.Root.matchedEntities(idx, :);
+            idx = obj.Root.allEntities.File == exptFile;
+            allEntities = sortrows(obj.Root.allEntities(idx, :), "Path");
+            
+            % Second node is always the unmatched one
+            exptNodes = findall(obj.Tree.Children, "Tag", exptFile);
+
+            % Assign nodes to matched or unmatched location
+            for i = 1:height(allEntities)
+                if ismember(allEntities.Path(i), matchedEntities.Path)
+                    parentIdx = 1;
+                else
+                    parentIdx = 2;
+                end
+                iNode = uitreenode(exptNodes(parentIdx),...
+                    "Text", h5tools.util.getPathEnd(allEntities.Path(i)),...
+                    "Tag", allEntities.Path(i));
+                addStyle(obj.Tree, obj.Icons(allEntities.Entity(i)),...
+                    "Node", iNode);
+            end
+            drawnow;
+        end
+
+        function resetExperimentNodes(obj, exptFile)
+            if nargin < 2 
+                if obj.Root.numExperiments > 0
+                    arrayfun(@(x) resetExperimentNodes(obj, x), obj.Root.hdfFiles);
+                end
+                return
+            end
+            exptNodes = findall(obj.Tree, "Tag", exptFile);
+            delete(exptNodes(1).Children);
+            delete(exptNodes(2).Children);
+        end
+
+        function update(obj, varargin)
+            if nargin < 2
+                return
+            end
             evt = varargin{1};
 
             switch evt.EventType
+                case "TabHidden"
+                    obj.isActive = false;
+                case "TabActive"
+                    obj.isActive = true;
                 case "AddExperiment"
                     for i = 1:numel(evt.Data.FileName)
                         obj.addExperiment(evt.Data.FileName(i));
                     end 
                 case "RemoveExperiment"
                     obj.removeExperiment(evt.Data.FileName);
-                case "Filter"
+                case "PushFilter"
+                    obj.filterNodes(); 
             end
         end
 
@@ -78,17 +128,28 @@ classdef EntityTree < aod.app.Component
                 exptFile        string 
             end
 
+            addNodes = obj.Root.numFilters > 0 || obj.isActive;
+
             tic
             % Create the experiment node
             [~, fName, ~] = fileparts(exptFile);
             exptFolder = uitreenode(obj.Tree,... 
+                obj.UnmatchedNode, "before",...
                 "Text", [char(fName), '.h5'],...
                 "Tag", exptFile);
-            uitreenode(obj.UnmatchedNode,...
+            exptFolder2 = uitreenode(obj.UnmatchedNode,...
                 "Text", [char(fName), '.h5'],...
                 "Tag", exptFile);
+            addStyle(obj.Tree, uistyle("FontWeight", "bold"),...
+                "Node", [exptFolder, exptFolder2]);
+            
+            if ~addNodes
+                obj.filterNodes(exptFile);
+                return 
+            end
+
             % Collect the entity information
-            entityTable = obj.Root.QueryManager.entityTable;
+            entityTable = obj.Root.matchedEntities;
             entityTable = entityTable(entityTable.File == exptFile, :);
             entityTable = sortrows(entityTable, "Path", "ascend");
 
@@ -110,6 +171,10 @@ classdef EntityTree < aod.app.Component
     end
 
     methods (Access = protected)
+        function willGo(obj, varargin)
+            obj.loadIcons();
+        end
+
         function createUi(obj)
             obj.Tree = uitree(aod.app.util.uilayoutfill(obj.Canvas),...
                 "SelectionChangedFcn", @obj.onSelected_Node);
@@ -138,6 +203,7 @@ classdef EntityTree < aod.app.Component
 
             iconPath = fullfile(aod.app.util.getIconFolder(), "+entity");
             iconPath = iconPath + filesep;
+            iconOpts = {"BackgroundColor", [1 1 1]};
 
             obj.Icons('Experiment') = uistyle("FontWeight", "bold",...
                 "Icon", iconPath + "experiment.png");
@@ -148,7 +214,7 @@ classdef EntityTree < aod.app.Component
             obj.Icons('Channel') = uistyle(...
                 "Icon", iconPath + "journey.png");
             obj.Icons('Device') = uistyle(...
-                "Icon", iconPath + "led-diode.png");
+                "Icon", imread(iconPath + "led-diode.png", iconOpts{:}));
             obj.Icons('Calibration') = uistyle(...
                 "Icon", iconPath + "accuracy.png");
             obj.Icons('ExperimentDataset') = uistyle(...

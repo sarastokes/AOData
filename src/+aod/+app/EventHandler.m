@@ -3,13 +3,15 @@ classdef EventHandler < handle
 %
 % Constructor:
 %   obj = aod.app.EventHandler(parent, publisher)
-
+%
+% See also:
+%   aod.app.Component, aod.app.Event
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent          aod.app.Component
+        Parent          
         Listeners       event.listener    
     end
 

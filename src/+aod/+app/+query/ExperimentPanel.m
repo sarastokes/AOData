@@ -9,6 +9,9 @@ classdef ExperimentPanel < aod.app.Component
 %
 % Children:
 %   N/A
+%
+% Events:
+%   AddExperiment, RemoveExperiment
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -31,6 +34,7 @@ classdef ExperimentPanel < aod.app.Component
         function createUi(obj)
             layout = uigridlayout(obj.Canvas, [2 1],...
                 "RowHeight", {30, "1x", 30}, "RowSpacing", 5);
+
             uilabel(layout, "Text", "Experiments:",...
                 "FontWeight", "bold", "FontSize", 12,...
                 "HorizontalAlignment", "center");
@@ -39,6 +43,7 @@ classdef ExperimentPanel < aod.app.Component
             if obj.Root.numExperiments ~= 0
                 obj.exptListbox.Items = obj.Root.hdfFiles;
             end
+
             buttonLayout = uigridlayout(layout, [1 2],...
                 "ColumnSpacing", 5, "Padding", [0 0 0 0]);
             obj.addButton = uibutton(buttonLayout,...
@@ -58,6 +63,7 @@ classdef ExperimentPanel < aod.app.Component
             if filterIdx == 0
                 return
             end
+
             % Collect information about the new experiment
             exptFile = string(fullfile(pathName, fName));
             numExpts = numel(obj.exptListbox.Items);
@@ -66,6 +72,7 @@ classdef ExperimentPanel < aod.app.Component
             else
                 index = numel(exptFile);
             end
+
             obj.publish("AddExperiment", obj.exptListbox,...
                 "FileName", exptFile, "Index", index);
         end
@@ -73,11 +80,13 @@ classdef ExperimentPanel < aod.app.Component
         function onPush_RemoveButton(obj, ~, ~)
             value = obj.exptListbox.Value;
             numExpts = numel(obj.exptListbox.Items);
+
             if numel(value) > 1
                 index = [numExpts-numel(value)+1, numExpts];
             else
                 index = numExpts;
             end
+
             obj.publish("RemoveExperiment", obj.exptListbox,... 
                 "FileName", value, "ExperimentIndex", index);
         end

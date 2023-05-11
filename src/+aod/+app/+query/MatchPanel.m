@@ -19,6 +19,7 @@ classdef MatchPanel < aod.app.Component
     properties (SetAccess = private)
         isExpanded          logical
         isVisible           logical
+        isDirty             logical
     end
 
     properties
@@ -46,12 +47,22 @@ classdef MatchPanel < aod.app.Component
                     obj.isVisible = false;
                 elseif evt.EventType == "TabActive"
                     obj.isVisible = true;
+                    if obj.isDirty
+                        disp('Switch to un-updated panel');
+                    end
                 end
             end
 
-            if obj.isVisible
+            if ~obj.isVisible
+                obj.isDirty = true;
                 obj.updateChildren(varargin{:});
+                return 
             end
+
+            if ismember(evt.EventType, ["AddExperiment", "RemoveExperiment"])
+                obj.showEntityCount();
+            end
+            obj.updateChildren(varargin{:});
         end
     end
 
@@ -90,7 +101,9 @@ classdef MatchPanel < aod.app.Component
                 "RowHeight", {"1x", "fit", 0.1},...
                 "RowSpacing", 3,...
                 "Padding", [5 5 5 5]);
+
             obj.entityTree = aod.app.query.EntityTree(obj, obj.matchLayout);
+            
             expandLayout = uigridlayout(obj.matchLayout, [1 2],...
                 "ColumnWidth", {"fit", "1x"}, "RowHeight", {"fit"},...
                 "Padding", [0 0 0 0]);
@@ -98,8 +111,9 @@ classdef MatchPanel < aod.app.Component
                 "Text", "Expand", "Icon", obj.getIcon("collapse"),...
                 "ButtonPushedFcn", @obj.onPush_Expand);
             obj.entityLabel = uilabel(expandLayout,...
-                "Text", "0 matched entities",...
+                "Text", "0 matched entities (0 total)",...
                 "HorizontalAlignment", "left");
+            
             obj.entityBox = aod.app.query.EntityBox(obj, obj.matchLayout);
         end
 
@@ -109,6 +123,13 @@ classdef MatchPanel < aod.app.Component
             else
                 obj.collapse();
             end
+        end
+    end
+
+    methods (Access = private)
+        function showEntityCount(obj)
+            obj.entityLabel.Text = ...
+                sprintf("Total entities (%u)", obj.Root.numEntities);
         end
     end
 end 

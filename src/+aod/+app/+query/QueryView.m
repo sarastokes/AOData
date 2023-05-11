@@ -17,7 +17,8 @@ classdef QueryView < aod.app.Component
 % -------------------------------------------------------------------------
 
     properties 
-        QueryManager        aod.api.QueryManager = aod.api.QueryManager([]);
+        QueryManager        
+        matchedEntities     
     end
 
     properties
@@ -33,6 +34,8 @@ classdef QueryView < aod.app.Component
     properties (Dependent)
         Experiments         aod.persistent.Experiment
         numExperiments      double  {mustBeInteger}
+        allEntities         
+        numEntities         double  {mustBeInteger}
         numFilters          double  {mustBeInteger}
         hdfFiles            string 
     end
@@ -48,14 +51,22 @@ classdef QueryView < aod.app.Component
     end
 
     methods
-        function obj = QueryView()
-            obj = obj@aod.app.Component([], []);
+        function obj = QueryView(varargin)
+            obj = obj@aod.app.Component([], [], varargin{:});
 
             obj.setHandler(aod.app.query.handlers.QueryView(obj));
         end
 
         function value = get.Experiments(obj)
             value = obj.QueryManager.Experiments;
+        end
+
+        function value = get.allEntities(obj)
+            value = obj.QueryManager.entityTable;
+        end
+
+        function value = get.numEntities(obj)
+            value = obj.QueryManager.numEntities;
         end
 
         function value = get.numFilters(obj)
@@ -72,22 +83,39 @@ classdef QueryView < aod.app.Component
     end
 
     methods
-        %function update(obj, evt)
-        %    if nargin < 0
-        %        obj.updateChildren();
-        %    end
+        function update(obj, evt)
+            if nargin == 0
+                obj.updateChildren();
+            end
 
-        %    switch evt.EventType 
-        %        case "AddExperiment"
-        %        case "RemoveExperiment"
-        %        case "AddNewFilter"
-        %    end
-        %end
+            switch evt.EventType 
+                case "AddExperiment"
+                    obj.collectMatchedEntities();
+                    disp('Collected entities')
+                case "RemoveExperiment"
+                    obj.collectMatchedEntities();
+                case "PushFilter"
+                    obj.collectMatchedEntities();
+            end
+            obj.updateChildren(evt);
+        end
 
-        function filterEntities(obj)
+        function close(obj)
+            delete(obj.figureHandle);
+        end
+
+        function collectMatchedEntities(obj)
             if obj.numExperiments == 0
+                obj.matchedEntities = table.empty();
                 return 
             end
+
+            if obj.numFilters == 0
+                obj.matchedEntities = obj.QueryManager.entityTable;
+                disp('Collected unfiltered entities')
+            else
+                [~, obj.matchedEntities] = obj.QueryManager.filter();
+            end 
         end
     end
 
@@ -96,9 +124,15 @@ classdef QueryView < aod.app.Component
             value = [obj.exptPanel; obj.filterPanel;...
                      obj.codePanel; obj.matchPanel];
         end
+
+        function willGo(obj, varargin)
+            obj.QueryManager = aod.api.QueryManager(varargin{:});
+            obj.collectMatchedEntities();
+        end
         
         function createUi(obj)
-            obj.figureHandle = uifigure();
+            obj.figureHandle = uifigure(...
+                "CloseRequestFcn", @obj.onClose_Figure);
             obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + 300;
             if ispref('AOData', 'Development') && getpref('AOData', 'Development')
                 %! Development
@@ -138,6 +172,10 @@ classdef QueryView < aod.app.Component
                 obj.matchPanel.update(evtActive);
                 obj.codePanel.update(evtHidden);
             end
+        end
+
+        function onClose_Figure(obj, ~, ~)
+            delete(obj.figureHandle);
         end
     end
 end 

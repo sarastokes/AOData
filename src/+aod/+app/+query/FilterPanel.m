@@ -45,6 +45,19 @@ classdef FilterPanel < aod.app.Component
     end
 
     methods
+        function update(obj, varargin)
+            evt = varargin{1};
+
+            filterEvents = ["PushFilter", "PullFilter",...
+                "EditFilter", "CheckFilter"];
+            
+            if ismember(evt.EventType, filterEvents)
+                obj.Filters(evt.Data.ID).update(varargin{:});
+            end
+        end
+    end
+
+    methods
         function filterID = addFilter(obj)
             filterID = obj.numFilters + 1;
             newFilter = aod.app.query.FilterBox(obj, obj.filterLayout, filterID);

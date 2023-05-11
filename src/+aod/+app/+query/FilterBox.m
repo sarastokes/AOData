@@ -21,7 +21,7 @@ classdef FilterBox < aod.app.Component
 
     properties 
         ID                  double
-    end
+    end 
 
     properties (Dependent)
         isReady             logical
@@ -32,6 +32,7 @@ classdef FilterBox < aod.app.Component
     properties
         gridLayout          matlab.ui.container.GridLayout
         fillLayout          matlab.ui.container.GridLayout
+
         inputBox 
         filterControls 
         Subfilters
@@ -40,11 +41,10 @@ classdef FilterBox < aod.app.Component
     methods
         function obj = FilterBox(parent, canvas, ID)
             obj = obj@aod.app.Component(parent, canvas);
+
             obj.ID = ID;
-
-            obj.fillLayout.Layout.Row = obj.ID; 
-            obj.fillLayout.Layout.Column = 1;
-
+            obj.didGo();
+            
             obj.setHandler(aod.app.query.handlers.FilterBox(obj));
         end
 
@@ -82,10 +82,12 @@ classdef FilterBox < aod.app.Component
     methods
         function addNewSubfilter(obj)
             subfilterID = obj.numSubfilters + 1;
-            obj.gridLayout.RowHeight = repmat(obj.FILTER_HEIGHT, [1, 1 + subfilterID]);
+            obj.gridLayout.RowHeight = ...
+                repmat(obj.FILTER_HEIGHT, [1, 1 + subfilterID]);
             obj.fillLayout.RowHeight = {"fit"};
             obj.Canvas.RowHeight = {"fit"};
-            newSubfilter = aod.app.query.SubfilterBox(obj, obj.gridLayout, subfilterID);
+            newSubfilter = aod.app.query.SubfilterBox(obj,... 
+                obj.gridLayout, subfilterID);
             newSubfilter.gridLayout.Layout.Column = [1 2];
             newSubfilter.gridLayout.Layout.Row = subfilterID + 1;
             obj.Subfilters = cat(1, obj.Subfilters, newSubfilter);
@@ -104,6 +106,11 @@ classdef FilterBox < aod.app.Component
                 obj.filterControls;...
                 obj.Subfilters];
         end 
+
+        function didGo(obj)
+            obj.fillLayout.Layout.Row = obj.ID; 
+            obj.fillLayout.Layout.Column = 1;
+        end
         
         function createUi(obj)
             obj.fillLayout = aod.app.util.uilayoutfill(obj.Canvas, 0);

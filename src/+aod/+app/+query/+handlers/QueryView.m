@@ -19,7 +19,6 @@ classdef QueryView < aod.app.EventHandler
         end
 
         function handleRequest(obj, ~, evt)
-            assignin('base', 'QueryViewRequest', evt);
             switch evt.EventType 
                 case "AddExperiment"
                     newExperiments = [];
@@ -34,9 +33,13 @@ classdef QueryView < aod.app.EventHandler
                     obj.Parent.update(evt);
                 case "PushFilter"
                     obj.Parent.QueryManager.addFilter( ...
-                        obj.Parent.Filters(evt.Data.ID).getFilter());
+                        evt.Trigger.getFilter());
                     obj.Parent.update(evt);
                 case "SearchRequest"
+                    switch evt.Trigger.filterType 
+                        case aod.api.FilterTypes.CLASS 
+                            evt.Data.ListBox.Items = unique(obj.Parent.MatchedEntities.Class); 
+                    end
             end
         end
     end

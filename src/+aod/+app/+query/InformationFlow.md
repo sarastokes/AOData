@@ -1,22 +1,17 @@
 
 
-**InputBox**
-- AddSubfilter (*FilterBox*)
-- SearchRequest (*QueryView*)
-- ChangedFilterType (*SubfilterBox*)
-- ChangedSubfilterType (*FilterBox*)
-
-**ExperimentPanel**
-- AddExperiment (*ExperimentPanel*, *QueryView*)
-- RemoveExperiment (*ExperimentPanel*, *QueryView*)
-
-**FilterControls**
-- PushFilter (*QueryView*)
-- PullFilter (*QueryView*)
-- EditFilter 
-- CheckFilter
-
-**EntityTree**
-- NodeSelected (*QueryView*)
-
-**MatchPanel**, **CodePanel**, **FilterBox**, **SubfilterBox**
+|Object|Event|Upstream|Downstream|
+|-|-|-|-|
+|ExperimentPanel|AddExperiment|QueryView|ExperimentPanel|
+|ExperimentPanel|RemoveExperiment|QueryView|ExperimentPanel|
+|EntityTree|NodeSelected|QueryView|EntityBox|
+|EntityTree|ParentRequest|MatchPanel|EntityTree|
+|InputBox|AddSubfilter|FilterBox|SubfilterBox|
+|InputBox|SearchRequest|QueryView|InputBox|
+|InputBox|ChangedFilterType|FilterBox|InputBox, FilterControls|
+|InputBox|ChangedSubfilterType|SubfilterBox||
+|InputBox|ChangedFilterInput|FilterBox|FilterControls|
+|InputBox|ChangedSubfilterInput|SubfilterBox|FilterControls|
+|FilterControls|PushFilter|QueryView|FilterPanel --> FilterControls|
+|FilterControls|PullFilter|QueryView|FilterPanel --> FilterControls|
+|FilterControls|EditFilter|FilterBox|FilterControls|

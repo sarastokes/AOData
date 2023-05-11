@@ -10,6 +10,8 @@ classdef Component < handle & matlab.mixin.Heterogeneous
 % Subclassable methods:
 %   - update(obj, varargin)
 %   - value = specifyChildren(obj)
+%   - willGo(obj)
+%   - didGo(obj)
 %   - createUi(obj)
 %
 % See also:
@@ -28,7 +30,7 @@ classdef Component < handle & matlab.mixin.Heterogeneous
         % Graphics container for creating UI
         Canvas    
         % EventHandler for passing actions to other components
-        Handler         aod.app.EventHandler        
+        Handler                
     end
 
     properties (Dependent)
@@ -47,7 +49,7 @@ classdef Component < handle & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Component(parent, canvas)
+        function obj = Component(parent, canvas, varargin)
             if nargin == 0
                 return
             end
@@ -55,6 +57,7 @@ classdef Component < handle & matlab.mixin.Heterogeneous
             obj.Parent = parent;
             obj.Canvas = canvas;
 
+            obj.willGo(varargin{:});
             obj.createUi();
         end
 
@@ -88,6 +91,14 @@ classdef Component < handle & matlab.mixin.Heterogeneous
     end
 
     methods (Access = protected)
+        function willGo(obj, varargin)
+            % Option for subclass construction prior to UI creation
+        end
+
+        function didGo(obj)
+            % Option for UI modification after subclass construction
+        end
+
         function value = specifyChildren(obj)
             value = [];
         end

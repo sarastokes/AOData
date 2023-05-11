@@ -26,6 +26,7 @@ classdef SubfilterBox < aod.app.Component
 
     properties 
         gridLayout          matlab.ui.container.GridLayout 
+        
         inputBox 
         filterControls
     end

@@ -37,6 +37,8 @@ classdef QueryManager < handle
         numFiles
         % Number of filters
         numFilters
+        % Number of entities across files
+        numEntities
     end
 
     methods
@@ -62,6 +64,14 @@ classdef QueryManager < handle
                 out = 0;
             else
                 out = numel(obj.Filters);
+            end
+        end
+        
+        function value = get.numEntities(obj)
+            if obj.numFiles == 0
+                value = 0;
+            else
+                value = height(obj.entityTable);
             end
         end
     end

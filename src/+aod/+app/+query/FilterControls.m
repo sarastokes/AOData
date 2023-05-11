@@ -43,23 +43,30 @@ classdef FilterControls < aod.app.Component
 
     methods
         function update(obj, varargin)
-            if nargin == 2
-                evt = varargin{1};
-            end
+            evt = varargin{1};
 
-            if strcmp(evt.EventType, "ChangedFilterInput")
-                if evt.Data.Ready
-                    obj.checkButton.Enable = "on";
-                    obj.addButton.Enable = "on";
-                else
+            switch evt.EventType 
+                case "ChangedFilterInput"
+                    if evt.Data.Ready
+                        obj.checkButton.Enable = "on";
+                        obj.addButton.Enable = "on";
+                    else
+                        obj.checkButton.Enable = "off";
+                        obj.addButton.Enable = "off";
+                    end
+                case "ChangeFilterType"
                     obj.checkButton.Enable = "off";
                     obj.addButton.Enable = "off";
-                end
-            elseif strcmp(evt.EventType, "ChangeFilterType")
-                obj.checkButton.Enable = "off";
-                obj.addButton.Enable = "off";
+                case "PushFilter"
+                    obj.removeButton.Enable = "on";
+                    obj.addButton.Enable = "off";
+                    obj.editButton.Enable = "on";
+                    obj.checkButton.Enable = "off";
             end
         end
+    end
+
+    methods 
 
         function filterAdded(obj)
             obj.addButton.Enable = "off";
@@ -88,6 +95,7 @@ classdef FilterControls < aod.app.Component
                 "ButtonPushedFcn", @obj.onPush_Button);
             obj.removeButton = uibutton(buttonLayout,...
                 "Text", "", "Tag", "PullFilter",...
+                "Enable", "off",...
                 "Icon", obj.getIcon('cancel'),...
                 "ButtonPushedFcn", @obj.onPush_Button);
             obj.editButton = uibutton(buttonLayout,...
@@ -112,7 +120,7 @@ classdef FilterControls < aod.app.Component
             end
             disp(eventName);
             
-            obj.publish(eventName, obj,...
+            obj.publish(eventName, obj.Parent,...
                 "ID", obj.Parent.ID, "SubID", subID);
         end
     end

@@ -333,7 +333,7 @@ classdef InputBox < aod.app.Component
         end
 
         function onPush_SearchNames(obj, src, evt)
-            obj.publish("SearchRequest", obj,...
+            obj.publish("SearchRequest", obj.Parent,...
                 "ListBox", obj.nameDropdown);
         end
 
