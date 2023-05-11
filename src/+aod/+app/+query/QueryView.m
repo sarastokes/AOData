@@ -56,6 +56,10 @@ classdef QueryView < aod.app.Component
 
             obj.setHandler(aod.app.query.handlers.QueryView(obj));
         end
+    end
+
+    % Dependent set/get methods
+    methods 
 
         function value = get.Experiments(obj)
             value = obj.QueryManager.Experiments;
@@ -82,22 +86,39 @@ classdef QueryView < aod.app.Component
         end
     end
 
+    % Callback methods
+    methods (Access = private)
+        function onTab_Changed(obj, src, evt)
+            evtHidden = aod.app.Event("TabHidden", src);
+            evtActive = aod.app.Event("TabActive", src);
+
+            if strcmp(evt.NewValue.Title, 'Code')
+                obj.codePanel.update(evtActive);
+                obj.matchPanel.update(evtHidden);
+            elseif strcmp(evt.NewValue.Title, 'Matches')
+                obj.matchPanel.update(evtActive);
+                obj.codePanel.update(evtHidden);
+            end
+        end
+
+        function onClose_Figure(obj, ~, ~)
+            delete(obj.figureHandle);
+        end
+    end
+
+    % Component methods (public)
     methods
         function update(obj, evt)
-
             if ismember(evt.EventType, ["PushFilter", "PullFilter",...
-                    "AddExperiment", "RemoveExperiment"])
+                    "EditFilter", "AddExperiment", "RemoveExperiment"])
                 obj.collectMatchedEntities();
             end
 
             obj.updateChildren(evt);
         end
-
-        function close(obj)
-            delete(obj.figureHandle);
-        end
     end
 
+    % Component methods (protected)
     methods (Access = protected)
         function value = specifyChildren(obj)
             value = [obj.exptPanel; obj.filterPanel;...
@@ -138,25 +159,13 @@ classdef QueryView < aod.app.Component
             obj.codeTab = uitab(obj.resultGroup, ...
                 "Title", "Code");
             obj.codePanel = aod.app.query.CodePanel(obj, obj.codeTab);
-        end
+        end 
 
-        function onTab_Changed(obj, src, evt)
-            evtHidden = aod.app.Event("TabHidden", src);
-            evtActive = aod.app.Event("TabActive", src);
-            
-            if strcmp(evt.NewValue.Title, 'Code')
-                obj.codePanel.update(evtActive);
-                obj.matchPanel.update(evtHidden);
-            elseif strcmp(evt.NewValue.Title, 'Matches')
-                obj.matchPanel.update(evtActive);
-                obj.codePanel.update(evtHidden);
-            end
-        end
-
-        function onClose_Figure(obj, ~, ~)
+        function close(obj)
             delete(obj.figureHandle);
         end
     end
+
 
     methods (Access = private)
         function collectMatchedEntities(obj)

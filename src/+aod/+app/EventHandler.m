@@ -39,6 +39,10 @@ classdef EventHandler < handle
                 p.handleRequest([], evtData);
             end
         end
+
+        function close(obj)
+            obj.removeAllListeners();
+        end
     end
 
     methods (Access = protected)

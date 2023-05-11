@@ -90,7 +90,6 @@ classdef InputBox < aod.app.Component
     end
 
     methods 
-
         function update(obj, evt)
 
             switch evt.EventType
@@ -319,6 +318,12 @@ classdef InputBox < aod.app.Component
             end
         end
 
+        function close(obj)
+            delete(obj.gridLayout);
+        end
+    end 
+
+    methods (Access = private)
         function onSelected_FilterDropdown(obj, src, evt)
             if strcmp(evt.Value, evt.PreviousValue)
                 return
@@ -377,5 +382,4 @@ classdef InputBox < aod.app.Component
                 "Ready", obj.isReady);
         end
     end
-
 end

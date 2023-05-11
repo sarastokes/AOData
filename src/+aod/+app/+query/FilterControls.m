@@ -21,12 +21,14 @@ classdef FilterControls < aod.app.Component
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    %% TODO: Needs filterID
     properties (SetAccess = private)
         isSubfilter         logical 
+        isAdded             logical
     end
 
     properties 
+        gridLayout          matlab.ui.container.GridLayout
+
         addButton           matlab.ui.control.Button
         checkButton         matlab.ui.control.Button
         editButton          matlab.ui.control.Button
@@ -39,52 +41,52 @@ classdef FilterControls < aod.app.Component
                 isSubfilter = false;
             end
             obj = obj@aod.app.Component(parent, canvas, isSubfilter);
+            obj.isAdded = false;
 
             obj.setHandler(aod.app.query.handlers.FilterControls(obj));
         end
     end
 
+    % Component methods
     methods
         function update(obj, evt)
             switch evt.EventType 
                 case "ChangedFilterInput"
                     if evt.Data.Ready
-                        obj.checkButton.Enable = "on";
-                        obj.addButton.Enable = "on";
+                        if obj.isAdded
+                            obj.checkButton.Enable = "on";
+                        else
+                            obj.addButton.Enable = "on";
+                        end
                     else
-                        obj.checkButton.Enable = "off";
-                        obj.addButton.Enable = "off";
+                        if obj.isAdded
+                            obj.checkButton.Enable = "off";
+                        else
+                            obj.addButton.Enable = "off";
+                        end
                     end
                 case "ChangeFilterType"
                     obj.checkButton.Enable = "off";
                     obj.addButton.Enable = "off";
                 case "PushFilter"
+                    obj.isAdded = true;
                     obj.removeButton.Enable = "on";
                     obj.addButton.Enable = "off";
                     obj.editButton.Enable = "on";
                     obj.checkButton.Enable = "off";
-                case "EditButton"
+                case "PullFilter"
+                    obj.isAdded = false;
+                case "EditFilter"
                     obj.editButton.Enable = "off";
                     obj.removeButton.Enable = "on";
-                    obj.addButon.Enable = "on";
+                    obj.addButon.Enable = "off";
+                    obj.checkButton.Enable = "on";
+                case "CheckFilter"
+                    obj.editButton.Enable = "on";
+                    obj.removeButton.Enable = "on";
                     obj.checkButton.Enable = "off";
+                    obj.addButton.Enable = "off";
             end
-        end
-    end
-
-    methods 
-        function filterAdded(obj)
-            obj.addButton.Enable = "off";
-            obj.editButton.Enable = "on";
-            obj.checkButton.Enable = "off";
-            obj.removeButton.Enable = "on";
-        end
-
-        function filterEdited(obj)
-            obj.addButton.Enable = "on";
-            obj.editButton.Enable = "off";
-            obj.removeButton.Enable = "on";
-            obj.checkButton.Enable = "on";
         end
     end
 
@@ -94,32 +96,38 @@ classdef FilterControls < aod.app.Component
         end
 
         function createUi(obj)
-            buttonLayout = uigridlayout(obj.Canvas, [2 2],...
+            obj.gridLayout = uigridlayout(obj.Canvas, [2 2],...
                 "RowSpacing", 2, "ColumnSpacing", 2,...
                 "Padding", [5 5 5 5]);
-            obj.addButton = uibutton(buttonLayout,...
+            obj.addButton = uibutton(obj.gridLayout,...
                 "Text", "", "Tag", "PushFilter",...
                 "Icon", obj.getIcon("add"),...
                 "Enable", "off",...
                 "ButtonPushedFcn", @obj.onPush_Button);
-            obj.removeButton = uibutton(buttonLayout,...
+            obj.removeButton = uibutton(obj.gridLayout,...
                 "Text", "", "Tag", "PullFilter",...
                 "Enable", "off",...
                 "Icon", obj.getIcon('cancel'),...
                 "ButtonPushedFcn", @obj.onPush_Button);
-            obj.editButton = uibutton(buttonLayout,...
+            obj.editButton = uibutton(obj.gridLayout,...
                 "Text", "", "Tag", "EditFilter",...
                 "Icon", obj.getIcon('edit'),...
                 "Enable", "off",...
                 "ButtonPushedFcn", @obj.onPush_Button);
-            obj.checkButton = uibutton(buttonLayout,...
+            obj.checkButton = uibutton(obj.gridLayout,...
                 "Text", "", "Tag", "CheckFilter",...
                 "Icon", obj.getIcon('check'),...
                 "Enable", "off",...
                 "ButtonPushedFcn", @obj.onPush_Button);
         end
 
-        function onPush_Button(obj, src, evt)
+        function close(obj)
+            delete(obj.gridLayout);
+        end
+    end
+
+    methods (Access = private)
+        function onPush_Button(obj, src, ~)
             if obj.isSubfilter
                 eventName = strrep(src.Tag, "Filter", "Subfilter");
                 subID = obj.Parent.subID;

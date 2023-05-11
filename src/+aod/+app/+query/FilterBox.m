@@ -125,6 +125,12 @@ classdef FilterBox < aod.app.Component
             obj.filterControls = aod.app.query.FilterControls(...
                 obj, obj.gridLayout);
         end
+
+        function close(obj)
+            delete(obj.fillLayout);
+            close(obj.inputBox);
+            close(obj.filterControls);
+        end
     end
 
     methods (Access = private)
@@ -144,6 +150,8 @@ classdef FilterBox < aod.app.Component
                 F = aod.api.FilterTypes.makeNewFilter(...
                     QM, {obj.filterType, name, value});
             end
+
+            % TODO: Add filters
         end
     end
 end 

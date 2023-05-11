@@ -9,6 +9,9 @@ classdef EntityTree < aod.app.Component
 %
 % Children:
 %   N/A
+%
+% Events:
+%   SelectedNode, DeselectedNode
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -26,10 +29,6 @@ classdef EntityTree < aod.app.Component
         isDirty         logical = false
     end
 
-    properties (Hidden, Constant)
-        BOLD_STYLE = uistyle("FontWeight", "bold");
-    end
-
     methods
         function obj = EntityTree(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
@@ -38,7 +37,6 @@ classdef EntityTree < aod.app.Component
 
     methods 
         function filterNodes(obj, exptFile)
-
             if nargin < 2
                 if obj.Root.numExperiments > 0
                     arrayfun(@(x) obj.filterNodes(x), obj.Root.hdfFiles); 
@@ -72,36 +70,6 @@ classdef EntityTree < aod.app.Component
                     "Node", iNode);
             end
             drawnow;
-        end
-
-        function resetExperimentNodes(obj, exptFile)
-            if nargin < 2 
-                if obj.Root.numExperiments > 0
-                    arrayfun(@(x) resetExperimentNodes(obj, x), obj.Root.hdfFiles);
-                end
-                return
-            end
-            exptNodes = findall(obj.Tree, "Tag", exptFile);
-            delete(exptNodes(1).Children);
-            delete(exptNodes(2).Children);
-        end
-
-        function update(obj, evt)
-
-            switch evt.EventType
-                case "TabHidden"
-                    obj.isActive = false;
-                case "TabActive"
-                    obj.isActive = true;
-                case "AddExperiment"
-                    for i = 1:numel(evt.Data.FileName)
-                        obj.addExperiment(evt.Data.FileName(i));
-                    end 
-                case "RemoveExperiment"
-                    obj.removeExperiment(evt.Data.FileName);
-                case "PushFilter"
-                    obj.filterNodes(); 
-            end
         end
 
         function reset(obj)
@@ -172,6 +140,27 @@ classdef EntityTree < aod.app.Component
         end
     end
 
+    % aod.app.Component methods (public)
+    methods
+        function update(obj, evt)
+            switch evt.EventType
+                case "TabHidden"
+                    obj.isActive = false;
+                case "TabActive"
+                    obj.isActive = true;
+                case "AddExperiment"
+                    for i = 1:numel(evt.Data.FileName)
+                        obj.addExperiment(evt.Data.FileName(i));
+                    end
+                case "RemoveExperiment"
+                    obj.removeExperiment(evt.Data.FileName);
+                case "PushFilter"
+                    obj.filterNodes();
+            end
+        end
+    end
+
+    % aod.app.Component methods (protected)
     methods (Access = protected)
         function willGo(obj, varargin)
             obj.loadIcons();
@@ -188,7 +177,10 @@ classdef EntityTree < aod.app.Component
                 end
             end
         end
+    end
 
+    % Callback methods
+    methods (Access = private)
         function onSelected_Node(obj, src, evt)
             if src.Tag == "Experiment"
                 eventName = 'ExperimentSelected';
@@ -197,9 +189,23 @@ classdef EntityTree < aod.app.Component
             end
             obj.publish(eventName, src);
         end
+
+        function resetExperimentNodes(obj, exptFile)
+
+            if nargin < 2
+                if obj.Root.numExperiments > 0
+                    arrayfun(@(x) resetExperimentNodes(obj, x), obj.Root.hdfFiles);
+                end
+                return
+            end
+
+            exptNodes = findall(obj.Tree, "Tag", exptFile);
+            delete(exptNodes(1).Children);
+            delete(exptNodes(2).Children);
+        end
     end
 
-    methods (Access = private)
+    methods 
         function loadIcons(obj)
             obj.Icons = containers.Map();
 

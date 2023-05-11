@@ -17,18 +17,18 @@ classdef SubfilterBox < aod.app.Component
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        subID 
+        subID               double {mustBeInteger}
     end
 
     properties (Dependent)
-        ID 
+        ID                  double {mustBeInteger}
     end
 
     properties 
         gridLayout          matlab.ui.container.GridLayout 
         
-        inputBox 
-        filterControls
+        inputBox            % aod.app.query.InputBox
+        filterControls      % aod.app.query.FilterControls
     end
 
     methods
@@ -50,6 +50,7 @@ classdef SubfilterBox < aod.app.Component
         end
     end
 
+    % Component methods
     methods
         function update(obj, evt)
             switch evt.EventType
@@ -76,6 +77,10 @@ classdef SubfilterBox < aod.app.Component
 
             obj.inputBox = aod.app.query.InputBox(obj, obj.gridLayout, true);
             obj.filterControls = aod.app.query.FilterControls(obj, obj.gridLayout, true);
+        end
+
+        function close(obj)
+            delete(obj.gridLayout);
         end
     end
 end 

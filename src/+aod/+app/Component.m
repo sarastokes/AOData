@@ -10,9 +10,10 @@ classdef Component < handle & matlab.mixin.Heterogeneous
 % Subclassable methods:
 %   - update(obj, varargin)
 %   - value = specifyChildren(obj)
-%   - willGo(obj)
-%   - didGo(obj)
+%   - willGo(obj, varargin)
 %   - createUi(obj)
+%   - didGo(obj, varargin)
+%   - close(obj)
 %
 % See also:
 %   aod.app.EventHandler, aod.app.Event
@@ -87,27 +88,35 @@ classdef Component < handle & matlab.mixin.Heterogeneous
             obj.updateChildren(evt);
         end
 
-        function publish(obj, eventName, varargin)
-            evtData = aod.app.Event(eventName, varargin{:});
-            notify(obj, 'NewEvent', evtData);
-        end
     end
 
     methods (Access = protected)
-        function willGo(obj, varargin)
+        function willGo(obj, varargin) %#ok<INUSD>
             % Option for subclass construction prior to UI creation
         end
 
-        function didGo(obj)
+        function didGo(obj) %#ok<MANU>
             % Option for UI modification after subclass construction
         end
 
-        function value = specifyChildren(obj)
+        function close(obj) %#ok<MANU>
+            % Option for UI actions before object deletion
+            if ~isempty(obj.Handler)
+                obj.Handler.close();
+            end
+        end
+
+        function value = specifyChildren(obj) %#ok<MANU>
             value = [];
         end
     end
 
     methods (Sealed, Access = protected)
+        function publish(obj, eventName, varargin)
+            evtData = aod.app.Event(eventName, varargin{:});
+            notify(obj, 'NewEvent', evtData);
+        end
+
         function updateChildren(obj, varargin)
             if ~isempty(obj.Children)
                 arrayfun(@(x) x.update(varargin{:}), obj.Children);

@@ -35,6 +35,15 @@ classdef QueryView < aod.app.EventHandler
                     obj.Parent.QueryManager.addFilter( ...
                         evt.Trigger.getFilter());
                     obj.Parent.update(evt);
+                case "PullFilter"
+                    obj.Parent.QueryManager.removeFilter(evt.Data.ID);
+                    obj.Parent.update(evt);
+                case "EditFilter"
+                    obj.Parent.QueryManager.Filters(evt.Data.ID).disableFilter();
+                    obj.Parent.update(evt);
+                case "CheckFilter"
+                    obj.Parent.QueryManager.Filters(evt.Data.ID).enableFilter();
+                    obj.Parent.update(evt);
                 case "SearchRequest"
                     switch evt.Trigger.filterType 
                         case aod.api.FilterTypes.CLASS 

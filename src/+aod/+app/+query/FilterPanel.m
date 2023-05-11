@@ -34,7 +34,10 @@ classdef FilterPanel < aod.app.Component
 
             obj.setHandler(aod.app.query.handlers.FilterPanel(obj));
         end
+    end
 
+    % Dependent set/get methods
+    methods 
         function value = get.numFilters(obj)
             if isempty(obj.Filters)
                 value = 0;
@@ -45,9 +48,39 @@ classdef FilterPanel < aod.app.Component
     end
 
     methods
+        function filterID = addFilter(obj)
+            filterID = obj.numFilters + 1;
+            newFilter = aod.app.query.FilterBox(obj, obj.filterLayout, filterID);
+            obj.Filters = cat(1, obj.Filters, newFilter);
+            obj.filterLayout.RowHeight = ...
+                repmat("fit", [1 obj.numFilters]);
+        end
+    end
+
+    % Callback methods
+    methods (Access = private)
+        function onPush_AddNewFilter(obj, ~, ~)
+            obj.addFilter();
+        end
+
+        function onPush_ClearFilters(obj, ~, ~)
+            for i = numel(obj.Filters):-1:1
+                delete(obj.Filters(i).gridLayout);
+            end
+            obj.Filters = [];
+        end
+    end
+
+    % aod.app.Component methods (public)
+    methods
         function update(obj, evt)
             filterEvents = ["PushFilter", "PullFilter",...
                 "EditFilter", "CheckFilter"];
+            if strcmp(evt.EventType, "PullFilter")
+                % TODO: Close out filter box, then delete
+                obj.Filters(evt.Data.ID).close();
+                delete(obj.Filters);
+            end
             
             % Only send update to caller filterBox
             if ismember(evt.EventType, filterEvents)
@@ -56,18 +89,7 @@ classdef FilterPanel < aod.app.Component
         end
     end
 
-    methods
-        function filterID = addFilter(obj)
-            filterID = obj.numFilters + 1;
-            newFilter = aod.app.query.FilterBox(obj, obj.filterLayout, filterID);
-            %newFilter.gridLayout.Layout.Row = filterID;
-            %newFilter.gridLayout.Layout.Column = 1;
-            obj.Filters = cat(1, obj.Filters, newFilter);
-            obj.filterLayout.RowHeight = ... 
-                repmat("fit", [1 obj.numFilters]);
-        end
-    end
-
+    % aod.app.Component methods (protected)
     methods (Access = protected)
         function value = specifyChildren(obj)
             value = obj.Filters;
@@ -95,17 +117,6 @@ classdef FilterPanel < aod.app.Component
                 "ButtonPushedFcn", @obj.onPush_ClearFilters);
             obj.clearFilterButton.Layout.Row = 2;
             obj.clearFilterButton.Layout.Column = 2;
-        end
-
-        function onPush_AddNewFilter(obj, ~, ~)
-            obj.addFilter();
-        end
-
-        function onPush_ClearFilters(obj, ~, ~)
-            for i = numel(obj.Filters):-1:1
-                delete(obj.Filters(i).gridLayout);
-            end
-            obj.Filters = [];
         end
     end
 end 
