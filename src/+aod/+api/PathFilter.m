@@ -72,7 +72,7 @@ classdef PathFilter < aod.api.FilterQuery
             txt = sprintf("aod.api.PathFilter(%s, %s)",... 
                 input, value2string(obj.PathName));
             if ~isempty(output)
-                txt = sprintf("%s = %s;", output);
+                txt = sprintf("%s = %s;", output, txt);
             end
         end
     end

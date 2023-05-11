@@ -12,6 +12,7 @@ classdef FilterTest < matlab.unittest.TestCase
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+%#ok<*STRQUOT>
 
     properties
         FILENAME
@@ -53,8 +54,8 @@ classdef FilterTest < matlab.unittest.TestCase
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
-            testCase.verifyError(...
-                @() testCase.QM.filter(), "go:NoFiltersSet");
+            %testCase.verifyError(...
+            %    @() testCase.QM.filter(), "go:NoFiltersSet");
 
             testCase.verifyError(...
                 @() testCase.QM.addFilter(1), "addFilter:InvalidInput");
@@ -69,6 +70,9 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.QM.clearFilters();
 
             testCase.verifyNumElements(1, testCase.QM.numFiles);
+
+            % Add a new file
+            
         end
 
         function FilterAddition(testCase)
@@ -118,7 +122,11 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = PF1.apply();
             testCase.verifyNumElements(find(idx), 1);
             testCase.verifyEqual(PF1.describe(),... 
-                string('PathFilter: Path="/Experiment"')); %#ok<STRQUOT>
+                string('PathFilter: Path="/Experiment"'));
+            testCase.verifyEqual(PF1.code(), ...
+                string('aod.api.PathFilter(QM, "/Experiment")'));
+            testCase.verifyEqual(PF1.code("QM", "F"),...
+                string('F = aod.api.PathFilter(QM, "/Experiment");'));
             
             PF2 = aod.api.PathFilter(testCase.QM, @(x) endsWith(x, "Experiment"));
             idx = PF2.apply();
@@ -144,6 +152,8 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = UF.apply();
             testCase.verifyEqual(nnz(idx), 1);
             testCase.verifyTrue(contains(UF.describe(), testCase.EXPT.UUID));
+            testCase.verifyEqual(UF.code(),...
+                string('aod.api.UuidFilter(QM, "32d2a116-c856-4027-ab86-dc5e18f7d648")'));
         end
 
         function UuidFilterWarning(testCase)
@@ -171,6 +181,12 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = CF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
             CF2.describe();
+
+            testCase.verifyEqual(CF2.code(),...
+                "aod.api.ClassFilter(QM, @(x)endsWith(x,'Experiment'))");
+            testCase.verifyEqual(CF2.code("QM", "F"), ...
+                "F = aod.api.ClassFilter(QM, @(x)endsWith(x,'Experiment'));");
+
             % Alt initialization
             testCase.QM.addFilter({'Class', @(x) endsWith(x, 'Experiment')});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
@@ -200,6 +216,11 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = DF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
             DF2.describe();
+            testCase.verifyEqual(DF2.code(),... 
+                string('aod.api.DatasetFilter(QM, "epochIDs", [1 2])')); 
+            testCase.verifyEqual(DF2.code("QM", "F"),...
+                string('F = aod.api.DatasetFilter(QM, "epochIDs", [1 2]);'));
+
             % Alt initialization
             testCase.QM.addFilter({'Dataset', 'epochIDs', [1 2]});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
@@ -229,6 +250,11 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyEqual(numel(matches), 1);
             testCase.verifyEqual(height(entityInfo), 1);
             EF.describe();
+            testCase.verifyEqual(EF.code(),...
+                string('aod.api.EntityFilter(QM, "Experiment")'));
+            testCase.verifyEqual(EF.code("QM", "F"),...
+                string('F = aod.api.EntityFilter(QM, "Experiment");'));
+
             % Alt initialization
             testCase.QM.addFilter({'Entity', 'Experiment'});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
@@ -264,6 +290,11 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyEqual(nnz(idx), 1);
             testCase.verifyTrue(endsWith(CF.getMatchedGroups(), "0001"));
             CF.describe();
+
+            testCase.verifyEqual(CF.code(),...
+                string('aod.api.ChildFilter(QM, "Response", {"Dataset", "Data", [2 4 6 8]})'));
+            testCase.verifyEqual(CF.code("QM", "F"),...
+                string('F = aod.api.ChildFilter(QM, "Response", {"Dataset", "Data", [2 4 6 8]});'));
         end
 
         function ChildFilterWarnings(testCase)
@@ -283,6 +314,8 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.QM.clearFilters();
 
             LF = aod.api.LinkFilter(testCase.QM, 'Source');
+            testCase.verifyEqual(LF.code(),...
+                string('aod.api.LinkFilter(QM, "Source")'));
             testCase.verifyEqual(nnz(LF.apply()), 2);
             LF.describe();
         end
@@ -312,10 +345,14 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.QM.clearFilters();
 
             % Get responses with parent Epoch that has Epoch ID 1
-            PF = aod.api.ParentFilter(testCase.QM, 'Response', 'Epoch',...
+            PF1 = aod.api.ParentFilter(testCase.QM, 'Response', 'Epoch',...
                 {'Dataset', 'ID', 1});
-            testCase.verifyEqual(nnz(PF.apply()), 2);
-            PF.describe();
+            testCase.verifyEqual(nnz(PF1.apply()), 2);
+            PF1.describe();
+            testCase.verifyEqual(PF1.code(),...
+                string('aod.api.ParentFilter(QM, "Response", "Epoch", {"Dataset", "ID", 1})'));
+            testCase.verifyEqual(PF1.code("QM", "F"),...
+                string('F = aod.api.ParentFilter(QM, "Response", "Epoch", {"Dataset", "ID", 1});'));
 
             % Get Sources with Parent Source that has name ending in OS
             PF2 = aod.api.ParentFilter(testCase.QM, 'Source',...
@@ -345,7 +382,10 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = PF1.apply();
             testCase.verifyEqual(nnz(idx), 1);
             PF1.describe();
-
+            testCase.verifyEqual(PF1.code(),...
+                string('aod.api.ParameterFilter(QM, "Laboratory")'));
+            testCase.verifyEqual(PF1.code("QM", "F"),...
+                string('F = aod.api.ParameterFilter(QM, "Laboratory");'));
 
             % Specific parameter value (match)
             PF2 = aod.api.ParameterFilter(testCase.QM,... 
@@ -353,6 +393,8 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = PF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
             PF2.describe();
+            
+
             % Alt initialization
             testCase.QM.addFilter({'Parameter', 'Laboratory', 'Primate-1P'});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);

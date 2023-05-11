@@ -73,7 +73,7 @@ classdef ClassFilter < aod.api.FilterQuery
             txt = sprintf("aod.api.ClassFilter(%s, %s)",... 
                 input, value2string(obj.Name));
             if ~isempty(output)
-                txt = sprintf("%s = %s;", output);
+                txt = sprintf("%s = %s;", output, txt);
             end
         end
     end

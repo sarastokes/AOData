@@ -12,14 +12,17 @@ classdef EntityFilter < aod.api.FilterQuery
 %
 % Inputs:
 %   parent          aod.api.QueryManager
-%   entityType      text name of entity or aod.core.EntityTypes
+%   entityType      string or aod.core.EntityTypes
+%       Entities to search 
 %
 % Examples:
 %   QM = aod.api.EntityManager("MyFile.h5")
 %   % Initialize by entity name
-%   EF1 = aod.api.FilterQuery(QM, 'Response')
+%   EF1 = aod.api.EntityFilter(QM, 'Response')
 %   % Initialize by entity type
-%   EF2 = aod.api.FilterQuery(QM, aod.core.EntityTypes.RESPONSE)
+%   EF2 = aod.api.EntityFilter(QM, aod.core.EntityTypes.RESPONSE)
+%   % Search for more than one entity
+%   EF3 = aod.api.EntityFilter(QM, ["Experiment", "Epoch"]);
 %
 % See also:
 %   aod.api.QueryManager
@@ -34,7 +37,10 @@ classdef EntityFilter < aod.api.FilterQuery
     methods 
         function obj = EntityFilter(parent, entityType)
             obj@aod.api.FilterQuery(parent);
-            obj.EntityName = char(aod.core.EntityTypes.get(entityType));
+
+            entityType = convertCharsToStrings(entityType);
+            obj.EntityName = arrayfun(...
+                @(x) string(aod.core.EntityTypes.get(x)), entityType);
         end
     end
 
@@ -50,7 +56,7 @@ classdef EntityFilter < aod.api.FilterQuery
         
             for i = 1:height(entities)
                 if obj.localIdx(i)
-                    obj.localIdx(i) = strcmpi(entities.Entity(i), obj.EntityName);
+                    obj.localIdx(i) = ismember(entities.Entity(i), obj.EntityName);
                 end
             end
 
@@ -72,7 +78,7 @@ classdef EntityFilter < aod.api.FilterQuery
             txt = sprintf("aod.api.EntityFilter(%s, %s)",... 
                 input, value2string(obj.EntityName));
             if ~isempty(output)
-                txt = sprintf("%s = %s;", output);
+                txt = sprintf("%s = %s;", output, txt);
             end
         end        
     end

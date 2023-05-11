@@ -24,12 +24,25 @@ function out = value2string(input)
     elseif isstring(input)
         out = string(sprintf('"%s"', out));
     elseif isenum(input)
-        mc = metaclass(input);
-        out = sprintf("%s.%s")
+        out = sprintf("%s.%s", class(input), out);
     elseif isnumeric(input) 
-        if numel(input) > 1
+        if numel(input) == 1
+            out = num2str(out);
+        else
             out = "[" + out + "]";
+            % Replace newline with semicolon
+            out = strrep(out, newline, ";");
+            % Remove repeated spaces
+            idx = strfind(out, " ");
+            repeatedSpaces = diff(idx);
+            if any(repeatedSpaces == 1)
+                idx = idx(1+find(repeatedSpaces==1));
+                out = char(out);
+                out(idx) = [];
+                out = string(out);
+            end
         end
+        % Add class if not double
         if ~isa(input, 'double')
             out = sprintf("%s(%s)", class(input), out);
         end 

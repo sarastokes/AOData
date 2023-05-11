@@ -35,18 +35,6 @@ classdef ChildFilter < aod.api.StackedFilterQuery
             tag = tag + newline + childTags;
         end
 
-        
-        function out = code(obj, input, output)
-            arguments 
-                obj 
-                input           string  = "QM"
-                output          string  = "F"
-            end
-
-            out = sprintf("%s = aod.api.ChildFilter(%s, %s);",... 
-                output, input, char(obj.childType));
-        end
-
         function out = apply(obj)
             obj.localIdx = obj.getQueryIdx();
             obj.filterIdx = true(size(obj.localIdx));
@@ -101,6 +89,23 @@ classdef ChildFilter < aod.api.StackedFilterQuery
             end
             
             out = obj.localIdx;
+        end
+
+        function txt = code(obj, input, output)
+            arguments 
+                obj 
+                input           string  = "QM"
+                output          string  = []
+            end
+
+            txt = code@aod.api.StackedFilterQuery(obj);
+
+            txt = sprintf("aod.api.ChildFilter(%s, %s%s",...
+                input, value2string(string(obj.childType)), txt);
+            
+            if ~isempty(output)
+                txt = sprintf("%s = %s;", output, txt);
+            end
         end
     end
 end 

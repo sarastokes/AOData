@@ -81,5 +81,24 @@ classdef (Abstract) StackedFilterQuery < aod.api.FilterQuery
                 end
             end
         end
+
+        function txt = code(obj, ~, ~)
+
+            if isempty(obj.Filters)
+                txt = ")";
+                return
+            end
+
+            txt = "";
+            if obj.numFilters ~= 0
+                for i = 1:obj.numFilters
+                    txt = txt + ", ";
+                    filterName = extractBetween(class(obj.Filters(i)), "aod.api.", "Filter");
+                    txt = txt + "{" + value2string(string(filterName));
+                    txt = txt + extractBetween(obj.Filters(i).code(), "(QM", ")") + "}";
+                end
+            end
+            txt = txt + ")";
+        end
     end
 end 

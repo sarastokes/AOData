@@ -14,7 +14,7 @@ classdef LinkFilter < aod.api.StackedFilterQuery
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Name
+        Name                        string
     end
 
     properties (SetAccess = private)
@@ -116,7 +116,7 @@ classdef LinkFilter < aod.api.StackedFilterQuery
             end
 
             txt = sprintf("aod.api.LinkFilter(%s, %s)",... 
-                input, obj.Name);
+                input, value2string(obj.Name));
             if ~isempty(output)
                 txt = sprintf("%s = %s;", output, txt);
             end

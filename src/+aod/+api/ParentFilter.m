@@ -87,8 +87,11 @@ classdef ParentFilter < aod.api.StackedFilterQuery
                 output          string  = []
             end
 
-            txt = sprintf("aod.api.ParentFilter(%s, %s, %s)",... 
-                input, char(obj.targetEntityType), char(obj.parentEntityType));
+            txt = code@aod.api.StackedFilterQuery(obj);
+            
+            txt = sprintf("aod.api.ParentFilter(%s, %s, %s%s",... 
+                input, value2string(string(obj.targetEntityType)), ...
+                value2string(string(obj.parentEntityType)), txt);
 
             if ~isempty(output)
                 txt = sprintf("%s = %s;", output, txt);
