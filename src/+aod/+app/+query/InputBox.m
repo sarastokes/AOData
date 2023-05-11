@@ -283,7 +283,7 @@ classdef InputBox < aod.app.Component
 
             obj.searchButton = uibutton(obj.nameLayout,...
                 "Text", "", "Icon", obj.getIcon("search"),...
-                "Visible", "off",...
+                "Tag", "DropDown", "Visible", "off",...
                 "ButtonPushedFcn", @obj.onPush_SearchNames);
             obj.searchButton.Layout.Row = 2;
             obj.searchButton.Layout.Column = 2;
@@ -355,9 +355,16 @@ classdef InputBox < aod.app.Component
             obj.onChange_Anything();
         end
 
-        function onPush_SearchNames(obj, ~, ~)
-            obj.publish("SearchRequest", obj.Parent,...
-                "ListBox", obj.nameDropdown);
+        function onPush_SearchNames(obj, src, ~)
+            if src.Tag == "DropDown"
+                obj.publish("SearchRequest", obj.Parent,...
+                    "ListBox", obj.nameDropdown);
+                obj.showNameDropdown();
+                set(src, "Tag", "EditField");
+            else
+                obj.showNameEditfield();
+                set(src, "Tag", "DropDown");
+            end
         end
 
         function onChange_Anything(obj)

@@ -14,23 +14,5 @@ classdef ExperimentPanel < aod.app.EventHandler
         function obj = ExperimentPanel(parent)
             obj = obj@aod.app.EventHandler(parent);
         end
-
-        function handleRequest(obj, ~, evt)
-            switch evt.EventType 
-                case "AddExperiment"
-                    expt = string(evt.Trigger.Items)';
-                    expt = cat(1, expt, evt.Data.FileName);
-                    evt.Trigger.Items = expt;
-                    obj.Parent.removeButton.Enable = "on";
-                case "RemoveExperiment"
-                    expt = setdiff(evt.Trigger.Items, evt.Data.FileName);
-                    evt.Trigger.Items = expt;
-                    if isempty(expt)
-                        obj.Parent.removeButton.Enable = "off";
-                    end
-            end 
-            obj.passRequest(evt);
-        end
-
     end
 end 

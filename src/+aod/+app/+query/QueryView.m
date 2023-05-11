@@ -85,14 +85,9 @@ classdef QueryView < aod.app.Component
     methods
         function update(obj, evt)
 
-            switch evt.EventType 
-                case "AddExperiment"
-                    obj.collectMatchedEntities();
-                    disp('Collected entities')
-                case "RemoveExperiment"
-                    obj.collectMatchedEntities();
-                case "PushFilter"
-                    obj.collectMatchedEntities();
+            if ismember(evt.EventType, ["PushFilter", "PullFilter",...
+                    "AddExperiment", "RemoveExperiment"])
+                obj.collectMatchedEntities();
             end
 
             obj.updateChildren(evt);
@@ -100,20 +95,6 @@ classdef QueryView < aod.app.Component
 
         function close(obj)
             delete(obj.figureHandle);
-        end
-
-        function collectMatchedEntities(obj)
-            if obj.numExperiments == 0
-                obj.matchedEntities = table.empty();
-                return 
-            end
-
-            if obj.numFilters == 0
-                obj.matchedEntities = obj.QueryManager.entityTable;
-                disp('Collected unfiltered entities')
-            else
-                [~, obj.matchedEntities] = obj.QueryManager.filter();
-            end 
         end
     end
 
@@ -174,6 +155,21 @@ classdef QueryView < aod.app.Component
 
         function onClose_Figure(obj, ~, ~)
             delete(obj.figureHandle);
+        end
+    end
+
+    methods (Access = private)
+        function collectMatchedEntities(obj)
+            if obj.numExperiments == 0
+                obj.matchedEntities = table.empty();
+                return 
+            end
+
+            if obj.numFilters == 0
+                obj.matchedEntities = obj.QueryManager.entityTable;
+            else
+                [~, obj.matchedEntities] = obj.QueryManager.filter();
+            end 
         end
     end
 end 

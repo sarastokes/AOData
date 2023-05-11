@@ -30,6 +30,21 @@ classdef ExperimentPanel < aod.app.Component
         end
     end
 
+    methods
+        function update(obj, evt)
+            switch evt.EventType
+                case "AddExperiment"
+                    obj.exptListbox.Items = obj.Root.hdfFiles;
+                    obj.removeButton.Enable = "on";
+                case "RemoveExperiment"
+                    obj.exptListbox.Items = obj.Root.hdfFiles;
+                    if obj.Root.numExperiments == 0
+                        obj.removeButton.Enable = "off";
+                    end
+            end
+        end
+    end
+
     methods (Access = protected)
         function createUi(obj)
             layout = uigridlayout(obj.Canvas, [2 1],...

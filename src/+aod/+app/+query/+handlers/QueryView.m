@@ -38,8 +38,11 @@ classdef QueryView < aod.app.EventHandler
                 case "SearchRequest"
                     switch evt.Trigger.filterType 
                         case aod.api.FilterTypes.CLASS 
-                            evt.Data.ListBox.Items = unique(obj.Parent.MatchedEntities.Class); 
+                            items = unique(obj.Parent.matchedEntities.Class);
+                        case aod.api.FilterTypes.PATH
+                            items = unique(obj.Parent.matchedEntities.Path);
                     end
+                    evt.Data.ListBox.Items = items;
             end
         end
     end

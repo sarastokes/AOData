@@ -87,7 +87,7 @@ classdef CodePanel < aod.app.Component
                 "Text", "Export Code", "Icon", obj.getIcon("save"),...
                 "ButtonPushedFcn", @obj.onPush_ExportCode);
 
-            obj.createCode();
+            %obj.createCode();
         end
 
         function onPush_CopyCode(obj, ~, ~)
@@ -101,7 +101,7 @@ classdef CodePanel < aod.app.Component
 
     methods (Access = private)
         function createCode(obj)
-            obj.codePanel.codeEditor.Value = "";
+            obj.codeEditor.Value = "";
             obj.codeEditor.Value = "% AOQuery: " + string(datetime("now")) + newline;
             obj.codeEditor.insertText(newline + "% Identify experiment files" + newline, "end");
             obj.codeExperiments();
