@@ -92,6 +92,7 @@ classdef QueryManager < handle
                 matches = [];  % TODO
                 entityInfo = obj.entityTable;
                 warning("go:NoFiltersSet", "Add filters first");
+                return
             end
 
             % Reset match indices

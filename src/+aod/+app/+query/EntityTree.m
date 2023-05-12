@@ -17,8 +17,11 @@ classdef EntityTree < aod.app.Component
 % -------------------------------------------------------------------------
 
     properties
+        % Tree containing each entity in each experiment
         Tree            matlab.ui.container.Tree
+        % Root node for unmatched entity tree
         UnmatchedNode   matlab.ui.container.TreeNode
+        % Caches the uistyle (icons, font weight) for each entity
         Icons
     end
 
@@ -32,6 +35,7 @@ classdef EntityTree < aod.app.Component
     methods
         function obj = EntityTree(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
+            obj.setHandler(aod.app.query.handlers.EntityTree(obj));
         end
     end
 
@@ -154,7 +158,7 @@ classdef EntityTree < aod.app.Component
                     end
                 case "RemoveExperiment"
                     obj.removeExperiment(evt.Data.FileName);
-                case "PushFilter"
+                case {"PushFilter", "PullFilter", "ClearFilters"}
                     obj.filterNodes();
             end
         end
@@ -181,13 +185,8 @@ classdef EntityTree < aod.app.Component
 
     % Callback methods
     methods (Access = private)
-        function onSelected_Node(obj, src, evt)
-            if src.Tag == "Experiment"
-                eventName = 'ExperimentSelected';
-            else
-                eventName = 'EntitySelected';
-            end
-            obj.publish(eventName, src);
+        function onSelected_Node(obj, ~, ~)
+            obj.publish("SelectedNode", obj);
         end
 
         function resetExperimentNodes(obj, exptFile)

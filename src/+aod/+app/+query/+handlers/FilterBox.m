@@ -6,7 +6,6 @@ classdef FilterBox < aod.app.EventHandler
         end
 
         function handleRequest(obj, ~, evt)
-            assignin('base', 'FilterBoxRequest', evt);
             switch evt.EventType 
                 case "ChangeFilterType"
                     obj.Parent.update(evt);

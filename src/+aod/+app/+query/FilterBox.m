@@ -101,10 +101,7 @@ classdef FilterBox < aod.app.Component
 
     methods (Access = protected)
         function value = specifyChildren(obj)
-            value = [...
-                obj.inputBox;...
-                obj.filterControls;...
-                obj.Subfilters];
+            value = [obj.inputBox; obj.filterControls; obj.Subfilters];
         end 
 
         function didGo(obj)

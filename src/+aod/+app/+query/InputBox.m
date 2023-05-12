@@ -95,7 +95,7 @@ classdef InputBox < aod.app.Component
             switch evt.EventType
                 case "PushFilter"
                     obj.toggleEnable("off");
-                case "PullFilter"
+                case "EditFilter"
                     obj.toggleEnable("on");
             end
 

@@ -35,6 +35,8 @@ classdef MatchPanel < aod.app.Component
             obj = obj@aod.app.Component(parent, canvas);
             obj.isExpanded = false;
             obj.isVisible = true;
+
+            obj.setHandler(aod.app.query.handlers.MatchPanel(obj));
         end
     end
 

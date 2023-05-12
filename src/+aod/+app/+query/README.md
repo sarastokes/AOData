@@ -13,12 +13,14 @@
             - SubfilterBox 
 
 1. **EntityTree**
-    - NodeSelected
+    - SelectedNode
+    - DeselectedNode
 2. **ExperimentPanel**
     - AddExperiment
     - RemoveExperiment
 3. **FilterPanel**
     - AddNewFilter
+    - ClearFilters
 4. **FilterBox**
     - ChangeFilterType
 5. **InputBox**

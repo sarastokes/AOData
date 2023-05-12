@@ -95,7 +95,7 @@ classdef QueryView < aod.app.Component
             if strcmp(evt.NewValue.Title, 'Code')
                 obj.codePanel.update(evtActive);
                 obj.matchPanel.update(evtHidden);
-            elseif strcmp(evt.NewValue.Title, 'Matches')
+            elseif strcmp(evt.NewValue.Title, 'Entities')
                 obj.matchPanel.update(evtActive);
                 obj.codePanel.update(evtHidden);
             end
@@ -110,7 +110,8 @@ classdef QueryView < aod.app.Component
     methods
         function update(obj, evt)
             if ismember(evt.EventType, ["PushFilter", "PullFilter",...
-                    "EditFilter", "AddExperiment", "RemoveExperiment"])
+                    "EditFilter", "ClearFilters",... 
+                    "AddExperiment", "RemoveExperiment"])
                 obj.collectMatchedEntities();
             end
 

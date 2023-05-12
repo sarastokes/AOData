@@ -35,7 +35,7 @@ classdef CodePanel < aod.app.Component
     properties (Hidden, Constant)
         % These events always trigger a full component update
         UPDATE_EVENTS = ["AddExperiment", "RemoveExperiment",...
-            "PushFilter", "PullFilter"];
+            "PushFilter", "PullFilter", "ClearFilters"];
     end
 
     methods 
@@ -84,8 +84,8 @@ classdef CodePanel < aod.app.Component
                 "Text", "Copy Code", "Icon", obj.getIcon("copy"),...
                 "ButtonPushedFcn", @obj.onPush_CopyCode);
             obj.exportButton = uibutton(buttonLayout,...
-                "Text", "Export Code", "Icon", obj.getIcon("save"),...
-                "ButtonPushedFcn", @obj.onPush_ExportCode);
+                "Text", "Export Code", "Icon", obj.getIcon("save"));
+                %"ButtonPushedFcn", @obj.onPush_ExportCode);
 
             %obj.createCode();
         end
@@ -94,9 +94,9 @@ classdef CodePanel < aod.app.Component
             clipboard('copy', obj.codeEditor.Value);
         end
 
-        function onPush_ExportCode(~, ~, ~)
-            % TODO: Export code interface
-        end
+        %function onPush_ExportCode(~, ~, ~)
+        %    % TODO: Export code interface
+        %end
     end
 
     methods (Access = private)

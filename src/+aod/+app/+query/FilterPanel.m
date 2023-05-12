@@ -47,7 +47,7 @@ classdef FilterPanel < aod.app.Component
         end
     end
 
-    methods
+    methods (Access = private)
         function filterID = addFilter(obj)
             filterID = obj.numFilters + 1;
             newFilter = aod.app.query.FilterBox(obj, obj.filterLayout, filterID);
@@ -64,27 +64,43 @@ classdef FilterPanel < aod.app.Component
         end
 
         function onPush_ClearFilters(obj, ~, ~)
-            for i = numel(obj.Filters):-1:1
-                delete(obj.Filters(i).gridLayout);
-            end
-            obj.Filters = [];
+            obj.publish("ClearFilters", obj);
         end
     end
 
     % aod.app.Component methods (public)
     methods
         function update(obj, evt)
-            filterEvents = ["PushFilter", "PullFilter",...
-                "EditFilter", "CheckFilter"];
-            if strcmp(evt.EventType, "PullFilter")
-                % TODO: Close out filter box, then delete
-                obj.Filters(evt.Data.ID).close();
-                delete(obj.Filters);
-            end
-            
-            % Only send update to caller filterBox
-            if ismember(evt.EventType, filterEvents)
-                obj.Filters(evt.Data.ID).update(evt);
+            switch evt.EventType
+                case "ClearFilters"
+                    if strcmp(evt.EventType, "ClearFilters")
+                        for i = numel(obj.Filters):-1:1
+                            %delete(obj.Filters(i).gridLayout);
+                            obj.Filters(i).close();
+                        end
+                        obj.Filters = [];
+                    end
+                    return
+                case "PullFilter"
+                    % Update the remaining filter's ID numbers
+                    if numel(obj.Filters) > evt.Data.ID 
+                        for i = evt.Data.ID+1:numel(obj.Filters)
+                            obj.Filters(i).setFilterID(i-1);
+                        end
+                    end
+                    % Remove the target filter
+                    obj.Filters(evt.Data.ID).close();
+                    delete(obj.Filters(evt.Data.ID));
+                    obj.Filters(evt.Data.ID) = [];
+                    % Update row heights
+                    if isempty(obj.Filters)
+                        obj.filterLayout.RowHeight = {"fit"};
+                    else
+                        obj.filterLayout.RowHeight = ...
+                            repmat("fit", [1 obj.numFilters]);
+                    end
+                case {"PushFilter", "CheckFilter", "EditFilter"}
+                    obj.Filters(evt.Data.ID).update(evt);
             end
         end
     end

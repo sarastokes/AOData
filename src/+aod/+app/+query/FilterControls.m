@@ -22,13 +22,14 @@ classdef FilterControls < aod.app.Component
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        % Whether the controls are attached to a subfilter or not
         isSubfilter         logical 
+        % Whether the Parent filter has been added to QueryManager
         isAdded             logical
     end
 
     properties 
         gridLayout          matlab.ui.container.GridLayout
-
         addButton           matlab.ui.control.Button
         checkButton         matlab.ui.control.Button
         editButton          matlab.ui.control.Button
@@ -106,7 +107,7 @@ classdef FilterControls < aod.app.Component
                 "ButtonPushedFcn", @obj.onPush_Button);
             obj.removeButton = uibutton(obj.gridLayout,...
                 "Text", "", "Tag", "PullFilter",...
-                "Enable", "off",...
+                "Enable", "on",...
                 "Icon", obj.getIcon('cancel'),...
                 "ButtonPushedFcn", @obj.onPush_Button);
             obj.editButton = uibutton(obj.gridLayout,...

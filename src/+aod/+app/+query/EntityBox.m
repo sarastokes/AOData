@@ -21,9 +21,7 @@ classdef EntityBox < aod.app.Component
 
     properties
         entityLayout        matlab.ui.container.GridLayout
-        datasetText         matlab.ui.control.ListBox
-        attrTable           matlab.ui.control.Table
-        linkText            matlab.ui.control.ListBox
+        entityLabels
     end
 
     properties (Dependent)
@@ -44,7 +42,25 @@ classdef EntityBox < aod.app.Component
         function update(obj, evt)
             switch evt.EventType
                 case "SelectedNode"
-                    % TODO: Decide what entity info to show
+                    hdfPath = evt.Trigger.Tree.SelectedNodes(1).Tag;
+                    entityList = string(strsplit(hdfPath, '/'));
+                    idx = cellfun(@(x) isempty(x) || ismember(x, aod.core.EntityTypes.allContainerNames()), entityList);
+                    entityList(idx) = [];
+                    for i = 1:5
+                        if i > numel(entityList)
+                            obj.entityLabels(i).Text = "";
+                        elseif i == 1
+                            obj.entityLabels(i).Text = entityList(i);
+                        else
+                            obj.entityLabels(i).Text = ...
+                                string(repmat('-- ', [1, i-1])) + entityList(i);
+                        end
+                        if i == numel(entityList)
+                            obj.entityLabels(i).FontWeight = "bold";
+                        else
+                            obj.entityLabels(i).FontWeight = "normal";
+                        end
+                    end
                 case "DeselectedNode"
                     obj.reset();
             end
@@ -59,44 +75,16 @@ classdef EntityBox < aod.app.Component
 
     methods (Access = protected)
         function createUi(obj)
-            obj.entityLayout = uigridlayout(obj.Canvas, [2, 1],...
-                "RowHeight", {"fit", "fit"},...
+            obj.entityLayout = uigridlayout(obj.Canvas, [5, 1],...
+                "RowHeight", {"fit"},...
                 "RowSpacing", 3, "Padding", [0 0 0 0],...
                 "Scrollable", "on");
-            
-            % Datasets
-            datasetLayout = uigridlayout(obj.entityLayout, [2 2],...
-                "RowHeight", {obj.TEXT_HEIGHT, "1x"},...
-                "Padding", [0 0 0 0], "RowSpacing", 1,...
-                "ColumnSpacing", 3);
-            datasetLayout.Layout.Row = 1;
-            
-            lbl1 = uilabel(datasetLayout, "Text", "Datasets:",...
-                "FontWeight", "bold",...
-                "HorizontalAlignment", "center",...
-                "VerticalAlignment", "bottom");
-            lbl1.Layout.Row = 1; lbl1.Layout.Column = 1;
-
-            obj.datasetText = uilistbox(datasetLayout,...
-                "Items", {});
-            obj.datasetText.Layout.Row = 2;
-            obj.datasetText.Layout.Column = 1;
-
-            % Links
-            lbl2 = uilabel(datasetLayout, "Text", "Links:",...
-                "FontWeight", "bold",...
-                "HorizontalAlignment", "center",...
-                "VerticalAlignment", "bottom");
-            lbl2.Layout.Row = 1; lbl2.Layout.Column = 2;
-            obj.linkText = uilistbox(datasetLayout,...
-                "Items", {});
-            obj.linkText.Layout.Row = 2;
-            obj.linkText.Layout.Column = 2;
-            
-            % Attributes
-            obj.attrTable = uitable(obj.entityLayout,...
-                "ColumnName", {"Attribute", "Value"});
-            obj.attrTable.Layout.Row = 2;
+            labels = [];
+            for i = 1:5
+                iLabel = uilabel(obj.entityLayout, "Text", "");
+                labels = cat(1, labels, iLabel);
+            end
+            obj.entityLabels = labels;
         end
     end
 end 
