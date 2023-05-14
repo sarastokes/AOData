@@ -80,7 +80,7 @@ classdef FilterControls < aod.app.Component
                 case "EditFilter"
                     obj.editButton.Enable = "off";
                     obj.removeButton.Enable = "on";
-                    obj.addButon.Enable = "off";
+                    obj.addButton.Enable = "off";
                     obj.checkButton.Enable = "on";
                 case "CheckFilter"
                     obj.editButton.Enable = "on";

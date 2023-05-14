@@ -170,6 +170,8 @@ classdef Component < handle & matlab.mixin.Heterogeneous
                     icon = "search.png";
                 case "tree"
                     icon = "tree-structure.png";
+                case "window"
+                    icon = "static-views.png";
                 otherwise
                     warning('getIcon:InvalidInput',...
                         'Icon %s not found', name);

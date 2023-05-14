@@ -51,7 +51,7 @@ classdef FilterPanel < aod.app.Component
         function filterID = addFilter(obj)
             filterID = obj.numFilters + 1;
             newFilter = aod.app.query.FilterBox(obj, obj.filterLayout, filterID);
-            obj.Filters = cat(1, obj.Filters, newFilter);
+            obj.Filters = [obj.Filters; newFilter];
             obj.filterLayout.RowHeight = ...
                 repmat("fit", [1 obj.numFilters]);
         end

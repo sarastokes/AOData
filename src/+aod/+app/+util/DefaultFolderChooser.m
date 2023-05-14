@@ -1,5 +1,5 @@
 classdef DefaultFolderChooser < aod.app.util.FolderChooser
-% Wrapper for uigetfile for use with testsuite
+% Wrapper for uigetdir for use with testsuite
 
     methods 
         function folderName = chooseFolder(~, title, startPath)

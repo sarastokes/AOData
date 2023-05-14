@@ -11,7 +11,7 @@ classdef EntityTree < aod.app.Component
 %   N/A
 %
 % Events:
-%   SelectedNode, DeselectedNode
+%   SelectedNode, DeselectedNode, OpenViewer
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -22,7 +22,7 @@ classdef EntityTree < aod.app.Component
         % Root node for unmatched entity tree
         UnmatchedNode   matlab.ui.container.TreeNode
         % Caches the uistyle (icons, font weight) for each entity
-        Icons
+        Icons           % containers.Map
     end
 
     properties (SetAccess = private)
@@ -186,7 +186,12 @@ classdef EntityTree < aod.app.Component
     % Callback methods
     methods (Access = private)
         function onSelected_Node(obj, ~, ~)
-            obj.publish("SelectedNode", obj);
+            if obj.Tree.SelectedNode == obj.UnmatchedNode
+                return
+            end
+            obj.publish("SelectedNode", obj,...
+                "Path", obj.Tree.SelectedNode.Tag,...
+                "File", obj.Tree.SelectedNode.Parent.Tag);
         end
 
         function resetExperimentNodes(obj, exptFile)

@@ -20,6 +20,8 @@ classdef MatchPanel < aod.app.EventHandler
             if ismember(evt.EventType, ["SelectedNode", "DeselectedNode"])
                 % Don't pass local events
                 obj.Parent.update(evt);
+            else
+                obj.passRequest(evt);
             end
         end
     end

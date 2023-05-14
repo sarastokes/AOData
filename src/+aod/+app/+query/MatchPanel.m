@@ -22,8 +22,8 @@ classdef MatchPanel < aod.app.Component
     end
 
     properties
-        entityTree 
-        entityBox
+        entityTree          % aod.app.query.EntityTree
+        entityBox           % aod.app.query.EntityBox
 
         matchLayout         matlab.ui.container.GridLayout
         expandButton        matlab.ui.control.Button
@@ -54,7 +54,7 @@ classdef MatchPanel < aod.app.Component
             if src.Text == "Expand"
                 set(obj.expandButton, ...
                     "Text", "Minimize", "Icon", obj.getIcon("expand"));
-                obj.matchLayout.RowHeight = {"1x", "fit", "0.5x"};
+                obj.matchLayout.RowHeight = {"1x", "fit", "0.7x"};
                 obj.entityBox.entityLayout.Scrollable = "on";
                 obj.isExpanded = true;
             else
@@ -97,7 +97,7 @@ classdef MatchPanel < aod.app.Component
             obj.matchLayout = uigridlayout(...
                 aod.app.util.uilayoutfill(obj.Canvas), [3 1],...
                 "RowHeight", {"1x", "fit", 0.1},...
-                "RowSpacing", 3,...
+                "RowSpacing", 2,...
                 "Padding", [5 5 5 5]);
 
             obj.entityTree = aod.app.query.EntityTree(obj, obj.matchLayout);

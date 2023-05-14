@@ -16,18 +16,22 @@ classdef QueryView < aod.app.Component
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties 
-        QueryManager        
-        matchedEntities     
+    properties (SetAccess = private)
+        % Manages AOData queries
+        QueryManager            % aod.api.QueryManager
+        % Caches any AODataViewer apps opened
+        AppCache                % aod.app.AppCache
+        % Entities that match the user's filters
+        matchedEntities         % table
     end
 
     properties
         figureHandle        matlab.ui.Figure
 
-        codePanel
-        exptPanel
-        filterPanel 
-        matchPanel
+        codePanel           % aod.app.query.CodePanel
+        exptPanel           % aod.app.query.ExperimentPanel
+        filterPanel         % aod.app.query.FilterPanel
+        matchPanel          % aod.app.query.MatchPanel
     end
 
     % QueryManager interface
@@ -55,12 +59,12 @@ classdef QueryView < aod.app.Component
             obj = obj@aod.app.Component([], [], varargin{:});
 
             obj.setHandler(aod.app.query.handlers.QueryView(obj));
+            obj.AppCache = aod.app.viewer.AODataViewerCache();
         end
     end
 
     % Dependent set/get methods
     methods 
-
         function value = get.Experiments(obj)
             value = obj.QueryManager.Experiments;
         end
@@ -114,7 +118,6 @@ classdef QueryView < aod.app.Component
                     "AddExperiment", "RemoveExperiment"])
                 obj.collectMatchedEntities();
             end
-
             obj.updateChildren(evt);
         end
     end
@@ -135,10 +138,9 @@ classdef QueryView < aod.app.Component
             obj.figureHandle = uifigure(...
                 "CloseRequestFcn", @obj.onClose_Figure);
             obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + 300;
-            if ispref('AOData', 'Development') && getpref('AOData', 'Development')
-                %! Development
-                obj.figureHandle.Position(1:2) = [-1000 127];
-            end
+            %if ispref('AOData', 'Development') && getpref('AOData', 'Development')
+            %    obj.figureHandle.Position(1:2) = [-1000 127];
+            %end
 
             mainLayout = uigridlayout(obj.figureHandle, [1 2],...
                 "ColumnWidth", {"1.6x", "1x"}, "ColumnSpacing", 2,...
@@ -164,11 +166,16 @@ classdef QueryView < aod.app.Component
 
         function close(obj)
             delete(obj.figureHandle);
+            obj.AppCache.close();
         end
     end
 
 
     methods (Access = private)
+        function openViewer(obj, hdfPath)
+            obj.AppCache.getUI(hdfPath);
+        end
+
         function collectMatchedEntities(obj)
             if obj.numExperiments == 0
                 obj.matchedEntities = table.empty();

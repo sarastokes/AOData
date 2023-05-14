@@ -20,6 +20,8 @@ classdef QueryView < aod.app.EventHandler
 
         function handleRequest(obj, ~, evt)
             switch evt.EventType 
+                case "OpenViewer"
+                    obj.Parent.openViewer();
                 case "AddExperiment"
                     newExperiments = [];
                     for i = 1:numel(evt.Data.FileName)

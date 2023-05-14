@@ -101,31 +101,33 @@ classdef CodePanel < aod.app.Component
 
     methods (Access = private)
         function createCode(obj)
+            
             obj.codeEditor.Value = "";
-            obj.codeEditor.Value = "% AOQuery: " + string(datetime("now")) + newline;
-            obj.codeEditor.insertText(newline + "% Identify experiment files" + newline, "end");
-            obj.codeExperiments();
-            obj.codeEditor.insertText(newline + "% Create QueryManager" + newline, "end");
-            obj.codeEditor.insertText("QM = aod.api.QueryManager(exptFiles);" + newline, "end");
-            obj.codeEditor.insertText(newline + "% Add filters" + newline, "end");
-            obj.codeFilters();
-            obj.codeEditor.insertText(newline + "% Filter" + newline, "end");
-            obj.codeEditor.insertText("[matches, entityInfo] = QM.filter();" + newline, "end");
+            value = "% AOQuery: " + string(datetime("now")) + newline;
+            value = value + newline + "% Identify experiment files" + newline;
+            value = obj.codeExperiments(value);
+            value = value + newline + "% Create QueryManager" + newline;
+            value = value + "QM = aod.api.QueryManager(exptFiles);" + newline;
+            value = value + newline + "% Add filters" + newline;
+            value = obj.codeFilters(value);
+            value = value + newline + "% Filter" + newline;
+            value = value + "[matches, entityInfo] = QM.filter();" + newline;
+            obj.codeEditor.Value = value;
 
             % Mark the component as up to date
             obj.isDirty = false;
         end
 
-        function codeExperiments(obj)
+        function value = codeExperiments(obj, value)
             if obj.Root.numExperiments == 0
                 str = "exptFiles = [];" + newline;
-                obj.codeEditor.insertText(str, "end");
+                value = value + str;
                 return
             end
 
             if obj.Root.numExperiments == 1
                 str = "exptFiles = " + value2string(obj.Root.hdfFiles) + ";" + newline;
-                obj.codeEditor.insertText(str, "end");
+                value = value + str;
                 return
             end
 
@@ -137,16 +139,16 @@ classdef CodePanel < aod.app.Component
                 end
             end
             str = str + "];" + newline;
-            obj.codeEditor.insertText(str, "end");
+            value = value + str;
         end
 
-        function codeFilters(obj)
+        function value = codeFilters(obj, value)
             if isempty(obj.Root.numFilters)
                 return
             end
             for i = 1:obj.Root.numFilters
-                obj.codeEditor.insertText(...
-                    sprintf("QM.addFilter(%s);",obj.Root.QueryManager.Filters(i).code()) + newline, "end");
+                value = value + ...
+                    sprintf("QM.addFilter(%s);",obj.Root.QueryManager.Filters(i).code()) + newline;
             end
         end
     end

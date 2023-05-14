@@ -2,7 +2,7 @@ classdef EntityBox < aod.app.Component
 % Interface for viewing entity-specific information
 %
 % Parent:
-%   Component
+%   aod.app.Component
 %
 % Constructor:
 %   obj = aod.app.query.EntityBox(parent, canvas)
@@ -11,9 +11,7 @@ classdef EntityBox < aod.app.Component
 %   N/A
 %
 % Events:
-%   N/A
-%
-% TODO: Entity information display
+%   OpenViewer
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -21,7 +19,8 @@ classdef EntityBox < aod.app.Component
 
     properties
         entityLayout        matlab.ui.container.GridLayout
-        entityLabels
+        entityLabels        matlab.ui.control.Label
+        viewerButton        matlab.ui.control.Button
     end
 
     properties (Dependent)
@@ -31,6 +30,7 @@ classdef EntityBox < aod.app.Component
     methods
         function obj = EntityBox(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
+            obj.setHandler(aod.app.EventHandler(obj));
         end
 
         function value = get.isVisible(obj)
@@ -39,6 +39,11 @@ classdef EntityBox < aod.app.Component
     end
 
     methods
+        function reset(obj)
+            arrayfun(@(x) set(x, "Text", ""), obj.entityLabels);
+            set(obj.viewerButton, "Tag", hdfPath, "Enable", "off");
+        end
+
         function update(obj, evt)
             switch evt.EventType
                 case "SelectedNode"
@@ -61,23 +66,25 @@ classdef EntityBox < aod.app.Component
                             obj.entityLabels(i).FontWeight = "normal";
                         end
                     end
+                    set(obj.viewerButton, "Tag", hdfPath, "Enable", "on");
                 case "DeselectedNode"
                     obj.reset();
             end
         end
+    end
 
-        function reset(obj)
-            obj.datasetText.Items = {};
-            obj.linkText.Items = {};
-            obj.attrTable.Data = [];
+    methods (Access = private)
+        function onPush_OpenAODataViewer(obj, src, ~)
+            obj.publish("OpenViewer", obj,...
+                "HdfPath", src.Tag);
         end
     end
 
     methods (Access = protected)
         function createUi(obj)
-            obj.entityLayout = uigridlayout(obj.Canvas, [5, 1],...
+            obj.entityLayout = uigridlayout(obj.Canvas, [6, 1],...
                 "RowHeight", {"fit"},...
-                "RowSpacing", 3, "Padding", [0 0 0 0],...
+                "RowSpacing", 1, "Padding", [0 0 0 0],...
                 "Scrollable", "on");
             labels = [];
             for i = 1:5
@@ -85,6 +92,12 @@ classdef EntityBox < aod.app.Component
                 labels = cat(1, labels, iLabel);
             end
             obj.entityLabels = labels;
+
+            obj.viewerButton = uibutton(obj.entityLayout,...
+                "Text", "Open in AODataViewer",...
+                "Icon", obj.getIcon("window"),...
+                "Enable", "off",...
+                "ButtonPushedFcn", @obj.onPush_OpenAODataViewer);
         end
     end
 end 

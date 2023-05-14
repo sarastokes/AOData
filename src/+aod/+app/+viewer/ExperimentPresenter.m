@@ -80,6 +80,11 @@ classdef ExperimentPresenter < appbox.Presenter
             % Extract entity from a node
             e = obj.Experiment.getByPath(node.Tag);
         end
+
+        function selectNodeByPath(obj, hdfPath)
+            node = obj.view.path2node(hdfPath);
+            obj.view.selectNode(node);
+        end
     end
 
     methods (Access = protected)
