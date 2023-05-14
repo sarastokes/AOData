@@ -35,7 +35,7 @@ classdef EntityTree < aod.app.Component
     methods
         function obj = EntityTree(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
-            obj.setHandler(aod.app.query.handlers.EntityTree(obj));
+            obj.setHandler(aod.app.EventHandler(obj));
         end
     end
 

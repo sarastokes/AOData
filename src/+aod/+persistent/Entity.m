@@ -357,7 +357,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.verifyReadOnlyMode();
 
             % Ensure new name will be unique
-            cohortNames = aod.h5.getEntityGroupCohort(obj.hdfPath);
+            cohortNames = aod.h5.getEntityGroupCohort(obj);
             if ismember(lower(name), lower(cohortNames))
                 error('changeGroupName:NameConflict',...
                     'The name %s matches an existing group in same location', name);
@@ -369,7 +369,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             evtData = aod.persistent.events.NameEvent(name, obj.Name);
             notify(obj, 'NameChanged', evtData);
 
-            parentPath = h5tools.util.getPathParent(obj.hdfName);
+            parentPath = h5tools.util.getPathParent(obj.hdfPath);
             obj.changeHdfPath(h5tools.util.buildPath(parentPath, name));
 
             %! obj.setName(name);

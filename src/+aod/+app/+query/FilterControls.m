@@ -44,7 +44,7 @@ classdef FilterControls < aod.app.Component
             obj = obj@aod.app.Component(parent, canvas, isSubfilter);
             obj.isAdded = false;
 
-            obj.setHandler(aod.app.query.handlers.FilterControls(obj));
+            obj.setHandler(aod.app.EventHandler(obj));
         end
     end
 

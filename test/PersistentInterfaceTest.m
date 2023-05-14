@@ -22,15 +22,14 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            testCase.SMALL_FILE = 'PersistentInterface.h5';
+            % Create and write a full experiment (prior versions may have 
+            % unexpected changes from prior tests)
             testCase.FILE = 'ToyExperiment.h5';
-            if exist(testCase.FILE, 'file')
-                testCase.EXPT = loadExperiment(testCase.FILE);
-            else
-                [~, testCase.EXPT] = ToyExperiment(true);
-            end
+            [~, testCase.EXPT] = ToyExperiment(true);
+
+            testCase.SMALL_FILE = 'PersistentInterface.h5';
             testCase.SMALL_EXPT = test.util.makeSmallExperiment(...
-                true, testCase.FILE);
+                true, testCase.SMALL_FILE);
         end
     end
 

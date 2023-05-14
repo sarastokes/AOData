@@ -32,7 +32,7 @@ classdef FilterPanel < aod.app.Component
         function obj = FilterPanel(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
 
-            obj.setHandler(aod.app.query.handlers.FilterPanel(obj));
+            obj.setHandler(aod.app.EventHandler(obj));
         end
     end
 

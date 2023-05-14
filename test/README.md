@@ -1,14 +1,15 @@
 # AOData Test Suite
 
 ## Code Coverage
-As of 30Apr2023, the ```aod``` package report contains **158 files** and has:
-- **80.55%** statement coverage (5214 executable). 
-- **84.88%** function coverage (847 executable).
+As of 13May2023, the ```aod``` package report contains **190 files** and has:
+- **80.42%** statement coverage (6274 executable). 
+- **85.34%** function coverage (1037 executable).
 
 ## Tests
 The AOData test suite currently contains the following:
 - User interfaces:
   - ```AODataManagerTest``` - tests display, preference setting and interaction with AODataManagerApp
+  - ```AOQueryAppTest``` - tests user interface for building AOData queries
   - ```AODataViewerTest``` - tests display and user interaction with the AODataViewer app
   - ```SubclassGeneratorTest``` - tests the framework and UI for generating template subclasses
 - Built-in classes:
@@ -24,6 +25,7 @@ The AOData test suite currently contains the following:
 - Persistent interface
   - ```FilterTest``` - tests AOQuery filters
   - ```InterfaceTest``` - tests equality between persistent and core interfaces
+  - ```PersistentInterfaceTest``` - tests reading HDF5 files into MATLAB interface
   - ```PersistorTest``` - tests modification of HDF5 files from persistent interface
 - HDF5 tests
   - ```HDFTest``` - tests I/O accuracy for MATLAB data types to HDF5 datasets and attributes

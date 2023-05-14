@@ -26,7 +26,7 @@ classdef ExperimentPanel < aod.app.Component
         function obj = ExperimentPanel(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
 
-            obj.setHandler(aod.app.query.handlers.ExperimentPanel(obj));
+            obj.setHandler(aod.app.EventHandler(obj));
         end
     end
 

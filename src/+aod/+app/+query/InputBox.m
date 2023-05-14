@@ -56,7 +56,7 @@ classdef InputBox < aod.app.Component
                 obj.isSubfilter = isSubfilter;
             end
 
-            obj.setHandler(aod.app.query.handlers.InputBox(obj));
+            obj.setHandler(aod.app.EventHandler(obj));
 
             obj.nameProvided = false;
             obj.valueProvided = false;

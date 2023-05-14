@@ -27,11 +27,8 @@ classdef PersistorTest < matlab.unittest.TestCase
         function methodSetup(testCase)
             % Creates an experiment, writes to HDF5 and reads back in  
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
-                'test', 'ToyExperiment.h5');            
-            if ~exist(fileName, 'file')
-                ToyExperiment(true, true);
-            end
-            testCase.EXPT = loadExperiment(fileName);
+                'test', 'ToyExperiment.h5');
+            [~, testCase.EXPT] = ToyExperiment(true, true);
 
             % Copy experiment for EntityRename
             h5tools.files.copyFile(fileName, "EntityRenameTest.h5");
@@ -113,7 +110,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             pEXPT.setReadOnlyMode(false);
             
             % Change the group name of a source
-            pEXPT.Sources(1).Sources(1).setName("OD")
+            pEXPT.Sources(1).Sources(1).setGroupName("OD")
             links = aod.h5.collectExperimentLinks(pEXPT.hdfName);
             % Confirm softlink updates
             testCase.verifyEmpty(find(contains(links.Location, "/OS/")));

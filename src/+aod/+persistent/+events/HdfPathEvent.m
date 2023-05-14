@@ -14,7 +14,7 @@ classdef (ConstructOnLoad) HdfPathEvent < event.EventData
 % -------------------------------------------------------------------------
 
     properties 
-        Entity          aod.persistent.Entity 
+        Entity          % aod.persistent.Entity 
         NewPath         string 
         OldPath         string
     end

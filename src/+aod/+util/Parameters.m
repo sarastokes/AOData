@@ -1,5 +1,5 @@
 classdef Parameters < containers.Map & matlab.mixin.CustomDisplay 
-% PARAMETERS
+% Container for metadata specified as key/value pairs 
 %
 % Description:
 %   Wrapper for containers.Map with detailed contents display
@@ -13,17 +13,35 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 % Methods:
 %   out = toMap(obj)
 %       Convert back to containers.Map
+%   out = toStruct(obj)
+%       Convert to a struct
 % All other methods and properties are identical to containers.Map
 %
 % See Also:
 %   containers.Map
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     methods
         function obj = Parameters(varargin)
             obj = obj@containers.Map(varargin{:});
+        end
+
+        function out = toStruct(obj)
+            % Convert to a struct object
+            %
+            % Syntax:
+            %   out = toStruct(obj)
+            %
+            % See also:
+            %   map2struct
+            % -------------------------------------------------------------
+            if isempty(obj)
+                out = struct();
+            else
+                out = map2struct(obj.toMap());
+            end
         end
 
         function out = toMap(obj)

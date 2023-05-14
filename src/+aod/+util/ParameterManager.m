@@ -66,7 +66,7 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             if nargin < 3
                 errorType = ErrorTypes.WARNING;
             else
-                errorType = ErrorTypes.get(errorType);
+                errorType = ErrorTypes.init(errorType);
             end
 
             [tf, idx] = obj.hasParam(paramName);
