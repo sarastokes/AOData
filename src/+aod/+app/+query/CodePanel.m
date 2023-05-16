@@ -41,6 +41,7 @@ classdef CodePanel < aod.app.Component
     methods 
         function obj = CodePanel(parent, canvas)
             obj = obj@aod.app.Component(parent, canvas);
+            
             obj.isVisible = false;
             obj.isDirty = true;
         end
@@ -58,11 +59,13 @@ classdef CodePanel < aod.app.Component
                 end
             end
 
-            if obj.isVisible
-                obj.createCode();
-            elseif ismember(evt.EventType, obj.UPDATE_EVENTS)
-                % Mark as un-updated while hidden
-                obj.isDirty = true;
+            if ismember(evt.EventType, obj.UPDATE_EVENTS)
+                if obj.isVisible
+                    obj.createCode();
+                else 
+                    % Mark as un-updated while hidden
+                    obj.isDirty = true;
+                end
             end
         end
     end
@@ -84,19 +87,19 @@ classdef CodePanel < aod.app.Component
                 "Text", "Copy Code", "Icon", obj.getIcon("copy"),...
                 "ButtonPushedFcn", @obj.onPush_CopyCode);
             obj.exportButton = uibutton(buttonLayout,...
-                "Text", "Export Code", "Icon", obj.getIcon("save"));
-                %"ButtonPushedFcn", @obj.onPush_ExportCode);
+                "Text", "Export Code", "Icon", obj.getIcon("save"),...
+                "ButtonPushedFcn", @obj.onPush_ExportCode);
 
-            %obj.createCode();
+            obj.createCode();
         end
 
         function onPush_CopyCode(obj, ~, ~)
             clipboard('copy', obj.codeEditor.Value);
         end
 
-        %function onPush_ExportCode(~, ~, ~)
-        %    % TODO: Export code interface
-        %end
+        function onPush_ExportCode(obj, ~, ~)
+            textToNewFile(obj.codeEditor.Value);
+        end
     end
 
     methods (Access = private)

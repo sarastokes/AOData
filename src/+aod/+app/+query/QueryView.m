@@ -137,7 +137,7 @@ classdef QueryView < aod.app.Component
         function createUi(obj)
             obj.figureHandle = uifigure(...
                 "CloseRequestFcn", @obj.onClose_Figure);
-            obj.figureHandle.Position(3) = obj.figureHandle.Position(3) + 300;
+            obj.figureHandle.Position(3:4) = obj.figureHandle.Position(3:4) + [300 50];
             %if ispref('AOData', 'Development') && getpref('AOData', 'Development')
             %    obj.figureHandle.Position(1:2) = [-1000 127];
             %end
