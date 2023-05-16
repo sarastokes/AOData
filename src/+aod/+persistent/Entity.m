@@ -32,11 +32,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   tf = isequal(obj, entity)
 %   
 % Events:
-%   FileChanged
-%   LinkChanged
-%   GroupChanged
-%   DatasetChanged
 %   AttributeChanged
+%   DatasetChanged
+%   FileChanged
+%   GroupChanged
+%   LinkChanged
+%   NameChanged
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -68,7 +69,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     properties (Dependent)
         % Whether the file is in read-only mode or not
-        readOnly
+        readOnly                logical
         % The HDF5 file name
         hdfFileName
     end
@@ -92,7 +93,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         dsetNames
         attNames
 
-        % Persistence properties
+        % Middle layer between HDF5 file and interface
         factory                 % aod.persistent.EntityFactory
     end
 
@@ -138,7 +139,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         function value = get.groupName(obj)
             value = h5tools.util.getPathEnd(obj.hdfPath);
         end
+    end
 
+    % Modification methods
+    methods 
         function setReadOnlyMode(obj, tf)
             % Toggle read-only mode on and off
             %
@@ -1155,8 +1159,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   deleteEntity(obj)
             % -------------------------------------------------------------
             obj.verifyReadOnlyMode();
+
             evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
             notify(obj, 'GroupChanged', evtData);
+
+            delete(obj);
         end
     end
 

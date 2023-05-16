@@ -95,13 +95,28 @@ classdef EntityFactory < handle
             % Update the middle layer to reflect changes to an entity
             % -------------------------------------------------------------
 
-            % Refresh the list of UUIDs
-            obj.entityManager.collect();
-
             % Make sure irrelevant UUIDs are removed from the cache
             if strcmp(evt.Action, 'Remove')
+                % Identify any child entities
+                allChildren = obj.entityManager.getEntityChildren(obj);
+                if numel(allChildren) > 0
+                    warning('deleteEntity:Children',...
+                        'This action will also delete %u child entities', ...
+                        numel(allChildren));
+                end
+                % Remove the entity and all children from cache
                 remove(obj.cache, evt.UUID);
+                if allChildren > 0
+                    for i = 1:numel(allChildren)
+                        remove(obj.cache, obj.entityManager.path2uuid(allChildren(i)));
+                    end
+                end
+                % Reload parent entity
+                evt.Entity.Parent.reload();
             end
+
+            % Refresh the list of UUIDs
+            obj.entityManager.collect();
         end
 
         function onEntityRenamed(obj, ~, evt)

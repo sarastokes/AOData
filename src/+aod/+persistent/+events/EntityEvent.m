@@ -21,24 +21,21 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
 
     properties
         Action 
-        UUID 
-        NewPath 
-        OldPath
+        Entity 
+        NewPath
     end
 
     methods
-        function obj = EntityEvent(action, oldUUID, hdfPath, oldPath)
+        function obj = EntityEvent(action, entity, hdfPath)
             arguments
                 action          {mustBeMember(action, {'Add', 'Remove', 'Rename'})}
-                oldUUID         string = string.empty()
+                entity          = []
                 hdfPath         string = string.empty()
-                oldPath         string = string.empty()
             end
             
             obj.Action = action;
-            obj.UUID = oldUUID;
+            obj.Entity = entity;
             obj.NewPath = hdfPath;
-            obj.OldPath = oldPath;
         end
     end
 end 

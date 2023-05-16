@@ -13,7 +13,7 @@ classdef EntityManager < handle
     
 
     properties
-        hdfName
+        hdfName            
         pathMap
         classMap
         entityMap
@@ -59,9 +59,25 @@ classdef EntityManager < handle
             hdfPath = char(obj.Table{obj.Table.UUID == uuid, 'Path'});
         end
 
+        function uuid = path2uuid(obj, path)
+            uuid = obj.Table{obj.Table.Path == path, 'UUID'};
+        end
+
         function tf = hasUUID(obj, uuid)
             uuid = aod.util.validateUUID(uuid);
             tf = ismember(uuid, obj.Table.UUID);
+        end
+
+        function paths = getEntityChildren(obj, entity)
+            if isa(entity, 'aod.persistent.Entity')
+                hdfPath = entity.hdfPath;
+            elseif istext(entity)
+                hdfPath = convertCharsToStrings(entity);
+            end 
+
+            paths = obj.Table.Path(...
+                startsWith(obj.Table.Path, hdfPath) & ...
+                strlength(obj.Table.Path) > strlength(hdfPath));
         end
     end
 
@@ -94,6 +110,8 @@ classdef EntityManager < handle
             %
             % Syntax:
             %   [idx, attributeValue] = findAttribute(info, attributeName)
+            %
+            % TODO: Out of date - use faster h5tools-matlab functions
             % ---------------------------------------------------------------------
             arguments
                 info                struct 

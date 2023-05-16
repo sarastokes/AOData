@@ -30,6 +30,7 @@ classdef Persistor < handle
 
     events
         EntityChanged
+        % Triggered when an HDF5 path changes due to group name change
         HdfPathChanged
     end
 
@@ -150,20 +151,25 @@ classdef Persistor < handle
 
             if ~isempty(evt.OldEntity)
                 previousUUID = evt.OldEntity.UUID;
+                previousPath = evt.OldEntity.hdfPath;
             else
                 previousUUID = [];
+                previousPath = [];
             end
 
             % Make the change in the underlying HDF5 file
             if strcmp(evt.Action, 'Add')
                 aod.h5.writeEntity(obj.hdfName, evt.Entity);
+                % TODO: Reload?
             elseif strcmp(evt.Action, 'Remove')
                 % Check for links to the group
                 linkLocations = obj.checkGroupLinks(hdfPath);
                 if ~isempty(linkLocations)
+                    disp(linkLocations)
                     error("onGroupChanged:EntityIsALinkTarget",...
-                    "Group to be removed has a link at %s", linkLocations(1));
+                    "Group to be removed is a target to %u links", numel(linkLocations));
                 end
+
                 % Remove if safe
                 h5tools.deleteObject(obj.hdfName, hdfPath);
             elseif strcmp(evt.Action, 'Replace')
@@ -181,7 +187,7 @@ classdef Persistor < handle
 
             % Ensure the change is reflected in EntityFactory
             evtData = aod.persistent.events.EntityEvent(...
-                evt.Action, previousUUID);
+                evt.Action, evt.Entity);
             notify(obj, 'EntityChanged', evtData);
 
             % Refresh the associated EntityContainer
