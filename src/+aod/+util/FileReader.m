@@ -6,8 +6,13 @@ classdef (Abstract) FileReader < handle
 %
 % Constructor:
 %   obj = aod.util.FileReader(fileName)
+%
+% Examples:
+%   % Initialize without file and set afterwards
+%   obj = aod.util.FileReader([])
+%   obj.changeFile('myfile.txt')
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -29,11 +34,18 @@ classdef (Abstract) FileReader < handle
 
     methods
         function obj = FileReader(fileName)
-            fileName = completeFileName(fileName);
-            obj.fullFile = fileName;
+            if nargin > 0 && ~isempty(fileName)
+                fileName = completeFileName(fileName);
+                obj.fullFile = fileName;
+            end
             obj.parameters = aod.util.Parameters();
             % Because some files may be time-consuming to load, readFile()
             % is not called bu default when the FileReader is created
+        end
+
+        function changeFile(obj, fileName)
+            fileName = completeFileName(fileName);
+            obj.fullFile = fileName;
         end
 
         function out = reload(obj)

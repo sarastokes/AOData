@@ -4,35 +4,36 @@ classdef (ConstructOnLoad) GroupEvent < event.EventData
 % Description:
 %   An event triggered when an HDF5 group is added/changed/removed
 %
-% Parent:
+% Superclass:
 %   event.EventData
 %
 % Constructor:
-%   obj = aod.persistent.events.GroupEvent(entity, action, oldEntity)
+%   obj = aod.persistent.events.GroupEvent(entity, action, newEntity)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
         Entity
         Action
-        OldEntity
+        NewEntity
     end
 
     methods
-        function obj = GroupEvent(entity, action, oldEntity)
+        function obj = GroupEvent(entity, action, newEntity)
             arguments
                 entity      {mustBeA(entity, {'aod.core.Entity', 'aod.persistent.Entity'})}
                 action      {mustBeMember(action, {'Add', 'Remove', 'Replace'})}
-                oldEntity    = []
+                newEntity   = []
             end
             
             obj.Entity = entity;
             obj.Action = action;
-            if ~isempty(oldEntity)
-                mustBeA(entity, 'aod.persistent.Entity');
+            
+            if ~isempty(newEntity)
+                mustBeA(newEntity, 'aod.persistent.Entity');
             end
-            obj.OldEntity = oldEntity;
+            obj.NewEntity = newEntity;
         end
     end
 end 

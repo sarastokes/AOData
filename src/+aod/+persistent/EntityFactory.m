@@ -61,6 +61,12 @@ classdef EntityFactory < handle
             end
         end
 
+        function removeFromCache(obj, UUID)
+            if ~isempty(obj.isCached(UUID))
+                remove(obj.cache, UUID);
+            end
+        end
+
         function clearCache(obj)
             obj.cache = aod.util.Parameters();
         end
@@ -98,17 +104,18 @@ classdef EntityFactory < handle
             % Make sure irrelevant UUIDs are removed from the cache
             if strcmp(evt.Action, 'Remove')
                 % Identify any child entities
-                allChildren = obj.entityManager.getEntityChildren(obj);
+                allChildren = obj.entityManager.getEntityChildren(evt.Entity);
                 if numel(allChildren) > 0
                     warning('deleteEntity:Children',...
                         'This action will also delete %u child entities', ...
                         numel(allChildren));
                 end
                 % Remove the entity and all children from cache
-                remove(obj.cache, evt.UUID);
-                if allChildren > 0
+                obj.removeFromCache(evt.Entity.UUID);
+                if numel(allChildren) > 0
                     for i = 1:numel(allChildren)
-                        remove(obj.cache, obj.entityManager.path2uuid(allChildren(i)));
+                        %! Check for softlinks
+                        obj.removeFromCache(obj.entityManager.path2uuid(allChildren(i)));
                     end
                 end
                 % Reload parent entity

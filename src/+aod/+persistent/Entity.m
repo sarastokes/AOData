@@ -909,7 +909,17 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             idx = find(obj.linkNames == name);
             info = h5info(obj.hdfName, obj.hdfPath);
             linkPath = info.Links(idx).Value{1};
-            e = obj.factory.create(linkPath);
+            try
+                e = obj.factory.create(linkPath);
+            catch ME
+                if strcmp(ME.identifier, 'create:InvalidPath')
+                    e = aod.h5.BrokenSoftlink(obj, name, linkPath);
+                    warning('loadLink:BrokenSoftlink',...
+                        'In entity %s, property %s refers to an invalid HDF5 path', obj.Name, name);
+                else
+                    rethrow(ME);
+                end
+            end
         end
 
         function d = loadDataset(obj, name, varargin)
@@ -1151,7 +1161,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             evtData = aod.persistent.events.GroupEvent(entity, 'Add');
             notify(obj, 'GroupChanged', evtData);
         end
+    end
 
+    methods
         function deleteEntity(obj)
             % Delete this entity
             %

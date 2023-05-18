@@ -15,6 +15,9 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
 %       'Add', 'Remove', or 'Replace'
 %   oldUUID         string (default = "")
 %       UUID of existing persisted entity involved in change
+%
+% Information flow:
+%   aod.persistent.Persistor --> aod.persistent.EntityFactory
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -28,11 +31,15 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
     methods
         function obj = EntityEvent(action, entity, hdfPath)
             arguments
-                action          {mustBeMember(action, {'Add', 'Remove', 'Rename'})}
+                action          string {mustBeMember(action, {'Add', 'Remove', 'Rename'})}
                 entity          = []
                 hdfPath         string = string.empty()
             end
             
+            if ~isempty(entity)
+                mustBeA(entity, 'aod.persistent.Entity');
+            end
+
             obj.Action = action;
             obj.Entity = entity;
             obj.NewPath = hdfPath;

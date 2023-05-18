@@ -147,15 +147,7 @@ classdef Persistor < handle
             % Get entity information prior to changes
             containerName = evt.Entity.entityType.persistentParentContainer();
             hdfPath = char(src.hdfPath);
-            parent = evt.Source;
-
-            if ~isempty(evt.OldEntity)
-                previousUUID = evt.OldEntity.UUID;
-                previousPath = evt.OldEntity.hdfPath;
-            else
-                previousUUID = [];
-                previousPath = [];
-            end
+            parent = evt.Entity.Parent;
 
             % Make the change in the underlying HDF5 file
             if strcmp(evt.Action, 'Add')
@@ -176,7 +168,7 @@ classdef Persistor < handle
                 %! Check whether group names are the same
                 newName = ~strcmp(evt.Entity.groupName, evt.OldEntity.groupName);
                 
-                %! Replace links if group name is different
+                % Replace links if group name is different
                 linkLocations = obj.checkGroupLinks(hdfPath);
                 %! Check child links too (overwrite Parent)
                 h5tools.deleteObject(obj.hdfName, parent.hdfPath,...

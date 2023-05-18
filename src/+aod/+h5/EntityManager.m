@@ -69,10 +69,13 @@ classdef EntityManager < handle
         end
 
         function paths = getEntityChildren(obj, entity)
-            if isa(entity, 'aod.persistent.Entity')
+            if isSubclass(entity, 'aod.persistent.Entity')
                 hdfPath = entity.hdfPath;
             elseif istext(entity)
                 hdfPath = convertCharsToStrings(entity);
+            else
+                error('EntityManager:InvalidType',...
+                    'Input must be persistent entity or HDF path');
             end 
 
             paths = obj.Table.Path(...
