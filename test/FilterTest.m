@@ -21,6 +21,8 @@ classdef FilterTest < matlab.unittest.TestCase
         
         SMALL_EXPT
         SMALL_QM
+
+        EMPTY_QM
     end
 
     methods (TestClassSetup)
@@ -39,6 +41,9 @@ classdef FilterTest < matlab.unittest.TestCase
             % Make a smaller experiment to test for empty entities
             testCase.SMALL_EXPT = test.util.makeSmallExperiment(true);
             testCase.SMALL_QM = aod.api.QueryManager(testCase.SMALL_EXPT);
+
+            % Make an empty QueryManager
+            testCase.EMPTY_QM = aod.api.QueryManager();
         end
     end
     
@@ -50,19 +55,53 @@ classdef FilterTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags=["QueryManager", "AOQuery"])
+        function QueryManagerExperiments(testCase)
+
+            testCase.EMPTY_QM.addExperiment(testCase.SMALL_EXPT);
+            testCase.verifyEqual(testCase.EMPTY_QM.numEntities, 1);
+            testCase.verifyNumElements(testCase.EMPTY_QM.hdfName, 1);
+            testCase.verifyNumElements(testCase.EMPTY_QM.Experiments, 1);
+
+            testCase.EMPTY_QM.removeExperiment(1);
+            testCase.verifyEqual(testCase.EMPTY_QM.numEntities, 0);
+            testCase.verifyEmpty(testCase.EMPTY_QM.hdfName);
+            testCase.verifyEmpty(testCase.EMPTY_QM.Experiments);
+            testCase.verifyEmpty(testCase.EMPTY_QM.filterIdx);
+        end
+
+        function QueryManagerWarnings(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            testCase.verifyWarning(...
+                @() testCase.QM.filter(), "filter:NoFiltersSet");
+        end
+
+        function DisableFilters(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+
+            testCase.QM.addFilter({'Name', 'Experiment'});
+            testCase.QM.Filters(1).disable();
+            testCase.verifyWarning(...
+                @() testCase.QM.filter(), 'filter:AllFiltersDisabled');
+            testCase.QM.Filters(1).enable();
+            testCase.verifyNumElements(testCase.QM.filter(), 1);
+        end
+
         function QueryManagerErrors(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
-            %testCase.verifyError(...
-            %    @() testCase.QM.filter(), "go:NoFiltersSet");
 
             testCase.verifyError(...
                 @() testCase.QM.addFilter(1), "addFilter:InvalidInput");
 
             testCase.verifyError(...
-                @() aod.api.QueryManager(1),...
-                "QueryManager:InvalidInput");
+                @() aod.api.QueryManager(1), "QueryManager:InvalidInput");
+
+            testCase.verifyError(...
+                @() testCase.EMPTY_QM.filter(), "filter:NoExperiments");
         end
 
         function QueryFiles(testCase)
@@ -70,9 +109,7 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.QM.clearFilters();
 
             testCase.verifyNumElements(1, testCase.QM.numFiles);
-
-            % Add a new file
-            
+            testCase.verifyEqual(testCase.QM.describe(), "Empty QueryManager");
         end
 
         function FilterAddition(testCase)

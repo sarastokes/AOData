@@ -37,6 +37,8 @@ classdef QueryManager < handle
         numFiles
         % Number of filters
         numFilters
+        % Number of disabled filters
+        numDisabled
         % Number of entities across files
         numEntities
     end
@@ -74,6 +76,14 @@ classdef QueryManager < handle
                 value = height(obj.entityTable);
             end
         end
+
+        function value = get.numDisabled(obj)
+            if obj.numFilters == 0
+                value = 0;
+            else
+                value = numel(arrayfun(@(x) ~x.isEnabled, obj.Filters));
+            end
+        end
     end
 
     methods 
@@ -91,7 +101,14 @@ classdef QueryManager < handle
             if obj.numFilters == 0
                 matches = [];  % TODO
                 entityInfo = obj.entityTable;
-                warning("go:NoFiltersSet", "Add filters first");
+                warning("filter:NoFiltersSet", "Add filters first");
+                return
+            end
+
+            if obj.numFilters == obj.numDisabled
+                matches = [];
+                entityInfo = obj.entityTable;
+                warning('filter:AllFiltersDisabled', 'All filters are disabled, enable first');
                 return
             end
 

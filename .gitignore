@@ -15,6 +15,7 @@
 ## Environments
 *.DS_Store
 *.vscode
+*.vs
 
 ## Development folders
 dev/
