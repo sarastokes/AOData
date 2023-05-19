@@ -1,11 +1,6 @@
-classdef Specification < handle & matlab.mixin.Heterogeneous
-
-    properties (SetAccess = protected)
-        Value 
-    end
+classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 
     methods (Abstract)
-        tf = validate(obj, input)
         out = text(obj)
     end
 

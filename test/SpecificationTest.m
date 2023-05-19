@@ -16,6 +16,73 @@ classdef SpecificationTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    properties
+        TEST_OBJ
+    end
+    
+    methods (TestClassSetup)
+        function setup(testCase)
+            testCase.TEST_OBJ = test.TestSpecificationObject();
+        end
+    end
+
+    methods (Test, TestTags="Specification")
+        function FixedDimensions(testCase)
+            ref1 = [aod.specification.size.FixedDimension(1),...
+                   aod.specification.size.FixedDimension(2)];
+            
+            rowSize1a = aod.specification.Size([1,2]);
+            testCase.verifyEqual(rowSize1a.Value, ref1);
+            testCase.verifyEqual(rowSize1a.text(), "(1,2)");
+
+            rowSize1b = aod.specification.Size("(1,2)");
+            testCase.verifyEqual(rowSize1b.Value, ref1);
+            testCase.verifyTrue(rowSize1b.validate([1 2]));
+            testCase.verifyFalse(rowSize.validate([1 2]'));
+        end
+
+        function MixedDimensions(testCase)
+            ref2 = [aod.specification.size.UnrestrictedDimension(),...
+                    aod.specification.size.FixedDimension(1)];
+
+            rowSize2a = aod.specification.Size("(:,1)");
+            rowSize2b = aod.specification.Size(findprop(testCase.TEST_OBJ, "PropB"));
+            testCase.verifyEqual(rowSize2a.text(), "(:,1)");
+
+            testCase.verifyEqual(rowSize2a.Value, ref2);
+            testCase.verifyEqual(rowSize2b.Value, rowSize2a.Value);
+        end
+
+        function UnrestrictedDimensions(testCase)
+            ref3 = [aod.specification.size.UnrestrictedDimension(),...
+                    aod.specification.size.UnrestrictedDimension()];
+
+            rowSize3a = aod.specification.Size("(:,:)");
+            testCase.verifyEqual(rowSize3a.text(), "(:,:)");
+
+            testCase.verifyEqual(rowSize3a.Value, ref3);
+            testCase.verifyTrue(rowSize3a.validate(eye(3)));
+            testCase.verifyFalse(rowSize3a.validate(ones(3,3,3)));
+        end
+
+        function UnrestrictedSize(testCase)
+            ref4 = aod.specification.size.UnrestrictedSize();
+            rowSize4a = aod.specification.Size([]);
+            testCase.verifyEqual(rowSize4a.Value, ref4);
+            testCase.verifyTrue(rowSize4a.validate(ones([3 3 3])));
+            testCase.verifyTrue(rowSize4a.validate(1));
+            testCase.verifyEqual(rowSize4a.text(), "[]");
+        end
+
+
+        function Specification(testCase)
+            sizeSpec = aod.specification.Size("(1,:)");
+            classSpec = aod.specification.MatlabClass("double");
+            descSpec = aod.specification.Description("This is a description");
+            defaultSpec = aod.specification.DefaultValue(1);
+        end
+    end
+
     methods (Test, TestTags="Parameter")
         function ParameterNameSearch(testCase)
             import aod.util.ErrorTypes
@@ -31,10 +98,10 @@ classdef SpecificationTest < matlab.unittest.TestCase
             p1 = PM.get('BadParam', ErrorTypes.NONE);
             testCase.verifyEmpty(p1);
             testCase.verifyError(...
-                @() PM.getParam('BadParam', ErrorTypes.ERROR),...
+                @() PM.get('BadParam', ErrorTypes.ERROR),...
                 "get:ParameterNotFound");
             testCase.verifyWarning(...
-                @() PM.getParam('BadParam', ErrorTypes.WARNING),...
+                @() PM.get('BadParam', ErrorTypes.WARNING),...
                 "get:ParameterNotFound");
         end
 

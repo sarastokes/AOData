@@ -1,4 +1,4 @@
-classdef ValidationFunction < aod.specification.Specification
+classdef ValidationFunction < aod.specification.Validator
 %
 % Constructor:
 %   obj = aod.specification.ValdiationFunction(input)
@@ -59,7 +59,7 @@ classdef ValidationFunction < aod.specification.Specification
         end
     end
 
-    methods (Static)
+    methods (Static, Access = private)
         function output = validateFunctionHandles(input)
             [tf, output] = isfunctionhandle(input);
             if ~tf 
@@ -67,12 +67,16 @@ classdef ValidationFunction < aod.specification.Specification
                     'Input must be function handle, cell of function handles or text convertable to a function handle');
             end
         end
+    end
 
+    methods (Static)
         function out = get(input)
             [tf, output] = isfunctionhandle(input);
             if ~iscolumn(output)
                 output = output';
             end
+
+            obj = aod.specification.ValidationFunction(output);
         end
     end
 end 

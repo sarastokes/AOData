@@ -1,4 +1,7 @@
-classdef DefaultValue < aod.specification.Specification 
+classdef DefaultValue < aod.specification.Validator 
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     properties
         Value           = []

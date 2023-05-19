@@ -1,4 +1,8 @@
-classdef MatlabClass < aod.specification.Specification
+classdef MatlabClass < aod.specification.Validator
+
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         Class   (1,:)       string = "[]"
