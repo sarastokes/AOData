@@ -44,7 +44,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         %> Response data (rows are samples) 
         Data                          
         %> Timing of each sample in the Response  (*double/duration*)    
-        Timing (:,1)         {mustBeA(Timing, ["double", "duration"])} = []                   
+        Timing (:,1)         duration = seconds([])
     end
 
     methods 
@@ -172,6 +172,8 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             if ~isempty(timing) 
                 assert(isvector(timing), 'Timing must be a vector');
                 timing = timing(:);  % Columnate
+            else
+                timing = seconds([]);
             end
             obj.Timing = timing;
         end

@@ -23,7 +23,7 @@ classdef RigidRegistration < aod.core.Registration
 %   tform = affine2d_to_3d(tform)
 %
 % Inherited methods:
-%   setRegistrationDate(obj, regDate)
+%   setDate(obj, regDate)
 %
 % Dependencies:
 %   Image Processing Toolbox

@@ -29,6 +29,7 @@ classdef Persistor < handle
 % -------------------------------------------------------------------------
 
     events
+        % Triggered when a full HDF5 group (entity) is changed
         EntityChanged
         % Triggered when an HDF5 path changes due to group name change
         HdfPathChanged
@@ -127,12 +128,10 @@ classdef Persistor < handle
                 catch
                     % As far as` I can find, there's no way to change an 
                     % existing softlink so pull metadata, delete, recreate
-                    linkAttr = h5tools.readatt(obj.hdfName, linkPath, 'all');
                     h5tools.deleteObject(obj.hdfName, linkPath);
                     % Recreate the link and add original attributes
                     h5tools.writelink(obj.hdfName,...
                         src.hdfPath, evt.Name, evt.Value.hdfPath);
-                    h5tools.writeatt(obj.hdfName, linkPath, linkAttr);
                 end
             end
         end

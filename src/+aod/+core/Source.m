@@ -19,7 +19,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = protected)
         % Container for Source's sub-Sources
-        Sources                         = aod.core.Source.empty()
+        Sources                 aod.core.Source = aod.core.Source.empty()
     end
 
     methods

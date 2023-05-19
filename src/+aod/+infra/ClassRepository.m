@@ -22,12 +22,7 @@ classdef ClassRepository < handle
 
     methods 
         function obj = ClassRepository(path)
-            if nargin < 1            
-                if ~ispref('AOData', 'SearchPaths')
-                    warning('getPathPreferences:SearchPathsNotSet',...
-                        'Use AODataManagerApp to set search paths');
-                    return
-                end
+            if nargin < 1
                 path = obj.getPathPreferences();
             end
             obj.setSearchPath(path);
@@ -94,7 +89,7 @@ classdef ClassRepository < handle
         end
 
         function loadClass(obj, name)
-            m = eval(sprintf('?%s', name));
+            m = meta.class.fromName(name);
             if ~m.Abstract
                 supers = superclasses(name);
                 for i = 1:numel(supers)

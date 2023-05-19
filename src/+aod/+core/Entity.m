@@ -90,7 +90,7 @@ classdef (Abstract) Entity < handle
     
     properties (Dependent)
         % Automated name from getLabel(), used for HDF5 group name if the name property is not set
-        label
+        label                       char
         % Expected parameter names, optional default values and validation
         expectedParameters          % aod.util.ParameterManager
         % Expected dataset names
@@ -99,7 +99,7 @@ classdef (Abstract) Entity < handle
 
     properties (Hidden, Dependent)
         % The name that will be used for the HDF5 group
-        groupName
+        groupName                   char
     end
 
     properties (Hidden, Access = private)

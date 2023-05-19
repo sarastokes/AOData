@@ -21,7 +21,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 %       Software used to perform the registration
 %
 % Sealed methods:
-%   setRegistrationDate(obj, regDate)
+%   setDate(obj, regDate)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -34,24 +34,24 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
         function obj = Registration(name, registrationDate, varargin)
             obj@aod.core.Entity(name, varargin{:});
             if nargin > 1
-                obj.setRegistrationDate(registrationDate);
+                obj.setDate(registrationDate);
             end
         end
     end
 
     methods (Sealed)
-        function setRegistrationDate(obj, regDate)
+        function setDate(obj, regDate)
             % Set the date where the registration was performed
             % 
             % Syntax:
-            %   obj.setRegistrationDate(regDate)
+            %   obj.setDate(regDate)
             %
             % Inputs:
             %   regDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
             
             if ~isscalar(obj)
-                arrayfun(@(x) setRegistrationDate(x, regDate), obj);
+                arrayfun(@(x) setDate(x, regDate), obj);
                 return
             end
 

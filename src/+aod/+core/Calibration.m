@@ -33,7 +33,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %       Who performed the calibration
 %
 % Sealed methods:
-%   setCalibrationDate(obj, calibrationDate)
+%   setDate(obj, calibrationDate)
 %
 % -------------------------------------------------------------------------
 % See Also:
@@ -74,7 +74,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             obj = obj@aod.core.Entity(name, varargin{:});
             
             if nargin > 1 && ~isempty(calibrationDate)
-                obj.setCalibrationDate(calibrationDate);
+                obj.setDate(calibrationDate);
             end
         end
     end 
@@ -101,14 +101,11 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
 
-        function setCalibrationDate(obj, calDate)
-            % SETCALIBRATIONDATE
-            %
-            % Description:
-            %   Set the date where the calibration was performed
+        function setDate(obj, calDate)
+            % Set the date where the calibration was performed
             % 
             % Syntax:
-            %   obj.setCalibrationDate(calDate)
+            %   obj.setDate(calDate)
             %
             % Inputs:
             %   calDate             datetime, or char: 'yyyyMMdd'

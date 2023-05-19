@@ -149,7 +149,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(cal2.UUID, testCase.EXPT.Calibrations(2).UUID);
 
             % Remove a calibration date
-            testCase.EXPT.Calibrations(1).setCalibrationDate([]);
+            testCase.EXPT.Calibrations(1).setDate([]);
             testCase.verifyTrue(isempty(testCase.EXPT.Calibrations(1).calibrationDate));
             
             % Remove a single calibraiton
@@ -547,9 +547,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             reg2 = aod.core.Registration('Reg2');
 
             % Add and remove registration dates
-            reg1.setRegistrationDate([]);
+            reg1.setDate([]);
             regDate = getDateYMD();
-            setRegistrationDate([reg1, reg2], regDate);
+            setDate([reg1, reg2], regDate);
             test.util.verifyDatesEqual(testCase, reg1.registrationDate, regDate);
 
             % Add Registrations to an Epoch

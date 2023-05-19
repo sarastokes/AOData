@@ -32,6 +32,8 @@ classdef PersistorTest < matlab.unittest.TestCase
 
             % Copy experiment for EntityRename
             h5tools.files.copyFile(fileName, "EntityRenameTest.h5");
+            % Copy experiment for EntityDeletion
+            h5tools.files.copyFile(fileName, "EntityDeletionTest.h5");
 
             % Make a smaller experiment for testing empty entities
             testCase.SMALL_EXPT = test.util.makeSmallExperiment(...
@@ -104,7 +106,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="Modification")
+    methods (Test, TestTags = "EntityModification")
         function EntityRename(testCase)
             pEXPT = loadExperiment("EntityRenameTest.h5");
             pEXPT.setReadOnlyMode(false);
@@ -125,6 +127,32 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyTrue(contains(epochSource.hdfPath, "/OD/"));
         end
 
+        function EntityDeletion(testCase)
+            pEXPT = loadExperiment("EntityDeletionTest.h5");
+            pEXPT.setReadOnlyMode(false);
+
+            % Delete an analysis
+            numAnalyses = numel(pEXPT.Analyses);
+            analysisPath = pEXPT.Analyses(1).hdfPath;
+            analysisUUID = pEXPT.Analyses(1).UUID;
+            pEXPT.Analyses(1).deleteEntity();
+            testCase.verifyNumElements(pEXPT.Analyses, numAnalyses - 1);
+            testCase.verifyEmpty(pEXPT.factory.isCached(analysisUUID));
+            
+            % Delete a source with children that are linked
+            pEXPT.Sources(1).deleteEntity();
+            epoch = pEXPT.Epochs(1);
+            testCase.verifyClass(epoch.Source, 'aod.h5.BrokenSoftlink');
+            
+            % Add a new source and replace softlink
+            newSource = aod.core.Source("ExtraSource");
+            pEXPT.add(newSource);
+            epoch.Source.fixLink(pEXPT.Sources(1));
+            testCase.verifyClass(pEXPT.Epochs(1).Source, 'aod.persistent.Source');
+        end
+    end
+
+    methods (Test, TestTags = "Modification")
         function ParamIO(testCase)
             import matlab.unittest.constraints.Throws
             

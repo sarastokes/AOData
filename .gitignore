@@ -34,6 +34,7 @@ test/test.h5
 test/ExperimentTest.h5
 test/ToyExperiment.h5
 test/EntityRenameTest.h5
+test/EntityDeletionTest.h5
 test/HdfTest.h5
 test/SmallExperiment.h5
 test/ShellExperiment.h5

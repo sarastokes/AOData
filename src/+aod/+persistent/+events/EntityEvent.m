@@ -35,9 +35,9 @@ classdef (ConstructOnLoad) EntityEvent < event.EventData
                 entity          = []
                 hdfPath         string = string.empty()
             end
-            
+
             if ~isempty(entity)
-                mustBeA(entity, 'aod.persistent.Entity');
+                aod.util.mustBeEntity(entity);
             end
 
             obj.Action = action;

@@ -22,6 +22,10 @@ function deleteTestFiles()
         delete('EntityRenameTest.h5');
     end
 
+    if exist('EntityDeletionTest.h5', 'file')
+        delete('EntityDeletionTest.h5');
+    end
+
     if exist('SmallExperiment.h5', 'file')
         delete('SmallExperiment.h5');
     end

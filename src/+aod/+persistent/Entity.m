@@ -915,7 +915,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 if strcmp(ME.identifier, 'create:InvalidPath')
                     e = aod.h5.BrokenSoftlink(obj, name, linkPath);
                     warning('loadLink:BrokenSoftlink',...
-                        'In entity %s, property %s refers to an invalid HDF5 path', obj.Name, name);
+                        'In entity %s, property %s refers to an invalid HDF5 path', ...
+                        obj.groupName, name);
                 else
                     rethrow(ME);
                 end

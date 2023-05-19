@@ -1,5 +1,5 @@
 classdef Rois < aod.core.Annotation
-% ROIS
+% Regions of interest
 % 
 % Description:
 %   ROIs in physiology experiment
@@ -25,8 +25,22 @@ classdef Rois < aod.core.Annotation
 %
 % Protected methods:
 %   setMap(obj, map);
+%
+% Examples:
+%   % Load ROIs from a know file type 
+%   obj = aod.builtin.annotations.Rois('MyRois', 'rois.csv');
+%   obj.load();
+%
+%   % Load ROIs from a custom file type or with custom reader
+%   obj = aod.builtin.annotations.Rois('MyRois',...
+%       aod.builtin.readers.ImageJRoiReader('rois.zip', [100 200]));
+%   obj.load();
+%
+%   % Load data without associated file 
+%   roiData = magic(5);
+%   obj = aod.builtin.annotations.Rois('MyRois', roiData);
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -48,30 +62,30 @@ classdef Rois < aod.core.Annotation
         function obj = Rois(name, rois, varargin)
             obj = obj@aod.core.Annotation(name, varargin{:});
 
-            if isSubclass(rois, 'aod.util.FileReader')
-                obj.Reader = rois;
-                obj.load([]);
-            else
-                
-            end
-
             ip = aod.util.InputParser();
             addParameter(ip, 'Reader', []);
+            addParameter(ip, 'Image', []);
             parse(ip, varargin{:});
-            
-            reader = ip.Results.Reader;
 
-            if ~isempty(reader)
-                obj.setReader(@() reader(rois));
-            end
+            obj.setReader(ip.Results.Reader);
+            obj.setImage(ip.Results.Image);
 
-            % Assign reader, if necessary. If rois are text, it is 
+            %if isSubclass(rois, 'aod.util.FileReader')
+            %    obj.Reader = rois;
+            %    obj.load(obj.Reader);
+            %else
+            %    obj.load(rois);
+            %end
+
+            % Assign Reader, if necessary. If "rois" are text, it is 
             % assumed they represent a file name
-            if isempty(obj.Reader) && istext(rois)
-                obj.setReader(aod.util.findFileReader(rois));
+            if isfile(rois)
+                obj.setFile(rois);
+                if isempty(obj.Reader)
+                    obj.setReader(aod.util.findFileReader(rois));
+                end
+                obj.load();
             end
-
-            obj.load(rois);
         end
     end
 
@@ -80,19 +94,34 @@ classdef Rois < aod.core.Annotation
             % Obtain data to send to setMap()
             %
             % Syntax:
-            %   load(obj, rois, imSize)
+            %   load(obj, rois)
+            %
+            % Inputs:
+            %   rois            numeric, string/char, aod.util.FileReader
             % -------------------------------------------------------------
-            if isSubclass(rois, 'aod.util.FileReader')
+
+            if nargin < 2
                 obj.setMap(obj.Reader.readFile());
-                if ~isa(obj.Data, 'double')
-                    obj.Data = im2double(obj.Data);
-                end
-            else
-                if ~isa(obj.Data, 'double')
-                    obj.Data = double(obj.Data);
-                end
-                obj.setMap(rois);
+                return
             end
+
+            if ~isa(obj.Data, 'double')
+                obj.setMap(rois);
+                return
+            end
+
+            if isfile(rois)
+                if isempty(obj.Reader)
+                    obj.Reader = aod.util.findFileReader(rois);
+                else
+                    obj.Reader.changeFile(rois);
+                end
+            elseif isSubclass(rois, 'aod.util.FileReader')
+                obj.Reader = rois;
+            end
+
+            obj.setMap(obj.Reader.readFile());
+            obj.setFile('ROIs', obj.Reader.fullFile);
         end
            
         function reload(obj)
@@ -111,6 +140,12 @@ classdef Rois < aod.core.Annotation
         end
 
         function setReader(obj, reader)
+            % Set the FileReader
+            %
+            % Syntax:
+            %   setReader(obj, reader)
+            % -------------------------------------------------------------
+
             if nargin < 2 || isempty(reader)
                 obj.Reader = [];
                 return 
@@ -135,36 +170,6 @@ classdef Rois < aod.core.Annotation
                 obj.setFile('Image', img);
             else
                 obj.Image = img;
-            end
-        end
-    end
-
-    methods (Access = protected)
-        function setMetadata(obj)
-            if isempty(obj.Data)
-                return
-            end
-            if ~isempty(obj.Metadata)
-                % If there were existing ROIs, make sure to append to  
-                % Metadata rather than erasing existing table
-                newROIs = obj.numRois - height(obj.Metadata);
-                newTable = table(height(obj.Metadata) + rangeCol(1, newROIs),...
-                    repmat("", [newROIs, 1]), 'VariableNames', {'ID', 'UID'});
-                newTable = [obj.Metadata; newTable];
-                obj.Metadata = newTable;
-            else
-                obj.createMetadata();
-            end
-        end
-
-        function createMetadata(obj, forceOverwrite)
-            if nargin < 2
-                forceOverwrite = false;
-            end
-            if isempty(obj.Metadata) || forceOverwrite
-                obj.Metadata = table(rangeCol(1, obj.numRois), ...
-                    repmat("", [obj.numRois, 1]),...
-                    'VariableNames', {'ID', 'UID'});
             end
         end
     end

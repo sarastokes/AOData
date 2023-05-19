@@ -22,11 +22,9 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    if nargin < 1 || isempty(writeToHDF)
-        writeToHDF = false;
-    end
-    if nargin < 2
-        saveAsMat = false;
+    arguments
+        writeToHDF      logical = false
+        saveAsMat       logical = false
     end
 
     experiment = aod.core.Experiment('Tester', cd, '20220823',...
@@ -98,20 +96,21 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
         'Source', experiment.get('Source', {'Name', 'Right'}));
     epoch.setFile('PresyncFile', fullfile(cd, 'PresyncFile.txt'));
     experiment.add(epoch);
-    epoch.setTiming(1:5);
+    epoch.setTiming(seconds(1:5));
     epoch.setFile('PostSyncFile', fullfile(cd, 'PostSyncFile.txt'));
     
     experiment.add(aod.core.Epoch(2, 'Source', epoch.Source));
     setParam(experiment.Epochs, 'RefPmtGain', 0.51);
 
     % Registrations
-    reg = aod.builtin.registrations.RigidRegistration('SIFT', '20220823', eye(3));
+    reg = aod.builtin.registrations.RigidRegistration( ...
+        'SIFT', '20220823', eye(3));
     epoch.add(reg);
 
     % Responses
     response1 = aod.core.Response('ResponseWithTiming');
     response1.setData(2:2:8);
-    response1.setTiming(linspace(0.5, 2.5, 4));
+    response1.setTiming(seconds(linspace(0.5, 2.5, 4)));
     epoch.add(response1);
 
     response2 = aod.core.Response('ResponseWithoutTiming');
@@ -131,7 +130,8 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     experiment.add(aod.core.Annotation('Annotation1'));
 
     % Analysis
-    experiment.add(aod.core.Analysis('TestAnalysis', 'Date', getDateYMD()));
+    experiment.add(aod.core.Analysis('TestAnalysis', ...
+        'Date', getDateYMD()));
 
     if writeToHDF
         fileName = fullfile(getpref('AOData', 'BasePackage'), 'test', 'ToyExperiment.h5');

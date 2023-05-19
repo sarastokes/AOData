@@ -63,7 +63,7 @@ classdef Experiment < aod.core.Entity
         Systems                 aod.core.System         
 
         % A table containing all git repositories and their current status
-        Code                          
+        Code                    table            
     end
 
     properties (Dependent)
@@ -78,7 +78,7 @@ classdef Experiment < aod.core.Entity
             obj = obj@aod.core.Entity(name, varargin{:});
 
             obj.setHomeDirectory(homeFolder);
-            obj.setExperimentDate(expDate);
+            obj.setDate(expDate);
 
             % Create a table of current status of all associated repos
             obj.appendGitHashes();
@@ -118,11 +118,11 @@ classdef Experiment < aod.core.Entity
             obj.homeDirectory = filePath;
         end
         
-        function setExperimentDate(obj, expDate)
+        function setDate(obj, expDate)
             % Change the experiment's date
             %
             % Syntax:
-            %   setExperimentDate(obj, expDate)
+            %   setDate(obj, expDate)
             %
             % Inputs:
             %   expDate         datetime or text in format 'YYYYMMdd'
@@ -557,24 +557,6 @@ classdef Experiment < aod.core.Entity
         end
     end
 
-    methods 
-        function sources = getAllSources(obj)
-            % Returns all sources in an Experiment 
-            %
-            % Description:
-            %   Returns all sources and nested sources in Experiment
-            %
-            % Syntax:
-            %   sources = getAllSources(obj)
-            % -------------------------------------------------------------
-            sources = aod.core.Source.empty();
-            if isempty(obj.Sources)
-                return
-            end
-            sources = obj.Sources.getAllSources();
-        end 
-    end
-
     methods (Access = protected)
         function addEpoch(obj, epoch)
             % ADDEPOCH
@@ -640,6 +622,22 @@ classdef Experiment < aod.core.Entity
             [~, idx] = sort(obj.epochIDs);
             obj.Epochs = obj.Epochs(idx);
         end
+
+        function sources = getAllSources(obj)
+            % Returns all sources in an Experiment 
+            %
+            % Description:
+            %   Returns all sources and nested sources in Experiment
+            %
+            % Syntax:
+            %   sources = getAllSources(obj)
+            % -------------------------------------------------------------
+            sources = aod.core.Source.empty();
+            if isempty(obj.Sources)
+                return
+            end
+            sources = obj.Sources.getAllSources();
+        end 
 
         function appendGitHashes(obj)
             % APPENDGITHASHES

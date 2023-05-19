@@ -40,7 +40,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         % Time the Epoch (i.e. data acquisition) began
         startTime           datetime = datetime.empty()                          
         % Timing of samples during Epoch                             
-        Timing (:,1)        {mustBeA(Timing, ["double", "duration"])} = []
+        Timing (:,1)        duration = seconds([])
 
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
@@ -359,6 +359,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             if ~isempty(timing)
                 assert(isvector(timing), 'Timing must be a vector');
                 timing = timing(:);  % Columnate
+            else
+                timing = seconds([]);
             end
 
             obj.Timing = timing;
