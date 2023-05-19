@@ -29,18 +29,18 @@ classdef QueryManager < handle
         % The HDF5 file name(s) being queried
         hdfName             string
         % Table of entities from experiment EntityManager
-        entityTable 
+        entityTable         
     end
 
     properties (Dependent)
         % Number of AOData HDF5 files
-        numFiles
+        numFiles            double 
         % Number of filters
-        numFilters
+        numFilters          double
         % Number of disabled filters
-        numDisabled
+        numDisabled         double
         % Number of entities across files
-        numEntities
+        numEntities         double
     end
 
     methods
@@ -81,7 +81,7 @@ classdef QueryManager < handle
             if obj.numFilters == 0
                 value = 0;
             else
-                value = numel(arrayfun(@(x) ~x.isEnabled, obj.Filters));
+                value = nnz(arrayfun(@(x) ~x.isEnabled, obj.Filters));
             end
         end
     end

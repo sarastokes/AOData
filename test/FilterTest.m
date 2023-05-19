@@ -82,10 +82,10 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.QM.clearFilters();
 
             testCase.QM.addFilter({'Name', 'Experiment'});
-            testCase.QM.Filters(1).disable();
+            testCase.QM.Filters(1).disableFilter();
             testCase.verifyWarning(...
                 @() testCase.QM.filter(), 'filter:AllFiltersDisabled');
-            testCase.QM.Filters(1).enable();
+            testCase.QM.Filters(1).enableFilter();
             testCase.verifyNumElements(testCase.QM.filter(), 1);
         end
 
@@ -132,12 +132,25 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyEqual(nnz(NF1.apply()),1);
             testCase.verifyTrue(NF1.didFilter);
             NF1.describe();
+            testCase.verifyEqual(NF1.code(),...
+                "aod.api.NameFilter(QM, 'ChannelOptimization')");
+            testCase.verifyEqual(NF1.code("QM", "F"),...
+                "F = aod.api.NameFilter(QM, 'ChannelOptimization');");
 
             NF2 = aod.api.NameFilter(testCase.QM, @(x) endsWith(x, 'Optimization'));
             testCase.verifyEqual(nnz(NF2.apply()),1);
             % Alt initialization
             testCase.QM.addFilter({'Name', @(x) endsWith(x, 'Optimization')});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
+        end
+
+        function NameFilterErrors(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
+            
+            testCase.verifyError(...
+                @() aod.api.NameFilter(testCase.QM, 123),...
+                "NameFilter:InvalidInput");
         end
 
         function NameFilterWarnings(testCase)
@@ -190,7 +203,7 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyEqual(nnz(idx), 1);
             testCase.verifyTrue(contains(UF.describe(), testCase.EXPT.UUID));
             testCase.verifyEqual(UF.code(),...
-                string('aod.api.UuidFilter(QM, "32d2a116-c856-4027-ab86-dc5e18f7d648")'));
+                string(sprintf('aod.api.UuidFilter(QM, "%s")', testCase.EXPT.UUID)));
         end
 
         function UuidFilterWarning(testCase)
@@ -326,6 +339,7 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = CF.apply();
             testCase.verifyEqual(nnz(idx), 1);
             testCase.verifyTrue(endsWith(CF.getMatchedGroups(), "0001"));
+            testCase.verifyTrue(CF.isStacked);
             CF.describe();
 
             testCase.verifyEqual(CF.code(),...
@@ -343,6 +357,17 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyWarning(...
                 @() CF.apply, "apply:NoMatches");
         end
+        
+        function ChildFilterErrors(testCase)
+            CF = aod.api.ChildFilter(testCase.QM, 'Analysis', ...
+                {'Name', 'BadAnalysisName'});
+            %testCase.verifyError(...
+            %    @() CF.addFilter({'Child', 'Analysis', {'Name', 'BadAnalysisName'}}),...
+            %    "addFilter:DoubleStackedFilter");
+            testCase.verifyError(...
+                @() CF.addFilter(123),...
+                "addFilter:InvalidInput");
+        end
     end
 
     methods (Test, TestTags=["LinkFilter", "AOQuery"])
@@ -354,7 +379,12 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyEqual(LF.code(),...
                 string('aod.api.LinkFilter(QM, "Source")'));
             testCase.verifyEqual(nnz(LF.apply()), 2);
+            testCase.verifyFalse(LF.isStacked);
+            testCase.verifyEqual(LF.numFilters, 0);
             LF.describe();
+
+            testCase.verifyEqual(LF.code(),...
+                string('aod.api.LinkFilter(QM, "Source")'));
         end
 
         function LinkFilterWarnings(testCase)
