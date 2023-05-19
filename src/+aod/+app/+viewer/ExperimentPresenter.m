@@ -78,7 +78,7 @@ classdef ExperimentPresenter < appbox.Presenter
 
         function e = node2entity(obj, node)
             % Extract entity from a node
-            e = obj.Experiment.getByPath(node.Tag);
+            e = aod.h5.getByPath(obj.Experiment, node.Tag);
         end
 
         function selectNodeByPath(obj, hdfPath)
@@ -250,7 +250,7 @@ classdef ExperimentPresenter < appbox.Presenter
                     return
                 end
                 % Get the data from the entity's properties
-                entity = obj.Experiment.getByPath(node.Parent.Tag);
+                entity = aod.h5.getByPath(obj.Experiment, node.Parent.Tag);
                 data = entity.(node.Text);
                 % Determine appropriate display and reformat data if needed
                 [displayType, data] = node.NodeData.AONode.displayInfo(data);
@@ -291,7 +291,7 @@ classdef ExperimentPresenter < appbox.Presenter
             %obj.view.update();
 
             % Load links and datasets
-            entity = obj.Experiment.getByPath(node.Tag);
+            entity = aod.h5.getByPath(obj.Experiment, node.Tag);
             obj.processEntityDatasets(node, entity);
             obj.processEntityLinks(node, entity);
 
@@ -329,7 +329,7 @@ classdef ExperimentPresenter < appbox.Presenter
         function onViewSendNodeToBase(obj, ~, ~)
             node = obj.view.getSelectedNode();
             hdfPath = node.Tag;
-            e = obj.Experiment.getByPath(hdfPath);
+            e = aod.h5.getByPath(obj.Experiment, hdfPath);
             assignin('base', node.Text, e);
         end
         

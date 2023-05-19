@@ -41,10 +41,6 @@ function replaceLink(entity, linkName, newTarget)
 
     linkPath = h5tools.buildPath(entity.hdfPath, linkName);
 
-    % Store the attributes then delete the link
-    %linkAttr = h5tools.readatt(entity.hdfName, linkPath, 'all');
     h5tools.deleteObject(entity.hdfName, linkPath);
-    % Recreate the link and attributes
     h5tools.writelink(entity.hdfName, ...
         entity.hdfPath, obj.Name, newPath);
-    %h5tools.writeatt(entity.hdfName, newPath, linkAttr);

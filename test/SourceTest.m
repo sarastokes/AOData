@@ -29,6 +29,13 @@ classdef SourceTest < matlab.unittest.TestCase
     end
     
     methods(Test, TestTags=["Source", "Core", "LevelOne"])
+        function SourceLevel(testCase)
+            source = testCase.createSource();
+
+            testCase.verifyEqual(source.getLevel(), 1);
+            testCase.verifyEqual(source.Sources.getLevel(), [2 2]);
+        end
+
         function SourceIO(testCase)
             import matlab.unittest.constraints.Throws
 
@@ -36,13 +43,14 @@ classdef SourceTest < matlab.unittest.TestCase
             source1 = aod.core.Source('MC00851');
             source2 = aod.core.Source('MC00838');
             testCase.EXPT.add([source1, source2]);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 2);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Source')), 2);
 
             % Create second-level source
             source1a = aod.core.Source('OS');
             source1b = aod.core.Source('OD');
             source1.add([source1a, source1b]);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 4);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Source')), 4);
+            testCase.verifyNumElements(source.get('Source', {'Name', 'OS'}), 1);
             
             % Check labels
             testCase.verifyEqual('MC00851_OS', source1a.label);
@@ -56,11 +64,11 @@ classdef SourceTest < matlab.unittest.TestCase
             source1a1 = aod.core.Source('Right');
             source1a2 = aod.core.Source('Left');
             source1a.add([source1a1, source1a2]);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Source')), 6);
 
             source1b1 = aod.core.Source('Right');
             source1b.add(source1b1);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 7);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Source')), 7);
 
             % Check remove all files
             source1.setFile('MyFile1', 'test.txt');
@@ -71,11 +79,11 @@ classdef SourceTest < matlab.unittest.TestCase
 
             % Remove a single source
             testCase.EXPT.remove('Source', 2);
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 6);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Source')), 6);
 
             % Clear all the sources
             testCase.EXPT.remove('Source', 'all');
-            testCase.verifyEqual(numel(testCase.EXPT.getAllSources()), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.get('Source')), 0);
         end
 
         function GetSource(testCase)

@@ -10,7 +10,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 % Public Methods:
 %   setReadOnlyMode(obj, tf)
 %   h = ancestor(obj, entityType)
-%   e = getByPath(obj, hdfPath)
 %
 %   setDescription(obj, txt)
 %   setName(obj, txt)
@@ -205,38 +204,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 h = h.Parent;
                 if isempty(h)
                     break
-                end
-            end
-        end
-
-        function e = getByPath(obj, hdfPath)
-            % Return any entity within the persistent hierarchy 
-            %
-            % Syntax:
-            %   e = getByPath(obj, hdfPath)
-            %
-            % Notes:
-            %   Returns empty with a warning if hdfPath not found
-            % -------------------------------------------------------------
-            arguments
-                obj
-                hdfPath     string 
-            end
-
-            if ~isscalar(hdfPath)
-                e = aod.util.arrayfun(@(x) getByPath(obj, x), hdfPath);
-                return
-            end
-
-            try
-                e = obj.factory.create(hdfPath);
-            catch ME
-                if strcmp(ME.identifier, 'create:InvalidPath')
-                    warning('getByPath:InvalidHdfPath',...
-                        'HDF path not found: %s', hdfPath);
-                    e = [];
-                else
-                    rethrow(ME);
                 end
             end
         end

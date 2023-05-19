@@ -41,12 +41,16 @@ classdef Experiment < aod.core.Entity
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = private)
         % The experiment's data folder path
-        homeDirectory           char
-        % The date the experiment was performed (yyyyMMdd)
-        experimentDate (1,1)    datetime
+        homeDirectory  (1,:)    char
+        % The date the experiment was performed 
+        experimentDate (1, 1)   datetime
+        % A table containing all git repositories and their status
+        Code                    table
+    end
 
+    properties (SetAccess = protected)
         % Container for Experiment's Analyses
         Analyses                aod.core.Analysis  
         % Container for Experiment's Annotations     
@@ -60,10 +64,7 @@ classdef Experiment < aod.core.Entity
         % Container for Experiment's Sources
         Sources                 aod.core.Source      
         % Container for Experiment's Systems 
-        Systems                 aod.core.System         
-
-        % A table containing all git repositories and their current status
-        Code                    table            
+        Systems                 aod.core.System          
     end
 
     properties (Dependent)

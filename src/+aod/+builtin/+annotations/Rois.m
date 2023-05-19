@@ -79,7 +79,7 @@ classdef Rois < aod.core.Annotation
 
             % Assign Reader, if necessary. If "rois" are text, it is 
             % assumed they represent a file name
-            if isfile(rois)
+            if istext(rois) && isfile(rois)
                 obj.setFile(rois);
                 if isempty(obj.Reader)
                     obj.setReader(aod.util.findFileReader(rois));

@@ -52,10 +52,10 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
 
         function GetByPath(testCase)
             epochPath = '/Experiment/Epochs/0001';
-            h = testCase.EXPT.getByPath(epochPath);
+            h = aod.h5.getByPath(testCase.EXPT, epochPath);
             testCase.verifyEqual(h.UUID, testCase.EXPT.Epochs(1).UUID);
 
-            testCase.verifyWarning(@()testCase.EXPT.getByPath('badpath'),...
+            testCase.verifyWarning(@()aod.h5.getByPath(testCase.EXPT, 'badpath'), ...
                 'getByPath:InvalidHdfPath');
         end
 

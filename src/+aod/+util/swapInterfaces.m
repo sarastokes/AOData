@@ -36,7 +36,7 @@ function pEntity = swapInterfaces(cEntity)
         error("swapInterface:EntityNotFound",...
             "Entity not found in persisted experiment");
     end
-    pEntity = h.getByPath(path);
+    pEntity = aod.h5.getByPath(h, path);
 
 
     

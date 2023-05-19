@@ -277,7 +277,7 @@ classdef QueryManager < handle
             hdfPath = obj.entityTable.Path(rowIdx);
             exptName = obj.entityTable.File(rowIdx);
             expt = obj.Experiments(ismember(obj.hdfName, exptName));
-            entity = expt.getByPath(hdfPath);
+            entity = aod.h5.getByPath(expt, hdfPath);
         end
     end
 

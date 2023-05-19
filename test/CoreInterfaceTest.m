@@ -413,7 +413,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Create some responses
             response1 = aod.core.Response('ResponseWithTiming');
             response1.setData(2:2:8);
-            response1.setTiming(linspace(0.5, 2.5, 4));
+            response1.setTiming(seconds(linspace(0.5, 2.5, 4)));
 
             response2 = aod.core.Response('ResponseWithoutTiming');
             response2.setData(2:2:8);
@@ -430,7 +430,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyEmpty(testCase.EXPT.Epochs(1).Responses(1).Timing);
 
             % Add timing at the epoch level
-            testCase.EXPT.Epochs(2).setTiming(linspace(0.5, 2.5, 4));
+            testCase.EXPT.Epochs(2).setTiming(seconds(linspace(0.5, 2.5, 4)));
             testCase.verifyTrue(testCase.EXPT.Epochs(2).hasTiming());
             testCase.EXPT.Epochs(2).setTiming([]);
             testCase.verifyFalse(testCase.EXPT.Epochs(2).hasTiming());

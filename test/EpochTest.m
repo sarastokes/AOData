@@ -154,8 +154,8 @@ classdef EpochTest < matlab.unittest.TestCase
             testCase.verifyEqual(hasTiming([epoch1, epoch2]), [false, false]);
 
             % Add timing to one epoch
-            epoch1.setTiming(1:4);
-            testCase.verifyEqual(epoch1.Timing, (1:4)');
+            epoch1.setTiming(seconds(1:4));
+            testCase.verifyEqual(epoch1.Timing, seconds(1:4)');
             
             % Clear timing
             setTiming([epoch1, epoch2], []);
