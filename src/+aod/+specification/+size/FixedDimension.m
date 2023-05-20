@@ -26,6 +26,13 @@ classdef FixedDimension < aod.specification.Specification
             obj.Length = dimSize;
         end
 
+    end
+
+    methods 
+        function setValue(obj, input)
+            obj.Length = input;
+        end
+
         function tf = validate(obj, input)
             if istext(input)
                 input = str2double(input);
@@ -35,6 +42,17 @@ classdef FixedDimension < aod.specification.Specification
 
         function output = text(obj)
             output = string(num2str(obj.Length));
+        end
+    end
+
+    % MATLAB built-in methods
+    methods
+        function tf = isequal(obj, other)
+            if isa(other, class(obj)) && obj.Length == other.Length 
+                tf = true;
+            else
+                tf = false;
+            end
         end
     end
 end

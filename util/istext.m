@@ -18,5 +18,5 @@ function tf = istext(obj, cellstrFlag)
     if cellstrFlag
         tf = ischar(obj) | isstring(obj) | iscellstr(obj);
     else
-        tf = char(obj) | isstring(obj);
+        tf = ischar(obj) | isstring(obj);
     end

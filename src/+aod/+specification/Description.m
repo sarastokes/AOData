@@ -1,7 +1,10 @@
 classdef Description < aod.specification.Descriptor 
 %
+% Superclass:
+%   aod.specification.Descriptor
+%
 % Constructor:
-%   aod.specification.Description
+%   obj = aod.specification.Description(input)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -12,39 +15,32 @@ classdef Description < aod.specification.Descriptor
 
     methods
         function obj = Description(input)
-            obj = obj@aod.specification.Descriptor(input);
+            if nargin < 1 || aod.util.isempty(input) || input == "[]"
+                input = "";
+            end
+            obj.setValue(input);
+        end
+    end
+
+    % aod.specification.Descriptor methods
+    methods
+        function setValue(obj, input)
+            if aod.util.isempty(input)
+                obj.Value = "";
+                return 
+            end
+
+            if isa(input, 'meta.property')
+                input = input.Description;
+            end
+            
+            input = convertCharsToStrings(input);
+            
+            obj.Value = input;
         end
 
         function output = text(obj)
             output = obj.Value;
-        end
-    end
-
-    methods (Access = protected)
-        function assign(obj, input)
-            input = convertCharsToStrings(input);
-            obj.Value = input;
-        end
-    end
-
-    methods (Static)
-        function obj = get(obj, className, propName)
-            if istext(input)
-                mc = meta.class.fromName(input);
-            elseif ~isa(mc, 'meta.class')
-                mc = metaclass(mc);
-            end
-
-            idx = find(arrayfun(@(x) strcmp(x.Name, propName), mc.PropertyList));
-
-            if isempty(idx)
-                error("getClassPropDescription:PropertyNotFound", ...
-                    "Property %s not found", propName);
-            end
-
-            value = mc.PropertyList(idx).Description;
-
-            obj = aod.specification.Description(value);
         end
     end
 end 

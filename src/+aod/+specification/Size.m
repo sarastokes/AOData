@@ -18,7 +18,18 @@ classdef Size < aod.specification.Validator
         function obj = Size(input)
             if nargin < 1 || isempty(input) || strcmp(input, '[]')
                 obj.Value = aod.specification.size.UnrestrictedSize;
-                return
+            else
+                obj.setValue(input);
+            end
+        end
+    end
+
+    % aod.specification.Specification methods
+    methods
+        function setValue(obj, input)
+            if isempty(input) || strcmp(input, '[]')
+                obj.Value = aod.specification.size.UnrestrictedSize;
+                return 
             end
 
             if istext(input)
@@ -29,25 +40,21 @@ classdef Size < aod.specification.Validator
                 obj.Value = obj.parseNumeric(input);
             end 
         end
-    end
 
-    % aod.specification.Specification methods
-    methods
         function tf = validate(obj, input)
             % Validate whether input size is consistent with specs
             % -----------------------------------------------------------
 
             % Check whether size is specified
-            if isempty(obj) || isa(obj, 'aod.specification.size.UnrestrictedSize')
+            if isempty(obj) || isa(obj.Value, 'aod.specification.size.UnrestrictedSize')
                 tf = true;
                 return
             end
 
             % Check the dimensionality
-            if numel(obj) ~= ndims(input)
-                error('validate:DimensionsDoNotMatch',...
-                    "Input was expected to have %u dimensions, but had %u",...
-                    numel(obj), ndims(input));
+            if numel(obj.Value) ~= ndims(input)
+                tf = false;
+                return
             end
             % Check the individual dimensions
             for i = 1:numel(obj.Value)
@@ -128,6 +135,35 @@ classdef Size < aod.specification.Validator
                     end
                 end
             end
+        end
+    end
+
+    % MATLAB built-in methods
+    methods 
+        function tf = isempty(obj)
+            tf = isempty(obj.Value);
+        end
+
+        function tf = isequal(obj, other)
+            if isa(obj, 'aod.specification.size.UnrestrictedSize') & ...
+                isa(other, 'aod.specification.size.UnrestrictedSize')
+                tf = true;
+                return 
+            end
+
+            if numel(obj.Value) ~= numel(other.Value)
+                tf = false;
+                return
+            end
+
+            for i = 1:numel(obj.Value)
+                if ~isequal(class(obj.Value(i)), class(other.Value(i))) || ...
+                        ~isequal(obj.Value(i), other.Value(i))
+                    tf = false;
+                    return
+                end
+            end
+            tf = true;
         end
     end
 end

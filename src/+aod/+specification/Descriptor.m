@@ -4,13 +4,9 @@ classdef (Abstract) Descriptor < aod.specification.Specification
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    methods (Abstract, Access = protected)
-        assign(obj, input)
-    end
-    
     methods
-        function obj = Descriptor(input)
-            obj.assign(input);
+        function obj = Descriptor()
+            % Leave it to subclasses
         end
     end
 end 

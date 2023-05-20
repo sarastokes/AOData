@@ -1,82 +1,119 @@
 classdef ValidationFunction < aod.specification.Validator
+% Validation functions for dataset
+%
+% Superclass:
+%   aod.specification.Validator
 %
 % Constructor:
 %   obj = aod.specification.ValdiationFunction(input)
 %
+% Examples:
+%   % Intiialize from a single function handle
+%   obj = aod.specification.ValidationFunction(@mustBeNumeric);
+%
+%   % Initialize from a cell of function handles
+%   obj = aod.specification.ValidationFunction({@isnumeric, @(x) x > 1})
+%
+%   % Initialize from meta.property
+%   mc = meta.class.fromName('aod.core.Experiment')
+%   obj = aod.specification.ValidationFunction(mc.PropertyList(1));
+%
+% Notes:
+%   - Both validation functions without an output (e.g. mustBeNumeric) and
+%       validation functions with a logical output (e.g. isdouble) are ok
+%   - Mirrors meta.Validation which isn't accessible
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Functions (1,:)      cell    = {}
+        Value   (1,:)      cell    = {}
     end
 
     methods
         function obj = ValidationFunction(input)
-            if nargin > 0 || isempty(input)
-                obj.Functions = obj.validateFunctionHandles(input);
+            if nargin > 0 && ~isempty(input)
+                obj.setValue(input);
+            end
+        end
+    end
+
+    % aod.specification.Specification methods
+    methods 
+        function setValue(obj, input)
+            if aod.util.isempty(input)
+                obj.Value = {};
+            else
+                obj.Value = obj.validateInput(input);
             end
         end
 
         function tf = validate(obj, input)
-            if isempty(obj.Functions)
+            if isempty(obj.Value)
                 tf = true;
                 return 
             end
-            
+
             % Validation functions like mustBeNumeric have no output but 
             % will have errored if invalid. Other functions should return 
             % true, so isValid should be a cell with empty or 1 (not 0)
-            isValid = false(1, numel(obj.Functions));
-            for i = 1:numel(obj.Functions)
+            isValid = false(1, numel(obj.Value));
+
+            for i = 1:numel(obj.Value)
                 iValid = [];
                 try
                     % Validation function that returns true/false
-                    iValid = obj.Functions{i}(input);
+                    iValid = obj.Value{i}(input);
                     % Make sure the validation function is appropriate
                     if ~islogical(iValid)
                         error('validate:InvalidValidationFunctions',...
-                            'Function %u returned type %s, but should return true/false',...
+                            'Function %u returned type %s, but should return logical',...
                             i, class(iValid));
                     end
                 catch ME 
                     % Skip errors by "mustBe" validation functions
                     if ~strcmp(ME.identifier, "MATLAB:TooManyOutputs")
-                        rethrow(ME);
+                        iValid = false;
                     end
                 end
                 if isempty(iValid)
-                    obj.Functions{i}(input);
-                    iValid = true; % Would have errored if invalid
+                    try
+                        obj.Value{i}(input);
+                        iValid = true;      % Would have errored if failed
+                    catch ME
+                        iValid = false;
+                        warning(ME.identifier, '%s', ME.message);
+                    end
                 end
                 isValid(i) = iValid;
             end
-            tf = isValid;
+            tf = all(iValid);
         end
 
         function out = text(obj)
-            out = cellfun(@(x) string(func2str(x)), obj.Functions);
+            out = cellfun(@(x) string(func2str(x)), obj.Value);
         end
     end
 
     methods (Static, Access = private)
-        function output = validateFunctionHandles(input)
+        function output = validateInput(input)
+            if isa(input, 'meta.property')
+                output = input.Validation.ValidatorFunctions;
+                return
+            end
+
             [tf, output] = isfunctionhandle(input);
             if ~tf 
-                error('valdiateFunctionHandles:InvalidInput',...
+                error('validateFunctionHandles:InvalidInput',...
                     'Input must be function handle, cell of function handles or text convertable to a function handle');
             end
         end
     end
 
-    methods (Static)
-        function out = get(input)
-            [tf, output] = isfunctionhandle(input);
-            if ~iscolumn(output)
-                output = output';
-            end
-
-            obj = aod.specification.ValidationFunction(output);
+    % MATLAB built-in methods
+    methods 
+        function tf = isempty(obj)
+            tf = isempty(obj.Value);
         end
     end
 end 

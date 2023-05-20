@@ -1,35 +1,49 @@
 classdef MatlabClass < aod.specification.Validator
-
+%
+% Superclass:
+%   aod.specification.Validator
+%
+% Constructor:
+%   obj = aod.specification.MatlabClass(input)
+%
+% Inputs:
+%   input           char, string, cellstr or meta.property
+%       MATLAB class or classes
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Class   (1,:)       string = "[]"
+        Value   (1,:)       string = ""
     end
 
     methods
         function obj = MatlabClass(classes)
-            if nargin < 1
-                obj.Class = "[]";
-                return
+            if nargin > 0
+                obj.Value = obj.parse(classes);
             end
-            obj.Class = obj.parse(classes);
+        end
+    end
+
+    % aod.specification.Specification methods
+    methods 
+        function setValue(obj, input)
+            obj.Value = obj.parse(input);
         end
 
         function tf = validate(obj, value)
-            if obj.Class == "[]"
+            if isempty(obj)
                 tf = true;
                 return
             end
-            tf = any(arrayfun(@(x) isa(value, x), obj.Class));
+            tf = isSubclass(value, obj.Value);
         end
 
         function out = text(obj)
-            if numel(obj.Class) > 1
-                out = array2commalist(obj.Class);
+            if numel(obj.Value) > 1
+                out = array2commalist(obj.Value);
             else
-                out = obj.Class;
+                out = obj.Value;
             end        
         end
     end
@@ -37,13 +51,18 @@ classdef MatlabClass < aod.specification.Validator
     methods (Static, Access = private)
         function classes = parse(input)
 
-            arguments
-                input       string 
+            if isa(input, 'meta.property')
+                if ~isempty(input.Validation.Class)
+                    input = input.Validation.Class.Name;
+                end
             end
 
-            if isscalar(input) && (isempty(input) || ismember(input, ["", "[]"]))
+            if aod.util.isempty(input)
+                classes = "";
                 return
             end
+
+            input = convertCharsToStrings(input);
 
             if isscalar(input) && contains(input, ',')
                 input = strsplit(input, ',');
@@ -59,6 +78,13 @@ classdef MatlabClass < aod.specification.Validator
                         'Class %s not recognized', input(i));
                 end
             end
+        end
+    end
+
+    % MATLAB built-in methods
+    methods 
+        function tf = isempty(obj)
+            tf = (obj.Value == "");
         end
     end
 end

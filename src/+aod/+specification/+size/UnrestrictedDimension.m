@@ -14,6 +14,11 @@ classdef UnrestrictedDimension < aod.specification.Specification
     methods
         function obj = UnrestrictedDimension()
         end
+    end
+
+    methods
+        function setValue(~, ~)
+        end
 
         function tf = validate(~, ~)
             tf = true;
@@ -21,6 +26,13 @@ classdef UnrestrictedDimension < aod.specification.Specification
 
         function output = text(obj)
             output = ":";
+        end
+    end
+
+    % MATLAB builtin methods
+    methods
+        function tf = isequal(obj, other)
+            tf = isa(other, class(obj));
         end
     end
 end

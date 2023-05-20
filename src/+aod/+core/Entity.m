@@ -113,7 +113,7 @@ classdef (Abstract) Entity < handle
             addOptional(ip, 'Name', [], @(x) istext(x) | isempty(x));
             addParameter(ip, 'Parent', []);
             parse(ip, varargin{:});
-
+            
             if ~isempty(ip.Results.Name)
                 obj.setName(ip.Results.Name);
             end
