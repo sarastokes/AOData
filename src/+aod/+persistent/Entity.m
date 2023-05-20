@@ -264,6 +264,29 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
         end
 
+        function setProp(obj, propName, propValue)
+        
+            arguments
+                obj
+                propName        char 
+                propValue       = []
+            end
+
+            obj.verifyReadOnlyMode();
+
+            % Check in expectedDatasets
+            p = findprop(obj, propName);
+            if ~isempty(p)
+                %! check in expectedDatasets
+                return
+            end
+            if ~strcmp(p.SetAccess, 'public')
+                error('setProp:SetAccessDenied',...
+                    'Property %s does not have public SetAccess', propName);
+            end
+        end
+
+
         function removeDataset(obj, propName)
             % Remove a dataset/link from the entity
             %
@@ -304,7 +327,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Special property methods
     methods
-
         function setGroupName(obj, name)
             % Change the entity's group name and HDF5 path
             %

@@ -16,6 +16,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+%#ok<*MANU,*NASGU> 
+
     properties
         TEST_OBJ
     end
@@ -28,10 +30,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Size")
         function Size(testCase)
-            emptyObj = aod.specification.Size();
-            testCase.verifyClass(emptyObj.Value,...
-                "aod.specification.size.UnrestrictedSize");
-
             propObj = aod.specification.Size(...
                 findprop(testCase.TEST_OBJ, 'PropA'));
             testCase.verifyEqual( ...
@@ -40,9 +38,42 @@ classdef SpecificationTest < matlab.unittest.TestCase
                  aod.specification.size.FixedDimension(2).Length]);
         end
 
+        function EmptySize(testCase) 
+            emptyObj = aod.specification.Size();
+            testCase.verifyEmpty(emptyObj);
+            testCase.verifyEqual(emptyObj.text(), "[]");
+            testCase.verifyTrue(emptyObj.validate(123));
+        end
+
+        function SizeEquality(testCase)
+            obj1 = aod.specification.Size();
+            obj2 = aod.specification.Size("(1,:)");
+            obj3 = aod.specification.Size([1, 2]);
+            obj4 = aod.specification.Size([2, 1]);
+            obj5 = aod.specification.Size([2, 2, 2]);
+
+            testCase.verifyNotEqual(obj1, 123);
+            testCase.verifyNotEqual(obj1, obj2);
+            testCase.verifyNotEqual(obj2, obj3);
+            testCase.verifyNotEqual(obj3, obj4);
+            testCase.verifyNotEqual(obj4, obj5);
+        end
+
+        function SizeErrors(testCase)
+            testCase.verifyError(...
+                @() aod.specification.Size(1),...
+                "Size:InvalidDimensions");
+            
+            testCase.verifyError(...
+                @() aod.specification.Size("(1)"),...
+                "Size:InvalidDimensions");
+        end
+
         function FixedDimensions(testCase)
             ref1 = [aod.specification.size.FixedDimension(1),...
                    aod.specification.size.FixedDimension(2)];
+            testCase.verifyNotEqual(ref1(1), ref1(2));
+            testCase.verifyEqual(ref1(1), ref1(1));
             
             rowSize1a = aod.specification.Size([1,2]);
             testCase.verifyEqual(rowSize1a.text(), "(1,2)");
@@ -84,17 +115,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyTrue(rowSize3a.validate(eye(3)));
             testCase.verifyFalse(rowSize3a.validate(ones(3,3,3)));
         end
-
-        function UnrestrictedSize(testCase)
-            ref4 = aod.specification.size.UnrestrictedSize();
-            rowSize4a = aod.specification.Size([]);
-            testCase.verifyEqual(rowSize4a.Value, ref4);
-            testCase.verifyTrue(rowSize4a.validate(ones([3 3 3])));
-            testCase.verifyTrue(rowSize4a.Value.validate(ones([3 3 3])));
-            testCase.verifyTrue(rowSize4a.validate(1));
-            testCase.verifyEqual(rowSize4a.text(), "[]");
-            testCase.verifyEqual(rowSize4a.Value.text(), "[]");
-        end
     end
 
     methods (Test, TestTags="MatlabClass")
@@ -107,31 +127,67 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj2.Value, "double");
             testCase.verifyTrue(obj2.validate(123));
             testCase.verifyFalse(obj2.validate('test'));
+
+            testCase.verifyNotEqual(obj1, obj2);
+        end
+
+        function MultipleMatlabClass(testCase)
+            obj = aod.specification.MatlabClass(["char", "string"]);
+            testCase.verifyTrue(obj.validate('test'));
+            testCase.verifyTrue(obj.validate("test"));
+            testCase.verifyFalse(obj.validate(123));
+            testCase.verifyEqual(obj.text(), "char, string");
+
+            obj2 = aod.specification.MatlabClass("string, char");
+            testCase.verifyEqual(obj, obj2);
+
+            obj3 = aod.specification.MatlabClass("string, double");
+            testCase.verifyNotEqual(obj, obj3);
         end
 
         function EmptyMatlabClass(testCase)
             obj = aod.specification.MatlabClass();
             testCase.verifyEmpty(obj);
             testCase.verifyTrue(obj.validate(123));
+            testCase.verifyEqual(obj.text(), "");
 
             obj.setValue("string");
             testCase.verifyEqual(obj.Value, "string");
             testCase.verifyEqual(obj.text, "string");
+            testCase.verifyTrue(obj.validate("hello"));
+            testCase.verifyFalse(obj.validate('hello'));
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj);
+        end
+
+        function MatlabClassEquality(testCase)
+            obj1 = aod.specification.MatlabClass([]);
+            obj2 = aod.specification.MatlabClass("double");
+            obj3 = aod.specification.MatlabClass("double, char");
+            testCase.verifyNotEqual(obj1, 123);
+            testCase.verifyNotEqual(obj2, obj1);
+            testCase.verifyNotEqual(obj3, obj2);
+        end
+
+        function MatlabClassError(testCase)
+            testCase.verifyError(...
+                @() aod.specification.MatlabClass("badclass"),...
+                "MatlabClass:InvalidClass");
+
+            testCase.verifyError(...
+                @() aod.specification.MatlabClass(123),...
+                "MatlabClass:InvalidInput");
         end
     end
 
     methods (Test, TestTags="DefaultValue")
         function DefaultValue(testCase)
-            classSpec = aod.specification.MatlabClass("double");
-            obj = aod.specification.DefaultValue(2, classSpec);
+
+            obj = aod.specification.DefaultValue(2);
             testCase.verifyEqual('2', obj.text());
             testCase.verifyTrue(obj.validate(true));
             testCase.verifyFalse(isempty(obj));
-
-            % Create a default value that does not match the class
-            testCase.verifyError(...
-                @() aod.specification.DefaultValue("bad", classSpec),...
-                "checkClass:DefaultValueDoesNotMatchClass");
 
             % Change value
             obj.setValue(3);
@@ -145,6 +201,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Value, "test description");
             obj.setValue("test");
             testCase.verifyEqual(obj.Value, "test");
+            testCase.verifyEqual(obj.text(), "test");
 
 
             expt = aod.core.Experiment("test", cd, getDateYMD());
@@ -192,9 +249,50 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
+    methods (Test, TestTags="DataObject")
+        function DataObjectFromMetaclass(testCase)
+            % All but size
+            obj1 = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropC'));
+            testCase.verifyTrue(obj1.validate(123));
+            testCase.verifyFalse(obj1.validate("bad"));
+            testCase.verifyEmpty(obj1.Size);
+            testCase.verifyEqual(obj1.Default.Value, 1);
+            testCase.verifyEqual(obj1.Class.Value, "double");
+
+            objD = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropD'));
+            testCase.verifyEqual(obj1.Description.Value, "This is PropD");
+
+            % All fields
+            obj2 = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropB'));
+            testCase.verifyTrue(obj2.validate([1 2 3]'));
+            testCase.verifyFalse(obj2.validate([1 2 3]));
+
+            % No description
+            objA = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropA'));
+            testCase.verifyEmpty(objA.Description);
+        end
+
+        function DataObjectFromInput(testCase)
+            obj = aod.specification.DataObject('test',...
+                "Size", "(1,2)",...
+                "Class", "double",...
+                "Function", {@mustBeNumeric},...
+                "Default", [2 2],...
+                "Description", "This is a test");
+        end
+
+        function EmptyDataObject(testCase)
+            obj = aod.specification.DataObject("mytest");
+            testCase.verifyEmpty(obj.Default);
+            testCase.verifyEmpty(obj.Functions);
+            testCase.verifyEmpty(obj.Class);
+            testCase.verifyEmpty(obj.Size);
+        end
+    end
+
     methods (Test, TestTags="Specification")
         function Specification(testCase)
-            sizeSpec = aod.specification.Size("(1,:)");
+            sizeSpec = aod.specification.Size("(1,:)"); 
             classSpec = aod.specification.MatlabClass("double");
             descSpec = aod.specification.Description("This is a description");
             defaultSpec = aod.specification.DefaultValue(1);

@@ -43,4 +43,11 @@ classdef Description < aod.specification.Descriptor
             output = obj.Value;
         end
     end
+
+    % MATLAB built-in methods
+    methods
+        function tf = isempty(obj)
+            tf = aod.util.isempty(obj.Value);
+        end
+    end
 end 

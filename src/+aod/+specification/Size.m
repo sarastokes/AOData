@@ -11,14 +11,12 @@ classdef Size < aod.specification.Validator
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value
+        Value               
     end
 
     methods
         function obj = Size(input)
-            if nargin < 1 || isempty(input) || strcmp(input, '[]')
-                obj.Value = aod.specification.size.UnrestrictedSize;
-            else
+            if nargin > 0
                 obj.setValue(input);
             end
         end
@@ -28,7 +26,7 @@ classdef Size < aod.specification.Validator
     methods
         function setValue(obj, input)
             if isempty(input) || strcmp(input, '[]')
-                obj.Value = aod.specification.size.UnrestrictedSize;
+                obj.Value = [];
                 return 
             end
 
@@ -46,7 +44,7 @@ classdef Size < aod.specification.Validator
             % -----------------------------------------------------------
 
             % Check whether size is specified
-            if isempty(obj) || isa(obj.Value, 'aod.specification.size.UnrestrictedSize')
+            if isempty(obj)
                 tf = true;
                 return
             end
@@ -68,7 +66,7 @@ classdef Size < aod.specification.Validator
 
         function out = text(obj)
             % Converts to a text representation
-            if isempty(obj.Value) || isa(obj.Value, 'aod.specification.size.UnrestrictedSize')
+            if isempty(obj.Value) 
                 out = "[]";
                 return
             end
@@ -93,7 +91,7 @@ classdef Size < aod.specification.Validator
 
             [startIdx, endIdx] = regexp(input, "[\d:]{1,10}");
             if numel(startIdx) == 1
-                error('init:InvalidDimensions',...
+                error('Size:InvalidDimensions',...
                     'Dimensionality specification cannot be scalar');
             end
 
@@ -110,7 +108,7 @@ classdef Size < aod.specification.Validator
 
         function value = parseNumeric(input)
             if numel(input) == 1
-                error('init:InvalidDimensions', ...
+                error('Size:InvalidDimensions', ...
                 'Dimensionality specification cannot be scalar');
             end
             
@@ -122,7 +120,7 @@ classdef Size < aod.specification.Validator
 
         function value = parseMetaProperty(input)
             if isempty(input.Validation.Size)
-                value = aod.specification.size.None;
+                value = [];
             else 
                 mcSize = input.Validation.Size;
                 value = [];
@@ -145,9 +143,8 @@ classdef Size < aod.specification.Validator
         end
 
         function tf = isequal(obj, other)
-            if isa(obj, 'aod.specification.size.UnrestrictedSize') & ...
-                isa(other, 'aod.specification.size.UnrestrictedSize')
-                tf = true;
+            if ~isa(other, 'aod.specification.Size')
+                tf = false;
                 return 
             end
 

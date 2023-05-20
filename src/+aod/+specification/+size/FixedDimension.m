@@ -1,4 +1,4 @@
-classdef FixedDimension < aod.specification.Specification
+classdef FixedDimension < aod.specification.Validator
 % A fixed dimension (must equal a specific number)
 %
 % Description:

@@ -51,17 +51,20 @@ classdef MatlabClass < aod.specification.Validator
     methods (Static, Access = private)
         function classes = parse(input)
 
-            if isa(input, 'meta.property')
-                if ~isempty(input.Validation.Class)
-                    input = input.Validation.Class.Name;
-                end
-            end
-
             if aod.util.isempty(input)
                 classes = "";
                 return
             end
 
+
+            if isa(input, 'meta.property')
+                if ~isempty(input.Validation.Class)
+                    input = input.Validation.Class.Name;
+                end
+            elseif ~istext(input)
+                error('MatlabClass:InvalidInput',...
+                    'Inputs must be char, string or meta.property');
+            end
             input = convertCharsToStrings(input);
 
             if isscalar(input) && contains(input, ',')
@@ -74,7 +77,7 @@ classdef MatlabClass < aod.specification.Validator
                 if exist(input(i), 'builtin') || exist(input(i), 'class')
                     classes(i) = input(i);
                 else
-                    error('MatlabClass:UnidentifiedClass',...
+                    error('MatlabClass:InvalidClass',...
                         'Class %s not recognized', input(i));
                 end
             end
@@ -85,6 +88,26 @@ classdef MatlabClass < aod.specification.Validator
     methods 
         function tf = isempty(obj)
             tf = (obj.Value == "");
+        end
+
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.specification.MatlabClass')
+                tf = false;
+                return 
+            end
+            
+            if numel(obj.Value) ~= numel(other.Value)
+                tf = false; 
+                return 
+            end
+
+            for i = 1:numel(obj.Value)
+                if ~ismember(obj.Value(i), other.Value)
+                    tf = false;
+                    return 
+                end
+            end
+            tf = true;
         end
     end
 end

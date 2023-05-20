@@ -8,20 +8,22 @@ classdef DefaultValue < aod.specification.Validator
     end
 
     methods
-        function obj = DefaultValue(value, classSpec)
+        function obj = DefaultValue(input)
             if nargin > 0
-                obj.Value = value;
-            end
-
-            if nargin > 1
-                obj.checkClass(classSpec);
+                obj.setValue(input);
             end
         end
     end
 
     methods 
         function setValue(obj, input)
-            obj.Value = input;
+            if isa(input, 'meta.property')
+                if input.HasDefault
+                    obj.Value = input.DefaultValue;
+                end
+            else
+                obj.Value = input;
+            end
         end
 
         function tf = validate(~, ~)
@@ -30,20 +32,6 @@ classdef DefaultValue < aod.specification.Validator
 
         function out = text(obj)
             out = value2string(obj.Value);
-        end
-
-        function checkClass(obj, matlabClass)
-            arguments
-                obj
-                matlabClass     aod.specification.MatlabClass 
-            end
-
-            tf = matlabClass.validate(obj.Value);
-            if ~tf
-                error('checkClass:DefaultValueDoesNotMatchClass',...
-                    'Default value has class %s, not %s',...
-                    class(obj.Value), matlabClass.Value);
-            end
         end
     end
 

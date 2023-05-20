@@ -1,4 +1,4 @@
-classdef UnrestrictedDimension < aod.specification.Specification
+classdef UnrestrictedDimension < aod.specification.Validator
 % An unrestricted dimension, equivalent of ":"
 %
 % Parent:
