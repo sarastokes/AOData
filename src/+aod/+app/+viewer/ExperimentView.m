@@ -146,7 +146,7 @@ classdef ExperimentView < aod.app.UIView
             end
 
             % Gray out system attributes and sort to be last in table
-            systemAttributes = aod.h5.getSystemAttributes();
+            systemAttributes = aod.infra.getSystemAttributes();
             rowIdx = find(cellfun(@(x) ismember(x, systemAttributes), data{:, 1}));
             [rowIdx, idx] = sort(rowIdx);
             obj.Attributes.Data = data(idx,:);

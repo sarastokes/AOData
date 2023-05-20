@@ -12,7 +12,7 @@ classdef Experiment < aod.core.Entity
 %   obj = Experiment(name, experimentFolderPath, experimentDate,...
 %       'Administrator', 'AdministratorName', 'Laboratory', 'LabName')
 %
-% Parameters:
+% Attributes:
 %   Adminstrator                Person(s) who conducted the experiment
 %   Laboratory                  Which lab the experiment occurred in
 %
@@ -368,11 +368,11 @@ classdef Experiment < aod.core.Entity
             %   out = obj.get('Calibration', 'Subclass',... 
             %       'aod.builtin.calibrations.PowerMeasurement')
             %
-            % Search for Epochs that have Parameter "Defocus"
-            %   out = obj.get('Epoch', 'Parameter', 'Defocus')
+            % Search for Epochs that have Attribute "Defocus"
+            %   out = obj.get('Epoch', 'Attribute', 'Defocus')
             %
-            % Search for Epochs with Parameter "Defocus" = 0.3
-            %   out = obj.get('Epoch', 'Parameter', 'Defocus', 0.3)
+            % Search for Epochs with Attribute "Defocus" = 0.3
+            %   out = obj.get('Epoch', 'Attribute', 'Defocus', 0.3)
             % -------------------------------------------------------------
 
             import aod.core.EntityTypes
@@ -656,8 +656,8 @@ classdef Experiment < aod.core.Entity
 
     % Overloaded methods
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Entity(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Entity(obj);
 
             value.add('Administrator', string.empty(), @isstring,... 
                 'Person(s) performed the experiment');

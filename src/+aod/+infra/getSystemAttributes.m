@@ -7,7 +7,7 @@ function out = getSystemAttributes()
 %   h5-tools-matlab and those that are properties of aod.core.Entity
 %
 % Syntax:
-%   out = aod.h5.getSystemAttributes()
+%   out = aod.infra.getSystemAttributes()
 %   
 % See also:
 %   aod.h5.getPersistedProperties

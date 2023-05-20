@@ -1,8 +1,8 @@
-function success = writeExpectedParameters(hdfName, pathName, dsetName, PM)
-% Write aod.util.ParameterManager as an HDF5 dataset
+function success = writeExpectedAttributes(hdfName, pathName, dsetName, PM)
+% Write aod.util.AttributeManager as an HDF5 dataset
 %
 % Syntax:
-%   success = aod.h5.writeExpectedParameters(hdfName, pathName, dsetName, PM)
+%   success = aod.h5.writeExpectedAttributes(hdfName, pathName, dsetName, PM)
 %
 % Inputs:
 %   hdfName         char or H5ML.id
@@ -11,15 +11,15 @@ function success = writeExpectedParameters(hdfName, pathName, dsetName, PM)
 %       HDF5 path to group where dataset will be written
 %   dsetName        char
 %       Name of the dataset
-%   PM              aod.util.ParameterManager
-%       Parameter manager to be written
+%   PM              aod.util.AttributeManager
+%       Attribute manager to be written
 %
 % Outputs:
 %   success         logical
-%       Whether the ParameterManager was written or not
+%       Whether the AttributeManager was written or not
 %
 % See also:
-%   aod.util.ParameterManager, aod.h5.readExpectedParameters
+%   aod.util.AttributeManager, aod.h5.readExpectedAttributes
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -28,12 +28,12 @@ function success = writeExpectedParameters(hdfName, pathName, dsetName, PM)
         hdfName
         pathName
         dsetName
-        PM          {mustBeA(PM, 'aod.util.ParameterManager')}
+        PM          {mustBeA(PM, 'aod.util.AttributeManager')}
     end
 
     if isempty(PM)
-        warning('writeExpectedParameters:Empty',...
-            'Empty ParameterManager not written to %s', fullpath);
+        warning('writeExpectedAttributes:Empty',...
+            'Empty AttributeManager not written to %s', fullpath);
         success = false;
         return
     end

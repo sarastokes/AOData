@@ -21,7 +21,7 @@ classdef AttributeSpecification < aod.util.templates.Specification
         function obj = AttributeSpecification(name)
             obj.Name = name;
 
-            % Key/value parameters are always optional by default
+            % Key/value attributes are always optional by default
             obj.isOptional = true;
         end
     end

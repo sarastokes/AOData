@@ -25,10 +25,10 @@ function success = write(hdfName, pathName, dsetName, data, description)
 %   numeric, char, string, logical, table, timetable, datetime, duration
 %   enum, struct, containers.Map(), affine2d, imref2d, simtform2d, cfit
 %   See h5tools-matlab documentation for limitations.
-% AOData also adds support for aod.util.Parameters and aod.util.FileReader
+% AOData also adds support for aod.util.Attributes and aod.util.FileReader
 %
 % See also:
-%   h5tools.write, aod.h5.read, aod.h5.writeExpectedParameters
+%   h5tools.write, aod.h5.read, aod.h5.writeExpectedAttributes
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -44,12 +44,12 @@ function success = write(hdfName, pathName, dsetName, data, description)
     
         fullPath = h5tools.util.buildPath(pathName, dsetName);
     
-        if isa(data, 'aod.util.Parameters')
-            h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.util.Parameters");
+        if isa(data, 'aod.util.Attributes')
+            h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.util.Attributes");
             h5tools.writeatt(hdfName, fullPath, data);
             success = true;
-        elseif isa(data, 'aod.util.ParameterManager')
-            success = aod.h5.writeExpectedParameters(hdfName, pathName, dsetName, data);
+        elseif isa(data, 'aod.util.AttributeManager')
+            success = aod.h5.writeExpectedAttributes(hdfName, pathName, dsetName, data);
             h5tools.writeatt(hdfName, fullPath, 'Description',...
                 "Specification of expected metadata for the entity")
         elseif isa(data, 'aod.util.DatasetManager')

@@ -13,7 +13,7 @@ classdef Subject < aod.core.Source
 %       'Species', "value", 'Sex', "value",... 
 %       'Age', value, 'Demographics', "value")
 %
-% Parameters:
+% Attributes:
 %   Species             string
 %       Species of the subject
 %   Sex                 "male", "female", "unknown"
@@ -33,8 +33,8 @@ classdef Subject < aod.core.Source
     end
     
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Entity(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Entity(obj);
 
             value.add('Species', string.empty(), @isstring,...
                 'Species of the subject');

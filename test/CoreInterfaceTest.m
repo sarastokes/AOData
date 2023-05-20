@@ -3,7 +3,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 %
 % Description:
 %   Tests adding, searching and removing entities to an Experiment and 
-%   functionality inherited from aod.core.Entity (e.g. parameters, files)
+%   functionality inherited from aod.core.Entity (e.g. attributes, files)
 %
 % Parent:
 %   matlab.unittest.TestCase
@@ -89,18 +89,18 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyTrue(isequal(testCase.EXPT, testCase.EXPT));
         end
 
-        function ParameterAccess(testCase)
+        function AttributeAccess(testCase)
             import aod.util.ErrorTypes
             testCase.verifyError(...
-                @()testCase.EXPT.getParam('BadParam', ErrorTypes.ERROR),...
-                'getParam:NotFound');
+                @()testCase.EXPT.getAttr('BadParam', ErrorTypes.ERROR),...
+                'getAttr:NotFound');
             testCase.verifyWarning(...
-                @()testCase.EXPT.getParam('BadParam', ErrorTypes.WARNING),...
-                'getParam:NotFound');
+                @()testCase.EXPT.getAttr('BadParam', ErrorTypes.WARNING),...
+                'getAttr:NotFound');
             testCase.verifyTrue(...
-                ismissing(testCase.EXPT.getParam('BadParam', ErrorTypes.MISSING)));
+                ismissing(testCase.EXPT.getAttr('BadParam', ErrorTypes.MISSING)));
             testCase.verifyEmpty(...
-                testCase.EXPT.getParam('BadParam', ErrorTypes.NONE));
+                testCase.EXPT.getAttr('BadParam', ErrorTypes.NONE));
         end
 
         function FileAccess(testCase)
@@ -231,19 +231,19 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             out = testCase.EXPT.get('Annotation', {'Name', 'Annotation1'});
             testCase.verifyNumElements(out, 1);
 
-            % Query from Experiment by parameter presence
-            annotation2.setParam('MyParam', 1);
+            % Query from Experiment by attribute presence
+            annotation2.setAttr('MyParam', 1);
             testCase.verifyTrue(...
-                testCase.EXPT.has('Annotation', {'Param', 'MyParam'}));
-            out = testCase.EXPT.get('Annotation', {'Param', 'MyParam'});
+                testCase.EXPT.has('Annotation', {'Attr', 'MyParam'}));
+            out = testCase.EXPT.get('Annotation', {'Attr', 'MyParam'});
             testCase.verifyNumElements(out, 1);
             testCase.verifyTrue(strcmpi(out.Name, 'Annotation2'));
 
-            % Query from Experiment by parameter value
-            out = testCase.EXPT.get('Annotation', {'Param', 'MyParam', 1});
+            % Query from Experiment by attribute value
+            out = testCase.EXPT.get('Annotation', {'Attr', 'MyParam', 1});
             testCase.verifyNumElements(out, 1);
             testCase.verifyEmpty(...
-                testCase.EXPT.get('Annotation', {'Param', 'MyParam', 2}));
+                testCase.EXPT.get('Annotation', {'Attr', 'MyParam', 2}));
 
             % Test query removal from Experiment
             testCase.EXPT.remove('Annotation', 1);
@@ -328,7 +328,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Query devices from Channel
             testCase.verifyNumElements(channel1.get('Device',... 
-                {'Param', 'Diameter', 5}), 1);
+                {'Attr', 'Diameter', 5}), 1);
 
             % Work with device array
             allDevices = testCase.EXPT.get('Device');

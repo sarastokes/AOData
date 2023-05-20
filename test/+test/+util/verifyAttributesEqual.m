@@ -1,13 +1,13 @@
-function verifyParametersEqual(testCase, actual, expected)
-% Check whether aod.util.Parameters are equal
+function verifyAttributesEqual(testCase, actual, expected)
+% Check whether aod.util.Attributes are equal
 %
 % Syntax:
-%   test.util.verifyParametersEqual(testCase, actual, expected)
+%   test.util.verifyAttributesEqual(testCase, actual, expected)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    testCase.verifyClass(actual, 'aod.util.Parameters');
+    testCase.verifyClass(actual, 'aod.util.Attributes');
 
     testCase.verifyEqual(expected.Count, actual.Count)
 

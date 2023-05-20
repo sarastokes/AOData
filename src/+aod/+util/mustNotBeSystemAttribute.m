@@ -15,7 +15,7 @@ function mustNotBeSystemAttribute(name)
         name            string
     end
 
-    if ismember(name, aod.h5.getSystemAttributes())
+    if ismember(name, aod.infra.getSystemAttributes())
         eidType = "mustNotBeSystemAttribute:InvalidInput";
         msgType = sprintf('%s is reserved by AOData and cannot be directly modified', name);
         throwAsCaller(MException(eidType, msgType));

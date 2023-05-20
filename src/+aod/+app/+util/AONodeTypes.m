@@ -41,7 +41,7 @@ classdef AONodeTypes
         LOGICAL
 
         % Specific AOData types
-        PARAMETERMANAGER
+        ATTRIBUTEMANAGER
         DATASETMANAGER
         HOMEDIRECTORY
         QUERYMANAGER
@@ -88,7 +88,7 @@ classdef AONodeTypes
                     out = char(data);
                 case AONodeTypes.TRANSFORM
                     out = data.T;
-                case AONodeTypes.PARAMETERMANAGER
+                case AONodeTypes.ATTRIBUTEMANAGER
                     out = data.table();
                 case AONodeTypes.NUMERIC
                     if ~ismatrix(data)
@@ -130,7 +130,7 @@ classdef AONodeTypes
                 AONodeTypes.NUMERIC,...
                 AONodeTypes.NOTES,...       % non-scalar string
                 AONodeTypes.TRANSFORM,...
-                AONodeTypes.PARAMETERMANAGER,...
+                AONodeTypes.ATTRIBUTEMANAGER,...
                 AONodeTypes.CODE];
             
             tf = ismember(obj, tableNodes);
@@ -185,7 +185,7 @@ classdef AONodeTypes
                     out = 'code.png';
                 case AONodeTypes.HOMEDIRECTORY 
                     out = 'home-page.png';
-                case AONodeTypes.PARAMETERMANAGER
+                case AONodeTypes.ATTRIBUTEMANAGER
                     out = 'settings.png';
                 case AONodeTypes.DATASETMANAGER 
                     out = 'settings.png';
@@ -228,8 +228,8 @@ classdef AONodeTypes
                         obj = AONodeTypes.HOMEDIRECTORY;
                     case 'filereader'
                         obj = AONodeTypes.FILEREADER;
-                    case 'expectedparameters'
-                        obj = AONodeTypes.PARAMETERMANAGER;
+                    case 'expectedattributes'
+                        obj = AONodeTypes.ATTRIBUTEMANAGER;
                     case 'expecteddatasets'
                         obj = AONodeTypes.DATASETMANAGER;
                 end
@@ -291,7 +291,7 @@ classdef AONodeTypes
                     obj = AONodeTypes.STRUCTURE;
                 case 'logical'
                     obj = AONodeTypes.LOGICAL;
-                case {'aod.util.parameters', 'files'}
+                case {'aod.util.Attributes', 'files'}
                     obj = AONodeTypes.FILES;
                 case 'aod.util.filereader'
                     obj = AONodeTypes.FILEREADER;
@@ -303,8 +303,8 @@ classdef AONodeTypes
                     obj = AONodeTypes.DESCRIPTION;
                 case 'homedirectory'
                     obj = AONodeTypes.HOMEDIRECTORY;
-                case {'parametermanager', 'aod.util.parametermanager'}
-                    obj = AONodeTypes.PARAMETERMANAGER;
+                case {'attributemanager', 'aod.util.attributemanager'}
+                    obj = AONodeTypes.ATTRIBUTEMANAGER;
                 case {'datasetmanager', 'aod.util.datasetmanager'}
                     obj = AONodeTypes.DATASETMANAGER;
                 case {'querymanager', 'aod.api.querymanager'}

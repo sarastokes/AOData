@@ -20,16 +20,16 @@ classdef CustomDisplayTest < matlab.unittest.TestCase
 %#ok<*MANU> 
 
     methods (Test)
-        function Parameters(testCase)
-            paramObj = aod.util.Parameters();
+        function Attributes(testCase)
+            paramObj = aod.util.Attributes();
             disp(paramObj);
             paramObj('Param1') = 1;
             paramObj('Param2') = 2;
             disp(paramObj);
         end
 
-        function ParameterManager(testCase)
-            PM = aod.util.ParameterManager();
+        function AttributeManager(testCase)
+            PM = aod.util.AttributeManager();
             disp(PM);
 
             PM.add('Wavelength', [], [], 'Description');

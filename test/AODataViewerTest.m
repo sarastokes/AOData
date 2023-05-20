@@ -71,11 +71,11 @@ classdef AODataViewerTest < matlab.uitest.TestCase
                 string(testCase.VIEW.Attributes.Data{1,2}), "Container");
         end
 
-        function Experiment_ExpectedParameters(testCase)
+        function Experiment_ExpectedAttributes(testCase)
             testCase.VIEW.Tree.SelectedNodes = [];
 
             h = findobj(testCase.VIEW.Tree.Children.Children,...
-                'Tag', '/Experiment/expectedParameters');
+                'Tag', '/Experiment/expectedAttributes');
 
             testCase.choose(h(1));
 

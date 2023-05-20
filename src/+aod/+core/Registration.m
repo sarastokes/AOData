@@ -14,7 +14,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 %   registrationDate        datetime
 %       Date registration was performed
 %
-% Parameters:
+% Attributes:
 %   Administrator           string
 %       Person(s) who performed the registration
 %   Software                string
@@ -66,8 +66,8 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Entity(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Entity(obj);
 
             value.add('Administrator', string.empty(), @istext,... 
                 "Person(s) who performed the registration");

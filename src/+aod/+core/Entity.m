@@ -13,14 +13,14 @@ classdef (Abstract) Entity < handle
 %   Parent                      aod.core.Entity
 %   Name                        char
 %   UUID                        string
-%   parameters                  aod.util.Parameters
-%   files                       aod.util.Parameters
+%   attributes                  aod.util.Attributes
+%   files                       aod.util.Attributes
 %   description                 string
 %   notes                       string
 %
 % Dependent properties:
 %   label                       string      (defined by getLabel)
-%   expectedParameters          aod.util.ParameterManager
+%   expectedAttributes          aod.util.AttributeManager
 %
 % Public methods:
 %   h = ancestor(obj, className)
@@ -30,10 +30,10 @@ classdef (Abstract) Entity < handle
 %   setNote(obj, txt)
 %   removeNote(obj, ID)
 %
-%   tf = hasParam(obj, paramName)
-%   setParam(obj, varargin)
-%   value = getParam(obj, paramName, msgLevel)
-%   removeParam(obj, paramName)
+%   tf = hasAttr(obj, paramName)
+%   setAttr(obj, varargin)
+%   value = getAttr(obj, paramName, msgLevel)
+%   removeAttr(obj, paramName)
 %   
 %   tf = hasFile(obj, fileName)
 %   setFile(obj, fileName, filePath)
@@ -45,8 +45,8 @@ classdef (Abstract) Entity < handle
 %
 % Protected methods:
 %   value = getLabel(obj)
-%   value = specifyParameters(obj)
-%   parseParameters(obj, varargin)
+%   value = specifyAttributes(obj)
+%   parseAttributes(obj, varargin)
 %   sync(obj)
 %   validateName(obj)
 %
@@ -83,16 +83,16 @@ classdef (Abstract) Entity < handle
 
     properties (SetObservable, SetAccess = protected)
         % Files associated with the entity
-        files                       % aod.util.Parameters
+        files                       % aod.util.Attributes
         % Metadata for the entity which maps to HDF5 attributes
-        parameters                  % aod.util.Parameters
+        attributes                  % aod.util.Attributes
     end
     
     properties (Dependent)
         % Automated name from getLabel(), used for HDF5 group name if the name property is not set
         label                       char
-        % Expected parameter names, optional default values and validation
-        expectedParameters          % aod.util.ParameterManager
+        % Expected attribute names, optional default values and validation
+        expectedAttributes          % aod.util.AttributeManager
         % Expected dataset names
         expectedDatasets            % aod.util.DatasetManager
     end
@@ -133,11 +133,11 @@ classdef (Abstract) Entity < handle
             end
             
             % Initialize containers
-            obj.files = aod.util.Parameters();
-            obj.parameters = aod.util.Parameters();
+            obj.files = aod.util.Attributes();
+            obj.attributes = aod.util.Attributes();
             
             % Parse unmatched inputs
-            obj.parseParameters(ip.Unmatched);
+            obj.parseAttributes(ip.Unmatched);
 
             % Set listeners for any SetObservable properties
             obj.assignListeners();
@@ -153,8 +153,8 @@ classdef (Abstract) Entity < handle
             value = obj.getLabel();
         end
 
-        function value = get.expectedParameters(obj)
-            value = obj.specifyParameters();
+        function value = get.expectedAttributes(obj)
+            value = obj.specifyAttributes();
         end
 
         function value = get.expectedDatasets(obj)
@@ -356,20 +356,20 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    % Parameter methods
+    % Attribute methods
     methods (Sealed)
-        function tf = hasParam(obj, paramName)
-            % Check whether entity has a parameter
+        function tf = hasAttr(obj, paramName)
+            % Check whether entity has a attribute
             %
             % Description:
-            %   Check whether entity parameters has a specific parameter
+            %   Check whether entity attributes has a specific attribute
             %
             % Syntax:
-            %   tf = hasParam(obj, paramName)
+            %   tf = hasAttr(obj, paramName)
             %
             % Examples:
-            %   % See whether entity has parameter 'MyParam'
-            %   tf = obj.hasParam('MyParam')
+            %   % See whether entity has attribute 'MyParam'
+            %   tf = obj.hasAttr('MyParam')
             % -------------------------------------------------------------
             arguments
                 obj
@@ -377,21 +377,21 @@ classdef (Abstract) Entity < handle
             end
 
             if ~isscalar(obj)
-                tf = arrayfun(@(x) x.hasParam(paramName), obj);
+                tf = arrayfun(@(x) x.hasAttr(paramName), obj);
                 return
             end
             
-            tf = obj.parameters.isKey(paramName);
+            tf = obj.attributes.isKey(paramName);
         end
 
-        function paramValue = getParam(obj, paramName, errorType)
-            % Get the value of a parameter
+        function paramValue = getAttr(obj, paramName, errorType)
+            % Get the value of a attribute
             %
             % Description:
-            %   Return the value of a specific parameter. 
+            %   Return the value of a specific attribute. 
             %
             % Syntax:
-            %   paramValue = getParam(obj, paramName, errorType)
+            %   paramValue = getAttr(obj, paramName, errorType)
             %
             % Inputs:
             %   paramName       char
@@ -400,7 +400,7 @@ classdef (Abstract) Entity < handle
             %
             % Examples:
             %   % Get the value of 'MyParam'
-            %   paramValue = obj.getParam('MyParam')           
+            %   paramValue = obj.getAttr('MyParam')           
             % -------------------------------------------------------------
 
             arguments
@@ -418,12 +418,12 @@ classdef (Abstract) Entity < handle
             
             if ~isscalar(obj)
                 paramValue = aod.util.arrayfun(...
-                    @(x) x.getParam(paramName, ErrorTypes.MISSING), obj);
+                    @(x) x.getAttr(paramName, ErrorTypes.MISSING), obj);
 
                 % Parse missing values
                 isMissing = getMissing(paramValue);
                 if all(isMissing)
-                    error('getParam:NotFound', 'Did not find parameter %s', paramName);
+                    error('getAttr:NotFound', 'Did not find attribute %s', paramName);
                 end
 
                 % Attempt to return a matrix rather than a cell
@@ -433,16 +433,16 @@ classdef (Abstract) Entity < handle
                 return
             end
 
-            if obj.hasParam(paramName)
-                paramValue = obj.parameters(paramName);
+            if obj.hasAttr(paramName)
+                paramValue = obj.attributes(paramName);
             else
                 switch errorType 
                     case ErrorTypes.ERROR 
-                        error('getParam:NotFound',... 
-                            'Did not find %s in parameters', paramName);
+                        error('getAttr:NotFound',... 
+                            'Did not find %s in attributes', paramName);
                     case ErrorTypes.WARNING 
-                        warning('getParam:NotFound',... 
-                            'Did not find %s in parameters', paramName);
+                        warning('getAttr:NotFound',... 
+                            'Did not find %s in attributes', paramName);
                         paramValue = [];
                     case ErrorTypes.MISSING
                         paramValue = missing;
@@ -452,64 +452,64 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function setParam(obj, varargin)
-            % Add or change parameter(s)
+        function setAttr(obj, varargin)
+            % Add or change attribute(s)
             %
             % Description:
-            %   Add parameter(s) to the parameter property
+            %   Add attribute(s) to the attribute property
             %
             % Syntax:
-            %   obj.setParam(paramName, value)
-            %   obj.setParam(paramName1, value1, paramName2, value2)
-            %   obj.setParam(struct)
+            %   obj.setAttr(paramName, value)
+            %   obj.setAttr(paramName1, value1, paramName2, value2)
+            %   obj.setAttr(struct)
             %
             % Examples:
             %   obj = aod.builtin.devices.BandpassFilter(607, 70);
-            %   % Single parameter
-            %   obj.setParam('Bandwidth', 20)
-            %   % Multiple parameters
-            %   obj.setParam('Bandwidth', 20, 'Wavelength', 510)
+            %   % Single attribute
+            %   obj.setAttr('Bandwidth', 20)
+            %   % Multiple attributes
+            %   obj.setAttr('Bandwidth', 20, 'Wavelength', 510)
             %   % From structure
             %   S = struct('Bandwidth', 20, 'Wavelength', 510)
-            %   obj.setParam(S);
+            %   obj.setAttr(S);
             % -------------------------------------------------------------
 
             if ~isscalar(obj)
-                arrayfun(@(x) setParam(x, varargin{:}), obj);
+                arrayfun(@(x) setAttr(x, varargin{:}), obj);
                 return
             end
 
-            % Run through expectedParameters parser
-            ip = obj.expectedParameters.getParser();
+            % Run through expectedAttributes parser
+            ip = obj.expectedAttributes.getParser();
             ip.parse(varargin{:});
 
-            % Set expected parameters, if needed
+            % Set expected attributes, if needed
             k1 = setdiff(ip.Parameters, ip.UsingDefaults);
             if ~isempty(k1)
                 for i = 1:numel(k1)
-                    obj.parameters(k1{i}) = ip.Results.(k1{i});
+                    obj.attributes(k1{i}) = ip.Results.(k1{i});
                 end
             end
-            % Set adhoc parameters, if needed
+            % Set adhoc attributes, if needed
             k2 = fieldnames(ip.Unmatched);
             if ~isempty(k2)
                 for i = 1:numel(ip.Unmatched)
-                    obj.parameters(k2{i}) = ip.Unmatched.(k2{i});
+                    obj.attributes(k2{i}) = ip.Unmatched.(k2{i});
                 end
             end
         end
 
-        function removeParam(obj, paramName)
-            % Remove a parameter by name
+        function removeAttr(obj, paramName)
+            % Remove a attribute by name
             %
             % Description:
-            %   Remove a parameter by name from parameters property
+            %   Remove a attribute by name from attributes property
             %
             % Syntax:
-            %   removeParam(obj, paramName)
+            %   removeAttr(obj, paramName)
             %
             % Examples:
-            %   obj.removeParam('Bandwidth')
+            %   obj.removeAttr('Bandwidth')
             % -------------------------------------------------------------
             arguments
                 obj
@@ -517,15 +517,15 @@ classdef (Abstract) Entity < handle
             end
 
             if ~isscalar(obj)
-                arrayfun(@(x) removeParam(x, paramName), obj);
+                arrayfun(@(x) removeAttr(x, paramName), obj);
             end
 
-            if obj.hasParam(paramName)
+            if obj.hasAttr(paramName)
                 % Set to empty if expected, remove if ad-hoc
-                if obj.expectedParameters.hasParam(paramName)
-                    obj.parameters(paramName) = [];
+                if obj.expectedAttributes.hasAttr(paramName)
+                    obj.attributes(paramName) = [];
                 else
-                    remove(obj.parameters, paramName);
+                    remove(obj.attributes, paramName);
                 end
             end
         end
@@ -620,7 +620,7 @@ classdef (Abstract) Entity < handle
             end
 
             if strcmpi(fileName, 'all')
-                obj.files = aod.util.Parameters();
+                obj.files = aod.util.Attributes();
             elseif obj.hasFile(fileName)
                 remove(obj.files, fileName);
             end
@@ -781,14 +781,14 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function value = specifyParameters(obj) %#ok<MANU> 
-            % Initializes ParameterManager, subclasses can extend
+        function value = specifyAttributes(obj) %#ok<MANU> 
+            % Initializes AttributeManager, subclasses can extend
             %
             % Syntax:
-            %   value = specifyParameters(obj)
+            %   value = specifyAttributes(obj)
             % -------------------------------------------------------------
 
-            value = aod.util.ParameterManager();
+            value = aod.util.AttributeManager();
         end
 
         function value = specifyDatasets(obj)
@@ -808,21 +808,21 @@ classdef (Abstract) Entity < handle
     end
 
     methods (Access = protected)
-        function parseParameters(obj, varargin)
-            % Parses varargin input to constructor with expectedParameters
+        function parseAttributes(obj, varargin)
+            % Parses varargin input to constructor with expectedAttributes
             % 
             % Syntax:
-            %   parseParameters(obj, varargin)
+            %   parseAttributes(obj, varargin)
             %
             % See also:
-            %   aod.core.Entity.specifyParameters,
-            %   aod.util.ParameterManager
+            %   aod.core.Entity.specifyAttributes,
+            %   aod.util.AttributeManager
             % -------------------------------------------------------------
-            ip = obj.expectedParameters.parse(varargin{:});
+            ip = obj.expectedAttributes.parse(varargin{:});
             f = fieldnames(ip.Results);
             for i = 1:numel(f)
                 if ~isempty(ip.Results.(f{i}))
-                    obj.setParam(f{i}, ip.Results.(f{i}));
+                    obj.setAttr(f{i}, ip.Results.(f{i}));
                 end
             end
         end
@@ -863,7 +863,7 @@ classdef (Abstract) Entity < handle
             idx = arrayfun(@(x) strcmp(x.GetAccess, 'public'), mc.PropertyList);
             propList = propList(idx);
             % Remove system properties
-            propList = setdiff(propList, aod.h5.getSystemProperties());
+            propList = setdiff(propList, aod.infra.getSystemProperties());
             % Remove containers
             if ~isempty(obj.entityType.childContainers())
                 propList = setdiff(propList, obj.entityType.childContainers());

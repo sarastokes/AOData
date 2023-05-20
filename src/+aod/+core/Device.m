@@ -10,7 +10,7 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 % Constructor:
 %   obj = Device(varargin)
 %
-% Parameters:
+% Attributes:
 %   Model                            string   
 %       Model of the device
 %   Manufacturer                     string  
@@ -26,8 +26,8 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Entity(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Entity(obj);
 
             value.add('Manufacturer', string.empty(), @isstring,... 
                 "The company that made the device");

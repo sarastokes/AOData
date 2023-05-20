@@ -30,7 +30,7 @@ function writeEntity(hdfName, obj)
     % Determine which properties will be persisted
     persistedProps = aod.h5.getPersistedProperties(obj);
     % Extract out independently set properties
-    specialProps = aod.h5.getSystemProperties();
+    specialProps = aod.infra.getSystemProperties();
     persistedProps = setdiff(persistedProps, specialProps);
     % Extract out container properties
     containers = entityType.childContainers();
@@ -113,14 +113,14 @@ function writeEntity(hdfName, obj)
        aod.h5.write(hdfName, hdfPath, 'notes', obj.notes);
     end
 
-    % Write parameters, if necessary
-    if ~isempty(obj.parameters)
-        h5tools.writeatt(hdfName, hdfPath, obj.parameters);
+    % Write attributes, if necessary
+    if ~isempty(obj.attributes)
+        h5tools.writeatt(hdfName, hdfPath, obj.attributes);
     end
     
     % Write file paths, if necessary
     if ~isempty(obj.files)
-        h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.util.Parameters");
+        h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.util.Attributes");
         h5tools.writeatt(hdfName, [hdfPath, '/files'], obj.files);
     end
 
@@ -129,10 +129,10 @@ function writeEntity(hdfName, obj)
         h5tools.write(hdfName, hdfPath, 'Code', obj.Code);
     end
 
-    % Write expected parameters and datasets
-    if ~isempty(obj.expectedParameters)
+    % Write expected attributes and datasets
+    if ~isempty(obj.expectedAttributes)
         aod.h5.write(hdfName, hdfPath,... 
-            'expectedParameters', obj.expectedParameters);
+            'expectedAttributes', obj.expectedAttributes);
     end
     if ~isempty(obj.expectedDatasets)
         aod.h5.write(hdfName, hdfPath,...

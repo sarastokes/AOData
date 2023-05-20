@@ -26,7 +26,7 @@ classdef CoreApiTest < matlab.unittest.TestCase
             % - 2 Calibrations (base & PowerMeasurement)
             % - 1 System 
             % - 2 Analyses
-            % - 6 Epochs w/ varying parameters & files
+            % - 6 Epochs w/ varying attributes & files
             % - 4 Registrations ('RegType1' on 1/2, 'RegType2' on 6/7)
             % - 3 EpochDatasets ('Dset1' on 1/2, 'Dset2' on 1)
 
@@ -51,14 +51,14 @@ classdef CoreApiTest < matlab.unittest.TestCase
             testCase.EXPT.add(aod.core.Analysis('Analysis1'));
             testCase.EXPT.add(aod.core.Analysis('Analysis2'));
 
-            % Add epochs with a few parameters and files
+            % Add epochs with a few attributes and files
             epochIDs = [1, 2, 6, 7, 8, 9];
             pmtGains = [0.491, 0.5, 0.51, 0.51, 0.515, 0.515];
             for i = 1:numel(epochIDs)
                 testCase.EXPT.add(aod.core.Epoch(i));
-                % Don't add a parameter and file to the last epoch
+                % Don't add a attribute and file to the last epoch
                 if i ~= numel(epochIDs)
-                    testCase.EXPT.Epochs(i).setParam('PmtGain', pmtGains(i));
+                    testCase.EXPT.Epochs(i).setAttr('PmtGain', pmtGains(i));
                 end
                 if i > 2
                     testCase.EXPT.Epochs(i).setFile('MyFile', 'test.txt');
@@ -121,8 +121,8 @@ classdef CoreApiTest < matlab.unittest.TestCase
 
         function FirstMatchWarnings(testCase)
             testCase.verifyWarning(...
-                @() aod.core.EntitySearch(testCase.EXPT.Calibrations, {'Parameter', 'BadParamName', 1}),...
-                "parameterQuery:NoParamNameMatches");
+                @() aod.core.EntitySearch(testCase.EXPT.Calibrations, {'Attribute', 'BadParamName', 1}),...
+                "attributeQuery:NoParamNameMatches");
             testCase.verifyWarning(...
                 @() aod.core.EntitySearch(testCase.EXPT.Calibrations, {'Dataset', 'BadDatasetName', 1}),...
                 "datasetQuery:NoDsetNameMatches");
@@ -133,29 +133,29 @@ classdef CoreApiTest < matlab.unittest.TestCase
 
         function EmptyInput(testCase)
             testCase.verifyEmpty(aod.core.EntitySearch.go(...
-                testCase.EXPT.Analyses, {'Parameter', 'MyParam'}));
+                testCase.EXPT.Analyses, {'Attribute', 'MyParam'}));
         end
 
-        function testParameterSearch(testCase)
+        function testAttributeSearch(testCase)
             % Match param presence
             out = testCase.EXPT.get('Epoch',...
-                {'Parameter', 'PmtGain'});
+                {'Attribute', 'PmtGain'});
             testCase.verifyNumElements(out, 5);
 
             % Match param values
             out = testCase.EXPT.get('Epoch',...
-                {'Parameter', 'PmtGain', 0.5});
+                {'Attribute', 'PmtGain', 0.5});
             testCase.verifyNumElements(out, 1);
 
             % Match param values using a function handle
             out = testCase.EXPT.get('Epoch',...
-                {'Parameter', 'PmtGain', @(x) x < 0.505});
+                {'Attribute', 'PmtGain', @(x) x < 0.505});
             testCase.verifyNumElements(out, 2);
         end
 
-        function GetParamWithMissing(testCase)
-            % Nonscalar parameter search with missing entities
-            out = testCase.EXPT.Epochs.getParam('PmtGain');
+        function GetAttrWithMissing(testCase)
+            % Nonscalar attribute search with missing entities
+            out = testCase.EXPT.Epochs.getAttr('PmtGain');
             testCase.verifyNumElements(out, numel(testCase.EXPT.Epochs));
             testCase.verifyEqual(nnz(ismissing(out)), 1);
             % Here because the class setup is good for this test

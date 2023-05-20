@@ -151,7 +151,7 @@ classdef InputBox < aod.app.Component
                     obj.showNameEditfield();
                     obj.showSearchButton();
                     obj.hideValueInput();
-                case {FilterTypes.PARAMETER, FilterTypes.DATASET}
+                case {FilterTypes.ATTRIBUTE, FilterTypes.DATASET}
                     obj.nameLabel.Text = "Name";
                     obj.valueLabel.Text = "Value";
                     obj.showValueEditfield("Value");

@@ -6,7 +6,7 @@ classdef EntitySearch < handle
 %   of a specifc type with the queries listed below.
 %
 % Queries:
-%   Parameter, Dataset, File, Name, Class, Subclass
+%   Attribute, Dataset, File, Name, Class, Subclass
 %
 % Constructor:
 %   obj = aod.core.EntitySearch(entityGroup, varargin)
@@ -116,8 +116,8 @@ classdef EntitySearch < handle
                     obj.nameQuery(query{2:end});
                 case {'dataset', 'property'}
                     obj.datasetQuery(query{2:end});
-                case {'parameter', 'param'}
-                    obj.parameterQuery(query{2:end})
+                case {'attribute', 'attr'}
+                    obj.attributeQuery(query{2:end})
                 case {'file'}
                     obj.fileQuery(query{2:end});
             end
@@ -254,22 +254,22 @@ classdef EntitySearch < handle
             end
         end
 
-        function parameterQuery(obj, paramName, paramSpec)
-            % Find entities by parameter name/value
+        function attributeQuery(obj, paramName, paramSpec)
+            % Find entities by attribute name/value
             if nargin < 3
                 paramSpec = [];
             end
 
             % Find the entities with paramName
-            obj.filterIdx = hasParam(obj.Group, paramName);
+            obj.filterIdx = hasAttr(obj.Group, paramName);
 
             % Determine whether to continue and test for a specific value
             if isempty(paramSpec)
                 return
             else
                 if ~any(obj.filterIdx)
-                    warning('parameterQuery:NoParamNameMatches',...
-                        'No entities were found with the parameter %s', paramName);
+                    warning('attributeQuery:NoParamNameMatches',...
+                        'No entities were found with the attribute %s', paramName);
                     return
                 end
             end
@@ -281,10 +281,10 @@ classdef EntitySearch < handle
                         continue
                     end
                     try
-                        obj.filterIdx(i) = paramSpec(obj.Group(i).getParam(paramName));
+                        obj.filterIdx(i) = paramSpec(obj.Group(i).getAttr(paramName));
                     catch
-                        warning('parameterQuery:InvalidParamFcn',...
-                            'Parameter function for %s was invalid', paramName);
+                        warning('attributeQuery:InvalidParamFcn',...
+                            'attribute function for %s was invalid', paramName);
                     end
                 end
             else
@@ -292,7 +292,7 @@ classdef EntitySearch < handle
                     if ~obj.filterIdx(i)
                         continue
                     end
-                    obj.filterIdx(i) = isequal(obj.Group(i).getParam(paramName), paramSpec);
+                    obj.filterIdx(i) = isequal(obj.Group(i).getAttr(paramName), paramSpec);
                 end
             end
         end

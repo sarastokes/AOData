@@ -12,7 +12,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = Analysis(name)
 %   obj = Analysis(name, 'Date', analysisDate, 'Parent', entity)
 %
-% Parameters:
+% Attributes:
 %   Date                    datetime or text in format 'yyyyMMdd'
 %       Date analysis was performed (default = today)
 

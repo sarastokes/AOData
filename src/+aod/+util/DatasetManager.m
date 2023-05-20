@@ -11,7 +11,7 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
 %   Count
 %
 % See also:
-%   aod.util.templates.ExpectedDataset, aod.util.ParameterManager
+%   aod.util.templates.ExpectedDataset, aod.util.AttributeManager
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -97,7 +97,7 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
         end
 
         function remove(obj, name)
-            % Remove a parameter by name
+            % Remove a dataset by name
             %
             % Syntax:
             %   remove(obj, name)
@@ -280,7 +280,7 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
 
             [props, ~, ~, emptyProps] = aod.h5.getPersistedProperties(obj);
             classProps = [props; emptyProps];
-            systemProps = aod.h5.getSystemProperties();
+            systemProps = aod.infra.getSystemProperties();
 
             ED = []; numProps = 0;
             for i = 1:numel(propList)

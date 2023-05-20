@@ -21,7 +21,7 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
 %       Names of properties that are empty (if an object was provided)
 %
 % See also:
-%   aod.h5.getSystemAttributes
+%   aod.infra.getSystemAttributes
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

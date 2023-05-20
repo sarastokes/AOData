@@ -12,9 +12,9 @@ classdef PMT < aod.core.Device
 %   obj = aod.builtin.devices.PMT(name, 'SerialNumber', "value",...
 %       'Manufacturer', "value", 'Model', "value");
 %
-% Parameters:
+% Attributes:
 %   SerialNumber            string
-% Inherited Parameters:
+% Inherited Attributes:
 %   Manufacturer
 %   Model
 
@@ -29,8 +29,8 @@ classdef PMT < aod.core.Device
 
     
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Device(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Device(obj);
             
             value.add('SerialNumber', string.empty(), @isstring,... 
                 'Serial number of the light source');

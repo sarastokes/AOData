@@ -1,11 +1,11 @@
-function PM = readExpectedParameters(hdfName, pathName, dsetName)
-% Read a table of expected parameters from an HDF5 file
+function PM = readExpectedAttributes(hdfName, pathName, dsetName)
+% Read a table of expected attributes from an HDF5 file
 %
 % Syntax:
-%   PM = aod.h5.readExpectedParameters(hdfName, pathName, dsetName)
+%   PM = aod.h5.readExpectedAttributes(hdfName, pathName, dsetName)
 %
 % See also:
-%   aod.util.ParameterManager
+%   aod.util.AttributeManager
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -13,21 +13,21 @@ function PM = readExpectedParameters(hdfName, pathName, dsetName)
     % Read as a table
     T = h5tools.read(hdfName, pathName, dsetName);
 
-    % Convert to ParameterManager
-    PM = aod.util.ParameterManager();
+    % Convert to AttributeManager
+    PM = aod.util.AttributeManager();
     numParams = height(T);
     for i = 1:numParams
         try
             eval(sprintf('default = %s;', T.Default(i)));
         catch
-            warning("readExpectedParameters:DefaultEvalError",...
+            warning("readExpectedAttributes:DefaultEvalError",...
                 "Could not evaluate %s", T.Default(i));
             default = [];
         end
         try
             eval(sprintf('validation = %s;', T.Validation(i)));
         catch 
-            warning("readExpectedParameters:ValidationEvalError",...
+            warning("readExpectedAttributes:ValidationEvalError",...
                 "Could not evaluate %s", T.Validation(i));
             validation = [];
         end

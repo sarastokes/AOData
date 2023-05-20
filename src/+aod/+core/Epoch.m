@@ -374,8 +374,8 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             value = int2fixedwidthstr(obj.ID, 4);
         end
 
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Entity(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Entity(obj);
 
             value.add('SampleRate', [], @isnumeric,...
                 'Rate of data acquisition (Hz)');

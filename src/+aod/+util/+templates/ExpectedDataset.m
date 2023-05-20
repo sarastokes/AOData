@@ -9,7 +9,7 @@ classdef ExpectedDataset < handle & matlab.mixin.SetGet
 %       description, units)
 %
 % See also:
-%   aod.util.remplates.ExpectedDataset, aod.util.ParameterManager
+%   aod.util.remplates.ExpectedDataset, aod.util.AttributeManager
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

@@ -1,15 +1,15 @@
-function obj = map2parameters(cMap)
+function obj = map2attributes(cMap)
 % Create from containers.Map
 %
 % Syntax:
-%   obj = aod.util.Parameters.fromMap(cMap)
+%   obj = map2attributes(cMap)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     assert(isa(cMap, 'containers.Map'),...
         'Input must be a containers.Map');
              
-    obj = aod.util.Parameters();
+    obj = aod.util.Attributes();
     if isempty(cMap)
         return 
     end

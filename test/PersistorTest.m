@@ -75,7 +75,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 
             % Ensure edits cannot be made when read only mode is true
             testCase.verifyThat( ...
-                @() testCase.EXPT.setParam('NewParam', 'TestValue'),...
+                @() testCase.EXPT.setAttr('NewParam', 'TestValue'),...
                 Throws("verifyReadOnlyMode:ReadOnlyModeEnabled"));
             testCase.EXPT.setReadOnlyMode(false);
         end
@@ -160,17 +160,17 @@ classdef PersistorTest < matlab.unittest.TestCase
             
             % Ensure system attributes aren't editable
             testCase.verifyThat( ...
-                @() testCase.EXPT.setParam('Class', 'TestValue'),...
+                @() testCase.EXPT.setAttr('Class', 'TestValue'),...
                 Throws("mustNotBeSystemAttribute:InvalidInput"));
             
-            % Add a new parameter, ensure other attributes are editable
-            testCase.EXPT.setParam('TestParam', 0);
+            % Add a new attribute, ensure other attributes are editable
+            testCase.EXPT.setAttr('TestParam', 0);
             info = h5info('ToyExperiment.h5', '/Experiment');
             attributeNames = string({info.Attributes.Name});
             testCase.verifyTrue(ismember("TestParam", attributeNames));
 
-            % Remove the new parameter
-            testCase.EXPT.removeParam('TestParam');
+            % Remove the new attribute
+            testCase.EXPT.removeAttr('TestParam');
             info = h5info('ToyExperiment.h5', '/Experiment');
             attributeNames = string({info.Attributes.Name});
             testCase.verifyFalse(ismember("TestParam", attributeNames));

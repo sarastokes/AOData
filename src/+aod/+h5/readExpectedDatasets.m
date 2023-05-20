@@ -32,7 +32,7 @@ function DM = readExpectedDatasets(hdfName, pathName, dsetName)
                 eval(sprintf('default = %s;', T.Default(i)));
             end
         catch
-            warning("readExpectedParameters:DefaultEvalError",...
+            warning("readExpectedAttributes:DefaultEvalError",...
                 "Could not evaluate %s", T.Default(i));
             default = [];
         end
@@ -43,7 +43,7 @@ function DM = readExpectedDatasets(hdfName, pathName, dsetName)
                 eval(sprintf('validation = %s;', T.Validation(i)));
             end
         catch 
-            warning("readExpectedParameters:ValidationEvalError",...
+            warning("readExpectedAttributes:ValidationEvalError",...
                 "Could not evaluate %s", T.Validation(i));
             validation = [];
         end

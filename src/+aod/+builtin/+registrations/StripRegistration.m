@@ -10,7 +10,7 @@ classdef StripRegistration < aod.core.Registration
 % Constructor:
 %   obj = StripRegistration(registrationDate)
 %
-% Parameters:
+% Attributes:
 %   RegistrationType        "frame" or "strip"
 %       Whether the frame or strip registration was ultimately used                    
 %
@@ -42,8 +42,8 @@ classdef StripRegistration < aod.core.Registration
             end
             obj@aod.core.Registration(name, registrationDate, varargin{:});
             
-            % Hard-coded parameters
-            obj.setParam('Software', "ImageReg");
+            % Hard-coded attributes
+            obj.setAttr('Software', "ImageReg");
         end
 
         function apply(~)
@@ -66,9 +66,9 @@ classdef StripRegistration < aod.core.Registration
             S = reader.readFile();
 
             [S, hasFrame] = extractField(S, 'hasFrame');
-            obj.setParam('Frame', hasFrame);
+            obj.setAttr('Frame', hasFrame);
             [S, hasStrip] = extractField(S, 'hasStrip');
-            obj.setParam('Strip', hasStrip);
+            obj.setAttr('Strip', hasStrip);
 
             % Assign the remaining values as properties
             f = string(fieldnames(S));
@@ -92,14 +92,14 @@ classdef StripRegistration < aod.core.Registration
             else
                 reader = aod.builtin.readers.RegistrationParameterReader.init(fPath, ID);
             end
-            obj.setParam(reader.readFile());
+            obj.setAttr(reader.readFile());
             obj.setFile('RegistrationParameters', reader.fullFile);
         end
     end
 
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Registration(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Registration(obj);
 
             value.add('RegistrationType', [],... 
                 @(x) ismember(x, ["frame", "strip"]),...

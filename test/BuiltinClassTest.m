@@ -24,7 +24,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.devices.Pinhole(25,... 
                 'Manufacturer', "ThorLabs", 'Model', "P20K"); 
             obj.setDiameter(20);
-            paramValue = getParam(obj, 'Diameter');
+            paramValue = getAttr(obj, 'Diameter');
             testCase.verifyEqual(paramValue, 20);
         end
 
@@ -99,7 +99,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
                 'Reg', getDateYMD(), tform);
             out = obj.apply(I, 'SmoothEdges', true);
             testCase.verifyEqual(out, J);
-            testCase.verifyTrue(obj.hasParam('SmoothEdges'));
+            testCase.verifyTrue(obj.hasAttr('SmoothEdges'));
         end
 
         function StripRegistration(testCase)

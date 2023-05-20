@@ -63,9 +63,9 @@ classdef RigidRegistration < aod.core.Registration
                     'BoundsStyle', 'SameAsInput');
                 data = imwarp(data, tForm, 'OutputView', viewObj, varargin{:});
             end
-            % Add optional key/value inputs to imwarp to parameters
+            % Add optional key/value inputs to imwarp to attributes
             if nargin > 2
-                obj.setParam(varargin{:});
+                obj.setAttr(varargin{:});
             end
         end
     end

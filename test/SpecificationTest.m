@@ -300,48 +300,48 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="Parameter")
-        function ParameterNameSearch(testCase)
+    methods (Test, TestTags="Attribute")
+        function AttributeNameSearch(testCase)
             import aod.util.ErrorTypes
 
-            PM = aod.util.ParameterManager();
+            PM = aod.util.AttributeManager();
             PM.add('NewParam');
 
-            % Search for parameter that doesn't exist
+            % Search for attribute that doesn't exist
             p0 = PM.get('NewParam');
             testCase.verifyTrue(strcmp(p0.Name, "NewParam"));
             
-            % Search for parameter that exists
+            % Search for attribute that exists
             p1 = PM.get('BadParam', ErrorTypes.NONE);
             testCase.verifyEmpty(p1);
             testCase.verifyError(...
                 @() PM.get('BadParam', ErrorTypes.ERROR),...
-                "get:ParameterNotFound");
+                "get:AttributeNotFound");
             testCase.verifyWarning(...
                 @() PM.get('BadParam', ErrorTypes.WARNING),...
-                "get:ParameterNotFound");
+                "get:AttributeNotFound");
         end
 
-        function ParameterAddition(testCase)
-            PM = aod.util.ParameterManager();
+        function AttributeAddition(testCase)
+            PM = aod.util.AttributeManager();
         end
 
-        function CoreEntityParameters(testCase)
+        function CoreEntityAttributes(testCase)
             obj = aod.builtin.devices.BandpassFilter(510, 20);
-            p = obj.expectedParameters.get('Bandwidth');
+            p = obj.expectedAttributes.get('Bandwidth');
             testCase.verifyEqual(p.Name, 'Bandwidth');
 
-            % Set/remove expected parameter
-            obj.setParam('Bandwidth', 30);
-            testCase.verifyEqual(obj.parameters('Bandwidth'), 30);
-            obj.removeParam('Bandwidth');
-            testCase.verifyTrue(obj.parameters.isKey('Bandwidth'));
-            testCase.verifyEmpty(obj.parameters('Bandwidth'));
+            % Set/remove expected attribute
+            obj.setAttr('Bandwidth', 30);
+            testCase.verifyEqual(obj.attributes('Bandwidth'), 30);
+            obj.removeAttr('Bandwidth');
+            testCase.verifyTrue(obj.attributes.isKey('Bandwidth'));
+            testCase.verifyEmpty(obj.attributes('Bandwidth'));
 
-            % Set/remove adhoc parameter
-            obj.setParam('RandomParam', true);
-            obj.removeParam('RandomParam');
-            testCase.verifyFalse(obj.parameters.isKey('RandomParam'));
+            % Set/remove adhoc attribute
+            obj.setAttr('RandomParam', true);
+            obj.removeAttr('RandomParam');
+            testCase.verifyFalse(obj.attributes.isKey('RandomParam'));
         end
     end
 
@@ -376,12 +376,12 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEqual(DM.Count, 0);
             testCase.verifyEmpty(DM.list());
             
-            % Add a parameter
+            % Add a attribute
             DM.add('TestParam', "double", 0, {@isnumeric},...
-                "This is a test parameter", "seconds");
+                "This is a test attribute", "seconds");
             testCase.verifyEqual(DM.Count, 1);
 
-            % Overwrite existing parameter
+            % Overwrite existing attribute
             testCase.verifyWarning(...
                 @() DM.add('TestParam', 'double'), "add:OverwroteDataset");
             
@@ -391,7 +391,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             
             warning('off', "add:OverwroteDataset");
             DM.add('TestParam', "double", 2, {@isnumeric},...
-                "This is an overwritten test parameter", "seconds");
+                "This is an overwritten test attribute", "seconds");
             testCase.verifyEqual(DM.Count, 1);
             ED = DM.get('TestParam');
             testCase.verifyEqual(ED.Default, 2);
@@ -405,11 +405,11 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEqual(DM.Count, 4);
             testCase.verifyNumElements(DM.list, 4);
 
-            % Remove a parameter
+            % Remove a attribute
             DM.remove('epochIDs');
             testCase.verifyEqual(DM.Count, 3);
 
-            % Clear all parameters
+            % Clear all attributes
             DM.clear();
             testCase.verifyEqual(DM.Count, 0);
         end

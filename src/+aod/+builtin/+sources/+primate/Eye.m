@@ -10,7 +10,7 @@ classdef Eye < aod.core.sources.Eye
 % Constructor:
 %   obj = Eye(whichEye, varargin)
 %
-% Parameters:
+% Attributes:
 %   AxialLength                 double
 %       Axial length in mm
 %   PupilSize                   double
@@ -38,16 +38,16 @@ classdef Eye < aod.core.sources.Eye
         function obj = Eye(whichEye, varargin)
             obj = obj@aod.core.sources.Eye(whichEye, varargin{:});
 
-            if obj.hasParam('AxialLength')
-                obj.setParam('MicronsPerDegree', obj.micronsPerDegree());
+            if obj.hasAttr('AxialLength')
+                obj.setAttr('MicronsPerDegree', obj.micronsPerDegree());
             end
         end
 
         function value = get.micronsPerDegree(obj)
-            if isempty(obj.getParam('AxialLength'))
+            if isempty(obj.getAttr('AxialLength'))
                 value = [];
             else
-                value = 291.2 * (obj.getParam('AxialLength') / 24.2);
+                value = 291.2 * (obj.getAttr('AxialLength') / 24.2);
             end
         end
     end
@@ -81,19 +81,19 @@ classdef Eye < aod.core.sources.Eye
             % Syntax:
             %   otf = getOTF(obj, wavelength, sf)
             % -------------------------------------------------------------
-            if ~isempty(obj.getParam('PupilSize'))
+            if ~isempty(obj.getAttr('PupilSize'))
                 error('getOTF:NoPupilSize',...
                     'OTF calculation requires pupilSize property!');
             end
 
-            u0 = (obj.getParam('PupilSize') * pi * 10e5) / (wavelength * 180);
+            u0 = (obj.getAttr('PupilSize') * pi * 10e5) / (wavelength * 180);
             otf = 2/pi * (acos(sf ./ u0) - (sf ./ u0) .* sqrt(1 - (sf./u0).^2));
         end
     end
 
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.sources.Eye(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.sources.Eye(obj);
 
             value.add('ContactLens', [], @istext,...
                 'Contact lens used for the eye');
@@ -108,7 +108,7 @@ classdef Eye < aod.core.sources.Eye
 
     methods (Access = private)
         function checkAxialLength(obj)
-            if isempty(obj.getParam('AxialLength'))
+            if isempty(obj.getAttr('AxialLength'))
                 error('checkAxialLength:NoValue',...
                     'Axial length must be set for this calculation');
             end

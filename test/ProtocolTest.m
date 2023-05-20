@@ -63,7 +63,7 @@ classdef ProtocolTest < matlab.unittest.TestCase
             protocol2.setCalibration(aod.core.Calibration('TestCalibration'));
             testCase.verifyNotEqual(protocol1, protocol2);
 
-            % Compare protocols with different parameters
+            % Compare protocols with different attributes
             protocol3 = test.TestStimProtocol([],...
                 'PreTime', 6, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);

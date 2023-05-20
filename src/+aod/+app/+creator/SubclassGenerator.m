@@ -124,7 +124,7 @@ classdef SubclassGenerator < handle
         end
     end
 
-    % Properties and parameters
+    % Properties and attributes
     methods
         function [dset, idx] = getDataset(obj, dsetName)
             out = arrayfun(@(x) x.Name, obj.Datasets);

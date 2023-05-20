@@ -14,7 +14,7 @@ classdef LightSource < aod.core.Device
 %   wavelength
 %   spectra
 %
-% Inherited parameters:
+% Inherited attributes:
 %   Manufacturer
 %   Model
 %

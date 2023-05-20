@@ -51,3 +51,8 @@ test/PackageCoverage.txt
 ## Tutorial files
 tutorials/Tutorial_JustTheExperiment.h5
 tutorials/Tutorial_WithSystem.h5
+tutorials/+templates/
+tutorials/AODataWalkthrough.docx
+tutorials/Development.mlx
+docs/BestPractices.md
+docs/CoreClassDiagram.pdf

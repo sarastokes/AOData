@@ -2,7 +2,7 @@ function success = writeExpectedDatasets(hdfName, pathName, dsetName, DM)
 % Write aod.util.DatasetManager as an HDF5 dataset
 %
 % Syntax:
-%   success = aod.h5.writeExpectedParameters(hdfName, pathName, dsetName, PM)
+%   success = aod.h5.writeExpectedAttributes(hdfName, pathName, dsetName, PM)
 %
 % Inputs:
 %   hdfName         char or H5ML.id

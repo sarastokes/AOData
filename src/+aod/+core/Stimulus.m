@@ -87,17 +87,17 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
                 calibration = [];
             end
             protocolFcn = str2func(obj.protocolClass);
-            protocol = protocolFcn(calibration, map2struct(obj.parameters));
+            protocol = protocolFcn(calibration, map2struct(obj.attributes));
         end
     end
 
 
     methods (Sealed, Access = protected)
         function getProtocolParameters(obj, protocol)
-            % Extract parameters from protocol
+            % Extract attributes from protocol
             %
             % Description:
-            %   Extract calibration and parameters, save to Stimulus
+            %   Extract calibration and attributes, save to Stimulus
             %
             % Syntax:
             %   getProtocolParameters(obj, protocol)
@@ -114,7 +114,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
                     elseif strcmpi(propName, 'DateCreated')
                         obj.DateProtocolCreated = protocol.(propName);
                     else
-                        obj.setParam(propName, protocol.(propName));
+                        obj.setAttr(propName, protocol.(propName));
                     end
                 end
             end

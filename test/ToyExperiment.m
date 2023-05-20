@@ -100,7 +100,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     epoch.setFile('PostSyncFile', fullfile(cd, 'PostSyncFile.txt'));
     
     experiment.add(aod.core.Epoch(2, 'Source', epoch.Source));
-    setParam(experiment.Epochs, 'RefPmtGain', 0.51);
+    setAttr(experiment.Epochs, 'RefPmtGain', 0.51);
 
     % Registrations
     reg = aod.builtin.registrations.RigidRegistration( ...

@@ -33,7 +33,7 @@ function makeTestTextFile(outputDir, fileName)
     % Open and discard existing contents
     fid = fopen(fullfile(outputDir, fileName), 'w');
 
-    % Write some parameters
+    % Write some attributes
     fprintf(fid, 'PMTGain = 0.541\r\n');
     fprintf(fid, 'FieldOfView = 3.69, 2.70\r\n')
     fprintf(fid, 'Video = %s\r\n', fullfile(outputDir, 'test.avi'));

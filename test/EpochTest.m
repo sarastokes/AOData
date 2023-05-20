@@ -75,14 +75,14 @@ classdef EpochTest < matlab.unittest.TestCase
             testCase.verifyEqual(testCase.EXPT.id2index([1 2 4]), [1 2 3]);
             testCase.verifyNumElements(testCase.EXPT.id2epoch([1 2 4]), 3);
 
-            % Add a parameter to all
-            setParam(testCase.EXPT.Epochs, 'TestParam1', 0);
-            testCase.verifyTrue(all(hasParam(testCase.EXPT.Epochs, 'TestParam1')));
-            testCase.verifyEqual(testCase.EXPT.Epochs.getParam('TestParam1'), [0;0;0]);
+            % Add a attribute to all
+            setAttr(testCase.EXPT.Epochs, 'TestParam1', 0);
+            testCase.verifyTrue(all(hasAttr(testCase.EXPT.Epochs, 'TestParam1')));
+            testCase.verifyEqual(testCase.EXPT.Epochs.getAttr('TestParam1'), [0;0;0]);
 
-            % Remove a parameter from all
-            testCase.EXPT.Epochs.removeParam('TestParam1');
-            testCase.verifyFalse(any(hasParam(testCase.EXPT.Epochs, 'TestParam1')));
+            % Remove a attribute from all
+            testCase.EXPT.Epochs.removeAttr('TestParam1');
+            testCase.verifyFalse(any(hasAttr(testCase.EXPT.Epochs, 'TestParam1')));
 
             % Add a file to all
             testCase.EXPT.Epochs.setFile('TestFile1', 'test.txt');

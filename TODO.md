@@ -14,7 +14,7 @@
 - [x] Remove() method
 - [x] Fillmissing error type
 - [x] Consider making channels and devices at the same level
-- [x] Expected parameter parsing in setParam
+- [x] Expected parameter parsing in setAttr
 - [ ] DateCreated, DateLastModified for core interface
 
 ##### AOQuery App

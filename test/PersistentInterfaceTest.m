@@ -36,11 +36,11 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
     methods (Test, TestTags=["Entity"])
         function ParamRead(testCase)
             testCase.verifyTrue(...
-                testCase.EXPT.hasParam('Administrator'));
+                testCase.EXPT.hasAttr('Administrator'));
             testCase.verifyEqual(...
-                testCase.EXPT.getParam('Administrator'), "Sara Patterson");
+                testCase.EXPT.getAttr('Administrator'), "Sara Patterson");
             testCase.verifyFalse(...
-                testCase.EXPT.hasParam('BadParam'));
+                testCase.EXPT.hasAttr('BadParam'));
         end
 
         function FileRead(testCase)

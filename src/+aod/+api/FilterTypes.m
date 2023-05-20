@@ -11,7 +11,7 @@ classdef FilterTypes
     enumeration
         UNDEFINED
         ENTITY
-        PARAMETER
+        ATTRIBUTE
         DATASET
         LINK
         CLASS
@@ -29,8 +29,8 @@ classdef FilterTypes
             switch obj
                 case FilterTypes.ENTITY
                     out = str2func('aod.api.EntityFilter');
-                case FilterTypes.PARAMETER
-                    out = str2func('aod.api.ParameterFilter');
+                case FilterTypes.ATTRIBUTE
+                    out = str2func('aod.api.AttributeFilter');
                 case FilterTypes.DATASET
                     out = str2func('aod.api.DatasetFilter');
                 case FilterTypes.LINK
@@ -71,8 +71,8 @@ classdef FilterTypes
             switch lower(filterType)
                 case 'entity'
                     obj = FilterTypes.ENTITY;
-                case 'parameter'
-                    obj = FilterTypes.PARAMETER;
+                case 'attribute'
+                    obj = FilterTypes.ATTRIBUTE;
                 case 'dataset'
                     obj = FilterTypes.DATASET;
                 case 'link'

@@ -83,8 +83,8 @@ classdef ChannelOptimization < aod.core.Calibration
     end
 
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Calibration(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Calibration(obj);
             
             value.add('Wavelength', [], @isnumeric);
         end

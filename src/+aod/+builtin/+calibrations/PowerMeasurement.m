@@ -10,7 +10,7 @@ classdef PowerMeasurement < aod.core.Calibration
 % Constructor:
 %   obj = PowerMeasurement(name, calibrationDate, wavelength, varargin);
 %
-% Parameters:
+% Attributes:
 %   settingUnit             string
 %       Device setting unit (default = "normalized")
 %   valueUnit               string
@@ -22,7 +22,7 @@ classdef PowerMeasurement < aod.core.Calibration
 %   loadTable(obj, measurementTable)
 %
 % Note:
-%   Subclasses should set light source specific parameters (wavelength, 
+%   Subclasses should set light source specific attributes (wavelength, 
 %   settingUnit) in their constructors. If greater flexibility is needed,
 %   use the setValueUnit(), setSettingUnit() and setWavelength() functions
 
@@ -43,7 +43,7 @@ classdef PowerMeasurement < aod.core.Calibration
             obj = obj@aod.core.Calibration(name, calibrationDate);
             
             % Required input parsing
-            obj.setParam('Wavelength', wavelength);
+            obj.setAttr('Wavelength', wavelength);
         end
 
         function T = table(obj)
@@ -60,7 +60,7 @@ classdef PowerMeasurement < aod.core.Calibration
             end
             T = table(obj.Setting, obj.Value,...
                 'VariableNames', {'Setting', 'Power'});
-            T.Properties.VariableUnits = [obj.getParam('SettingUnit'), obj.getParam('ValueUnit')];
+            T.Properties.VariableUnits = [obj.getAttr('SettingUnit'), obj.getAttr('ValueUnit')];
         end
 
         function addMeasurement(obj, setting, value)
@@ -110,11 +110,11 @@ classdef PowerMeasurement < aod.core.Calibration
     methods (Access = protected)
         function value = getLabel(obj)
             value = [char(getClassWithoutPackages(obj)),... 
-                num2str(obj.getParam('Wavelength')), 'nm'];
+                num2str(obj.getAttr('Wavelength')), 'nm'];
         end
 
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Calibration(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Calibration(obj);
 
             value.add('Wavelength', double.empty(), @isnumeric,...
                 "The wavelength of the light source being measured");

@@ -14,7 +14,7 @@ classdef Rois < aod.core.Annotation
 % Optional Properties (inherited from aod.core.Annotation):
 %   Source          aod.core.Source
 %
-% Derived Parameters (automatically calculated from Data):
+% Derived Attributes (automatically calculated from Data):
 %   Count
 %   RoiIDs
 %

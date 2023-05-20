@@ -79,7 +79,7 @@ classdef SubclassWriter < handle
             out = out + "%" + sprintf('\t%s\n', obj.getConstructor);
             out = out + "%" + newline;
             if ~isempty(obj.Model.Attributes)
-                out = out + "% Parameters:" + newline;
+                out = out + "% Attributes:" + newline;
                 for i = 1:numel(obj.Model.Attributes)
                     iAttr = obj.Model.Attributes(i);
                     out = out + "% " + obj.indent(1) + iAttr.Name;
@@ -217,14 +217,14 @@ classdef SubclassWriter < handle
                 out = out + " " + newline;
             end
 
-            % ExpectedParameters
+            % ExpectedAttributes
             if ~isempty(obj.Model.Attributes)
-                out = out + obj.indent(2) + "function value = specifyParameters(obj)" + newline;
+                out = out + obj.indent(2) + "function value = specifyAttributes(obj)" + newline;
                 out = out + obj.indent(3) + sprintf(...
-                    "value = specifyParameters@%s(obj);", ...
+                    "value = specifyAttributes@%s(obj);", ...
                     obj.Model.SuperClass);
                 out = out + newline + " " + newline;
-                out = out + obj.indent(3) + "% Add new parameters" + newline;
+                out = out + obj.indent(3) + "% Add new attributes" + newline;
                 for i = 1:numel(obj.Model.Attributes)
                     iAttr = obj.Model.Attributes(i);
                     out = out + obj.indent(3)  + sprintf("value.add('%s'", iAttr.Name);
@@ -374,7 +374,7 @@ classdef SubclassWriter < handle
             
             out = out + obj.indent(3);
             if isa(prop, 'aod.util.templates.AttributeSpecification')
-                out = out + sprintf("obj.setParam('%s', value);", prop.Name);
+                out = out + sprintf("obj.setAttr('%s', value);", prop.Name);
             else
                 out = out + sprintf("obj.%s = value;", prop.Name);
             end

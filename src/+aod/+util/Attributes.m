@@ -1,4 +1,4 @@
-classdef Parameters < containers.Map & matlab.mixin.CustomDisplay 
+classdef Attributes < containers.Map & matlab.mixin.CustomDisplay 
 % Container for metadata specified as key/value pairs 
 %
 % Description:
@@ -8,7 +8,7 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 %   containers.Map, matlab.mixin.CustomDisplay
 %
 % Constructor:
-%   obj = aod.util.Parameters(keySet, valueSet)
+%   obj = aod.util.Attributes(keySet, valueSet)
 %
 % Methods:
 %   out = toMap(obj)
@@ -24,7 +24,7 @@ classdef Parameters < containers.Map & matlab.mixin.CustomDisplay
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Parameters(varargin)
+        function obj = Attributes(varargin)
             obj = obj@containers.Map(varargin{:});
         end
 

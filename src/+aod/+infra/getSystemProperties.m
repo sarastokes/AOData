@@ -6,11 +6,11 @@ function specialProps = getSystemProperties()
 %   when writing an entity to an HDF5 file
 %
 % Syntax:
-%   specialProps = aod.h5.getSystemProperties
+%   specialProps = aod.infa.getSystemProperties
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     
     specialProps = ["Parent", "notes", "Name", "files",...
-        "UUID", "description", "parameters", "Timing", "Code",...
-        "expectedDatasets", "expectedParameters"];
+        "UUID", "description", "attributes", "Timing", "Code",...
+        "expectedDatasets", "expectedAttributes"];

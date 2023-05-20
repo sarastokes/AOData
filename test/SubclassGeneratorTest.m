@@ -448,22 +448,22 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
             % Update the view
             testCase.press(findByTag(fig, "UpdateButton"));
 
-            % Confirm expected parameter box is present
+            % Confirm expected attribute box is present
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
-                "value = specifyParameters@aod.core.Channel(obj)")));
-            % Verify parameter expecification
+                "value = specifyAttributes@aod.core.Channel(obj)")));
+            % Verify attribute expecification
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
                 "value.add('Attr1', [], [],"))); % has description
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
                 "value.add('Attr2', 123, @isnumeric);"))); 
             % Verify set functions
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
-                "obj.setParam('Attr1', value);")));
+                "obj.setAttr('Attr1', value);")));
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
-                "obj.setParam('Attr2', value);")));
+                "obj.setAttr('Attr2', value);")));
             % Verify documentation
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
-                "% Parameters:")));
+                "% Attributes:")));
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
                 "(default = 123)")));
             

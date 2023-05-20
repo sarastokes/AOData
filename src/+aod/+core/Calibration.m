@@ -28,7 +28,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 %   calibrationDate         datetime or text in format yyyyMMdd
 %       Date calibration was performed (yyyyMMdd)
 %
-% Parameters:
+% Attributes:
 %   Administrator           string
 %       Who performed the calibration
 %
@@ -121,8 +121,8 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 
     % aod.core.Entity methods
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Entity(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Entity(obj);
             
             value.add('Administrator', "", @isstring,... 
                 'Person(s) who performed the calibration');

@@ -341,8 +341,8 @@ classdef SubclassGeneratorController < aod.app.Controller
         end
 
         function onPushAddAttribute(obj, ~, ~)
-            out = inputdlg('What is the parameter name?',... 
-                'New Parameter UI', [1 35], "MyParam");
+            out = inputdlg('What is the attribute name?',... 
+                'New Attribute UI', [1 35], "MyParam");
 
             if isempty(out)
                 return

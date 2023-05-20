@@ -1,21 +1,21 @@
-classdef ExpectedParameter < handle
-% Represents a MATLAB key/value input to parameters, mapping to attributes
+classdef ExpectedAttribute < handle
+% Represents a MATLAB key/value input to attributes, mapping to attributes
 %
 % Constructor:
-%   obj = aod.util.templates.ExpectedParameter(name)
-%   obj = aod.util.templats.ExpectedParameter(name,...
+%   obj = aod.util.templates.ExpectedAttribute(name)
+%   obj = aod.util.templats.ExpectedAttribute(name,...
 %       defaultValue, validationFcn, description)
 %
 % See also:
-%   aod.util.ParameterManager
+%   aod.util.AttributeManager
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     properties
-        % The parameter name in upper camelCase (e.g. MyParamName)
+        % The attribute name in upper camelCase (e.g. MyParamName)
         Name            char
-        % Default value for the parameter
+        % Default value for the attribute
         Default                                                     = []
         % Anonymous function handle for validating input
         Validation                                                  = []
@@ -24,7 +24,7 @@ classdef ExpectedParameter < handle
     end
 
     methods
-        function obj = ExpectedParameter(name, defaultValue, validationFcn, description)
+        function obj = ExpectedAttribute(name, defaultValue, validationFcn, description)
             obj.Name = name;
 
             if nargin > 1 && ~isempty(defaultValue)
@@ -47,7 +47,7 @@ classdef ExpectedParameter < handle
             end
 
             if ~isa(value, 'function_handle')
-                error('ExpectedParameter:InvalidFunction',...
+                error('ExpectedAttribute:InvalidFunction',...
                     '"validationFcn" must be a function handle');
             end
             obj.Validation = value;
@@ -68,9 +68,9 @@ classdef ExpectedParameter < handle
             % Tests for equality.
             %
             % Description:
-            %   Two ExpectedParameter objects are considered equal if they 
+            %   Two ExpectedAttribute objects are considered equal if they 
             %   have the same name (case-insensitive). If the second input 
-            %   is not an ExpectedParameter, it is not equal
+            %   is not an ExpectedAttribute, it is not equal
             %
             % Syntax:
             %   tf = isequal(obj, other)
@@ -81,7 +81,7 @@ classdef ExpectedParameter < handle
                 return
             end
 
-            if ~isa(other, 'aod.util.templates.ExpectedParameter')
+            if ~isa(other, 'aod.util.templates.ExpectedAttribute')
                 tf = false;
                 return
             end

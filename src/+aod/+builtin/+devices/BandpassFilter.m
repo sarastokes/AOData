@@ -7,10 +7,10 @@ classdef BandpassFilter < aod.core.Device
 % Properties:
 %   transmission
 %
-% Parameters:
+% Attributes:
 %   Wavelength
 %   Bandwidth
-% Inherited parameters:
+% Inherited attributes:
 %   Manufacturer
 %   Model
 %
@@ -38,11 +38,11 @@ classdef BandpassFilter < aod.core.Device
 
     methods 
         function setWavelength(obj, wavelength)
-            obj.setParam('Wavelength', wavelength);
+            obj.setAttr('Wavelength', wavelength);
         end
         
         function setBandwidth(obj, bandwidth)
-            obj.setParam('Bandwidth', bandwidth);
+            obj.setAttr('Bandwidth', bandwidth);
         end
         
         function setTransmission(obj, transmission)
@@ -58,12 +58,12 @@ classdef BandpassFilter < aod.core.Device
     methods (Access = protected)
         function value = getLabel(obj)
             value = sprintf('%ux%unmBandpassFilter',... 
-                obj.getParam('Wavelength'),... 
-                obj.getParam('Bandwidth'));
+                obj.getAttr('Wavelength'),... 
+                obj.getAttr('Bandwidth'));
         end
 
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Device(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Device(obj);
 
             value.add('Wavelength', [], @isnumeric, 'Wavelength in nm');
             value.add('Bandwidth', [], @isnumeric, 'Bandwidth in nm');

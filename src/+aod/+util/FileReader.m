@@ -18,8 +18,8 @@ classdef (Abstract) FileReader < handle
     properties (SetAccess = protected)
         % Full file name, including file path
         fullFile
-        % Key/value parameters related to file reading
-        parameters
+        % Key/value attributes related to file reading
+        attributes
     end
 
     properties (Transient, SetAccess = protected)
@@ -38,7 +38,7 @@ classdef (Abstract) FileReader < handle
                 fileName = completeFileName(fileName);
                 obj.fullFile = fileName;
             end
-            obj.parameters = aod.util.Parameters();
+            obj.attributes = aod.util.Attributes();
             % Because some files may be time-consuming to load, readFile()
             % is not called bu default when the FileReader is created
         end

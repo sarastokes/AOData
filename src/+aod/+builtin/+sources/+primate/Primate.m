@@ -10,7 +10,7 @@ classdef Primate < aod.core.sources.Subject
 % Constructor:
 %   obj = aod.core.sources.Primate(name)
 %
-% Parameters:
+% Attributes:
 %   DateOfBirth
 %
 % Dependent properties:
@@ -36,8 +36,8 @@ classdef Primate < aod.core.sources.Subject
     end
 
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.sources.Subject(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.sources.Subject(obj);
 
             value.remove('Age');
             value.add('DateOfBirth', datetime.empty(), @isdatetime,...

@@ -15,7 +15,7 @@ classdef ImagingLight < aod.core.Stimulus
 %   Intensity               double
 %       Imaging light intensity
 %
-% Parameters:
+% Attributes:
 %   IntensityUnits          string
 %       Units for the specified imaging light intensity
 %
@@ -57,13 +57,13 @@ classdef ImagingLight < aod.core.Stimulus
             % Syntax:
             %   obj.setUnits(units)
             % -------------------------------------------------------------
-            obj.setParam('IntensityUnits', units);
+            obj.setAttr('IntensityUnits', units);
         end
     end
 
     methods (Access = protected)
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Stimulus(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Stimulus(obj);
 
             value.add('IntensityUnits', [], @istext,...
                 "Units for the imaging light intensity");

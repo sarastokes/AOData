@@ -10,7 +10,7 @@ classdef Pinhole < aod.core.Device
 % Constructor:
 %   obj = aod.builtin.devices.Pinhole(diameter, varargin)
 %
-% Parameters:
+% Attributes:
 %   Diameter            double
 %       Pinhole diameter in microns
 %   Model               string
@@ -42,17 +42,17 @@ classdef Pinhole < aod.core.Device
             % Example:
             %   obj.setDiameter(25)
             % -------------------------------------------------------------
-            obj.setParam('Diameter', diameter);
+            obj.setAttr('Diameter', diameter);
         end
     end
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = ['Pinhole_', num2str(obj.getParam('Diameter')), 'microns'];
+            value = ['Pinhole_', num2str(obj.getAttr('Diameter')), 'microns'];
         end
 
-        function value = specifyParameters(obj)
-            value = specifyParameters@aod.core.Device(obj);
+        function value = specifyAttributes(obj)
+            value = specifyAttributes@aod.core.Device(obj);
             
             value.add('Diameter', [], @isnumeric,...
                 'Pinhole diameter in microns');

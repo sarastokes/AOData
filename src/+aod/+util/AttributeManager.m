@@ -1,14 +1,14 @@
-classdef ParameterManager < handle & matlab.mixin.CustomDisplay
-% Manages the specification of expected parameters (HDF5 attributes)
+classdef AttributeManager < handle & matlab.mixin.CustomDisplay
+% Manages the specification of expected attributes (HDF5 attributes)
 %
 % Parent:
 %   handle, matlab.mixin.CustomDisplay
 %
 % Constructor:
-%   obj = aod.util.ParameterManager()
+%   obj = aod.util.AttributeManager()
 %
 % Properties:
-%   ExpectedParameters
+%   ExpectedAttributes
 %   Count
 %
 % Methods:
@@ -18,7 +18,7 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
 %
 %   ip = getParser(obj)
 %   ip = parse(obj, varargin)
-%   [tf, idx] = hasParam(obj, paramName)
+%   [tf, idx] = hasAttr(obj, paramName)
 %
 % Overloaded methods:
 %   tf = isempty(obj)
@@ -26,13 +26,13 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
 %   T = table(obj)
 %
 % See also:
-%   aod.util.ExpectedParameter, aod.util.Parameters
+%   aod.util.ExpectedAttribute, aod.util.Attributes
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        ExpectedParameters          % aod.util.templates.ExpectedParameter
+        ExpectedAttributes          % aod.util.templates.ExpectedAttribute
     end
 
     properties (Dependent)
@@ -40,22 +40,22 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
     end
 
     methods 
-        function obj = ParameterManager()
+        function obj = AttributeManager()
             % Do nothing
         end
         
         function out = get.Count(obj)
-            if isempty(obj.ExpectedParameters)
+            if isempty(obj.ExpectedAttributes)
                 out = 0;
             else
-                out = numel(obj.ExpectedParameters);
+                out = numel(obj.ExpectedAttributes);
             end
         end
     end
 
     methods
         function p = get(obj, paramName, errorType)
-            % Get an ExpectedParameter, if it exists
+            % Get an ExpectedAttribute, if it exists
             %
             % Syntax:
             %   p = get(obj, paramName)
@@ -69,149 +69,149 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
                 errorType = ErrorTypes.init(errorType);
             end
 
-            [tf, idx] = obj.hasParam(paramName);
+            [tf, idx] = obj.hasAttr(paramName);
 
             if tf 
-                p = obj.ExpectedParameters(idx);
+                p = obj.ExpectedAttributes(idx);
             else
                 p = [];
                 switch errorType 
                     case ErrorTypes.ERROR 
-                        error('get:ParameterNotFound',...
-                            'Parameter named %s does not exist', paramName);
+                        error('get:AttributeNotFound',...
+                            'Attribute named %s does not exist', paramName);
                     case ErrorTypes.WARNING
-                        warning('get:ParameterNotFound',...
-                            'Parameter named %s does not exist', paramName);
+                        warning('get:AttributeNotFound',...
+                            'Attribute named %s does not exist', paramName);
                 end
             end
         end
 
-        function add(obj, param, defaultValue, validationFcn, description)
-            % Add a new expected parameter
+        function add(obj, attr, defaultValue, validationFcn, description)
+            % Add a new expected attribute
             %
             % Syntax:
             %   add(obj, name)
             %   add(obj, name, defaultValue, validationFcn, description)
             % 
             % Inputs:
-            %   param       char, ExpectedParameter, ParameterManager
-            %       Parameter name or parameter class
+            %   attr       char, ExpectedAttribute, AttributeManager
+            %       Attribute name or attribute class
             %
             % Examples:
-            %   % ExpectedParameter and ParameterManager as a single input
-            %   expParam = aod.util.ExpectedParameter('MyParam');
+            %   % ExpectedAttribute and AttributeManager as a single input
+            %   expParam = aod.util.ExpectedAttribute('MyParam');
             %   obj.add(expParam)
             %
-            %   % Add a new parameter by components (2-4 are optional)
-            %   obj.add('MyParam', [], @(x) ischar(x), 'A parameter');
+            %   % Add a new attribute by components (2-4 are optional)
+            %   obj.add('MyParam', [], @(x) ischar(x), 'A attribute');
             % -------------------------------------------------------------
 
             arguments
                 obj
-                param               
+                attr               
                 defaultValue                    = []
                 validationFcn                   = []
                 description         string      = string.empty()
             end
 
-            % Single inputs can be ExpectedParameter or ParameterManager
+            % Single inputs can be ExpectedAttribute or AttributeManager
             if nargin == 2
-                if isa(param, 'aod.util.templates.ExpectedParameter')
-                    if any(isequal(param, obj.ExpectedParameters))
-                        error('add:ParameterExists',...
-                            'A parameter already exists named %s, use remove first', param.Name);     
+                if isa(attr, 'aod.util.templates.ExpectedAttribute')
+                    if any(isequal(attr, obj.ExpectedAttributes))
+                        error('add:AttributeExists',...
+                            'A attribute already exists named %s, use remove first', attr.Name);     
                     end
-                    obj.ExpectedParameters = cat(1, obj.ExpectedParameters, param);
+                    obj.ExpectedAttributes = cat(1, obj.ExpectedAttributes, attr);
                     return
-                elseif isa(param, 'aod.util.ParameterManager')
-                    PM = param;
-                    for i = 1:numel(PM.ExpectedParameters)
-                        obj.add(PM.ExpectedParameters(i));
+                elseif isa(attr, 'aod.util.AttributeManager')
+                    PM = attr;
+                    for i = 1:numel(PM.ExpectedAttributes)
+                        obj.add(PM.ExpectedAttributes(i));
                     end
                     return
                 end
             end
             
-            newParam = aod.util.templates.ExpectedParameter(...
-                param, defaultValue, validationFcn, description);
+            newParam = aod.util.templates.ExpectedAttribute(...
+                attr, defaultValue, validationFcn, description);
 
             % Confirm 
-            if any(isequal(newParam, obj.ExpectedParameters))
-                error('add:ParameterExists',...
-                    'A parameter already exists named %s', newParam.Name);
+            if any(isequal(newParam, obj.ExpectedAttributes))
+                error('add:AttributeExists',...
+                    'A attribute already exists named %s', newParam.Name);
             end
-            obj.ExpectedParameters = cat(1, obj.ExpectedParameters, newParam);
+            obj.ExpectedAttributes = cat(1, obj.ExpectedAttributes, newParam);
         end
 
         function remove(obj, paramName)
-            % Remove a parameter by name
+            % Remove a attribute by name
             %
             % Syntax:
             %   remove(obj, paramName)
             %
             % Inputs:
             %   paramName           string/char
-            %       Parameter name to remove
+            %       Attribute name to remove
             %
             % Examples:
-            %   PM = aod.util.ParameterManager();
-            %   PM.add('MyParam', [], @(x) ischar(x), 'A parameter');
+            %   PM = aod.util.AttributeManager();
+            %   PM.add('MyParam', [], @(x) ischar(x), 'A attribute');
             %   PM.remove('MyParam');
             % ----------------------------------------------------------
 
-            if isempty(obj.ExpectedParameters)
+            if isempty(obj.ExpectedAttributes)
                 return
             end
 
-            [~, idx] = obj.hasParam(paramName);
+            [~, idx] = obj.hasAttr(paramName);
             if isempty(idx)
-                warning('remove:ParamNotFound', 'Parameter %s not found', paramName);
+                warning('remove:ParamNotFound', 'Attribute %s not found', paramName);
             else
-                obj.ExpectedParameters(idx) = [];
+                obj.ExpectedAttributes(idx) = [];
             end
         end
 
         function clear(obj)
-            % Clear all parameters
+            % Clear all attributes
             %
             % Syntax:
             %   clear(obj)
             % ----------------------------------------------------------
-            obj.ExpectedParameters = [];
+            obj.ExpectedAttributes = [];
         end
     end
 
     methods
-        function [tf, idx] = hasParam(obj, paramName)
-            % Check whether parameter exists and optionally, get index
+        function [tf, idx] = hasAttr(obj, paramName)
+            % Check whether attribute exists and optionally, get index
             %
             % Syntax:
-            %   [tf, idx] = hasParam(obj, paramName)
+            %   [tf, idx] = hasAttr(obj, paramName)
             % ----------------------------------------------------------
 
-            if isempty(obj.ExpectedParameters)
+            if isempty(obj.ExpectedAttributes)
                 tf = false; idx = [];
                 return
             end
             
             paramName = convertCharsToStrings(paramName);
 
-            allParamNames = arrayfun(@(x) string(x.Name), obj.ExpectedParameters);
+            allParamNames = arrayfun(@(x) string(x.Name), obj.ExpectedAttributes);
 
             idx = find(allParamNames == paramName);
             tf = ~isempty(idx);
         end
         
         function ip = getParser(obj)
-            % Populate an inputParser with parameters
+            % Populate an inputParser with attributes
             %
             % Syntax:
             %   ip = getParser(obj)
             % ----------------------------------------------------------
 
             ip = aod.util.InputParser;
-            for i = 1:numel(obj.ExpectedParameters)
-                ip = addToParser(obj.ExpectedParameters(i), ip);
+            for i = 1:numel(obj.ExpectedAttributes)
+                ip = addToParser(obj.ExpectedAttributes(i), ip);
             end
         end
 
@@ -234,8 +234,8 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
                 header = getHeader@matlab.mixin.CustomDisplay(obj);
             else
                 headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
-                headerStr = sprintf('%s with %u parameters:',... 
-                    headerStr, numel(obj.ExpectedParameters));
+                headerStr = sprintf('%s with %u attributes:',... 
+                    headerStr, numel(obj.ExpectedAttributes));
                 header = sprintf('  %s',headerStr);
             end
         end
@@ -246,26 +246,26 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             else                
                 propList = struct();
 
-                for i = 1:numel(obj.ExpectedParameters)
+                for i = 1:numel(obj.ExpectedAttributes)
                     value = "Default = ";
-                    if isempty(obj.ExpectedParameters(i).Default)
+                    if isempty(obj.ExpectedAttributes(i).Default)
                         value = value + "[]";
                     else
-                        value = value + strtrim(formattedDisplayText(obj.ExpectedParameters(i).Default));
+                        value = value + strtrim(formattedDisplayText(obj.ExpectedAttributes(i).Default));
                     end
                     value = value + ", Validation = ";
-                    if isempty(obj.ExpectedParameters(i).Validation)
+                    if isempty(obj.ExpectedAttributes(i).Validation)
                         value = value + "[]";
                     else
-                        value = value + strtrim(formattedDisplayText(obj.ExpectedParameters(i).Validation));
+                        value = value + strtrim(formattedDisplayText(obj.ExpectedAttributes(i).Validation));
                     end
                     value = value + ", Description = ";
-                    if isempty(obj.ExpectedParameters(i).Description)
+                    if isempty(obj.ExpectedAttributes(i).Description)
                         value = value + "[]";
                     else
-                        value = value + obj.ExpectedParameters(i).Description;
+                        value = value + obj.ExpectedAttributes(i).Description;
                     end
-                    propList.(obj.ExpectedParameters(i).Name) = value;
+                    propList.(obj.ExpectedAttributes(i).Name) = value;
                 end
                 propgrp = matlab.mixin.util.PropertyGroup(propList);
             end
@@ -275,11 +275,11 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
     % Builtin methods
     methods
         function tf = isempty(obj)
-            tf = isempty(obj.ExpectedParameters);
+            tf = isempty(obj.ExpectedAttributes);
         end
 
         function tf = isequal(obj, other)
-            if ~isa(other, 'aod.util.ParameterManager')
+            if ~isa(other, 'aod.util.AttributeManager')
                 tf = false;
                 return
             end
@@ -290,13 +290,13 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             end
 
             for i = 1:obj.Count 
-                iParam = obj.ExpectedParameters(i);
-                [tfParam, idx] = other.hasParam(iParam.Name);
+                iParam = obj.ExpectedAttributes(i);
+                [tfParam, idx] = other.hasAttr(iParam.Name);
                 if ~tfParam
                     tf = false; 
                     return
                 end
-                oParam = other.ExpectedParameters(idx);
+                oParam = other.ExpectedAttributes(idx);
                 if any([isempty(iParam.Validation), isempty(oParam.Validation)])
                     if ~isequal(iParam.Validation, oParam.Validation)
                         disp(iParam.Name)
@@ -337,7 +337,7 @@ classdef ParameterManager < handle & matlab.mixin.CustomDisplay
             descriptions = repmat("[]", [obj.Count, 1]);
 
             for i = 1:obj.Count
-                EP = obj.ExpectedParameters(i);
+                EP = obj.ExpectedAttributes(i);
 
                 names(i) = EP.Name;
 

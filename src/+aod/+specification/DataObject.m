@@ -41,8 +41,6 @@ classdef DataObject < handle
             addParameter(ip, 'Default', []);
             parse(ip, varargin{:});
 
-            %setParams = setdiff(ip.Parameters, ip.UsingDefaults);
-            %cellfun(@(x) obj.parse(x, ip.Results.(x)), setParams);
             arrayfun(@(x) obj.parse(x, ip.Results.(x)), string(ip.Parameters));
             obj.checkIntegrity();
         end

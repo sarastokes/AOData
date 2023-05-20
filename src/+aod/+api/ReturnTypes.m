@@ -13,7 +13,7 @@ classdef ReturnTypes
     enumeration
         ENTITY
         PATH
-        PARAMETER
+        ATTRIBUTE
         DATASET
     end
 
@@ -31,8 +31,8 @@ classdef ReturnTypes
                     out = ReturnTypes.ENTITY;
                 case 'path'
                     out = ReturnTypes.PATH;
-                case 'parameter'
-                    out = ReturnTypes.PARAMETER;
+                case 'attribute'
+                    out = ReturnTypes.ATTRIBUTE;
                 case 'dataset'
                     out = ReturnTypes.DATASET;
                 case 'parent'

@@ -49,8 +49,8 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
             out = FilterTypes.init('entity');
             testCase.verifyEqual(out, FilterTypes.ENTITY);
-            out = FilterTypes.init('parameter');
-            testCase.verifyEqual(out, FilterTypes.PARAMETER);
+            out = FilterTypes.init('attribute');
+            testCase.verifyEqual(out, FilterTypes.ATTRIBUTE);
             out = FilterTypes.init('dataset');
             testCase.verifyEqual(out, FilterTypes.DATASET);
             out = FilterTypes.init('link');
@@ -116,8 +116,8 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, AONodeTypes.FILEREADER);
             out = AONodeTypes.init('notes');
             testCase.verifyEqual(out, AONodeTypes.NOTES);
-            out = AONodeTypes.init('parametermanager');
-            testCase.verifyEqual(out, AONodeTypes.PARAMETERMANAGER);
+            out = AONodeTypes.init('attributemanager');
+            testCase.verifyEqual(out, AONodeTypes.ATTRIBUTEMANAGER);
             out = AONodeTypes.init('description');
             testCase.verifyEqual(out, AONodeTypes.DESCRIPTION);
             out = AONodeTypes.init('homedirectory');
@@ -149,8 +149,8 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, ReturnTypes.ENTITY);
             out = ReturnTypes.init('path');
             testCase.verifyEqual(out, ReturnTypes.PATH);
-            out = ReturnTypes.init('parameter');
-            testCase.verifyEqual(out, ReturnTypes.PARAMETER);
+            out = ReturnTypes.init('attribute');
+            testCase.verifyEqual(out, ReturnTypes.ATTRIBUTE);
             out = ReturnTypes.init('dataset');
             testCase.verifyEqual(out, ReturnTypes.DATASET);
             testCase.verifyEqual(ReturnTypes.init(out), ReturnTypes.DATASET);

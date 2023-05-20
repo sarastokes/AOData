@@ -17,10 +17,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   addDataset(obj, propName, propValue)
 %   removeDataset(obj, propName)
 %
-%   tf = hasParam(obj, paramName)
-%   out = getParam(obj, paramName)
-%   setParam(obj, paramName, paramValue)
-%   removeParam(obj, paramName)
+%   tf = hasAttr(obj, paramName)
+%   out = getAttr(obj, paramName)
+%   setAttr(obj, paramName, paramValue)
+%   removeAttr(obj, paramName)
 %
 %   tf = hasFile(obj, fileKey)
 %   out = getFile(obj, fileKey)
@@ -43,9 +43,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     properties (SetAccess = protected)
         % Entity metadata that maps to attributes
-        parameters              % aod.util.Parameters
+        attributes              % aod.util.Attributes
         % Files associated with the entity
-        files                   % aod.util.Parameters
+        files                   % aod.util.Attributes
         % A description of the entity
         description             string
         % Miscellaneous notes about the entity
@@ -61,7 +61,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         % When the entity's HDF5 group was last modified
         LastModified            datetime
         % Specification of expected metadata 
-        expectedParameters      = aod.util.ParameterManager
+        expectedAttributes      = aod.util.AttributeManager
         % Specification of expected datasets
         expectedDatasets        = aod.util.DatasetManager
     end
@@ -117,9 +117,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.hdfPath = hdfPath;
             obj.factory = entityFactory;
 
-            % Initialize parameters 
-            obj.files = aod.util.Parameters();
-            obj.parameters = aod.util.Parameters();
+            % Initialize attributes 
+            obj.files = aod.util.Attributes();
+            obj.attributes = aod.util.Attributes();
 
             % Create entity from file
             if ~isempty(obj.hdfName)
@@ -467,13 +467,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
     end
 
-    % Parameter methods
+    % Attribute methods
     methods (Sealed)
-        function tf = hasParam(obj, paramName)
-            % Check whether parameter is present
+        function tf = hasAttr(obj, paramName)
+            % Check whether attribute is present
             %
             % Syntax:
-            %   tf = hasParam(obj, paramName)
+            %   tf = hasAttr(obj, paramName)
             % -------------------------------------------------------------
             arguments
                 obj
@@ -481,23 +481,23 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             if ~isscalar(obj)
-                tf = arrayfun(@(x) hasParam(x, paramName), obj);
+                tf = arrayfun(@(x) hasAttr(x, paramName), obj);
                 return
             end
 
-            if isempty(obj.parameters)
+            if isempty(obj.attributes)
                 tf = false;
             else
-                tf = isKey(obj.parameters, paramName);
+                tf = isKey(obj.attributes, paramName);
             end
         end
 
-        function out = getParam(obj, paramName, errorType)
-            % Get the value of a parameter by name
+        function out = getAttr(obj, paramName, errorType)
+            % Get the value of a attribute by name
             %
             % Syntax:
-            %   out = getParam(obj, paramName)
-            %   out = getParam(obj, paramName, errorType)
+            %   out = getAttr(obj, paramName)
+            %   out = getAttr(obj, paramName, errorType)
             %
             % Notes:
             %   Error type defaults to WARNING for scalar operations and is
@@ -519,12 +519,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             
             if ~isscalar(obj)
                 out = aod.util.arrayfun(...
-                    @(x) getParam(x, paramName, ErrorTypes.MISSING), obj);
+                    @(x) getAttr(x, paramName, ErrorTypes.MISSING), obj);
 
                 % Parse missing values
                 isMissing = getMissing(out);
                 if all(isMissing)
-                    error('getParam:NotFound', 'Did not find parameter %s', paramName);
+                    error('getAttr:NotFound', 'Did not find attribute %s', paramName);
                 end
 
                 % Attempt to return a matrix rather than a cell
@@ -534,16 +534,16 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            if obj.hasParam(paramName)
-                out = obj.parameters(paramName);
+            if obj.hasAttr(paramName)
+                out = obj.attributes(paramName);
             else
                 switch errorType 
                     case ErrorTypes.ERROR
-                        error("getParam:ParamNotFound",...
-                            "Parameter %s not present", paramName);
+                        error("getAttr:ParamNotFound",...
+                            "Attribute %s not present", paramName);
                     case ErrorTypes.WARNING
-                        warning("getParam:ParamNotFound",...
-                            "Parameter %s not present", paramName);
+                        warning("getAttr:ParamNotFound",...
+                            "Attribute %s not present", paramName);
                         out = [];
                     case ErrorTypes.MISSING
                         out = missing;
@@ -553,11 +553,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
         end
 
-        function setParam(obj, paramName, paramValue)
-            % Add new parameter or change the value of existing parameter
+        function setAttr(obj, paramName, paramValue)
+            % Add new attribute or change the value of existing attribute
             %
             % Syntax:
-            %   setParam(obj, paramName, paramValue)
+            %   setAttr(obj, paramName, paramValue)
             % -------------------------------------------------------------
             arguments
                 obj
@@ -569,21 +569,21 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             aod.util.mustNotBeSystemAttribute(paramName)
             
             if ~isscalar(obj)
-                arrayfun(@(x) x.setParam(paramName, paramValue), obj);
+                arrayfun(@(x) x.setAttr(paramName, paramValue), obj);
                 return
             end
 
             % Make the change in the HDF5 file
             obj.setAttribute(paramName, paramValue);
             % Make the change in the MATLAB object
-            obj.parameters(paramName) = paramValue;
+            obj.attributes(paramName) = paramValue;
         end
 
-        function removeParam(obj, paramName)
-            % Remove a parameter from the entity
+        function removeAttr(obj, paramName)
+            % Remove a attribute from the entity
             %
             % Syntax:
-            %   removeParam(obj, paramName)
+            %   removeAttr(obj, paramName)
             % -------------------------------------------------------------
             arguments
                 obj
@@ -593,26 +593,26 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.verifyReadOnlyMode();
 
             if ~isscalar(obj)
-                arrayfun(@(x) removeParam(x, paramName), obj);
+                arrayfun(@(x) removeAttr(x, paramName), obj);
                 return
             end
 
-            if ismember(paramName, aod.h5.getSystemAttributes())
-                warning("setParam:SystemAttribute",...
-                    "Parameter %s not removed, member of system attributes", paramName);
+            if ismember(paramName, aod.infra.getSystemAttributes())
+                warning("setAttr:SystemAttribute",...
+                    "Attribute %s not removed, member of system attributes", paramName);
                 return
             end
             
-            if ~obj.hasParam(paramName)
-                warning("removeParam:ParamNotFound",...
-                    "Parameter %s not found in parameters property!", paramName);
+            if ~obj.hasAttr(paramName)
+                warning("removeAttr:ParamNotFound",...
+                    "Attribute %s not found in attributes property!", paramName);
                 return
             end
 
             evtData = aod.persistent.events.AttributeEvent(paramName);
             notify(obj, 'AttributeChanged', evtData);
 
-            remove(obj.parameters, paramName);
+            remove(obj.attributes, paramName);
 
             obj.loadInfo();
         end
@@ -797,11 +797,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.description = obj.loadDataset('description');
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
-            obj.files = obj.loadDataset('files', 'aod.util.Parameters');
+            obj.files = obj.loadDataset('files', 'aod.util.Attributes');
             
-            expectedParams = obj.loadDataset('expectedParameters');
+            expectedParams = obj.loadDataset('expectedAttributes');
             if ~isempty(expectedParams)
-                obj.expectedParameters = expectedParams;
+                obj.expectedAttributes = expectedParams;
             end
 
             expectedDsets = obj.loadDataset('expectedDatasets');
@@ -813,7 +813,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.Parent = obj.loadLink('Parent');
 
             % ATTRIBUTES
-            % Universial attributes that map to properties, not parameters
+            % Universial attributes that map to properties, not attributes
             specialAttributes = ["UUID", "Class", "EntityType", "LastModified", "label"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
@@ -827,7 +827,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % Parse the remaining attributes
             for i = 1:numel(obj.attNames)
                 if ~ismember(obj.attNames(i), specialAttributes)
-                    obj.parameters(char(obj.attNames(i))) = ...
+                    obj.attributes(char(obj.attNames(i))) = ...
                         h5readatt(obj.hdfName, obj.hdfPath, obj.attNames(i));
                 end
             end

@@ -40,8 +40,8 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyTrue(any(contains(groupNames, "0002")));
         end
 
-        function Parameters(testCase)
-            params = aod.util.Parameters();
+        function Attributes(testCase)
+            params = aod.util.Attributes();
             params('A') = 1;
             map = params.toMap();
             testCase.verifyClass(map, 'containers.Map');
@@ -66,45 +66,45 @@ classdef UtilityTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Parameters", "Utility"])
+    methods (Test, TestTags=["Attributes", "Utility"])
         function ParamManager(testCase)
-            PM = aod.util.ParameterManager();
+            PM = aod.util.AttributeManager();
             testCase.verifyEqual(PM.Count, 0);
             testCase.verifyEmpty(PM.table());
 
             % Add param info
             PM.add('MyParam1');
             testCase.verifyEqual(PM.Count, 1);
-            testCase.verifyTrue(PM.hasParam('MyParam1'));
+            testCase.verifyTrue(PM.hasAttr('MyParam1'));
 
-            % Error for existing parameter
-            testCase.verifyError(@() PM.add('MyParam1'), "add:ParameterExists");
+            % Error for existing attribute
+            testCase.verifyError(@() PM.add('MyParam1'), "add:AttributeExists");
 
-            % Add an ExpectedParameter
-            EP = aod.util.templates.ExpectedParameter('MyParam2');
+            % Add an ExpectedAttribute
+            EP = aod.util.templates.ExpectedAttribute('MyParam2');
             PM.add(EP);
             testCase.verifyEqual(PM.Count, 2);
             testCase.verifyEqual(height(PM.table()), 2);
 
-            % Add a ParameterManager
-            PM2 = aod.util.ParameterManager();
+            % Add a AttributeManager
+            PM2 = aod.util.AttributeManager();
             PM2.add(PM);
             testCase.verifyEqual(PM2.Count, 2);
             
-            % Remove parameters
+            % Remove attributes
             PM.remove('MyParam1');
             testCase.verifyEqual(PM.Count, 1);
-            testCase.verifyFalse(PM.hasParam('MyParam1'));
+            testCase.verifyFalse(PM.hasAttr('MyParam1'));
 
-            % Warning for wrong parameter name
+            % Warning for wrong attribute name
             testCase.verifyWarning(...
                 @() PM.remove('BadParamName'), "remove:ParamNotFound");
 
-            % Clear parameters
+            % Clear attributes
             PM2.clear();
             testCase.verifyEqual(PM2.Count, 0);
 
-            % No error for empty parameter manager
+            % No error for empty attribute manager
             PM2.remove('MyParam1');
         end
     end

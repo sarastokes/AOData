@@ -1,5 +1,5 @@
 classdef Size < aod.specification.Validator
-% Container for the expected size of a dataset or parameter
+% Container for the expected size of a dataset or attribute
 %
 % Superclasses:
 %   aod.specification.Specification

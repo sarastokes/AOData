@@ -439,23 +439,23 @@ classdef FilterTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags=["ParameterFilter", "AOQuery"])
-        function ParameterFilter(testCase)
+    methods (Test, TestTags=["AttributeFilter", "AOQuery"])
+        function AttributeFilter(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
-            % Has parameter
-            PF1 = aod.api.ParameterFilter(testCase.QM, 'Laboratory');
+            % Has attribute
+            PF1 = aod.api.AttributeFilter(testCase.QM, 'Laboratory');
             idx = PF1.apply();
             testCase.verifyEqual(nnz(idx), 1);
             PF1.describe();
             testCase.verifyEqual(PF1.code(),...
-                string('aod.api.ParameterFilter(QM, "Laboratory")'));
+                string('aod.api.AttributeFilter(QM, "Laboratory")'));
             testCase.verifyEqual(PF1.code("QM", "F"),...
-                string('F = aod.api.ParameterFilter(QM, "Laboratory");'));
+                string('F = aod.api.AttributeFilter(QM, "Laboratory");'));
 
-            % Specific parameter value (match)
-            PF2 = aod.api.ParameterFilter(testCase.QM,... 
+            % Specific attribute value (match)
+            PF2 = aod.api.AttributeFilter(testCase.QM,... 
                 'Laboratory', "Primate-1P");
             idx = PF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
@@ -463,7 +463,7 @@ classdef FilterTest < matlab.unittest.TestCase
             
 
             % Alt initialization
-            testCase.QM.addFilter({'Parameter', 'Laboratory', 'Primate-1P'});
+            testCase.QM.addFilter({'Attribute', 'Laboratory', 'Primate-1P'});
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
         end
 
@@ -471,13 +471,13 @@ classdef FilterTest < matlab.unittest.TestCase
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
-            % Has parameter, no match
-            PF4 = aod.api.ParameterFilter(testCase.QM, 'BadParam');
+            % Has attribute, no match
+            PF4 = aod.api.AttributeFilter(testCase.QM, 'BadParam');
             testCase.verifyWarning(...
                 @() PF4.apply(), "apply:NoMatches");
             
-            % Specific parameter value (no match)
-            PF3 = aod.api.ParameterFilter(testCase.QM,...
+            % Specific attribute value (no match)
+            PF3 = aod.api.AttributeFilter(testCase.QM,...
                 'Laboratory', "none");
             testCase.verifyWarning(@() PF3.apply(), "apply:NoMatches");
             testCase.QM.addFilter(PF3);
