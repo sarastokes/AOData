@@ -35,9 +35,9 @@ classdef Primate < aod.core.sources.Subject
         end
     end
 
-    methods (Access = protected)
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.sources.Subject(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.sources.Subject();
 
             value.remove('Age');
             value.add('DateOfBirth', datetime.empty(), @isdatetime,...

@@ -112,9 +112,11 @@ classdef PowerMeasurement < aod.core.Calibration
             value = [char(getClassWithoutPackages(obj)),... 
                 num2str(obj.getAttr('Wavelength')), 'nm'];
         end
+    end
 
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.Calibration(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Calibration();
 
             value.add('Wavelength', double.empty(), @isnumeric,...
                 "The wavelength of the light source being measured");

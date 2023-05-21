@@ -373,9 +373,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % ensure alphabetical sorting doesn't get it out of order)
             value = int2fixedwidthstr(obj.ID, 4);
         end
+    end
 
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.Entity(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Entity();
 
             value.add('SampleRate', [], @isnumeric,...
                 'Rate of data acquisition (Hz)');

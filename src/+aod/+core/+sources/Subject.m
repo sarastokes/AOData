@@ -32,9 +32,9 @@ classdef Subject < aod.core.Source
         end
     end
     
-    methods (Access = protected)
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.Entity(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Entity();
 
             value.add('Species', string.empty(), @isstring,...
                 'Species of the subject');

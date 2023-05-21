@@ -209,19 +209,24 @@ classdef SubclassWriter < handle
 
         function out = getDependentSetMethods(obj)
             out = "";
-            if obj.Model.groupNameMode == "DefinedInternally"
+            if obj.Model.groupNameMode == "DefinedInternally"                             
                 out = out + obj.indent(2) + "function value = getLabel(obj)" + newline;
                 out = out + obj.indent(3) + sprintf("value = getLabel@%s(obj);", obj.Model.SuperClass) + newline + newline;
                 out = out + obj.indent(3) + "% Define any additional processing needed to set label value" + newline;
                 out = out + obj.indent(2) + "end" + newline;
                 out = out + " " + newline;
+
+                % Methods block
+                out = obj.indent(1) + "methods (Access = protected)" + newline + out;
+                out = out + obj.indent(1) + "end" + newline;
+                out = out + " " + newline;
             end
 
             % ExpectedAttributes
             if ~isempty(obj.Model.Attributes)
-                out = out + obj.indent(2) + "function value = specifyAttributes(obj)" + newline;
+                out = out + obj.indent(2) + "function value = specifyAttributes()" + newline;
                 out = out + obj.indent(3) + sprintf(...
-                    "value = specifyAttributes@%s(obj);", ...
+                    "value = specifyAttributes@%s();", ...
                     obj.Model.SuperClass);
                 out = out + newline + " " + newline;
                 out = out + obj.indent(3) + "% Add new attributes" + newline;
@@ -249,14 +254,19 @@ classdef SubclassWriter < handle
                     out = out + ");" + newline;
                 end
                 out = out + obj.indent(2) + "end" + newline +  " " + newline;
+
+                % Methods block
+                out = obj.indent(1) + "methods (Static)" + newline + out;
+                out = out + obj.indent(1) + "end" + newline;
+                out = out + " " + newline;
             end
 
             if out == ""
                 return
             end
-            out = obj.indent(1) + "methods (Access = protected)" + newline + out;
-            out = out + obj.indent(1) + "end" + newline;
-            out = out + " " + newline;
+            % out = obj.indent(1) + "methods (Access = protected)" + newline + out;
+            % out = out + obj.indent(1) + "end" + newline;
+            % out = out + " " + newline;
         end
     end
 

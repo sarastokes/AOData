@@ -97,9 +97,9 @@ classdef StripRegistration < aod.core.Registration
         end
     end
 
-    methods (Access = protected)
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.Registration(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Registration();
 
             value.add('RegistrationType', [],... 
                 @(x) ismember(x, ["frame", "strip"]),...

@@ -989,10 +989,10 @@ end
 		No parameters are set in \aodclass{aod.core.Entity}; however, several core classes define them. For example, \aodclass{aod.core.Device} has two expected parameters (Manufacturer and Model), which are defined as follows: 
 
 		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
-function value = specifyAttributes(obj)
+function value = specifyAttributes()
 	% Subclasses should always call the inherited method first, putting their 
 	% superclass after the @. 
-	value = specifyAttributes@aod.core.Entity(obj)
+	value = specifyAttributes@aod.core.Entity()
 	% Add two new parameters 
 	value.add('Manufacturer', [], @ischar, 'Manufacturer of the Device');
 	value.add('Model', [], @ischar, 'Model of the Device');

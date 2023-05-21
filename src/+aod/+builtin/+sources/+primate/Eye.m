@@ -91,9 +91,9 @@ classdef Eye < aod.core.sources.Eye
         end
     end
 
-    methods (Access = protected)
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.sources.Eye(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.sources.Eye();
 
             value.add('ContactLens', [], @istext,...
                 'Contact lens used for the eye');

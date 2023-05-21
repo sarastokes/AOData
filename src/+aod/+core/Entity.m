@@ -45,10 +45,12 @@ classdef (Abstract) Entity < handle
 %
 % Protected methods:
 %   value = getLabel(obj)
-%   value = specifyAttributes(obj)
 %   parseAttributes(obj, varargin)
 %   sync(obj)
 %   validateName(obj)
+%
+% Static methods:
+%   value = specifyAttributes()
 %
 % Protected methods (with aod.persistent.Entity subclass access allowed):
 %   addParent(obj, parent)
@@ -766,16 +768,6 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function value = specifyAttributes(obj) %#ok<MANU> 
-            % Initializes AttributeManager, subclasses can extend
-            %
-            % Syntax:
-            %   value = specifyAttributes(obj)
-            % -------------------------------------------------------------
-
-            value = aod.util.AttributeManager();
-        end
-
         function value = specifyDatasets(obj)
             value = obj.DatasetManager;
         end
@@ -1022,6 +1014,18 @@ classdef (Abstract) Entity < handle
             else
                 tf = false;
             end
+        end
+    end
+
+    methods (Static)
+        function value = specifyAttributes() 
+            % Initializes AttributeManager, subclasses can extend
+            %
+            % Syntax:
+            %   value = specifyAttributes()
+            % -------------------------------------------------------------
+
+            value = aod.util.AttributeManager();
         end
     end
 end 

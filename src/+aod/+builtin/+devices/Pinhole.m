@@ -50,9 +50,11 @@ classdef Pinhole < aod.core.Device
         function value = getLabel(obj)
             value = ['Pinhole_', num2str(obj.getAttr('Diameter')), 'microns'];
         end
+    end
 
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.Device(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Device();
             
             value.add('Diameter', [], @isnumeric,...
                 'Pinhole diameter in microns');

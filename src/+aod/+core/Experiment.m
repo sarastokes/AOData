@@ -655,9 +655,9 @@ classdef Experiment < aod.core.Entity
     end
 
     % Overloaded methods
-    methods (Access = protected)
-        function value = specifyAttributes(obj)
-            value = specifyAttributes@aod.core.Entity(obj);
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Entity();
 
             value.add('Administrator', string.empty(), @isstring,... 
                 'Person(s) performed the experiment');
