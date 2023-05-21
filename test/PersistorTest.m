@@ -75,7 +75,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 
             % Ensure edits cannot be made when read only mode is true
             testCase.verifyThat( ...
-                @() testCase.EXPT.setAttr('NewParam', 'TestValue'),...
+                @() testCase.EXPT.setAttr('NewAttr', 'TestValue'),...
                 Throws("verifyReadOnlyMode:ReadOnlyModeEnabled"));
             testCase.EXPT.setReadOnlyMode(false);
         end
@@ -153,7 +153,7 @@ classdef PersistorTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags = "Modification")
-        function ParamIO(testCase)
+        function AttrIO(testCase)
             import matlab.unittest.constraints.Throws
             
             testCase.EXPT.setReadOnlyMode(false);
@@ -164,16 +164,16 @@ classdef PersistorTest < matlab.unittest.TestCase
                 Throws("mustNotBeSystemAttribute:InvalidInput"));
             
             % Add a new attribute, ensure other attributes are editable
-            testCase.EXPT.setAttr('TestParam', 0);
+            testCase.EXPT.setAttr('TestAttr', 0);
             info = h5info('ToyExperiment.h5', '/Experiment');
             attributeNames = string({info.Attributes.Name});
-            testCase.verifyTrue(ismember("TestParam", attributeNames));
+            testCase.verifyTrue(ismember("TestAttr", attributeNames));
 
             % Remove the new attribute
-            testCase.EXPT.removeAttr('TestParam');
+            testCase.EXPT.removeAttr('TestAttr');
             info = h5info('ToyExperiment.h5', '/Experiment');
             attributeNames = string({info.Attributes.Name});
-            testCase.verifyFalse(ismember("TestParam", attributeNames));
+            testCase.verifyFalse(ismember("TestAttr", attributeNames));
         end
 
         function FileIO(testCase)
@@ -277,7 +277,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             channel = aod.core.Channel("TestChannel",... 
                 "Parent", testCase.SMALL_EXPT.Systems(1));
             % Confirm interoperability of core/persistent
-            testCase.verifyClass(channel.ancestor('experiment'),... 
+            testCase.verifyClass(channel.getParent('experiment'),... 
                 "aod.persistent.Experiment");
             % Add the new channel
             testCase.SMALL_EXPT.Systems(1).add(channel);

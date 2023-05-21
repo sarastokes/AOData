@@ -23,17 +23,17 @@ classdef (Abstract) Entity < handle
 %   expectedAttributes          aod.util.AttributeManager
 %
 % Public methods:
-%   h = ancestor(obj, className)
+%   h = getParent(obj, className)
 %   setName(obj, name)
 %   setDescription(obj, txt, overwrite)
 %
 %   setNote(obj, txt)
 %   removeNote(obj, ID)
 %
-%   tf = hasAttr(obj, paramName)
+%   tf = hasAttr(obj, attrName)
 %   setAttr(obj, varargin)
-%   value = getAttr(obj, paramName, msgLevel)
-%   removeAttr(obj, paramName)
+%   value = getAttr(obj, attrName, msgLevel)
+%   removeAttr(obj, attrName)
 %   
 %   tf = hasFile(obj, fileName)
 %   setFile(obj, fileName, filePath)
@@ -172,8 +172,8 @@ classdef (Abstract) Entity < handle
 
     % Hierarchy methods
     methods (Sealed)
-        function out = getParent(obj)
-            % Get the parent of an entity
+        function out = getParent(obj, className)
+            % Get the parent of an entity or ancestor of a specific type
             %
             % Description:
             %   Can be accessed through the Parent property, but this 
@@ -184,34 +184,19 @@ classdef (Abstract) Entity < handle
             %   % Get the parent of one entity (equivalent to obj.Parent)
             %   h = obj.getParent()
             % -------------------------------------------------------------
+            if nargin < 2
+                className = [];
+            end
 
             if ~isscalar(obj)
-                out = aod.util.arrayfun(@(x) getParent(x), obj);
+                out = aod.util.arrayfun(@(x) getParent(x, className), obj);
                 return
             end
-            out = obj.Parent;
-        end
-
-        function h = ancestor(obj, className)
-            % Get parent entity matching a specific entityType
-            %
-            % Description:
-            %   Recursively search 'Parent' property for an entity 
-            %   matching or subclassing className. Or of a specific 
-            %   entity type.
-            %
-            % Syntax:
-            %   h = obj.ancestor(className)
-            %
-            % Inputs:
-            %   className           char, aod.core.EntityTypes
-            %       Class name or entity type to search for
-            %
-            % Examples:
-            %   p = obj.ancestor('Experiment')
-            %   p = obj.ancestor(aod.core.EntityTypes.EXPERIMENT)
-            %   p = obj.ancestor('aod.core.Experiment')
-            % -------------------------------------------------------------
+            
+            if isempty(className)
+                out = obj.Parent;
+                return 
+            end
 
             % See whether input is an entity type
             try
@@ -222,18 +207,18 @@ classdef (Abstract) Entity < handle
                 end
             end
 
-            h = obj;
+            out = obj;
             if isa(className, 'aod.core.EntityTypes')
-                while h.entityType ~= className
-                    h = h.Parent;
-                    if isempty(h)
+                while out.entityType ~= className
+                    out = out.Parent;
+                    if isempty(out)
                         break
                     end
                 end
             else
-                while ~isSubclass(h, className)
-                    h = h.Parent;
-                    if isempty(h)
+                while ~isSubclass(out, className)
+                    out = out.Parent;
+                    if isempty(out)
                         break
                     end
                 end
@@ -358,54 +343,54 @@ classdef (Abstract) Entity < handle
 
     % Attribute methods
     methods (Sealed)
-        function tf = hasAttr(obj, paramName)
+        function tf = hasAttr(obj, attrName)
             % Check whether entity has a attribute
             %
             % Description:
             %   Check whether entity attributes has a specific attribute
             %
             % Syntax:
-            %   tf = hasAttr(obj, paramName)
+            %   tf = hasAttr(obj, attrName)
             %
             % Examples:
-            %   % See whether entity has attribute 'MyParam'
-            %   tf = obj.hasAttr('MyParam')
+            %   % See whether entity has attribute 'MyAttr'
+            %   tf = obj.hasAttr('MyAttr')
             % -------------------------------------------------------------
             arguments
                 obj
-                paramName       char
+                attrName       char
             end
 
             if ~isscalar(obj)
-                tf = arrayfun(@(x) x.hasAttr(paramName), obj);
+                tf = arrayfun(@(x) x.hasAttr(attrName), obj);
                 return
             end
             
-            tf = obj.attributes.isKey(paramName);
+            tf = obj.attributes.isKey(attrName);
         end
 
-        function paramValue = getAttr(obj, paramName, errorType)
+        function attrValue = getAttr(obj, attrName, errorType)
             % Get the value of a attribute
             %
             % Description:
             %   Return the value of a specific attribute. 
             %
             % Syntax:
-            %   paramValue = getAttr(obj, paramName, errorType)
+            %   attrValue = getAttr(obj, attrName, errorType)
             %
             % Inputs:
-            %   paramName       char
+            %   attrName       char
             % Optional inputs:
             %   errorType       aod.util.ErrorTypes (default = WARNING) 
             %
             % Examples:
-            %   % Get the value of 'MyParam'
-            %   paramValue = obj.getAttr('MyParam')           
+            %   % Get the value of 'MyAttr'
+            %   attrValue = obj.getAttr('MyAttr')           
             % -------------------------------------------------------------
 
             arguments
                 obj
-                paramName           char 
+                attrName           char 
                 errorType           = []
             end
             
@@ -417,37 +402,37 @@ classdef (Abstract) Entity < handle
             end
             
             if ~isscalar(obj)
-                paramValue = aod.util.arrayfun(...
-                    @(x) x.getAttr(paramName, ErrorTypes.MISSING), obj);
+                attrValue = aod.util.arrayfun(...
+                    @(x) x.getAttr(attrName, ErrorTypes.MISSING), obj);
 
                 % Parse missing values
-                isMissing = getMissing(paramValue);
+                isMissing = getMissing(attrValue);
                 if all(isMissing)
-                    error('getAttr:NotFound', 'Did not find attribute %s', paramName);
+                    error('getAttr:NotFound', 'Did not find attribute %s', attrName);
                 end
 
                 % Attempt to return a matrix rather than a cell
-                if iscell(paramValue) && any(isMissing)
-                    paramValue = extractCellData(paramValue);
+                if iscell(attrValue) && any(isMissing)
+                    attrValue = extractCellData(attrValue);
                 end
                 return
             end
 
-            if obj.hasAttr(paramName)
-                paramValue = obj.attributes(paramName);
+            if obj.hasAttr(attrName)
+                attrValue = obj.attributes(attrName);
             else
                 switch errorType 
                     case ErrorTypes.ERROR 
                         error('getAttr:NotFound',... 
-                            'Did not find %s in attributes', paramName);
+                            'Did not find %s in attributes', attrName);
                     case ErrorTypes.WARNING 
                         warning('getAttr:NotFound',... 
-                            'Did not find %s in attributes', paramName);
-                        paramValue = [];
+                            'Did not find %s in attributes', attrName);
+                        attrValue = [];
                     case ErrorTypes.MISSING
-                        paramValue = missing;
+                        attrValue = missing;
                     case ErrorTypes.NONE
-                        paramValue = [];
+                        attrValue = [];
                 end
             end
         end
@@ -459,8 +444,8 @@ classdef (Abstract) Entity < handle
             %   Add attribute(s) to the attribute property
             %
             % Syntax:
-            %   obj.setAttr(paramName, value)
-            %   obj.setAttr(paramName1, value1, paramName2, value2)
+            %   obj.setAttr(attrName, value)
+            %   obj.setAttr(attrName1, value1, attrName2, value2)
             %   obj.setAttr(struct)
             %
             % Examples:
@@ -499,33 +484,33 @@ classdef (Abstract) Entity < handle
             end
         end
 
-        function removeAttr(obj, paramName)
+        function removeAttr(obj, attrName)
             % Remove a attribute by name
             %
             % Description:
             %   Remove a attribute by name from attributes property
             %
             % Syntax:
-            %   removeAttr(obj, paramName)
+            %   removeAttr(obj, attrName)
             %
             % Examples:
             %   obj.removeAttr('Bandwidth')
             % -------------------------------------------------------------
             arguments
                 obj
-                paramName       char
+                attrName       char
             end
 
             if ~isscalar(obj)
-                arrayfun(@(x) removeAttr(x, paramName), obj);
+                arrayfun(@(x) removeAttr(x, attrName), obj);
             end
 
-            if obj.hasAttr(paramName)
+            if obj.hasAttr(attrName)
                 % Set to empty if expected, remove if ad-hoc
-                if obj.expectedAttributes.hasAttr(paramName)
-                    obj.attributes(paramName) = [];
+                if obj.expectedAttributes.hasAttr(attrName)
+                    obj.attributes(attrName) = [];
                 else
-                    remove(obj.attributes, paramName);
+                    remove(obj.attributes, attrName);
                 end
             end
         end
@@ -724,7 +709,7 @@ classdef (Abstract) Entity < handle
             %   If multiple entities are provided, they are assumed to be 
             %   from the same Experiment
             % -------------------------------------------------------------
-            h = ancestor(obj(1), 'aod.core.Experiment');
+            h = getParent(obj(1), 'aod.core.Experiment');
             if ~isempty(h)
                 out = h.homeDirectory;
             else
@@ -842,7 +827,7 @@ classdef (Abstract) Entity < handle
             %   ensure a matching UUID is present (will be needed when 
             %   writing to HDF5 as a link)
             % -------------------------------------------------------------
-            h = obj.ancestor('aod.core.Experiment');
+            h = obj.getParent('aod.core.Experiment');
             if isempty(h)
                 return
             end

@@ -134,10 +134,10 @@ classdef SourceTest < matlab.unittest.TestCase
             testCase.verifyEmpty(source.Sources);
         end
 
-        function Ancestor(testCase)
+        function GetParent(testCase)
             % Confirm returns empty w/ no error if ancestor isn't present
             source = testCase.createSource();
-            testCase.verifyEmpty(source.ancestor('Experiment'));
+            testCase.verifyEmpty(source.getParent('Experiment'));
         end
         
         function SourceErrors(testCase)

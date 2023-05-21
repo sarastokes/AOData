@@ -34,13 +34,13 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags=["Entity"])
-        function ParamRead(testCase)
+        function AttrRead(testCase)
             testCase.verifyTrue(...
                 testCase.EXPT.hasAttr('Administrator'));
             testCase.verifyEqual(...
                 testCase.EXPT.getAttr('Administrator'), "Sara Patterson");
             testCase.verifyFalse(...
-                testCase.EXPT.hasAttr('BadParam'));
+                testCase.EXPT.hasAttr('BadAttr'));
         end
 
         function FileRead(testCase)
@@ -59,8 +59,8 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
                 'getByPath:InvalidHdfPath');
         end
 
-        function Ancestor(testCase)
-            h = ancestor(testCase.EXPT.Epochs(1).Responses(1), 'experiment');
+        function GetParent(testCase)
+            h = getParent(testCase.EXPT.Epochs(1).Responses(1), 'experiment');
             testCase.verifyEqual(testCase.EXPT.UUID, h.UUID);
         end
 

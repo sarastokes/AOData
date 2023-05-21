@@ -24,7 +24,7 @@ function pEntity = swapInterfaces(cEntity)
     assert(cEntity.entityType ~= aod.core.EntityTypes.EXPERIMENT,...
         "swapInterface only works for non-experiment entities");
     
-    h = cEntity.ancestor('Experiment');
+    h = cEntity.getParent('Experiment');
     if ~isSubclass(h, 'aod.persistent.Entity')
         error("swapInterfaces:NoPersistedParent",...
         "Entity must have a persisted parent");

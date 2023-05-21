@@ -562,7 +562,7 @@ obj = aod.core.Entity(name)
 			\item \aodfcn{removeFile(obj, fileKey)}\\
 			%
 			\item \aodfcn{fPath = getHomeDirectory(obj)} - once an entity has been added to the Experiment or to another entity that is added, this function will return the \aodprop{homeDirectory} of \aodclass{aod.core.Experiment}
-			\item \aodfcn{h = ancestor(obj, entityType)} - recursively searches \aodprop{Parent} to find an entity of the specified type. % find an entity that that is a className or subclass of className 
+			\item \aodfcn{h = getParent(obj, entityType)} - recursively searches \aodprop{Parent} to find an entity of the specified type. % find an entity that that is a className or subclass of className 
 			\item \aodfcn{assignUUID(obj, UUID)} - assign a specific UUID to an entity. UUIDs are generated automatically for all entities and must be unique within in an experiment. However, some entities may not be unique across experiments. Use this method if you would like to have, for example, a Source or Device that is identifiable by the same UUID in each experiment. 
 		\end{itemize}
 		\docheader{Protected methods:}
