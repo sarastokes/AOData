@@ -66,6 +66,34 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
             entity.setParent(obj);
             obj.addEntity(entity);
         end
+
+        function remove(obj, entityType, varargin)
+            
+            import aod.core.EntityTypes
+
+            entityType = aod.core.EntityTypes.get(entityType);
+            if ~ismember(entityType, obj.entityType.validChildTypes())
+                error('remove:InvalidEntityType', ...
+                    'Entity must be EpochDataset, Registration, Response and Stimulus');
+            end 
+
+            % Remove all entities?
+            if istext(varargin{1}) && strcmpi(varargin{1}, 'all')
+                obj.(entityType.parentContainer()) = entityType.empty();
+                return 
+            end
+
+            % Remove specific entities, by ID or query
+            if isnumeric(varargin{1})
+                mustBeInteger(varargin{1});
+                mustBeInRange(varargin{1}, 0, numel(obj.(entityType.persistentParentContainer())));
+                idx = varargin{1};
+            elseif iscell(varargin{1})
+                % Get the indices of entities matching query
+            else error('remove:InvalidID',...
+                    'ID must be "all", query or integer index of entities to remove');
+            end
+        end
     end
 
     methods (Sealed, Access = protected)

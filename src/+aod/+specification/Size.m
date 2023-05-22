@@ -6,12 +6,17 @@ classdef Size < aod.specification.Validator
 %
 % Static method constructor:
 %   obj = aod.specification.Size(input)
+%
+% Methods:
+%   tf = isscalar(obj)
+%   tf = isvector(obj)
+%   x = ndims(obj)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value               
+        Value          
     end
 
     methods
@@ -19,6 +24,34 @@ classdef Size < aod.specification.Validator
             if nargin > 0
                 obj.setValue(input);
             end
+        end
+
+        function tf = isscalar(obj)
+            tf = false;
+            if ndims(obj) == 2 && all(obj.isfixed())
+                if all(arrayfun(@(x) x.Length == 1, obj.Value))
+                    tf = true;
+                end
+            end
+        end
+
+        function tf = isvector(obj)
+            if isempty(obj)
+                tf = false;
+            end
+            fixedDims = obj.isfixed();
+            if ndims(obj) ~= 2 || nnz(fixedDims) == 0
+                tf = false;
+                return 
+            end 
+
+            idx = false(1, obj.ndims());
+            for i = 1:numel(obj.Value)
+                if fixedDims(i) && obj.Value(i).Length == 1
+                    idx(i) = true;
+                end
+            end
+            tf = (nnz(idx) == 1);
         end
     end
 
@@ -54,6 +87,7 @@ classdef Size < aod.specification.Validator
                 tf = false;
                 return
             end
+
             % Check the individual dimensions
             for i = 1:numel(obj.Value)
                 if ~validate(obj.Value(i), size(input, i))
@@ -61,6 +95,8 @@ classdef Size < aod.specification.Validator
                     return
                 end
             end
+
+            % If it passes all the tests, the input is valid
             tf = true;
         end
 
@@ -82,6 +118,12 @@ classdef Size < aod.specification.Validator
             end
 
             out = string(out);
+        end
+    end
+
+    methods (Access = private)
+        function idx = isfixed(obj)
+            idx = arrayfun(@(x) isa(x, 'aod.specification.size.FixedDimension'), obj.Value);
         end
     end
 
@@ -161,6 +203,10 @@ classdef Size < aod.specification.Validator
                 end
             end
             tf = true;
+        end
+
+        function value = ndims(obj)
+            value = numel(obj.Value);
         end
     end
 end

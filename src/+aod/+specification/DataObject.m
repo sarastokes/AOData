@@ -32,16 +32,20 @@ classdef DataObject < handle
 
             % Initialize from user-defined inputs
             obj.Name = prop;
-            ip = inputParser();
-            ip.CaseSensitive = false;
-            addParameter(ip, 'Size', []);
-            addParameter(ip, 'Description', "");
-            addParameter(ip, 'Class', []);
-            addParameter(ip, 'Function', {});
-            addParameter(ip, 'Default', []);
-            parse(ip, varargin{:});
 
+            ip = obj.getParser(varargin{:});
             arrayfun(@(x) obj.parse(x, ip.Results.(x)), string(ip.Parameters));
+            obj.checkIntegrity();
+        end
+    end
+
+    methods 
+        function assign(obj, varargin)
+            ip = obj.getParser(varargin{:});
+
+            % Only pass the values user provided
+            changedProps = setdiff(ip.Parameters, ip.UsingDefault);
+            cellfun(@(x) obj.parse(x, ip.Results.(x)), changedProps);
             obj.checkIntegrity();
         end
 
@@ -96,6 +100,17 @@ classdef DataObject < handle
                     error('DataObject:InvalidType',...
                         'Specification type must be size, function class, default or description');
             end
+
+            function ip = getParser(obj, varargin)
+                ip = inputParser();
+                ip.CaseSensitive = false;
+                addParameter(ip, 'Size', []);
+                addParameter(ip, 'Description', "");
+                addParameter(ip, 'Class', []);
+                addParameter(ip, 'Function', {});
+                addParameter(ip, 'Default', []);
+                parse(ip, varargin{:});
+            end 
         end
 
         function checkIntegrity(obj)

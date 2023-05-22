@@ -29,8 +29,8 @@ classdef EntitySearch < handle
 
     methods
         function obj = EntitySearch(entityGroup, queries)
-            arguments
-                entityGroup         {mustBeA(entityGroup, 'aod.core.Entity')}
+            arguments 
+                entityGroup         {aod.util.mustBeEntity(entityGroup)}
             end
 
             arguments (Repeating)
@@ -128,12 +128,12 @@ classdef EntitySearch < handle
     end 
 
     % Query methods
-    methods (Access = private)
+    methods (Access = protected)
         function classQuery(obj, className)
             % Find entities that are members of specified class
             for i = 1:numel(obj.Group)
                 if obj.filterIdx(i)
-                    obj.filterIdx(i) = strcmpi(class(obj.Group(i)), className);
+                    obj.filterIdx(i) = strcmpi(obj.getEntityClass(obj.Group(i)), className);
                 end
             end
         end
@@ -142,7 +142,7 @@ classdef EntitySearch < handle
             % Find entities that are members/subclasses of specified class
             for i = 1:numel(obj.Group)
                 if obj.filterIdx(i)
-                    obj.filterIdx(i) = isSubclass(obj.Group(i), className);
+                    obj.filterIdx(i) = isSubclass(obj.getEntityClass(obj.Group(i)), className);
                 end
             end
         end
@@ -294,6 +294,16 @@ classdef EntitySearch < handle
                     end
                     obj.filterIdx(i) = isequal(obj.Group(i).getAttr(paramName), paramSpec);
                 end
+            end
+        end
+    end
+
+    methods (Static)
+        function className = getEntityClass(entity)
+            if isSubclass(entity, 'aod.core.Entity')
+                className = class(entity);
+            elseif isSubclass(entity, 'aod.persistent.Entity')
+                className = entity.entityClassName;
             end
         end
     end

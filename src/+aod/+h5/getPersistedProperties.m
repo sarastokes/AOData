@@ -21,9 +21,9 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
 %       Names of properties that are empty (if an object was provided)
 %
 % See also:
-%   aod.infra.getSystemAttributes
+%   aod.infra.getSystemAttributes, aod.infra.getSystemProperties
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     arguments
@@ -34,16 +34,18 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
     if isSubclass(obj, 'aod.core.Entity')
         isObject = true;
         mc = metaclass(obj);
-    else
-        assert(istext(obj) && exist(obj, 'class'),... 
+    elseif isa(obj, 'meta.class')
+        mc = obj;
+        isObject = false;
+    elseif istext(obj)
+        assert(ismember('aod.core.Entity', superclasses(obj)),... 
             'Input must be class name or instance of a class')
         isObject = false;
         mc = meta.class.fromName(obj);
     end
 
-    entityType = aod.core.EntityTypes.get(obj);
-    containerProps = entityType.childContainers();
-    
+    containerProps = aod.core.EntityTypes.allContainerNames();
+   
     alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
     alwaysAttributeProps = ["UUID", "label", "parameters", "entityType", "DateCreated", "LastModified"];
     alwaysAbandonedProps = "Reader";  %! TODO

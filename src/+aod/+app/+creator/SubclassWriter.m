@@ -261,9 +261,9 @@ classdef SubclassWriter < handle
                 out = out + " " + newline;
             end
 
-            if out == ""
-                return
-            end
+            % if out == ""
+            %     return
+            % end
             % out = obj.indent(1) + "methods (Access = protected)" + newline + out;
             % out = out + obj.indent(1) + "end" + newline;
             % out = out + " " + newline;

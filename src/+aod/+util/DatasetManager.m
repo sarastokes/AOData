@@ -271,15 +271,21 @@ classdef DatasetManager < handle & matlab.mixin.CustomDisplay
     methods (Static)
         function DM = populate(obj)
             
-            arguments
-                obj         {mustBeA(obj, 'aod.core.Entity')}
+            if istext(obj) && ismember('aod.core.Entity', superclasses(obj))
+                mc = meta.class.fromName(obj);
+            elseif isSubclass(obj, 'aod.core.Entity')
+                mc = metaclass(obj);
+            else
+                error('populate:InvalidInput',...
+                    'Input must be a class or class name with superclass aod.core.Entity');
             end
             
-            mc = metaclass(obj);
+            % mc = metaclass(obj);
             propList = mc.PropertyList;
 
-            [props, ~, ~, emptyProps] = aod.h5.getPersistedProperties(obj);
-            classProps = [props; emptyProps];
+            % [props, ~, ~, emptyProps] = aod.h5.getPersistedProperties(obj);
+            classProps = aod.h5.getPersistedProperties(mc);
+            %classProps = [props; emptyProps];
             systemProps = aod.infra.getSystemProperties();
 
             ED = []; numProps = 0;

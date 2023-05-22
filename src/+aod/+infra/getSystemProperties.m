@@ -1,4 +1,4 @@
-function specialProps = getSystemProperties()
+function props = getSystemProperties()
 % Return properties reserved by AOData
 %
 % Description:
@@ -6,11 +6,12 @@ function specialProps = getSystemProperties()
 %   when writing an entity to an HDF5 file
 %
 % Syntax:
-%   specialProps = aod.infa.getSystemProperties
+%   props = aod.infa.getSystemProperties()
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     
-    specialProps = ["Parent", "notes", "Name", "files",...
+    props = ["Parent", "notes", "Name", "files",...
         "UUID", "description", "attributes", "Timing", "Code",...
         "expectedDatasets", "expectedAttributes"];
+    %props = [props, aod.core.EntityTypes.allContainerNames()];

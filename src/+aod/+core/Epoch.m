@@ -158,7 +158,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 end
             else
                 error('remove:InvalidID',...
-                    'ID must be "all" or integer index of entities to remove');
+                    'ID must be "all", query or integer index of entities to remove');
             end
     
             switch entityType 
