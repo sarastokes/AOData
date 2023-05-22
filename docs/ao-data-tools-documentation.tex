@@ -219,7 +219,7 @@ pic me set={file}{file},
 			\item While metadata file names for each epoch are predictable, we still need a way of automatically identifying them that is robust to small changes. Robust reading of metadata is important too, we don't want the code to break if a line is added/removed from a .txt file.
 			\item A strong metadata solution will extend beyond what is generated during an experiment to include stimulus design and analysis. 
 			\item We have individual preferences on how we analyze our post-registration data and need a common foundation that can accommodate and contain those preferences.
-			\item Our code changes over time and we need to be free to make necessary changes without fear of breaking past code. % git and aod.util.Attributes
+			\item Our code changes over time and we need to be free to make necessary changes without fear of breaking past code. % git and aod.common.Attributes
 			\item Metadata and data must be saved in a format appropriate for long-term archival. This format should be platform/language-independent, fast and capable of handling large heterogeneous datasets. % HDF5 files
 		\end{enumerate}
 		
@@ -466,7 +466,7 @@ disp(channel.Devices.parameters)
 		\noindent When you create custom classes in MATLAB, you can only concatenate members of the same class. This gets annoying when you have multiple subclasses of one of your custom classes and want to make them into an array (which we do for all containers). By subclassing \matclass{matlab.mixin.Heterogenous} in each core class (other than Entity), your subclasses of, for example, \aodclass{aod.core.Device} can be concatenated into an array. A quirk of using \matclass{matlab.mixin.Heterogeneous} is that all methods in the class subclassing it must be either \texttt{Sealed} or \texttt{Abstract}. You don't have to continue this practice when subclassing the core classes and do not need to declare inheritance again from \matclass{matlab.mixin.Heterogeneous}. Also, your classes cannot inherit two classes that use \matclass{matlab.mixin.Heterogeneous} (e.g. both Device and Channel), though I can't imagine why you would need to do that anyway.
 	\subsubsection{Enumerations}
 		\label{subsubsection:Enum}
-		\noindent Enumerations are useful when you have a list of things and you want to standardize their behavior. MATLAB's documentation (see \myurl{\ref{section:CodeDoc}}) will do a better job describing this than I will, but two things are worth mentioning here. First, entity behavior is codified in an enumeration (\aodclass{aod.core.EntityTypes}). Second, you may want to include a static \aodfcn{init} method if you want to read back your own enumerations classes from HDF to MATLAB. You don't need to deal with enumerations to use AOData, but they can be helpful (for more examples see \aodclass{sara.EpochTypes} and \aodclass{sara.SpectralTypes}).	
+		\noindent Enumerations are useful when you have a list of things and you want to standardize their behavior. MATLAB's documentation (see \myurl{\ref{section:CodeDoc}}) will do a better job describing this than I will, but two things are worth mentioning here. First, entity behavior is codified in an enumeration (\aodclass{aod.common.EntityTypes}). Second, you may want to include a static \aodfcn{init} method if you want to read back your own enumerations classes from HDF to MATLAB. You don't need to deal with enumerations to use AOData, but they can be helpful (for more examples see \aodclass{sara.EpochTypes} and \aodclass{sara.SpectralTypes}).	
 		
 	\subsubsection{Dynamic Properties}
 		\label{subsubsection:DynProps}
@@ -502,7 +502,7 @@ obj = MyClass(inputs)
 	\begin{itemize}
 		\item \aodprop{MyProp}
 	\end{itemize}
-	\docheader{Parameters:} Optional inputs sent to \aodclass{aod.util.Attributes} and written as attributes
+	\docheader{Parameters:} Optional inputs sent to \aodclass{aod.common.Attributes} and written as attributes
 	\begin{itemize}
 		\item \aodparam{MyParam}
 	\end{itemize}
@@ -530,8 +530,8 @@ obj = aod.core.Entity(name)
 		\begin{itemize}
 			\item \aodprop{Name} - user-defined name for the entity
 			\item \aodprop{description} - a space for describing the Entity is (in case the class, properties and parameters are not sufficient)
-			\item \aodprop{parameters} - \aodclass{aod.util.Attributes} containing entity metadata
-			\item \aodprop{files} - \aodclass{aod.util.Attributes} containing file names associated with the entity
+			\item \aodprop{parameters} - \aodclass{aod.common.Attributes} containing entity metadata
+			\item \aodprop{files} - \aodclass{aod.common.Attributes} containing file names associated with the entity
 			\item \aodprop{notes} - a space for miscellaneous comments
 		\end{itemize}
 		\docheader{Private Properties:} These are handled behind the scenes and average users shouldn't need to worry about them
@@ -752,7 +752,7 @@ obj = aod.core.Annotation(data)
 		\end{itemize}
 		\docheader{Protected Properties:}
 		\begin{itemize}
-			\item \aodprop{Reader} - \aodclass{aod.util.FileReader}
+			\item \aodprop{Reader} - \aodclass{aod.common.FileReader}
 		\end{itemize}
 		\docheader{Sealed Protected Methods:}
 		\begin{itemize}
@@ -814,7 +814,7 @@ obj = aod.core.Registration(name, registrationDate)
 			\item \aodclass{aod.builtin.registrations.StripRegistration}
 		\end{itemize}
 	\subsection{aod.core.Stimulus \myparent{aod.core.Entity, matlab.mixin.Heterogeneous}}
-		\noindent Stimuli presented during the Epoch. Optionally, the contents of \aodclass{aod.core.Stimulus} can be generated automatically by passing a \aodclass{aod.util.Protocol} used to create the stimulus presented during the trial.
+		\noindent Stimuli presented during the Epoch. Optionally, the contents of \aodclass{aod.core.Stimulus} can be generated automatically by passing a \aodclass{aod.common.Protocol} used to create the stimulus presented during the trial.
 		\begin{lstlisting}
 obj = aod.core.Stimulus(name)
 obj = aod.core.Stimulus(name, protocol)
@@ -929,7 +929,7 @@ response = aod.core.Response(name);
 		\end{lstlisting}
 	
 \section{Support Classes}
-	\subsection{aod.core.EntityTypes \myparent{enumeration}}
+	\subsection{aod.common.EntityTypes \myparent{enumeration}}
 		\noindent Lays out the business logic of the different entity types. Unlikely that you will need to make any changes here but it's worth checking out if you're interested in how the entities are organized. 
 		
 	\subsection{aod.util.Factory \textcolor{gray}{(handle)}}
@@ -965,15 +965,15 @@ classdef MyFactory < aod.util.Factory
 end
 		\end{lstlisting}
 		
-	\subsection{aod.util.Attributes \myparent{containers.Map}}
-		\noindent  This is a wrapper for MATLAB's builtin \aodclass{containers.Map} class, so you if know how to use that then you know how to use \aodclass{aod.util.Attributes}. The only differences are better command line display (each key and the associated values are displayed) and a standardized approach for writing to HDF5 files. 
+	\subsection{aod.common.Attributes \myparent{containers.Map}}
+		\noindent  This is a wrapper for MATLAB's builtin \aodclass{containers.Map} class, so you if know how to use that then you know how to use \aodclass{aod.common.Attributes}. The only differences are better command line display (each key and the associated values are displayed) and a standardized approach for writing to HDF5 files. 
 		
 		This class is central to AOData because it provides a means of defining properties for entities in a flexible way that avoids hard-coding and class incompatibility as you change the underlying code. 
-		Each core class has a \aodclass{aod.util.Attributes} class. The contents of an \aodclass{aod.util.Attributes} property will be written as \textbf{attributes} of its parent entity in the HDF5 file. The contents of an attribute should be reasonably small (some text, a number, maybe a short row of numbers. If needed, more info can be found in \myurl{\ref{subsection:HDFIO}} on "Reading and Writing Entities to HDF5 files").  \textbf{In general, entity parameters are metadata and entity properties are data}. There are undoubtedly exceptions, but it's a good rule of thumb.
+		Each core class has a \aodclass{aod.common.Attributes} class. The contents of an \aodclass{aod.common.Attributes} property will be written as \textbf{attributes} of its parent entity in the HDF5 file. The contents of an attribute should be reasonably small (some text, a number, maybe a short row of numbers. If needed, more info can be found in \myurl{\ref{subsection:HDFIO}} on "Reading and Writing Entities to HDF5 files").  \textbf{In general, entity parameters are metadata and entity properties are data}. There are undoubtedly exceptions, but it's a good rule of thumb.
 		
 		\textit{More info here.} See \aodclass{aod.core.Devices} for an example on specification of default class parameters.
 		
-		There is one other use for \aodclass{aod.util.Attributes} and that is providing a \aodclass{containers.Map}-like data type to store files associated with an entity (e.g. \aodprop{files} for \aodclass{aod.core.Epoch}). Any property named \aodprop{files} will be written as a group with the contents as attributes. This is a bit odd but it was the best option available as I didn't want to clutter up the entity attributes or datasets with a bunch of file names.
+		There is one other use for \aodclass{aod.common.Attributes} and that is providing a \aodclass{containers.Map}-like data type to store files associated with an entity (e.g. \aodprop{files} for \aodclass{aod.core.Epoch}). Any property named \aodprop{files} will be written as a group with the contents as attributes. This is a bit odd but it was the best option available as I didn't want to clutter up the entity attributes or datasets with a bunch of file names.
 	
 	\subsection{aod.util.template.ExpectedParameter \myparent{handle}}
 		\label{subsection:ExpectedParameter}
@@ -1010,11 +1010,11 @@ ParameterManager with 2 parameters:
 		\end{lstlisting}
 
 
-	\subsection{aod.util.Protocol \myparent{handle}}
+	\subsection{aod.common.Protocol \myparent{handle}}
 		\label{subsection:ProtocolDoc}
 		\noindent Protocols define how stimuli are constructed from a basic set of parameters and how they are transformed into the format the stimulator requires. See \myurl{\ref{subsection:CreatingAProtocol}} on ``Creating A Protocol'' for a detailed explanation. 
 		\begin{lstlisting}[style=matlab-editor, basicstyle=\mlttfamily\footnotesize]
-obj = aod.util.Protocol(calibration, varargin)
+obj = aod.common.Protocol(calibration, varargin)
 		\end{lstlisting}
 	
 		\docheader{Abstract Methods:}
@@ -1042,13 +1042,13 @@ obj = aod.util.Protocol(calibration, varargin)
 			\item \aodfcn{value = samples2sec(obj)}
 		\end{itemize}
 		
-		\noindent How is \aodclass{aod.util.Protocol} different from \aodclass{aod.core.Stimulus}? A Protocol defines how the stimulus was created and provides a record of the parameters used. A Stimulus is what actually happened during the experiment (e.g. for the LEDs we have two outputs: a JSON file with the LED voltages at each stimulation interval which is 2 ms and a CSV file with the voltages at each frame along with the timing of each frame). 
+		\noindent How is \aodclass{aod.common.Protocol} different from \aodclass{aod.core.Stimulus}? A Protocol defines how the stimulus was created and provides a record of the parameters used. A Stimulus is what actually happened during the experiment (e.g. for the LEDs we have two outputs: a JSON file with the LED voltages at each stimulation interval which is 2 ms and a CSV file with the voltages at each frame along with the timing of each frame). 
 	
-	\subsection{aod.util.FileReader \myparent{handle}}
+	\subsection{aod.common.FileReader \myparent{handle}}
 		\label{subsection:FileReaderDoc}
 		\noindent FileReader classes provide a designated, contained location for reading files. Create one per metadata file you want to read in, then you can easily add/remove/alter how the files are read without disrupting any other code. The files created during an experiment change with the type of trial you run and with subclasses of \aodclass{aod.core.Epoch}, you can define exactly which are needed. 
 		
-		Without knowing the contents of your files and the information you want to extract, how can \aodclass{aod.util.FileReader} help you read files in a robust way, beyond just providing a contained location for reading each file?  
+		Without knowing the contents of your files and the information you want to extract, how can \aodclass{aod.common.FileReader} help you read files in a robust way, beyond just providing a contained location for reading each file?  
 	
 	\subsection{aod.util.FileManager \myparent{handle}}
 		\noindent The \aodclass{aod.util.FileManager} class houses pipelines for automatically identifying specific experiment files. Not every file need to be assigned through \aodclass{aod.util.FileManager}, but if you have a large number of files generated per Epoch, for example, it can be useful to segregate file name buil\\
@@ -1110,7 +1110,7 @@ experiment.Epochs(1:5).Responses
 
 \section{HDF5 File Details}
 	\label{section:HDF5_Details}
-	\noindent High-level summary: When you write an entity to an HDF5 file, the entity will be written as a \textbf{group}. Public properties will be written as  \textbf{datasets} within the group. Anything in a \aodclass{aod.util.Attributes} object will be written as an \textbf{attribute} of the group. Properties referring to other entities (e.g. Parent) are written as \textbf{references}.  Several entities also contain default groups which are \textit{containers} for other groups (e.g. Experiments have Calibrations, a container group for all the individual Calibration groups). 
+	\noindent High-level summary: When you write an entity to an HDF5 file, the entity will be written as a \textbf{group}. Public properties will be written as  \textbf{datasets} within the group. Anything in a \aodclass{aod.common.Attributes} object will be written as an \textbf{attribute} of the group. Properties referring to other entities (e.g. Parent) are written as \textbf{references}.  Several entities also contain default groups which are \textit{containers} for other groups (e.g. Experiments have Calibrations, a container group for all the individual Calibration groups). 
 	
 	\subsection{Entity locations within the HDF5 file}
 		\label{subsection:EntityLocationsInHDF5}
@@ -1195,13 +1195,13 @@ experiment.Epochs(1:5).Responses
 			\item All other properties are written as datasets within the entity group. Virtually all MATLAB data types are supported, except multilevel \matclass{struct}. Most other data types translate well, with a few quirks:
 			\begin{itemize}
 				\item HDF5 doesn't have a \matclass{datetime} class, so these properties are written as a text dataset, with attributes specifying the format to aid conversion when reading the HDF5 file back into MATLAB.
-				\item For an \aodclass{enumeration} property, the enumerated type is written as a string dataset. The name of the enumeration class is written as an attribute of the dataset. This works if the enumeration class has a static method called \aodfcn{init()} that takes the enumerated type name as a char and returns the enumerated type (see \aodclass{aod.core.EntityTypes} for an example). HDF5 does have enumeration support, but this works just as well. 
-				\item Several entities have a \aodprop{files} property of class \aodclass{aod.util.Attributes}. The contents are written as attributes of a text dataset with some placeholder text.
+				\item For an \aodclass{enumeration} property, the enumerated type is written as a string dataset. The name of the enumeration class is written as an attribute of the dataset. This works if the enumeration class has a static method called \aodfcn{init()} that takes the enumerated type name as a char and returns the enumerated type (see \aodclass{aod.common.EntityTypes} for an example). HDF5 does have enumeration support, but this works just as well. 
+				\item Several entities have a \aodprop{files} property of class \aodclass{aod.common.Attributes}. The contents are written as attributes of a text dataset with some placeholder text.
 				\item If \aodprop{Timing} is present but empty and the parent class has \aodprop{Timing}, a link will be written to that dataset. This allows, for example \aodclass{aod.core.Response} to inherit timing from \aodclass{aod.core.Epoch}
 				\item Data of class \matclass{table} are converted to as \aodclass{struct}, then written as compound data types
 			\end{itemize}
 			Each dataset is written with an attribute describing the original MATLAB type to ensure the data is read back in appropriately.
-			\item The contents of \aodclass{aod.util.Attributes} classes are written as attributes of the entity group.
+			\item The contents of \aodclass{aod.common.Attributes} classes are written as attributes of the entity group.
 			\begin{itemize}
 				\item Attributes should be small, consistent with them representing metadata rather than the data itself - some text, a number, maybe a row of numbers. I'm not sure what the hard size limit is (if there is one) but if you're writing some ND array it's worth thinking about whether it truly qualifies as metadata.
 				\item Arrays of more than one \matclass{string} and \matclass{struct} cannot be written as attributes.
@@ -1229,8 +1229,8 @@ T = table(obj);
 		
 		Second, we can use the same system in different ways. In the example above, we're using one system for anatomy and for physiology. The channels involved and the devices within them are different, even though it's technically the same ``System''. The different ``Channels'' and their devices make sense under a larger group that defines how the system is being used. This is why channels fall under systems in the persistent hierarchy and why there is the capacity for you to specify more that one System (they're more like ``System Configurations'' but that was a long class name).  
 		
-		How is this implemented? In \aodclass{aod.core.EntityTypes}, there is a function called \aodfcn{validParentTypes()}. 
-		There is also a method called \aodfcn{setParent()} which takes an input, confirms it is a subclass of the valid parent types defined in \aodclass{aod.core.EntityTypes}.
+		How is this implemented? In \aodclass{aod.common.EntityTypes}, there is a function called \aodfcn{validParentTypes()}. 
+		There is also a method called \aodfcn{setParent()} which takes an input, confirms it is a subclass of the valid parent types defined in \aodclass{aod.common.EntityTypes}.
 		
 		So that was the logic behind the location of \aodclass{aod.core.Device}. Now what do we put in the class? When designing the classes, the overarching goal was to standardize behavior while being as generic and unrestrictive as possible. 
 		That being said, the purpose here is archiving the many aspects of our experiments that are relevant to interpreting the results, like the relationship between Devices, Channels and Systems described above. I took the perspective of asking What does someone else need to know to about this device to understand it 10 years from now? Then I asked whether that information could apply to every single device and if the answer was no, it's not included in \aodclass{aod.core.Device}. I settled on two parameters: \aodparam{Manufacturer} and \aodparam{Model}. I considered serial number as well, but that was only useful for some devices (e.g. a PMT) and completely unnecessary for others (e.g. a pinhole).
@@ -1298,7 +1298,7 @@ end
 		\noindent The option to store not only the output, but also the file name and how the file was read.
 	\subsection{Creating a protocol}
 		\label{subsection:CreatingAProtocol}
-		\noindent Each subclass of \aodclass{aod.util.Protocol} must define two properties: \aodprop{sampleRate}, the rate data is sampled in Hz, and \aodprop{stimRate}, the rate stimuli are presented in Hz.
+		\noindent Each subclass of \aodclass{aod.common.Protocol} must define two properties: \aodprop{sampleRate}, the rate data is sampled in Hz, and \aodprop{stimRate}, the rate stimuli are presented in Hz.
 		\\
 		The stimulus is created and written with the following methods:
 		\begin{enumerate}
@@ -1311,7 +1311,7 @@ end
 	
 		\noindent Below is a template for defining a new protocol:
 		\begin{lstlisting}[style=Matlab-editor, basicstyle=\mlttfamily\footnotesize]
-classdef MyProtocol < aod.util.Protocol
+classdef MyProtocol < aod.common.Protocol
 
 	% Define properties specific to this protocol
 	properties
@@ -1327,7 +1327,7 @@ classdef MyProtocol < aod.util.Protocol
 	
 	methods
 		function obj = MyProtocol(varargin)
-			obj = obj@aod.util.Protocol(varargin{:});
+			obj = obj@aod.common.Protocol(varargin{:});
 			
 			% Parse properties specific to this protocol
 			ip = aod.util.InputParser();
@@ -1361,7 +1361,7 @@ end
 		For example, here's a protocol called \aodclass{Steps} for the LEDs on the 1P primate system. Data is sampled at 25 Hz (\aodprop{sampleRate}) and the update rate for the LEDs is 500 Hz (\aodprop{stimRate}). 
 		This protocol begins at a baseline value (\aodprop{baseIntensity}) for a set amount of time (\aodprop{preTime}), increases (\aodprop{contrast}) for a set amount of time (\aodprop{stimTime}), then returns to the baseline value (\aodprop{baseIntensity}) for a set amount of time (\aodprop{tailTime}), This creates an achromatic step in contrast.
 		\begin{lstlisting}[style=Matlab-editor, basicstyle=\mlttfamily\footnotesize]
-classdef Step < aod.util.Protocol
+classdef Step < aod.common.Protocol
 	
 	% Protocol-specific, all public access properties are saved
 	properties
@@ -1386,7 +1386,7 @@ classdef Step < aod.util.Protocol
 	
 	methods
 		function obj = ContrastStep(ledMaxPowers, varargin)
-			obj = obj@aod.util.Protocol(varargin{:});
+			obj = obj@aod.common.Protocol(varargin{:});
 			
 			obj.ledMaxValues = ledMaxValues;
 			
@@ -1462,7 +1462,7 @@ classdef Step < aod.util.Protocol
 end
 		\end{lstlisting}
 	\noindent 
-	You might notice a this protocol used few functions and properties that weren't defined. These are inherited from \aodclass{aod.util.Protocol}. For example, several methods are defined for converting between seconds and samples (\aodfcn{obj.sec2samples(sec)}, \aodfcn{obj.samples2sec(samples)}) which use the value you set for \aodprop{sampleRate}. To convert between seconds and the stimulator's timing, there's \aodfcn{obj.sec2pts(sec)} and \aodfcn{obj.pts2sec(pts)} which use your value for \aodprop{stimRate}. There's also a property \aodprop{totalTime} which calls the function \aodfcn{calculateTotalTime()}. See the \aodclass{aod.util.Protocol} code for more.	
+	You might notice a this protocol used few functions and properties that weren't defined. These are inherited from \aodclass{aod.common.Protocol}. For example, several methods are defined for converting between seconds and samples (\aodfcn{obj.sec2samples(sec)}, \aodfcn{obj.samples2sec(samples)}) which use the value you set for \aodprop{sampleRate}. To convert between seconds and the stimulator's timing, there's \aodfcn{obj.sec2pts(sec)} and \aodfcn{obj.pts2sec(pts)} which use your value for \aodprop{stimRate}. There's also a property \aodprop{totalTime} which calls the function \aodfcn{calculateTotalTime()}. See the \aodclass{aod.common.Protocol} code for more.	
 
 \section{Miscellaneous FAQs}
 	\label{section:Misc}

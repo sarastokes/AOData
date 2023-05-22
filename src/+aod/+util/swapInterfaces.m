@@ -21,7 +21,7 @@ function pEntity = swapInterfaces(cEntity)
     end
 
     aod.util.mustHaveParent(cEntity);
-    assert(cEntity.entityType ~= aod.core.EntityTypes.EXPERIMENT,...
+    assert(cEntity.entityType ~= aod.common.EntityTypes.EXPERIMENT,...
         "swapInterface only works for non-experiment entities");
     
     h = cEntity.getParent('Experiment');

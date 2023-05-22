@@ -21,7 +21,7 @@ classdef CustomDisplayTest < matlab.unittest.TestCase
 
     methods (Test)
         function Attributes(testCase)
-            paramObj = aod.util.Attributes();
+            paramObj = aod.common.Attributes();
             disp(paramObj);
             paramObj('Param1') = 1;
             paramObj('Param2') = 2;

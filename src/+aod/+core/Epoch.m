@@ -88,7 +88,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Notes: Only entities contained by Epoch can be added:
             %   EpochDataset, Response, Registration, Stimulus
             % ------------------------------------------------------------- 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             entityType = EntityTypes.get(entity);
             if ~ismember(entityType, obj.entityType.validChildTypes())
@@ -129,9 +129,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 return 
             end
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
-            entityType = aod.core.EntityTypes.get(entityType);
+            entityType = aod.common.EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('remove:InvalidEntityType',...
                     'Entity must be EpochDataset, Registration, Response and Stimulus');
@@ -150,7 +150,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
                 idx = varargin{1};
             elseif iscell(varargin{1})
                 % Get the indices of entities matching query
-                [~, idx] = aod.core.EntitySearch.go(obj.get(entityType), varargin{:});
+                [~, idx] = aod.common.EntitySearch.go(obj.get(entityType), varargin{:});
                 if isempty(idx)
                     warning('remove:NoQueryMatches',...
                         'The query returned no matches, no entities removed.');
@@ -185,12 +185,12 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   criteria (described below in examples)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
             %   One or more cells containing queries (TODO: doc)
             % -------------------------------------------------------------
             
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
@@ -201,7 +201,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             group = obj.(entityType.parentContainer());
 
             if nargin > 2 && ~isempty(group)
-                out = aod.core.EntitySearch.go(group, varargin{:});
+                out = aod.common.EntitySearch.go(group, varargin{:});
             else
                 out = group;
             end
@@ -218,7 +218,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             %   tf = has(obj, entityType, varargin)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
             %   One or more cells containing queries (TODO: doc)
             % -------------------------------------------------------------

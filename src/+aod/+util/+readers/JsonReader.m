@@ -1,11 +1,11 @@
-classdef JsonReader < aod.util.FileReader
+classdef JsonReader < aod.common.FileReader
 % Read a JSON file
 %
 % Description:
 %   Basis for reading in JSON files
 %
 % Parent:
-%   aod.util.FileReader
+%   aod.common.FileReader
 %
 % Constructor:
 %   obj = aod.util.readers.JsonReader(fName)
@@ -18,7 +18,7 @@ classdef JsonReader < aod.util.FileReader
 
     methods
         function obj = JsonReader(varargin)
-            obj = obj@aod.util.FileReader(varargin{:});
+            obj = obj@aod.common.FileReader(varargin{:});
         end
 
         function out = readFile(obj)

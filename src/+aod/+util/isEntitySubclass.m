@@ -11,7 +11,7 @@ function tf = isEntitySubclass(obj, entityType)
 %
 % Inputs:
 %   obj             object to check class 
-%   entityType      char/aod.core.EntityTypes (default = all entities)
+%   entityType      char/aod.common.EntityTypes (default = all entities)
 %
 % Examples:
 %   % Check whether class is an Entity subclass
@@ -21,7 +21,7 @@ function tf = isEntitySubclass(obj, entityType)
 %   tf = aod.util.isEntitySubclass(obj, "Annotation")
 %
 % See also:
-%   aod.core.EntityTypes
+%   aod.common.EntityTypes
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -31,7 +31,7 @@ function tf = isEntitySubclass(obj, entityType)
         return
     end
 
-    entityType = aod.core.EntityTypes.get(entityType);
+    entityType = aod.common.EntityTypes.get(entityType);
     persistentParentClass = entityType.getPersistentClassName();
     coreParentClass = entityType.getCoreClassName();
 

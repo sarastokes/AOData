@@ -9,7 +9,7 @@ function obj = map2attributes(cMap)
     assert(isa(cMap, 'containers.Map'),...
         'Input must be a containers.Map');
              
-    obj = aod.util.Attributes();
+    obj = aod.common.Attributes();
     if isempty(cMap)
         return 
     end

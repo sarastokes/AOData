@@ -257,7 +257,7 @@ classdef SubclassGenerator < handle
                 entityType      
             end
 
-            obj.EntityType = aod.core.EntityTypes.get(entityType);
+            obj.EntityType = aod.common.EntityTypes.get(entityType);
         end
 
         function set.SuperClass(obj, className)
@@ -350,7 +350,7 @@ classdef SubclassGenerator < handle
         end 
 
         function out = getAllowableEntityTypes(obj) %#ok<MANU> 
-            mc = meta.class.fromName('aod.core.EntityTypes');
+            mc = meta.class.fromName('aod.common.EntityTypes');
             out = arrayfun(@(x) string(appbox.capitalize(x.Name)),... 
                 mc.EnumerationMemberList);
         end

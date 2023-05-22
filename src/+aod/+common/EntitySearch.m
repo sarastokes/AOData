@@ -9,10 +9,10 @@ classdef EntitySearch < handle
 %   Attribute, Dataset, File, Name, Class, Subclass
 %
 % Constructor:
-%   obj = aod.core.EntitySearch(entityGroup, varargin)
+%   obj = aod.common.EntitySearch(entityGroup, varargin)
 %
 % Single line execution:
-%   [matches, idx] = aod.core.EntitySearch.go(entityGroup, varargin)
+%   [matches, idx] = aod.common.EntitySearch.go(entityGroup, varargin)
 %
 % Examples:
 %   A comprehensive list of examples is provided in AOQuery's documentation 
@@ -70,7 +70,7 @@ classdef EntitySearch < handle
             %   EntitySearch object and directly returning the matches
             %
             % Syntax:
-            %   [out, ID] = aod.core.EntitySearch.go(entityGroup, varargin)
+            %   [out, ID] = aod.common.EntitySearch.go(entityGroup, varargin)
             %
             % Inputs:
             %   entityGroup         array of core entities
@@ -96,7 +96,7 @@ classdef EntitySearch < handle
                 out = entityGroup;
                 return
             end
-            obj = aod.core.EntitySearch(entityGroup, varargin{:});
+            obj = aod.common.EntitySearch(entityGroup, varargin{:});
             [out, ID] = obj.getMatches();
         end
     end

@@ -8,8 +8,8 @@ classdef LinkSpecification < aod.util.templates.Specification
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        % aod.core.EntityTypes member (required)
-        EntityType       % aod.core.EntityTypes member(s)   
+        % aod.common.EntityTypes member (required)
+        EntityType       % aod.common.EntityTypes member(s)   
     end
 
     properties (SetAccess = protected)
@@ -41,7 +41,7 @@ classdef LinkSpecification < aod.util.templates.Specification
                 value = commalist2array(value);
             end
             
-            value = aod.util.arrayfun(@(x) aod.core.EntityTypes.get(x), value);
+            value = aod.util.arrayfun(@(x) aod.common.EntityTypes.get(x), value);
 
             obj.EntityType = value;
 

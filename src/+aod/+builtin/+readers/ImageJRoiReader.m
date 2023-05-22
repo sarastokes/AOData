@@ -1,4 +1,4 @@
-classdef ImageJRoiReader < aod.util.FileReader
+classdef ImageJRoiReader < aod.common.FileReader
 % IMAGEJROIREADER
 %
 % Description:
@@ -32,7 +32,7 @@ classdef ImageJRoiReader < aod.util.FileReader
 
     methods
         function obj = ImageJRoiReader(fileName, imSize)
-            obj@aod.util.FileReader(fileName);
+            obj@aod.common.FileReader(fileName);
             obj.Size = imSize;
         end
 

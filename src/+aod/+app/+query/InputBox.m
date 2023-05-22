@@ -140,7 +140,7 @@ classdef InputBox < aod.app.Component
                     obj.nameLabel.Text = "Entity Type";
                     obj.hideValueInput();
                     obj.showNameDropdown();
-                    obj.nameDropdown.Items = string(aod.core.EntityTypes.all());
+                    obj.nameDropdown.Items = string(aod.common.EntityTypes.all());
                     obj.searchButton.Visible = "off";
                 case FilterTypes.NAME 
                     obj.nameLabel.Text = "Entity Name";

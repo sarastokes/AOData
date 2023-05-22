@@ -49,7 +49,7 @@ classdef EntityBox < aod.app.Component
                 case "SelectedNode"
                     hdfPath = evt.Trigger.Tree.SelectedNodes(1).Tag;
                     entityList = string(strsplit(hdfPath, '/'));
-                    idx = cellfun(@(x) isempty(x) || ismember(x, aod.core.EntityTypes.allContainerNames()), entityList);
+                    idx = cellfun(@(x) isempty(x) || ismember(x, aod.common.EntityTypes.allContainerNames()), entityList);
                     entityList(idx) = [];
                     for i = 1:5
                         if i > numel(entityList)

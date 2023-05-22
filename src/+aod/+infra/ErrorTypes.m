@@ -18,22 +18,22 @@ classdef ErrorTypes
 
     methods (Static)
         function obj = init(value)
-            if isa(value, 'aod.util.ErrorTypes')
+            if isa(value, 'aod.infra.ErrorTypes')
                 obj = value;
                 return 
             end
 
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
 
             switch lower(value)
                 case 'error'
-                    obj = aod.util.ErrorTypes.ERROR;
+                    obj = aod.infra.ErrorTypes.ERROR;
                 case 'warning'
-                    obj = aod.util.ErrorTypes.WARNING;
+                    obj = aod.infra.ErrorTypes.WARNING;
                 case 'missing'
-                    obj = aod.util.ErrorTypes.MISSING;
+                    obj = aod.infra.ErrorTypes.MISSING;
                 case 'none'
-                    obj = aod.util.ErrorTypes.NONE;
+                    obj = aod.infra.ErrorTypes.NONE;
                 otherwise
                     error("ErrorTypes:UnrecognizedInput",...
                         'Message levels are error, warning, missing and none');

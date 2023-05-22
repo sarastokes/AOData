@@ -16,7 +16,7 @@ function mirrorClass = findMirror(entityType, entityClass, classManager)
 % -------------------------------------------------------------------------
     
     arguments
-        entityType      {mustBeA(entityType, 'aod.core.EntityTypes')}
+        entityType      {mustBeA(entityType, 'aod.common.EntityTypes')}
         entityClass     string 
         classManager    {mustBeA(classManager, 'aod.infra.ClassRepository')} = []
     end

@@ -90,7 +90,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
 
         function AttributeAccess(testCase)
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
             testCase.verifyError(...
                 @()testCase.EXPT.getAttr('BadParam', ErrorTypes.ERROR),...
                 'getAttr:NotFound');
@@ -104,7 +104,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         end
 
         function FileAccess(testCase)
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
 
             testCase.verifyError(...
                 @()testCase.EXPT.getFile('BadFile', ErrorTypes.ERROR),...
@@ -323,7 +323,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Check device ancestor
             testCase.verifyEqual(...
-                device1.getParent(aod.core.EntityTypes.EXPERIMENT),...
+                device1.getParent(aod.common.EntityTypes.EXPERIMENT),...
                 testCase.EXPT);
 
             % Query devices from Channel

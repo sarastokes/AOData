@@ -89,7 +89,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setTarget(obj, target)
             % -------------------------------------------------------------
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
             entityType = EntityTypes.get(target);
             
             switch entityType 

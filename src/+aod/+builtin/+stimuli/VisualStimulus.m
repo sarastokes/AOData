@@ -9,7 +9,7 @@ classdef VisualStimulus < aod.core.Stimulus
 %   obj = aod.builtin.stimuli.VisualStimulus 
 %
 % See also:
-%   aod.util.Protocol
+%   aod.common.Protocol
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

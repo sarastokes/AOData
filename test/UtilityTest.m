@@ -41,7 +41,7 @@ classdef UtilityTest < matlab.unittest.TestCase
         end
 
         function Attributes(testCase)
-            params = aod.util.Attributes();
+            params = aod.common.Attributes();
             params('A') = 1;
             map = params.toMap();
             testCase.verifyClass(map, 'containers.Map');
@@ -186,10 +186,10 @@ classdef UtilityTest < matlab.unittest.TestCase
         function PropDescription(testCase)
             epoch1 = aod.core.Epoch(1);
             testCase.verifyEqual(...
-                aod.util.getClassPropDescription(epoch1, 'ID'),...
-                aod.util.getClassPropDescription(metaclass(epoch1), 'ID'));
+                aod.specification.util.getClassPropDescription(epoch1, 'ID'),...
+                aod.specification.util.getClassPropDescription(metaclass(epoch1), 'ID'));
             testCase.verifyError(...
-                @() aod.util.getClassPropDescription(epoch1, 'BadName'),...
+                @() aod.specification.util.getClassPropDescription(epoch1, 'BadName'),...
                 "getClassPropDescription:PropertyNotFound");
         end
     end
@@ -208,9 +208,9 @@ classdef UtilityTest < matlab.unittest.TestCase
             out = FM.checkFilesFound(files);
             testCase.verifyEqual(out, files(end));
 
-            FM.setErrorType(aod.util.ErrorTypes.ERROR);
+            FM.setErrorType(aod.infra.ErrorTypes.ERROR);
             testCase.verifyEqual(...
-                FM.messageLevel, aod.util.ErrorTypes.ERROR);
+                FM.messageLevel, aod.infra.ErrorTypes.ERROR);
         end
     end
 end 

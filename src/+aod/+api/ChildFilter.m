@@ -24,7 +24,7 @@ classdef ChildFilter < aod.api.StackedFilterQuery
         function obj = ChildFilter(parent, childType, varargin)
             obj@aod.api.StackedFilterQuery(parent, varargin{:});
 
-            obj.childType = aod.core.EntityTypes.get(childType);
+            obj.childType = aod.common.EntityTypes.get(childType);
         end
     end
 

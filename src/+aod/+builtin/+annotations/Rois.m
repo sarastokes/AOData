@@ -70,7 +70,7 @@ classdef Rois < aod.core.Annotation
             obj.setReader(ip.Results.Reader);
             obj.setImage(ip.Results.Image);
 
-            %if isSubclass(rois, 'aod.util.FileReader')
+            %if isSubclass(rois, 'aod.common.FileReader')
             %    obj.Reader = rois;
             %    obj.load(obj.Reader);
             %else
@@ -97,7 +97,7 @@ classdef Rois < aod.core.Annotation
             %   load(obj, rois)
             %
             % Inputs:
-            %   rois            numeric, string/char, aod.util.FileReader
+            %   rois            numeric, string/char, aod.common.FileReader
             % -------------------------------------------------------------
 
             if nargin < 2
@@ -116,7 +116,7 @@ classdef Rois < aod.core.Annotation
                 else
                     obj.Reader.changeFile(rois);
                 end
-            elseif isSubclass(rois, 'aod.util.FileReader')
+            elseif isSubclass(rois, 'aod.common.FileReader')
                 obj.Reader = rois;
             end
 
@@ -151,9 +151,9 @@ classdef Rois < aod.core.Annotation
                 return 
             end
 
-            if ~isSubclass(reader, 'aod.util.FileReader')
+            if ~isSubclass(reader, 'aod.common.FileReader')
                 error('setReader:InvalidType',...
-                    'Input must be a subclass of aod.util.FileReader');
+                    'Input must be a subclass of aod.common.FileReader');
             end
             
             obj.Reader = reader;

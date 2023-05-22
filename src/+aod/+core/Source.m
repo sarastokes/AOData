@@ -55,7 +55,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   tf = has(obj, entityType, varargin)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
             %   One or more cells containing queries
             %
@@ -73,10 +73,10 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   out = get(obj, varargin)
             %
             % Notes:
-            %   - Queries are documented in aod.core.EntitySearch
+            %   - Queries are documented in aod.common.EntitySearch
             %
             % See Also:
-            %   aod.core.EntitySearch
+            %   aod.common.EntitySearch
             % -------------------------------------------------------------
 
             if isempty(obj.Sources)
@@ -84,7 +84,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 return
             end
         
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             try
                 entityType = EntityTypes.get(varargin{1});
@@ -105,7 +105,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             if iscell(varargin{startIdx})
-                out = aod.core.EntitySearch.go(obj.Sources, varargin{startIdx:end});
+                out = aod.common.EntitySearch.go(obj.Sources, varargin{startIdx:end});
             else
                 error('get:InvalidInput', 'Input must be a cell')
             end
@@ -137,7 +137,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.remove({'Name', 'Right'}) 
             % -------------------------------------------------------------
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
             
             try 
                 entityType = EntityTypes.get(varargin{1});
@@ -147,7 +147,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 startIdx = 1;
             end
 
-            assert(entityType == aod.core.EntityTypes.SOURCE,...
+            assert(entityType == aod.common.EntityTypes.SOURCE,...
                 'Only Sources can be removed from Source');
 
             ID = varargin{startIdx};
@@ -160,7 +160,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 removeParent(obj.Sources);
                 obj.Sources = aod.core.Source.empty();
             elseif iscell(ID)
-                [~, ID] = aod.core.EntitySearch.go(obj.Sources, varargin{startIdx:end});
+                [~, ID] = aod.common.EntitySearch.go(obj.Sources, varargin{startIdx:end});
                 if ~isempty(ID)
                     removeParent(obj.Sources(ID));
                     obj.Sources(ID) = [];

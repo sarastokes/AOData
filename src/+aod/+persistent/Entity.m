@@ -43,9 +43,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     properties (SetAccess = protected)
         % Entity metadata that maps to attributes
-        attributes              % aod.util.Attributes
+        attributes              % aod.common.Attributes
         % Files associated with the entity
-        files                   % aod.util.Attributes
+        files                   % aod.common.Attributes
         % A description of the entity
         description             string
         % Miscellaneous notes about the entity
@@ -118,8 +118,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.factory = entityFactory;
 
             % Initialize attributes 
-            obj.files = aod.util.Attributes();
-            obj.attributes = aod.util.Attributes();
+            obj.files = aod.common.Attributes();
+            obj.attributes = aod.common.Attributes();
 
             % Create entity from file
             if ~isempty(obj.hdfName)
@@ -194,7 +194,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   h = getParent(obj, entityType)
             %
             % Examples:
-            %   h = obj.getParent(aod.core.EntityTypes.EXPERIMENT)
+            %   h = obj.getParent(aod.common.EntityTypes.EXPERIMENT)
             %   h = obj.getParent('experiment')
             % -------------------------------------------------------------
 
@@ -203,7 +203,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 return
             end
 
-            entityType = aod.core.EntityTypes.get(entityType);
+            entityType = aod.common.EntityTypes.get(entityType);
 
             h = obj;
             while h.entityType ~= entityType
@@ -515,7 +515,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 errorType           = []
             end
 
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
 
             if isempty(errorType)
                 errorType = ErrorTypes.WARNING;
@@ -664,7 +664,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 errorType       = []
             end
 
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
             if isempty(errorType)
                 errorType = ErrorTypes.ERROR;
             else
@@ -709,7 +709,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             arguments
                 obj
                 fileKey             char
-                errorType           = aod.util.ErrorTypes.WARNING
+                errorType           = aod.infra.ErrorTypes.WARNING
             end
 
             if ~isscalar(obj)
@@ -803,7 +803,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.description = obj.loadDataset('description');
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
-            obj.files = obj.loadDataset('files', 'aod.util.Attributes');
+            obj.files = obj.loadDataset('files', 'aod.common.Attributes');
             
             expectedAttrs = obj.loadDataset('expectedAttributes');
             if ~isempty(expectedAttrs)
@@ -823,7 +823,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             specialAttributes = ["UUID", "Class", "EntityType", "LastModified", "label"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
-            obj.entityType = aod.core.EntityTypes.get(obj.loadAttribute('EntityType'));
+            obj.entityType = aod.common.EntityTypes.get(obj.loadAttribute('EntityType'));
             obj.entityClassName = obj.loadAttribute('Class');
             lastModTime = obj.loadAttribute('LastModified');
             if ~isempty(lastModTime)

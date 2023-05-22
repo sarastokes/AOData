@@ -10,17 +10,17 @@ function mustBeEntityType(obj, entityType)
 %
 % Inputs:
 %   obj             AOData object
-%   entityType      aod.core.EntityTypes or char/string of entityType
+%   entityType      aod.common.EntityTypes or char/string of entityType
 %
 % Examples:
-%   mustBeEntityType(obj, aod.core.EntityTypes.ANNOTATION)
+%   mustBeEntityType(obj, aod.common.EntityTypes.ANNOTATION)
 %   mustBeEntityType(obj, 'annotation');
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
 
-    entityType = aod.core.EntityTypes.get(entityType);
+    entityType = aod.common.EntityTypes.get(entityType);
 
     if ~isscalar(obj)
         for i = 1:numel(obj)

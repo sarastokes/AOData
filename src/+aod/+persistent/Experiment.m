@@ -86,7 +86,7 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
                 return
             end
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             entityType = EntityTypes.get(entity);
             if ~ismember(entityType, obj.entityType.validChildTypes())
@@ -103,7 +103,7 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             error('remove:NotYetImplemented',... 
                 'This function is under development');
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
             entityType = EntityTypes.get(entityType);
 
             if ~ismember(entityType, obj.entityTypes.validChildTypes())

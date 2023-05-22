@@ -1,11 +1,11 @@
-classdef TiffReader < aod.util.FileReader
+classdef TiffReader < aod.common.FileReader
 % Reads .tiff files
 %
 % Description:
 %   Reads in TIFF files
 %
 % Parent:
-%   aod.util.FileReader
+%   aod.common.FileReader
 %
 % Constructor:
 %   obj = aod.util.readers.TiffReader(fName)
@@ -15,7 +15,7 @@ classdef TiffReader < aod.util.FileReader
 
     methods
         function obj = TiffReader(fileName)
-            obj = obj@aod.util.FileReader(fileName);
+            obj = obj@aod.common.FileReader(fileName);
         end
 
         function out = readFile(obj)

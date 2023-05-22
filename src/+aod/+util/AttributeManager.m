@@ -26,7 +26,7 @@ classdef AttributeManager < handle & matlab.mixin.CustomDisplay
 %   T = table(obj)
 %
 % See also:
-%   aod.util.ExpectedAttribute, aod.util.Attributes
+%   aod.util.ExpectedAttribute, aod.common.Attributes
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -61,7 +61,7 @@ classdef AttributeManager < handle & matlab.mixin.CustomDisplay
             %   p = get(obj, paramName)
             % -------------------------------------------------------------
 
-            import aod.util.ErrorTypes 
+            import aod.infra.ErrorTypes 
 
             if nargin < 3
                 errorType = ErrorTypes.WARNING;

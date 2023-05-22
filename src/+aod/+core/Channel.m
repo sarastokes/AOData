@@ -49,7 +49,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   tf = has(obj, entityType, varargin)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
             %   One or more cells containing queries (TODO: doc)
             %
@@ -72,19 +72,19 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   out = get(obj, queries)   
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             %       Child entity type to access (Device)
             %   queries             cell
             %       One or more queries within cells
             %
             % Notes:
-            %   - Queries are documented in aod.core.EntitySearch
+            %   - Queries are documented in aod.common.EntitySearch
             %
             % See Also:
-            %   aod.core.EntitySearch
+            %   aod.common.EntitySearch
             % -------------------------------------------------------------
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             try
                 entityType = EntityTypes.get(varargin{1}); 
@@ -100,7 +100,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             if nargin > 2
-                out = aod.core.EntitySearch.go(obj.Devices,... 
+                out = aod.common.EntitySearch.go(obj.Devices,... 
                     varargin{startIdx:end});
             else
                 out = obj.Devices;
@@ -145,8 +145,8 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             
             if nargin == 3
-                entityType = aod.core.EntityTypes.get(varargin{1});
-                if entityType ~= aod.core.EntityTypes.DEVICE
+                entityType = aod.common.EntityTypes.get(varargin{1});
+                if entityType ~= aod.common.EntityTypes.DEVICE
                     error('remove:InvalidEntityType', ...
                         'Only Device can be removed from Channel');
                 end

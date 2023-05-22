@@ -63,7 +63,7 @@ classdef EntityTypes
             %   parentTypes = validParentTypes(obj)
             % -------------------------------------------------------------
             
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             switch obj 
                 case EntityTypes.EXPERIMENT
@@ -94,7 +94,7 @@ classdef EntityTypes
             %   childTypes = validChildTypes(obj)
             % -------------------------------------------------------------
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             switch obj 
                 case EntityTypes.EXPERIMENT 
@@ -125,7 +125,7 @@ classdef EntityTypes
             % Example:
             %   For SYSTEM, parentContainer returns 'Systems'
             % -------------------------------------------------------------
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             switch obj
                 case EntityTypes.SOURCE
@@ -229,7 +229,7 @@ classdef EntityTypes
             % Notes:
             %   Experiment does not support empty and will return [].
             % -------------------------------------------------------------
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             switch obj 
                 case EntityTypes.EXPERIMENT
@@ -293,7 +293,7 @@ classdef EntityTypes
             %   hdfPath = getPath(obj, entity, manager, parentPath)
             % -------------------------------------------------------------
             
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             if obj == EntityTypes.EXPERIMENT
                 hdfPath = '/Experiment';
@@ -331,7 +331,7 @@ classdef EntityTypes
                     'manager must be a subclass of aod.h5.EntityManager');
             end
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             switch obj 
                 case EntityTypes.EXPERIMENT 
@@ -377,7 +377,7 @@ classdef EntityTypes
                 return
             end
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             switch obj
                 case EntityTypes.EXPERIMENT
@@ -439,7 +439,7 @@ classdef EntityTypes
                 obj         {mustBeA(obj, ["aod.core.Entity","aod.persistent.Entity"])}
             end
 
-            import aod.core.EntityTypes 
+            import aod.common.EntityTypes 
 
             if isSubclass(obj, {'aod.core.Experiment', 'aod.persistent.Experiment'})
                 out = EntityTypes.EXPERIMENT;
@@ -480,25 +480,25 @@ classdef EntityTypes
             %   from an object in the core or persistent interface
             %
             % Syntax:
-            %   obj = aod.core.EntityTypes.get(entityName)
+            %   obj = aod.common.EntityTypes.get(entityName)
             %
             % Example:
             % % Return from name
-            %   obj = aod.core.EntityTypes.get('epoch')
+            %   obj = aod.common.EntityTypes.get('epoch')
             %
             % % Return from class
             %   epoch = aod.core.Epoch(1);
-            %   obj = aod.core.EntityTypes.get(epoch);
+            %   obj = aod.common.EntityTypes.get(epoch);
             %
             % Notes:
-            %   For compatibility, if a aod.core.EntityTypes is passed as
+            %   For compatibility, if a aod.common.EntityTypes is passed as
             %   input, it will be returned without error
             %   Several abbreviations are also defined, see code
             % -------------------------------------------------------------
             
-            import aod.core.EntityTypes;
+            import aod.common.EntityTypes;
 
-            if isa(entityName, 'aod.core.EntityTypes')
+            if isa(entityName, 'aod.common.EntityTypes')
                 obj = entityName;
                 return
             elseif aod.util.isEntitySubclass(entityName)
@@ -545,10 +545,10 @@ classdef EntityTypes
             % Return all entity types
             %
             % Syntax:
-            %   entityTypes = aod.core.EntityTypes.all()
+            %   entityTypes = aod.common.EntityTypes.all()
             % -------------------------------------------------------------
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             entityTypes = [EntityTypes.EXPERIMENT, EntityTypes.SOURCE,...
                 EntityTypes.SYSTEM, EntityTypes.CHANNEL, EntityTypes.DEVICE,...

@@ -25,7 +25,7 @@ function out = read(hdfName, pathName, dsetName, className)
     fullPath = h5tools.util.buildPath(pathName, dsetName);
 
     % Deal with AOData-specific classes first
-    if strcmp(className, "aod.util.Attributes")
+    if strcmp(className, "aod.common.Attributes")
         out = h5tools.readatt(hdfName, fullPath, 'all');
         out = map2attributes(out);
         return
@@ -45,6 +45,6 @@ function out = read(hdfName, pathName, dsetName, className)
     out = h5tools.read(hdfName, pathName, dsetName);
 
     % Deal with AOData-specific classes that weren't flagged by user
-    if isstring(out) && isscalar(out) && isequal(out, "aod.util.Attributes")
+    if isstring(out) && isscalar(out) && isequal(out, "aod.common.Attributes")
         out = h5tools.readatt(hdfName, fullPath, 'all');
     end

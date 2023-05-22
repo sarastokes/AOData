@@ -291,9 +291,9 @@ classdef AONodeTypes
                     obj = AONodeTypes.STRUCTURE;
                 case 'logical'
                     obj = AONodeTypes.LOGICAL;
-                case {'aod.util.Attributes', 'files'}
+                case {'aod.common.attributes', 'files'}
                     obj = AONodeTypes.FILES;
-                case 'aod.util.filereader'
+                case 'aod.common.filereader'
                     obj = AONodeTypes.FILEREADER;
                 case 'affine2d'
                     obj = AONodeTypes.TRANSFORM;

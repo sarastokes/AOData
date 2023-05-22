@@ -48,16 +48,16 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyEmpty(ME);
 
             ME.add(testCase.EXPT.Epochs);
-            testCase.verifyEqual(ME.whichEntities(),aod.core.EntityTypes.EPOCH);
+            testCase.verifyEqual(ME.whichEntities(),aod.common.EntityTypes.EPOCH);
             testCase.verifyEqual(numel(ME.Epochs), testCase.EXPT.numEpochs);
             disp(ME);
 
             ME.add(testCase.EXPT.Sources);
             testCase.verifyNumElements(ME.whichEntities, 2);
             testCase.verifyTrue(...
-                ismember(aod.core.EntityTypes.EPOCH, ME.whichEntities()));
+                ismember(aod.common.EntityTypes.EPOCH, ME.whichEntities()));
             testCase.verifyTrue(...
-                ismember(aod.core.EntityTypes.SOURCE, ME.whichEntities()));
+                ismember(aod.common.EntityTypes.SOURCE, ME.whichEntities()));
         end
 
         function MixedEntitySetErrors(testCase)

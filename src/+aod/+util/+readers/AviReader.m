@@ -1,11 +1,11 @@
-classdef AviReader < aod.util.FileReader
+classdef AviReader < aod.common.FileReader
 % Read an AVI file
 %
 % Description:
 %   Reads in AVI files
 %
 % Parent:
-%   aod.util.FileReader
+%   aod.common.FileReader
 %
 % Constructor:
 %   obj = aod.util.readers.AviReader(fName)
@@ -16,7 +16,7 @@ classdef AviReader < aod.util.FileReader
 
     methods
         function obj = AviReader(fileName)
-            obj = obj@aod.util.FileReader(fileName);
+            obj = obj@aod.common.FileReader(fileName);
         end
 
         function out = readFile(obj)

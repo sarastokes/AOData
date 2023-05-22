@@ -138,7 +138,7 @@ classdef ExperimentPresenter < appbox.Presenter
                 h5tools.util.getPathEnd(path), path, S);
 
             % Create child containers, if necessary
-            entityType = aod.core.EntityTypes.get(entityType);
+            entityType = aod.common.EntityTypes.get(entityType);
             childTypes = entityType.childContainers();
             if ~isempty(childTypes)
                 for i = 1:numel(childTypes)

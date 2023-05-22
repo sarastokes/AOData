@@ -1,11 +1,11 @@
-classdef CsvReader < aod.util.FileReader 
+classdef CsvReader < aod.common.FileReader 
 % CSVREADER
 %
 % Description:
 %   Basis for reading in CSV files
 %
 % Parent:
-%   aod.util.FileReader
+%   aod.common.FileReader
 %
 % Constructor:
 %   obj = aod.util.readers.CsvReader(fName)
@@ -15,7 +15,7 @@ classdef CsvReader < aod.util.FileReader
 
     methods
         function obj = CsvReader(fileName)
-            obj = obj@aod.util.FileReader(fileName);
+            obj = obj@aod.common.FileReader(fileName);
         end
 
         function out = readFile(obj)

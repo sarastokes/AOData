@@ -1,11 +1,11 @@
-classdef (Abstract) TxtReader < aod.util.FileReader
+classdef (Abstract) TxtReader < aod.common.FileReader
 % Text file reader (abstract)
 %
 % Description:
 %   Superclass for text reader classes with useful methods for robust code
 %
 % Parent:
-%   obj = aod.util.FileReader
+%   obj = aod.common.FileReader
 %
 % Constructor:
 %   obj = aod.util.readers.TxtReader(varargin)
@@ -39,7 +39,7 @@ classdef (Abstract) TxtReader < aod.util.FileReader
 
     methods
         function obj = TxtReader(fileName)
-            obj = obj@aod.util.FileReader(fileName);
+            obj = obj@aod.common.FileReader(fileName);
         end
     end
 

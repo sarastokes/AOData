@@ -55,7 +55,7 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
                 return
             end
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             entityType = EntityTypes.get(entity);
             if ~ismember(entityType, obj.entityType.validChildTypes())
@@ -69,9 +69,9 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 
         function remove(obj, entityType, varargin)
             
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
-            entityType = aod.core.EntityTypes.get(entityType);
+            entityType = aod.common.EntityTypes.get(entityType);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('remove:InvalidEntityType', ...
                     'Entity must be EpochDataset, Registration, Response and Stimulus');

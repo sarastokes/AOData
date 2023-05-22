@@ -1,4 +1,4 @@
-classdef CoreApiTest < matlab.unittest.TestCase
+classdef CommonApiTest < matlab.unittest.TestCase
 % Test search capabilitites in the core interface
 %
 % Description:
@@ -8,10 +8,10 @@ classdef CoreApiTest < matlab.unittest.TestCase
 %   matlab.unittest.TestCase
 %
 % Use:
-%   result = runtests('CoreApiTest.m')
+%   result = runtests('CommonApiTest.m')
 %
 % See Also:
-%   runAODataTestSuite, aod.core.EntitySearch, CoreInterfaceTest
+%   runAODataTestSuite, aod.common.EntitySearch, CoreInterfaceTest
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -81,7 +81,7 @@ classdef CoreApiTest < matlab.unittest.TestCase
     methods (Test)
         function EmptySearch(testCase)
             testCase.verifyWarning(...
-                @() aod.core.EntitySearch.go('Response'), "go:NoQueries");
+                @() aod.common.EntitySearch.go('Response'), "go:NoQueries");
         end
 
         function NameSearch(testCase)
@@ -101,14 +101,14 @@ classdef CoreApiTest < matlab.unittest.TestCase
         end
 
         function ClassSearch(testCase)
-            egObj = aod.core.EntitySearch(testCase.EXPT.Calibrations,...
+            egObj = aod.common.EntitySearch(testCase.EXPT.Calibrations,...
                 {'Class', 'aod.builtin.calibrations.PowerMeasurement'});
             testCase.verifyEqual(numel(egObj.getMatches()), 1);
         end
 
         function DatasetSearch(testCase)
             % Test for presence of a dataset
-            out = aod.core.EntitySearch.go(testCase.EXPT.Calibrations,...
+            out = aod.common.EntitySearch.go(testCase.EXPT.Calibrations,...
                 {'Dataset', 'measurements'});
             testCase.verifyNumElements(out, 1);
 
@@ -121,18 +121,18 @@ classdef CoreApiTest < matlab.unittest.TestCase
 
         function FirstMatchWarnings(testCase)
             testCase.verifyWarning(...
-                @() aod.core.EntitySearch(testCase.EXPT.Calibrations, {'Attribute', 'BadParamName', 1}),...
+                @() aod.common.EntitySearch(testCase.EXPT.Calibrations, {'Attribute', 'BadParamName', 1}),...
                 "attributeQuery:NoParamNameMatches");
             testCase.verifyWarning(...
-                @() aod.core.EntitySearch(testCase.EXPT.Calibrations, {'Dataset', 'BadDatasetName', 1}),...
+                @() aod.common.EntitySearch(testCase.EXPT.Calibrations, {'Dataset', 'BadDatasetName', 1}),...
                 "datasetQuery:NoDsetNameMatches");
             testCase.verifyWarning(...
-                @() aod.core.EntitySearch(testCase.EXPT.Calibrations, {'File', 'BadFileName', 'test.txt'}),...
+                @() aod.common.EntitySearch(testCase.EXPT.Calibrations, {'File', 'BadFileName', 'test.txt'}),...
                 "fileQuery:NoFileNameMatches");
         end
 
         function EmptyInput(testCase)
-            testCase.verifyEmpty(aod.core.EntitySearch.go(...
+            testCase.verifyEmpty(aod.common.EntitySearch.go(...
                 testCase.EXPT.Analyses, {'Attribute', 'MyParam'}));
         end
 
@@ -163,17 +163,17 @@ classdef CoreApiTest < matlab.unittest.TestCase
 
         function testFileSearch(testCase)
             % Match file presence
-            out = aod.core.EntitySearch.go(testCase.EXPT.Epochs,...
+            out = aod.common.EntitySearch.go(testCase.EXPT.Epochs,...
                 {'File', 'MyFile'});
             testCase.verifyNumElements(out, 5);
 
             % Match files values using a function handle
-            egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
+            egObj = aod.common.EntitySearch(testCase.EXPT.Epochs,...
                 {'File', 'MyFile', @(x) endsWith(x, '.txt')});
             testCase.verifyNumElements(egObj.getMatches(), 4);
 
             % Match files by name
-            egObj = aod.core.EntitySearch(testCase.EXPT.Epochs,...
+            egObj = aod.common.EntitySearch(testCase.EXPT.Epochs,...
                 {'File', 'MyFile', 'test.txt'});
             testCase.verifyNumElements(egObj.getMatches(), 4);
         end

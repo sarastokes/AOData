@@ -194,7 +194,7 @@ classdef Experiment < aod.core.Entity
                 return
             end
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
             entityType = EntityTypes.get(entity);
 
             switch entityType 
@@ -256,7 +256,7 @@ classdef Experiment < aod.core.Entity
             %   remove(obj, 'System', 'all');
             % -------------------------------------------------------------
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             % Identify and validate entity type to remove
             entityType = EntityTypes.get(entityType);
@@ -283,7 +283,7 @@ classdef Experiment < aod.core.Entity
                 ID = sort(ID, 'descend');
             elseif iscell(varargin{1})
                 % Remove entities matching one or more queries
-                out = aod.core.EntitySearch.go(obj.(entityType.parentContainer), varargin{:});
+                out = aod.common.EntitySearch.go(obj.(entityType.parentContainer), varargin{:});
                 if isempty(out)
                     warning('remove:NoMatches', 'Query did not return any matches');
                     return
@@ -335,7 +335,7 @@ classdef Experiment < aod.core.Entity
             %   tf = has(obj, entityType, varargin)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
             %   One or more cells containing queries
             %
@@ -354,7 +354,7 @@ classdef Experiment < aod.core.Entity
             %   criteria (described below in examples)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             %
             % Examples:
             % Search for Sources named "OD"
@@ -375,7 +375,7 @@ classdef Experiment < aod.core.Entity
             %   out = obj.get('Epoch', 'Attribute', 'Defocus', 0.3)
             % -------------------------------------------------------------
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             entityType = EntityTypes.get(entityType);
 
@@ -420,7 +420,7 @@ classdef Experiment < aod.core.Entity
             end
 
             if nargin > 2 && ~isempty(group)
-                out = aod.core.EntitySearch.go(group, varargin{:});
+                out = aod.common.EntitySearch.go(group, varargin{:});
             else
                 out = group;
             end
@@ -438,7 +438,7 @@ classdef Experiment < aod.core.Entity
             % Inputs:
             %   ID          integer or empty
             %       Epoch ID(s). For all epochs, set to 'all' or []
-            %   entityType      aod.core.EntityTypes or char
+            %   entityType      aod.common.EntityTypes or char
             %       Entity type to get (epoch dataset, registration,  
             %       stimulus or response)
             % Optional inputs:
@@ -455,7 +455,7 @@ classdef Experiment < aod.core.Entity
             %   out = obj.getFromEpoch(1:3, 'Stimulus', {'Name', 'Mustang'})
             % -------------------------------------------------------------
             
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
             
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
@@ -503,13 +503,13 @@ classdef Experiment < aod.core.Entity
                     end 
                     % Were queries provided as well
                     if nargin > 4
-                        out = aod.core.EntitySearch.go(group, varargin{2:end});
+                        out = aod.common.EntitySearch.go(group, varargin{2:end});
                     else
                         out = group;
                     end
                 else % Was the extra input just queries
                     if ~isempty(group)
-                        out = aod.core.EntitySearch.go(group, varargin{:});
+                        out = aod.common.EntitySearch.go(group, varargin{:});
                     end
                 end
             else
@@ -526,7 +526,7 @@ classdef Experiment < aod.core.Entity
             % Inputs:
             %   ID              integer or "all"
             %       Epoch IDs to process
-            %   entityType      aod.core.EntityTypes or char
+            %   entityType      aod.common.EntityTypes or char
             %       Type of entity within Epoch to remove
             % Optional inputs:
             %   entityID        integer or "all" (default = "all")
@@ -544,8 +544,8 @@ classdef Experiment < aod.core.Entity
                 aod.util.mustBeEpochID(obj, ID);
             end
 
-            import aod.core.EntityTypes
-            entityType = aod.core.EntityTypes.get(entityType);
+            import aod.common.EntityTypes
+            entityType = aod.common.EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
                 error('removeByEpoch:InvalidEntityType',...
                     'Only child entities of Epoch can be removed');

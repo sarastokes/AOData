@@ -1,4 +1,4 @@
-classdef ImageReader < aod.util.FileReader 
+classdef ImageReader < aod.common.FileReader 
 % Reads an image 
 %
 % Constructor:
@@ -15,7 +15,7 @@ classdef ImageReader < aod.util.FileReader
 
     methods
         function obj = ImageReader(varargin)
-            obj@aod.util.FileReader(varargin{:});
+            obj@aod.common.FileReader(varargin{:});
         end
         
         function out = readFile(obj)

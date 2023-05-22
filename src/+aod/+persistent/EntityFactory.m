@@ -68,7 +68,7 @@ classdef EntityFactory < handle
         end
 
         function clearCache(obj)
-            obj.cache = aod.util.Attributes();
+            obj.cache = aod.common.Attributes();
         end
 
         function e = create(obj, hdfPath)
@@ -84,7 +84,7 @@ classdef EntityFactory < handle
             end
 
             className = T{T.Path == hdfPath, 'Class'};
-            entityType = aod.core.EntityTypes.get(obj.entityManager.entityMap(uuid));
+            entityType = aod.common.EntityTypes.get(obj.entityManager.entityMap(uuid));
 
             %! Consider deprecating
             mirrorFcn = str2func(aod.infra.findMirror(...

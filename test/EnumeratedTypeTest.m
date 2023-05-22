@@ -29,18 +29,18 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Initialization'})
         function ErrorTypesInit(testCase)
             import matlab.unittest.constraints.Throws
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
 
-            out = aod.util.ErrorTypes.init('error');
+            out = aod.infra.ErrorTypes.init('error');
             testCase.verifyEqual(out, ErrorTypes.ERROR);
-            out = aod.util.ErrorTypes.init('warning');
+            out = aod.infra.ErrorTypes.init('warning');
             testCase.verifyEqual(out, ErrorTypes.WARNING);
-            out = aod.util.ErrorTypes.init('missing');
+            out = aod.infra.ErrorTypes.init('missing');
             testCase.verifyEqual(out, ErrorTypes.MISSING);
-            out = aod.util.ErrorTypes.init('none');
+            out = aod.infra.ErrorTypes.init('none');
             testCase.verifyEqual(out, ErrorTypes.NONE);
             testCase.verifyThat(...
-                @() aod.util.ErrorTypes.init('BadInput'),...
+                @() aod.infra.ErrorTypes.init('BadInput'),...
                 Throws("ErrorTypes:UnrecognizedInput"));
         end
 
@@ -112,7 +112,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, AONodeTypes.ENUM);
             out = AONodeTypes.init('logical');
             testCase.verifyEqual(out, AONodeTypes.LOGICAL);
-            out = AONodeTypes.init('aod.util.filereader');
+            out = AONodeTypes.init('aod.common.FileReader');
             testCase.verifyEqual(out, AONodeTypes.FILEREADER);
             out = AONodeTypes.init('notes');
             testCase.verifyEqual(out, AONodeTypes.NOTES);
@@ -220,7 +220,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
     methods (Test, TestTags={'EntityTypes'})
         function EntityTypeInit(testCase)
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             testCase.verifyEqual(EntityTypes.get(EntityTypes.EXPERIMENT),...
                 EntityTypes.EXPERIMENT);
@@ -239,7 +239,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
 
         function Empty(testCase)
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             testCase.verifyEmpty(EntityTypes.STIMULUS.empty());
             testCase.verifyEmpty(EntityTypes.CHANNEL.empty());
@@ -248,14 +248,14 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
 
         function Text(testCase)
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             testCase.verifyEqual(char(EntityTypes.EXPERIMENTDATASET), 'ExperimentDataset');
             testCase.verifyEqual(string(EntityTypes.STIMULUS), "Stimulus");
         end
 
         function HdfPaths(testCase)
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
 
             testCase.verifyError(...
                 @() EntityTypes.CHANNEL.getPath(123), "getPath:InvalidEntity");
@@ -263,31 +263,31 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
 
         function persistentParentContainer(testCase)
-            out = aod.core.EntityTypes.EPOCH.persistentParentContainer();
+            out = aod.common.EntityTypes.EPOCH.persistentParentContainer();
             testCase.verifyEqual('EpochsContainer', out);
         end
 
         function childContainers(testCase)
             % TODO Check for use
-            out = aod.core.EntityTypes.SYSTEM.childContainers(true);
+            out = aod.common.EntityTypes.SYSTEM.childContainers(true);
             testCase.verifyEqual("ChannelsContainer", out);
         end
 
         function collectAll(testCase)
-            out = collectAll(aod.core.EntityTypes.EXPERIMENT, testCase.EXPT);
+            out = collectAll(aod.common.EntityTypes.EXPERIMENT, testCase.EXPT);
             testCase.verifyNumElements(out, 1);
             testCase.verifyEqual(out.UUID, testCase.EXPT.UUID);
         end
 
         function CoreClassName(testCase)
-            className = aod.core.EntityTypes.EXPERIMENT.getCoreClassName();
+            className = aod.common.EntityTypes.EXPERIMENT.getCoreClassName();
             testCase.verifyEqual(className, 'aod.core.Experiment');
         end
 
         function UniqueExperiment(testCase)
             % Test where Experiment behaves differently from other entities
 
-            expType = aod.core.EntityTypes.EXPERIMENT;
+            expType = aod.common.EntityTypes.EXPERIMENT;
             testCase.verifyEmpty(expType.validParentTypes());
             testCase.verifyEmpty(expType.parentContainer());
         end

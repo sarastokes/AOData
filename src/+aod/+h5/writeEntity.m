@@ -17,7 +17,7 @@ function writeEntity(hdfName, obj)
         obj                 {mustBeA(obj, 'aod.core.Entity')}
     end
 
-    import aod.core.EntityTypes
+    import aod.common.EntityTypes
 
     entityType = EntityTypes.get(obj);
     mc = metaclass(obj);
@@ -120,7 +120,7 @@ function writeEntity(hdfName, obj)
     
     % Write file paths, if necessary
     if ~isempty(obj.files)
-        h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.util.Attributes");
+        h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.common.Attributes");
         h5tools.writeatt(hdfName, [hdfPath, '/files'], obj.files);
     end
 
@@ -164,7 +164,7 @@ function writeEntity(hdfName, obj)
 
         % Write dataset description, if exists
         % TODO: Switch in expectedDataset descriptors
-        dsetDescription = aod.util.getClassPropDescription(mc, persistedProps(i));
+        dsetDescription = aod.specification.util.getClassPropDescription(mc, persistedProps(i));
         % Write dataset
         success = aod.h5.write(hdfName, hdfPath, persistedProps(i), prop, dsetDescription);
         if ~success

@@ -30,6 +30,13 @@ function tf = isSubclass(x, className)
         className           string
     end
 
+    % Parse class name
+    if istext(x) && exist(x, 'class')
+        tf = ismember(x, superclasses(x));
+        return
+    end
+
+    % Parse class object
     for i = 1:numel(className)
         if isa(x, className(i))
             tf = true;

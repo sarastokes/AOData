@@ -63,7 +63,7 @@ classdef MixedEntitySet < handle & matlab.mixin.CustomDisplay
             %   entityTypes = whichEntities(obj)
             %
             % Output:
-            %   entityTypes         aod.core.EntityTypes
+            %   entityTypes         aod.common.EntityTypes
             %       Entity types present in MixedEntitySet
             % -------------------------------------------------------------
 

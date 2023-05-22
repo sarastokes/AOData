@@ -11,7 +11,7 @@ classdef Stimulus < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
 %   obj = aod.persistent.Stimulus(hdfFile, hdfPath, factory)
 %
 % See also:
-%   aod.core.Stimulus, aod.util.Protocol
+%   aod.core.Stimulus, aod.common.Protocol
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

@@ -8,7 +8,7 @@ classdef ProtocolTest < matlab.unittest.TestCase
 %   result = runtests('ProtocolTest')
 %
 % See also:
-%   runAODataTestSuite, aod.util.Protocol
+%   runAODataTestSuite, aod.common.Protocol
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------

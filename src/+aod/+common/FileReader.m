@@ -5,11 +5,11 @@ classdef (Abstract) FileReader < handle
 %   Standardized interface for reading files
 %
 % Constructor:
-%   obj = aod.util.FileReader(fileName)
+%   obj = aod.common.FileReader(fileName)
 %
 % Examples:
 %   % Initialize without file and set afterwards
-%   obj = aod.util.FileReader([])
+%   obj = aod.common.FileReader([])
 %   obj.changeFile('myfile.txt')
 
 % By Sara Patterson, 2023 (AOData)
@@ -38,7 +38,7 @@ classdef (Abstract) FileReader < handle
                 fileName = completeFileName(fileName);
                 obj.fullFile = fileName;
             end
-            obj.attributes = aod.util.Attributes();
+            obj.attributes = aod.common.Attributes();
             % Because some files may be time-consuming to load, readFile()
             % is not called bu default when the FileReader is created
         end

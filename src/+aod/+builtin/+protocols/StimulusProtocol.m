@@ -1,11 +1,11 @@
-classdef (Abstract) StimulusProtocol < aod.util.Protocol
+classdef (Abstract) StimulusProtocol < aod.common.Protocol
 % STIMULUSPROTOCOL (abstract)
 %
 % Description:
 %   A protocol presenting a visual stimulus 
 %
 % Parent:
-%   aod.util.Protocol
+%   aod.common.Protocol
 %
 % Constructor:
 %   obj = StimulusProtocol(calibration, varargin)
@@ -54,7 +54,7 @@ classdef (Abstract) StimulusProtocol < aod.util.Protocol
 
     methods
         function obj = StimulusProtocol(calibration, varargin)
-            obj = obj@aod.util.Protocol(calibration);
+            obj = obj@aod.common.Protocol(calibration);
 
              % Input parsing
             ip = inputParser();

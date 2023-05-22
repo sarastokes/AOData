@@ -13,8 +13,8 @@ classdef (Abstract) Entity < handle
 %   Parent                      aod.core.Entity
 %   Name                        char
 %   UUID                        string
-%   attributes                  aod.util.Attributes
-%   files                       aod.util.Attributes
+%   attributes                  aod.common.Attributes
+%   files                       aod.common.Attributes
 %   description                 string
 %   notes                       string
 %
@@ -79,15 +79,15 @@ classdef (Abstract) Entity < handle
     end
 
     properties (Hidden, SetAccess = private)
-        % The entity's type, aod.core.EntityTypes
-        entityType                  %aod.core.EntityTypes
+        % The entity's type, aod.common.EntityTypes
+        entityType                  %aod.common.EntityTypes
     end
 
     properties (SetObservable, SetAccess = protected)
         % Files associated with the entity
-        files                       % aod.util.Attributes
+        files                       % aod.common.Attributes
         % Metadata for the entity which maps to HDF5 attributes
-        attributes                  % aod.util.Attributes
+        attributes                  % aod.common.Attributes
     end
     
     properties (Dependent)
@@ -121,7 +121,7 @@ classdef (Abstract) Entity < handle
             end
 
             % Assign entity type
-            obj.entityType = aod.core.EntityTypes.get(obj);
+            obj.entityType = aod.common.EntityTypes.get(obj);
 
             % Generate a random unique identifier to distinguish the class
             obj.UUID = aod.util.generateUUID();
@@ -135,8 +135,8 @@ classdef (Abstract) Entity < handle
             end
             
             % Initialize containers
-            obj.files = aod.util.Attributes();
-            obj.attributes = aod.util.Attributes();
+            obj.files = aod.common.Attributes();
+            obj.attributes = aod.common.Attributes();
             
             % Parse unmatched inputs
             obj.parseAttributes(ip.Unmatched);
@@ -202,7 +202,7 @@ classdef (Abstract) Entity < handle
 
             % See whether input is an entity type
             try
-                className = aod.core.EntityTypes.get(className);
+                className = aod.common.EntityTypes.get(className);
             catch ME
                 if ~strcmp(ME.identifier, "get:UnknownEntity")
                     rethrow(ME);
@@ -210,7 +210,7 @@ classdef (Abstract) Entity < handle
             end
 
             out = obj;
-            if isa(className, 'aod.core.EntityTypes')
+            if isa(className, 'aod.common.EntityTypes')
                 while out.entityType ~= className
                     out = out.Parent;
                     if isempty(out)
@@ -383,7 +383,7 @@ classdef (Abstract) Entity < handle
             % Inputs:
             %   attrName       char
             % Optional inputs:
-            %   errorType       aod.util.ErrorTypes (default = WARNING) 
+            %   errorType       aod.infra.ErrorTypes (default = WARNING) 
             %
             % Examples:
             %   % Get the value of 'MyAttr'
@@ -396,7 +396,7 @@ classdef (Abstract) Entity < handle
                 errorType           = []
             end
             
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
             if isempty(errorType)
                 errorType = ErrorTypes.WARNING;
             else
@@ -607,7 +607,7 @@ classdef (Abstract) Entity < handle
             end
 
             if strcmpi(fileName, 'all')
-                obj.files = aod.util.Attributes();
+                obj.files = aod.common.Attributes();
             elseif obj.hasFile(fileName)
                 remove(obj.files, fileName);
             end
@@ -625,7 +625,7 @@ classdef (Abstract) Entity < handle
             % Inputs:
             %   fileName       char
             % Optional inputs:
-            %   errorType      aod.util.ErrorTypes (default = ERROR)            
+            %   errorType      aod.infra.ErrorTypes (default = ERROR)            
             % -------------------------------------------------------------
 
             arguments
@@ -634,7 +634,7 @@ classdef (Abstract) Entity < handle
                 errorType       = []
             end
 
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
             if isempty(errorType)
                 errorType = ErrorTypes.ERROR;
             else
@@ -852,7 +852,7 @@ classdef (Abstract) Entity < handle
                         continue
                     end
                     propValue = obj.(propList(i));
-                    propType = aod.core.EntityTypes.get(propValue);
+                    propType = aod.common.EntityTypes.get(propValue);
                     matches = aod.util.findByUUID(propType.collectAll(h), propValue.UUID);
                     if isempty(matches)
                         warning("Entity:SyncWarning",...

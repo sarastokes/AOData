@@ -60,7 +60,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             % -------------------------------------------------------------
             arguments
                 obj 
-                protocol        {mustBeA(protocol, 'aod.util.Protocol')}
+                protocol        {mustBeA(protocol, 'aod.common.Protocol')}
             end 
             
             obj.protocolClass = class(protocol);

@@ -12,7 +12,7 @@ classdef EntityFilter < aod.api.FilterQuery
 %
 % Inputs:
 %   parent          aod.api.QueryManager
-%   entityType      string or aod.core.EntityTypes
+%   entityType      string or aod.common.EntityTypes
 %       Entities to search 
 %
 % Examples:
@@ -20,7 +20,7 @@ classdef EntityFilter < aod.api.FilterQuery
 %   % Initialize by entity name
 %   EF1 = aod.api.EntityFilter(QM, 'Response')
 %   % Initialize by entity type
-%   EF2 = aod.api.EntityFilter(QM, aod.core.EntityTypes.RESPONSE)
+%   EF2 = aod.api.EntityFilter(QM, aod.common.EntityTypes.RESPONSE)
 %   % Search for more than one entity
 %   EF3 = aod.api.EntityFilter(QM, ["Experiment", "Epoch"]);
 %
@@ -40,7 +40,7 @@ classdef EntityFilter < aod.api.FilterQuery
 
             entityType = convertCharsToStrings(entityType);
             obj.EntityName = arrayfun(...
-                @(x) string(aod.core.EntityTypes.get(x)), entityType);
+                @(x) string(aod.common.EntityTypes.get(x)), entityType);
         end
     end
 

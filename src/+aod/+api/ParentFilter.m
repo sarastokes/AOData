@@ -25,8 +25,8 @@ classdef ParentFilter < aod.api.StackedFilterQuery
         function obj = ParentFilter(parent, targetType, parentType, varargin)
             obj@aod.api.StackedFilterQuery(parent, varargin{:});
 
-            obj.targetEntityType = aod.core.EntityTypes(targetType);
-            obj.parentEntityType = aod.core.EntityTypes(parentType);
+            obj.targetEntityType = aod.common.EntityTypes(targetType);
+            obj.parentEntityType = aod.common.EntityTypes(parentType);
 
             if ~ismember(obj.parentEntityType, obj.targetEntityType.validParentTypes())
                 error('ParentFilter:InvalidParentType',... 

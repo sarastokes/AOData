@@ -15,9 +15,10 @@ The AOData test suite currently contains the following:
 - Built-in classes:
   - ```BuiltinClassTest``` - tests operation of builtin subclasses. 
   - ```FileReaderTest``` - tests builtin file readers
+- Common interface
+  - ```CoreApiTest``` - tests core interface queries
 - Core interface  
   - ```CoreInterfaceTest``` - tests basic functions of the core interface not covered in dedicated tests. 
-  - ```CoreApiTest``` - tests core interface queries
   - ```EpochTest``` - tests core Epoch interface
   - ```ResponseTest``` - tests core Response interface
   - ```SourceTest``` - tests core Source interface

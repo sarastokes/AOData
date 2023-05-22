@@ -43,7 +43,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %   tf = has(obj, entityType, varargin)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
             %   One or more cells containing queries 
             %
@@ -65,10 +65,10 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %   out = get(obj, entityType, varargin)
             %
             % Inputs:
-            %   entityType          char or aod.core.EntityTypes
+            %   entityType          char or aod.common.EntityTypes
             % -------------------------------------------------------------
 
-            import aod.core.EntityTypes
+            import aod.common.EntityTypes
             entityType = EntityTypes.get(entityType);
 
             switch entityType
@@ -82,7 +82,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             end
             
             if nargin > 2
-                out = aod.core.EntitySearch.go(group, varargin{:});
+                out = aod.common.EntitySearch.go(group, varargin{:});
             else
                 out = group;
             end
@@ -137,8 +137,8 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             if nargin == 2
                 ID = varargin{1};
             elseif nargin == 3
-                entityType = aod.core.EntityTypes.get(varargin{1});
-                assert(entityType == aod.core.EntityTypes.CHANNEL,...
+                entityType = aod.common.EntityTypes.get(varargin{1});
+                assert(entityType == aod.common.EntityTypes.CHANNEL,...
                     'Only Channels can be removed from System');
                 ID = varargin{2};
             end

@@ -8,7 +8,7 @@ Contact me if you think you need a new entity type. If it's something I have ove
 
 The process of adding a new Entity would take an hour or two and backwards compatibility is possible. 
 
-```aod.core.EntityTypes```
+```aod.common.EntityTypes```
 - Add to enumeration
 - Add to ```validParentTypes```
 - Add to ```validChildTypes```

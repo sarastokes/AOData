@@ -8,7 +8,7 @@ classdef Attributes < containers.Map & matlab.mixin.CustomDisplay
 %   containers.Map, matlab.mixin.CustomDisplay
 %
 % Constructor:
-%   obj = aod.util.Attributes(keySet, valueSet)
+%   obj = aod.common.Attributes(keySet, valueSet)
 %
 % Methods:
 %   out = toMap(obj)

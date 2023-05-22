@@ -1,4 +1,4 @@
-classdef MatReader < aod.util.FileReader
+classdef MatReader < aod.common.FileReader
 % Read a .mat file
 %
 % Description:
@@ -7,7 +7,7 @@ classdef MatReader < aod.util.FileReader
 %   a struct.
 %
 % Parent:
-%   aod.util.FileReader
+%   aod.common.FileReader
 %
 % Syntax:
 %   obj = aod.util.readers.MatReader(fName)
@@ -17,7 +17,7 @@ classdef MatReader < aod.util.FileReader
 
     methods
         function obj = MatReader(fileName)
-            obj = obj@aod.util.FileReader(fileName);
+            obj = obj@aod.common.FileReader(fileName);
         end
 
         function out = readFile(obj)

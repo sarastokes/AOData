@@ -10,7 +10,7 @@ classdef (Abstract) FileManager < handle
     properties (SetAccess = protected)
         baseFolderPath
         baseFolderName
-        messageLevel = aod.util.ErrorTypes.WARNING 
+        messageLevel = aod.infra.ErrorTypes.WARNING 
     end
 
     methods (Abstract)
@@ -30,7 +30,7 @@ classdef (Abstract) FileManager < handle
         end
 
         function setErrorType(obj, errorType)
-            obj.messageLevel = aod.util.ErrorTypes.init(errorType);
+            obj.messageLevel = aod.infra.ErrorTypes.init(errorType);
         end
     end
 

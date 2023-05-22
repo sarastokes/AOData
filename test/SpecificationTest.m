@@ -302,7 +302,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Attribute")
         function AttributeNameSearch(testCase)
-            import aod.util.ErrorTypes
+            import aod.infra.ErrorTypes
 
             PM = aod.util.AttributeManager();
             PM.add('NewParam');
