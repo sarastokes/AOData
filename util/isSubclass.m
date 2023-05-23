@@ -21,7 +21,6 @@ function tf = isSubclass(x, className)
 %   05Aug2022 - SSP - Added check for class membership
 %   03Sep2022 - SSP - Added support for multiple class names
 
-
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
@@ -32,7 +31,7 @@ function tf = isSubclass(x, className)
 
     % Parse class name
     if istext(x) && exist(x, 'class')
-        tf = ismember(x, superclasses(x));
+        tf = strcmpi(x, className) | ismember(className, superclasses(x));
         return
     end
 

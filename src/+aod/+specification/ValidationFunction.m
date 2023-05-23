@@ -27,13 +27,15 @@ classdef ValidationFunction < aod.specification.Validator
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value   (1,:)      cell    = {}
+        Value   (1,:)      cell    = cell.empty()
     end
 
     methods
         function obj = ValidationFunction(input)
-            if nargin > 0 && ~isempty(input)
-                obj.setValue(input);
+            if nargin > 0 
+                if ~isempty(input)
+                    obj.setValue(input);
+                end
             end
         end
     end
@@ -91,7 +93,24 @@ classdef ValidationFunction < aod.specification.Validator
         end
 
         function out = text(obj)
-            out = cellfun(@(x) string(func2str(x)), obj.Value);
+            if isempty(obj)
+                out = "[]";
+                return
+            end
+            
+            indiv = cellfun(@(x) string(func2str(x)), obj.Value);
+            if numel(indiv) > 1
+                out = "{";
+                for i = 1:numel(indiv)
+                    out = out + indiv(i);
+                    if i < numel(indiv)
+                        out = out + ", ";
+                    end
+                end
+                out = out + "}";
+            else
+                out = "{" + indiv + "}";
+            end
         end
     end
 

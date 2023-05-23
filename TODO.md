@@ -1,44 +1,25 @@
 ## TODO
 
 ##### Major
-- [x] Add UIDs to all Entitys
-- [x] Implement search by UID
-- [x] Replace duplicated epoch from Creator
-- [x] Decide where allowableParentTypes go
-- [x] Units to dataset metadata?
-- [x] Mapping Calibration property of Protocol (can't easily go in parameters)
-- [x] Where should converting files to relative be done?
-- [x] Dependent but not hidden properties should be written (e.g. epochIDs)
-- [x] Abandon Timing core class
-- [x] Remove entity-specific add methods
-- [x] Remove() method
-- [x] Fillmissing error type
-- [x] Consider making channels and devices at the same level
-- [x] Expected parameter parsing in setAttr
-- [ ] DateCreated, DateLastModified for core interface
-
+- [ ] Specification framework
+  - [ ] Cross checking with `expectedDatasets`
+- [ ] AODataViewer plugins for visualizing data
+- [ ] Persistent interface `get` and `remove` functions
+- [ ] Persistent interface handling of empty properties
+  
 ##### AOQuery App
 - [ ] Code for subfilters
 - [ ] Decide on weblab submodule addition (see CodePanel and CodePanel2)
 
 ##### HDF5
-- Write data from persistent interface
-  - [ ] Set property for dynamicprops
-  - [x] Overwrite string, char, datetime (dimensions don't matter)
-  - [x] Overwrite numeric dataset with same dimensions
-  - [x] Overwrite numeric dataset with different dimensions
-- [ ] Could copying the file replicate h5repack?
-- [x] Testing for int and uint
+- Replacing entities (to preserve UUID and softlinks)
+  - [ ] Set property for dynamicprops 
 - [ ] Write ParameterManager
 
 ##### Minor
-- [x] Name vs name
-- [x] files property should be lowercase
-- [ ] How to handle Reader properties
-- [x] Devices with same UUID in multiple channels?
-- [ ] Figure out identification of existing Sources when adding Source hierarchy
+- [ ] How to handle FileReader associations
+- [ ] Pull parameters from FileReader
 
 ##### Documentation
-- [x] Handle class
 - [ ] Date formats
 - [ ] ExpectedParameters

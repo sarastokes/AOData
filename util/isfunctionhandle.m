@@ -19,6 +19,7 @@ function [tf, output] = isfunctionhandle(input)
         if iscellstr(input)
             input = string(input);
         end
+
         try
             output = arrayfun(@str2func, input, 'UniformOutput', false);
             tf = true;

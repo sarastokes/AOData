@@ -38,7 +38,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         % Time the Epoch (i.e. data acquisition) began
-        startTime           datetime = datetime.empty()                          
+        startTime           datetime {mustBeScalarOrEmpty} = datetime.empty()                          
         % Timing of samples during Epoch                             
         Timing (:,1)        duration = seconds([])
 
@@ -55,9 +55,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     % Entity link properties
     properties (SetAccess = protected)
         % Source of data acquired during the Epoch
-        Source          {mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
+        Source              {mustBeScalarOrEmpty, mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
         % System used for data acquisition during the Epoch
-        System          {mustBeEntityType(System, 'System')} = aod.core.System.empty()
+        System              {mustBeScalarOrEmpty, mustBeEntityType(System, 'System')} = aod.core.System.empty()
     end
     
     methods 

@@ -49,6 +49,18 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
     % Core methods
     methods (Sealed)
+        function out = id2index(obj, ID)
+            out = [];
+            for i = 1:numel(ID)
+                iIdx = find(obj.epochIDs == ID(i));
+                if isempty(iIdx)
+                    error('id2index:EpochIdNotFOund',...
+                    'No epoch was found with ID %u', ID(i));
+                end
+                out = cat(1, out, iIdx);
+            end
+        end
+
         function setHomeDirectory(obj, homeDirectory)
             % SETHOMEDIRECTORY
             %
@@ -107,6 +119,73 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             entityType = EntityTypes.get(entityType);
 
             if ~ismember(entityType, obj.entityTypes.validChildTypes())
+            end
+        end
+    end
+
+    % Child methods
+    methods 
+        function out = getFromEpoch(obj, ID, entityType, varargin)
+            import aod.common.EntityTypes
+
+            
+            entityType = EntityTypes.get(entityType);
+            if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
+                error('getFromEpoch:NonChildEntityType',...
+                    'Can only access child entities of Epoch');
+            end
+
+            if isempty(obj.Epochs)
+                out = [];
+            end
+
+            if isempty(ID)
+                ID = obj.epochIDs;
+            elseif istext(ID) && strcmpi(ID, 'all')
+                ID = obj.epochIDs;
+            else
+                aod.util.mustBeEpochID(obj, ID);
+            end
+            idx = obj.id2index(ID);
+
+            switch entityType 
+                case EntityTypes.EPOCHDATASET
+                    group = vertcat(obj.Epochs(idx).EpochDatasets);
+                case EntityTypes.REGISTRATION
+                    group = vertcat(obj.Epochs(idx).Registrations);
+                case EntityTypes.RESPONSE
+                    group = vertcat(obj.Epochs(idx).Responses);
+                case EntityTypes.STIMULUS 
+                    group = vertcat(obj.Epochs(idx).Stimuli);
+            end
+            
+            if isempty(group)
+                out = group;
+                return
+            end
+            
+            % Default is empty unless meets criteria below
+            if nargin > 3
+                % Was index provided for entities returned?
+                if ~iscell(varargin{1})
+                    entityID = varargin{1};
+                    if isnumeric(entityID)
+                        mustBeInteger(entityID); mustBeInRange(entityID, 1, numel(group));
+                        group = group(entityID);
+                    end 
+                    % Were queries provided as well
+                    if nargin > 4
+                        out = aod.common.EntitySearch.go(group, varargin{2:end});
+                    else
+                        out = group;
+                    end
+                else % Was the extra input just queries
+                    if ~isempty(group)
+                        out = aod.common.EntitySearch.go(group, varargin{:});
+                    end
+                end
+            else
+                out = group;
             end
         end
     end

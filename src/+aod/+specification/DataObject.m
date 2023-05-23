@@ -5,22 +5,27 @@ classdef DataObject < handle
 
     properties (SetAccess = private)
         Name            (1,1)     string
-        Size            (1,1)     aod.specification.Size = aod.specification.Size([]);
+        Required        (1,1)     logical = false 
+        Size                      aod.specification.Size = aod.specification.Size([]);
         Class           (1,1)     aod.specification.MatlabClass = aod.specification.MatlabClass([]);
         Default         (1,1)     aod.specification.DefaultValue = aod.specification.DefaultValue([])
         Functions       (1,1)     aod.specification.ValidationFunction = aod.specification.ValidationFunction([])
         Description     (1,1)     aod.specification.Description = aod.specification.Description([])
+        Units           (1,1)     string        % For now
     end
 
     properties (Hidden, Constant)
-        FIELDS = ["size", "class", "default", "function", "description"];
+        FIELDS = ["size", "class", "default", "function", "description", "units"];
     end
 
     methods
         function obj = DataObject(prop, varargin)
-
             % Defaults
-            obj.Size = aod.specification.Size([]);
+            obj.Size = aod.specification.Size([]); 
+            obj.Functions = aod.specification.ValidationFunction([])
+            if nargin == 0
+                return 
+            end
 
             % Initialize from meta.property
             if isa(prop, 'meta.property')
@@ -56,6 +61,23 @@ classdef DataObject < handle
             tf = all([tf1, tf2, tf3]);
         end
 
+        function out = text(obj)
+
+            out = "Name: " + obj.Name + newline;
+            out = out + "    Description: " + obj.Description.text() + newline;
+            out = out + "    Class: " + obj.Class.text() + newline;
+            out = out + "    Size: " + obj.Size.text() + newline;
+            out = out + "    Validators: " + obj.Functions.text() + newline;
+            % if obj.Required
+            %     out = out + "    Required: true" + newline;
+            % else
+            %     out = out + "    Required: false" + newline;
+            % end
+        end
+    end
+
+    % Setters
+    methods
         function setClass(obj, input)
             obj.Class.setValue(input);
             obj.checkIntegrity();
@@ -96,21 +118,12 @@ classdef DataObject < handle
                     obj.setDefault(specValue);
                 case 'description'
                     obj.Description.setValue(specValue);
+                case 'units'
+                    % Leave alone for now
                 otherwise
                     error('DataObject:InvalidType',...
                         'Specification type must be size, function class, default or description');
             end
-
-            function ip = getParser(obj, varargin)
-                ip = inputParser();
-                ip.CaseSensitive = false;
-                addParameter(ip, 'Size', []);
-                addParameter(ip, 'Description', "");
-                addParameter(ip, 'Class', []);
-                addParameter(ip, 'Function', {});
-                addParameter(ip, 'Default', []);
-                parse(ip, varargin{:});
-            end 
         end
 
         function checkIntegrity(obj)
@@ -135,5 +148,18 @@ classdef DataObject < handle
                 end
             end
         end
+    end
+
+    methods (Static, Access = private)
+        function ip = getParser(~, varargin)
+            ip = inputParser();
+            ip.CaseSensitive = false;
+            addParameter(ip, 'Size', []);
+            addParameter(ip, 'Description', "");
+            addParameter(ip, 'Class', []);
+            addParameter(ip, 'Function', {});
+            addParameter(ip, 'Default', []);
+            parse(ip, varargin{:});
+        end 
     end
 end 

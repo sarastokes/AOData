@@ -39,6 +39,25 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 
     % Addition methods
     methods (Sealed)
+        function out = get(obj, entityType, varargin)
+        
+            import aod.common.EntityTypes
+
+            entityType = EntityTypes.get(entityType);
+            if ~ismember(entityType, obj.entityType.validChildTypes())
+                error('get:InvalidEntityType',...
+                    'Entity must be EpochDataset, Registration, Response and Stimulus');
+            end
+
+            group = obj.(entityType.parentContainer());
+
+            if nargin > 2 && ~isempty(group)
+                out = aod.common.EntitySearch.go(group, varargin{:});
+            else
+                out = group;
+            end
+        end
+
         function add(obj, entity)
             % Add a new entity to the Epoch
             %

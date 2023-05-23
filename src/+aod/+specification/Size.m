@@ -16,7 +16,8 @@ classdef Size < aod.specification.Validator
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value          
+        Value           = []
+        SizeType        aod.specification.SizeTypes = aod.specification.SizeTypes.UNDEFINED   
     end
 
     methods
@@ -25,41 +26,16 @@ classdef Size < aod.specification.Validator
                 obj.setValue(input);
             end
         end
-
-        function tf = isscalar(obj)
-            tf = false;
-            if ndims(obj) == 2 && all(obj.isfixed())
-                if all(arrayfun(@(x) x.Length == 1, obj.Value))
-                    tf = true;
-                end
-            end
-        end
-
-        function tf = isvector(obj)
-            if isempty(obj)
-                tf = false;
-            end
-            fixedDims = obj.isfixed();
-            if ndims(obj) ~= 2 || nnz(fixedDims) == 0
-                tf = false;
-                return 
-            end 
-
-            idx = false(1, obj.ndims());
-            for i = 1:numel(obj.Value)
-                if fixedDims(i) && obj.Value(i).Length == 1
-                    idx(i) = true;
-                end
-            end
-            tf = (nnz(idx) == 1);
-        end
     end
 
     % aod.specification.Specification methods
     methods
         function setValue(obj, input)
+            import aod.specification.SizeTypes
+
             if isempty(input) || strcmp(input, '[]')
                 obj.Value = [];
+                obj.SizeType = SizeTypes.UNDEFINED;
                 return 
             end
 
@@ -70,6 +46,20 @@ classdef Size < aod.specification.Validator
             elseif isnumeric(input)
                 obj.Value = obj.parseNumeric(input);
             end 
+
+            if ndims(obj) > 2
+                obj.SizeType = SizeTypes.NDARRAY;
+            elseif isscalar(obj)
+                obj.SizeType = SizeTypes.SCALAR;
+            elseif isvector(obj)
+                if obj.isfixed(1) && obj.Value(1).Length == 1
+                    obj.SizeType = SizeTypes.ROW;
+                else
+                    obj.SizeType = SizeTypes.COLUMN
+                end
+            else 
+                obj.SizeType = SizeTypes.MATRIX;
+            end
         end
 
         function tf = validate(obj, input)
@@ -122,8 +112,11 @@ classdef Size < aod.specification.Validator
     end
 
     methods (Access = private)
-        function idx = isfixed(obj)
+        function idx = isfixed(obj, whichDim)
             idx = arrayfun(@(x) isa(x, 'aod.specification.size.FixedDimension'), obj.Value);
+            if nargin > 1
+                idx = idx(whichDim);
+            end
         end
     end
 
@@ -207,6 +200,38 @@ classdef Size < aod.specification.Validator
 
         function value = ndims(obj)
             value = numel(obj.Value);
+        end
+
+        function tf = isscalar(obj)
+            tf = false;
+
+            if ndims(obj) == 2 && all(obj.isfixed())
+                if all(arrayfun(@(x) x.Length == 1, obj.Value))
+                    tf = true;
+                end
+            end
+        end
+
+        function tf = isvector(obj)
+            if isempty(obj)
+                tf = false;
+                return 
+            end
+
+            fixedDims = obj.isfixed();
+            if ndims(obj) ~= 2 || nnz(fixedDims) == 0
+                tf = false;
+                return
+            end
+
+            idx = false(1, obj.ndims());
+            for i = 1:numel(obj.Value)
+                if fixedDims(i) && obj.Value(i).Length == 1
+                    idx(i) = true;
+                end
+            end
+            
+            tf = (nnz(idx) == 1);
         end
     end
 end

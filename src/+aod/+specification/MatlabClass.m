@@ -40,7 +40,9 @@ classdef MatlabClass < aod.specification.Validator
         end
 
         function out = text(obj)
-            if numel(obj.Value) > 1
+            if isempty(obj)
+                out = "[]";
+            elseif numel(obj.Value) > 1
                 out = array2commalist(obj.Value);
             else
                 out = obj.Value;
@@ -59,14 +61,17 @@ classdef MatlabClass < aod.specification.Validator
 
             if isa(input, 'meta.property')
                 if ~isempty(input.Validation.Class)
-                    input = input.Validation.Class.Name;
+                    classes = string(input.Validation.Class.Name);
+                else
+                    classes = "";
                 end
+                return
             elseif ~istext(input)
                 error('MatlabClass:InvalidInput',...
                     'Inputs must be char, string or meta.property');
             end
-            input = convertCharsToStrings(input);
 
+            input = convertCharsToStrings(input);
             if isscalar(input) && contains(input, ',')
                 input = strsplit(input, ',');
                 input = arrayfun(@strip, input);

@@ -1,8 +1,8 @@
 classdef CommonApiTest < matlab.unittest.TestCase
-% Test search capabilitites in the core interface
+% Test search capabilitites in the common interface
 %
 % Description:
-%   Tests API for filtering entities in the core interface
+%   Tests API for filtering entities in the common interface
 %
 % Parent:
 %   matlab.unittest.TestCase
@@ -13,11 +13,12 @@ classdef CommonApiTest < matlab.unittest.TestCase
 % See Also:
 %   runAODataTestSuite, aod.common.EntitySearch, CoreInterfaceTest
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
         EXPT
+        PRST
     end
 
     methods (TestClassSetup)
@@ -75,6 +76,9 @@ classdef CommonApiTest < matlab.unittest.TestCase
             testCase.EXPT.Epochs(1).add(aod.core.EpochDataset('Dset1'));
             testCase.EXPT.Epochs(1).add(aod.core.EpochDataset('Dset2'));
             testCase.EXPT.Epochs(2).add(aod.core.EpochDataset('Dset1'));
+
+            aod.h5.writeExperimentToFile("CommonApiTest.h5", testCase.EXPT, true);
+            testCase.PRST = loadExperiment("CommonApiTest.h5");
         end
     end
 
@@ -163,19 +167,28 @@ classdef CommonApiTest < matlab.unittest.TestCase
 
         function testFileSearch(testCase)
             % Match file presence
-            out = aod.common.EntitySearch.go(testCase.EXPT.Epochs,...
+            outC = aod.common.EntitySearch.go(testCase.EXPT.Epochs,...
                 {'File', 'MyFile'});
-            testCase.verifyNumElements(out, 5);
+            testCase.verifyNumElements(outC, 5);
+            outP = aod.common.EntitySearch.go(testCase.EXPT.Epochs,...
+                {'File', 'MyFile'});
+            testCase.verifyNumElements(outP, 5);
 
             % Match files values using a function handle
-            egObj = aod.common.EntitySearch(testCase.EXPT.Epochs,...
+            egObjC = aod.common.EntitySearch(testCase.EXPT.Epochs,...
                 {'File', 'MyFile', @(x) endsWith(x, '.txt')});
-            testCase.verifyNumElements(egObj.getMatches(), 4);
+            testCase.verifyNumElements(egObjC.getMatches(), 4);
+            egObjP = aod.common.EntitySearch(testCase.PRST.Epochs,...
+                {'File', 'MyFile', @(x) endsWith(x, '.txt')});
+            testCase.verifyNumElements(egObjP.getMatches(), 4);
 
             % Match files by name
-            egObj = aod.common.EntitySearch(testCase.EXPT.Epochs,...
+            egObjC = aod.common.EntitySearch(testCase.EXPT.Epochs,...
                 {'File', 'MyFile', 'test.txt'});
-            testCase.verifyNumElements(egObj.getMatches(), 4);
+            testCase.verifyNumElements(egObjC.getMatches(), 4);
+            egObjP = aod.common.EntitySearch(testCase.PRST.Epochs,...
+                {'File', 'MyFile', 'test.txt'});
+            testCase.verifyNumElements(egObjP.getMatches(), 4);
         end
 
         function GetFileWithMissing(testCase)
@@ -213,6 +226,9 @@ classdef CommonApiTest < matlab.unittest.TestCase
                 "get:InvalidEntityType");
             testCase.verifyError(...
                 @() testCase.EXPT.Epochs(1).get('System'),...
+                "get:InvalidEntityType");
+            testCase.verifyError(...
+                @() testCase.PRST.Epochs(1).get('System'),...
                 "get:InvalidEntityType");
         end
         
