@@ -50,6 +50,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % See also:
             %   aod.core.System/get
             % -------------------------------------------------------------
+            
             out = obj.get(entityType, varargin{:});
             tf = ~isempty(out);
         end

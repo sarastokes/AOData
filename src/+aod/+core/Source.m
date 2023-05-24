@@ -78,13 +78,13 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % See Also:
             %   aod.common.EntitySearch
             % -------------------------------------------------------------
-
+            
+            import aod.common.EntityTypes
+            
             if isempty(obj.Sources)
                 out = aod.core.Source.empty();
                 return
             end
-        
-            import aod.common.EntityTypes
 
             try
                 entityType = EntityTypes.get(varargin{1});
@@ -178,6 +178,14 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             % Syntax:
             %   value = getLevel(obj)
+            %
+            % Examples:
+            %   source = aod.core.Source('MySource');
+            %   source.add(aod.core.Source('OS'))
+            %   value = source.getLevel()
+            %   >> Returns 1
+            %   value = source.Sources(1).getLevel()
+            %   >> Returns 2
             % -------------------------------------------------------------
             if ~isscalar(obj)
                 value = arrayfun(@(x) x.getLevel, obj);
@@ -192,32 +200,32 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
 
-        function allSources = getAllSources(obj)
+        function out = getChildSources(obj)
             % Get all child sources of this source
             %
             % Syntax:
-            %   allSources = getAllSources(obj)
+            %   out = getChildSources(obj)
             %
             % Examples:
             %   source = aod.core.Source('MySource');
             %   source.add(aod.core.Source('OS'))
             %   source.add(aod.core.Source('OD'))
-            %   allSources = source.getAllSources();
+            %   out = source.getChildSources();
             %   >> Returns OD and OS
             % -------------------------------------------------------------
             
             if ~isscalar(obj)
-                allSources = uncell(aod.util.arrayfun(@(x) getAllSources(x), obj));
+                out = uncell(aod.util.arrayfun(@(x) getChildSources(x), obj));
                 return
             end
 
-            allSources = obj;
+            out = obj;
             if isempty(obj.Sources)
                 return
             end
             for i = 1:numel(obj.Sources)
-                allSources = cat(1, allSources, obj.Sources(i));
-                allSources = obj.iterSource(obj.Sources(i), allSources);
+                out = cat(1, out, obj.Sources(i));
+                out = obj.iterSource(obj.Sources(i), out);
             end
         end
 

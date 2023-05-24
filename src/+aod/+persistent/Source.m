@@ -25,6 +25,73 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
     end
 
     methods (Sealed)
+        function tf = has(obj, entityType, varargin)
+            % Search Source's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries
+            %
+            % See also:
+            %   aod.persistent.Source/get
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
+
+        function out = get(obj, varargin)
+            % Search and access child Sources
+            %
+            % Syntax:
+            %   out = get(obj, varargin)
+            %
+            % Notes:
+            %   - Queries are documented in aod.common.EntitySearch
+            %
+            % See Also:
+            %   aod.common.EntitySearch
+            % -------------------------------------------------------------
+
+            import aod.common.EntityTypes
+
+            if isempty(obj.Sources)
+                out = aod.persistent.Source.empty();
+                return
+            end
+
+            try
+                entityType = EntityTypes.get(varargin{1});
+                startIdx = 2;
+            catch
+                entityType = EntityTypes.SOURCE;
+                startIdx = 1;
+            end
+
+            if entityType ~= EntityTypes.SOURCE
+                error('get:InvalidEntityType', ...
+                'Entity must be a Source');
+            end
+
+            if nargin == startIdx
+                out = obj.Sources;
+                return
+            end
+
+            if iscell(varargin{startIdx})
+                out = aod.common.EntitySearch.go(obj.Sources, varargin{startIdx:end});
+            else
+                error('get:InvalidInput', 'Input must be a cell')
+            end
+        end
+
         function obj = add(obj, entity)
             % ADD
             % 
@@ -41,6 +108,65 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
 
             entity.setParent(obj);
             obj.addEntity(entity);
+        end
+    end
+
+    methods 
+        function value = getLevel(obj)
+            % Get source level within Source hierarchy
+            %
+            % Syntax:
+            %   value = getLevel(obj)
+            %
+            % Examples:
+            %   EXPT = loadExperiment('ToyExperiment.h5');
+            %   value = EXPT.Sources(1)
+            %   >> Returns 1
+            %   value = EXPT.Sources(1).Sources(1)
+            %   >> Returns 2
+            % -------------------------------------------------------------
+
+            if ~isscalar(obj)
+                value = arrayfun(@(x) x.getLevel, obj);
+                return
+            end
+
+            value = 1;
+            parent = obj.Parent;
+
+            while isSubclass(parent, 'aod.persistent.Source')
+                value = value + 1;
+                parent = parent.Parent;
+            end
+        end
+
+        function out = getChildSources(obj)
+            % Get all child sources of this source
+            %
+            % Syntax:
+            %   out = getChildSources(obj)
+            %
+            % Examples:
+            %   EXPT = loadExperiment('ToyExperiment.h5')
+            %   out = EXPT.Sources(1).getChildSources();
+            %   >> Returns OD and OS and locations
+            % -------------------------------------------------------------
+
+            if ~isscalar(obj)
+                out = uncell(aod.util.arrayfun(@(x) getChildSources(x), obj));
+                return
+            end
+
+            out = obj;
+
+            if isempty(obj.Sources)
+                return
+            end
+
+            for i = 1:numel(obj.Sources)
+                out = cat(1, out, obj.Sources(i));
+                out = obj.iterSource(obj.Sources(i), out);
+            end
         end
     end
 

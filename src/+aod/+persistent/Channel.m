@@ -27,6 +27,9 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
     end
 
     methods (Sealed)
+        function tf = has(obj, varargin)
+        end
+        
         function add(obj, device)
             % ADD
             %

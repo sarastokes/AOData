@@ -31,6 +31,7 @@ test/coverage_report/
 test/single_report/
 
 test/test.h5
+test/CommonApiTest.h5
 test/ExperimentTest.h5
 test/ToyExperiment.h5
 test/EntityRenameTest.h5

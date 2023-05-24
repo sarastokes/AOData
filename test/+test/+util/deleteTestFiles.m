@@ -18,6 +18,10 @@ function deleteTestFiles()
         delete('ToyExperiment.mat');
     end
 
+    if exist('CommonApiTest.h5', 'file')
+        delete('CommonApiTest.h5');
+    end
+
     if exist('EntityRenameTest.h5', 'file')
         delete('EntityRenameTest.h5');
     end
@@ -34,7 +38,7 @@ function deleteTestFiles()
         delete('ShellExperiment.h5');
     end
 
-    if exist('PersistentInterface.h5')
+    if exist('PersistentInterface.h5', 'file')
         delete('PersistentInterface.h5');
     end
     

@@ -81,12 +81,103 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
             obj.homeDirectory = homeDirectory;
         end
+    end
+
+    methods
+        function tf = has(obj, entityType, varargin)
+            % Search Experiment's child entities & return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria & return if matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries
+            %
+            % See also:
+            %   aod.persistent.Experiment/get
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
+
+        function out = get(obj, entityType, varargin)
+            % Search all entities of a specific type within experiment
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (described below in examples)
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            %
+            % Examples:
+            % Search for Sources named "OD"
+            %   out = obj.get('Source', {'Name', "OD"})
+            %
+            % Search for Devices of class "aod.builtin.devices.Pinhole"
+            %   out = obj.get('Device', {'Class', 'aod.builtin.devices.Pinhole'})
+            %
+            % Search for Calibrations that are a subclass of
+            % "aod.builtin.calibrations.PowerMeasurement"
+            %   out = obj.get('Calibration',... 
+            %       {'Subclass', 'aod.builtin.calibrations.PowerMeasurement'})
+            %
+            % Search for Epochs that have Attribute "Defocus"
+            %   out = obj.get('Epoch', {'Attribute', 'Defocus'})
+            %
+            % Search for Epochs with Attribute "Defocus" = 0.3
+            %   out = obj.get('Epoch', {'Attribute', 'Defocus', 0.3})
+            % -------------------------------------------------------------
+        
+            import aod.common.EntityTypes 
+
+            entityType = EntityTypes.get(entityType);
+
+            switch entityType 
+                case EntityTypes.SOURCE 
+                    out = obj.Sources.getChildSources();
+                case EntityTypes.CHANNEL 
+                    if isempty(obj.Systems)
+                        group = aod.persistent.Channel.empty();
+                    else
+                        group = vertcat(obj.Systems.Channels);
+                    end
+                case EntityTypes.DEVICE
+                    if isempty(obj.Systems)
+                        out = aod.persistent.Device.empty();
+                    else
+                        out = obj.Systems.getChannelDevices();
+                    end
+                case EntityTypes.EXPERIMENT 
+                    out = obj;  % There is only one experiment
+                    return 
+                otherwise             
+                    group = obj.(entityType.parentContainer());
+            end
+
+            if nargin > 2 && ~isempty(group)
+                out = aod.common.EntitySearch.go(group, varargin{:});
+            else
+                out = group;
+            end
+        end
 
         function add(obj, entity)
             % Add a new entity to the Experiment
             %
             % Syntax:
             %   add(obj, entity)
+            %
+            % Examples:
+            %   EXPT = loadExperiment('ToyExperiment.h5')
+            %   newAnalysis = aod.core.Analysis("Test");
+            %   EXPT.add(newAnalysis);
             % -------------------------------------------------------------
             arguments
                 obj
@@ -146,18 +237,9 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             else
                 aod.util.mustBeEpochID(obj, ID);
             end
+            
             idx = obj.id2index(ID);
-
-            switch entityType 
-                case EntityTypes.EPOCHDATASET
-                    group = vertcat(obj.Epochs(idx).EpochDatasets);
-                case EntityTypes.REGISTRATION
-                    group = vertcat(obj.Epochs(idx).Registrations);
-                case EntityTypes.RESPONSE
-                    group = vertcat(obj.Epochs(idx).Responses);
-                case EntityTypes.STIMULUS 
-                    group = vertcat(obj.Epochs(idx).Stimuli);
-            end
+            group = vertcat(obj.Epochs(idx).(entityType.parentContainer()));
             
             if isempty(group)
                 out = group;

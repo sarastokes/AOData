@@ -27,6 +27,64 @@ classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
     end
 
     methods (Sealed)
+        function tf = has(obj, entityType, varargin)
+            % Search Systems's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries
+            %
+            % See also:
+            %   aod.persistent.System/get
+            % -------------------------------------------------------------
+
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
+
+        function out = get(obj, entityType, varargin)
+            % Get System's channels and devices
+            %
+            % Description:
+            %   Return all the channels or devices within the system or 
+            %   just the ones that match the one or more queries
+            %
+            % Syntax:
+            %   out = get(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            % -------------------------------------------------------------
+        
+            import aod.common.EntityTypes 
+
+            entityType = EntityTypes.get(entityType);
+
+            switch entityType
+                case EntityTypes.CHANNEL
+                    group = obj.Channels; 
+                case EntityTypes.DEVICE 
+                    group = obj.getChannelDevices();
+                otherwise
+                    error('get:InvalidEntityType',...
+                        'Only Channel and Device can be searched from System');
+            end 
+
+            if nargin > 2
+                out = aod.common.EntitySearch.go(group, varargin{:});
+            else
+                out = group;
+            end
+        end
+
         function add(obj, channel)
             % ADD
             % 
@@ -34,7 +92,11 @@ classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
             %   Add a Channel to the Experiment and the HDF5 file
             %
             % Syntax:
-            %   add(obj, channel)
+            %   add(obj, channel)            
+            %
+            % Examples:
+            %   channel = aod.core.Channel('MyChannel');
+            %   system.add(channel)
             % -------------------------------------------------------------
             arguments
                 obj
@@ -43,6 +105,29 @@ classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
 
             channel.setParent(obj);
             obj.addEntity(channel);
+        end
+    end
+
+    methods 
+        function devices = getChannelDevices(obj)
+            % Get all Devices within System's Channels
+            %
+            % Description:
+            %   Get devices within all channels
+            %
+            % Syntax:
+            %   devices = getChannelDevices(obj)
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                devices = uncell(aod.util.arrayfun(@(x) getChannelDevices(x), obj));
+                return
+            end
+
+            if isempty(obj.Channels)
+                devices = aod.persistent.Device.empty();
+            else
+                devices = vertcat(obj.Channels.Devices);
+            end
         end
     end
 

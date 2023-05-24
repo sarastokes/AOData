@@ -358,65 +358,52 @@ classdef Experiment < aod.core.Entity
             %
             % Examples:
             % Search for Sources named "OD"
-            %   out = obj.get('Source', 'Name', "OD")
+            %   out = obj.get('Source', {'Name', "OD"})
             %
             % Search for Devices of class "aod.builtin.devices.Pinhole"
-            %   out = obj.get('Device', 'Class', 'aod.builtin.devices.Pinhole')
+            %   out = obj.get('Device', {'Class', 'aod.builtin.devices.Pinhole'})
             %
-            % Search for Calibrations that are a subclass of 
+            % Search for Calibrations that are a subclass of
             % "aod.builtin.calibrations.PowerMeasurement"
-            %   out = obj.get('Calibration', 'Subclass',... 
-            %       'aod.builtin.calibrations.PowerMeasurement')
+            %   out = obj.get('Calibration',...
+            %       {'Subclass', 'aod.builtin.calibrations.PowerMeasurement'})
             %
             % Search for Epochs that have Attribute "Defocus"
-            %   out = obj.get('Epoch', 'Attribute', 'Defocus')
+            %   out = obj.get('Epoch', {'Attribute', 'Defocus'})
             %
             % Search for Epochs with Attribute "Defocus" = 0.3
-            %   out = obj.get('Epoch', 'Attribute', 'Defocus', 0.3)
+            %   out = obj.get('Epoch', {'Attribute', 'Defocus', 0.3})
             % -------------------------------------------------------------
 
             import aod.common.EntityTypes
 
             entityType = EntityTypes.get(entityType);
-
-            switch entityType
-                case EntityTypes.SOURCE
-                    group = obj.getAllSources();
-                case EntityTypes.SYSTEM 
-                    group = obj.Systems;
-                case EntityTypes.CHANNEL                          
-                    if isempty(obj.Systems)
-                        group = aod.core.Channel.empty();
-                    else
-                        group = vertcat(obj.Systems.Channels);
-                    end
-                case EntityTypes.DEVICE            
-                    if isempty(obj.Systems)
-                        group = aod.core.Device.empty();
-                    else
-                        group = vertcat(obj.Systems.getChannelDevices());
-                    end
-                case EntityTypes.CALIBRATION
-                    group = obj.Calibrations;
-                case EntityTypes.EXPERIMENTDATASET 
-                    group = obj.ExperimentDatasets;
-                case EntityTypes.EPOCH
-                    group = obj.Epochs;
-                case EntityTypes.RESPONSE
-                    group = obj.getFromEpoch('all', 'Response');
-                case EntityTypes.REGISTRATION
-                    group = obj.getFromEpoch('all', 'Registration');
-                case EntityTypes.EPOCHDATASET 
-                    group = obj.getFromEpoch('all', 'EpochDataset');
-                case EntityTypes.STIMULUS
-                    group = obj.getFromEpoch('all', 'Stimulus');
-                case EntityTypes.ANNOTATION
-                    group = obj.Annotations;
-                case EntityTypes.ANALYSIS
-                    group = obj.Analyses;
-                case EntityTypes.EXPERIMENT
-                    out = obj;  % There is only one experiment
-                    return
+            if ismember(entityType, obj.entityType.validChildTypes)                
+                if entityType == EntityTypes.SOURCE
+                    group = obj.getChildSources();
+                else
+                    group = obj.(entityType.parentContainer());
+                end
+            elseif ismember(entityType, EntityTypes.EPOCH.validChildTypes)
+                group = obj.getFromEpoch('all', entityType);
+            else 
+                switch entityType 
+                    case EntityTypes.CHANNEL 
+                        if isempty(obj.Systems)
+                            group = aod.core.Channel.empty();
+                        else
+                            group = vertcat(obj.Systems.Channels);
+                        end
+                    case EntityTypes.DEVICE          
+                        if isempty(obj.Systems)
+                            group = aod.core.Device.empty();
+                        else
+                            group = vertcat(obj.Systems.getChannelDevices());
+                        end 
+                    case EntityTypes.EXPERIMENT 
+                        out = obj;  % There is only one experiment
+                        return
+                end
             end
 
             if nargin > 2 && ~isempty(group)
@@ -474,18 +461,9 @@ classdef Experiment < aod.core.Entity
             else
                 aod.util.mustBeEpochID(obj, ID);
             end
-            idx = obj.id2index(ID);
 
-            switch entityType 
-                case EntityTypes.EPOCHDATASET
-                    group = vertcat(obj.Epochs(idx).EpochDatasets);
-                case EntityTypes.REGISTRATION
-                    group = vertcat(obj.Epochs(idx).Registrations);
-                case EntityTypes.RESPONSE
-                    group = vertcat(obj.Epochs(idx).Responses);
-                case EntityTypes.STIMULUS 
-                    group = vertcat(obj.Epochs(idx).Stimuli);
-            end
+            idx = obj.id2index(ID);
+            group = vertcat(obj.Epochs(idx).(entityType.parentContainer()));
             
             if isempty(group)
                 out = group;
@@ -624,20 +602,20 @@ classdef Experiment < aod.core.Entity
             obj.Epochs = obj.Epochs(idx);
         end
 
-        function sources = getAllSources(obj)
+        function sources = getChildSources(obj)
             % Returns all sources in an Experiment 
             %
             % Description:
             %   Returns all sources and nested sources in Experiment
             %
             % Syntax:
-            %   sources = getAllSources(obj)
+            %   sources = getChildSources(obj)
             % -------------------------------------------------------------
             sources = aod.core.Source.empty();
             if isempty(obj.Sources)
                 return
             end
-            sources = obj.Sources.getAllSources();
+            sources = obj.Sources.getChildSources();
         end 
 
         function appendGitHashes(obj)
