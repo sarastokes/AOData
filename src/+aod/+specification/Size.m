@@ -154,7 +154,7 @@ classdef Size < aod.specification.Validator
         end
 
         function value = parseMetaProperty(input)
-            if isempty(input.Validation.Size)
+            if isempty(input.Validation) || isempty(input.Validation.Size)
                 value = [];
             else 
                 mcSize = input.Validation.Size;

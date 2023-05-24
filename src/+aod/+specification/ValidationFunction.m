@@ -117,7 +117,11 @@ classdef ValidationFunction < aod.specification.Validator
     methods (Static, Access = private)
         function output = validateInput(input)
             if isa(input, 'meta.property')
-                output = input.Validation.ValidatorFunctions;
+                if isempty(input.Validation) || isempty(input.Validation.ValidatorFunctions)
+                    output = [];
+                else
+                    output = input.Validation.ValidatorFunctions;
+                end
                 return
             end
 

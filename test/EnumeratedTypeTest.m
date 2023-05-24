@@ -28,7 +28,6 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
     methods (Test, TestTags = {'Initialization'})
         function ErrorTypesInit(testCase)
-            import matlab.unittest.constraints.Throws
             import aod.infra.ErrorTypes
 
             out = aod.infra.ErrorTypes.init('error');
@@ -39,9 +38,23 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, ErrorTypes.MISSING);
             out = aod.infra.ErrorTypes.init('none');
             testCase.verifyEqual(out, ErrorTypes.NONE);
-            testCase.verifyThat(...
+            testCase.verifyError(...
                 @() aod.infra.ErrorTypes.init('BadInput'),...
-                Throws("ErrorTypes:UnrecognizedInput"));
+                "ErrorTypes:UnrecognizedInput");
+        end
+
+        function SizeTypesInit(testCase)
+            import aod.specification.SizeTypes
+
+            testCase.verifyEqual(SizeTypes.get('scalar'), SizeTypes.SCALAR);
+            testCase.verifyEqual(SizeTypes.get('row'), SizeTypes.ROW);
+            testCase.verifyEqual(SizeTypes.get('column'), SizeTypes.COLUMN);
+            testCase.verifyEqual(SizeTypes.get('matrix'), SizeTypes.MATRIX);
+            testCase.verifyEqual(SizeTypes.get('ndarray'), SizeTypes.NDARRAY);
+            testCase.verifyEqual(SizeTypes.get('undefined'), SizeTypes.UNDEFINED);
+
+            testCase.verifyError(...
+                @() SizeTypes.get('badinput'), "SizeTypes:InvalidInput");
         end
 
         function FilterTypesInit(testCase)

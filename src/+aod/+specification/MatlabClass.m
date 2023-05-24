@@ -60,7 +60,7 @@ classdef MatlabClass < aod.specification.Validator
 
 
             if isa(input, 'meta.property')
-                if ~isempty(input.Validation.Class)
+                if ~isempty(input.Validation) && ~isempty(input.Validation.Size)
                     classes = string(input.Validation.Class.Name);
                 else
                     classes = "";

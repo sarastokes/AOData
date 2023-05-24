@@ -149,7 +149,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             obj = aod.specification.MatlabClass();
             testCase.verifyEmpty(obj);
             testCase.verifyTrue(obj.validate(123));
-            testCase.verifyEqual(obj.text(), "");
+            testCase.verifyEqual(obj.text(), "[]");
 
             obj.setValue("string");
             testCase.verifyEqual(obj.Value, "string");
@@ -297,6 +297,28 @@ classdef SpecificationTest < matlab.unittest.TestCase
             descSpec = aod.specification.Description("This is a description");
             defaultSpec = aod.specification.DefaultValue(1);
             fcnSpec = aod.specification.ValidationFunction(@mjstBeNumeric);
+        end
+
+        function SpecificationManager(testCase)
+            obj = aod.specification.SpecificationManager.populate('aod.core.Epoch');
+            testCase.verifyEqual(obj.numDatasets, 4);
+            testCase.verifyNumElements(obj.Datasets, 4);
+            testCase.verifyEqual("aod.core.Epoch", obj.className);
+
+            testCase.verifyTrue(obj.has('ID'));
+            testCase.verifyEmpty(obj.get('Blah'));
+            testCase.verifyFalse(obj.has('Blah'));
+
+            out = obj.text();
+            testCase.verifySize(obj.table(), [4 5]);
+        end
+
+        function SpecificationManagerError(testCase)
+            obj = aod.specification.SpecificationManager.populate('aod.core.Epoch');
+            ep = aod.core.Epoch(1);
+
+            testCase.verifyError(...
+                @() obj.add(findprop(ep, 'ID')), "add:DatasetExists");
         end
     end
 

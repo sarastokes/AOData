@@ -40,7 +40,11 @@ classdef Description < aod.specification.Descriptor
         end
 
         function output = text(obj)
-            output = obj.Value;
+            if isempty(obj)
+                output = "[]";
+            else
+                output = obj.Value;
+            end
         end
     end
 

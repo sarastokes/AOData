@@ -1,4 +1,8 @@
 classdef DataObject < handle 
+% 
+% Syntax:
+%   obj = aod.specification.DataObject(prop, varargin)
+%
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -6,11 +10,11 @@ classdef DataObject < handle
     properties (SetAccess = private)
         Name            (1,1)     string
         Required        (1,1)     logical = false 
-        Size                      aod.specification.Size = aod.specification.Size([]);
-        Class           (1,1)     aod.specification.MatlabClass = aod.specification.MatlabClass([]);
+        Size                      aod.specification.Size 
+        Class           (1,1)     aod.specification.MatlabClass
         Default         (1,1)     aod.specification.DefaultValue = aod.specification.DefaultValue([])
         Functions       (1,1)     aod.specification.ValidationFunction = aod.specification.ValidationFunction([])
-        Description     (1,1)     aod.specification.Description = aod.specification.Description([])
+        Description               aod.specification.Description 
         Units           (1,1)     string        % For now
     end
 
@@ -20,9 +24,12 @@ classdef DataObject < handle
 
     methods
         function obj = DataObject(prop, varargin)
-            % Defaults
+            % Defaults (prevents issues w/ instantiation in property block)
             obj.Size = aod.specification.Size([]); 
-            obj.Functions = aod.specification.ValidationFunction([])
+            obj.Class = aod.specification.MatlabClass([]);
+            obj.Description = aod.specification.Description([]);
+            obj.Functions = aod.specification.ValidationFunction([]);
+
             if nargin == 0
                 return 
             end
@@ -78,6 +85,18 @@ classdef DataObject < handle
 
     % Setters
     methods
+        function setRequired(obj, input)
+            if isa(input, "meta.property")
+                return
+            end
+            obj.Required = input;
+        end
+
+        function setDescription(obj, input)
+            obj.Description.setValue(input);
+            obj.checkIntegrity();
+        end
+
         function setClass(obj, input)
             obj.Class.setValue(input);
             obj.checkIntegrity();
@@ -91,6 +110,7 @@ classdef DataObject < handle
         function setFunctions(obj, input)
             obj.Functions.setValue(input);
             obj.checkIntegrity();
+            obj.extractFromFunctions();
         end
 
         function setDefault(obj, input)
@@ -117,7 +137,7 @@ classdef DataObject < handle
                 case 'default'
                     obj.setDefault(specValue);
                 case 'description'
-                    obj.Description.setValue(specValue);
+                    obj.setDescription(specValue);
                 case 'units'
                     % Leave alone for now
                 otherwise
@@ -148,10 +168,27 @@ classdef DataObject < handle
                 end
             end
         end
+
+        function extractFromFunctions(obj)
+            if isempty(obj.Functions)
+                return
+            end
+            fcnText = obj.Functions.text();
+            if contains(fcnText, "mustBeScalarOrEmpty")
+                obj.setSize([1, 1]);
+            elseif contains(fcnText, "mustBeText")
+                obj.setClass("string, char");
+                if contains(fcnText, "mustBeTextScalar")
+                    obj.setSize("(1,:)");
+                end
+            elseif contains(fcnText, "mustBeNonzeroLengthText")
+                obj.setClass("string, char");
+            end
+        end
     end
 
     methods (Static, Access = private)
-        function ip = getParser(~, varargin)
+        function ip = getParser(varargin)
             ip = inputParser();
             ip.CaseSensitive = false;
             addParameter(ip, 'Size', []);
