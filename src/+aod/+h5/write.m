@@ -52,7 +52,7 @@ function success = write(hdfName, pathName, dsetName, data, description)
             success = aod.h5.writeExpectedAttributes(hdfName, pathName, dsetName, data);
             h5tools.writeatt(hdfName, fullPath, 'Description',...
                 "Specification of expected metadata for the entity")
-        elseif isa(data, 'aod.util.DatasetManager')
+        elseif isa(data, 'aod.specification.DatasetManager')
             success = aod.h5.writeExpectedDatasets(hdfName, pathName, dsetName, data);
             h5tools.writeatt(hdfName, fullPath, 'Description',...
                 "Specification of expected data for the entity");

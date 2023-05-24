@@ -2,12 +2,14 @@ classdef TestAnalysis < aod.core.Analysis
 
     properties
         Source
-        Data 
+        Data        = 2
+        Prop   (1,1)    string = "test"
     end
 
     methods
         function obj = TestAnalysis()
-            obj = obj@aod.core.Analysis('Test', '20220904');
+            obj = obj@aod.core.Analysis('Test',...
+                "Date", '20220904');
 
             obj.Data = randn([4, 5]);
         end

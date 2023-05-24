@@ -249,31 +249,31 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="DataObject")
-        function DataObjectFromMetaclass(testCase)
+    methods (Test, TestTags="Dataset")
+        function DatasetFromMetaclass(testCase)
             % All but size
-            obj1 = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropC'));
+            obj1 = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropC'));
             testCase.verifyTrue(obj1.validate(123));
             testCase.verifyFalse(obj1.validate("bad"));
             testCase.verifyEmpty(obj1.Size);
             testCase.verifyEqual(obj1.Default.Value, 1);
             testCase.verifyEqual(obj1.Class.Value, "double");
 
-            objD = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropD'));
+            objD = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropD'));
             testCase.verifyEqual(obj1.Description.Value, "This is PropD");
 
             % All fields
-            obj2 = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropB'));
+            obj2 = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropB'));
             testCase.verifyTrue(obj2.validate([1 2 3]'));
             testCase.verifyFalse(obj2.validate([1 2 3]));
 
             % No description
-            objA = aod.specification.DataObject(findprop(testCase.TEST_OBJ, 'PropA'));
+            objA = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropA'));
             testCase.verifyEmpty(objA.Description);
         end
 
-        function DataObjectFromInput(testCase)
-            obj = aod.specification.DataObject('test',...
+        function DatasetFromInput(testCase)
+            obj = aod.specification.Dataset('test',...
                 "Size", "(1,2)",...
                 "Class", "double",...
                 "Function", {@mustBeNumeric},...
@@ -281,8 +281,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 "Description", "This is a test");
         end
 
-        function EmptyDataObject(testCase)
-            obj = aod.specification.DataObject("mytest");
+        function EmptyDataset(testCase)
+            obj = aod.specification.Dataset("mytest");
             testCase.verifyEmpty(obj.Default);
             testCase.verifyEmpty(obj.Functions);
             testCase.verifyEmpty(obj.Class);
@@ -299,8 +299,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
             fcnSpec = aod.specification.ValidationFunction(@mjstBeNumeric);
         end
 
-        function SpecificationManager(testCase)
-            obj = aod.specification.SpecificationManager.populate('aod.core.Epoch');
+        function DatasetManager(testCase)
+            obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
             testCase.verifyEqual(obj.numDatasets, 4);
             testCase.verifyNumElements(obj.Datasets, 4);
             testCase.verifyEqual("aod.core.Epoch", obj.className);
@@ -313,8 +313,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifySize(obj.table(), [4 5]);
         end
 
-        function SpecificationManagerError(testCase)
-            obj = aod.specification.SpecificationManager.populate('aod.core.Epoch');
+        function DatasetManagerError(testCase)
+            obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
             ep = aod.core.Epoch(1);
 
             testCase.verifyError(...
@@ -392,7 +392,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             %    "parseClassName:InvalidClass");
         end
 
-        function DatasetManager(testCase)
+        function DatasetManagerOld(testCase)
             % Empty DatasetManager
             DM = aod.util.DatasetManager();
             testCase.verifyEqual(DM.Count, 0);

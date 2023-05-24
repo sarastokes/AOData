@@ -395,7 +395,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % No error even though device is empty
             system2 = aod.core.System('System2');
-            clearAllDevices([system1, system2]);
+            clearAllDevices([system1, system2], 'all');
         end
     end
 

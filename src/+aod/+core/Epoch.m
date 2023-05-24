@@ -54,9 +54,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     % Entity link properties
     properties (SetAccess = protected)
-        % Source of data acquired during the Epoch
+        % The Source of data acquired during the Epoch
         Source              {mustBeScalarOrEmpty, mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
-        % System used for data acquisition during the Epoch
+        % The System used for data acquisition during the Epoch
         System              {mustBeScalarOrEmpty, mustBeEntityType(System, 'System')} = aod.core.System.empty()
     end
     
@@ -381,6 +381,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
             value.add('SampleRate', [], @isnumeric,...
                 'Rate of data acquisition (Hz)');
+        end
+
+        function mngr = specifyDatasets(mngr)
+            mngr.set('ID',... 
+                'Description', 'Epoch ID in the Experiment');
         end
     end
 end 

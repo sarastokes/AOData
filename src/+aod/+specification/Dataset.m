@@ -1,7 +1,7 @@
-classdef DataObject < handle 
+classdef Dataset < handle 
 % 
 % Syntax:
-%   obj = aod.specification.DataObject(prop, varargin)
+%   obj = aod.specification.Dataset(prop, varargin)
 %
 
 % By Sara Patterson, 2023 (AOData)
@@ -12,8 +12,8 @@ classdef DataObject < handle
         Required        (1,1)     logical = false 
         Size                      aod.specification.Size 
         Class           (1,1)     aod.specification.MatlabClass
-        Default         (1,1)     aod.specification.DefaultValue = aod.specification.DefaultValue([])
-        Functions       (1,1)     aod.specification.ValidationFunction = aod.specification.ValidationFunction([])
+        Default         (1,1)     aod.specification.DefaultValue
+        Functions       (1,1)     aod.specification.ValidationFunction
         Description               aod.specification.Description 
         Units           (1,1)     string        % For now
     end
@@ -23,10 +23,11 @@ classdef DataObject < handle
     end
 
     methods
-        function obj = DataObject(prop, varargin)
+        function obj = Dataset(prop, varargin)
             % Defaults (prevents issues w/ instantiation in property block)
             obj.Size = aod.specification.Size([]); 
             obj.Class = aod.specification.MatlabClass([]);
+            obj.Default = aod.specification.DefaultValue([]);
             obj.Description = aod.specification.Description([]);
             obj.Functions = aod.specification.ValidationFunction([]);
 
@@ -56,7 +57,7 @@ classdef DataObject < handle
             ip = obj.getParser(varargin{:});
 
             % Only pass the values user provided
-            changedProps = setdiff(ip.Parameters, ip.UsingDefault);
+            changedProps = setdiff(ip.Parameters, ip.UsingDefaults);
             cellfun(@(x) obj.parse(x, ip.Results.(x)), changedProps);
             obj.checkIntegrity();
         end
@@ -75,6 +76,7 @@ classdef DataObject < handle
             out = out + "    Class: " + obj.Class.text() + newline;
             out = out + "    Size: " + obj.Size.text() + newline;
             out = out + "    Validators: " + obj.Functions.text() + newline;
+            out = out + "    Default: " + obj.Default.text() + newline;
             % if obj.Required
             %     out = out + "    Required: true" + newline;
             % else
@@ -141,7 +143,7 @@ classdef DataObject < handle
                 case 'units'
                     % Leave alone for now
                 otherwise
-                    error('DataObject:InvalidType',...
+                    error('Dataset:InvalidType',...
                         'Specification type must be size, function class, default or description');
             end
         end

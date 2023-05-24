@@ -53,14 +53,14 @@ classdef MatlabClass < aod.specification.Validator
     methods (Static, Access = private)
         function classes = parse(input)
 
-            if aod.util.isempty(input)
+            if aod.util.isempty(input) || input == "[]"
                 classes = "";
                 return
             end
 
 
             if isa(input, 'meta.property')
-                if ~isempty(input.Validation) && ~isempty(input.Validation.Size)
+                if ~isempty(input.Validation) && ~isempty(input.Validation.Class)
                     classes = string(input.Validation.Class.Name);
                 else
                     classes = "";

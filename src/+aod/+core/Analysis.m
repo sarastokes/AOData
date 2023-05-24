@@ -57,4 +57,9 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
         end
     end
 
+    methods (Static)
+        function mngr = specifyDatasets(mngr)
+            specifyDatasets@aod.core.Entity(mngr);
+        end
+    end
 end 

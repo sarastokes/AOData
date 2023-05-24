@@ -41,7 +41,7 @@ classdef Experiment < aod.core.Entity
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = private)
         % The experiment's data folder path
         homeDirectory  (1,:)    char
         % The date the experiment was performed 

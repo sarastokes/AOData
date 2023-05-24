@@ -25,7 +25,7 @@ classdef Description < aod.specification.Descriptor
     % aod.specification.Descriptor methods
     methods
         function setValue(obj, input)
-            if aod.util.isempty(input)
+            if aod.util.isempty(input) || input == "[]"
                 obj.Value = "";
                 return 
             end

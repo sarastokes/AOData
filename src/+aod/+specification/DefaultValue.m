@@ -21,6 +21,8 @@ classdef DefaultValue < aod.specification.Validator
                 if input.HasDefault
                     obj.Value = input.DefaultValue;
                 end
+            elseif istext(input) && input == "[]"
+                obj.Value = [];
             else
                 obj.Value = input;
             end
@@ -32,6 +34,7 @@ classdef DefaultValue < aod.specification.Validator
 
         function out = text(obj)
             out = value2string(obj.Value);
+            out = convertCharsToStrings(out);
         end
     end
 

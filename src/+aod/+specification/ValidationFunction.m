@@ -102,14 +102,22 @@ classdef ValidationFunction < aod.specification.Validator
             if numel(indiv) > 1
                 out = "{";
                 for i = 1:numel(indiv)
-                    out = out + indiv(i);
+                    out = out + formatFcn(indiv(i));
                     if i < numel(indiv)
                         out = out + ", ";
                     end
                 end
                 out = out + "}";
             else
-                out = "{" + indiv + "}";
+                out = "{" + formatFcn(indiv) + "}";
+            end
+
+            function y = formatFcn(x)
+                if ~startsWith(x, "@")
+                    y = "@" + x;
+                else
+                    y = x;
+                end
             end
         end
     end

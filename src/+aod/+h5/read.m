@@ -38,9 +38,9 @@ function out = read(hdfName, pathName, dsetName, className)
 
     if strcmp(dsetName, "expectedDatasets")
         out = aod.h5.readExpectedDatasets(hdfName, pathName, dsetName);
-        return 
+        return
     end
-    
+
     % Generic HDF5 datasets
     out = h5tools.read(hdfName, pathName, dsetName);
 

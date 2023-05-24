@@ -145,7 +145,7 @@ classdef (Abstract) Entity < handle
             obj.assignListeners();
 
             % Initialize DatasetManager for basis of expectedDatasets
-            obj.DatasetManager = aod.util.DatasetManager.populate(obj);
+            obj.DatasetManager = aod.specification.DatasetManager.populate(class(obj));
         end
     end
 
@@ -160,7 +160,7 @@ classdef (Abstract) Entity < handle
         end
 
         function value = get.expectedDatasets(obj)
-            value = obj.specifyDatasets();
+            value = obj.specifyDatasets(obj.DatasetManager);
         end
 
         function value = get.groupName(obj)
@@ -767,21 +767,6 @@ classdef (Abstract) Entity < handle
                 value = obj.Name;
             end
         end
-
-        function value = specifyDatasets(obj)
-            value = obj.DatasetManager;
-        end
-
-        function value = populateDatasetManager(obj)
-            % Initializes DatasetManager, subclasses can extend
-            %
-            % Syntax:
-            %   value = specifyDatasets(obj)
-            % -------------------------------------------------------------
-            tic
-            value = aod.util.DatasetManager.populate(obj);
-            fprintf("Dataset time = %.2f\n", toc);
-        end
     end
 
     methods (Access = protected)
@@ -1024,8 +1009,18 @@ classdef (Abstract) Entity < handle
             % Syntax:
             %   value = specifyAttributes()
             % -------------------------------------------------------------
-
             value = aod.util.AttributeManager();
+        end
+
+        function mngr = specifyDatasets(mngr)
+            % Modifies DatasetManager, subclasses can extend
+            %
+            % Syntax:
+            %   mngr = specifyAttributes(mngr)
+            %
+            % Inputs:
+            %   mngr        aod.specification.DatasetManager
+            % -------------------------------------------------------------
         end
     end
 end 

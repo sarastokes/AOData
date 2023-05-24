@@ -1,4 +1,4 @@
-classdef SpecificationManager < handle 
+classdef DatasetManager < handle
 
     properties (SetAccess = private)
         className       (1,1)   string 
@@ -10,7 +10,7 @@ classdef SpecificationManager < handle
     end
 
     methods 
-        function obj = SpecificationManager(className)
+        function obj = DatasetManager(className)
             
             if nargin > 0
                 obj.className = convertCharsToStrings(className);
@@ -30,15 +30,15 @@ classdef SpecificationManager < handle
             dset = obj.get(dsetName);
             if isempty(dset)
                 error('set:DatasetNameNotFound',...
-                    'SpecificationManager for %s does not have dataset %s',...
+                    'DatasetManager for %s does not have dataset %s', ...
                     obj.className, dsetName);
             end
             
-            dset.assign(dsetName, varargin{:});
+            dset.assign(varargin{:});
         end
 
         function [tf, idx] = has(obj, dsetName)
-            % Determine whether SpecificationManager has a dataset
+            % Determine whether DatasetManager has a dataset
             % -------------------------------------------------------------
             arguments
                 obj
@@ -71,7 +71,7 @@ classdef SpecificationManager < handle
             % -------------------------------------------------------------
             arguments 
                 obj
-                dset            aod.specification.DataObject 
+                dset            aod.specification.Dataset 
             end
 
             if ~isscalar(dset)
@@ -120,17 +120,17 @@ classdef SpecificationManager < handle
 
     methods (Static)
         function obj = populate(className)
-            % Populate and create a SpecificationManager from a class name
+            % Populate and create a DatasetManager from a class name
             %
             % Syntax:
-            %   obj = aod.specification.SpecificationManager.populate(className)
+            %   obj = aod.specification.DatasetManager.populate(className)
             %
             % Inputs:
             %   className           string or char
             %       Name of class (must be aod.core.Entity subclass)
             %
             % Examples:
-            %   obj = aod.specification.SpecificationManager.populate('aod.core.Epoch')
+            %   obj = aod.specification.DatasetManager.populate('aod.core.Epoch')
             % -------------------------------------------------------------
             
             if ~isSubclass(className, "aod.core.Entity")
@@ -144,7 +144,7 @@ classdef SpecificationManager < handle
             classProps = aod.h5.getPersistedProperties(mc);
             systemProps = aod.infra.getSystemProperties();
 
-            obj = aod.specification.SpecificationManager(className);
+            obj = aod.specification.DatasetManager(className);
             for i = 1:numel(propList)
                 % Skip system properties
                 if ismember(propList(i).Name, systemProps)
@@ -156,7 +156,7 @@ classdef SpecificationManager < handle
                     continue
                 end
 
-                dataObj = aod.specification.DataObject(propList(i));
+                dataObj = aod.specification.Dataset(propList(i));
                 obj.add(dataObj);
             end
         end
@@ -164,6 +164,10 @@ classdef SpecificationManager < handle
 
     % MATLAB builtin methods
     methods
+        function tf = isempty(obj)
+            tf = (obj.numDatasets == 0);
+        end
+
         function T = table(obj)
             % Create a table from dataset specifications
             %
@@ -183,10 +187,11 @@ classdef SpecificationManager < handle
             descriptions = arrayfun(@(x) x.Description.text(), obj.Datasets);
             sizes = arrayfun(@(x) x.Size.text(), obj.Datasets);
             classes = arrayfun(@(x) x.Class.text(), obj.Datasets);
+            defaults = arrayfun(@(x) x.Default.text(), obj.Datasets);
             functions = arrayfun(@(x) x.Functions.text(), obj.Datasets);
 
-            T = table(names, descriptions, classes, sizes, functions,...
-                'VariableNames', {'Name', 'Description', 'Class', 'Size', 'Functions'});
+            T = table(names, descriptions, classes, sizes, functions, defaults,...
+                'VariableNames', {'Name', 'Description', 'Class', 'Size', 'Functions', 'Default'});
         end
     end
 end 

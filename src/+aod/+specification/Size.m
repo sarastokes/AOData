@@ -33,7 +33,7 @@ classdef Size < aod.specification.Validator
         function setValue(obj, input)
             import aod.specification.SizeTypes
 
-            if isempty(input) || strcmp(input, '[]')
+            if aod.util.isempty(input) || (istext(input) && input == "[]")
                 obj.Value = [];
                 obj.SizeType = SizeTypes.UNDEFINED;
                 return 
@@ -55,7 +55,7 @@ classdef Size < aod.specification.Validator
                 if obj.isfixed(1) && obj.Value(1).Length == 1
                     obj.SizeType = SizeTypes.ROW;
                 else
-                    obj.SizeType = SizeTypes.COLUMN
+                    obj.SizeType = SizeTypes.COLUMN;
                 end
             else 
                 obj.SizeType = SizeTypes.MATRIX;
@@ -92,7 +92,7 @@ classdef Size < aod.specification.Validator
 
         function out = text(obj)
             % Converts to a text representation
-            if isempty(obj.Value) 
+            if isempty(obj.Value)
                 out = "[]";
                 return
             end
