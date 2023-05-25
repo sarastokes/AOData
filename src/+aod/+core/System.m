@@ -191,6 +191,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   clearAllDevices(obj)
             % -------------------------------------------------------------
+            
             if ~isscalar(obj)
                 arrayfun(@(x) clearAllDevices(x), obj);
                 return

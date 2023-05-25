@@ -16,6 +16,28 @@ classdef SizeTypes
         UNDEFINED
     end
 
+    methods
+        function out = getSizing(obj)
+            import aod.specification.SizeTypes
+
+            switch obj 
+                case SizeTypes.SCALAR
+                    out = "(1,1)";
+                case SizeTypes.ROW 
+                    out = "(1,:)";
+                case SizeTypes.COLUMN
+                    out = "(:,1)";
+                case SizeTypes.MATRIX
+                    out = "(:,:)";
+                case SizeTypes.UNDEFINED
+                    out = [];
+                case SizeTypes.NDARRAY
+                    error('getSizing:NotEnoughInfo',...
+                        "NDARRAY does not provide enough info to specify size");
+            end
+        end
+    end
+
     methods (Static)
         function obj = get(input)
 
@@ -28,6 +50,8 @@ classdef SizeTypes
                     obj = SizeTypes.ROW;
                 case 'column'
                     obj = SizeTypes.COLUMN;
+                case 'matrix'
+                    obj = SizeTypes.MATRIX;
                 case 'ndarray'
                     obj = SizeTypes.NDARRAY;
                 case 'undefined'

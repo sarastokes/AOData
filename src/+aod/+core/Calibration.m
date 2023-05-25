@@ -43,11 +43,11 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        calibrationDate                 datetime
+        calibrationDate   datetime  {mustBeScalarOrEmpty}
     end
 
     properties (SetAccess = protected)
-        Target       % System, Channel or Device calibrated
+        Target       {mustBeScalarOrEmpty}
     end
 
     methods
@@ -126,6 +126,17 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             
             value.add('Administrator', "", @isstring,... 
                 'Person(s) who performed the calibration');
+        end
+
+        function mngr = specifyDatasets(mngr)
+            mngr = specifyDatasets@aod.core.Entity(mngr);
+
+            mngr.set("Target",...
+                "Size", "(1,1)",...
+                "Function", {@mustBeScalarOrEmpty, ...
+                    @(x) aod.util.mustBeEntityType(x, ["System", "Channel", "Device"])});
+            mngr.set("calibrationDate",...
+                "Size", "(1,1)");
         end
     end
 end

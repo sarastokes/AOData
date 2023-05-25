@@ -11,15 +11,16 @@ function mustBeEntityType(obj, entityType)
 % Inputs:
 %   obj             AOData object
 %   entityType      aod.common.EntityTypes or char/string of entityType
+%       One or more entity types
 %
 % Examples:
 %   aod.util.mustBeEntityType(obj, aod.common.EntityTypes.ANNOTATION)
 %   aod.util.mustBeEntityType(obj, 'annotation');
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    entityType = aod.common.EntityTypes.get(entityType);
+    entityType = convertCharsToStrings(entityType);
 
     if ~isscalar(obj)
         for i = 1:numel(obj)
@@ -27,9 +28,15 @@ function mustBeEntityType(obj, entityType)
         end
     end
 
-    if ~isSubclass(obj, entityType.getCoreClassName()) ...
-            && ~isSubclass(obj, entityType.getPersistentClassName())
-        eidType = 'mustBeEntityType:InvalidEntityType';
-        msgType = sprintf('Entity must be %s', char(entityType));
-        throwAsCaller(MException(eidType, msgType));
+
+    for i = 1:numel(entityType)
+        iType = aod.common.EntityTypes.get(entityType(i));
+        if isSubclass(obj, iType.getCoreClassName()) || ...
+            isSubclass(obj, iType.getPersistentClassName())
+            return
+        end
     end
+
+    eidType = 'mustBeEntityType:InvalidEntityType';
+    msgType = sprintf('Entity must be %s', array2commalist(entityType));
+    throwAsCaller(MException(eidType, msgType));

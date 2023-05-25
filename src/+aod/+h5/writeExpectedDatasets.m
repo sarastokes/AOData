@@ -1,5 +1,5 @@
 function success = writeExpectedDatasets(hdfName, pathName, dsetName, DM, parentClass)
-% Write aod.util.DatasetManager as an HDF5 dataset
+% Write aod.specification.DatasetManager as an HDF5 dataset
 %
 % Syntax:
 %   success = aod.h5.writeExpectedAttributes(hdfName, pathName, dsetName,...

@@ -43,7 +43,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
         % The annotation data
         Data   
         % Source associated with the Annotation
-        Source                      = aod.core.Source.empty()       
+        Source     {mustBeScalarOrEmpty, aod.util.mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()       
     end
 
     methods

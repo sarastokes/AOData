@@ -7,7 +7,7 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
 %       aod.util.getPersistedProps(obj, verbose)
 %
 % Input:
-%   obj             aod.core.Entity or class name
+%   obj             aod.core.Entity, class name or meta.class
 %   verbose         logical (default = false)
 %
 % Output:
@@ -31,17 +31,18 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
         verbose             logical                             = false
     end
 
-    if isSubclass(obj, 'aod.core.Entity')
-        isObject = true;
-        mc = metaclass(obj);
-    elseif isa(obj, 'meta.class')
+    
+    if isa(obj, 'meta.class')
         mc = obj;
         isObject = false;
+    elseif isobject(obj) && isSubclass(obj, 'aod.core.Entity')
+        isObject = true;
+        mc = metaclass(obj);
     elseif istext(obj)
-        assert(ismember('aod.core.Entity', superclasses(obj)),... 
-            'Input must be class name or instance of a class')
         isObject = false;
         mc = meta.class.fromName(obj);
+        assert(isSubclass(mc, 'aod.core.Entity'),...
+            'Input must be a class name or instance of a class');
     end
 
     containerProps = aod.common.EntityTypes.allContainerNames();

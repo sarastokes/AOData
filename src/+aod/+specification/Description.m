@@ -53,5 +53,13 @@ classdef Description < aod.specification.Descriptor
         function tf = isempty(obj)
             tf = aod.util.isempty(obj.Value);
         end
+
+        function out = jsonencode(obj)
+            if isempty(obj)
+                out = jsonencode([]);
+            else
+                out = jsonencode(obj.Value);
+            end
+        end
     end
 end 

@@ -38,10 +38,22 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
 
     properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
         % Time the Epoch (i.e. data acquisition) began
-        startTime           datetime {mustBeScalarOrEmpty} = datetime.empty()                          
-        % Timing of samples during Epoch                             
+        startTime           datetime        {mustBeScalarOrEmpty} = datetime.empty()                          
+        % The timing of samples during Epoch                             
         Timing (:,1)        duration = seconds([])
+    end
 
+
+    % Entity link properties
+    properties (SetAccess = protected)
+        % The Source of data acquired during the Epoch
+        Source              {mustBeScalarOrEmpty, aod.util.mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
+        % The System used for data acquisition during the Epoch
+        System              {mustBeScalarOrEmpty, aod.util.mustBeEntityType(System, 'System')} = aod.core.System.empty()
+    end
+    
+    % Containers for child entities
+    properties (SetAccess = private)
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
         % Container for Epoch's Responses
@@ -52,14 +64,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         EpochDatasets       aod.core.EpochDataset
     end
 
-    % Entity link properties
-    properties (SetAccess = protected)
-        % The Source of data acquired during the Epoch
-        Source              {mustBeScalarOrEmpty, mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
-        % The System used for data acquisition during the Epoch
-        System              {mustBeScalarOrEmpty, mustBeEntityType(System, 'System')} = aod.core.System.empty()
-    end
-    
     methods 
         function obj = Epoch(ID, varargin)
             obj = obj@aod.core.Entity([], varargin{:});

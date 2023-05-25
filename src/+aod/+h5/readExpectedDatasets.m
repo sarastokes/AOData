@@ -1,5 +1,5 @@
 function DM = readExpectedDatasets(hdfName, pathName, dsetName)
-% Read aod.util.DatasetManager
+% Read aod.specification.DatasetManager
 %
 % Syntax:
 %   DM = aod.h5.readExpectedDatasets(hdfName, pathName, dsetName)
@@ -13,7 +13,10 @@ function DM = readExpectedDatasets(hdfName, pathName, dsetName)
 %       Name of the dataset
 %
 % Outputs:
-%   DM              aod.util.DatasetManager
+%   DM              aod.specification.DatasetManager
+%
+% See also:
+%   aod.h5.writeExpectedDatasets, aod.specification.DatasetManager
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

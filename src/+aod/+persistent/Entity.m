@@ -63,7 +63,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         % Specification of expected metadata 
         expectedAttributes      = aod.util.AttributeManager
         % Specification of expected datasets
-        expectedDatasets        = aod.util.DatasetManager
+        expectedDatasets        = aod.specification.DatasetManager
     end
 
     properties (Dependent)

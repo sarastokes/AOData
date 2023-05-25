@@ -20,7 +20,8 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        analysisDate            datetime = datetime.empty()
+        % Date the analysis was performed
+        analysisDate    datetime    {mustBeScalarOrEmpty} = datetime.empty()
     end
 
     methods

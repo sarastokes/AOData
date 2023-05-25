@@ -37,12 +37,6 @@ classdef CustomDisplayTest < matlab.unittest.TestCase
             disp(PM);
         end
 
-        function DatasetManager(testCase) 
-            cEXPT = ToyExperiment(false);
-            DM = aod.util.DatasetManager.populate(cEXPT);
-            disp(DM);
-        end
-
         function HierarchyDisplay(testCase)
             cEXP = ToyExperiment(false);
             aod.util.displayHierarchy(cEXP);

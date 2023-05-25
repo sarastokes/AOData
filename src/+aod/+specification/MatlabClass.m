@@ -48,16 +48,16 @@ classdef MatlabClass < aod.specification.Validator
                 out = obj.Value;
             end        
         end
+
     end
 
     methods (Static, Access = private)
         function classes = parse(input)
 
-            if aod.util.isempty(input) || input == "[]"
+            if aod.util.isempty(input) || istext(input) && all(input == "[]")
                 classes = "";
                 return
             end
-
 
             if isa(input, 'meta.property')
                 if ~isempty(input.Validation) && ~isempty(input.Validation.Class)
@@ -113,6 +113,14 @@ classdef MatlabClass < aod.specification.Validator
                 end
             end
             tf = true;
+        end
+
+        function out = jsonencode(obj)
+            if isempty(obj)
+                out = jsonencode([]);
+            else
+                out = jsonencode(obj.Value);
+            end
         end
     end
 end

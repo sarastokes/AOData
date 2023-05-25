@@ -305,7 +305,7 @@ classdef AONodeTypes
                     obj = AONodeTypes.HOMEDIRECTORY;
                 case {'attributemanager', 'aod.util.attributemanager'}
                     obj = AONodeTypes.ATTRIBUTEMANAGER;
-                case {'datasetmanager', 'aod.util.datasetmanager'}
+                case {'datasetmanager', 'aod.specification.datasetmanager'}
                     obj = AONodeTypes.DATASETMANAGER;
                 case {'querymanager', 'aod.api.querymanager'}
                     obj = AONodeTypes.QUERYMANAGER;

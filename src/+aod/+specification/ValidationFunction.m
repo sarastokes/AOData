@@ -146,5 +146,13 @@ classdef ValidationFunction < aod.specification.Validator
         function tf = isempty(obj)
             tf = isempty(obj.Value);
         end
+        
+        function out = jsonencode(obj)
+            if isempty(obj)
+                out = jsonencode([]);
+            else
+                out = jsonencode(obj.text());
+            end
+        end
     end
 end 

@@ -5,7 +5,7 @@ function tf = isSubclass(x, className)
 %   tf = isSubclass(x, className)
 %
 % Inputs:
-%   x               object
+%   x               object, meta.class
 %   className       string, char or cellstr
 %
 % Examples:
@@ -32,6 +32,15 @@ function tf = isSubclass(x, className)
     % Parse class name
     if istext(x) && exist(x, 'class')
         tf = strcmpi(x, className) | ismember(className, superclasses(x));
+        return
+    end
+
+    if isa(x, 'meta.class')
+        if strcmp(x.Name, className)
+            tf = true;
+        else
+            tf = ismember(className, superclasses(x.Name));
+        end
         return
     end
 

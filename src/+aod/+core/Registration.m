@@ -27,7 +27,8 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        registrationDate                datetime = datetime.empty()
+        % The date the registration was performed
+        registrationDate    datetime    {mustBeScalarOrEmpty} = datetime.empty()
     end
 
     methods

@@ -96,7 +96,7 @@ classdef (Abstract) Entity < handle
         % Expected attribute names, optional default values and validation
         expectedAttributes          % aod.util.AttributeManager
         % Expected dataset names
-        expectedDatasets            % aod.util.DatasetManager
+        expectedDatasets            % aod.specification.DatasetManager
     end
 
     properties (Hidden, Dependent)
@@ -994,8 +994,15 @@ classdef (Abstract) Entity < handle
                 entity
             end
 
+
             if aod.util.isEntitySubclass(entity)
-                tf = isequal(obj.UUID, entity.UUID);
+                if isempty(entity) && isempty(obj)
+                    tf = true;
+                elseif isempty(entity) ~= isempty(obj)
+                    tf = false;
+                else
+                    tf = isequal(obj.UUID, entity.UUID);
+                end
             else
                 tf = false;
             end

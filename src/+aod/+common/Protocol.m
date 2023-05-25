@@ -61,7 +61,7 @@ classdef (Abstract) Protocol < handle
             if nargin > 0 && ~isempty(calibration)
                 obj.Calibration = calibration;
             else
-                obj.Calibration = aod.core.empty.Calibration();
+                obj.Calibration = aod.core.Calibration.empty();
             end
 
             obj.DateCreated = getDateYMD();
@@ -135,11 +135,13 @@ classdef (Abstract) Protocol < handle
         function tf = isequal(obj, protocol)
             % Determine whether two protocols are equal
             if ~strcmp(class(protocol), class(obj))
-                tf = false; return
+                tf = false; 
+                return
             end
 
             if ~isequal(obj.Calibration, protocol.Calibration)
-                tf = false; return
+                tf = false; 
+                return
             end
 
             mc = metaclass(obj);

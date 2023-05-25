@@ -43,7 +43,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         %> Response data (rows are samples) 
         Data                          
-        %> Timing of each sample in the Response  (*double/duration*)    
+        %> Timing of each sample in the Response  (*duration*)    
         Timing (:,1)         duration = seconds([])
     end
 

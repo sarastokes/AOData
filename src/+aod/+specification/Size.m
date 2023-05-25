@@ -8,12 +8,16 @@ classdef Size < aod.specification.Validator
 %   obj = aod.specification.Size(input)
 %
 % Methods:
+%   tf = isempty(obj)
+%   tf = isequal(obj, other)
 %   tf = isscalar(obj)
 %   tf = isvector(obj)
 %   x = ndims(obj)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+
+%#ok<*ISMAT>
 
     properties (SetAccess = private)
         Value           = []
@@ -31,6 +35,12 @@ classdef Size < aod.specification.Validator
     % aod.specification.Specification methods
     methods
         function setValue(obj, input)
+            % Set the Size value
+            %
+            % Syntax:
+            %   setValue(obj, input)
+            % -----------------------------------------------------------
+            
             import aod.specification.SizeTypes
 
             if aod.util.isempty(input) || (istext(input) && input == "[]")
@@ -39,31 +49,30 @@ classdef Size < aod.specification.Validator
                 return 
             end
 
+            try
+                obj.SizeType = SizeTypes.get(input);
+                input = obj.SizeType.getSizing();
+            catch
+
+            end
+
             if istext(input)
                 obj.Value = obj.parseText(input);
+                obj.setSizeType();
             elseif isa(input, 'meta.property')
                 obj.Value = obj.parseMetaProperty(input);
+                obj.setSizeType();
             elseif isnumeric(input)
                 obj.Value = obj.parseNumeric(input);
+                obj.setSizeType();
             end 
-
-            if ndims(obj) > 2
-                obj.SizeType = SizeTypes.NDARRAY;
-            elseif isscalar(obj)
-                obj.SizeType = SizeTypes.SCALAR;
-            elseif isvector(obj)
-                if obj.isfixed(1) && obj.Value(1).Length == 1
-                    obj.SizeType = SizeTypes.ROW;
-                else
-                    obj.SizeType = SizeTypes.COLUMN;
-                end
-            else 
-                obj.SizeType = SizeTypes.MATRIX;
-            end
         end
 
         function tf = validate(obj, input)
             % Validate whether input size is consistent with specs
+            %
+            % Syntax:
+            %   tf = validate(obj, input)
             % -----------------------------------------------------------
 
             % Check whether size is specified
@@ -92,6 +101,7 @@ classdef Size < aod.specification.Validator
 
         function out = text(obj)
             % Converts to a text representation
+            % -------------------------------------------------------------
             if isempty(obj.Value)
                 out = "[]";
                 return
@@ -112,6 +122,28 @@ classdef Size < aod.specification.Validator
     end
 
     methods (Access = private)
+        function setSizeType(obj)
+            % Set aod.specification.SizeTypes
+            % -------------------------------------------------------------
+            import aod.specification.SizeTypes
+
+            if isempty(obj.Value)
+                obj.SizeType = SizeTypes.UNDEFINED;
+            elseif ndims(obj) > 2
+                obj.SizeType = SizeTypes.NDARRAY;
+            elseif isscalar(obj)
+                obj.SizeType = SizeTypes.SCALAR;
+            elseif isvector(obj)
+                if obj.isfixed(1) && obj.Value(1).Length == 1
+                    obj.SizeType = SizeTypes.ROW;
+                else
+                    obj.SizeType = SizeTypes.COLUMN;
+                end
+            else 
+                obj.SizeType = SizeTypes.MATRIX;
+            end
+        end
+
         function idx = isfixed(obj, whichDim)
             idx = arrayfun(@(x) isa(x, 'aod.specification.size.FixedDimension'), obj.Value);
             if nargin > 1
@@ -121,6 +153,7 @@ classdef Size < aod.specification.Validator
     end
 
     methods (Static, Access = private)
+
         function value = parseText(input)
             input = convertStringsToChars(input);
 
@@ -139,6 +172,7 @@ classdef Size < aod.specification.Validator
                     value = cat(2, value, aod.specification.size.FixedDimension(iSize));
                 end
             end
+
         end
 
         function value = parseNumeric(input)
@@ -174,10 +208,20 @@ classdef Size < aod.specification.Validator
     % MATLAB built-in methods
     methods 
         function tf = isempty(obj)
+            % Determine whether object is empty (aka UNDEFINED)
+            %
+            % Syntax:
+            %   tf = isempty(obj)
+            % -------------------------------------------------------------
             tf = isempty(obj.Value);
         end
 
         function tf = isequal(obj, other)
+            % Determine whether two objects are equal
+            %
+            % Syntax:
+            %   tf = isequal(obj, other)
+            % -------------------------------------------------------------
             if ~isa(other, 'aod.specification.Size')
                 tf = false;
                 return 
@@ -198,11 +242,36 @@ classdef Size < aod.specification.Validator
             tf = true;
         end
 
+        function out = jsonencode(obj)
+            if isempty(obj)
+                out = jsonencode([]);
+            else
+                out = jsonencode(obj.text());
+            end
+        end
+
         function value = ndims(obj)
-            value = numel(obj.Value);
+            % Determine the number of dimensions specified
+            %
+            % Syntax:
+            %   value = ndims(obj)
+            %
+            % Notes:
+            %   - If Size is empty (aka undefined), value will be empty
+            % -------------------------------------------------------------
+            if isempty(obj.Value)
+                value = [];
+            else
+                value = numel(obj.Value);
+            end
         end
 
         function tf = isscalar(obj)
+            % Determine whether specification is a scalar
+            %
+            % Syntax:
+            %   tf = isscalar(obj)
+            % -------------------------------------------------------------
             tf = false;
 
             if ndims(obj) == 2 && all(obj.isfixed())
@@ -213,13 +282,18 @@ classdef Size < aod.specification.Validator
         end
 
         function tf = isvector(obj)
+            % Determine whether specification is a vector
+            %
+            % Syntax:
+            %   tf = isrow(obj)
+            % -------------------------------------------------------------
             if isempty(obj)
                 tf = false;
                 return 
             end
 
             fixedDims = obj.isfixed();
-            if ndims(obj) ~= 2 || nnz(fixedDims) == 0
+            if ndims(obj) ~= 2 || nnz(fixedDims) == 0 
                 tf = false;
                 return
             end

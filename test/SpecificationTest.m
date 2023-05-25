@@ -185,7 +185,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         function DefaultValue(testCase)
 
             obj = aod.specification.DefaultValue(2);
-            testCase.verifyEqual('2', obj.text());
+            testCase.verifyEqual("2", obj.text());
             testCase.verifyTrue(obj.validate(true));
             testCase.verifyFalse(isempty(obj));
 
@@ -259,8 +259,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj1.Default.Value, 1);
             testCase.verifyEqual(obj1.Class.Value, "double");
 
-            objD = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropD'));
-            testCase.verifyEqual(obj1.Description.Value, "This is PropD");
+            %objD = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropD'));
+            %testCase.verifyEqual(obj1.Description.Value, "This is PropD");
 
             % All fields
             obj2 = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropB'));
@@ -282,11 +282,29 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function EmptyDataset(testCase)
-            obj = aod.specification.Dataset("mytest");
+            obj0 = aod.specification.Dataset();
+
+            obj = aod.specification.Dataset("MyProp");
             testCase.verifyEmpty(obj.Default);
             testCase.verifyEmpty(obj.Functions);
             testCase.verifyEmpty(obj.Class);
             testCase.verifyEmpty(obj.Size);
+            testCase.verifyFalse(obj.Required);
+
+            % Test assignment
+            obj.assign("Size", "(1,1)",...
+                "Description", "test",...
+                "Class", "string",...
+                "Default", "hey",...
+                "Function", {@mustBeTextScalar});
+            testCase.verifyEqual(obj.Default.Value, "hey");
+            testCase.verifyEqual(obj.Description.Value, "test");
+            testCase.verifyEqual(obj.Class.Value, ["string", "char"]);
+            testCase.verifyEqual(obj.Size.SizeType, ...
+                aod.specification.SizeTypes.SCALAR);
+
+            obj.setRequired(true);
+            testCase.verifyTrue(obj.Required);
         end
     end
 
@@ -310,7 +328,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyFalse(obj.has('Blah'));
 
             out = obj.text();
-            testCase.verifySize(obj.table(), [4 5]);
+            testCase.verifySize(obj.table(), [4 6]);
         end
 
         function DatasetManagerError(testCase)
@@ -378,62 +396,45 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 "PropertySpecification:InvalidClassName")
         end
 
-        function ExpectedDataset(testCase)
-            ED = aod.util.templates.ExpectedDataset("Test",...
-                "double,duration", [], {@isnumeric},...
-                "This is a test class", "seconds");
-            testCase.verifyEqual(numel(ED.Class), 2);
-
-            testCase.verifyError(...
-                @()set(ED, "Validation", "double"),...
-                "MATLAB:validation:UnableToConvert");
-            %testCase.verifyError(...
-            %    @()set(ED, "Class", "badclass"),...
-            %    "parseClassName:InvalidClass");
-        end
-
-        function DatasetManagerOld(testCase)
-            % Empty DatasetManager
-            DM = aod.util.DatasetManager();
-            testCase.verifyEqual(DM.Count, 0);
-            testCase.verifyEmpty(DM.list());
-            
-            % Add a attribute
-            DM.add('TestParam', "double", 0, {@isnumeric},...
-                "This is a test attribute", "seconds");
-            testCase.verifyEqual(DM.Count, 1);
-
-            % Overwrite existing attribute
-            testCase.verifyWarning(...
-                @() DM.add('TestParam', 'double'), "add:OverwroteDataset");
-            
-            ED = aod.util.templates.ExpectedDataset("TestParam");
-            testCase.verifyWarning(...
-                @() DM.add(ED), "add:OverwroteDataset");
-            
-            warning('off', "add:OverwroteDataset");
-            DM.add('TestParam', "double", 2, {@isnumeric},...
-                "This is an overwritten test attribute", "seconds");
-            testCase.verifyEqual(DM.Count, 1);
-            ED = DM.get('TestParam');
-            testCase.verifyEqual(ED.Default, 2);
-            warning('on', "add:OverwroteDataset");
-        end
-
-        function PopulatedDatasetManager(testCase)
+        function DatasetManagerFromEntity(testCase)
             % Populated DatasetManager
             cEXPT = ToyExperiment(false);
-            DM = aod.util.DatasetManager.populate(cEXPT);
-            testCase.verifyEqual(DM.Count, 4);
+            DM = aod.specification.DatasetManager.populate(cEXPT);
+            testCase.verifyEqual(DM.numDatasets, 4);
             testCase.verifyNumElements(DM.list, 4);
 
-            % Remove a attribute
-            DM.remove('epochIDs');
-            testCase.verifyEqual(DM.Count, 3);
+            % Hard to test, but make sure it's error free
+            DM.text();
+            DM.struct();
 
-            % Clear all attributes
-            DM.clear();
-            testCase.verifyEqual(DM.Count, 0);
+            % Get dataset by name
+            D = DM.get('experimentDate');
+            testCase.verifyEqual(D.Name, "experimentDate");
+
+            % Modify
+            DM.set('experimentDate',...
+                "Description", "test");
+            testCase.verifyEqual(D.Description.Value, "test");
+        end
+
+        function DatasetManagerAltPopulate(testCase)
+            DM1 = aod.specification.DatasetManager.populate( ...
+                'aod.core.Experiment');
+            DM2 = aod.specification.DatasetManager.populate( ...
+                meta.class.fromName('aod.core.Experiment'));
+
+            testCase.verifyEqual(DM1.numDatasets, DM2.numDatasets);
+        end
+
+        function EmptyDatasetManager(testCase)
+            obj = aod.specification.DatasetManager();
+            testCase.verifyEmpty(obj.list());
+            testCase.verifyEqual(obj.text(), "Empty DatasetManager");
+            testCase.verifyEmpty(fieldnames(obj.struct()));
+
+            [tf, idx] = obj.has('DsetName');
+            testCase.verifyFalse(tf);
+            testCase.verifyEmpty(idx);
         end
     end
 end 

@@ -1,6 +1,7 @@
 classdef Dataset < handle 
-% 
-% Syntax:
+% Represents the specifications for a single dataset (aka property)
+%
+% Constructor:
 %   obj = aod.specification.Dataset(prop, varargin)
 %
 
@@ -200,5 +201,18 @@ classdef Dataset < handle
             addParameter(ip, 'Default', []);
             parse(ip, varargin{:});
         end 
+    end
+
+    % MATLAB builtin methods
+    methods 
+        function P = struct(obj)
+            P = struct();
+            P.Name = obj.Name;
+            P.Size = obj.Size.jsonencode();
+            P.Default = obj.Default.jsonencode();
+            P.Class = obj.Class.jsonencode();
+            P.Description = obj.Description.jsonencode();
+            P.Function = obj.Functions.jsonencode();
+        end
     end
 end 
