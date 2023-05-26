@@ -18,7 +18,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 %   remove(obj, ID)
 %   assignUUID(obj, uuid)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -38,7 +38,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
     end
     
     methods (Sealed)
-        function tf = has(obj, entityType, varargin)
+        function tf = has(obj, varargin)
             % Search Channel's child entities and return if matches exist
             %
             % Description:
@@ -46,17 +46,15 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   criteria and return whether matches exist
             %
             % Syntax:
-            %   tf = has(obj, entityType, varargin)
+            %   tf = has(obj, varargin)
             %
             % Inputs:
-            %   entityType          char or aod.common.EntityTypes
-            % Optional inputs:
-            %   One or more cells containing queries (TODO: doc)
+            %   Identical to aod.core.Channel.get()
             %
             % See also:
             %   aod.core.Channel/get
             % -------------------------------------------------------------
-            out = obj.get(entityType, varargin{:});
+            out = obj.get(varargin{:});
             tf = ~isempty(out);
         end
 

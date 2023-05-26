@@ -39,7 +39,35 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 
     % Addition methods
     methods (Sealed)
+        function tf = has(obj, entityType, varargin)
+            % Search Epoch's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (see Epoch.get) and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   Identical to aod.persistent.Epoch.get()
+            % -------------------------------------------------------------
+
+            tf = ~isempty(obj.get(entityType, varargin{:}));
+        end
+
         function out = get(obj, entityType, varargin)
+            % Search Epoch's child entities and return matches
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (described below in examples)
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries (TODO: doc)
+            % -------------------------------------------------------------
         
             import aod.common.EntityTypes
 
@@ -84,34 +112,6 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 
             entity.setParent(obj);
             obj.addEntity(entity);
-        end
-
-        function remove(obj, entityType, varargin)
-            
-            import aod.common.EntityTypes
-
-            entityType = aod.common.EntityTypes.get(entityType);
-            if ~ismember(entityType, obj.entityType.validChildTypes())
-                error('remove:InvalidEntityType', ...
-                    'Entity must be EpochDataset, Registration, Response and Stimulus');
-            end 
-
-            % Remove all entities?
-            if istext(varargin{1}) && strcmpi(varargin{1}, 'all')
-                obj.(entityType.parentContainer()) = entityType.empty();
-                return 
-            end
-
-            % Remove specific entities, by ID or query
-            if isnumeric(varargin{1})
-                mustBeInteger(varargin{1});
-                mustBeInRange(varargin{1}, 0, numel(obj.(entityType.persistentParentContainer())));
-                idx = varargin{1};
-            elseif iscell(varargin{1})
-                % Get the indices of entities matching query
-            else error('remove:InvalidID',...
-                    'ID must be "all", query or integer index of entities to remove');
-            end
         end
     end
 

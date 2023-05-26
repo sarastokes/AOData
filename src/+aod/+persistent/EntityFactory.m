@@ -174,11 +174,9 @@ classdef EntityFactory < handle
                 % Entities cannot be loaded until link is fixed so correct
                 % through h5tools rather than persistent interface 
                 for j = 1:numel(sourcePaths)
-                    %linkAttr = h5tools.readatt(obj.hdfName, sourcePaths(j), 'all');
                     h5tools.deleteObject(obj.hdfName, sourcePaths(j));
                     [sourcePath, sourceLink] = h5tools.util.splitPath(sourcePaths(j));
                     h5tools.writelink(obj.hdfName, sourcePath, sourceLink, allPaths(i));
-                    %h5tools.writeatt(obj.hdfName, sourcePaths(j), linkAttr);
                     updatedEntities = cat(1, updatedEntities, sourcePaths);
                 end
             end

@@ -370,6 +370,10 @@ classdef SpecificationTest < matlab.unittest.TestCase
             obj = aod.builtin.devices.BandpassFilter(510, 20);
             p = obj.expectedAttributes.get('Bandwidth');
             testCase.verifyEqual(p.Name, 'Bandwidth');
+            expAtt = aod.specification.util.getAttributeSpecification( ...
+                'aod.builtin.devices.BandpassFilter');
+            p2 = expAtt.get('Bandwidth');
+            testCase.verifyEqual(p2.Name, 'Bandwidth');
 
             % Set/remove expected attribute
             obj.setAttr('Bandwidth', 30);

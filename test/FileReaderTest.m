@@ -13,7 +13,7 @@ classdef FileReaderTest < matlab.unittest.TestCase
 % See also:
 %   runAODataTestSuite
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
@@ -55,6 +55,9 @@ classdef FileReaderTest < matlab.unittest.TestCase
                 fullfile(testCase.dataFolder, 'test.mat'));
             output = reader.readFile();
             testCase.verifyEqual(output, eye(3));
+
+            testCase.verifyEqual(aod.util.readers.MatReader.read(...
+                fullfile(testCase.dataFolder, 'test.mat')), eye(3));
         end
 
         function TXT(testCase)

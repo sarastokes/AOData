@@ -1,4 +1,4 @@
-classdef RigidRegistration < aod.core.Registration 
+classdef RigidRegistration < aod.builtin.registrations.GeometricTransformation
 % RIGIDREGISTRATION
 %
 % Description:
@@ -28,7 +28,7 @@ classdef RigidRegistration < aod.core.Registration
 % Dependencies:
 %   Image Processing Toolbox
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -37,7 +37,7 @@ classdef RigidRegistration < aod.core.Registration
 
     methods
         function obj = RigidRegistration(name, registrationDate, data, varargin)
-            obj@aod.core.Registration(name, registrationDate, varargin{:});
+            obj@aod.builtin.registrations.GeometricTransformation(name, registrationDate, varargin{:});
 
             if ~isa(data, 'affine2d')
                 try
@@ -67,39 +67,6 @@ classdef RigidRegistration < aod.core.Registration
             if nargin > 2
                 obj.setAttr(varargin{:});
             end
-        end
-    end
-
-    methods (Static)
-        function tform = affine2d_to_3d(T)
-            % Converts affine2d to affine3d 
-            %
-            % Description:
-            %   Converts affine2d to affine3d so a full video or stack of 
-            %   images can be transformed without using a long for loop
-            %
-            % Syntax:
-            %   tform = affine2d_to_3d
-            %
-            % Inputs:
-            %   T           affine3d or 3x3 transformation matrix
-            %       The affine transform matrix
-            %
-            % Outputs:
-            %   tform       affine3d
-            %       A 3D affine transform object 
-            % -------------------------------------------------------------
-            if isa(T, 'affine2d')
-                T = T.T;
-            end
-
-            T2 = eye(4);
-            T2(2,1) = T(2,1);
-            T2(1,2) = T(1,2);
-            T2(4,1) = T(3,1);
-            T2(4,2) = T(3,2);
-            
-            tform = affine3d(T2);
         end
     end
 end 

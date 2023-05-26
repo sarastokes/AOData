@@ -80,6 +80,25 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end 
 
     methods (Sealed)
+        function tf = has(obj, entityType, varargin)
+            % Search Epoch's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (see Epoch.get) and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, entityType, varargin)
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            % Optional inputs:
+            %   One or more cells containing queries (TODO: doc)
+            % -------------------------------------------------------------
+            out = obj.get(entityType, varargin{:});
+            tf = ~isempty(out);
+        end
+
         function add(obj, entity)
             % Add an entity to the Epoch 
             %
@@ -209,25 +228,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             else
                 out = group;
             end
-        end
-
-        function tf = has(obj, entityType, varargin)
-            % Search Epoch's child entities and return if matches exist
-            %
-            % Description:
-            %   Search all entities of a specific type that match the given
-            %   criteria (see Epoch.get) and return whether matches exist
-            %
-            % Syntax:
-            %   tf = has(obj, entityType, varargin)
-            %
-            % Inputs:
-            %   entityType          char or aod.common.EntityTypes
-            % Optional inputs:
-            %   One or more cells containing queries (TODO: doc)
-            % -------------------------------------------------------------
-            out = obj.get(entityType, varargin{:});
-            tf = ~isempty(out);
         end
     end
 

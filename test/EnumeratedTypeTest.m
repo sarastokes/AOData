@@ -43,20 +43,6 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
                 "ErrorTypes:UnrecognizedInput");
         end
 
-        function SizeTypesInit(testCase)
-            import aod.specification.SizeTypes
-
-            testCase.verifyEqual(SizeTypes.get('scalar'), SizeTypes.SCALAR);
-            testCase.verifyEqual(SizeTypes.get('row'), SizeTypes.ROW);
-            testCase.verifyEqual(SizeTypes.get('column'), SizeTypes.COLUMN);
-            testCase.verifyEqual(SizeTypes.get('matrix'), SizeTypes.MATRIX);
-            testCase.verifyEqual(SizeTypes.get('ndarray'), SizeTypes.NDARRAY);
-            testCase.verifyEqual(SizeTypes.get('undefined'), SizeTypes.UNDEFINED);
-
-            testCase.verifyError(...
-                @() SizeTypes.get('badinput'), "SizeTypes:InvalidInput");
-        end
-
         function FilterTypesInit(testCase)
             import aod.api.FilterTypes
 
@@ -228,6 +214,35 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
             testCase.verifyTrue(GroupLoadState.ATTRIBUTES.hasName());
             testCase.verifyFalse(GroupLoadState.NONE.hasName());
+        end
+    end
+
+    methods (Test, TestTags="SizeTypes")
+    
+        function SizeTypesInit(testCase)
+            import aod.specification.SizeTypes
+
+            testCase.verifyEqual(SizeTypes.get('scalar'), SizeTypes.SCALAR);
+            testCase.verifyEqual(SizeTypes.get('row'), SizeTypes.ROW);
+            testCase.verifyEqual(SizeTypes.get('column'), SizeTypes.COLUMN);
+            testCase.verifyEqual(SizeTypes.get('matrix'), SizeTypes.MATRIX);
+            testCase.verifyEqual(SizeTypes.get('ndarray'), SizeTypes.NDARRAY);
+            testCase.verifyEqual(SizeTypes.get('undefined'), SizeTypes.UNDEFINED);
+
+            testCase.verifyError(...
+                @() SizeTypes.get('badinput'), "SizeTypes:InvalidInput");
+        end
+
+        function SizeTypesConversion(testCase)
+            import aod.specification.SizeTypes
+
+            testCase.verifyEqual(SizeTypes.SCALAR.getSizing(), "(1,1)");
+            testCase.verifyEqual(SizeTypes.ROW.getSizing(), "(1,:)");
+            testCase.verifyEqual(SizeTypes.COLUMN.getSizing(), "(:,1)");
+            testCase.verifyEqual(SizeTypes.MATRIX.getSizing(), "(:,:)");
+            testCase.verifyEmpty(SizeTypes.UNDEFINED.getSizing());
+            testCase.verifyError(...
+                @() SizeTypes.NDARRAY.getSizing(), "getSizing:NotEnoughInfo");
         end
     end
 

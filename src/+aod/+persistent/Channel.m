@@ -17,6 +17,7 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        % Container for the Channel's Devices
         DevicesContainer
     end
 
@@ -28,13 +29,75 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
 
     methods (Sealed)
         function tf = has(obj, varargin)
+            % Search Channel's child entities and return if matches exist
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria and return whether matches exist
+            %
+            % Syntax:
+            %   tf = has(obj, varargin)
+            %
+            % Inputs:
+            %   Identical to aod.persistent.Channel.get()
+            %
+            % See also:
+            %   aod.persistent.Channel/get
+            % -------------------------------------------------------------
+
+            out = obj.get(varargin{:});
+            tf = ~isempty(out);
+        end
+
+        function out = get(obj, varargin)
+            % Search Channel's child entities
+            %
+            % Description:
+            %   Search all entities of a specific type that match the given
+            %   criteria (described below in examples)
+            %
+            % Syntax:
+            %   out = get(obj, entityType)
+            %   out = get(obj, queries)   
+            %
+            % Inputs:
+            %   entityType          char or aod.common.EntityTypes
+            %       Child entity type to access (Device)
+            %   queries             cell
+            %       One or more queries within cells
+            %
+            % Notes:
+            %   - Queries are documented in aod.common.EntitySearch
+            %
+            % See Also:
+            %   aod.common.EntitySearch
+            % -------------------------------------------------------------
+
+            import aod.common.EntityTypes
+
+            try
+                entityType = EntityTypes.get(varargin{1});
+                startIdx = 2;
+            catch
+                startIdx = 1;
+            end
+
+            % If entity type is provided, make sure its valid
+            if startIdx == 2 && entityType ~= EntityTypes.DEVICE
+                error('get:InvalidEntityType',...
+                    'Only Devices can be searched from channel');
+            end
+
+            if nargin > 2
+                out = aod.common.EntitySearch.go(obj.Devices,...
+                    varargin{startIdx:end});
+            else
+                out = obj.Devices;
+            end
         end
         
         function add(obj, device)
-            % ADD
-            %
-            % Description:
-            %   Add a Device to the Channel and the HDF5 file
+            % Add a Device to the Channel and the HDF5 file
             %
             % Syntax:
             %   add(obj, device)
