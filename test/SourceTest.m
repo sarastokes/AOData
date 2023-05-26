@@ -50,7 +50,7 @@ classdef SourceTest < matlab.unittest.TestCase
             source1b = aod.core.Source('OD');
             source1.add([source1a, source1b]);
             testCase.verifyEqual(numel(testCase.EXPT.get('Source')), 4);
-            testCase.verifyNumElements(source.get('Source', {'Name', 'OS'}), 1);
+            testCase.verifyNumElements(source1.get('Source', {'Name', 'OS'}), 1);
             
             % Check labels
             testCase.verifyEqual('MC00851_OS', source1a.label);

@@ -147,12 +147,13 @@ classdef SubclassGenerator < handle
                 prop        {mustBeA(prop, 'aod.util.templates.PropertySpecification')}
             end
 
+            if isrow(prop)
+                prop = prop';
+            end
+
             if isempty(obj.Datasets)
                 obj.Datasets = prop;
             else
-                if isrow(prop)
-                    prop = prop';
-                end
                 obj.Datasets = cat(1, obj.Datasets, prop);
             end
             notify(obj, "ChangedDatasets");
@@ -266,7 +267,7 @@ classdef SubclassGenerator < handle
                 className       string
             end
             
-            assert(~isSubclass(className, 'aod.core.Entity'),...
+            assert(isSubclass(className, 'aod.core.Entity'),...
                 'Superclass must be a subclass of aod.core.Entity');
             obj.SuperClass = className; 
         end

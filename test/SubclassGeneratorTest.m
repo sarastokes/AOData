@@ -450,7 +450,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
 
             % Confirm expected attribute box is present
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
-                "value = specifyAttributes@aod.core.Channel(obj)")));
+                "value = specifyAttributes@aod.core.Channel()")));
             % Verify attribute expecification
             testCase.verifyTrue(any(contains(app.detailBox.Value,...
                 "value.add('Attr1', [], [],"))); % has description

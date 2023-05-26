@@ -8,7 +8,7 @@ classdef RegistrationParameterReader < aod.util.readers.TxtReader
 %   aod.util.readers.TxtReader
 %
 % Syntax:
-%   obj = RegistrationParameterReader(fileName)
+%   obj = aod.builtin.readers.RegistrationParameterReader(fileName)
 %
 % See also:
 %   aod.builtin.registrations.StripRegistration

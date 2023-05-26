@@ -152,4 +152,19 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.numRois, numel(unique(data(:))));
         end
     end
+
+    methods (Test, TestTags=["Readers"])
+        function RegistrationParameterReader(testCase)
+            obj = aod.builtin.registrations.StripRegistration([], "20220314");
+
+            reader = aod.builtin.readers.RegistrationParameterReader(...
+                fullfile(test.util.getAODataTestFolder(), "test_data", 
+                    "851_20230314_ref_0003_20230314_params_ref000_001.txt"));
+            out = reader.readFile();
+            testCase.verifyTrue(strcmp(out.System,...
+                "nVidia GPU: NVIDIA GeForce GTX 1660"));
+            testCase.verifyEqual(out.StripSaveVideo, true);
+            testCase.verifyEqual(out.NccLinesToIgnore, 27);
+        end
+    end
 end 

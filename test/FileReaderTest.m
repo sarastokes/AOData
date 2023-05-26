@@ -50,6 +50,13 @@ classdef FileReaderTest < matlab.unittest.TestCase
                 'AbsTol', 0.001);
         end
 
+        function MAT(testCase)
+            reader = aod.util.readers.MatReader(...
+                fullfile(testCase.dataFolder, 'test.mat'));
+            output = reader.readFile();
+            testCase.verifyEqual(output, eye(3));
+        end
+
         function TXT(testCase)
             reader = test.TestTxtReader(...
                 fullfile(testCase.dataFolder, 'test.txt'));

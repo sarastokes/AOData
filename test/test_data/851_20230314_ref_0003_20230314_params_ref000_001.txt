@@ -1,0 +1,55 @@
+
+
+
+Created Date & Time (yyyy-mm-dd hh:mm:ss)
+2023-03-14 19:22:29
+------------------------------------------------
+Registration parameters
+Raw vieo to be registered:		c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003.avi
+Filtering option:			3x3 Gaussian
+Algorithm runs on:			nVidia GPU: NVIDIA GeForce GTX 1660
+Frame-level number to register:		0
+NCC lines to ignore:			50
+Frame-level maximum motion:		200
+Frame-level save video:			yes
+Frame-level save full video:		yes
+Frame-level registration only:		no
+NCC rows to ignore:			27
+NCC columns to ignore:			27
+Strip # for registration:		20
+Strip height for registration:		64
+Number of strips for registration:	20
+Strip-level maximum motion:		200
+Strip-level save video:			yes
+Strip-level save full video:		yes
+Minimum cropping flag:			percentile
+Minimum cropping value:			0.00
+NCC correlation threshold:		0.750
+Run video frames from #:		1
+Run video frames to #			3020
+Run video frames with reference #:	0
+Run video with automatic reference:	no
+Run video with a reference image:	yes
+Run video with a reference image name:	c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\reference_0001_linear.bmp
+Run video rotating 90 degrees:		yes
+Primary video name:			c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003.avi
+Run video with desinusoiding:		no
+Run video with desinusoiding matrix:	
+Run secondary video:			yes
+Secondary video file name:		C:\Users\spatterson\Dropbox\Postdoc\Data\AO\MC00851_20230314\Vis\851_20230314_vis_0003.avi
+------------------------------------------------
+Saved file name:			primary video
+Motion data in file :			c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003_20230314_motion_ref000_001.csv
+Averaged image (strip-reg):		c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003_20230314_strip_ref000_001.tif
+Averaged image (frame-ref):		c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003_20230314_frame_ref000_001.tif
+Raw data output file :			c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003_20230314_data_ref000_001.dat
+Registered video (strip-reg):		c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003_20230314_strip_ref000_001.avi
+Registered video (frame-reg):		c:\users\spatterson\dropbox\postdoc\data\ao\mc00851_20230314\ref\851_20230314_ref_0003_20230314_frame_ref000_001.avi
+------------------------------------------------
+Saved file name:			secondary video
+Motion data in file :			C:\Users\spatterson\Dropbox\Postdoc\Data\AO\MC00851_20230314\Vis\851_20230314_vis_0003_20230314_motion_ref000_001.csv
+Averaged image (strip-reg):		C:\Users\spatterson\Dropbox\Postdoc\Data\AO\MC00851_20230314\Vis\851_20230314_vis_0003_20230314_strip_ref000_001.tif
+Averaged image (frame-ref):		C:\Users\spatterson\Dropbox\Postdoc\Data\AO\MC00851_20230314\Vis\851_20230314_vis_0003_20230314_frame_ref000_001.tif
+Raw data output file :			C:\Users\spatterson\Dropbox\Postdoc\Data\AO\MC00851_20230314\Vis\851_20230314_vis_0003_20230314_data_ref000_001.dat
+Registered video (strip-reg):		C:\Users\spatterson\Dropbox\Postdoc\Data\AO\MC00851_20230314\Vis\851_20230314_vis_0003_20230314_strip_ref000_001.avi
+Registered video (frame-reg):		C:\Users\spatterson\Dropbox\Postdoc\Data\AO\MC00851_20230314\Vis\851_20230314_vis_0003_20230314_frame_ref000_001.avi
