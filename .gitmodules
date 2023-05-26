@@ -12,3 +12,6 @@
 [submodule "lib/superbar"]
 	path = lib/superbar
 	url = https://github.com/scottclowe/superbar.git
+[submodule "lib/weblab"]
+	path = lib/weblab
+	url = https://github.com/lordtumnus/weblab
