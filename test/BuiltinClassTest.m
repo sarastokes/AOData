@@ -60,6 +60,19 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags = {'Calibrations'})
+        function MeasurementTable(testCase)
+            obj = aod.builtin.calibrations.MeasurementTable( ...
+                "Power", getDateYMD(),...
+                ["Mustang", "Value"], ["%", "microwatts"]);
+            obj.addMeasurements({22, 10}, {28, 17});
+            testCase.verifySize(obj.table(), [2 2]);
+            obj.removeMeasurements(1);
+            testCase.verifySize(obj.table(), [1 2]);
+            testCase.verifyEqual(...
+                obj.Measurements.Properties.VariableNames, ...
+                cellstr(["Mustang", "Value"]));
+        end
+
         function RoomMeasurement(testCase)
             obj = aod.builtin.calibrations.RoomMeasurement(getDateYMD());
             % Add a first measurement
@@ -158,13 +171,13 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.registrations.StripRegistration([], "20220314");
 
             reader = aod.builtin.readers.RegistrationParameterReader(...
-                fullfile(test.util.getAODataTestFolder(), "test_data", 
+                fullfile(test.util.getAODataTestFolder(), "test_data",... 
                     "851_20230314_ref_0003_20230314_params_ref000_001.txt"));
             out = reader.readFile();
             testCase.verifyTrue(strcmp(out.System,...
                 "nVidia GPU: NVIDIA GeForce GTX 1660"));
             testCase.verifyEqual(out.StripSaveVideo, true);
-            testCase.verifyEqual(out.NccLinesToIgnore, 27);
+            testCase.verifyEqual(out.NccLinesToIgnore, 50);
         end
     end
 end 

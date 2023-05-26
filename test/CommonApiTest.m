@@ -25,6 +25,7 @@ classdef CommonApiTest < matlab.unittest.TestCase
         function methodSetup(testCase)
             % Set up an experiment with:
             % - 2 Calibrations (base & PowerMeasurement)
+            % - 1 Source with 2 subsources
             % - 1 System 
             % - 2 Analyses
             % - 6 Epochs w/ varying attributes & files
@@ -35,6 +36,11 @@ classdef CommonApiTest < matlab.unittest.TestCase
                 '851_20221117', cd, '20221117',...
                 'Administrator', "Sara Patterson",... 
                 'Laboratory', "1P Primate");
+
+            % Add a source hierarchy
+            testCase.EXPT.add(aod.core.Source("838"));
+            testCase.EXPT.Sources.add([ ...
+                aod.core.Source("OS"), aod.core.Source("OD")]);
 
             % Add calibrations (two classes)
             testCase.EXPT.add(aod.core.Calibration(...
@@ -96,12 +102,22 @@ classdef CommonApiTest < matlab.unittest.TestCase
             out = testCase.EXPT.get('Analysis',...
                 {'Name', @(x) contains(x, 'Analysis')});
             testCase.verifyNumElements(out, 2);
+
+
+            testCase.verifyTrue(testCase.PRST.Sources(1).has('Source', ...
+                {'Name', 'OS'}));
+            testCase.verifyTrue(testCase.PRST.Sources(1).has({'Name', 'OS'}));
+            testCase.verifyTrue(testCase.PRST.Systems(1).has('Channel',...
+                {'Name', 'TestChannel1'}));
         end
 
         function SubclassSearch(testCase)
             out = testCase.EXPT.get('Calibration',...
                 {'Subclass', 'aod.core.Calibration'});
             testCase.verifyNumElements(out, 2);
+
+            testCase.verifyTrue(testCase.PRST.Systems(1).has('Device',...
+                {'Subclass', 'aod.builtin.devices.DichroicFilter'}));
         end
 
         function ClassSearch(testCase)
@@ -230,12 +246,26 @@ classdef CommonApiTest < matlab.unittest.TestCase
             testCase.verifyError(...
                 @() testCase.PRST.Epochs(1).get('System'),...
                 "get:InvalidEntityType");
+
+            % Persistent interface
+            testCase.verifyError(...
+                @() testCase.EXPT.Systems(1).get('Epoch'),...
+                'get:InvalidEntityType');
+            testCase.verifyError(...
+                @() testCase.PRST.Sources(1).get('Epoch'),...
+                'get:InvalidEntityType');
         end
         
         function IDErrors(testCase)
             testCase.verifyError(...
                 @() testCase.EXPT.Systems(1).remove('Channel', 'BadID'),...
                 "remove:InvalidID");
+        end
+
+        function QueryErrors(testCase)
+            testCase.verifyError(...
+                @() testCase.PRST.Sources(1).get('Source', 123),...
+                "get:InvalidInput");
         end
     end
 end

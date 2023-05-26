@@ -1,19 +1,24 @@
 classdef MeasurementTable < aod.core.Calibration 
 % Calibrations stored in a table
 %
-% Parent:
+% Superclasses:
 %   aod.core.Calibration
 %
 % Example:
 %   obj = aod.builtin.calibrations.MeasurementTable('Demo', '20230314',...
 %       ["Setting", "Value"], ["%", "uW"]);
-%
+
+
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties
+    properties (SetAccess = protected)
         % A table containing calibration measurements
-        Measurements
+        Measurements        table 
+    end
+
+    properties (Dependent)
+        numMeasurements     double  {mustBeInteger}
     end
 
     methods
@@ -27,6 +32,16 @@ classdef MeasurementTable < aod.core.Calibration
             end
         end
 
+        function value = get.numMeasurements(obj)
+            if isempty(obj)
+                value = 0;
+            else
+                value = height(obj.Measurements);
+            end
+        end
+    end
+
+    methods 
         function addMeasurements(obj, varargin)
             % Add measurements by row
             %
@@ -62,6 +77,13 @@ classdef MeasurementTable < aod.core.Calibration
             %   obj.remove([2, 3])
             % -------------------------------------------------------------
             obj.Measurements(idx, :) = [];
+        end
+    end 
+
+    % MATLAB builtin methods
+    methods
+        function tf = isempty(obj)
+            tf = isempty(obj.Measurements);
         end
 
         function T = table(obj)
