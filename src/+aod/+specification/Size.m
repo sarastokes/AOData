@@ -53,7 +53,7 @@ classdef Size < aod.specification.Validator
                 obj.SizeType = SizeTypes.get(input);
                 input = obj.SizeType.getSizing();
             catch
-
+                
             end
 
             if istext(input)
@@ -158,7 +158,10 @@ classdef Size < aod.specification.Validator
             input = convertStringsToChars(input);
 
             [startIdx, endIdx] = regexp(input, "[\d:]{1,10}");
-            if numel(startIdx) == 1
+            if isempty(startIdx) 
+                error('Size:InvalidTextInput',...
+                    'Text input must be numeric specification, "row", "column", "scalar", "matrix", or "undefined"')
+            elseif numel(startIdx) == 1
                 error('Size:InvalidDimensions',...
                     'Dimensionality specification cannot be scalar');
             end

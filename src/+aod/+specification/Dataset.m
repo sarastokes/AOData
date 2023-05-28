@@ -88,6 +88,10 @@ classdef Dataset < handle
 
     % Setters
     methods
+        function setName(obj, name)
+            obj.Name = name;
+        end
+
         function setRequired(obj, input)
             if isa(input, "meta.property")
                 return

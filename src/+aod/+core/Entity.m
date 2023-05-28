@@ -2,7 +2,8 @@ classdef (Abstract) Entity < handle
 % ENTITY (Abstract)
 %
 % Description:
-%   Parent class for all entities in AOData's object model (core)
+%   Parent class providing a consistent interface to all entities in 
+%   AOData's object model
 %
 % Constructor:
 %   obj = aod.core.Entity()
@@ -62,8 +63,8 @@ classdef (Abstract) Entity < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        % The Entity's parent Entity, aod.core.Entity subclass
-        Parent                      % aod.core.Entity
+        % The Entity's parent Entity
+        Parent                      % aod.core.Entity subclass
         % User-defined name for the entity, defines the HDF5 group name
         Name(1,:)                   char = char.empty()
         % Unique identifier for the entity

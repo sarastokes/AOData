@@ -182,6 +182,14 @@ classdef AttributeManager < handle & matlab.mixin.CustomDisplay
     end
 
     methods
+        function attrNames = list(obj)
+            if isempty(obj)
+                attrNames = [];
+            else
+                attrNames = string(aod.util.arrayfun(@(x) x.Name, obj.ExpectedAttributes));
+            end
+        end
+
         function [tf, idx] = hasAttr(obj, paramName)
             % Check whether attribute exists and optionally, get index
             %

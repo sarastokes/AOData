@@ -7,7 +7,7 @@ function out = extractCellData(data)
 % See also:
 %   NaN, missing, NaT
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     arguments
@@ -31,4 +31,4 @@ function out = extractCellData(data)
     end
 
     % Cast to datatype to convert missing/NaN/NaT to appropriate value
-    out = cellfun(@(x) cast(x, classNames), data);
+    out = vertcat(data{:});

@@ -80,14 +80,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     properties (Hidden, SetAccess = private)
         % Entity properties
-        Name                    char
+        Name                    string
         label                   char 
         entityType
-        entityClassName         
+        entityClassName         char      
 
         % HDF5 properties
-        hdfName 
-        hdfPath 
+        hdfName                 string 
+        hdfPath                 char
         linkNames
         dsetNames
         attNames
@@ -820,7 +820,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             % ATTRIBUTES
             % Universial attributes that map to properties, not attributes
-            specialAttributes = ["UUID", "Class", "EntityType", "LastModified", "label"];
+            specialAttributes = ["UUID", "Class", "EntityType", "LastModified", "DateCreated", "label"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.common.EntityTypes.get(obj.loadAttribute('EntityType'));
@@ -829,12 +829,16 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             if ~isempty(lastModTime)
                 obj.LastModified = datetime(lastModTime);
             end
+            dateCreated = obj.loadAttribute('DateCreated');
+            if ~isempty(dateCreated)
+                obj.DateCreated = datetime(dateCreated);
+            end
 
             % Parse the remaining attributes
             for i = 1:numel(obj.attNames)
                 if ~ismember(obj.attNames(i), specialAttributes)
                     obj.attributes(char(obj.attNames(i))) = ...
-                        h5readatt(obj.hdfName, obj.hdfPath, obj.attNames(i));
+                        obj.loadAttribute(obj.attNames(i));
                 end
             end
 

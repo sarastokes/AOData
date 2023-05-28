@@ -141,7 +141,7 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
             switch entityType 
                 case EntityTypes.SOURCE 
-                    out = obj.Sources.getChildSources();
+                    group = obj.Sources.getChildSources();
                 case EntityTypes.CHANNEL 
                     if isempty(obj.Systems)
                         group = aod.persistent.Channel.empty();
@@ -150,13 +150,15 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
                     end
                 case EntityTypes.DEVICE
                     if isempty(obj.Systems)
-                        out = aod.persistent.Device.empty();
+                        group = aod.persistent.Device.empty();
                     else
-                        out = obj.Systems.getChannelDevices();
+                        group = obj.Systems.getChannelDevices();
                     end
                 case EntityTypes.EXPERIMENT 
                     out = obj;  % There is only one experiment
                     return 
+                case {EntityTypes.RESPONSE, EntityTypes.STIMULUS, EntityTypes.EPOCHDATASET, EntityTypes.REGISTRATION}
+                    group = obj.getFromEpoch('all', entityType, varargin{:});
                 otherwise             
                     group = obj.(entityType.parentContainer());
             end
@@ -200,25 +202,12 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             entity.setParent(obj);
             obj.addEntity(entity);
         end
-
-        function remove(obj, varargin)
-            % Remove an 
-            error('remove:NotYetImplemented',... 
-                'This function is under development');
-
-            import aod.common.EntityTypes
-            entityType = EntityTypes.get(entityType);
-
-            if ~ismember(entityType, obj.entityTypes.validChildTypes())
-            end
-        end
     end
 
     % Child methods
     methods 
         function out = getFromEpoch(obj, ID, entityType, varargin)
             import aod.common.EntityTypes
-
             
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())

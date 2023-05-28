@@ -15,25 +15,29 @@ classdef MixedEntitySet < handle & matlab.mixin.CustomDisplay
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
-        Experiments             aod.persistent.Experiment
-        Sources                 aod.persistent.Source 
-        Systems                 aod.persistent.System
-        Channels                aod.persistent.Channel 
-        Devices                 aod.persistent.Device 
-        Calibrations            aod.persistent.Calibration 
-        Epochs                  aod.persistent.Epoch 
-        EpochDatasets           aod.persistent.EpochDataset 
-        Registrations           aod.persistent.Registration 
-        Responses               aod.persistent.Response 
-        Stimuli                 aod.persistent.Stimulus 
-        ExperimentDatasets      aod.persistent.ExperimentDataset 
-        Annotations             aod.persistent.Annotation
-        Analyses                aod.persistent.Analysis 
+        Experiments         {aod.util.mustBeEntityType(Experiments, 'Experiment')} = aod.persistent.Experiment.empty()    
+        Sources             {aod.util.mustBeEntityType(Sources, 'Source')} = aod.persistent.Source.empty()
+        Systems             {aod.util.mustBeEntityType(Systems, 'System')} = aod.persistent.System.empty()
+        Channels            {aod.util.mustBeEntityType(Channels, 'Channel')} = aod.persistent.Channel.empty() 
+        Devices             {aod.util.mustBeEntityType(Devices, 'Device')} = aod.persistent.Device.empty() 
+        Calibrations        {aod.util.mustBeEntityType(Calibrations, 'Calibration')} = aod.persistent.Calibration.empty()
+        Epochs              {aod.util.mustBeEntityType(Epochs, 'Epoch')} = aod.persistent.Epoch.empty()
+        EpochDatasets       {aod.util.mustBeEntityType(EpochDatasets, 'EpochDataset')} = aod.persistent.EpochDataset.empty()
+        Registrations       {aod.util.mustBeEntityType(Registrations, 'Registration')} = aod.persistent.Registration
+        Responses           {aod.util.mustBeEntityType(Responses, 'Response')} = aod.persistent.Response.empty()
+        Stimuli             {aod.util.mustBeEntityType(Stimuli, 'Stimulus')} = aod.persistent.Stimulus.empty()
+        ExperimentDatasets  {aod.util.mustBeEntityType(ExperimentDatasets, 'ExperimentDataset')} = aod.persistent.ExperimentDataset.empty();       
+        Annotations         {aod.util.mustBeEntityType(Annotations, 'Annotation')} = aod.persistent.Annotation.empty()   
+        Analyses            {aod.util.mustBeEntityType(Analyses, 'Analysis')} = aod.persistent.Analysis.empty()
+    end
+
+    properties (Hidden, Access=protected)
+        entityClass
     end
 
     methods 
         function obj = MixedEntitySet()
-            % Do nothing on initialization
+            entityClass = 'aod.persistent.Entity';
         end
 
         function add(obj, entity)
@@ -47,9 +51,9 @@ classdef MixedEntitySet < handle & matlab.mixin.CustomDisplay
             %       One or more new entities of the same type
             % -------------------------------------------------------------
             
-            if ~isSubclass(entity, 'aod.persistent.Entity')
+            if ~isSubclass(entity, obj.entityClass)
                 error('add:InvalidInput',... 
-                    'Input must be subclass of aod.persistent.Entity');
+                    'Input must be subclass of %s', obj.entityClass);
             end
 
             containerName = entity(1).entityType.parentContainer();
