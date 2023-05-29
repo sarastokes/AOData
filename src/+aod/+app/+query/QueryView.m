@@ -41,6 +41,7 @@ classdef QueryView < aod.app.Component
         allEntities         
         numEntities         double  {mustBeInteger}
         numFilters          double  {mustBeInteger}
+        numDisabled         double  {mustBeInteger}
         hdfFiles            string 
     end
 
@@ -79,6 +80,10 @@ classdef QueryView < aod.app.Component
 
         function value = get.numFilters(obj)
             value = obj.QueryManager.numFilters;
+        end
+
+        function value = get.numDisabled(obj)
+            value = obj.QueryManager.numDisabled;
         end
 
         function value = get.numExperiments(obj)
@@ -137,13 +142,10 @@ classdef QueryView < aod.app.Component
         function createUi(obj)
             obj.figureHandle = uifigure(...
                 "CloseRequestFcn", @obj.onClose_Figure);
-            obj.figureHandle.Position(3:4) = obj.figureHandle.Position(3:4) + [300 50];
-            %if ispref('AOData', 'Development') && getpref('AOData', 'Development')
-            %    obj.figureHandle.Position(1:2) = [-1000 127];
-            %end
+            obj.figureHandle.Position(3:4) = obj.figureHandle.Position(3:4) + [350 50];
 
             mainLayout = uigridlayout(obj.figureHandle, [1 2],...
-                "ColumnWidth", {"1.6x", "1x"}, "ColumnSpacing", 2,...
+                "ColumnWidth", {"1.5x", "1x"}, "ColumnSpacing", 2,...
                 "Padding", [3 3 3 3]);
 
             obj.dataGroup = uitabgroup(mainLayout);
@@ -162,6 +164,12 @@ classdef QueryView < aod.app.Component
             obj.codeTab = uitab(obj.resultGroup, ...
                 "Title", "Code");
             obj.codePanel = aod.app.query.CodePanel(obj, obj.codeTab);
+
+            % Set default font names
+            uiTypes = ["uitab", "uilistbox", "uibutton", "uilabel"];
+            for i = 1:numel(uiTypes)
+                set(findall(obj.figureHandle, 'Type', uiTypes(i)), "FontName", "Arial");
+            end
         end 
 
         function close(obj)
@@ -182,7 +190,7 @@ classdef QueryView < aod.app.Component
                 return 
             end
 
-            if obj.numFilters == 0
+            if obj.numFilters == 0 || (obj.numFilters == obj.numDisabled)
                 obj.matchedEntities = obj.QueryManager.entityTable;
             else
                 [~, obj.matchedEntities] = obj.QueryManager.filter();

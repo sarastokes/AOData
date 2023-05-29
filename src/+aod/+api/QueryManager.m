@@ -230,11 +230,13 @@ classdef QueryManager < handle
             % -------------------------------------------------------------
             arguments 
                 obj 
-                idx         {mustBeInteger}
+                idx         {mustBeInteger, mustBePositive}
             end
 
-            mustBeInRange(idx, 1, numel(obj.Filters));
             obj.Filters(idx) = [];
+            if isempty(obj.Filters)
+                obj.Filters = aod.api.FilterQuery.empty();
+            end
         end
 
         function clearFilters(obj)

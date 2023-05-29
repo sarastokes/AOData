@@ -54,6 +54,7 @@ classdef SubclassWriter < handle
             % Set methods
             out = out + obj.getSetMethods();
             % Dependent property methods
+            out = out + obj.getSetLabel();
             out = out + obj.getDependentSetMethods();
             % Close classdef
             out = out + "end" + newline;
@@ -73,7 +74,7 @@ classdef SubclassWriter < handle
             out = out + sprintf("%% Description:\n");
             out = out + sprintf("%%\tDetailed description of %s\n%%\n", ...
                 obj.Model.ClassName);
-            out = out + sprintf("%% Parent:\n%%\t%s\n%%\n", ...
+            out = out + sprintf("%% Superclasses:\n%%\t%s\n%%\n", ...
                 obj.Model.SuperClass);
             out = out + "% Constructor:" + newline;
             out = out + "%" + sprintf('\t%s\n', obj.getConstructor);
@@ -206,13 +207,12 @@ classdef SubclassWriter < handle
             out = out + obj.indent(1) + "end" + newline + " " + newline;
 
         end
-
-        function out = getDependentSetMethods(obj)
+        function out = getSetLabel(obj)
             out = "";
             if obj.Model.groupNameMode == "DefinedInternally"                             
                 out = out + obj.indent(2) + "function value = getLabel(obj)" + newline;
                 out = out + obj.indent(3) + sprintf("value = getLabel@%s(obj);", obj.Model.SuperClass) + newline + newline;
-                out = out + obj.indent(3) + "% Define any additional processing needed to set label value" + newline;
+                out = out + obj.indent(3) + "% Modify value as needed to set label" + newline;
                 out = out + obj.indent(2) + "end" + newline;
                 out = out + " " + newline;
 
@@ -220,6 +220,16 @@ classdef SubclassWriter < handle
                 out = obj.indent(1) + "methods (Access = protected)" + newline + out;
                 out = out + obj.indent(1) + "end" + newline;
                 out = out + " " + newline;
+            end
+        end
+
+        function out = getDependentSetMethods(obj)
+            out = "";
+
+            if isempty(obj.Model.Attributes) && isempty(obj.Model.Datasets)
+                return
+            else
+                out = obj.indent(1) + "methods (Static)" + newline;
             end
 
             % ExpectedAttributes
@@ -254,19 +264,30 @@ classdef SubclassWriter < handle
                     out = out + ");" + newline;
                 end
                 out = out + obj.indent(2) + "end" + newline +  " " + newline;
-
-                % Methods block
-                out = obj.indent(1) + "methods (Static)" + newline + out;
-                out = out + obj.indent(1) + "end" + newline;
-                out = out + " " + newline;
             end
 
-            % if out == ""
-            %     return
-            % end
-            % out = obj.indent(1) + "methods (Access = protected)" + newline + out;
-            % out = out + obj.indent(1) + "end" + newline;
-            % out = out + " " + newline;
+            if ~isempty(obj.Model.Datasets)
+                out = out + obj.indent(2) + "function mngr = specifyDatasets(mngr)" + newline;
+                out = out + obj.indent(3) + sprintf("mngr = specifyDatasets@%s(mngr);", obj.Model.SuperClass);
+                out = out + newline + newline;
+
+                for i = 1:numel(obj.Model.Datasets)
+                    iDataset = obj.Model.Datasets(i);
+                    if isempty(iDataset.Default) && isempty(iDataset.Validation) && isempty(iDataset.Description)
+                        continue 
+                    end
+                    out = out + obj.indent(3) + sprintf("mngr.set(""%s""", iDataset.Name);
+                    if ~isempty(iDataset.Description)
+                        out = out + ",..." + newline;
+                        out = out + "Description, " + iDataset.Description;
+                    end
+                    out = out + ");" + newline;
+                end
+                out = out + obj.indent(2) + "end" + newline;
+            end
+
+            out = out + obj.indent(1) + "end" + newline;
+            out = out + " " + newline;
         end
     end
 

@@ -13,11 +13,10 @@ classdef SubclassGeneratorController < aod.app.Controller
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties %(SetAccess = private)
-        methodListBox
-        detailBox
-        titleBox
-        helpBox
+    properties (SetAccess = private)
+        helpBox                 matlab.ui.control.TextArea
+        titleBox                matlab.ui.control.Label
+        codeEditor              weblab.components.CodeEditor 
     end
 
     properties (Hidden, Constant)
@@ -30,7 +29,7 @@ classdef SubclassGeneratorController < aod.app.Controller
     methods
         function obj = SubclassGeneratorController(model)
             arguments
-                model   {mustBeA(model, "aod.app.creator.SubclassGenerator")} = SubclassGenerator();
+                model   {mustBeA(model, "aod.app.creator.SubclassGenerator")} = aod.app.creator.SubclassGenerator();
             end
             
             obj@aod.app.Controller(model);
@@ -408,28 +407,16 @@ classdef SubclassGeneratorController < aod.app.Controller
             end
         end
 
-        function onMenuChangeFont(obj, ~, ~)
-            uisetfont(obj.detailBox);
-        end
-
-        function onMenuIncreaseFontSize(obj, ~, ~)
-            fontsize(obj.detailBox, "increase");
-        end
-
-        function onMenuDecreaseFontSize(obj, ~, ~)
-            fontsize(obj.detailBox, "decrease");
-        end
-
         function onPushUpdate(obj, ~, ~)
             % ONPUSHUPDATE
             if ~obj.Model.isViewable
                 return
             end
-            set(obj.detailBox, "Value", "");
+            obj.codeEditor.Value = "";
             obj.update();
             writer = aod.app.creator.SubclassWriter(obj.Model);
             out = writer.getFull();
-            set(obj.detailBox, "Value", out);
+            obj.codeEditor.Value = out;
             obj.update();
         end
 
@@ -440,30 +427,43 @@ classdef SubclassGeneratorController < aod.app.Controller
 
         function onGetHelp(obj, src, ~)
             switch src.Tag 
+                case "CodePanel"
+                    obj.helpBox.Value = "Once Class Name, File Path, Entity Type and Superclass are set " + ...
+                        "click the Update button after making changes to see their impact on how the AOData " + ...
+                        "class is defined. Pressing the Write button will save the code.";
                 case "ClassNamePanel"
-                    obj.helpBox.Value = "What will your class be named?";
+                    obj.helpBox.Value = "What will your class be named? For consistency, capitalize each word (e.g., MyNewClass)";
+                case "FilePathPanel"
+                    obj.helpBox.Value = "Where will your class be saved?" + ...
+                        " It should be an a package folder (i.e. one that starts with ""+"")" + ...
+                        " and a simple approach is to use packages named after specific entity types" + ...
+                        " (e.g. save your registrations in a package called ""+registration"")";
                 case "EntityTypePanel"
                     obj.helpBox.Value = ...
                         "Which AOData entity type should the new class be?";
                 case "SuperclassPanel"
                     obj.helpBox.Value = "Choose a superclass. " + ... 
-                        "The entity will inherit properties and methods " +...
-                        "from this class";
+                        "The entity will inherit properties and methods from this class";
                 case "GroupNamePanel"
                     obj.helpBox.Value = ...
-                        "How will the entity's HDF5 group name be determined?";
+                        "How will the entity's HDF5 group name be determined?" + ...
+                        " Does the user need to provide one (UserDefined)? " + ...
+                        " Could there be a default name?" + ...
+                        " Or can it be automated based on the entity's properties and attributes (DefinedInternally)";
+                case "AttributePanel"
+                    obj.helpBox.Value = ...
+                        "Add, remove and edit the name and specifications of any expected attributes for the entity.";
+                otherwise
+                    obj.helpBox.Value = "Click on a panel's name for more information.";
             end
         end
     end
 
     methods
         function obj = createUi(obj)
-            % Default uigridlayout properties
-            
-            % Center the UI on the screen and name
-            obj.figureHandle.Position(3:4) = [1.5 1.3] .* obj.figureHandle.Position(3:4);
-            movegui(obj.figureHandle, "center");
-            obj.figureHandle.Name = "Subclass Generator";
+            obj.figureHandle.Position(3:4) = [1.5 1.35] .* obj.figureHandle.Position(3:4);
+            set(obj.figureHandle, "Name", "AOData Subclass Generator",...
+                'DefaultUicontrolFontName', 'Arial')
 
             mainLayout = uigridlayout(obj.figureHandle, [4 2],...
                 "RowHeight", {'fit', '2x', 'fit', '0.15x'},...
@@ -476,22 +476,10 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "FontWeight", "bold");
             obj.setLayout(obj.titleBox, 1, 1);
 
-            % UI Controls
-            uiTabGroup = uitabgroup(mainLayout);
-            obj.setLayout(uiTabGroup, 2, 1);
-
-            % Basic Tab
-            basicTab = uitab(uiTabGroup, "Title", "Basic");
-            basicGrid = uigridlayout(basicTab, [3 6],...
-                "RowHeight", {70, 70, 70}, obj.LAYOUT_PROPS{:});
-
-            % Detail Tab
-            detailTab = uitab(uiTabGroup, "Title", "Details");
-            detailGrid = uigridlayout(detailTab, [1 3], obj.LAYOUT_PROPS{:});
-
-            % Advanced Tab
-            advTab = uitab(uiTabGroup, "Title", "Advanced");
-            advGrid = uigridlayout(advTab, [1 1], obj.LAYOUT_PROPS{:});
+            % User input grid
+            basicGrid = uigridlayout(mainLayout, [4 6],...
+                "RowHeight", {60, 60, 60, '1x'}, obj.LAYOUT_PROPS{:});
+            obj.setLayout(basicGrid, 2, 1);
 
             % Documentation box
             h = uilabel(mainLayout, "Text", "Documentation:",...
@@ -499,11 +487,11 @@ classdef SubclassGeneratorController < aod.app.Controller
             obj.setLayout(h, 3, 1);
 
             obj.helpBox = uitextarea(mainLayout,...
-                "Value", "Click on a panel for more information.");
-            obj.setLayout(obj.helpBox, 4, 1);
+                "Value", "Click on a panel's name for more information.");
+            obj.setLayout(obj.helpBox, 4, [1, 2]);
 
             % Details
-            p = uipanel(mainLayout, "Title", "Details",...
+            p = uipanel(mainLayout, "Title", "Code",...
                 "Tag", "DetailPanel", "FontSize", 12);
             obj.setLayout(p, [1 3], 2);
             obj.makeDetailBox(p);
@@ -555,11 +543,11 @@ classdef SubclassGeneratorController < aod.app.Controller
             %   > uieditbox, uieditbox
             % - Optional: importance - required, optional or N/A
             %   > uidropdown (default N/A)
-            p = uipanel(detailGrid, "Title", "Attributes",...
+            p = uipanel(basicGrid, "Title", "Attributes",...
                 "FontSize", 12, "FontWeight", "bold",... 
                 "Tag", "AttributePanel",...
                 "ButtonDownFcn", @obj.onGetHelp);
-            obj.setLayout(p, 1, 1);
+            obj.setLayout(p, 4, [1 2]);
             obj.makeAttributePanel(p);
 
             % What datasets should the entity have (properties)?
@@ -569,11 +557,11 @@ classdef SubclassGeneratorController < aod.app.Controller
             %   > uieditfield, uieditfield
             % - Optional: Property's importance - required, optional or N/A
             %   > uidropdown (default N/A)
-            p = uipanel(detailGrid, "Title", "Datasets",...
+            p = uipanel(basicGrid, "Title", "Datasets",...
                 "FontSize", 12, "FontWeight", "bold",... 
                 "Tag", "DatasetPanel",...
                 "ButtonDownFcn", @obj.onGetHelp);
-            obj.setLayout(p, 1, 2);
+            obj.setLayout(p, 4, [3 4]);
             obj.makeDatasetPanel(p);
 
             % What links should the entity have (properties)?
@@ -581,11 +569,11 @@ classdef SubclassGeneratorController < aod.app.Controller
             %   > uieditfield
             % - Optional: entityType(s)
             %   > uidropdown (excluding Experiment, Parent & EntityType)
-            p = uipanel(detailGrid, "Title", "Links",...
+            p = uipanel(basicGrid, "Title", "Links",...
                 "FontSize", 12, "FontWeight", "bold",...
                 "Tag", "LinkPanel",...
                 "ButtonDownFcn", @obj.onGetHelp);
-            obj.setLayout(p, 1, 3);
+            obj.setLayout(p, 4, [5 6]);
             obj.makeLinkPanel(p);
 
             % How should the entity's group name be determined?
@@ -602,43 +590,37 @@ classdef SubclassGeneratorController < aod.app.Controller
             obj.setLayout(p, 3, [1 6]);
             obj.makeEntityGroupNamePanel(p);
 
-            % Any specifications on inherited methods?
-            p = uipanel(advGrid, "Title", "Inherited Methods",...
-                "FontSize", 12, "Tag", "InheritedMethodsPanel",...
-                "ButtonDownFcn", @obj.onGetHelp);
-            obj.setLayout(p, [4 5], 1);
-            obj.makeMethodPanel(p);
+            uiTypes = ["uipanel", "uilistbox", "uidropdown", ...
+                "uilabel", "uitextarea", "uibutton"];
+            for i = 1:numel(uiTypes)
+                set(findall(obj.figureHandle, 'Type', uiTypes(i)), 'FontName', 'Arial');
+            end
         end
     end
 
     methods (Access = private)
         function makeDetailBox(obj, p)
-            g = uigridlayout(p, [2 2],...
+            mainLayout = uigridlayout(p, [2 1],...
                 "RowHeight", {'1x', 'fit'}, obj.LAYOUT_PROPS{:});
-            obj.detailBox = uitextarea(g, ...
-                "FontSize", 10, "HorizontalAlignment", "left",...
-                "FontName", "Consolas", "Editable", "off");
-            obj.setLayout(obj.detailBox, 1, [1 2]);
-            h = uibutton(g, "Text", "Update",...
+        
+            obj.codeEditor = weblab.components.CodeEditor();
+            f = weblab.internal.Frame("Parent", mainLayout);
+            f.insert(obj.codeEditor);
+            obj.codeEditor.style('fontSize', '12px');
+            obj.codeEditor.Editable = false;
+
+            buttonLayout = uigridlayout(mainLayout, [1 2],...
+                "RowHeight", {"fit"}, "Padding", 0);
+            h = uibutton(buttonLayout, "Text", "Update",...
                 "Icon", obj.getIcon('refresh.png'),...
                 "Enable", "off", "Tag", "UpdateButton",...
                 "ButtonPushedFcn", @obj.onPushUpdate);
             obj.setLayout(h, 2, 1);
-            h = uibutton(g, "Text", "Write",...
+            h = uibutton(buttonLayout, "Text", "Write",...
                 "Icon", obj.getIcon('making-notes.png'),...
                 "Enable", "off", "Tag", "WriteButton",...
                 "ButtonPushedFcn", @obj.onPushWrite);
             obj.setLayout(h, 2, 2);
-
-            % Add a context menu to change font
-            cm = uicontextmenu(obj.figureHandle);
-            uimenu(cm, "Text", "Change Font",...
-                "MenuSelectedFcn", @obj.onMenuChangeFont);
-            uimenu(cm, "Text", "Increase FontSize",...
-                "MenuSelectedFcn", @obj.onMenuIncreaseFontSize);
-            uimenu(cm, "Text", "Decrease FontSize",...
-                "MenuSelectedFcn", @obj.onMenuDecreaseFontSize);
-            obj.detailBox.ContextMenu = cm;
         end
 
         function makeFilePathPanel(obj, p)
@@ -653,32 +635,35 @@ classdef SubclassGeneratorController < aod.app.Controller
         end
 
         function makeEntityGroupNamePanel(obj, p)
-            g = uigridlayout(p, [2 2], obj.LAYOUT_PROPS{:});
+            g = uigridlayout(p, [1 2], obj.LAYOUT_PROPS{:});
             h = uidropdown(g,...
                 "Tag", "GroupNameDropdown",...
                 "ValueChangedFcn", @obj.onSelectedGroupNameMode);
-            obj.setLayout(h, [1 2], 1);
+            obj.setLayout(h, 1, 1);
 
-            h = uilabel(g,...
-                "Text", "Default Entity Name:",...
+            defaultLayout = uigridlayout(p, [1 2],...
+                'ColumnWidth', {'fit', '1x'}, obj.LAYOUT_PROPS{:});
+            uilabel(defaultLayout,...
+                "Text", "Default Name:",...
                 "HorizontalAlignment", "left");
-            obj.setLayout(h, 1, 2);
-            h = uieditfield(g,...
+            uieditfield(defaultLayout,...
                 "Tag", "DefaultGroupName",...
                 "ValueChangedFcn", @obj.onSetDefaultName);
-            obj.setLayout(h, 2, 2);
         end
 
         function [h1, h2, h3] = makeButtons(obj, g)
-            h1 = uibutton(g, "Text", "Add",...
-                "Icon", obj.getIcon('add.png'));
+            h1 = uibutton(g, "Text", "",...
+                "Icon", obj.getIcon('add.png'),...
+                "Tooltip", "Add");
             obj.setLayout(h1, 1, 1);
-            h2 = uibutton(g, "Text", "Remove",...
+            h2 = uibutton(g, "Text", "",...
+                "Tooltip", "Remove",...
                 "Icon", obj.getIcon('do-not-disturb.png'));
-            obj.setLayout(h2, 2, 1);
-            h3 = uibutton(g, "Text", "Edit",...
+            obj.setLayout(h2, 1, 2);
+            h3 = uibutton(g, "Text", "",...
+                "Tooltip", "Edit",...
                 "Icon", obj.getIcon('edit.png'));
-            obj.setLayout(h3, 3, 1);
+            obj.setLayout(h3, 1, 3);
         end
 
         function makeAttributePanel(obj, p)
@@ -686,7 +671,7 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "RowHeight", {'1x', 'fit'}, obj.LAYOUT_PROPS{:});
             h = uilistbox(g, "Items", "", "Tag", "AttributeListBox");
             obj.setLayout(h, 1, 1);
-            g2 = uigridlayout(g, [3 1], obj.LAYOUT_PROPS{:});
+            g2 = uigridlayout(g, [1 3], obj.LAYOUT_PROPS{:});
             obj.setLayout(g2, 2, 1);
             [h1, h2, h3] = obj.makeButtons(g2);
             set(h1, "Tag", "AddAttributeButton",...
@@ -701,7 +686,7 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "RowHeight", {'1x', 'fit'}, obj.LAYOUT_PROPS{:});
             h = uilistbox(g, "Items", "", "Tag", "DatasetListBox");
             obj.setLayout(h, 1, 1);
-            g2 = uigridlayout(g, [3 1], obj.LAYOUT_PROPS{:});
+            g2 = uigridlayout(g, [1 3], obj.LAYOUT_PROPS{:});
             obj.setLayout(g2, 2, 1);
             [h1, h2, h3] = obj.makeButtons(g2);
             set(h1, "Tag", "AddDatasetButton",...
@@ -716,7 +701,8 @@ classdef SubclassGeneratorController < aod.app.Controller
                 "RowHeight", {'1x', 'fit'}, obj.LAYOUT_PROPS{:});
             h = uilistbox(g, "Items", "", "Tag", "LinkListBox");
             obj.setLayout(h, 1, 1);
-            g2 = uigridlayout(g, [3 1], obj.LAYOUT_PROPS{:});
+            g2 = uigridlayout(g, [1 3], ...
+                "RowHeight", {"fit"}, obj.LAYOUT_PROPS{:});
             obj.setLayout(g2, 2, 1);
             [h1, h2, h3] = obj.makeButtons(g2);
             set(h1, "Tag", "AddLinkButton",...
@@ -724,36 +710,6 @@ classdef SubclassGeneratorController < aod.app.Controller
             set(h2, "Tag", "RemoveLinkButton",...
                 "ButtonPushedFcn", @obj.onPushRemoveLink);
             set(h3, "Tag", "EditLinkButton");
-        end
-        
-        function makeMethodPanel(obj, p)
-            g = uigridlayout(p, [4 3], obj.LAYOUT_PROPS{:},...
-                "ColumnWidth", {"1x", 30, "1x"},...
-                "RowHeight", {30, "1x", 30, "1x"});
-            % - Overloaded methods?
-            %   > uidropdown
-            obj.methodListBox = uilistbox(g,...
-                "Items", "", "Enable", "off",...
-                "Tag", "InheritedMethods");
-            obj.setLayout(obj.methodListBox, [1 4], 1);
-
-            h = uilabel(g, "Text", "Overload");
-            obj.setLayout(h, 3, 1);
-            h = uilistbox(g,...
-                "Items", "", "Multiselect", "on",... 
-                "Enable", "off", "Tag", "OverloadedMethods",...
-                "ValueChangedFcn", @obj.onChangedOverloadedMethods);
-            obj.setLayout(h, 3, 1);
-
-            % - Overwritten methods?
-            %   > uidropdown
-            h = uilabel(g, "Text", "Overwrite");
-            obj.setLayout(h, 3, 3);
-            h = uilistbox(g,...
-                "Items", "", "Multiselect", "on",... 
-                "Enable", "off", "Tag", "OverwrittenMethods",...
-                "ValueChangedFcn", @obj.onChangedOverwrittenMethods);
-            obj.setLayout(h, 3, 4);
         end
     end
 

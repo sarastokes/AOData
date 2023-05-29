@@ -138,14 +138,18 @@ classdef FilterBox < aod.app.Component
                 return
             end
             name = obj.inputBox.getName();
+            if startsWith(name, "@")
+                name = str2func(name);
+            end
             value = obj.inputBox.getValue();
 
             if isempty(value) || value == ""
                 F = aod.api.FilterTypes.makeNewFilter(...
                     QM, {obj.filterType, name});
-            else
+            else % Has a value input
+                eval(sprintf("inputValue = %s;", value));
                 F = aod.api.FilterTypes.makeNewFilter(...
-                    QM, {obj.filterType, name, value});
+                    QM, {obj.filterType, name, inputValue});
             end
 
             % TODO: Add filters

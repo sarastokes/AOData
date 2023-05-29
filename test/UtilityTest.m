@@ -62,7 +62,7 @@ classdef UtilityTest < matlab.unittest.TestCase
             testCase.verifyError(@() obj.create(), "create:NotImplemented");
         end
 
-        function RepoManager(testCase) %#ok<MANU> 
+        function RepoManager(testCase)
             RM = aod.infra.RepositoryManager();
             RM.listPackages();
             RM.update();
