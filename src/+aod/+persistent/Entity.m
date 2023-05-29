@@ -43,9 +43,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     properties (SetAccess = protected)
         % Entity metadata that maps to attributes
-        attributes              % aod.common.Attributes
+        attributes              % aod.common.KeyValueMap
         % Files associated with the entity
-        files                   % aod.common.Attributes
+        files                   % aod.common.KeyValueMap
         % A description of the entity
         description             string
         % Miscellaneous notes about the entity
@@ -118,8 +118,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.factory = entityFactory;
 
             % Initialize attributes 
-            obj.files = aod.common.Attributes();
-            obj.attributes = aod.common.Attributes();
+            obj.files = aod.common.KeyValueMap();
+            obj.attributes = aod.common.KeyValueMap();
 
             % Create entity from file
             if ~isempty(obj.hdfName)
@@ -803,7 +803,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.description = obj.loadDataset('description');
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
-            obj.files = obj.loadDataset('files', 'aod.common.Attributes');
+            obj.files = obj.loadDataset('files', 'aod.common.KeyValueMap');
             
             expectedAttrs = obj.loadDataset('expectedAttributes');
             if ~isempty(expectedAttrs)

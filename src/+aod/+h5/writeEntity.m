@@ -120,7 +120,7 @@ function writeEntity(hdfName, obj)
     
     % Write file paths, if necessary
     if ~isempty(obj.files)
-        h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.common.Attributes");
+        h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.common.KeyValueMap");
         h5tools.writeatt(hdfName, [hdfPath, '/files'], obj.files);
     end
 

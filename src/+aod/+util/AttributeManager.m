@@ -26,7 +26,7 @@ classdef AttributeManager < handle & matlab.mixin.CustomDisplay
 %   T = table(obj)
 %
 % See also:
-%   aod.util.ExpectedAttribute, aod.common.Attributes
+%   aod.util.ExpectedAttribute, aod.common.KeyValueMap
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

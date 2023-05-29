@@ -1,15 +1,18 @@
 function obj = map2attributes(cMap)
-% Create from containers.Map
+% Create AOData's KeyValueMap from containers.Map
 %
 % Syntax:
 %   obj = map2attributes(cMap)
+%
+% See also:
+%   aod.common.KeyValueMap, containers.Map
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     assert(isa(cMap, 'containers.Map'),...
         'Input must be a containers.Map');
              
-    obj = aod.common.Attributes();
+    obj = aod.common.KeyValueMap();
     if isempty(cMap)
         return 
     end

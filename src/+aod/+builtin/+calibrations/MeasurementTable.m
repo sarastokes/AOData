@@ -27,7 +27,7 @@ classdef MeasurementTable < aod.core.Calibration
             
             obj.Measurements = table.empty(0, numel(measurements));
             obj.Measurements.Properties.VariableNames = measurements;
-            if nargin > 3 && isempty(units)
+            if nargin > 3 && ~isempty(units)
                 obj.Table.Properties.VariableUnits = units;
             end
         end

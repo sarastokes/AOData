@@ -64,13 +64,27 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.calibrations.MeasurementTable( ...
                 "Power", getDateYMD(),...
                 ["Mustang", "Value"], ["%", "microwatts"]);
-            obj.addMeasurements({22, 10}, {28, 17});
-            testCase.verifySize(obj.table(), [2 2]);
-            obj.removeMeasurements(1);
-            testCase.verifySize(obj.table(), [1 2]);
+            testCase.verifyEqual(obj.numMeasurements, 0);
+            testCase.verifyTrue(isempty(obj));
             testCase.verifyEqual(...
                 obj.Measurements.Properties.VariableNames, ...
                 cellstr(["Mustang", "Value"]));
+
+            obj.addMeasurements({22, 10}, {28, 17});
+            testCase.verifyEqual(obj.numMeasurements, 2);
+            testCase.verifySize(obj.table(), [2 2]);
+
+            % Remove measurements
+            obj.removeMeasurements(1);
+            testCase.verifySize(obj.table(), [1 2]);
+        end
+
+        function MeasurementTableErrors(testCase)
+            obj = aod.builtin.calibrations.MeasurementTable(...
+                "Power", getDateYMD(), ["Mustang", "Value"]);
+            testCase.verifyError(...
+                @() obj.addMeasurements(123),...
+                "addMeasurement:InvalidInput");
         end
 
         function RoomMeasurement(testCase)

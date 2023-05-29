@@ -16,6 +16,8 @@ classdef UtilityTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+%#ok<*MANU>
+
     properties
         EXPT 
     end
@@ -41,10 +43,18 @@ classdef UtilityTest < matlab.unittest.TestCase
         end
 
         function Attributes(testCase)
-            params = aod.common.Attributes();
+            params = aod.common.KeyValueMap();
             params('A') = 1;
             map = params.toMap();
             testCase.verifyClass(map, 'containers.Map');
+            
+            S = params.toStruct();
+            testCase.verifyClass(S, 'struct');
+        end
+
+        function EmptyKeyValueMap(testCase) 
+            obj = aod.common.KeyValueMap();
+            toMap(obj)
         end
 
         function Factory(testCase)

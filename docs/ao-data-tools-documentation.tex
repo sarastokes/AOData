@@ -219,7 +219,7 @@ pic me set={file}{file},
 			\item While metadata file names for each epoch are predictable, we still need a way of automatically identifying them that is robust to small changes. Robust reading of metadata is important too, we don't want the code to break if a line is added/removed from a .txt file.
 			\item A strong metadata solution will extend beyond what is generated during an experiment to include stimulus design and analysis. 
 			\item We have individual preferences on how we analyze our post-registration data and need a common foundation that can accommodate and contain those preferences.
-			\item Our code changes over time and we need to be free to make necessary changes without fear of breaking past code. % git and aod.common.Attributes
+			\item Our code changes over time and we need to be free to make necessary changes without fear of breaking past code. % git and aod.common.KeyValueMap
 			\item Metadata and data must be saved in a format appropriate for long-term archival. This format should be platform/language-independent, fast and capable of handling large heterogeneous datasets. % HDF5 files
 		\end{enumerate}
 		
@@ -502,7 +502,7 @@ obj = MyClass(inputs)
 	\begin{itemize}
 		\item \aodprop{MyProp}
 	\end{itemize}
-	\docheader{Parameters:} Optional inputs sent to \aodclass{aod.common.Attributes} and written as attributes
+	\docheader{Parameters:} Optional inputs sent to \aodclass{aod.common.KeyValueMap} and written as attributes
 	\begin{itemize}
 		\item \aodparam{MyParam}
 	\end{itemize}
@@ -530,8 +530,8 @@ obj = aod.core.Entity(name)
 		\begin{itemize}
 			\item \aodprop{Name} - user-defined name for the entity
 			\item \aodprop{description} - a space for describing the Entity is (in case the class, properties and parameters are not sufficient)
-			\item \aodprop{parameters} - \aodclass{aod.common.Attributes} containing entity metadata
-			\item \aodprop{files} - \aodclass{aod.common.Attributes} containing file names associated with the entity
+			\item \aodprop{parameters} - \aodclass{aod.common.KeyValueMap} containing entity metadata
+			\item \aodprop{files} - \aodclass{aod.common.KeyValueMap} containing file names associated with the entity
 			\item \aodprop{notes} - a space for miscellaneous comments
 		\end{itemize}
 		\docheader{Private Properties:} These are handled behind the scenes and average users shouldn't need to worry about them
@@ -965,15 +965,15 @@ classdef MyFactory < aod.util.Factory
 end
 		\end{lstlisting}
 		
-	\subsection{aod.common.Attributes \myparent{containers.Map}}
-		\noindent  This is a wrapper for MATLAB's builtin \aodclass{containers.Map} class, so you if know how to use that then you know how to use \aodclass{aod.common.Attributes}. The only differences are better command line display (each key and the associated values are displayed) and a standardized approach for writing to HDF5 files. 
+	\subsection{aod.common.KeyValueMap \myparent{containers.Map}}
+		\noindent  This is a wrapper for MATLAB's builtin \aodclass{containers.Map} class, so you if know how to use that then you know how to use \aodclass{aod.common.KeyValueMap}. The only differences are better command line display (each key and the associated values are displayed) and a standardized approach for writing to HDF5 files. 
 		
 		This class is central to AOData because it provides a means of defining properties for entities in a flexible way that avoids hard-coding and class incompatibility as you change the underlying code. 
-		Each core class has a \aodclass{aod.common.Attributes} class. The contents of an \aodclass{aod.common.Attributes} property will be written as \textbf{attributes} of its parent entity in the HDF5 file. The contents of an attribute should be reasonably small (some text, a number, maybe a short row of numbers. If needed, more info can be found in \myurl{\ref{subsection:HDFIO}} on "Reading and Writing Entities to HDF5 files").  \textbf{In general, entity parameters are metadata and entity properties are data}. There are undoubtedly exceptions, but it's a good rule of thumb.
+		Each core class has a \aodclass{aod.common.KeyValueMap} class. The contents of an \aodclass{aod.common.KeyValueMap} property will be written as \textbf{attributes} of its parent entity in the HDF5 file. The contents of an attribute should be reasonably small (some text, a number, maybe a short row of numbers. If needed, more info can be found in \myurl{\ref{subsection:HDFIO}} on "Reading and Writing Entities to HDF5 files").  \textbf{In general, entity parameters are metadata and entity properties are data}. There are undoubtedly exceptions, but it's a good rule of thumb.
 		
 		\textit{More info here.} See \aodclass{aod.core.Devices} for an example on specification of default class parameters.
 		
-		There is one other use for \aodclass{aod.common.Attributes} and that is providing a \aodclass{containers.Map}-like data type to store files associated with an entity (e.g. \aodprop{files} for \aodclass{aod.core.Epoch}). Any property named \aodprop{files} will be written as a group with the contents as attributes. This is a bit odd but it was the best option available as I didn't want to clutter up the entity attributes or datasets with a bunch of file names.
+		There is one other use for \aodclass{aod.common.KeyValueMap} and that is providing a \aodclass{containers.Map}-like data type to store files associated with an entity (e.g. \aodprop{files} for \aodclass{aod.core.Epoch}). Any property named \aodprop{files} will be written as a group with the contents as attributes. This is a bit odd but it was the best option available as I didn't want to clutter up the entity attributes or datasets with a bunch of file names.
 	
 	\subsection{aod.util.template.ExpectedParameter \myparent{handle}}
 		\label{subsection:ExpectedParameter}
@@ -1110,7 +1110,7 @@ experiment.Epochs(1:5).Responses
 
 \section{HDF5 File Details}
 	\label{section:HDF5_Details}
-	\noindent High-level summary: When you write an entity to an HDF5 file, the entity will be written as a \textbf{group}. Public properties will be written as  \textbf{datasets} within the group. Anything in a \aodclass{aod.common.Attributes} object will be written as an \textbf{attribute} of the group. Properties referring to other entities (e.g. Parent) are written as \textbf{references}.  Several entities also contain default groups which are \textit{containers} for other groups (e.g. Experiments have Calibrations, a container group for all the individual Calibration groups). 
+	\noindent High-level summary: When you write an entity to an HDF5 file, the entity will be written as a \textbf{group}. Public properties will be written as  \textbf{datasets} within the group. Anything in a \aodclass{aod.common.KeyValueMap} object will be written as an \textbf{attribute} of the group. Properties referring to other entities (e.g. Parent) are written as \textbf{references}.  Several entities also contain default groups which are \textit{containers} for other groups (e.g. Experiments have Calibrations, a container group for all the individual Calibration groups). 
 	
 	\subsection{Entity locations within the HDF5 file}
 		\label{subsection:EntityLocationsInHDF5}
@@ -1196,12 +1196,12 @@ experiment.Epochs(1:5).Responses
 			\begin{itemize}
 				\item HDF5 doesn't have a \matclass{datetime} class, so these properties are written as a text dataset, with attributes specifying the format to aid conversion when reading the HDF5 file back into MATLAB.
 				\item For an \aodclass{enumeration} property, the enumerated type is written as a string dataset. The name of the enumeration class is written as an attribute of the dataset. This works if the enumeration class has a static method called \aodfcn{init()} that takes the enumerated type name as a char and returns the enumerated type (see \aodclass{aod.common.EntityTypes} for an example). HDF5 does have enumeration support, but this works just as well. 
-				\item Several entities have a \aodprop{files} property of class \aodclass{aod.common.Attributes}. The contents are written as attributes of a text dataset with some placeholder text.
+				\item Several entities have a \aodprop{files} property of class \aodclass{aod.common.KeyValueMap}. The contents are written as attributes of a text dataset with some placeholder text.
 				\item If \aodprop{Timing} is present but empty and the parent class has \aodprop{Timing}, a link will be written to that dataset. This allows, for example \aodclass{aod.core.Response} to inherit timing from \aodclass{aod.core.Epoch}
 				\item Data of class \matclass{table} are converted to as \aodclass{struct}, then written as compound data types
 			\end{itemize}
 			Each dataset is written with an attribute describing the original MATLAB type to ensure the data is read back in appropriately.
-			\item The contents of \aodclass{aod.common.Attributes} classes are written as attributes of the entity group.
+			\item The contents of \aodclass{aod.common.KeyValueMap} classes are written as attributes of the entity group.
 			\begin{itemize}
 				\item Attributes should be small, consistent with them representing metadata rather than the data itself - some text, a number, maybe a row of numbers. I'm not sure what the hard size limit is (if there is one) but if you're writing some ND array it's worth thinking about whether it truly qualifies as metadata.
 				\item Arrays of more than one \matclass{string} and \matclass{struct} cannot be written as attributes.

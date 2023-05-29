@@ -69,6 +69,8 @@ classdef FileReaderTest < matlab.unittest.TestCase
                 'AOData\test\test_data\test.avi'));
             testCase.verifyTrue(reader.Data.Stabilization);
             testCase.verifyTrue(reader.Data.ClosedLoop);
+            
+            reader.changeFile(fullfile(testCase.dataFolder, 'test.txt'));
         end
 
         function AVI(testCase)

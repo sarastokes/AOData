@@ -38,7 +38,7 @@ classdef (Abstract) FileReader < handle
                 fileName = completeFileName(fileName);
                 obj.fullFile = fileName;
             end
-            obj.attributes = aod.common.Attributes();
+            obj.attributes = aod.common.KeyValueMap();
             % Because some files may be time-consuming to load, readFile()
             % is not called bu default when the FileReader is created
         end

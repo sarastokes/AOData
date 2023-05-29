@@ -25,7 +25,7 @@ function success = write(hdfName, pathName, dsetName, data, description)
 %   numeric, char, string, logical, table, timetable, datetime, duration
 %   enum, struct, containers.Map(), affine2d, imref2d, simtform2d, cfit
 %   See h5tools-matlab documentation for limitations.
-% AOData also adds support for aod.common.Attributes and aod.common.FileReader
+% AOData also adds support for aod.common.KeyValueMap and aod.common.FileReader
 %
 % See also:
 %   h5tools.write, aod.h5.read, aod.h5.writeExpectedAttributes
@@ -44,8 +44,8 @@ function success = write(hdfName, pathName, dsetName, data, description)
     
         fullPath = h5tools.util.buildPath(pathName, dsetName);
     
-        if isa(data, 'aod.common.Attributes')
-            h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.common.Attributes");
+        if isa(data, 'aod.common.KeyValueMap')
+            h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.common.KeyValueMap");
             h5tools.writeatt(hdfName, fullPath, data);
             success = true;
         elseif isa(data, 'aod.util.AttributeManager')

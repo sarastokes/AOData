@@ -1,5 +1,5 @@
 function verifyAttributesEqual(testCase, actual, expected)
-% Check whether aod.common.Attributes are equal
+% Check whether aod.common.KeyValueMap are equal
 %
 % Syntax:
 %   test.util.verifyAttributesEqual(testCase, actual, expected)
@@ -7,7 +7,7 @@ function verifyAttributesEqual(testCase, actual, expected)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    testCase.verifyClass(actual, 'aod.common.Attributes');
+    testCase.verifyClass(actual, 'aod.common.KeyValueMap');
 
     testCase.verifyEqual(expected.Count, actual.Count)
 

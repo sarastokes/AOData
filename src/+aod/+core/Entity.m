@@ -14,8 +14,8 @@ classdef (Abstract) Entity < handle
 %   Parent                      aod.core.Entity
 %   Name                        char
 %   UUID                        string
-%   attributes                  aod.common.Attributes
-%   files                       aod.common.Attributes
+%   attributes                  aod.common.KeyValueMap
+%   files                       aod.common.KeyValueMap
 %   description                 string
 %   notes                       string
 %
@@ -86,9 +86,9 @@ classdef (Abstract) Entity < handle
 
     properties (SetObservable, SetAccess = protected)
         % Files associated with the entity
-        files                       % aod.common.Attributes
+        files                       % aod.common.KeyValueMap
         % Metadata for the entity which maps to HDF5 attributes
-        attributes                  % aod.common.Attributes
+        attributes                  % aod.common.KeyValueMap
     end
     
     properties (Dependent)
@@ -136,8 +136,8 @@ classdef (Abstract) Entity < handle
             end
             
             % Initialize containers
-            obj.files = aod.common.Attributes();
-            obj.attributes = aod.common.Attributes();
+            obj.files = aod.common.KeyValueMap();
+            obj.attributes = aod.common.KeyValueMap();
             
             % Parse unmatched inputs
             obj.parseAttributes(ip.Unmatched);
@@ -608,7 +608,7 @@ classdef (Abstract) Entity < handle
             end
 
             if strcmpi(fileName, 'all')
-                obj.files = aod.common.Attributes();
+                obj.files = aod.common.KeyValueMap();
             elseif obj.hasFile(fileName)
                 remove(obj.files, fileName);
             end

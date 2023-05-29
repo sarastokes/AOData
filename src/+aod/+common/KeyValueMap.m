@@ -1,4 +1,4 @@
-classdef Attributes < containers.Map & matlab.mixin.CustomDisplay 
+classdef KeyValueMap < containers.Map & matlab.mixin.CustomDisplay 
 % Container for metadata specified as key/value pairs 
 %
 % Description:
@@ -8,7 +8,7 @@ classdef Attributes < containers.Map & matlab.mixin.CustomDisplay
 %   containers.Map, matlab.mixin.CustomDisplay
 %
 % Constructor:
-%   obj = aod.common.Attributes(keySet, valueSet)
+%   obj = aod.common.KeyValueMap(keySet, valueSet)
 %
 % Methods:
 %   out = toMap(obj)
@@ -24,7 +24,7 @@ classdef Attributes < containers.Map & matlab.mixin.CustomDisplay
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Attributes(varargin)
+        function obj = KeyValueMap(varargin)
             obj = obj@containers.Map(varargin{:});
         end
 
@@ -37,11 +37,7 @@ classdef Attributes < containers.Map & matlab.mixin.CustomDisplay
             % See also:
             %   map2struct
             % -------------------------------------------------------------
-            if isempty(obj)
-                out = struct();
-            else
-                out = map2struct(obj.toMap());
-            end
+            out = map2struct(obj.toMap());
         end
 
         function out = toMap(obj)
@@ -68,17 +64,19 @@ classdef Attributes < containers.Map & matlab.mixin.CustomDisplay
     methods (Access = protected)
         function header = getHeader(obj)
             if isempty(obj)
-                header = getHeader@matlab.mixin.CustomDisplay(obj);
+                %header = getHeader@matlab.mixin.CustomDisplay(obj);
+                header = 'An empty KeyValue Map';
             else
                 headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
                 headerStr = [headerStr, ' with ', num2str(numel(obj.keys)), ' members:'];
-                header = sprintf('  %s',headerStr);
+                header = sprintf('  %s', headerStr);
             end
         end
 
         function propgrp = getPropertyGroups(obj)
             if isempty(obj)
                 propgrp = getPropertyGroups@matlab.mixin.CustomDisplay(obj);
+                propgrp.PropertyList = {};
             else
                 keys = obj.keys;
                 values = obj.values;

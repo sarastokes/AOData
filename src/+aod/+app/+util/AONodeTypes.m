@@ -291,7 +291,7 @@ classdef AONodeTypes
                     obj = AONodeTypes.STRUCTURE;
                 case 'logical'
                     obj = AONodeTypes.LOGICAL;
-                case {'aod.common.attributes', 'files'}
+                case {'aod.common.keyvaluemap', 'files'}
                     obj = AONodeTypes.FILES;
                 case 'aod.common.filereader'
                     obj = AONodeTypes.FILEREADER;
