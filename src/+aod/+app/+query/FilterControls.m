@@ -48,7 +48,7 @@ classdef FilterControls < aod.app.Component
         end
     end
 
-    % Component methods
+    % Component public methods
     methods
         function update(obj, evt)
             switch evt.EventType 
@@ -66,7 +66,7 @@ classdef FilterControls < aod.app.Component
                             obj.addButton.Enable = "off";
                         end
                     end
-                case "ChangeFilterType"
+                case "ChangedFilterType"
                     obj.checkButton.Enable = "off";
                     obj.addButton.Enable = "off";
                 case "PushFilter"

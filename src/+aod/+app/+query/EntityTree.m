@@ -138,7 +138,7 @@ classdef EntityTree < aod.app.Component
         end
 
         function removeExperiment(obj, exptFile)
-            % Delete the experiment from the main tree and unmatched
+            % Delete experiment from the main tree and unmatched (same tag)
             h = findobj(obj.Tree, "Tag", exptFile);
             delete(h);
         end
@@ -186,16 +186,15 @@ classdef EntityTree < aod.app.Component
     % Callback methods
     methods (Access = private)
         function onSelected_Node(obj, ~, ~)
-            if obj.Tree.SelectedNode == obj.UnmatchedNode
+            if obj.Tree.SelectedNodes == obj.UnmatchedNode
                 return
             end
             obj.publish("SelectedNode", obj,...
-                "Path", obj.Tree.SelectedNode.Tag,...
-                "File", obj.Tree.SelectedNode.Parent.Tag);
+                "Path", obj.Tree.SelectedNodes.Tag,...
+                "File", obj.Tree.SelectedNodes.Parent.Tag);
         end
 
         function resetExperimentNodes(obj, exptFile)
-
             if nargin < 2
                 if obj.Root.numExperiments > 0
                     arrayfun(@(x) resetExperimentNodes(obj, x), obj.Root.hdfFiles);

@@ -22,8 +22,8 @@
     - AddNewFilter
     - ClearFilters
 4. **FilterBox**
-    - ChangeFilterType
 5. **InputBox**
+    - ChangedFilterType
     - NameProvided
     - ValueProvided
     - SearchNames

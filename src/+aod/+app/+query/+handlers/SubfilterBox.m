@@ -16,7 +16,7 @@ classdef SubfilterBox < aod.app.EventHandler
 
         function handleRequest(obj, ~, evt)
             switch evt.EventType
-                case "ChangeFilterType"
+                case "ChangedFilterType"
                     obj.Parent.update(evt);
             end
         end

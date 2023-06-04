@@ -330,7 +330,8 @@ classdef InputBox < aod.app.Component
             end
             obj.filterType = aod.api.FilterTypes.(upper(src.Value));
             obj.changeFilterType();
-            obj.onChange_Anything();
+            obj.publish('ChangedFilterType', obj,...
+                'FilterType', obj.filterType);
         end
 
         function onPush_AddSubfilter(obj, ~, ~)

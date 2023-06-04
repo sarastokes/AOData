@@ -38,8 +38,10 @@ classdef QueryView < aod.app.EventHandler
                         evt.Trigger.getFilter());
                     obj.Parent.update(evt);
                 case "PullFilter"
-                    obj.Parent.QueryManager.removeFilter(evt.Data.ID);
-                    obj.Parent.update(evt);
+                    if evt.Trigger.isAdded
+                        obj.Parent.QueryManager.removeFilter(evt.Data.ID);
+                    end
+                    obj.Parent.update(evt);    
                 case "EditFilter"
                     obj.Parent.QueryManager.Filters(evt.Data.ID).disableFilter();
                     obj.Parent.update(evt);

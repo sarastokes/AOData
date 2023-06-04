@@ -1,7 +1,7 @@
 classdef EntityBox < aod.app.Component
 % Interface for viewing entity-specific information
 %
-% Parent:
+% Superclasses:
 %   aod.app.Component
 %
 % Constructor:

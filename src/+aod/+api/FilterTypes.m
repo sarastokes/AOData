@@ -49,6 +49,16 @@ classdef FilterTypes
                     out = str2func('aod.api.PathFilter');
             end
         end
+
+        function tf = canBeNested(obj)
+            import aod.api.FilterTypes
+
+            if ismember(obj, [FilterTypes.LINK, FilterTypes.CHILD, FilterTypes.PARENT])
+                tf = true;
+            else
+                tf = false;
+            end
+        end
     end
     
     methods (Static)

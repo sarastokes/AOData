@@ -20,11 +20,12 @@ classdef FilterBox < aod.app.Component
 % -------------------------------------------------------------------------
 
     properties 
-        ID                  double
+        ID                  double      {mustBeInteger}
     end 
 
     properties (Dependent)
         isReady             logical
+        isAdded             logical
         filterType
         numSubfilters       double      {mustBeInteger}
     end
@@ -33,9 +34,9 @@ classdef FilterBox < aod.app.Component
         gridLayout          matlab.ui.container.GridLayout
         fillLayout          matlab.ui.container.GridLayout
 
-        inputBox 
-        filterControls 
-        Subfilters
+        inputBox            % aod.app.query.InputBox
+        filterControls      % aod.app.query.FilterControls
+        Subfilters          % aod.app.query.SubfilterBoxes
     end
 
     methods
@@ -50,6 +51,10 @@ classdef FilterBox < aod.app.Component
 
         function value = get.isReady(obj)
             value = obj.inputBox.isReady;
+        end
+
+        function value = get.isAdded(obj)
+            value = obj.filterControls.isAdded;
         end
 
         function value = get.filterType(obj)
@@ -94,8 +99,28 @@ classdef FilterBox < aod.app.Component
         end
 
         function removeSubfilter(obj, idx)
-            delete(obj.Subfilters(idx));
+            close(obj.Subfilters(idx));
+            obj.Subfilters(idx) = [];
             obj.gridLayout.RowHeight = repmat(obj.FILTER_HEIGHT, [1, 1 + obj.numSubfilters]);
+        end
+
+        function clearAllSubfilters(obj)
+            if isempty(obj.Subfilters)
+                return
+            end
+            for i = numel(obj.Subfilters):-1:1
+                obj.removeSubfilter(i);
+            end
+        end
+    end
+
+    methods 
+        function update(obj, evt)
+            if strcmp(evt.EventType, "ChangedFilterType")
+                if ~evt.Trigger.isSubfilter && ~evt.Data.FilterType.canBeNested
+                    obj.clearAllSubfilters();
+                end
+            end  
         end
     end
 
@@ -137,6 +162,7 @@ classdef FilterBox < aod.app.Component
                 F = [];
                 return
             end
+            
             name = obj.inputBox.getName();
             if startsWith(name, "@")
                 name = str2func(name);
@@ -151,8 +177,6 @@ classdef FilterBox < aod.app.Component
                 F = aod.api.FilterTypes.makeNewFilter(...
                     QM, {obj.filterType, name, inputValue});
             end
-
-            % TODO: Add filters
         end
     end
 end 

@@ -173,12 +173,12 @@ classdef QueryManager < handle
                     error('QueryManager:InvalidInput',...
                         'Input must be string of HDF file name(s) or array of aod.persistent.Experiment');
                 end
-                %! Make hdfName dependent?
-                %if isempty(obj.hdfName)
-                %    obj.hdfName = newName;
-                %else
+                
+                if isempty(obj.hdfName)
+                    obj.hdfName = newName;
+                else
                     obj.hdfName = [obj.hdfName; newName];
-                %end
+                end
                 obj.Experiments = [obj.Experiments; newExpt];
             end
             
