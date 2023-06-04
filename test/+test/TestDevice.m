@@ -9,6 +9,10 @@ classdef TestDevice < aod.core.Device
         ProtectedProp = 123;
     end
 
+    properties (SetAccess = protected)
+        ProtectedSetProp        {mustBeTextScalar} = "test"
+    end
+
     properties (Access = private)
         PrivateProp = 123;
     end
@@ -36,6 +40,15 @@ classdef TestDevice < aod.core.Device
 
         function out = get.HiddenDependentProp(obj)
             out = 123;
+        end
+    end
+
+    methods (Static)
+        function mngr = specifyDatasets(mngr)
+            mngr.set('ProtectedSetProp',...
+                'Description', 'A property with protected set access');
+            mngr.set('PublicProp',...
+                'Description', 'A property with public set access');
         end
     end
 end  

@@ -1,14 +1,14 @@
-classdef SubclassGeneratorController < aod.app.Controller
+classdef CustomSubclassController < aod.app.Controller
 % Controller for subclass generation ui
 %
 % Parent:
 %   aod.app.Controller
 %
 % Constructor:
-%   obj = aod.app.creator.SubclassGeneratorController(model)
+%   obj = aod.app.creator.CustomSubclassController(model)
 %
 % See also:
-%   aod.app.creator.SubclassGenerator, aod.app.creator.SubclassWriter
+%   aod.app.creator.CustomSubclass, aod.app.creator.SubclassWriter
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -27,9 +27,9 @@ classdef SubclassGeneratorController < aod.app.Controller
     end
 
     methods
-        function obj = SubclassGeneratorController(model)
+        function obj = CustomSubclassController(model)
             arguments
-                model   {mustBeA(model, "aod.app.creator.SubclassGenerator")} = aod.app.creator.SubclassGenerator();
+                model   {mustBeA(model, "aod.app.creator.CustomSubclass")} = aod.app.creator.CustomSubclass();
             end
             
             obj@aod.app.Controller(model);
@@ -268,11 +268,7 @@ classdef SubclassGeneratorController < aod.app.Controller
                 set(findByTag(obj.figureHandle, "SuperclassDropdown"),...
                     "Value", obj.Model.SuperClass);
             end
-            T = obj.Model.getAllowableMethods();
-            set(findByTag(obj.figureHandle, "OverloadedMethods"),...
-                "Enable", "on", "Items", [""; T.Name]);
-            set(findByTag(obj.figureHandle, "OverwrittenMethods"),...
-                "Enable", "on", "Items", [""; T.Name]);
+            %T = obj.Model.getAllowableMethods();
             obj.update();
         end
 
@@ -382,29 +378,6 @@ classdef SubclassGeneratorController < aod.app.Controller
             end
             out = h.Value;
             obj.Model.removeLink(out);
-        end
-
-        function onChangedOverloadedMethods(obj, ~, evt)
-            methodList = string(evt.Value)';
-            [success, ME] = obj.trySetModel('overloadedMethods', methodList);
-            if success
-                % TODO Did set method
-            else
-                obj.showError(ME.message);
-                warning(ME.identifier, ME.message);
-            end
-        end
-
-        function onChangedOverwrittenMethods(obj, ~, evt)    
-            % ONCHANGEDOVERWRITTENMETHODS        
-            methodList = string(evt.Value)';
-            [success, ME] = obj.trySetModel('overwrittenMethods', methodList);
-            if success
-                % TODO: Did set method
-            else
-                obj.showError(ME.message);
-                warning(ME.identifier, ME.message);
-            end
         end
 
         function onPushUpdate(obj, ~, ~)

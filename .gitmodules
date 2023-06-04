@@ -15,3 +15,6 @@
 [submodule "lib/weblab"]
 	path = lib/weblab
 	url = https://github.com/lordtumnus/weblab
+[submodule "lib/sparklinesComponent"]
+	path = lib/sparklinesComponent
+	url = https://github.com/MATLAB-Graphics-and-App-Building/sparklinesComponent

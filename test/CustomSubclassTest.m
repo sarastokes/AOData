@@ -1,13 +1,13 @@
-classdef SubclassGeneratorTest < matlab.uitest.TestCase
+classdef CustomSubclassTest < matlab.uitest.TestCase
 % Tests the subclass generator classes
 %
 % Syntax:
-%   results = runtests('SubclassGeneratorTest')
+%   results = runtests('CustomSubclassTest')
 %
 % See also:
 %   runAODataTestSuite, runTestWithDebug, runtests
 %
-% Tags of SubclassGeneratorController uicomponents:
+% Tags of CustomSubclassController uicomponents:
 % Buttons: "WriteButton", "UpdateButton", "FileBrowserButton"
 %          "AddDatasetButton", "RemoveDatasetButton", "EditDatasetButton"
 % Panels: "ClassNamePanel", "FilePathPanel", "EntityTypePanel", 
@@ -17,7 +17,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
 % ListBoxes: "DatasetListBox", "LinkListBox", "AttributeListBox"
 % EditBoxes: "ClassName", "FilePath", "DefaultGroupName"
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties
@@ -26,7 +26,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
 
     methods (TestClassSetup)
         function MakeBaseModel(testCase)
-            testCase.MODEL = aod.app.creator.SubclassGenerator();
+            testCase.MODEL = aod.app.creator.CustomSubclass();
             testCase.MODEL.ClassName = "DeviceSubclass";
             testCase.MODEL.FilePath = pwd;
             testCase.MODEL.EntityType = 'Device';
@@ -56,8 +56,8 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
     end
 
     methods (Test, TestTags=["Model"])
-        function SubclassGenerator(testCase)
-            M = aod.app.creator.SubclassGenerator('MyNewClass');
+        function CustomSubclass(testCase)
+            M = aod.app.creator.CustomSubclass('MyNewClass');
             testCase.verifyEqual(M.ClassName, "MyNewClass");
 
             D1 = aod.util.templates.PropertySpecification('Dset1');
@@ -73,7 +73,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Controller", "SubclassGenerator"])
+    methods (Test, TestTags=["Controller", "CustomSubclass"])
         function AppOpenClose(testCase)
             [model, app] = AODataSubclassCreator();
             app.show();
@@ -102,12 +102,12 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
 
         function InputNamePathEntity(testCase)
-            model = aod.app.creator.SubclassGenerator();
+            model = aod.app.creator.CustomSubclass();
             model.ClassName = "Demo1";
             model.FilePath = pwd;
             model.EntityType = 'Device';
 
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             % Verify class name
@@ -133,13 +133,13 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end 
 
         function SetSuperclass(testCase)
-            model = aod.app.creator.SubclassGenerator();
+            model = aod.app.creator.CustomSubclass();
             model.ClassName = "DeviceSubclass";
             model.FilePath = pwd;
             model.EntityType = 'Device';
             model.SuperClass = "aod.core.Device";
 
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             % Verify entity type
@@ -167,12 +167,12 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
     end
 
-    methods (Test, TestTags=["GroupName", "SubclassGenerator"])
+    methods (Test, TestTags=["GroupName", "CustomSubclass"])
         function GroupNames(testCase)
 
             % Setup
             model = testCase.getBaseModel();
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             groupBox = findByTag(fig, "GroupNameDropdown");
@@ -237,12 +237,12 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Datasets", "SubclassGenerator"])
+    methods (Test, TestTags=["Datasets", "CustomSubclass"])
         function ModelAddDataset(testCase)
 
             % Setup
             model = testCase.getBaseModel();
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             prop = aod.util.templates.PropertySpecification('Prop1');
@@ -278,7 +278,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         function DatasetSpecification1(testCase)
             % Test required properties with description and makeFcn
             model = testCase.getBaseModel();
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             % Create a required property w/ a set function
@@ -309,7 +309,7 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         function DatasetSpecification2(testCase)
             % Test optional properties with default & validation
             model = testCase.getBaseModel();
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             % Create an optional property with default + validation
@@ -340,14 +340,14 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Links", "SubclassGenerator"])
+    methods (Test, TestTags=["Links", "CustomSubclass"])
         function LinkSpecification(testCase)
-            model = aod.app.creator.SubclassGenerator();
+            model = aod.app.creator.CustomSubclass();
             model.ClassName = "AnnotationSubclass";
             model.FilePath = pwd;
             model.EntityType = 'Annotation';
             model.SuperClass = "aod.core.Annotation";
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             % Create a link to a Source
@@ -384,12 +384,12 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
 
         function ModelAddLink(testCase)
             % Setup
-            model = aod.app.creator.SubclassGenerator();
+            model = aod.app.creator.CustomSubclass();
             model.ClassName = "SystemSubclass";
             model.FilePath = pwd;
             model.EntityType = 'System';
             model.SuperClass = "aod.core.System";
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             prop = aod.util.templates.LinkSpecification('Link1', 'Source');
@@ -416,16 +416,16 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Attributes", "SubclassGenerator"])
+    methods (Test, TestTags=["Attributes", "CustomSubclass"])
         function AttributeSpecification(testCase)
             
-            model = aod.app.creator.SubclassGenerator();
+            model = aod.app.creator.CustomSubclass();
             model.ClassName = "ChannelSubclass";
             model.FilePath = pwd;
             model.EntityType = 'Channel';
             model.SuperClass = "aod.core.Channel";
 
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             % Attribute with a set function and description
@@ -473,13 +473,13 @@ classdef SubclassGeneratorTest < matlab.uitest.TestCase
 
         function ModelAddAttribute(testCase)
         
-            model = aod.app.creator.SubclassGenerator();
+            model = aod.app.creator.CustomSubclass();
             model.ClassName = "ChannelSubclass";
             model.FilePath = pwd;
             model.EntityType = 'Channel';
             model.SuperClass = "aod.core.Channel";
 
-            app = aod.app.creator.SubclassGeneratorController(model);
+            app = aod.app.creator.CustomSubclassController(model);
             fig = app.getView();
 
             prop = aod.util.templates.AttributeSpecification('Attr1');

@@ -5,15 +5,15 @@ function [model, app] = AODataSubclassCreator(model)
 %   [model, app] = AODataSubclassCreator(model)
 %
 % See also:
-%   aod.app.creator.SubclassGenerator, aod.app.creator.SubclassWriter, 
-%   aod.app.creator.SubclassGeneratorController
+%   aod.app.creator.CustomSubclass, aod.app.creator.SubclassWriter, 
+%   aod.app.creator.CustomSubclassController
 %
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
     if nargin < 1
-        model = aod.app.creator.SubclassGenerator();
+        model = aod.app.creator.CustomSubclass();
     end
 
-    app = aod.app.creator.SubclassGeneratorController(model);
+    app = aod.app.creator.CustomSubclassController(model);

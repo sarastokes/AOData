@@ -11,7 +11,7 @@ The AOData test suite currently contains the following:
   - ```AODataManagerTest``` - tests display, preference setting and interaction with AODataManagerApp
   - ```AOQueryAppTest``` - tests user interface for building AOData queries
   - ```AODataViewerTest``` - tests display and user interaction with the AODataViewer app
-  - ```SubclassGeneratorTest``` - tests the framework and UI for generating template subclasses
+  - ```CustomSubclassTest``` - tests the framework and UI for generating template subclasses
 - Built-in classes:
   - ```BuiltinClassTest``` - tests operation of builtin subclasses. 
   - ```FileReaderTest``` - tests builtin file readers

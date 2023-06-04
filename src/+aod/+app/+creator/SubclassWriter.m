@@ -5,7 +5,7 @@ classdef SubclassWriter < handle
 %   obj = aod.app.creator.SubclassWriter(model)
 %
 % See also:
-%    aod.app.creator.SubclassGenerator
+%    aod.app.creator.CustomSubclass
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

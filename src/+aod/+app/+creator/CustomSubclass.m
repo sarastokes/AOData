@@ -1,11 +1,11 @@
-classdef SubclassGenerator < handle
+classdef CustomSubclass < handle
 % Model for generating template subclass files
 %
 % Constructor:
-%   obj = aod.app.creator.SubclassGenerator(name)
+%   obj = aod.app.creator.CustomSubclass(name)
 %
 % See also:
-%   AODataSubclassCreator, aod.app.creator.SubclassGeneratorController
+%   AODataSubclassCreator, aod.app.creator.CustomSubclassController
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -27,8 +27,8 @@ classdef SubclassGenerator < handle
         defaultName             string          = string.empty()
         defineLabel             logical         = false
         
-        overloadedMethods       string          = string.empty()
-        overwrittenMethods      string          = string.empty()
+        % overloadedMethods       string          = string.empty()
+        % overwrittenMethods      string          = string.empty()
     end
 
     properties (SetAccess = protected) 
@@ -47,7 +47,7 @@ classdef SubclassGenerator < handle
     end
 
     methods
-        function obj = SubclassGenerator(name)
+        function obj = CustomSubclass(name)
             if nargin > 0
                 obj.ClassName = name;
             end
@@ -316,25 +316,25 @@ classdef SubclassGenerator < handle
     end
 
     % Inheritance methods
-    methods
-        function set.overloadedMethods(obj, value)
-            arguments
-                obj
-                value           string
-            end
+    % methods
+    %     function set.overloadedMethods(obj, value)
+    %         arguments
+    %             obj
+    %             value           string
+    %         end
 
-            obj.overloadedMethods = value;
-        end
+    %         obj.overloadedMethods = value;
+    %     end
 
-        function set.overwrittenMethods(obj, value)
-            arguments
-                obj
-                value           string
-            end
+    %     function set.overwrittenMethods(obj, value)
+    %         arguments
+    %             obj
+    %             value           string
+    %         end
             
-            obj.overwrittenMethods = value;
-        end
-    end
+    %         obj.overwrittenMethods = value;
+    %     end
+    % end
 
     % Support methods
     methods
