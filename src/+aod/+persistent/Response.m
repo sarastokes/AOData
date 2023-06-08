@@ -31,7 +31,7 @@ classdef Response < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
-            % Special handling of Timing w/ implicit inheritance from Epoch
+            %! Special handling of Timing w/ implicit inheritance from Epoch
             info = h5info(obj.hdfName, obj.hdfPath);
             if ~isempty(info.Groups) && contains(info.Groups(1).Name, 'Timing')
                 obj.Timing = obj.factory.create(info.Groups.Name);

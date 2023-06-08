@@ -64,7 +64,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             end 
             
             obj.protocolClass = class(protocol);
-            obj.DateProtocolCreated = protocol.DateCreated;
+            obj.DateProtocolCreated = protocol.dateCreated;
             obj.setFile('Protocol', fileparts(protocol.getFileName()));
             [~, obj.protocolName, ~] = fileparts(protocol.getFileName());
             obj.getProtocolParameters(protocol);

@@ -173,10 +173,33 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
     methods (Test, TestTags={'Annotations'})
         function Rois(testCase)
-            data = randi([1 400], 360, 242);
-            obj = aod.builtin.annotations.Rois('851_OSR_20220823',...
-                data, 'Size', [360, 242]);
-            testCase.verifyEqual(obj.numRois, numel(unique(data(:))));
+            data = zeros(360, 242);
+            counter = 0;
+            for i = 100:5:200
+                counter = counter+1;
+                data(i,i-1:i) = counter;
+            end
+            im = randi([1 400], 360, 242);
+            obj = aod.builtin.annotations.Rois('851_OSR_20220823', data,...
+                'Size', [360, 242], 'Image', im);
+            testCase.verifyEqual(obj.numRois, 21);
+            testCase.verifyEqual(obj.Data, data);
+            testCase.verifyEqual(obj.Image, im);
+        end
+
+        function RoisFromReader(testCase)
+            reader = aod.builtin.readers.ImageJRoiReader(...
+                fullfile(testCase.dataFolder, 'RoiSet.zip'), [242, 360]);
+            obj = aod.builtin.annotations.Rois('851_OSR_20230314', reader,...
+                'Source', aod.core.Source('RoiSource'));
+            testCase.verifyEqual(out.files('AnnotationData'), reader.fullFile);
+            testCase.verifyEqual(out.Source.Name, 'RoiSource');
+        end
+
+        function RoiErrors(testCase)
+            testCase.verifyError(...
+                @() aod.builtin.annotations.Rois(fullfile(testCase.dataFolder, 'RoiSet.zip')),...
+                'findFileReader:UnknownExtension');
         end
     end
 

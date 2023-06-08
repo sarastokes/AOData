@@ -78,7 +78,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     % Calibrations
     calibration1 = aod.builtin.calibrations.PowerMeasurement(...
         'Mustang', getDateYMD(), 488);
-    calibration1.addMeasurement(24:26, 16:18);
+    calibration1.addMeasurements({24 16}, {25 17}, {26 18});
     experiment.add(calibration1);
 
     calibration2 = aod.builtin.calibrations.ChannelOptimization([],...

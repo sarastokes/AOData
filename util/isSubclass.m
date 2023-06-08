@@ -28,6 +28,10 @@ function tf = isSubclass(x, className)
         x
         className           string
     end
+    
+    if isstring(x) && ~isscalar(x)
+        x = x(1);
+    end
 
     % Parse class name
     if istext(x) && exist(x, 'class')

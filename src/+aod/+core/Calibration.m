@@ -39,7 +39,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % See Also:
 %   aod.persistent.Calibration
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -134,9 +134,11 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             mngr.set("Target",...
                 "Size", "(1,1)",...
                 "Function", {@mustBeScalarOrEmpty, ...
-                    @(x) aod.util.mustBeEntityType(x, ["System", "Channel", "Device"])});
+                    @(x) aod.util.mustBeEntityType(x, ["System", "Channel", "Device"])},...
+                "Description", "Target of the calibration");
             mngr.set("calibrationDate",...
-                "Size", "(1,1)");
+                "Size", "(1,1)",...
+                "Description", "Date the calibration was performed");
         end
     end
 end

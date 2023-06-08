@@ -1,11 +1,11 @@
-classdef PowerMeasurement < aod.core.Calibration
+classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
 % POWERMEASUREMENT
 %
 % Description:
 %   Measurements of a light source's power at various settings
 %
-% Parent:
-%   aod.core.Calibration
+% Superclasses:
+%   aod.builtin.calibrations.MeasurementTable
 %
 % Constructor:
 %   obj = PowerMeasurement(name, calibrationDate, wavelength, varargin);
@@ -26,84 +26,24 @@ classdef PowerMeasurement < aod.core.Calibration
 %   settingUnit) in their constructors. If greater flexibility is needed,
 %   use the setValueUnit(), setSettingUnit() and setWavelength() functions
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        measurements
-    end
-
-    properties (Access = private)
-        Setting
-        Value
-    end
-
     methods 
-        function obj = PowerMeasurement(name, calibrationDate, wavelength, varargin)
-            obj = obj@aod.core.Calibration(name, calibrationDate);
+        function obj = PowerMeasurement(name, calibrationDate, wavelength, colNames, units, varargin)
+
+            if nargin < 4 || isempty(colNames)
+                colNames = ["Setting", "Power"];
+            end
+
+            if nargin < 5 || isempty(units)
+                units = ["%", "microwatts"];
+            end
+            obj = obj@aod.builtin.calibrations.MeasurementTable(name, ...
+                calibrationDate, colNames, units, varargin{:});
             
             % Required input parsing
             obj.setAttr('Wavelength', wavelength);
-        end
-
-        function T = table(obj)
-            % TABLE
-            %
-            % Description:
-            %   Convert Setting and Value to a table
-            %
-            % Syntax:
-            %   T = table(obj)
-            % -------------------------------------------------------------
-            if isempty(obj.Setting)
-                error('PowerMeasurement: No measurements found');
-            end
-            T = table(obj.Setting, obj.Value,...
-                'VariableNames', {'Setting', 'Power'});
-            T.Properties.VariableUnits = [obj.getAttr('SettingUnit'), obj.getAttr('ValueUnit')];
-        end
-
-        function addMeasurement(obj, setting, value)
-            % ADDMEASUREMENT
-            %
-            % Description:
-            %   Add measurement(s)
-            %
-            % Syntax:
-            %   addMeasurement(obj, setting, value)
-            %
-            % Example:
-            %   obj.addMeasurement(20, 16.5);
-            %   obj.addMeasurement("High", 270);
-            %   obj.addMeasurement([1 100], [3.3 260]);
-            % -------------------------------------------------------------
-            if isrow(setting)
-                setting = setting';
-            end
-            if isrow(value)
-                value = value';
-            end
-            for i = 1:size(setting, 1)
-                obj.Setting = cat(1, obj.Setting, setting(i));
-                obj.Value = cat(1, obj.Value, value(i));
-            end
-            obj.measurements = obj.table();
-        end
-
-        function loadTable(obj, measurementTable)
-            % LOADTABLE 
-            %
-            % Description:
-            %   loadTable(obj, measurementTable)
-            % -------------------------------------------------------------
-            
-            if istext(measurementTable)
-                T = readmatrix(measurementTable);
-                obj.setFile('Calibration', measurementTable);
-            elseif istable(measurementTable)
-                obj.Setting = measurementTable.Setting;
-                obj.Value = measurementTable.Value;
-            end
         end
     end
 
@@ -120,10 +60,13 @@ classdef PowerMeasurement < aod.core.Calibration
 
             value.add('Wavelength', double.empty(), @isnumeric,...
                 "The wavelength of the light source being measured");
-            value.add('ValueUnit', "normalized", @isstring,...
-                "The units for the dependent variables");
-            value.add('SettingUnit', "microwatt", @isstring,...
-                "The units for the independent (measured) variables");
+        end
+
+        function mngr = specifyDatasets(mngr)
+            mngr = specifyDatasets@aod.core.Calibration(mngr);
+
+            mngr.set('Measurements',...
+                'Class', 'table');
         end
     end
 end

@@ -235,38 +235,59 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Dataset methods
     methods
-        function addDataset(obj, propName, propValue)
+        function addDataset(obj, propName, propValue, ignoreValidation)
             % Add a new property (dataset/link) to the entity
             %
             % Syntax:
-            %   addDataset(obj, dsetName, dsetValue)
+            %   addDataset(obj, dsetName, dsetValue, ignoreValidation)
             %
-            % TODO: Add system datasets check
+            % Inputs:
+            %   propName            char
+            %       The property's name (HDF5 dataset name)
+            %   propValue           
+            %       The value of the property 
+            %
+            % Optional inputs:
+            %   ignoreValidation    logical
+            %       Whether to write even if the new value fails validation
             % -------------------------------------------------------------
             arguments
                 obj
                 propName            char
                 propValue           
+                ignoreValidation    logical = false   
             end
 
             obj.verifyReadOnlyMode();
 
-            % Check in expectedDatasets
-            descriptor = obj.expectedDatasets.get(propName);
-            %! Add descriptors
+            % Check whether the value can be validated with specs
+            propSpec = obj.expectedDatasets.get(dsetName);
+            if ~isempty(propSpec)
+                isValid = propSpec.validate(dsetValue);
+                if ~isValid 
+                    id = 'modifyDataset:InvalidValue';
+                    msg = "Value did not pass specs in expectedDatasets. " + ... 
+                           "Rerun with ignoreValidation=false to ignore.";
+                    if ignoreValidation
+                        warning(id, msg);
+                    else
+                        error(id, msg);
+                    end
+                end
+            end
 
             [isEntity, isPersisted] = aod.util.isEntity(propValue);
 
             % Make the change in the HDF5 file
             if isEntity
                 if isPersisted
-                    obj.setLink(propName, propValue);
+                    obj.modifyLink(propName, propValue);
                 else
                     error("addDataset:UnpersistedLink",...
                         "Links can only be written to persisted entities");
                 end
             else
-                obj.setDataset(propName, propValue);
+                obj.modifyDataset(propName, propValue);
             end
         end
 
@@ -319,15 +340,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             % Process as HDF5 link or dataset
             if ismember(propName, obj.dsetNames)
-                obj.setDataset(propName, []);
+                obj.modifyDataset(propName, []);
             elseif ismember(propName, obj.linkNames)
-                obj.setLink(propName, []);
+                obj.modifyLink(propName, []);
             end
 
-            %! Keep empty prop while MATLAB obj is up???
-            if isa(p, 'meta.DynamicProperty')
-                delete(p);
-            end
+            % Note that the dynamic property will not be deleted
         end  
     end
 
@@ -392,7 +410,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %answer = aod.app.diglogs.NameChangeDialog();
 
             % Make the change in the HDF5 file
-            obj.setDataset('Name', name);
+            obj.modifyDataset('Name', name);
 
             % Make the change in the MATLAB object
             obj.Name = name;
@@ -412,7 +430,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.verifyReadOnlyMode();
 
             % Make the change in the HDF5 file
-            obj.setDataset('description', obj, txt);
+            obj.modifyDataset('description', obj, txt);
 
             % Make the change in the MATLAB object
             obj.description = txt;
@@ -438,7 +456,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             % Make the change in the HDF5 file
-            obj.setDataset('notes', newValue);
+            obj.modifyDataset('notes', newValue);
 
             % Make the change in the MATLAB object
             obj.notes = newValue;
@@ -466,7 +484,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
 
             % Make the change in the HDF5 file
-            obj.setDataset('notes', newValue);
+            obj.modifyDataset('notes', newValue);
             
             % Make the change in the MATLAB object
             obj.notes = newValue;
@@ -799,12 +817,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             obj.loadInfo();
 
-            % DATASETS
+            % DATASETS -----------
             obj.description = obj.loadDataset('description');
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
             obj.files = obj.loadDataset('files', 'aod.common.KeyValueMap');
-            
+
             expectedAttrs = obj.loadDataset('expectedAttributes');
             if ~isempty(expectedAttrs)
                 obj.expectedAttributes = expectedAttrs;
@@ -815,10 +833,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 obj.expectedDatasets = expectedDsets;
             end
 
-            % LINKS
+            % LINKS -----------
             obj.Parent = obj.loadLink('Parent');
 
-            % ATTRIBUTES
+            % ATTRIBUTES -----------
             % Universial attributes that map to properties, not attributes
             specialAttributes = ["UUID", "Class", "EntityType", "LastModified", "DateCreated", "label"];
             obj.label = obj.loadAttribute('label');
@@ -948,28 +966,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Dynamic property methods
     methods (Access = protected)
-        function p = createDynProp(obj, propName, propType, propValue)
-            % Add a dynamic property related to an HDF5 link/dataset
-            %
-            % Syntax:
-            %   p = createDynProp(obj, propName, propType)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                propName            char
-                propType            {mustBeMember(propType, {'Link', 'Dataset'})}
-                propValue           = []'
-            end
-
-            p = obj.addprop(propName);
-            switch propType
-                case 'Link'
-                    obj.setLink(propName, propValue)
-                case 'Dataset'
-                    p.SetMethod = @obj.setDataset;
-            end
-        end
-
         function deleteDynProp(obj, propName)
             % Delete a dynamic property from entity and in HDF5 file
             %
@@ -997,15 +993,36 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             for i = 1:numel(obj.dsetNames)
                 p = findprop(obj, obj.dsetNames(i));
                 if isempty(p)
-                %if ~isprop(obj, obj.dsetNames(i))
                     p = obj.addprop(obj.dsetNames(i));
-                    p.Description = 'Dataset';
+                    propSpec = obj.expectedDatasets.get(obj.dsetNames(i));
+                    if isempty(propSpec)
+                        p.Description = propSpec.Description;
+                    else
+                        p.Description = 'Dataset';
+                    end
                     dsetValue = aod.h5.read(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                     obj.(obj.dsetNames(i)) = dsetValue;
                 elseif isa(p, 'meta.DynamicProperty')
                     dsetValue = aod.h5.read(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
+                    obj.(obj.dsetNames(i)) = dsetValue;
+                    warning('setDatasetsToDynProps:Deprecation',...
+                        'This method will be deprecated soon!');
+                end
+            end
+
+            if isempty(obj.expectedDatasets)
+                return
+            end
+
+            emptyDsets = setdiff(obj.expectedDatasets.list, obj.dsetNames);
+            for i = 1:numel(emptyDsets)
+                p = findprop(obj, emptyDsets(i));
+                if isempty(p)
+                    p = obj.addprop(emptyDsets(i));
+                    propSpec = obj.expectedDatasets.get(emptyDsets(i));
+                    p.Description = propSpec.Description.Value;
                 end
             end
         end
@@ -1027,7 +1044,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             for i = 1:numel(obj.linkNames)
                 p = findprop(obj, obj.linkNames(i));
                 if isempty(p)
-                %if ~isprop(obj, obj.linkNames(i))
                     % Create new dynamic property
                     p = obj.addprop(obj.linkNames(i));
                     p.Description = 'Link';
@@ -1067,11 +1083,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.LastModified = newValue;
         end
 
-        function setLink(obj, linkName, linkValue)
+        function modifyLink(obj, linkName, linkValue)
             % Modify a softlink in entity's HDF5 group
             %
             % Syntax:
-            %   setLink(obj, linkName, linkValue)
+            %   modifyLink(obj, linkName, linkValue)
             % -------------------------------------------------------------
             arguments
                 obj
@@ -1083,7 +1099,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             notify(obj, 'LinkChanged', evtData);
 
             if ~ismember(linkName, obj.linkNames)
-                %obj.createDynProp(linkName, 'Link');
                 h = obj.addprop(linkName);
                 h.Description = 'Link';
             end
@@ -1097,16 +1112,16 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.loadInfo();
         end
 
-        function setDataset(obj, dsetName, dsetValue)
+        function modifyDataset(obj, dsetName, dsetValue)
             % Modify a dataset in entity's HDF5 group
             %
             % Syntax:
-            %   setDataset(obj, dsetName, dsetValue)
+            %   modifyDataset(obj, dsetName, dsetValue)
             % -------------------------------------------------------------
 
             arguments
                 obj
-                dsetName            char        = ''
+                dsetName            char        
                 dsetValue                       = []
             end
 

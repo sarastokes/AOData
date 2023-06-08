@@ -34,8 +34,8 @@ classdef TiffReader < aod.common.FileReader
     end
 
     methods (Static)
-        function out = read(fileName)
-            obj = aod.util.readers.TiffReader(fileName);
+        function out = read(varargin)
+            obj = aod.util.readers.TiffReader(varargin{:});
             out = obj.readFile();
         end
     end

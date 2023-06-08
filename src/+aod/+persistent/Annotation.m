@@ -37,11 +37,7 @@ classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             % Syntax:
             %   setData(obj, data)
             % -------------------------------------------------------------
-            obj.Data = data;
-
-            evtData = aod.persistent.events.DatasetEvent('Data',...
-                data, obj.Data);
-            notify(obj, 'DatasetChanged', evtData);
+            obj.addDataset('Data', data);
         end
     end
 
@@ -54,6 +50,10 @@ classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
             % LINKS
             obj.Source = obj.loadLink("Source");
+
+            % Add additional user-defined datasets and links
+            obj.setDatasetsToDynProps();
+            obj.setLinksToDynProps();
         end
     end
 end

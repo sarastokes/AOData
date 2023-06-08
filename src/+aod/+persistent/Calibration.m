@@ -33,8 +33,9 @@ classdef Calibration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyna
             populate@aod.persistent.Entity(obj);
 
             obj.calibrationDate = obj.loadDataset('calibrationDate');
-            obj.setDatasetsToDynProps();
             
+            % Add additional user-defined datasets and links
+            obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
         end
     end

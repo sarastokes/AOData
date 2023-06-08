@@ -23,6 +23,8 @@ classdef DichroicFilter < aod.core.Device
 % Methods:
 %   setWavelength(obj, wavelength)
 %   setTransmission(obj, spectrum)
+
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -74,8 +76,9 @@ classdef DichroicFilter < aod.core.Device
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = [num2str(obj.getAttr('Wavelength')), 'nm',...
-                appbox.capitalize(obj.getAttr('Pass')), 'Pass', 'Filter'];
+            value = sprintf('%unm%sPassFilter',... 
+                obj.getAttr('Wavelength'),...
+                appbox.capitalize(obj.getAttr('Pass')));
         end
     end
 

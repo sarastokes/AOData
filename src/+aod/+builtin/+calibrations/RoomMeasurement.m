@@ -4,7 +4,7 @@ classdef RoomMeasurement < aod.core.Calibration
 % Description:
 %   Record of room measurements made during the experiment
 %
-% Parent:
+% Superclasses:
 %   aod.core.Calibration
 % 
 % Syntax:
@@ -19,13 +19,10 @@ classdef RoomMeasurement < aod.core.Calibration
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        measurements
-    end
-
     methods
         function obj = RoomMeasurement(calibrationDate, varargin)
-            obj = obj@aod.core.Calibration('RoomMeasurement', calibrationDate);
+            obj = obj@aod.core.Calibration('RoomMeasurement', calibrationDate,...
+                ["Time", "Temperature", "Humidity"], ["HH:mm", "Degrees F", "%"]);
         end
 
         function addMeasurement(obj, timestamp, temperature, humidity)
@@ -39,14 +36,21 @@ classdef RoomMeasurement < aod.core.Calibration
             % -------------------------------------------------------------
             arguments
                 obj
-                timestamp               string
+            end
+
+            arguments (Repeating)
+                timestamp               
                 temperature             double
                 humidity                double
+            end
+            % z = reshape([timestamp; temperature; humidity], 1, []);
+
+            if isdatetime(timestamp)
+                datestamp = arrayfun(@(x) datetime(x, 'Format', 'HH:mm'), timestamp);
             end
 
             for i = numel(timestamp)
                 datestamp = datetime(timestamp(i), 'Format', 'HH:mm');
-                %dur = obj.hoursmins2duration(timestamp(i));
                 T = cell2table({datestamp, temperature(i), humidity(i)});
                 T.Properties.VariableNames = {'Time', 'Temperature', 'Humidity'};
                 T.Properties.VariableUnits = ["HH:mm", "Degrees F", "%"];

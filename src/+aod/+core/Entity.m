@@ -227,6 +227,25 @@ classdef (Abstract) Entity < handle
                 end
             end
         end
+
+        function out = getGroupName(obj)
+            % Get the entity's HDF5 group name
+            %
+            % Description:
+            %   Can be accessed through the groupName property; however, 
+            %   this function supports groupName access for multiple 
+            %   entities at once. 
+            %
+            % Syntax:
+            %   out = getGroupName(obj)
+            % -------------------------------------------------------------
+            if ~isscalar(obj)
+                out = arrayfun(@(x) string(x.groupName), obj);
+                return
+            end
+
+            out = string(obj.groupName);
+        end
     end
 
     methods (Sealed)
@@ -879,7 +898,7 @@ classdef (Abstract) Entity < handle
             end
 
             existingEntities = obj.Parent.(containerName);
-            groupNames = string({existingEntities.groupName});
+            groupNames = getGroupName(existingEntities);
             if ismember(obj.label, groupNames)
                 isUnique = false;
                 warning("Entity:DuplicateGroupName",...

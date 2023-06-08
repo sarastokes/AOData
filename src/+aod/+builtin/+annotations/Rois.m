@@ -70,22 +70,7 @@ classdef Rois < aod.core.Annotation
             obj.setReader(ip.Results.Reader);
             obj.setImage(ip.Results.Image);
 
-            %if isSubclass(rois, 'aod.common.FileReader')
-            %    obj.Reader = rois;
-            %    obj.load(obj.Reader);
-            %else
-            %    obj.load(rois);
-            %end
-
-            % Assign Reader, if necessary. If "rois" are text, it is 
-            % assumed they represent a file name
-            if istext(rois) && isfile(rois)
-                obj.setFile(rois);
-                if isempty(obj.Reader)
-                    obj.setReader(aod.util.findFileReader(rois));
-                end
-                obj.load();
-            end
+            obj.load(rois);
         end
     end
 
@@ -100,17 +85,12 @@ classdef Rois < aod.core.Annotation
             %   rois            numeric, string/char, aod.common.FileReader
             % -------------------------------------------------------------
 
-            if nargin < 2
-                obj.setMap(obj.Reader.readFile());
-                return
-            end
-
             if ~isa(obj.Data, 'double')
                 obj.setMap(rois);
                 return
             end
 
-            if isfile(rois)
+            if istext(rois) && isfile(rois)
                 if isempty(obj.Reader)
                     obj.Reader = aod.util.findFileReader(rois);
                 else
@@ -121,7 +101,9 @@ classdef Rois < aod.core.Annotation
             end
 
             obj.setMap(obj.Reader.readFile());
-            obj.setFile('ROIs', obj.Reader.fullFile);
+            if ~isempty(obj.Reader)
+                obj.setFile('AnnotationData', obj.Reader.fullFile);
+            end
         end
            
         function reload(obj)
@@ -136,7 +118,6 @@ classdef Rois < aod.core.Annotation
             end
             newMap = obj.Reader.reload();
             obj.setMap(newMap);
-            obj.setMetadata();
         end
 
         function setReader(obj, reader)

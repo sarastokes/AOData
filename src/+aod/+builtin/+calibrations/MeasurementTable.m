@@ -1,13 +1,24 @@
 classdef MeasurementTable < aod.core.Calibration 
-% Calibrations stored in a table
+% Calibrations stored in a table, useful base for custom subclasses
 %
 % Superclasses:
 %   aod.core.Calibration
 %
+% Constructor:
+%   obj = aod.builtin.calibrations.MeasurementTable(name, calibrationDate,...
+%       colNames, units, varargin)
+%
+% Methods:
+%   addMeasurements(obj, varargin)
+%   removeMeasurements(obj, idx)
+%   loadTable(obj, measurementTable)
+%
 % Example:
 %   obj = aod.builtin.calibrations.MeasurementTable('Demo', '20230314',...
 %       ["Setting", "Value"], ["%", "uW"]);
-
+%
+% See also:
+%   aod.builtin.calibrations.PowerMeasurement
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -17,26 +28,14 @@ classdef MeasurementTable < aod.core.Calibration
         Measurements        table 
     end
 
-    properties (Dependent)
-        numMeasurements     double  {mustBeInteger}
-    end
-
     methods
-        function obj = MeasurementTable(name, calibrationDate, measurements, units)
-            obj@aod.core.Calibration(name, calibrationDate);
+        function obj = MeasurementTable(name, calibrationDate, colNames, units, varargin)
+            obj@aod.core.Calibration(name, calibrationDate, varargin{:});
             
-            obj.Measurements = table.empty(0, numel(measurements));
-            obj.Measurements.Properties.VariableNames = measurements;
+            obj.Measurements = table.empty(0, numel(colNames));
+            obj.Measurements.Properties.VariableNames = colNames;
             if nargin > 3 && ~isempty(units)
-                obj.Table.Properties.VariableUnits = units;
-            end
-        end
-
-        function value = get.numMeasurements(obj)
-            if isempty(obj)
-                value = 0;
-            else
-                value = height(obj.Measurements);
+                obj.Measurements.Properties.VariableUnits = units;
             end
         end
     end
@@ -78,11 +77,32 @@ classdef MeasurementTable < aod.core.Calibration
             % -------------------------------------------------------------
             obj.Measurements(idx, :) = [];
         end
+  
+        function loadTable(obj, measurementTable)
+            % LOADTABLE 
+            %
+            % Description:
+            %   loadTable(obj, measurementTable)
+            % -------------------------------------------------------------
+            
+            if istext(measurementTable)
+                T = readmatrix(measurementTable);
+                obj.setFile('Calibration', measurementTable);
+            elseif istable(measurementTable)
+                T = measurementTable;
+            end
+            % Check column names
+        end
     end 
 
     % MATLAB builtin methods
     methods
         function tf = isempty(obj)
+            % Whether the measurement table is empty
+            % 
+            % Syntax:
+            %   tf = isempty(obj)
+            % -------------------------------------------------------------
             tf = isempty(obj.Measurements);
         end
 
@@ -93,6 +113,15 @@ classdef MeasurementTable < aod.core.Calibration
             %   T = table(obj)
             % -------------------------------------------------------------
             T = obj.Measurements;
+        end
+    end
+
+    methods (Static)
+        function mngr = specifyDatasets(mngr)
+            mngr = specifyDatasets@aod.core.Calibration(mngr);
+
+            mngr.add('Measurements',...
+                'Class', 'table');
         end
     end
 end 

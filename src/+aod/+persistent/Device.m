@@ -26,6 +26,7 @@ classdef Device < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
+            % Add user-defined datasets and links
             obj.setDatasetsToDynProps();
             obj.setLinksToDynProps();
         end

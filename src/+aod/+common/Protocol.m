@@ -36,17 +36,17 @@ classdef (Abstract) Protocol < handle
 % Methods (to be redefined by subclasses if needed):
 %   stim = mapToStimulator(obj)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties  
-        Calibration     aod.core.Calibration    = aod.core.Calibration.empty()
-        DateCreated     datetime                = datetime.empty()
+        Calibration                         = aod.core.Calibration.empty()
+        dateCreated     datetime            = datetime.empty()
     end
 
     properties (Abstract, SetAccess = protected)
-        sampleRate(1,1)     double
-        stimRate(1,1)       double
+        sampleRate (1,1)     double
+        stimRate (1,1)       double
     end
 
     % Abstract methods must be defined by subclasses (see ProtocolTemplate)
@@ -64,7 +64,7 @@ classdef (Abstract) Protocol < handle
                 obj.Calibration = aod.core.Calibration.empty();
             end
 
-            obj.DateCreated = getDateYMD();
+            obj.dateCreated = getDateYMD();
         end
 
         function setCalibration(obj, calibration)
@@ -73,6 +73,10 @@ classdef (Abstract) Protocol < handle
             % Notes:
             %   Argument validation handled by property definition
             % -------------------------------------------------------------
+            if ~aod.util.isEntitySubclass('calibration')
+                error('setCalibration:InvalidInput',...
+                    'Protocol calibration must be of entity type Calibration');
+            end
             obj.Calibration = calibration;
         end
     end
