@@ -1,14 +1,14 @@
-classdef RoomMeasurement < aod.core.Calibration 
+classdef RoomMeasurement < aod.builtin.calibrations.MeasurementTable 
 % Measurements of temperature and humidity during experiment
 %
 % Description:
 %   Record of room measurements made during the experiment
 %
 % Superclasses:
-%   aod.core.Calibration
+%   aod.builtin.calibrations.MeasurementTable 
 % 
 % Syntax:
-%   obj = aod.builtin.calibrations.RoomMeasurement(calibrationDate)
+%   obj = aod.builtin.calibrations.RoomMeasurement(calibrationDate, varargin)
 %
 % Properties:
 %   measurements
@@ -21,11 +21,11 @@ classdef RoomMeasurement < aod.core.Calibration
 
     methods
         function obj = RoomMeasurement(calibrationDate, varargin)
-            obj = obj@aod.core.Calibration('RoomMeasurement', calibrationDate,...
-                ["Time", "Temperature", "Humidity"], ["HH:mm", "Degrees F", "%"]);
+            obj = obj@aod.builtin.calibrations.MeasurementTable('RoomMeasurement', calibrationDate,...
+                ["Time", "Temperature", "Humidity"], ["HH:mm", "Degrees F", "%"], varargin{:});
         end
 
-        function addMeasurement(obj, timestamp, temperature, humidity)
+        function addMeasurements(obj, varargin)
             % ADDMEASUREMENT
             %
             % Syntax:
@@ -34,15 +34,14 @@ classdef RoomMeasurement < aod.core.Calibration
             % Example:
             %   obj.addMeasurement('11:30', 71.1, 55);
             % -------------------------------------------------------------
-            arguments
-                obj
-            end
 
-            arguments (Repeating)
-                timestamp               
-                temperature             double
-                humidity                double
+            for i = 1:numel(varargin)
+                iArg = varargin{i};
+                iArg{1} = datetime(iArg{1}, "Format", "HH:mm");
+                varargin{i} = iArg;
             end
+            addMeasurements@aod.builtin.calibrations.MeasurementTable(obj, varargin{:});
+            return
             % z = reshape([timestamp; temperature; humidity], 1, []);
 
             if isdatetime(timestamp)

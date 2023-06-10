@@ -18,3 +18,6 @@
 [submodule "lib/sparklinesComponent"]
 	path = lib/sparklinesComponent
 	url = https://github.com/MATLAB-Graphics-and-App-Building/sparklinesComponent
+[submodule "lib/advanced-logger"]
+	path = lib/advanced-logger
+	url = https://github.com/mathworks/advanced-logger.git

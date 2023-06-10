@@ -1,5 +1,5 @@
 classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
-% POWERMEASUREMENT
+% Power measurements of a light source
 %
 % Description:
 %   Measurements of a light source's power at various settings
@@ -8,13 +8,8 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
 %   aod.builtin.calibrations.MeasurementTable
 %
 % Constructor:
-%   obj = PowerMeasurement(name, calibrationDate, wavelength, varargin);
-%
-% Attributes:
-%   settingUnit             string
-%       Device setting unit (default = "normalized")
-%   valueUnit               string
-%       Measurement unit (default = "microwatt")
+%   obj = PowerMeasurement(name, calibrationDate, wavelength,...
+%       colNames, colUnits, varargin);
 %
 % Methods:
 %   T = table(obj)
