@@ -15,7 +15,7 @@ classdef Rois < aod.core.Annotation
 %   Source          aod.core.Source
 %
 % Derived Attributes (automatically calculated from Data):
-%   Count
+%   numROIs
 %   RoiIDs
 %
 % Methods:
@@ -170,6 +170,17 @@ classdef Rois < aod.core.Annotation
 
             obj.roiIDs = IDs;
             obj.numRois = roiCount;
+        end
+    end
+
+    methods (Static)
+        function d = specifyDatasets(d)
+            d = specifyDatasets@aod.core.Annotation(d);
+
+            d.set("Image",...
+                "Size", "(:,:)", ...
+                "Function", @mustBeNumeric, ...
+                "Description", "The image used for the annotation");
         end
     end
 end

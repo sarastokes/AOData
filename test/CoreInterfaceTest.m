@@ -135,7 +135,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Add a second calibration with an empty date
             cal2 = aod.builtin.calibrations.PowerMeasurement('Mustang', [], 488);
-            cal2.addMeasurement(22, 100);
+            cal2.addMeasurements(22, 100);
             testCase.EXPT.add(cal2);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
 

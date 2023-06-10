@@ -134,7 +134,7 @@ classdef CommonApiTest < matlab.unittest.TestCase
         function DatasetSearch(testCase)
             % Test for presence of a dataset
             out = aod.common.EntitySearch.go(testCase.EXPT.Calibrations,...
-                {'Dataset', 'measurements'});
+                {'Dataset', 'Measurements'});
             testCase.verifyNumElements(out, 1);
 
             out = testCase.EXPT.get('Epochs', {'Dataset', 'ID', 1});

@@ -19,7 +19,7 @@ Check out the different options in ```AODataSubclassCreator``` to see how they i
 If you have an entity that is repeated across experiments, it is possible to assign the same UUID to that entity. Ideally, the entities should be recognizable as the same by their metadata (which can be queried by AOQuery) so I am considering just doing away with ```setUUID``` entirely...
 
 
-#### Tracking changes (```LastModified``` property)
-**Core interface** - Designate properties as "SetObservable" to update the ```LastModified``` property when changed.
+#### Tracking changes (```lastModified``` property)
+**Core interface** - Designate properties as "SetObservable" to update the ```lastModified``` property when changed.
 
 **Persistent interface** - All changes are tracked by default. 

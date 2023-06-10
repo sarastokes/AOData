@@ -137,8 +137,9 @@ classdef AODataViewerTest < matlab.uitest.TestCase
             testCase.VIEW.Tree.SelectedNodes = [];
 
             % Click the "Sources" link
-            h = findobj(h.Children, 'Tag', '/Experiment/Epochs/0001/Source');
-            testCase.choose(h(1));
+            h = findobj(testCase.VIEW.Tree.Children, ...
+                'Tag', '/Experiment/Epochs/0001/Source');
+            testCase.choose(h);
             testCase.verifyEqual(testCase.VIEW.LinkPanel.Visible,...
                 matlab.lang.OnOffSwitchState('on'));
             b = findobj(testCase.VIEW.LinkPanel.Children.Children, ...

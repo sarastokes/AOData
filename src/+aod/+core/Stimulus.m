@@ -111,7 +111,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
                     end
                     if strcmpi(propName, 'Calibration')
                         obj.setCalibration(protocol.(propName));
-                    elseif strcmpi(propName, 'DateCreated')
+                    elseif strcmpi(propName, 'dateCreated')
                         obj.DateProtocolCreated = protocol.(propName);
                     else
                         obj.setAttr(propName, protocol.(propName));

@@ -48,7 +48,7 @@ function writeExperimentToFile(hdfName, obj, overwriteFlag)
     % Add info about the environment in which the AOData file was created
     h5tools.writeatt(hdfName, '/', aod.infra.getAODataEnv());
     h5tools.writeatt(hdfName, '/', 'FileCreated', string(datetime('now')),...
-        'LastModified', string(datetime('now')));
+        'lastModified', string(datetime('now')));
     
     % Write the experiment first
     aod.h5.writeEntity(hdfName, obj);

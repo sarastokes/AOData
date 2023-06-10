@@ -1,7 +1,7 @@
 classdef ExperimentView < aod.app.UIView 
 % UI for AODataViewer
 %
-% Parent:
+% Superclasses:
 %   aod.app.UIView
 %
 % Syntax:
@@ -23,8 +23,9 @@ classdef ExperimentView < aod.app.UIView
     end
 
     properties 
-        Tree 
+        Tree            
         Attributes          matlab.ui.control.Table
+        Toolbar             
         ContextMenu         matlab.ui.container.ContextMenu
 
         AxesPanel 
@@ -262,6 +263,9 @@ classdef ExperimentView < aod.app.UIView
             
             obj.figureHandle.Position(3:4) = [500 450];
             % movegui(obj.figureHandle, 'center'); too slow
+
+            %! For plugins in the future
+            obj.Toolbar = uitoolbar(obj.figureHandle);
 
             mainLayout = uigridlayout(obj.figureHandle);
             mainLayout.RowHeight = {'1.5x', '1x'};

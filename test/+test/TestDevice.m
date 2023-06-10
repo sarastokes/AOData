@@ -1,6 +1,6 @@
 classdef TestDevice < aod.core.Device 
 
-    properties 
+    properties (SetObservable=true)
         EmptyProp 
         PublicProp = 123;
     end

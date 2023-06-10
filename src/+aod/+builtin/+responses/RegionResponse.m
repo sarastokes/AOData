@@ -1,5 +1,5 @@
 classdef RegionResponse < aod.core.Response
-% REGIONRESPONSE
+% Responses extracted from regions in an annotation
 %
 % Description:
 %   The average response with each region of a annotation
@@ -13,23 +13,16 @@ classdef RegionResponse < aod.core.Response
 % Properties:
 %   Annotation          aod.core.Annotation/aod.persistent.Annotation
 %
-% Private properties:
-%   listeners
-%
 % Methods:
 %   setAnnotation(obj, annotation)
 %   signals = get(obj, ID, timePoints)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         % Annotation defining regions within acquired data
         Annotation    {mustBeEntityType(Annotation, 'Annotation')} = aod.core.Annotation.empty()
-    end
-
-    properties (Access = private)
-        listeners
     end
 
     methods
@@ -38,10 +31,6 @@ classdef RegionResponse < aod.core.Response
             obj.setAnnotation(annotation);
 
             obj.extractResponse(varargin{:});
-
-            % Listen for changes to regions and flag for update
-            obj.listeners = addlistener(obj.Annotation,... 
-                'UpdatedRois', @obj.onUpdatedRois);
         end
     end
 
@@ -98,39 +87,6 @@ classdef RegionResponse < aod.core.Response
             out = obj.Parent.getStack();
         end
 
-        function extractResponse(obj)
-            % Get the average response over all pixels in each region
-            %
-            % Syntax:
-            %   extract(obj)
-            % -------------------------------------------------------------
-            imStack = obj.loadData();
-
-            roiMask = double(obj.Annotation.Data);
-            roiList = obj.Annotation.roiIDs;
-        
-            A = [];
-            for i = 1:obj.Annotation.numRois
-                [a, b] = find(roiMask == roiList(i));
-                % Look for ROIs exceeding image size
-                a(b > size(imStack,2)) = [];
-                b(b > size(imStack,2)) = [];
-                b(a > size(imStack,1)) = [];
-                a(a > size(imStack,1)) = [];
-                % Time course for each pixel in the ROI
-                signal = zeros(numel(a), size(imStack, 3));
-                for j = 1:numel(a)
-                    signal(j, :) = squeeze(imStack(a(j), b(j), :));
-                end
-                % Average timecourse over all pixels in the ROI
-                signal = mean(signal);
-                % Append to the matrix
-                A = cat(1, A, signal);
-            end
-
-            obj.setData(A');
-        end
-
         function [signals, xpts] = getRoiResponse(obj, ID)
             % GETROIRESPONSE
             %
@@ -147,17 +103,60 @@ classdef RegionResponse < aod.core.Response
         end
     end
 
-    % Overloaded methods
+    methods (Access = protected)
+        function extractResponse(obj)
+            % Get the average response over all pixels in each region
+            %
+            % Syntax:
+            %   extractResponse(obj)
+            % -------------------------------------------------------------
+            imStack = obj.loadData();
+
+            roiMask = double(obj.Annotation.Data);
+            roiList = obj.Annotation.roiIDs;
+
+            A = [];
+
+            for i = 1:obj.Annotation.numRois
+                [a, b] = find(roiMask == roiList(i));
+                % Look for ROIs exceeding image size
+                a(b > size(imStack, 2)) = [];
+                b(b > size(imStack, 2)) = [];
+                b(a > size(imStack, 1)) = [];
+                a(a > size(imStack, 1)) = [];
+                % Time course for each pixel in the ROI
+                signal = zeros(numel(a), size(imStack, 3));
+
+                for j = 1:numel(a)
+                    signal(j, :) = squeeze(imStack(a(j), b(j), :));
+                end
+
+                % Average timecourse over all pixels in the ROI
+                signal = mean(signal);
+                % Append to the matrix
+                A = cat(1, A, signal);
+            end
+
+            obj.setData(A');
+        end
+    end
+
+    % aod.core.Entity protected methods
     methods (Access = protected)
         function value = getLabel(obj)
             value = sprintf('Epoch%u_Responses', obj.Parent.ID);
         end
     end
 
-    % Event callbacks
-    methods (Access = private)
-        function onUpdatedRois(obj, ~, ~)
-            obj.load();
+    % aod.core.Entity static methods
+    methods (Static)
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Response(value);
+
+            value.set("Annotation",...
+                "Size", "(1,1)",...
+                "Function", @(x) aod.util.mustBeEntityType(x, "Annotation"),...
+                "Description", "The annotation used to extract responses");
         end
     end
 end

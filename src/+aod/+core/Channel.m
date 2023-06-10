@@ -16,7 +16,6 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 % Methods:
 %   add(obj, device)
 %   remove(obj, ID)
-%   assignUUID(obj, uuid)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

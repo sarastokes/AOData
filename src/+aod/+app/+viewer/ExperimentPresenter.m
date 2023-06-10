@@ -23,6 +23,7 @@ classdef ExperimentPresenter < appbox.Presenter
 
     properties 
         Experiment              aod.persistent.Experiment 
+        PluginManager
         EntityTable
         hdfName
     end

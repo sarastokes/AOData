@@ -48,7 +48,7 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
     containerProps = aod.common.EntityTypes.allContainerNames();
    
     alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
-    alwaysAttributeProps = ["UUID", "label", "parameters", "entityType", "DateCreated", "LastModified"];
+    alwaysAttributeProps = ["UUID", "label", "parameters", "entityType", "dateCreated", "lastModified"];
     alwaysAbandonedProps = "Reader";  %! TODO
     persistedProps = [];
     attributeProps = [];

@@ -10,7 +10,6 @@ classdef Dataset < handle
 
     properties (SetAccess = private)
         Name            (1,1)     string
-        Required        (1,1)     logical = false 
         Size                      aod.specification.Size 
         Class           (1,1)     aod.specification.MatlabClass
         Default         (1,1)     aod.specification.DefaultValue
@@ -78,11 +77,6 @@ classdef Dataset < handle
             out = out + "    Size: " + obj.Size.text() + newline;
             out = out + "    Validators: " + obj.Functions.text() + newline;
             out = out + "    Default: " + obj.Default.text() + newline;
-            % if obj.Required
-            %     out = out + "    Required: true" + newline;
-            % else
-            %     out = out + "    Required: false" + newline;
-            % end
         end
     end
 
@@ -90,13 +84,6 @@ classdef Dataset < handle
     methods
         function setName(obj, name)
             obj.Name = name;
-        end
-
-        function setRequired(obj, input)
-            if isa(input, "meta.property")
-                return
-            end
-            obj.Required = input;
         end
 
         function setDescription(obj, input)

@@ -20,6 +20,7 @@ classdef QueryManager < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
+        % Filters applied sequentially to the entities
         Filters             aod.api.FilterQuery
         Experiments         aod.persistent.Experiment
         filterIdx           logical
@@ -32,6 +33,14 @@ classdef QueryManager < handle
         entityTable         
     end
 
+    % Experiment info not in entityTable that should only be computed once
+    properties (SetAccess = private)
+        % A list of all entity names
+        entityNames
+        % A list of all datasets specified as "groupName/datasetName"
+        dsetNames        
+    end
+
     properties (Dependent)
         % Number of AOData HDF5 files
         numFiles            double 
@@ -41,6 +50,11 @@ classdef QueryManager < handle
         numDisabled         double
         % Number of entities across files
         numEntities         double
+    end
+
+    properties (Dependent, GetAccess = ?aod.api.FilterQuery)
+        allNames 
+        allDatasetNames
     end
 
     methods
@@ -83,6 +97,20 @@ classdef QueryManager < handle
             else
                 value = nnz(arrayfun(@(x) ~x.isEnabled, obj.Filters));
             end
+        end
+
+        function value = get.allNames(obj)
+            if isempty(obj.entityNames)
+                obj.populateEntityNames();
+            end
+            value = obj.entityNames;
+        end
+
+        function value = get.allDatasetNames(obj)
+            if isempty(obj.dsetNames)
+                obj.populateDatasetNames();
+            end
+            value = obj.dsetNames;
         end
     end
 
@@ -182,7 +210,9 @@ classdef QueryManager < handle
                 obj.Experiments = [obj.Experiments; newExpt];
             end
             
+            % Update experiment-dependent properties
             obj.populateEntityTable();
+            obj.refreshCache();
         end
 
         function removeExperiment(obj, expt)
@@ -194,8 +224,9 @@ classdef QueryManager < handle
             % Remove the experiment
             obj.Experiments(ID) = [];
             obj.hdfName(ID) = [];
-            % Update the entity table
+            % Update experiment-dependent properties
             obj.populateEntityTable();
+            obj.refreshCache();
         end
     end
 
@@ -251,7 +282,36 @@ classdef QueryManager < handle
         end
     end
 
+    methods (Access = protected)
+    end
+
     methods (Access = private)
+        function refreshCache(obj)
+            obj.entityNames = [];
+            obj.dsetNames = [];
+        end
+        
+        function populateEntityNames(obj)
+            if obj.numFiles == 0
+                return 
+            end
+
+            entities = obj.entityTable;
+            obj.entityNames = repmat("", [height(entities), 1]);
+            for i = 1:numel(obj.entityNames)
+                obj.entityNames(i) = h5tools.util.getPathEnd(entities.Path(i));
+            end
+        end
+
+        function populateDatasetNames(obj)
+            hdfNames = obj.hdfName();
+            obj.dsetNames = string.empty();
+            for i = 1:numel(hdfNames)
+                obj.dsetNames = cat(1, obj.dsetNames,...
+                    h5tools.collectDatasets(hdfNames(i)));
+            end
+        end
+
         function populateEntityTable(obj)
             obj.entityTable = [];
 

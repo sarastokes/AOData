@@ -33,7 +33,10 @@ classdef NameFilter < aod.api.FilterQuery
         Name
     end
 
-    properties (SetAccess = protected)
+    %properties (SetAccess = protected)
+    %    allNames
+    %end
+    properties (Dependent)
         allNames
     end
 
@@ -47,7 +50,11 @@ classdef NameFilter < aod.api.FilterQuery
             end
             obj.Name = name;
 
-            obj.collectNames();
+            %obj.collectNames();
+        end
+
+        function value = get.allNames(obj)
+            value = obj.Root.allNames;
         end
     end
 
@@ -97,13 +104,13 @@ classdef NameFilter < aod.api.FilterQuery
         end
     end
 
-    methods (Access = private)
-        function collectNames(obj)
-            entities = obj.getEntityTable();
-            obj.allNames = repmat("", [height(entities), 1]);
-            for i = 1:numel(obj.allNames)
-                obj.allNames(i) = h5tools.util.getPathEnd(entities.Path(i));
-            end
-        end
-    end
+    % methods (Access = private)
+        % function collectNames(obj)
+        %     entities = obj.getEntityTable();
+        %     obj.allNames = repmat("", [height(entities), 1]);
+        %     for i = 1:numel(obj.allNames)
+        %         obj.allNames(i) = h5tools.util.getPathEnd(entities.Path(i));
+        %     end
+        % end
+    % end
 end 

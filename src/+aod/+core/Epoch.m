@@ -34,11 +34,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = private)
         % Epoch ID number in Experiment
         ID (1,1)            double          {mustBeInteger}
+        % Time the Epoch (i.e. data acquisition) began
+        startTime           datetime        {mustBeScalarOrEmpty} = datetime.empty()   
     end
 
-    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
-        % Time the Epoch (i.e. data acquisition) began
-        startTime           datetime        {mustBeScalarOrEmpty} = datetime.empty()                          
+    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})                       
         % The timing of samples during Epoch                             
         Timing (:,1)        duration = seconds([])
     end

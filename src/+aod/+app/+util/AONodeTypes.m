@@ -88,7 +88,7 @@ classdef AONodeTypes
                     out = char(data);
                 case AONodeTypes.TRANSFORM
                     out = data.T;
-                case AONodeTypes.ATTRIBUTEMANAGER
+                case {AONodeTypes.ATTRIBUTEMANAGER, AONodeTypes.DATASETMANAGER}
                     out = data.table();
                 case AONodeTypes.NUMERIC
                     if ~ismatrix(data)
@@ -131,6 +131,7 @@ classdef AONodeTypes
                 AONodeTypes.NOTES,...       % non-scalar string
                 AONodeTypes.TRANSFORM,...
                 AONodeTypes.ATTRIBUTEMANAGER,...
+                AONodeTypes.DATASETMANAGER,...
                 AONodeTypes.CODE];
             
             tf = ismember(obj, tableNodes);
@@ -265,7 +266,7 @@ classdef AONodeTypes
             import aod.app.util.AONodeTypes;
 
             switch lower(nodeName)
-                case 'double'
+                case {'double', 'uint8', 'int8', 'uint16', 'int16', 'uint32', 'int32', 'uint64', 'int64'}
                     obj = AONodeTypes.NUMERIC;
                 case {'char', 'string'}
                     obj = AONodeTypes.TEXT;

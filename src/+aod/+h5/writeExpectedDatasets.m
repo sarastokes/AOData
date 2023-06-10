@@ -50,7 +50,8 @@ function success = writeExpectedDatasets(hdfName, pathName, dsetName, DM, parent
     T = DM.table();
     h5tools.write(hdfName, pathName, dsetName, T);
     h5tools.writeatt(hdfName, h5tools.util.buildPath(pathName, dsetName),...
-        'ParentClass', parentClass);
+        'ParentClass', parentClass,...
+        'DateWritten', datetime('now'));
     success = true;
 
     

@@ -74,9 +74,9 @@ classdef (Abstract) Entity < handle
         % Notes about the entity
         notes                       string = string.empty()
         % The date the entity was created
-        DateCreated                 datetime = datetime.empty()
+        dateCreated                 datetime = datetime.empty()
         % The date and time the entity was last modified
-        LastModified                datetime = datetime.empty()
+        lastModified                datetime = datetime.empty()
     end
 
     properties (Hidden, SetAccess = private)
@@ -126,9 +126,9 @@ classdef (Abstract) Entity < handle
 
             % Generate a random unique identifier to distinguish the class
             obj.UUID = aod.util.generateUUID();
-            % Get current time for DateCreated and LastModified
-            obj.DateCreated = datetime("now");
-            obj.LastModified = obj.DateCreated;
+            % Get current time for dateCreated and lastModified
+            obj.dateCreated = datetime("now");
+            obj.lastModified = obj.dateCreated;
 
             % Set the Parent, if necessary
             if ~isempty(ip.Results.Parent)
@@ -738,7 +738,7 @@ classdef (Abstract) Entity < handle
                 out = [];
             end
         end
-
+        
         function assignUUID(obj, uuid)
             % Assign a UUID to the entity
             %
@@ -990,13 +990,13 @@ classdef (Abstract) Entity < handle
         end
 
         function onPropertyChange(obj, ~, ~)
-            % Callback to update LastModified when property changes
+            % Callback to update lastModified when property changes
             %
             % Description:
             %   Triggered by the setting of a "SetObservable" property and 
-            %   updated the LastModified property to current date/time
+            %   updated the lastModified property to current date/time
             % -------------------------------------------------------------
-            obj.LastModified = datetime("now");
+            obj.lastModified = datetime("now");
         end
     end
 

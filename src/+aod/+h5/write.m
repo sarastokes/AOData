@@ -59,7 +59,7 @@ function success = write(hdfName, pathName, dsetName, data, description)
         else
             success = h5tools.write(hdfName, pathName, dsetName, data);
             % Description only written for datasets without mapped params
-            if ~isempty(description)
+            if success && ~isempty(description)
                 h5tools.writeatt(hdfName, fullPath, 'Description', description);
             end
         end

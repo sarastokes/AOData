@@ -57,9 +57,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         % A unique identifier for the entity
         UUID                    string
         % When the entity was first created
-        DateCreated             datetime 
+        dateCreated             datetime 
         % When the entity's HDF5 group was last modified
-        LastModified            datetime
+        lastModified            datetime
         % Specification of expected metadata 
         expectedAttributes      = aod.util.AttributeManager
         % Specification of expected datasets
@@ -174,6 +174,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             out = h.homeDirectory;
         end
 
+        function getGroupName(obj)
+            if ~isscalar(obj)
+                out = arrayfun(@(x) string(x.groupName), obj);
+                return
+            end
+            out = obj.groupName;
+        end
+
         function [entity, entityInfo] = query(obj, varargin)
             % Query existing entities throughout the experiment
             %
@@ -261,9 +269,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.verifyReadOnlyMode();
 
             % Check whether the value can be validated with specs
-            propSpec = obj.expectedDatasets.get(dsetName);
+            propSpec = obj.expectedDatasets.get(propName);
             if ~isempty(propSpec)
-                isValid = propSpec.validate(dsetValue);
+                isValid = propSpec.validate(propValue);
                 if ~isValid 
                     id = 'modifyDataset:InvalidValue';
                     msg = "Value did not pass specs in expectedDatasets. " + ... 
@@ -838,18 +846,18 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             % ATTRIBUTES -----------
             % Universial attributes that map to properties, not attributes
-            specialAttributes = ["UUID", "Class", "EntityType", "LastModified", "DateCreated", "label"];
+            specialAttributes = ["UUID", "Class", "EntityType", "lastModified", "dateCreated", "label"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.common.EntityTypes.get(obj.loadAttribute('EntityType'));
             obj.entityClassName = obj.loadAttribute('Class');
-            lastModTime = obj.loadAttribute('LastModified');
+            lastModTime = obj.loadAttribute('lastModified');
             if ~isempty(lastModTime)
-                obj.LastModified = datetime(lastModTime);
+                obj.lastModified = datetime(lastModTime);
             end
-            dateCreated = obj.loadAttribute('DateCreated');
+            dateCreated = obj.loadAttribute('dateCreated');
             if ~isempty(dateCreated)
-                obj.DateCreated = datetime(dateCreated);
+                obj.dateCreated = datetime(dateCreated);
             end
 
             % Parse the remaining attributes
@@ -1007,8 +1015,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     dsetValue = aod.h5.read(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                     obj.(obj.dsetNames(i)) = dsetValue;
-                    warning('setDatasetsToDynProps:Deprecation',...
-                        'This method will be deprecated soon!');
                 end
             end
 
@@ -1073,14 +1079,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function updateModificationTimestamp(obj)
-            % Updates the value of the "LastModified" attribute
+            % Updates the value of the "lastModified" attribute
             %
             % Syntax:
             %   updateModificationTimestamp(obj)
             % ------------------------------------------------------------- 
             newValue = datetime('now');
-            obj.setAttribute('LastModified', newValue);
-            obj.LastModified = newValue;
+            obj.setAttribute('lastModified', newValue);
+            obj.lastModified = newValue;
         end
 
         function modifyLink(obj, linkName, linkValue)
@@ -1162,7 +1168,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             obj.loadInfo();
 
-            if ~strcmp(attrName, 'LastModified')
+            if ~strcmp(attrName, 'lastModified')
                 obj.updateModificationTimestamp();
             end
         end

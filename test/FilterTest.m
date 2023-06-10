@@ -285,7 +285,25 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyWarning(...
                 @() DF3.apply(), 'apply:NoMatches');
         end
+    end
 
+    methods (Test, TestTags=["DatasetFilter", "AOQuery"])
+        function DescriptionFilter(testCase)
+            
+            DF1 = aod.api.DescriptionFilter(testCase.QM,...
+                "This is a test experiment");
+            testCase.verifyEqual(nnz(DF1.apply()), 1);
+            DF1.describe();
+
+            DF2 = aod.api.DescriptionFilter(testCase.QM,...
+                @(x) endsWith(x, "experiment"));
+            testCase.verifyEqual(nnz(DF2.apply()), 1);
+            DF2.describe();
+            testCase.verifyEqual(DF2.code(), ...
+                string('aod.api.DescriptionFilter(QM, "description", @(x)endsWith(x,"experiment"))'));
+
+
+        end
     end
 
     methods (Test, TestTags=["EntityFilter", "AOQuery"])

@@ -37,6 +37,11 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
         localIdx        logical
     end
 
+    properties (SetAccess = protected)
+        % Unlike Parent, this is always the QueryManager
+        Root
+    end
+
     properties (Dependent)
         didFilter
     end
@@ -56,6 +61,11 @@ classdef (Abstract) FilterQuery < handle & matlab.mixin.Heterogeneous
             obj.Parent = parent;
 
             obj.isNested = ~isSubclass(obj.Parent, 'aod.api.QueryManager');
+            if obj.isNested 
+                obj.Root = obj.Parent.Parent;
+            else
+                obj.Root = obj.Parent;
+            end
             obj.isEnabled = true;
         end
         

@@ -23,7 +23,7 @@ classdef MixedEntitySet < handle & matlab.mixin.CustomDisplay
         Calibrations        {aod.util.mustBeEntityType(Calibrations, 'Calibration')} = aod.persistent.Calibration.empty()
         Epochs              {aod.util.mustBeEntityType(Epochs, 'Epoch')} = aod.persistent.Epoch.empty()
         EpochDatasets       {aod.util.mustBeEntityType(EpochDatasets, 'EpochDataset')} = aod.persistent.EpochDataset.empty()
-        Registrations       {aod.util.mustBeEntityType(Registrations, 'Registration')} = aod.persistent.Registration
+        Registrations       {aod.util.mustBeEntityType(Registrations, 'Registration')} = aod.persistent.Registration.empty()
         Responses           {aod.util.mustBeEntityType(Responses, 'Response')} = aod.persistent.Response.empty()
         Stimuli             {aod.util.mustBeEntityType(Stimuli, 'Stimulus')} = aod.persistent.Stimulus.empty()
         ExperimentDatasets  {aod.util.mustBeEntityType(ExperimentDatasets, 'ExperimentDataset')} = aod.persistent.ExperimentDataset.empty();       
