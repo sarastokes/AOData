@@ -1,4 +1,4 @@
-classdef (Abstract) Entity < handle 
+classdef (Abstract) Entity < handle & aod.common.EntityMixin
 % ENTITY (Abstract)
 %
 % Description:
@@ -169,81 +169,6 @@ classdef (Abstract) Entity < handle
         end
     end
 
-    % Hierarchy methods
-    methods (Sealed)
-        function out = getParent(obj, className)
-            % Get the parent of an entity or ancestor of a specific type
-            %
-            % Description:
-            %   Can be accessed through the Parent property, but this 
-            %   method will concatenate parents if more than one entity 
-            %   is provided
-            %
-            % Syntax:
-            %   % Get the parent of one entity (equivalent to obj.Parent)
-            %   h = obj.getParent()
-            % -------------------------------------------------------------
-            if nargin < 2
-                className = [];
-            end
-
-            if ~isscalar(obj)
-                out = aod.util.arrayfun(@(x) getParent(x, className), obj);
-                return
-            end
-            
-            if isempty(className)
-                out = obj.Parent;
-                return 
-            end
-
-            % See whether input is an entity type
-            try
-                className = aod.common.EntityTypes.get(className);
-            catch ME
-                if ~strcmp(ME.identifier, "get:UnknownEntity")
-                    rethrow(ME);
-                end
-            end
-
-            out = obj;
-            if isa(className, 'aod.common.EntityTypes')
-                while out.entityType ~= className
-                    out = out.Parent;
-                    if isempty(out)
-                        break
-                    end
-                end
-            else
-                while ~isSubclass(out, className)
-                    out = out.Parent;
-                    if isempty(out)
-                        break
-                    end
-                end
-            end
-        end
-
-        function out = getGroupName(obj)
-            % Get the entity's HDF5 group name
-            %
-            % Description:
-            %   Can be accessed through the groupName property; however, 
-            %   this function supports groupName access for multiple 
-            %   entities at once. 
-            %
-            % Syntax:
-            %   out = getGroupName(obj)
-            % -------------------------------------------------------------
-            if ~isscalar(obj)
-                out = arrayfun(@(x) string(x.groupName), obj);
-                return
-            end
-
-            out = string(obj.groupName);
-        end
-    end
-
     methods (Sealed)
         function setName(obj, name)
             % Set entity's name
@@ -361,100 +286,6 @@ classdef (Abstract) Entity < handle
 
     % Attribute methods
     methods (Sealed)
-        function tf = hasAttr(obj, attrName)
-            % Check whether entity has a attribute
-            %
-            % Description:
-            %   Check whether entity attributes has a specific attribute
-            %
-            % Syntax:
-            %   tf = hasAttr(obj, attrName)
-            %
-            % Examples:
-            %   % See whether entity has attribute 'MyAttr'
-            %   tf = obj.hasAttr('MyAttr')
-            % -------------------------------------------------------------
-            arguments
-                obj
-                attrName       char
-            end
-
-            if ~isscalar(obj)
-                tf = arrayfun(@(x) x.hasAttr(attrName), obj);
-                return
-            end
-            
-            tf = obj.attributes.isKey(attrName);
-        end
-
-        function attrValue = getAttr(obj, attrName, errorType)
-            % Get the value of a attribute
-            %
-            % Description:
-            %   Return the value of a specific attribute. 
-            %
-            % Syntax:
-            %   attrValue = getAttr(obj, attrName, errorType)
-            %
-            % Inputs:
-            %   attrName       char
-            % Optional inputs:
-            %   errorType       aod.infra.ErrorTypes (default = WARNING) 
-            %
-            % Examples:
-            %   % Get the value of 'MyAttr'
-            %   attrValue = obj.getAttr('MyAttr')           
-            % -------------------------------------------------------------
-
-            arguments
-                obj
-                attrName           char 
-                errorType           = []
-            end
-            
-            import aod.infra.ErrorTypes
-            if isempty(errorType)
-                errorType = ErrorTypes.WARNING;
-            else
-                errorType = ErrorTypes.init(errorType);
-            end
-            
-            if ~isscalar(obj)
-                attrValue = aod.util.arrayfun(...
-                    @(x) x.getAttr(attrName, ErrorTypes.MISSING), obj);
-
-                % Parse missing values
-                isMissing = getMissing(attrValue);
-                if all(isMissing)
-                    error('getAttr:NotFound', 'Did not find attribute %s', attrName);
-                end
-
-                % Attempt to return a matrix rather than a cell
-                if iscell(attrValue) && any(isMissing)
-                    attrValue = extractCellData(attrValue);
-                end
-                return
-            end
-
-            if obj.hasAttr(attrName)
-                attrValue = obj.attributes(attrName);
-            else
-                switch errorType 
-                    case ErrorTypes.ERROR 
-                        error('getAttr:NotFound',... 
-                            'Did not find %s in attributes', attrName);
-                    case ErrorTypes.WARNING 
-                        warning('getAttr:NotFound',... 
-                            'Did not find %s in attributes', attrName);
-                        attrValue = [];
-                    case ErrorTypes.MISSING
-                        attrValue = missing;
-                    case ErrorTypes.NONE
-                        attrValue = [];
-                end
-            end
-        end
-
         function setAttr(obj, varargin)
             % Add or change attribute(s)
             %
@@ -536,32 +367,6 @@ classdef (Abstract) Entity < handle
 
     % File methods
     methods (Sealed)
-        function tf = hasFile(obj, fileName)
-            % Check whether entity has a file
-            %
-            % Description:
-            %   Check whether entity files has a specific file name
-            %
-            % Syntax:
-            %   tf = hasFile(obj, fileName)
-            %
-            % Examples:
-            %   % Check for the file named 'MyFile'
-            %   tf = obj.hasFile('MyFile')
-            % -------------------------------------------------------------
-            arguments
-                obj 
-                fileName                char
-            end
-
-            if ~isscalar(obj)
-                tf = arrayfun(@(x) hasFile(x, fileName), obj);
-                return
-            end
-
-            tf = obj.files.isKey(fileName);
-        end
-
         function setFile(obj, fileName, filePath)
             % Add or modify a file 
             %
@@ -651,11 +456,7 @@ classdef (Abstract) Entity < handle
             end
 
             import aod.infra.ErrorTypes
-            if isempty(errorType)
-                errorType = ErrorTypes.ERROR;
-            else
-                errorType = ErrorTypes.init(errorType);
-            end
+            errorType = ErrorTypes.init(errorType);
 
             if ~isscalar(obj)
                 fileValue = aod.util.arrayfun(...
@@ -727,7 +528,7 @@ classdef (Abstract) Entity < handle
             %   If multiple entities are provided, they are assumed to be 
             %   from the same Experiment
             % -------------------------------------------------------------
-            h = getParent(obj(1), 'aod.core.Experiment');
+            h = getParent(obj(1), 'Experiment');
             if ~isempty(h)
                 out = h.homeDirectory;
             else
@@ -786,25 +587,6 @@ classdef (Abstract) Entity < handle
     end
 
     methods (Access = protected)
-        function parseAttributes(obj, varargin)
-            % Parses varargin input to constructor with expectedAttributes
-            % 
-            % Syntax:
-            %   parseAttributes(obj, varargin)
-            %
-            % See also:
-            %   aod.core.Entity.specifyAttributes,
-            %   aod.util.AttributeManager
-            % -------------------------------------------------------------
-            ip = obj.expectedAttributes.parse(varargin{:});
-            f = fieldnames(ip.Results);
-            for i = 1:numel(f)
-                if ~isempty(ip.Results.(f{i}))
-                    obj.setAttr(f{i}, ip.Results.(f{i}));
-                end
-            end
-        end
-
         function sync(obj)
             % Sync entity with experiment hierarchy, check for conflicts
             % 
@@ -820,7 +602,7 @@ classdef (Abstract) Entity < handle
             %   ensure a matching UUID is present (will be needed when 
             %   writing to HDF5 as a link)
             % -------------------------------------------------------------
-            h = obj.getParent('aod.core.Experiment');
+            h = obj.getParent('Experiment');
             if isempty(h)
                 return
             end
@@ -1017,35 +799,6 @@ classdef (Abstract) Entity < handle
             %   updated the lastModified property to current date/time
             % -------------------------------------------------------------
             obj.lastModified = datetime("now");
-        end
-    end
-
-    % Overloaded MATLAB functions
-    methods
-        function tf = isequal(obj, entity)
-            % Test whether two entities have the same UUID. If 2nd input 
-            % is not an entity, returns false
-            %
-            % Syntax:
-            %   tf = isequal(obj, entity)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                entity
-            end
-
-
-            if aod.util.isEntitySubclass(entity)
-                if isempty(entity) && isempty(obj)
-                    tf = true;
-                elseif isempty(entity) ~= isempty(obj)
-                    tf = false;
-                else
-                    tf = isequal(obj.UUID, entity.UUID);
-                end
-            else
-                tf = false;
-            end
         end
     end
 

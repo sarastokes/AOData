@@ -1,4 +1,4 @@
-classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
+classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.EntityMixin
 % The base class for all AOData persistent objects
 %
 % Description:
@@ -172,19 +172,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             out = h.homeDirectory;
         end
 
-        function out = getGroupName(obj)
-            % Get entity's HDF5 group name
-            %
-            % Syntax:
-            %   getGroupName(obj, newEntity)
-            % -------------------------------------------------------------
-            if ~isscalar(obj)
-                out = arrayfun(@(x) string(x.groupName), obj);
-                return
-            end
-            out = obj.groupName;
-        end
-
         function [entity, entityInfo] = query(obj, varargin)
             % Query existing entities throughout the experiment
             %
@@ -196,33 +183,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
 
             [entity, entityInfo] = aod.api.QueryManager.go(obj, varargin{:});
-        end
-
-        function h = getParent(obj, entityType)
-            % Recursively search Parent for entity matching entityType
-            %
-            % Syntax:
-            %   h = getParent(obj, entityType)
-            %
-            % Examples:
-            %   h = obj.getParent(aod.common.EntityTypes.EXPERIMENT)
-            %   h = obj.getParent('experiment')
-            % -------------------------------------------------------------
-
-            if nargin < 2
-                h = obj.Parent;
-                return
-            end
-
-            entityType = aod.common.EntityTypes.get(entityType);
-
-            h = obj;
-            while h.entityType ~= entityType
-                h = h.Parent;
-                if isempty(h)
-                    break
-                end
-            end
         end
     end
 
@@ -559,90 +519,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % Attribute methods
     methods (Sealed)
-        function tf = hasAttr(obj, attrName)
-            % Check whether attribute is present
-            %
-            % Syntax:
-            %   tf = hasAttr(obj, attrName)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                attrName           char
-            end
-
-            if ~isscalar(obj)
-                tf = arrayfun(@(x) hasAttr(x, attrName), obj);
-                return
-            end
-
-            if isempty(obj.attributes)
-                tf = false;
-            else
-                tf = isKey(obj.attributes, attrName);
-            end
-        end
-
-        function out = getAttr(obj, attrName, errorType)
-            % Get the value of a attribute by name
-            %
-            % Syntax:
-            %   out = getAttr(obj, attrName)
-            %   out = getAttr(obj, attrName, errorType)
-            %
-            % Notes:
-            %   Error type defaults to WARNING for scalar operations and is
-            %   restricted to MISSING for nonscalar operations.
-            % -------------------------------------------------------------
-            arguments
-                obj
-                attrName           char 
-                errorType           = []
-            end
-
-            import aod.infra.ErrorTypes
-
-            if isempty(errorType)
-                errorType = ErrorTypes.WARNING;
-            else
-                errorType = ErrorTypes.init(errorType);
-            end
-            
-            if ~isscalar(obj)
-                out = aod.util.arrayfun(...
-                    @(x) getAttr(x, attrName, ErrorTypes.MISSING), obj);
-
-                % Parse missing values
-                isMissing = getMissing(out);
-                if all(isMissing)
-                    error('getAttr:NotFound', 'Did not find attribute %s', attrName);
-                end
-
-                % Attempt to return a matrix rather than a cell
-                if iscell(out) && any(isMissing)
-                    out = extractCellData(out);
-                end
-                return
-            end
-
-            if obj.hasAttr(attrName)
-                out = obj.attributes(attrName);
-            else
-                switch errorType 
-                    case ErrorTypes.ERROR
-                        error("getAttr:AttrNotFound",...
-                            "Attribute %s not present", attrName);
-                    case ErrorTypes.WARNING
-                        warning("getAttr:AttrNotFound",...
-                            "Attribute %s not present", attrName);
-                        out = [];
-                    case ErrorTypes.MISSING
-                        out = missing;
-                    case ErrorTypes.NONE
-                        out = [];
-                end
-            end
-        end
-
         function setAttr(obj, attrName, attrValue, ignoreValidation)
             % Add new attribute or change the value of existing attribute
             %
@@ -711,28 +587,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
     % File methods
     methods (Sealed)
-        function tf = hasFile(obj, fileKey)
-            % Check whether entity has a file
-            %
-            % Syntax:
-            %   tf = hasFile(obj, fileKey)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                fileKey             char
-            end
-
-            if ~isscalar(obj)
-                tf = arrayfun(@(x) hasFile(x, fileKey), obj);
-                return
-            end
-            if isempty(obj.files)
-                tf = false;
-            else
-                tf = isKey(obj.files, fileKey);
-            end
-        end
-
         function out = getFile(obj, fileKey, errorType)
             % Get file by name
             %
@@ -1338,22 +1192,4 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end  % toc = 2.9 ms
         end
     end
-    
-    % Overloaded MATLAB methods
-    methods
-        function tf = isequal(obj, entity)
-            % Tests whether the UUIDs of two entities are equal
-            %
-            % Syntax:
-            %   tf = isequal(obj, entity)
-            % -------------------------------------------------------------
-            
-            arguments
-                obj
-                entity      {mustBeA(entity, 'aod.persistent.Entity')}
-            end
-            tf = isequal(obj.UUID, entity.UUID);
-        end
-    end
-
 end 

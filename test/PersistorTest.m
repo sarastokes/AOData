@@ -271,6 +271,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 
             % System
             system = aod.core.System("TestSystem");
+            testCase.verifyEmpty(system.getParent());
             testCase.SMALL_EXPT.add(system);
             testCase.verifyNumElements(testCase.SMALL_EXPT.Systems, 1);
 
@@ -279,6 +280,10 @@ classdef PersistorTest < matlab.unittest.TestCase
             % Confirm interoperability of core/persistent
             testCase.verifyClass(channel.getParent('experiment'),... 
                 "aod.persistent.Experiment");
+            testCase.verifyClass(channel.getParent('channel'),...
+                "aod.core.Channel");
+            testCase.verifyClass(channel.getParent(),...
+                "aod.persistent.System");
             % Add the new channel
             testCase.SMALL_EXPT.Systems(1).add(channel);
             testCase.verifyNumElements(testCase.SMALL_EXPT.Systems(1).Channels, 1);
