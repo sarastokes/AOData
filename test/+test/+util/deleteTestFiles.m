@@ -30,6 +30,10 @@ function deleteTestFiles()
         delete('EntityDeletionTest.h5');
     end
 
+    if exist('FileReaderTest.h5', 'file')
+        delete('FileReaderTest.h5');
+    end
+
     if exist('SmallExperiment.h5', 'file')
         delete('SmallExperiment.h5');
     end

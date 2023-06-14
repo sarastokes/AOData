@@ -19,6 +19,17 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 %#ok<*MANU>  
 %#ok<*NASGU>
 
+    properties
+        dataFolder
+    end
+
+    methods (TestClassSetup)
+        function setup(testCase)
+            testCase.dataFolder = fullfile(...
+                test.util.getAODataTestFolder(), 'test_data');
+        end
+    end
+
     methods (Test, TestTags = {'Devices'})
         function Pinhole(testCase) 
             obj = aod.builtin.devices.Pinhole(25,... 
@@ -64,14 +75,12 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.calibrations.MeasurementTable( ...
                 "Power", getDateYMD(),...
                 ["Mustang", "Value"], ["%", "microwatts"]);
-            testCase.verifyEqual(obj.numMeasurements, 0);
             testCase.verifyTrue(isempty(obj));
             testCase.verifyEqual(...
                 obj.Measurements.Properties.VariableNames, ...
                 cellstr(["Mustang", "Value"]));
 
             obj.addMeasurements({22, 10}, {28, 17});
-            testCase.verifyEqual(obj.numMeasurements, 2);
             testCase.verifySize(obj.table(), [2 2]);
 
             % Remove measurements
@@ -84,17 +93,39 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
                 "Power", getDateYMD(), ["Mustang", "Value"]);
             testCase.verifyError(...
                 @() obj.addMeasurements(123),...
-                "addMeasurement:InvalidInput");
+                "addMeasurements:InvalidInput");
         end
 
         function RoomMeasurement(testCase)
             obj = aod.builtin.calibrations.RoomMeasurement(getDateYMD());
             % Add a first measurement
-            obj.addMeasurement("11:45", 71.1, 28);
-            testCase.verifyEqual(size(obj.measurements), [1 3]);
+            obj.addMeasurements({"11:45", 71.1, 28});
+            testCase.verifyEqual(size(obj.Measurements), [1 3]);
             % Append a measurement
-            obj.addMeasurement("12:20", 71.2, 28);
-            testCase.verifyEqual(size(obj.measurements), [2 3]);
+            obj.addMeasurements({"12:20", 71.2, 28});
+            testCase.verifyEqual(size(obj.Measurements), [2 3]);
+        end
+
+        function ChannelOptimization(testCase)
+            obj = aod.builtin.calibrations.ChannelOptimization(...
+                'Mustang', getDateYMD());
+            obj.setWavelength(488);
+            obj.setPosition(true, 'X', 1, 'Y', 2, 'Z', 3, 'Source', 4);
+            testCase.verifyEqual(obj.getAttr('Wavelength'), 488);
+            testCase.verifyEqual(obj.positions{1,1}, 1);
+            
+            obj.setPositions(false, 'X', 2, 'Y', 2);
+            testCase.verifyEqual(obj.positions{2,2}, 2);
+
+            obj.setPositions(true, 'Source', []);
+            testCase.verifyTrue(isnan(obj.positions{1,4}));
+
+            obj.setIterations(eye(3));
+            testCase.verifyEqual(obj.iterations, eye(3));
+
+            testCase.verifyError(...
+                @()obj.setAttr('Wavelength', 'badinput'),...
+                'MATLAB:InputParser:ArgumentFailedValidation');
         end
     end
 
@@ -192,13 +223,13 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
                 fullfile(testCase.dataFolder, 'RoiSet.zip'), [242, 360]);
             obj = aod.builtin.annotations.Rois('851_OSR_20230314', reader,...
                 'Source', aod.core.Source('RoiSource'));
-            testCase.verifyEqual(out.files('AnnotationData'), reader.fullFile);
-            testCase.verifyEqual(out.Source.Name, 'RoiSource');
+            testCase.verifyEqual(obj.files('AnnotationData'), reader.fullFile);
+            testCase.verifyEqual(obj.Source.Name, 'RoiSource');
         end
 
         function RoiErrors(testCase)
             testCase.verifyError(...
-                @() aod.builtin.annotations.Rois(fullfile(testCase.dataFolder, 'RoiSet.zip')),...
+                @() aod.builtin.annotations.Rois('ErrorROIs', fullfile(testCase.dataFolder, 'RoiSet.zip')),...
                 'findFileReader:UnknownExtension');
         end
     end

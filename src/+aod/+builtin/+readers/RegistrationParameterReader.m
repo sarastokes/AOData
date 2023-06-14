@@ -4,7 +4,7 @@ classdef RegistrationParameterReader < aod.util.readers.TxtReader
 % Description:
 %   Creates a struct containing all strip registration parameters
 %
-% Parent:
+% Superclasses:
 %   aod.util.readers.TxtReader
 %
 % Syntax:
@@ -13,10 +13,10 @@ classdef RegistrationParameterReader < aod.util.readers.TxtReader
 % See also:
 %   aod.builtin.registrations.StripRegistration
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties 
         registrationDate 
     end
 

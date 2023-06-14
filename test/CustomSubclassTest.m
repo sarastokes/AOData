@@ -406,7 +406,7 @@ classdef CustomSubclassTest < matlab.uitest.TestCase
             prop = aod.util.templates.LinkSpecification('Link1', 'Source');
             model.addLink(prop);
             % Select the new link and remove it
-            testCase.choose(findobj(fig, 'Type', 'uitabgroup'), 2);
+            %testCase.choose(findobj(fig, 'Type', 'uitabgroup'), 2);
             testCase.choose(linkBox, 'Link1');
             app.onPushRemoveLink();
             testCase.verifyEqual(linkBox.Items, {char.empty()});
@@ -489,7 +489,7 @@ classdef CustomSubclassTest < matlab.uitest.TestCase
             testCase.verifyTrue(ismember("Attr1", attrBox.Items));
 
             % Change tabs
-            testCase.choose(findobj(fig, 'Type', 'uitabgroup'), 2);
+            %testCase.choose(findobj(fig, 'Type', 'uitabgroup'), 2);
 
             % Remove the attribute
             testCase.choose(attrBox, 'Attr1');

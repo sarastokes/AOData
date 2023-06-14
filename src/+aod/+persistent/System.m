@@ -135,8 +135,9 @@ classdef System < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
-            obj.setDatasetsToDynProps();
-            obj.setLinksToDynProps();
+            % Add user-defined datasets and links
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
 
         function populateContainers(obj)

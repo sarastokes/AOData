@@ -289,6 +289,8 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["DatasetFilter", "AOQuery"])
         function DescriptionFilter(testCase)
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
             
             DF1 = aod.api.DescriptionFilter(testCase.QM,...
                 "This is a test experiment");
@@ -301,8 +303,16 @@ classdef FilterTest < matlab.unittest.TestCase
             DF2.describe();
             testCase.verifyEqual(DF2.code(), ...
                 string('aod.api.DescriptionFilter(QM, "description", @(x)endsWith(x,"experiment"))'));
+        end
 
+        function DescriptionFilterErrors(testCase)
+            
+            % Clear filters in case prior method errored
+            testCase.QM.clearFilters();
 
+            testCase.verifyError(...
+                @() aod.api.DescriptionFilter(testCase.QM, 123),...
+                "DescriptionFilter:InvalidInput");
         end
     end
 

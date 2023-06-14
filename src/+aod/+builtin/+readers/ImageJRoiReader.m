@@ -5,6 +5,9 @@ classdef ImageJRoiReader < aod.common.FileReader
 %   Wrapper for ImageJ ROI import functions with improvements to polygon
 %   ROI import
 %
+% Superclasses:
+%   aod.common.FileReader
+%
 % Syntax:
 %   obj = aod.builtin.readers.ImageJRoiReader(fullFilePath, imSize)
 %
@@ -26,14 +29,16 @@ classdef ImageJRoiReader < aod.common.FileReader
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties 
         Size (1,2)          {mustBeInteger}
     end
 
     methods
         function obj = ImageJRoiReader(fileName, imSize)
             obj@aod.common.FileReader(fileName);
-            obj.Size = imSize;
+            if nargin > 1
+                obj.Size = imSize;
+            end
         end
 
         function out = readFile(obj)

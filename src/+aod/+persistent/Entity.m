@@ -14,8 +14,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 %   setDescription(obj, txt)
 %   setName(obj, txt)
 %
-%   addDataset(obj, propName, propValue)
-%   removeDataset(obj, propName)
+%   addProp(obj, propName, propValue)
+%   setProp(obj, propName, propValue)
+%   removeProp(obj, propName)
 %
 %   tf = hasAttr(obj, attrName)
 %   out = getAttr(obj, attrName)
@@ -64,36 +65,37 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         expectedAttributes      = aod.util.AttributeManager
         % Specification of expected datasets
         expectedDatasets        = aod.specification.DatasetManager
+        % The underlying HDF5 file
+        hdfName                 string 
+        % The core class name used to create the entity
+        coreClassName           char    
     end
 
     properties (Dependent)
         % Whether the file is in read-only mode or not
         readOnly                logical
-        % The HDF5 file name
-        hdfFileName
     end
 
     properties (Hidden, Dependent)
         % The entity's HDF5 group name
-        groupName
+        groupName               char
     end
 
     properties (Hidden, SetAccess = private)
         % Entity properties
         Name                    string
         label                   char 
-        entityType
-        entityClassName         char      
-
-        % HDF5 properties
-        hdfName                 string 
+        entityType              % aod.common.EntityTypes
+        % The entity's HDF5 path
         hdfPath                 char
+        % Middle layer between HDF5 file and interface
+        factory                 % aod.persistent.EntityFactory
+    end
+    
+    properties (Access = private)
         linkNames
         dsetNames
         attNames
-
-        % Middle layer between HDF5 file and interface
-        factory                 % aod.persistent.EntityFactory
     end
 
     events
@@ -129,10 +131,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
         function value = get.readOnly(obj)
             value = obj.factory.persistor.readOnly;
-        end
-        
-        function value = get.hdfFileName(obj)
-            value = obj.factory.hdfName;
         end
 
         function value = get.groupName(obj)
@@ -174,7 +172,12 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             out = h.homeDirectory;
         end
 
-        function getGroupName(obj)
+        function out = getGroupName(obj)
+            % Get entity's HDF5 group name
+            %
+            % Syntax:
+            %   getGroupName(obj, newEntity)
+            % -------------------------------------------------------------
             if ~isscalar(obj)
                 out = arrayfun(@(x) string(x.groupName), obj);
                 return
@@ -235,19 +238,89 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 obj
                 newEntity       {mustBeA(newEntity, 'aod.core.Entity')}
             end
+
+            % Confirm entity types match
+            if ~isequal(newEntity.entityType, obj.entityType)
+                error('replaceEntity:InvalidEntityType',...
+                    'Entity types must match');
+            end
+
+            % Rename if necessary
+            if ~strcmp(newEntity.groupName, obj.groupName)
+                obj.setGroupName(newEntity.groupName);
+            end
             
-            evtData = aod.persistent.events.GroupEvent(newEntity, 'Replace', obj);
+            % Send to Persistor to perform HDF5 actions outside interface
+            % Includes updating specifications and entity's attr properties
+            evtData = aod.persistent.events.GroupEvent(obj, 'Replace', newEntity);
             notify(obj, 'GroupChanged', evtData);
+
+            [propsToAdd, propsToRemove, propsToChange] = obj.compareDatasets(obj, newEntity);
+            for i = 1:numel(propsToAdd)
+                obj.addProp(propsToAdd(i), newEntity.(propsToAdd(i)));
+            end
+
+            for i = 1:numel(propsToRemove)
+                obj.removeProp(propsToRemove(i));
+            end
+
+            for i = 1:numel(propsToChange)
+                obj.setProp(propsToChange(i), newEntity.(propsToChange(i)));
+            end
         end
     end
 
     % Dataset methods
     methods
-        function addDataset(obj, propName, propValue, ignoreValidation)
+        function addProp(obj, propName, propValue)
             % Add a new property (dataset/link) to the entity
             %
             % Syntax:
-            %   addDataset(obj, dsetName, dsetValue, ignoreValidation)
+            %   addProp(obj, dsetName, dsetValue, ignoreValidation)
+            %
+            % Inputs:
+            %   propName            char
+            %       The property's name (HDF5 dataset name)
+            %   propValue           
+            %       The value of the property 
+            % -------------------------------------------------------------
+            arguments
+                obj
+                propName            char
+                propValue           = []
+            end
+
+            % Confirm this is a new property
+            p = findprop(obj, propName);
+            if ~isempty(p)
+                if ismember(lower(propName), lower(aod.util.getAllPropNames(obj)));
+                    error('addProp:DatasetExist',...
+                        'Property %s exists, use setProp', propName);
+                end
+            end
+
+            obj.verifyReadOnlyMode();
+
+            % Make the change in the HDF5 file
+            [isEntity, isPersisted] = aod.util.isEntity(propValue);
+            if isEntity
+                if isPersisted
+                    obj.modifyLink(propName, propValue);
+                else
+                    error("addProp:UnpersistedLink",...
+                        "Links can only be written to persisted entities");
+                end
+            else
+                obj.modifyDataset(propName, propValue);
+            end
+        end
+
+        function setProp(obj, propName, propValue, ignoreValidation)
+            % Set the value of a property
+            %
+            % Syntax:
+            %   setProp(obj, propName, propValue)
+            %   setProp(obj, propName, propValue, ignoreValidation)
             %
             % Inputs:
             %   propName            char
@@ -261,13 +334,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                propName            char
-                propValue           
+                propName            char 
+                propValue                   = []
                 ignoreValidation    logical = false   
             end
 
             obj.verifyReadOnlyMode();
-
+ 
             % Check whether the value can be validated with specs
             propSpec = obj.expectedDatasets.get(propName);
             if ~isempty(propSpec)
@@ -283,15 +356,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     end
                 end
             end
-
-            [isEntity, isPersisted] = aod.util.isEntity(propValue);
-
+            
             % Make the change in the HDF5 file
+            [isEntity, isPersisted] = aod.util.isEntity(propValue);
             if isEntity
                 if isPersisted
                     obj.modifyLink(propName, propValue);
                 else
-                    error("addDataset:UnpersistedLink",...
+                    error("setProp:UnpersistedLink",...
                         "Links can only be written to persisted entities");
                 end
             else
@@ -299,34 +371,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
         end
 
-        function setProp(obj, propName, propValue)
-        
-            arguments
-                obj
-                propName        char 
-                propValue       = []
-            end
-
-            obj.verifyReadOnlyMode();
-
-            % Check in expectedDatasets
-            p = findprop(obj, propName);
-            if ~isempty(p)
-                %! check in expectedDatasets
-                return
-            end
-            if ~strcmp(p.SetAccess, 'public')
-                error('setProp:SetAccessDenied',...
-                    'Property %s does not have public SetAccess', propName);
-            end
-        end
-
-
-        function removeDataset(obj, propName)
+        function removeProp(obj, propName)
             % Remove a dataset/link from the entity
             %
             % Syntax:
-            %   removeDataset(obj, dsetName)
+            %   removeProp(obj, dsetName)
+            %
+            % Note:
+            %   The property will not be removed if in expectedDatasets
             % -------------------------------------------------------------
             obj.verifyReadOnlyMode();
 
@@ -334,7 +386,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
 
             % Ensure the property exists
             if isempty(p)
-                error("removeDataset:PropertyDoesNotExist",...
+                error("removeProp:PropertyDoesNotExist",...
                     "No link/dataset matches %s", propName);
             end
 
@@ -342,7 +394,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             mc = meta.class.fromName("aod.persistent.Entity");
             entityProps = arrayfun(@(x) string(x.Name), mc.PropertyList);
             if ismember(propName, entityProps)
-                error("removeDataset:EntityProperty",...
+                error("removeProp:EntityProperty",...
                     "Entity properties cannot be removed, use set methods.");
             end
 
@@ -353,7 +405,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 obj.modifyLink(propName, []);
             end
 
-            % Note that the dynamic property will not be deleted
+            % Delete if not in expectedDatasets
+            if ~obj.expectedDatasets.has(propName)
+                delete(p);
+            end
         end  
     end
 
@@ -388,8 +443,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     'The name %s matches an existing group in same location', name);
             end
             fprintf('Changing group name from %s to %s\n', obj.groupName, name);
-
-            % answer = aod.app.dialogs.NameChangeDialog()
 
             evtData = aod.persistent.events.NameEvent(name, obj.Name);
             notify(obj, 'NameChanged', evtData);
@@ -445,6 +498,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
         end
 
         function setNote(obj, newNote, ID)
+            % Add a note or replace an existing note
+            %
+            % Syntax:
+            %   setNote(obj, newNote, ID)
+            % -------------------------------------------------------------
             arguments
                 obj 
                 newNote         string
@@ -585,7 +643,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             end
         end
 
-        function setAttr(obj, attrName, attrValue)
+        function setAttr(obj, attrName, attrValue, ignoreValidation)
             % Add new attribute or change the value of existing attribute
             %
             % Syntax:
@@ -593,8 +651,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             % -------------------------------------------------------------
             arguments
                 obj
-                attrName       char
+                attrName            char
                 attrValue                  = []
+                ignoreValidation    logical = false
             end
 
             obj.verifyReadOnlyMode();
@@ -850,7 +909,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.common.EntityTypes.get(obj.loadAttribute('EntityType'));
-            obj.entityClassName = obj.loadAttribute('Class');
+            obj.coreClassName = obj.loadAttribute('Class');
             lastModTime = obj.loadAttribute('lastModified');
             if ~isempty(lastModTime)
                 obj.lastModified = datetime(lastModTime);
@@ -984,7 +1043,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             delete(p);
         end
 
-        function setDatasetsToDynProps(obj)
+        function populateDatasetsAsDynProps(obj)
             % Creates dynamic properties for all undefined datasets
             %
             % Description:
@@ -992,7 +1051,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   existing property of the class
             %
             % Syntax:
-            %   setDatasetsToDynProps(obj)
+            %   populateDatasetsAsDynProps(obj)
             % -------------------------------------------------------------
             if isempty(obj.dsetNames)
                 return
@@ -1002,19 +1061,22 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 p = findprop(obj, obj.dsetNames(i));
                 if isempty(p)
                     p = obj.addprop(obj.dsetNames(i));
-                    propSpec = obj.expectedDatasets.get(obj.dsetNames(i));
-                    if isempty(propSpec)
-                        p.Description = propSpec.Description;
-                    else
-                        p.Description = 'Dataset';
-                    end
                     dsetValue = aod.h5.read(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                     obj.(obj.dsetNames(i)) = dsetValue;
+                    % Check specifications
+                    propSpec = obj.expectedDatasets.get(obj.dsetNames(i));
+                    if ~isempty(propSpec)
+                        p.Description = propSpec.Description.Value;
+                        % Final step, after setting the value
+                        p.SetAccess = 'protected';
+                    end
                 elseif isa(p, 'meta.DynamicProperty')
                     dsetValue = aod.h5.read(...
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
+                    p.SetAccess = 'public';
                     obj.(obj.dsetNames(i)) = dsetValue;
+                    p.SetAccess = 'protected';
                 end
             end
 
@@ -1027,13 +1089,17 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                 p = findprop(obj, emptyDsets(i));
                 if isempty(p)
                     p = obj.addprop(emptyDsets(i));
+                    % Check specifications
                     propSpec = obj.expectedDatasets.get(emptyDsets(i));
-                    p.Description = propSpec.Description.Value;
+                    if ~isempty(propSpec)
+                        p.Description = propSpec.Description.Value;
+                        p.SetAccess = 'protected';
+                    end
                 end
             end
         end
 
-        function setLinksToDynProps(obj)
+        function populateLinksAsDynProps(obj)
             % Create dynamic properties for undefined links
             %
             % Description:
@@ -1041,7 +1107,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             %   set as an existing property of the class
             %
             % Syntax:
-            %   setLinksToDynProps(obj)
+            %   populateLinksAsDynProps(obj)
             % -------------------------------------------------------------
             if isempty(obj.linkNames)
                 return
@@ -1055,10 +1121,13 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
                     p.Description = 'Link';
                     linkValue = obj.loadLink(obj.linkNames(i));
                     obj.(obj.linkNames(i)) = linkValue;
+                    p.SetAccess = 'protected';
                 elseif isa(p, 'meta.DynamicProperty')
                     % Update existing dynamic property
                     linkValue = obj.loadLink(obj.linkNames(i));
+                    p.SetAccess = 'public';
                     obj.(obj.linkNames(i)) = linkValue;
+                    p.SetAccess = 'protected';
                 end
             end
         end
@@ -1245,7 +1314,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay
             else
                 headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
                 header = sprintf('%s (%s, %s)\n',... 
-                    headerStr, obj.label, char(obj.entityClassName));
+                    headerStr, obj.label, char(obj.coreClassName));
             end
         end 
 

@@ -28,9 +28,10 @@ classdef Analysis < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
             populate@aod.persistent.Entity(obj);
 
             obj.analysisDate = obj.loadDataset("analysisDate");
-            obj.setDatasetsToDynProps();
-            
-            obj.setLinksToDynProps();
+
+            % Add user-defined datasets and links
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end 
     end
 end 

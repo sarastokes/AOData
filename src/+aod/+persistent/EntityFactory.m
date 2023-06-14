@@ -120,10 +120,16 @@ classdef EntityFactory < handle
                 end
                 % Reload parent entity
                 evt.Entity.Parent.reload();
+            elseif strcmp(evt.Action, 'Replace')
+                evt.Entity.reload();
             end
 
             % Refresh the list of UUIDs
             obj.entityManager.collect();
+        end
+
+        function onEntityReplaced(obj, ~, evt)
+            
         end
 
         function onEntityRenamed(obj, ~, evt)

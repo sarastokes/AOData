@@ -22,11 +22,13 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % Optional key/value inputs:
 %   Administrator           char/string
 %       Who performed the calibration
+%   Target                  System, Channel or Device
 %
 % -------------------------------------------------------------------------
 % Properties:
 %   calibrationDate         datetime or text in format yyyyMMdd
 %       Date calibration was performed (yyyyMMdd)
+%   Target                  System, Channel or Device
 %
 % Attributes:
 %   Administrator           string

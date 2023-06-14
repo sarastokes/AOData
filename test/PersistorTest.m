@@ -212,7 +212,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.EXPT.setReadOnlyMode(false);
 
             % Add a property
-            testCase.EXPT.addDataset('Test', eye(3));
+            testCase.EXPT.addProp('Test', eye(3));
             % Confirm new property is now a dynamic property
             testCase.verifyTrue(isprop(testCase.EXPT, 'Test'));
             % Confirm new property correctly wrote to HDF5
@@ -220,17 +220,17 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.verifyEqual(eye(3), out);
         end
 
-        function RemoveDatasetWarnings(testCase)
+        function RemovePropWarnings(testCase)
             
             testCase.EXPT.setReadOnlyMode(false);
 
             testCase.verifyError(...
-                @() testCase.EXPT.removeDataset("UUID"),...
-                "removeDataset:EntityProperty");
+                @() testCase.EXPT.removeProp("UUID"),...
+                "removeProp:EntityProperty");
 
             testCase.verifyError(...
-                @() testCase.EXPT.removeDataset("BadProp"),...
-                "removeDataset:PropertyDoesNotExist");
+                @() testCase.EXPT.removeProp("BadProp"),...
+                "removeProp:PropertyDoesNotExist");
         end
 
         function Links(testCase)
@@ -238,20 +238,20 @@ classdef PersistorTest < matlab.unittest.TestCase
 
             % Edit a link
             newTargetPath = testCase.EXPT.Sources(1).hdfPath;
-            testCase.EXPT.Epochs(1).addDataset('Source', testCase.EXPT.Sources(1));
+            testCase.EXPT.Epochs(1).setProp('Source', testCase.EXPT.Sources(1));
             links = aod.h5.collectExperimentLinks(testCase.EXPT);
             testCase.verifyTrue(ismember(newTargetPath, links.Target));
             
             % Restore the original link
             oldTarget = testCase.EXPT.Sources(1).Sources(1).Sources(1);
-            testCase.EXPT.Epochs(1).addDataset('Source', oldTarget);
+            testCase.EXPT.Epochs(1).setProp('Source', oldTarget);
             links = aod.h5.collectExperimentLinks(testCase.EXPT);
             testCase.verifyTrue(strcmp(oldTarget.hdfPath, links.Target(1)));
      
             % Test for errors with unwritten links
             testCase.verifyError(...
-                @() testCase.EXPT.addDataset('BadLink', aod.core.Analysis('Test')),...
-                "addDataset:UnpersistedLink");
+                @() testCase.EXPT.setProp('BadLink', aod.core.Analysis('Test')),...
+                "setProp:UnpersistedLink");
         end
 
         function addEntity(testCase)

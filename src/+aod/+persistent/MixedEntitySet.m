@@ -37,7 +37,7 @@ classdef MixedEntitySet < handle & matlab.mixin.CustomDisplay
 
     methods 
         function obj = MixedEntitySet()
-            entityClass = 'aod.persistent.Entity';
+            obj.entityClass = 'aod.persistent.Entity';
         end
 
         function add(obj, entity)

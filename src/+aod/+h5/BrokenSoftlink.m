@@ -36,7 +36,7 @@ classdef BrokenSoftlink < handle
             %       The link destination, hdf path or entity
             % ----------------------------------------------------------
 
-            obj.Parent.addDataset(obj.Name, newTarget);
+            obj.Parent.setProp(obj.Name, newTarget);
         end
     end
 end

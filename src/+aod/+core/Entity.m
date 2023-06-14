@@ -66,13 +66,13 @@ classdef (Abstract) Entity < handle
         % The Entity's parent Entity
         Parent                      % aod.core.Entity subclass
         % User-defined name for the entity, defines the HDF5 group name
-        Name(1,:)                   char = char.empty()
+        Name                        string = string.empty()
         % Unique identifier for the entity
         UUID                        string = string.empty()
         % A description of the entity
         description                 string = string.empty() 
         % Notes about the entity
-        notes                       string = string.empty()
+        notes           (:,1)       string = string.empty()
         % The date the entity was created
         dateCreated                 datetime = datetime.empty()
         % The date and time the entity was last modified
@@ -165,11 +165,7 @@ classdef (Abstract) Entity < handle
         end
 
         function value = get.groupName(obj)
-            if isempty(obj.Name)
-                value = obj.label;
-            else
-                value = obj.Name;
-            end
+            value = obj.specifyGroupName();
         end
     end
 
@@ -738,28 +734,6 @@ classdef (Abstract) Entity < handle
                 out = [];
             end
         end
-        
-        function assignUUID(obj, uuid)
-            % Assign a UUID to the entity
-            %
-            % Description:
-            %   The same system may be used over multiple experiments and
-            %   should share UUIDs. This function provides public access
-            %   to aod.core.Entity's setUUID function to facilitate hard-
-            %   coded UUIDs for common sources
-            %
-            % Syntax:
-            %   obj.assignUUID(UUID)
-            %
-            % Notes:
-            %   Not recommended!
-            %
-            % See also:
-            %   aod.util.generateUUID
-            % -------------------------------------------------------------
-            uuid = aod.util.validateUUID(uuid);
-            obj.UUID = uuid;
-        end
     end
 
     % Methods meant to be overwritten by subclasses, if needed
@@ -783,6 +757,28 @@ classdef (Abstract) Entity < handle
             % -------------------------------------------------------------
             if isempty(obj.Name)
                 value = char(getClassWithoutPackages(obj));
+            else
+                value = obj.Name;
+            end
+        end
+        
+        function value = specifyGroupName(obj)
+            % Determines the HDF5 group name for the entity. 
+            %
+            % Description:
+            %   Subclasses can overwrite the default rules if needed, which
+            %   are that the "name" property is used unless empty. If the
+            %   name property is empty, the "label" property is used.
+            %
+            % Syntax:
+            %   value = specifyGroupName
+            %
+            % See also:
+            %   aod.core.Epoch.specifyGroupName
+            % -------------------------------------------------------------
+            
+            if aod.util.isempty(obj.Name)
+                value = obj.label;
             else
                 value = obj.Name;
             end
@@ -904,6 +900,30 @@ classdef (Abstract) Entity < handle
                 warning("Entity:DuplicateGroupName",...
                     "Entity shares a group name with an existing entity: %s", obj.label);
             end
+        end
+    end
+
+    methods (Access={?aod.util.Factory})
+        function assignUUID(obj, uuid)
+            % Assign a UUID to the entity
+            %
+            % Description:
+            %   The same system may be used over multiple experiments and
+            %   should share UUIDs. This function provides public access
+            %   to aod.core.Entity's setUUID function to facilitate hard-
+            %   coded UUIDs for common sources
+            %
+            % Syntax:
+            %   obj.assignUUID(UUID)
+            %
+            % Notes:
+            %   Access restricted to factory subclasses to protect UUIDs
+            %
+            % See also:
+            %   aod.util.generateUUID
+            % -------------------------------------------------------------
+            uuid = aod.util.validateUUID(uuid);
+            obj.UUID = uuid;
         end
     end
 

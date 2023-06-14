@@ -8,22 +8,26 @@ classdef ChannelOptimization < aod.core.Calibration
 % Syntax:
 %   obj = Optimization(name, calibrationDate, varargin)
 %   obj = aod.builtin.calibrations.ChannelOptimization(name, calibrationDate,...
-%       'Wavelength', value, 'PmtPosition', value,...
-%       'SourcePosition', value, 'Channel', value);
+%       'Wavelength', value, 'Target', entity);
 %
 % Properties:
 %   positions         table
 %       PMT XYZ and source position
 %   iterations          double
 %       Optimization iterations and mean light levels
+% Inherited properties:
+%   Target              system, channel or device
+%       The target of the calibration
+%   calibrationDate     datetime
 %
 % Parameters:
 %   Wavelength          double
 %       Wavelength of light source
 %
 % Methods:
-%   setPmtPosition(obj, modelEye, varargin)
+%   setPositions(obj, modelEye, varargin)
 %   setIterations(obj, data)
+%   setWavelength(obj, wl) 
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -46,14 +50,14 @@ classdef ChannelOptimization < aod.core.Calibration
         end
 
         function setWavelength(obj, value)
-            obj.setParam('Wavelength', value);
+            obj.setAttr('Wavelength', value);
         end
 
-        function setPosition(obj, modelEye, varargin)
+        function setPositions(obj, modelEye, varargin)
             % Set positions for model eye or in vivo
             %
             % Syntax:
-            %   setPosition(obj, modelEye, varargin)
+            %   setPositions(obj, modelEye, varargin)
             %
             % Examples:
             %   % Set the X and Y position for model eye
@@ -77,9 +81,14 @@ classdef ChannelOptimization < aod.core.Calibration
                 rowName = "InVivo";
             end
             
+            % Only change the inputs that were specified by user
             changedInputs = setdiff(ip.Parameters, ip.UsingDefaults);
             for i = 1:numel(changedInputs)
-                obj.positions(rowName, changedInputs{i}) = ip.Results.(changedInputs{i});
+                newValue = ip.Results.(changedInputs{i});
+                if isempty(newValue)
+                    newValue = NaN;
+                end
+                obj.positions{rowName, changedInputs{i}} = newValue;
             end
         end
     end

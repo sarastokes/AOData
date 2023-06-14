@@ -26,8 +26,9 @@ classdef EpochDataset < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyn
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
-            obj.setDatasetsToDynProps();
-            obj.setLinksToDynProps();
+            % Add user-defined datasets and link
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
     end
 end

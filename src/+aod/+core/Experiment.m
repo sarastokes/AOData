@@ -133,10 +133,7 @@ classdef Experiment < aod.core.Entity
         
         
         function epoch = id2epoch(obj, IDs)
-            % ID2EPOCH
-            %
-            % Description:
-            %   Input epoch ID(s), get Epoch(s)
+            % Input epoch ID(s), get Epoch(s)
             %
             % Syntax:
             %   epoch = id2epoch(obj, IDs)

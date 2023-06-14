@@ -123,12 +123,12 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
             obj.ID = obj.loadDataset("ID");
             obj.startTime = obj.loadDataset("startTime");
             obj.Timing = obj.loadDataset("Timing");
-            obj.setDatasetsToDynProps();
+            obj.populateDatasetsAsDynProps();
 
             % LINKS
             obj.Source = obj.loadLink("Source");
             obj.System = obj.loadLink("System");
-            obj.setLinksToDynProps();
+            obj.populateLinksAsDynProps();
         end
 
         function populateContainers(obj)

@@ -270,10 +270,10 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             obj.homeDirectory = obj.loadDataset('homeDirectory');
             obj.epochIDs = obj.loadDataset('epochIDs');
             obj.Code = obj.loadDataset('Code');
-            obj.setDatasetsToDynProps();
 
-            % Links
-            obj.setLinksToDynProps();
+            % Set user-defined datasets and links
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
 
         function populateContainers(obj)

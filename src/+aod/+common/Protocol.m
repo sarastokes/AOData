@@ -73,10 +73,11 @@ classdef (Abstract) Protocol < handle
             % Notes:
             %   Argument validation handled by property definition
             % -------------------------------------------------------------
-            if ~aod.util.isEntitySubclass('calibration')
-                error('setCalibration:InvalidInput',...
-                    'Protocol calibration must be of entity type Calibration');
-            end
+            aod.util.mustBeEntityType(calibration, 'Calibration');
+            % if ~aod.util.isEntitySubclass(calibration, 'calibration')
+            %    error('setCalibration:InvalidInput',...
+            %        'Protocol calibration must be of entity type Calibration');
+            %end
             obj.Calibration = calibration;
         end
     end

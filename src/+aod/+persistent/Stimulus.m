@@ -30,10 +30,11 @@ classdef Stimulus < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
-            obj.setDatasetsToDynProps();
-
             obj.Calibration = obj.loadLink("Calibration");
-            obj.setLinksToDynProps();
+
+            % Add user-defined datasets and links
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
     end
 end 

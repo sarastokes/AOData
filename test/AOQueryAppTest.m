@@ -77,8 +77,8 @@ classdef AOQueryAppTest < matlab.uitest.TestCase & matlab.mock.TestCase
             % Edit the second filter
             testCase.press(app.filterPanel.Filters(2).filterControls.editButton);
             testCase.choose(app.filterPanel.Filters(2).inputBox.filterDropdown, "ATTRIBUTE");
-            testCase.type(app.FilterPanel.Filters(2).inputBox.nameEditfield, "Pinhole");
-            testCase.type(app.FilterPanel.Filters(2).inputBox.valueEditfield, 20);
+            testCase.type(app.filterPanel.Filters(2).inputBox.nameEditfield, "Pinhole");
+            testCase.type(app.filterPanel.Filters(2).inputBox.valueEditfield, '20');
             testCase.choose(app.filterTab);  % So typing is registered as complete
             testCase.press(app.filterPanel.Filters(2).filterControls.addButton);
             testCase.verifyEqual(app.numFilters, 2);

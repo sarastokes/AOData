@@ -53,7 +53,7 @@ classdef SourceTest < matlab.unittest.TestCase
             testCase.verifyNumElements(source1.get('Source', {'Name', 'OS'}), 1);
             
             % Check labels
-            testCase.verifyEqual('MC00851_OS', source1a.label);
+            testCase.verifyEqual(source1a.label, "MC00851_OS");
 
             % Check has functionality
             testCase.verifyTrue(source1.has({'Name', 'OS'}));

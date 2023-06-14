@@ -59,7 +59,7 @@ classdef ProtocolTest < matlab.unittest.TestCase
             testCase.verifyNotEqual(protocol1, protocol2);
 
             % Restore date, add a calibration
-            protocol2.DateCreated = getDateYMD();
+            protocol2.dateCreated = getDateYMD();
             protocol2.setCalibration(aod.core.Calibration('TestCalibration'));
             testCase.verifyNotEqual(protocol1, protocol2);
 
@@ -75,7 +75,7 @@ classdef ProtocolTest < matlab.unittest.TestCase
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
             testCase.verifyError(@()protocol1.setCalibration(123),...
-                'setCalibration:InvalidInput');
+                'mustBeEntityType:InvalidEntityType');
         end
 
         function StimVsFrameRates(testCase)

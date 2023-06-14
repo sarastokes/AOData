@@ -4,13 +4,14 @@ classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 % Description:
 %   Represents a persisted Annotation in an HDF5 file
 %
-% Parent:
-%   aod.persistent.Entity
-%   matlab.mixin.Heterogeneous
-%   dynamicprops
+% Superclasses:
+%   aod.persistent.Entity, matlab.mixin.Heterogeneous, dynamicprops
 %
 % Constructor:
 %   obj = aod.persistent.Annotation(hdfFile, hdfPath, factory)
+%
+% Methods:
+%   setData(obj, data)
 %
 % See also:
 %   aod.core.Annotation
@@ -29,15 +30,13 @@ classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
     methods (Sealed)
         function setData(obj, data)
-            % SETDATA
-            % 
-            % Description:
-            %   Change Data saved in HDF5 file
+            % Change Data saved in HDF5 file
             %
             % Syntax:
             %   setData(obj, data)
             % -------------------------------------------------------------
-            obj.addDataset('Data', data);
+
+            obj.setProp('Data', data);
         end
     end
 
@@ -52,8 +51,8 @@ classdef Annotation < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             obj.Source = obj.loadLink("Source");
 
             % Add additional user-defined datasets and links
-            obj.setDatasetsToDynProps();
-            obj.setLinksToDynProps();
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
     end
 end

@@ -9,7 +9,7 @@ function pEXPT = makeSmallExperiment(writeToHdf, fileName)
 % -------------------------------------------------------------------------
 
     if nargin < 2
-        fileName = 'SmallExperiment.h5';
+        fileName = 'SmallExperiment2.h5';
     end
 
     % Make a small experiment with missing entity types

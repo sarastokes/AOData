@@ -163,17 +163,34 @@ classdef Persistor < handle
 
                 % Remove if safe
                 h5tools.deleteObject(obj.hdfName, hdfPath);
-            elseif strcmp(evt.Action, 'Replace')
-                %! Check whether group names are the same
-                newName = ~strcmp(evt.Entity.groupName, evt.OldEntity.groupName);
+            elseif strcmp(evt.Action, 'Replace');
+                newObj = evt.NewEntity;
+                oldObj = evt.Entity;
                 
-                % Replace links if group name is different
-                linkLocations = obj.checkGroupLinks(hdfPath);
-                %! Check child links too (overwrite Parent)
-                h5tools.deleteObject(obj.hdfName, parent.hdfPath,...
-                    h5tools.util.getPathEnd(hdfPath));
-                aod.h5.writeEntity(obj.hdfName, evt.NewEntity);
-                h5writeatt(obj.hdfName, hdfPath, 'UUID', uuid);
+                % Update atttribute properties
+                if ~strcmp(newObj.label, oldObj.label)
+                    h5writeatt(obj.hdfName, hdfPath, 'label', newObj.label);
+                end
+                if ~strmcp(newObj.description, oldObj.description)
+                    h5writeatt(obj.hdfName, hdfPath, 'description', newObj.description);
+                end
+                if ~isa(newObj, oldObj.coreClassName);
+                    h5writeatt(obj.hdfName, hdfPath, 'Class', class(newObj));
+                end
+                h5writeatt(obj.hdfName, hdfPath, 'dateCreated', newObj.dateCreated);
+
+                % Update specifications
+                if ~isequal(newObj.expectedDatasets, oldObj.expectedDatasets)
+                    aod.h5.writeExpectedDatasets(obj.hdfName, hdfPath,... 
+                        'expectedDatasets', newObj.expectedDatasets);
+                end
+                if ~isequal(newObj.expectedAttributes, oldObj.expectedAttributes)
+                    aod.h5.writeExpectedAttributes(obj.hdfName, hdfPath,...
+                        'expectedAttributes', newObj.expectedAttributes);
+                end
+
+                % Final steps below aren't needed
+                return 
             end
 
             % Ensure the change is reflected in EntityFactory

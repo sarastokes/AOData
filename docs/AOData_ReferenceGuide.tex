@@ -1,0 +1,1770 @@
+\documentclass{aodatadocs}
+
+% Enumerations
+\newlist{legal}{enumerate}{10}
+\setlist[legal]{label*=\arabic*.}
+
+% Colors
+\usepackage{ninecolors}
+\definecolor{codegreen}{rgb}{0, 0.6, 0}
+\definecolor{codegray}{rgb}{0.94, 0.94, 0.94}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{codeblue}{rgb}{0.1, 0.1, 0.6}
+\definecolor{codered}{rgb}{0.3, 0.3, 0.9}
+\definecolor{darkgray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkteal}{rgb}{0.1,0.6,0.5}
+\definecolor{backcolor}{rgb}{0.95,0.96,0.965}
+\definecolor{Green}{HTML}{319866}
+
+% Code listings
+\usepackage{listings}
+\usepackage{matlab-prettifier}
+\lstdefinestyle{mystyle}{
+    style=matlab-editor, 
+	backgroundcolor=\color{backcolor}, 
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codepurple},
+    keywordstyle=\color{codeblue},
+    numberstyle=\color{codered},
+    basicstyle=\ttfamily\large,
+    showspaces=false,
+    showstringspaces=false,
+    tabsize=4
+}
+\lstset{style=mystyle}
+
+% Tables
+\usepackage{array,calc,collcell}
+\newlength{\fwlen}
+\newcolumntype{L}[1]{>{\setlength{\fwlen}{#1}\collectcell\fixedLwidth}l<{\endcollectcell}}
+\makeatletter
+\newcommand{\fixedLwidth}[1]{\setlength{\@tempdima}{\widthof{#1}}\ifdim\@tempdima>\fwlen #1\else\setlength{\@tempdimb}{\fwlen-\@tempdima}#1\rule{\@tempdimb}{0pt}\fi}
+\makeatother
+
+% Function input flag environment
+\NewTColorBox{InputFlag}{}{enhanced,breakable,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,
+    title=Inputs,coltitle=black,
+    fonttitle=\sffamily\bfseries,
+    flagstyle/ul={green6!10}{green6},
+    before upper*=\begin{tabular}{L{3cm} L{1cm}}, 
+    after upper*=\end{tabular}}
+% Function output flag environment
+\NewTColorBox{OutputBox}{}{enhanced,breakable,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,
+    title=Outputs,coltitle=black,
+    fonttitle=\sffamily\bfseries,
+    flagstyle/ul={red6!10}{red6},
+    before upper*=\begin{tabular}{L{3cm} L{1cm}}, 
+    after upper*=\end{tabular}}
+% Property flag environment
+\NewTColorBox{PropFlag}{O{(Access=public)}}{enhanced,breakable,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,
+    title=Properties (\texttt{#1}),coltitle=black,
+    fonttitle=\sffamily\bfseries,
+    flagstyle/ul={azure4!10}{azure4},
+    before upper*=\begin{tabular}{L{3cm} L{1cm}}, 
+    after upper*=\end{tabular}}
+% Attribute flag environment
+\NewTColorBox{AttrFlag}{}{enhanced,breakable,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,
+    title=Attributes,coltitle=black,
+    fonttitle=\sffamily\bfseries,
+    flagstyle/ul={violet4!10}{violet4},
+    before upper*=\begin{tabular}{L{3cm} L{1cm}}, 
+    after upper*=\end{tabular}}
+% See also flag environment
+\NewTColorBox{SeeFlag}{}{enhanced,breakable,
+    top=1mm, bottom=1mm, left=1mm, right=1mm,
+    coltitle=black, fonttitle=\sffamily\bfseries,
+    title=See also, flagstyle/ul={gray6!10}{gray6}}
+\NewTColorBox{SuperFlag}{}{enhanced,breakable,
+    top=1mm, bottom=1mm, left=1mm, right=1mm,
+    coltitle=black, fonttitle=\sffamily\bfseries,
+    title=Superclasses, flagstyle/ul={gray6!10}{gray6}}
+\NewTColorBox{MethodTab}{O{methodName}}{enhanced,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,
+    title={#1},coltitle=black,
+    fonttitle=\sffamily\bfseries\Large,
+    filingstyle/ul={cyan4!20}{cyan2}}
+\NewTColorBox{StaticTab}{O{methodName}}{enhanced,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,boxrule=1mm,
+    title={#1},coltitle=black,
+    fonttitle=\sffamily\bfseries\Large,
+    filingstyle/ul={green4!20}{green2}}
+\NewTColorBox{ProtectTab}{O{methodName}}{enhanced,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,
+    title={#1},coltitle=black,
+    fonttitle=\sffamily\bfseries\Large,
+    filingstyle/ul={brown4!20}{brown2}}
+\NewTColorBox{CtorTab}{O{methodName}}{enhanced,
+    top=1mm,bottom=1mm,left=1mm,right=1mm,
+    title={#1},coltitle=black,
+    fonttitle=\sffamily\bfseries\Large,
+    filingstyle/ul={red4!20}{red2}}
+
+\NewTColorBox{CtorBox}{}{
+    colframe=white, colback=gray6!15,arc=1mm,
+    fontupper=\large\ttfamily\raggedright}
+\NewTColorBox{CodeBox}{}{
+    colframe=white, size=minimal,
+    fontupper=\ttfamily\raggedright}
+
+    
+\newcommand{\codeformat}[1]{\texttt{\raggedright #1}}
+\newcommand{\textbt}[1]{\texttt{\textbf{#1}}}
+\newcommand{\propd}[1]{\multicolumn{2}{l}{\hspace{3ex}#1}}
+\newcommand{\argin}[1]{\texttt{#1}}
+\newcommand{\newarg}[1]{\texttt{#1}}
+\newcommand{\oldarg}[1]{\texttt{\textit{#1}}}
+\newcommand{\propref}[1]{\texttt{#1}}
+
+% References
+\newcommand{\mclass}[1]{\textcolor{blue}{\texttt{#1}}}
+\newcommand{\myclass}[1]{\textcolor{blue4}{\texttt{\textbf{\underline{#1}}}}}
+\newcommand{\mymethod}[1]{\textcolor{violet4}{\texttt{\textbf{#1}}}}
+
+% Code markup
+\newcommand{\defblock}[1]{\textbt{\textcolor{blue}{#1}}}
+\newcommand{\ctext}[1]{\texttt{\textcolor{green4}{#1}}}
+\newcommand{\ccomm}[1]{\texttt{\textit{\textcolor{codegreen}{#1}}}}
+\newcommand{\ret}[1]{\textcolor{purple5}{\texttt{#1}}}
+\newcommand{\ONE}{$\qquad$}
+\newcommand{\CoreShare}{\textcolor{gray}{\textit{Same as core.}}}
+
+% Spacing
+\newcommand{\myspace}{\vspace{1ex}}
+\newcommand{\mybreak}{$\quad$\\\noindent\makebox[\linewidth]{\rule{0.88\paperwidth}{1.5pt}}\vspace{1.5ex}}
+
+
+\makeatletter
+\newcommand{\customlabel}[2]{%
+   \protected@write \@auxout {}{\string \newlabel {#1}{{#2}{\thepage}{#2}{#1}{}}}%
+   \hypertarget{#1}{}
+}
+\makeatother
+
+\begin{document}
+\begin{center}
+    \textsf{\textbf{\Huge AOData Documentation}}
+\end{center}
+$\quad$\\
+
+{\sffamily\begin{legal}[font=\Large\bfseries, itemsep=1.5ex]%[label*=\arabic*.]
+    \item {\Large\bfseries Core Interface (\texttt{aod.core})}
+    \begin{legal}[font=\large\bfseries, itemsep=1ex]
+        \item {\large\textbf{Entity} (\texttt{\ref{cls:cEntity}})}
+        \begin{itemize}
+            \item[] \hspace{-2.2ex}\underline{\textcolor{cyan2}{Public methods:}}
+            \item \ref{fcn:cEntityHasAttr} -- determine whether entity has an attribute 
+            \item \ref{fcn:cEntityHasFile} -- determine whether entity as a file
+            \item \ref{fcn:cEntityGetAttr} -- get the value of an attribute corresponding to the provided key.
+            \item \ref{fcn:cEntityGetFile} -- get the value of a file corresponding to the provided key
+            \item \ref{fcn:cEntityGetGroupName} -- get the name that will be used for the entity's HDF5 group.
+            \item \ref{fcn:cEntityGetHomeDirectory} -- get the parent experiment's home directory.
+            \item \ref{fcn:cEntityGetParent} -- get the parent or ancestor of the entity
+            \item \ref{fcn:cEntitySetAttr} -- set the values of existing attribute(s) or add new ones.
+            \item \ref{fcn:cEntitySetDescription} -- set an entity's description 
+            \item \ref{fcn:cEntitySetFile} -- add a new file or set the value of an existing file
+            \item \ref{fcn:cEntitySetName} -- set a user-defined group name for the entity
+            \item \ref{fcn:cEntitySetNote} -- add a note to the entity or overwrite an existing note
+            \item \ref{fcn:cEntityRemoveAttr} -- remove an attribute from the entity
+            \item \ref{fcn:cEntityRemoveFile} -- remove a file
+            \item \ref{fcn:cEntityRemoveNote} -- remove a note from the entity by index
+            \item[] \hspace{-2.2ex}\underline{Protected methods:}
+            \item \ref{fcn:cEntityGetLabel} -- define an automated group name 
+            \item[] \hspace{-2.2ex}\underline{Static methods:}
+            \item \ref{fcn:cEntitySpecifyAttributes} -- define and add specifications for the class' attributes
+            \item \ref{fcn:cEntitySpecifyDatasets} -- add or edit specifications for the class' properties
+        \end{itemize}
+        \item {\large\textbf{Experiment} (\ref{cls:cExperiment})}
+        \begin{itemize}
+            \item \ref{fcn:cExperimentAdd} -- add a child entity
+            \item \ref{fcn:cExperimentGetFromEpoch} -- search child entities of specific epoch(s)
+            \item \ret{id2epoch}
+            \item \ret{id2index}
+            \item \ref{fcn:cExperimentRemove} -- remove a child entity or entities of a specific type
+            \item \ret{removeByEpoch}
+            \item \ref{fcn:cExperimentSetDate} -- change the experiment's date
+            \item \ref{fcn:cExperimentSetHomeDirectory} -- change experiment file path 
+        \end{itemize}
+        \item {\large\textbf{Epoch} (\ref{cls:cEpoch})}
+        \begin{itemize}
+            \item \ref{fcn:cEpochAdd} -- add a new child entity to the Epoch
+            \item \ref{fcn:cEpochGet} -- get specific child entities of the Epoch
+            \item \ret{has}
+            \item \ret{setSource}
+            \item \ret{setStartTime}
+            \item \ret{setSystem}
+            \item \ret{setTiming}
+            \item \ref{fcn:cEpochRemove} -- remove a child entity from the Epoch 
+        \end{itemize}
+        \item {\large\textbf{Source} (\ref{cls:cSource})}
+            \begin{itemize}
+                \item \ret{get}
+                \item \ret{getAllSources}
+                \item \ret{getLevel}
+                \item \ret{has}
+                \item \ret{set}
+                \item \ret{remove}
+            \end{itemize}
+        \item {\large\textbf{System}}
+            \begin{itemize}
+                \item \ret{get}
+                \item \ret{getChannelDevices}
+                \item \ret{has}
+                \item \ret{set}
+                \item \ret{remove}
+            \end{itemize}
+        \item {\large\textbf{Channel}}
+            \begin{itemize}
+                \item \ret{get}
+                \item \ret{has}
+                \item \ret{set}
+                \item \ret{remove}
+            \end{itemize}
+        \item {\large\textbf{Device}}
+        \item {\large\textbf{Calibration}}
+            \begin{itemize}
+                \item \ret{setDate}
+                \item \ret{setTarget}
+            \end{itemize}
+        \item {\large\textbf{ExperimentDataset}}
+            \begin{itemize}
+                \item \ret{setData}
+            \end{itemize}
+        \item {\large\textbf{EpochDataset}}
+            \begin{itemize}
+                \item \ret{setData}
+            \end{itemize}
+        \item {\large\textbf{Registration}}
+            \begin{itemize}
+                \item \ret{setDate}
+                \item \ret{setData}
+            \end{itemize}
+        \item {\large\textbf{Response}}
+            \begin{itemize}
+                \item \ret{setData}
+                \item \ret{setTiming}
+            \end{itemize}
+        \item {\large\textbf{Stimulus}}
+            \begin{itemize}
+                \item \ret{getProtocol}
+                \item \ret{setCalibration}
+                \item \ret{setProtocol}
+            \end{itemize}
+        \item {\large\textbf{Annotation}}
+            \begin{itemize}
+                \item \ret{setData}
+                \item \ret{setDate}
+                \item \ret{setSource}
+            \end{itemize}
+        \item {\large\textbf{Analysis}}
+            \begin{itemize}
+                \item \ret{setData}
+                \item \ret{setDate}
+            \end{itemize}
+    \end{legal}
+    \item {\Large\bfseries Persistent Interface (\texttt{aod.persistent})}
+    \begin{legal}[font=\large\bfseries, itemsep=1ex]
+        \item {\large\textbf{Entity} (\ref{cls:pEntity})}
+        \begin{itemize}
+            \item \ref{fcn:pEntityAddProp} -- add a new property/HDF5 dataset
+            \item \ref{fcn:pEntityRemoveProp} -- remove or clear the value of a property/HDF5 dataset 
+            \item \ref{fcn:pEntityReplaceEntity} -- replace an entity with a new one from the core interface
+            \item \ref{fcn:pEntitySetProp} -- set the value of an existing property/HDF5 dataset 
+            \item \ref{fcn:pEntitySetReadOnlyMode} -- set whether changes to the underlying HDF5 file are allowed
+            \item \ref{fcn:pEntityQuery} -- query the contents of the experiment
+        \end{itemize}
+    \end{legal}
+    \item {\Large\bfseries Common Interface (\texttt{aod.common})}
+    \begin{legal}[font=\large\bfseries, itemsep=1ex]
+        \item {\large\textbf{FileReader} (\texttt{\ref{cls:FileReader}})}
+        \item {\large\textbf{KeyValueMap} (\texttt{\ref{cls:KeyValueMap}})}
+        %\begin{itemize}
+        %    \item \ref{fcn:KeyValueMapToMap} -- convert to \mclass{containers.Map}
+        %    \item \ref{fcn:KeyValueMapToStruct} -- convert to \mclass{struct}
+        %\end{itemize}
+    \end{legal}
+    \item {\Large\bfseries Builtin (\texttt{aod.builtin})}
+    \begin{legal}[font=\large\bfseries, itemsep=1ex]
+        \item {\large\textbf{Annotations} (\texttt{aod.builtin.annotations})}
+        \item {\large\textbf{Calibrations} (\texttt{aod.builtin.calibrations})}
+        \begin{legal}
+            \item \textbf{ChannelOptimization} (\ref{cls:bChannelOpt})
+        \end{legal}
+        \item {\large\textbf{Devices} (\texttt{aod.builtin.devices})}
+        \item {\large\textbf{Registrations} (\texttt{aod.builtin.registrations})}
+        \item {\large\textbf{Responses} (\texttt{aod.builtin.responses})}
+        \item {\large\textbf{Sources} (\texttt{aod.builtin.sources})}
+        \item {\large\textbf{Stimuli} (\texttt{aod.builtin.stimuli})}
+    \end{legal}
+    \item {\Large\bfseries Query API (\texttt{aod.api})}
+    \item {\Large\bfseries Specification (\texttt{aod.specification})}
+    \item {\Large\bfseries Infrastructure (\texttt{aod.infra})}
+    \item {\Large\bfseries Utilities (\texttt{aod.util})}
+\end{legal}
+}
+
+\pagebreak
+\section*{Example Class}
+    \noindent {\large This example class demonstrates how AOData classes are detailed in this documentation. Each class begins with a short description in  large text}.\\$\quad$\\
+    \textbf{Notes:} Sometimes classes will then have additional notes on their use in smaller text as such. In this documentation, classes, functions and methods are indicated in the text as
+    \begin{itemize} 
+        \item \mclass{name} -- MATLAB builtin classes and functions
+        \item \myclass{name} -- AOData classes 
+        \item \mymethod{name} -- a method of an AOData class.
+        \item \propref{name} -- a property or attribute of an AOData class.
+    \end{itemize} 
+    $\quad$\\
+    Next, the class' superclasses are introduced. The class will inherit properties and methods from this class. AOData entities will also inherit attributes from any superclasses that are also AOData entities. Entities are any subclass of \ref{cls:cEntity} or \ref{cls:pEntity}.
+    \begin{SuperFlag}
+        className, className... 
+    \end{SuperFlag}\vspace{2ex}
+    
+    \noindent Properties are introduced in the following blocks, with their specifications in parentheses:
+    \begin{PropFlag}[SetAccess = protected, GetAccess = public]
+        \newarg{PropName} & property's class (e.g., \mclass{double})\\
+        \propd{A description of the property}\\
+        &\\
+        \oldarg{PropName} & property's class\\
+        \propd{A property inherited from a superclass is indicated in italics.}\\ 
+    \end{PropFlag}\vspace{2ex}
+
+    \noindent Attributes are introduced in the following blocks:
+    \begin{AttrFlag}
+        \newarg{AttrName} & attribute's class (e.g., \mclass{string})\\
+        \propd{A description of the attribute}\\
+        &\\
+        \oldarg{AttrName} & attribute's class\\
+        \propd{A description of the inherited attribute}\\
+    \end{AttrFlag}\vspace{2ex}
+
+    \noindent Class methods are introduced in tabs using the following color code. The name is at the top in bold and a description is below in smaller text. 
+    \begin{CtorTab}[Constructor]
+        Each class has a constructor that creates objects of that class (a.k.a. instantiates). 
+    \end{CtorTab}\vspace{1ex}
+
+    \begin{MethodTab}[Public methods]
+        These methods have public access and can be called by any class or from the command line. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{ProtectTab}[Protected methods]
+        These methods have protected access. They can be called by the class and any of its subclasses, but not from other classes or from the command line. 
+    \end{ProtectTab}\vspace{1ex}
+
+    \begin{StaticTab}[Static methods]
+        These methods do not require instantiation of the class by calling the constructor. 
+    \end{StaticTab}\vspace{2ex}
+
+    \noindent Each method has a specific syntax for use. If there are multiple listed, the first shows the minimum, required inputs and the second shows all the optional inputs in italics. Optional key/value inputs are shown with a \textit{\texttt{`key'}}, then a \textit{\texttt{value}}.
+    
+    \begin{CtorBox}
+        out = myFunction(requiredInput)\\
+        out = myFunction(requiredInput, \textit{optionalInput, `OptionalKey', optionalValue})
+    \end{CtorBox}\vspace{2ex}
+
+    \noindent Next the inputs will be described in greater detail. Optional inputs will be identified, all others are required.
+    \begin{InputFlag}
+        \argin{requiredInput} & expected class (e.g., \mclass{double})\\
+        \propd{A description of the required input (function will error if not provided)}\\
+        &\\
+        \textbf{Optional inputs:}&\\
+        \argin{optionalInput} & expected class\\
+        \propd{Optional inputs are not required, but if included, they must be a specific position (in this example, \propref{optionalInput} must be 2nd).}\\
+        &\\
+        \textbf{Optional key/value inputs:}&\\
+        \argin{OptionalKey} & expected class\\
+        \propd{These inputs require a key and then the value. If there are multiple key/value inputs, the key/value pairs can be provided in any order.}\\
+    \end{InputFlag}\vspace{2ex}
+
+    \noindent If the method has outputs, they will be described as follows.
+    \begin{OutputBox}
+        \argin{output} & the output's class\\
+        \propd{A description of the output}\\
+    \end{OutputBox}\vspace{2ex}
+
+    \begin{example}
+        $\quad$\\ Many methods will have examples demonstrating their use. Most use a demo AOData experiment which you can access with:
+        \begin{CodeBox}
+            [cEXPT, pEXPT] = ToyExperiment(true);
+        \end{CodeBox}
+
+        \noindent This function creates an experiment in the core interface and returns it (\texttt{cEXPT}). Then, it writes the experiment to an HDF5 file and reads it into the persistent interface (\texttt{pEXPT}). Any example using these two variables requires running the line above first. 
+    \end{example}\vspace{2ex}
+
+    \noindent If the method is related to any other methods, they will be listed as below. For AOData methods and classes, clicking on them will take you to the appropriate area of the documentation.
+    
+    \begin{SeeFlag}
+        methodOne, methodTwo,... 
+    \end{SeeFlag}\vspace{1ex}
+
+
+    
+    \noindent {\large\textbf{Additional notes:}}\\
+
+\pagebreak 
+
+\section*{1.1. Entity (\texttt{aod.core.Entity})}
+    \customlabel{cls:cEntity}{\myclass{aod.core.Entity}}
+    \noindent {\large An \underline{abstract} class that provides a consistent interface to all AOData core classes. All subclasses of \ref{cls:cEntity} inherit the properties and methods below. For brevity, the inherited properties are omitted from the property lists of subclasses in this documentation.}\myspace
+
+    \begin{SuperFlag}
+        \mclass{handle}
+    \end{SuperFlag}\myspace
+   
+    \begin{PropFlag}[GetAccess=public, SetAccess=private]
+        \newarg{Name} & \mclass{string}\\
+        \propd{A user-defined name for the entity. See: \ref{fcn:cEntitySetName}}\\
+        &\\
+        \newarg{Parent} & \ref{cls:cEntity}\\
+        \propd{The Parent entity within the experiment hierarchy}\\
+        &\\
+        \texttt{UUID} & \mclass{string}\\
+        \propd{A unique identifier for the entity}\\
+        &\\
+        \texttt{description} & \mclass{string}\\
+        \propd{A description of the entity}\\
+        &\\
+        \texttt{dateCreated} & \mclass{datetime}\\
+        \propd{The date and time that the entity was created.}\\
+        &\\
+        \texttt{lastModified} & \mclass{datetime}\\
+        \propd{The date and time that the entity was last modified.}\\
+        &\\
+        \texttt{attributes} & \ref{cls:KeyValueMap}\\
+        \propd{The entity's metadata specified as key/value pairs.}\\
+        &\\
+        \texttt{files} & \ref{cls:KeyValueMap}\\
+        \propd{Files associated with the entity specified as key/value pairs.}\\
+        &\\
+        \texttt{notes} & \mclass{string}\\
+        \propd{Notes about the entity.}\\
+    \end{PropFlag}\myspace
+    
+    \begin{PropFlag}[Dependent, GetAccess=public]
+        \texttt{label} & \mclass{string}\\
+        \propd{l}{Automated group name used if \texttt{Name} is not set. See \ref{fcn:cEntityGetLabel}}\\
+        &\\
+        \texttt{expectedAttributes} & \ret{AttributeManager}\\
+        \propd{Attribute specifications (see \ref{fcn:cEntitySpecifyAttributes})}\\
+        &\\
+        \texttt{expectedDatasets} & \ret{DatasetManager}\\
+        \propd{Dataset specifications (see \ret{specifyDatasets})}\\
+    \end{PropFlag}
+
+    \begin{PropFlag}[Hidden, Dependent, GetAccess=public]
+        \newarg{groupName} & \mclass{char}\\
+        \propd{The name of the entity's HDF5 group}\\
+    \end{PropFlag}\myspace
+
+    \mybreak 
+
+%* ENTITY
+    \begin{CtorTab}[Entity()]
+        The constructor for \ref{cls:cEntity}. Because this is an abstract class, the constructor is only called within the constructors of the core classes.
+    \end{CtorTab}
+    
+    \begin{CtorBox}
+        obj = \textbf{aod.core.Entity}(\textit{name})\\
+        obj = \textbf{aod.core.Entity}(\textit{name, `Parent', parentEntity})
+    \end{CtorBox}\myspace
+
+    \begin{InputFlag}
+        \textbf{Optional positional inputs:}\\
+        \texttt{name} & \mclass{string}\\
+        &\\
+        \textbf{Optional key/value inputs:}&\\
+        \texttt{Parent} & \mclass{\ref{cls:cEntity}}\\
+        \propd{The attribute's key}\\
+    \end{InputFlag}\myspace
+
+    \mybreak
+
+%* HASATTR
+    \begin{MethodTab}[hasAttr()]
+        \customlabel{fcn:cEntityHasAttr}{\mymethod{hasAttr()}}
+        Determine whether entity has an attribute with the provided key.
+    \end{MethodTab}\myspace
+   
+    \begin{CtorBox}
+        tf = \textbf{hasAttr}(obj, attrKey).
+    \end{CtorBox}\myspace
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{attrKey} & \mclass{char}\\
+        \propd{The attribute's key}\\
+    \end{InputFlag}\myspace
+
+    \begin{OutputBox}
+        \texttt{tf} & \mclass{logical}\\
+        \propd{Whether the attribute is present.}\\
+    \end{OutputBox}\myspace
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityGetAttr}, \ref{fcn:cEntityRemoveAttr}, \ref{fcn:cEntitySetAttr}
+    \end{SeeFlag}\myspace
+
+    \mybreak
+
+%* HASFILE
+    \begin{MethodTab}[hasFile()]
+        \customlabel{fcn:cEntityHasFile}{\mymethod{hasFile()}}
+        Determine whether entity has a file with the provided key.
+    \end{MethodTab}\myspace
+    
+    \begin{CtorBox}
+        tf = \textbf{hasFile}(obj, fileKey)
+    \end{CtorBox}\myspace
+    
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{attrKey} & \mclass{char}\\
+        \propd{The file's key}\\
+    \end{InputFlag}\myspace
+
+    \begin{OutputBox}
+        \texttt{tf} & \mclass{logical}\\
+        \propd{Whether the file is present.}\\
+    \end{OutputBox}\myspace
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityGetFile}, \ref{fcn:cEntityHasFile}, \ref{fcn:cEntityRemoveFile}, \ref{cls:KeyValueMap}
+    \end{SeeFlag}
+
+    \mybreak
+
+%* GETATTR
+    \begin{MethodTab}[getAttr()]
+        \customlabel{fcn:cEntityGetAttr}{\mymethod{getAttr()}}
+        Get the value of the attribute corresponding to the provided key.
+    \end{MethodTab}\myspace      
+    
+    \begin{CtorBox}
+        attrValue = \textbf{getAttr}(obj, attrKey, \textit{errorType})
+    \end{CtorBox}\myspace
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{attrName} & \mclass{char}, \mclass{string}\\
+        \propd{The attribute's key}\\
+        &\\
+        \textbf{Optional inputs:} &\\
+        \texttt{errorType} & \ret{aod.util.ErrorTypes}\\
+        \propd{How to handle situations where attribute is not present (default: \mclass{aod.util.ErrorTypes.ERROR})}\\
+    \end{InputFlag}\myspace
+
+    \begin{OutputBox}
+        \texttt{value} & \\
+        \propd{The attribute's value}\\
+    \end{OutputBox}\myspace
+    
+    \begin{example}
+        $\quad$\\Get an array of the values of the \texttt{SampleRate} attribute for all Epochs and return \texttt{<missing>} for epochs that do not have a \texttt{SampleRate} attribute.
+        \begin{CodeBox}
+            \noindent\texttt{\raggedright 
+            sampleRates = \textbf{getAttr}(EXPT.Epochs, \ctext{`SampleRate'}, aod.util.ErrorTypes.MISSING);} 
+        \end{CodeBox}
+    \end{example}\myspace
+    
+    \begin{SeeFlag}
+        \ref{fcn:cEntityHasAttr}, \ref{fcn:cEntityRemoveAttr}, \ref{fcn:cEntitySetAttr}, , \ref{cls:KeyValueMap}, \ret{aod.util.ErrorTypes}
+    \end{SeeFlag}
+
+    \mybreak
+
+%* GETEXPTFILE
+    \begin{MethodTab}[getExptFile]
+        \customlabel{fcn:cEntityGetExptFile}{\mymethod{getExptFile()}}
+        Get a file value with the entity's \texttt{homeDirectory} appended.
+    \end{MethodTab}\myspace
+
+    \begin{CtorBox}
+        fileValue = \textbf{getExptFile}(obj, fileKey, \textit{errorType})
+    \end{CtorBox}\vspace{1ex}
+    
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{attrName} & \mclass{char}, \mclass{string}\\
+        \propd{The file's key}\\
+        &\\
+        \textbf{Optional inputs:} &\\
+        \texttt{errorType} & \ret{aod.util.ErrorTypes}\\
+        \propd{How to handle situations where file is not present (default: \mclass{aod.util.ErrorTypes.ERROR})}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \begin{OutputBox}
+        \texttt{fileValue} & \mclass{string}\\
+        \propd{The file associated with the provided key, with \texttt{homeDirectory} appended}\\
+    \end{OutputBox}\vspace{1ex}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityGetHomeDirectory}, \ref{fcn:cEntityGetFile}, \ref{fcn:cEntityHasFile}, \ref{fcn:cEntityRemoveFile}, \ref{cls:KeyValueMap}
+    \end{SeeFlag}
+
+    \mybreak
+
+%* GETFILE
+    \begin{MethodTab}[getFile()]
+        \customlabel{fcn:cEntityGetFile}{\mymethod{getFile()}}
+        Determine whether entity has an attribute with the provided key.
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        fileValue = \textbf{getFile}(obj, fileKey, \textit{errorType})
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{attrName} & \mclass{char}, \mclass{string}\\
+        \propd{The file's key}\\
+        &\\
+        \textbf{Optional inputs:} &\\
+        \texttt{errorType} & \ret{aod.util.ErrorTypes}\\
+        \propd{How to handle situations where file is not present (default: \mclass{aod.util.ErrorTypes.ERROR})}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \begin{OutputBox}
+        \texttt{fileValue} & \mclass{string}\\
+        \propd{The file associated with the provided key}\\
+    \end{OutputBox}\vspace{1ex}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityGetExptFile}, \ref{fcn:cEntityHasFile}, \ref{fcn:cEntityRemoveFile}, \ref{cls:KeyValueMap}
+    \end{SeeFlag}
+
+
+    \mybreak
+
+%* GETGROUPNAME
+        \begin{MethodTab}[getGroupName()]
+            \customlabel{fcn:cEntityGetGroupName}{\mymethod{getGroupName()}}
+            Get the name that will be used for the entity's HDF5 group when persisted.
+        \end{MethodTab}\vspace{1ex}
+
+        \begin{CtorBox}
+            name = \textbf{getGroupName}(obj)
+        \end{CtorBox}\vspace{1ex}
+
+    \mybreak
+
+
+%* GETHOMEDIRECTORY
+    \begin{MethodTab}[getHomeDirectory()]
+        \customlabel{fcn:cEntityGetHomeDirectory}{\mymethod{getHomeDirectory()}}
+        Get the \texttt{homeDirectory} value of the entity's parent experiment. The entity must be part of the experiment hierarchy for this function to return a value. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        name = \textbf{getHomeDirectory}(obj)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityGetExptFile}
+    \end{SeeFlag}\vspace{1ex}
+
+    \mybreak
+
+%* GETPARENT
+    \begin{MethodTab}[getParent()]
+        \customlabel{fcn:cEntityGetParent}{\mymethod{getParent()}}
+        Return the \propref{Parent} property or an ancestor (a.k.a. parent of the parent).
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        parent = \textbf{getParent}(obj, \textit{entityType})
+    \end{CtorBox}\vspace{1ex}
+
+    
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \textbf{Optional inputs:} &\\
+        \texttt{entityType} & \mclass{char} or \ret{aod.common.EntityTypes}\\
+        \propd{An ancestor entity type to retrieve.}\\
+    \end{InputFlag}\vspace{1ex}
+    
+    \begin{OutputBox}
+        \texttt{parent} & \ref{cls:cEntity}\\
+        \propd{The parent or ancestor entity. If none is found, returns empty.}\\
+    \end{OutputBox}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\ Retrieve the parent channels for all devices in an experiment (using the \texttt{Parent} property will not return a concatenated array of entities).
+        \begin{CodeBox}
+            \codeformat{allDevices = expt.get(\ctext{`Device'});\\
+            allParentChannels = \textbf{getParent}(allDevices);}
+        \end{CodeBox}
+        $\quad$\\ Find the parent Experiment for a device. This is useful when needing to access a key experiment property such as \texttt{homeDirectory}.
+        \begin{CodeBox}
+            expt = \textbf{getParent}(obj, \ctext{`Experiment'});
+        \end{CodeBox}
+    \end{example}\myspace
+
+    \mybreak
+
+%* SETATTR
+    \begin{MethodTab}[setAttr()]
+        \customlabel{fcn:cEntitySetAttr}{\mymethod{setAttr()}}
+        Set an attribute by providing the key and value. If the attribute is present in \texttt{expectedAttributes}, it will be checked against the specification to ensure the value is valid. 
+    \end{MethodTab}\vspace{1ex}
+    
+    \begin{CtorBox}
+        \textbf{setAttr}(obj, attrKey, attrValue)
+    \end{CtorBox}\vspace{1ex}
+    
+    \begin{SeeFlag}
+        \ref{fcn:cEntityHasAttr}, \ref{fcn:cEntityRemoveAttr}, \ref{fcn:cEntityGetAttr}, \ref{cls:KeyValueMap}
+    \end{SeeFlag}\vspace{1ex}
+
+    \mybreak
+
+%* SETDESCRIPTION
+    \begin{MethodTab}[setDescription()]
+        \customlabel{fcn:cEntitySetDescription}{\mymethod{setDescription()}}
+        Sets the entity's \propref{description} property.
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setDescription}(obj, value)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{value} & \mclass{char}\\
+        \propd{The entity's description}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\Set the entity's \texttt{description} property.
+        \begin{CodeBox}
+            obj = aod.core.Analysis(\ctext{"NewAnalysis"});\\
+            obj.\textbf{setDescription}(\ctext{"This is an analysis"});
+        \end{CodeBox}
+
+        $\quad$\\
+        Remove the entity's \texttt{description} property. 
+        \begin{CodeBox}
+            obj.\textbf{setDescription}([]);
+        \end{CodeBox}
+    \end{example}\vspace{1ex}
+
+    \mybreak
+
+%* SETFILE
+    \begin{MethodTab}[setFile()]
+        \customlabel{fcn:cEntitySetFile}{\mymethod{setFile()}}
+        Adds a new file or sets the value of an existing file in the \propref{files} property.
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setFile}(obj, fileKey, fileValue);
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityHasFile}, \ref{fcn:cEntityGetFile}, \ref{fcn:cEntityRemoveFile}, \ref{cls:KeyValueMap}
+    \end{SeeFlag}\vspace{1ex}
+
+    \mybreak
+
+%* SETNAME
+    \begin{MethodTab}[setName()]
+        \customlabel{fcn:cEntitySetName}{\mymethod{setName()}}
+        Sets the entity's \propref{Name} property. This will become the entity's HDF5 group name.
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setName}(obj, newName)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{name} & \mclass{string}\\
+        \propd{The entity's name}\\
+    \end{InputFlag}\vspace{1ex}
+
+    $\quad$\\
+    \begin{example}
+        $\quad$\\Remove the entity's \texttt{name} property (group name will then be dictated by \texttt{label}). 
+        \begin{CodeBox}
+            obj = aod.core.Analysis(\ctext{"NewAnalysis"});\\
+            \ccomm{\% If the Name property is set, this will be the group name}\\
+            >> disp(obj.groupName)\\
+            \hspace{3ex}`NewAnalysis'\\
+            $\quad$\\
+            \ccomm{\% Remove the name and group name will now be the output of \ref{fcn:cEntityGetLabel}.}\\
+            obj.\textbf{setName}([]);\\
+            >> disp(obj.groupName);\\
+            \hspace{3ex}`Analysis'
+        \end{CodeBox}
+    \end{example}\vspace{1ex}
+    
+    \begin{SeeFlag}
+        \ref{fcn:cEntityGetLabel}
+    \end{SeeFlag}\vspace{1ex}
+
+    \mybreak
+    
+%* SETNOTE
+    \begin{MethodTab}[setNote()]
+        \customlabel{fcn:cEntitySetNote}{\mymethod{setNote()}}
+        Add or overwrite a note for the entity's \propref{notes} property. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setNote}(obj, value, \textit{idx});
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{note} & \mclass{string}\\
+        \propd{The contents of the note}\\
+        &\\
+        \textbf{Optional inputs:}\\
+        \texttt{idx} & \mclass{double}\\
+        \propd{The index of an existing note to overwrite. If empty, the new note will be appended to the end.}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\Add two notes to an epoch. 
+        \begin{CodeBox}
+            obj = aod.core.Epoch(1);\\
+            obj.\textbf{setNote}(\ctext{"Bad registration"});\\
+            obj.\textbf{setNote}(\ctext{"This is a second note.});\\\vspace{0.5ex}
+            >> disp(obj.notes)\\
+            2 x 1 \mclass{string} array:\\
+            \hspace{3ex}"Bad registration"\\
+            \hspace{3ex}"This is the second note."\\
+        \end{CodeBox}\vspace{0.5ex}
+        Replace a note by specifying the index.
+        \begin{CodeBox}
+            obj.setNote(\ctext{"This is the new first note."}, 1)\\
+            >> disp(obj)\\
+            2 x 1 \mclass{string} array:\\
+            \hspace{3ex}"This is the new first note."\\
+            \hspace{3ex}"This is the second note."
+        \end{CodeBox}
+    \end{example}\vspace{1ex}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityRemoveNote}
+    \end{SeeFlag}
+
+    \mybreak
+
+%* REMOVEATTR
+    \begin{MethodTab}[removeAttr()]
+        \customlabel{fcn:cEntityRemoveAttr}{\mymethod{removeAttr()}}
+        Removes an existing attribute from \propref{attributes}.
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{removeAttr}(obj, attrKey)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{attrKey} & \mclass{char}\\
+        \propd{The attribute to remove}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\Remove an attribute named \texttt{SampleRate}.
+        \begin{CodeBox}
+            \codeformat{removeAttr(obj, \ctext{`SampleRate'});}
+        \end{CodeBox}
+    \end{example}\vspace{1ex}
+    
+    \begin{SeeFlag}
+        \ref{fcn:cEntityHasAttr}, \ref{fcn:cEntityGetAttr}, \ref{fcn:cEntitySetAttr}, \ref{cls:KeyValueMap}
+    \end{SeeFlag}
+
+    \mybreak
+
+%* REMOVEFILE
+    \begin{MethodTab}[removeFile()]
+        \customlabel{fcn:cEntityRemoveFile}{\mymethod{removeFile()}}
+        Removes an existing file from \propref{files}. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{removeFile}(obj, fileKey);
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{fileKey} & \mclass{char}\\
+        \propd{The key of the file to remove}\\
+    \end{InputFlag}\myspace
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityHasFile}, \ref{fcn:cEntityGetFile}, \ref{fcn:cEntitySetFile}, \ref{cls:KeyValueMap}
+    \end{SeeFlag}
+
+    \mybreak
+
+
+%* REMOVENOTE
+    \begin{MethodTab}[removeNote()]
+        \customlabel{fcn:cEntityRemoveNote}{\mymethod{removeNote()}}
+        Removes an existing note (specified by index in \propref{notes}). 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{removeNote}(obj, idx);
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\Add two notes to an epoch, then remove the first. 
+        \begin{CodeBox}
+            obj = aod.core.Epoch(1);\\
+            obj.setNote(\ctext{"Bad registration"});\\
+            obj.setNote(\ctext{"This is a second note.});\\
+            obj.\textbf{removeNote}(1);\\\vspace{0.5ex}
+            >> disp(obj.notes)\\
+            \hspace{3ex}"This is the second note."\\
+        \end{CodeBox}\vspace{0.5ex}
+    \end{example}\vspace{1ex}
+    
+    \begin{SeeFlag}
+        \ref{fcn:cEntitySetNote}
+    \end{SeeFlag}
+    
+    \mybreak
+
+%* GETLABEL
+    \begin{ProtectTab}[getLabel()]
+        \customlabel{fcn:cEntityGetLabel}{\mymethod{getLabel()}}
+        Populates the entity's \propref{label} property. The \propref{label} property is used for the entity's HDF5 group name if the user does not supply a value for the \propref{Name} property. The default output is the class name. 
+    \end{ProtectTab}\myspace
+
+    \begin{example}
+        Naming each pinhole individually would be time-consuming and could lead to heterogeneous naming conventions. The \ref{fcn:cEntityGetLabel} method is used by \ret{Pinhole} to define the \propref{label} property based on the pinhole diameter. 
+
+        $\quad$\\
+        \noindent\texttt{\raggedright 
+        \defblock{properties} \textit{(Access = protected)}\\
+        \ONE\defblock{function} value = \textbf{getLabel}(obj)\\
+        \ONE\ONE value = [\ctext{`Pinhole\_'}, \mclass{num2str}(obj.diameter), \ctext{`um'}];\\ 
+        \ONE\defblock{end}\\
+        \defblock{end}}
+    \end{example}\myspace
+
+    \mybreak
+
+%* SPECIFYATTRIBUTES
+    \begin{StaticTab}[specifyAttributes()]
+        \customlabel{fcn:cEntitySpecifyAttributes}{\mymethod{specifyAttributes()}}
+        Specify expected attributes (HDF5 attributes on the entity's HDF5 group).
+    \end{StaticTab}\vspace{1ex}
+    
+    \noindent The template below must be used for this method where \underline{\texttt{superclass}} is the entity's parent class (e.g. \ret{aod.core.Registration} for a Registration subclass).
+    
+    \begin{CtorBox}
+        \defblock{methods} \textit{(Static)}\\
+        \ONE\defblock{function} value = \textbf{specifyAttributes}()\\
+        \ONE\ONE value = specifyAttributes@\underline{superclass}();\\
+        \ONE\defblock{end}\\
+        \defblock{end}
+    \end{CtorBox}\myspace
+
+    \begin{SeeFlag}
+        \ret{aod.specification.AttributeManager}
+    \end{SeeFlag}\myspace
+
+    \mybreak
+
+%* SPECIFYDATASETS
+    \begin{StaticTab}[specifyDatasets()]
+        \customlabel{fcn:cEntitySpecifyDatasets}{\mymethod{specifyDatasets()}}
+        Add specifications to class's properties (HDF5 datasets).
+    \end{StaticTab}\myspace
+
+    \noindent The template below must be used for this method where \underline{\texttt{superclass}} is the entity's parent class (e.g. \ret{aod.core.Registration} for a Registration subclass).\myspace
+    
+    \begin{CtorBox}
+        \defblock{methods} \textit{(Static)}\\
+        \ONE\defblock{function} value = \textbf{specifyDatasets}(value)\\
+        \ONE\ONE value = specifyDatasets@\underline{superclass}(value);\\
+        \ONE\defblock{end}\\
+        \defblock{end}
+    \end{CtorBox}\myspace
+    
+    \begin{SeeFlag}
+        \ret{aod.specification.DatasetManager}
+    \end{SeeFlag}\myspace
+
+    \mybreak
+
+    \pagebreak
+\section*{1.2. Experiment (\texttt{aod.core.Experiment})}\customlabel{cls:cExperiment}{\myclass{aod.core.Experiment}}
+    \noindent {\large Represents a single experiment and serves as the root of an AOData HDF5 file}\vspace{1ex}
+
+    \begin{flagbox}(ul)[gray6]{Superclasses}
+        \ref{cls:cEntity}, \mclass{matlab.mixin.Heterogeneous}, \mclass{handle}
+    \end{flagbox}\vspace{1ex}
+
+    \begin{PropFlag}[SetAccess=private]
+        \texttt{homeDirectory} & \mclass{string}\\
+        \propd{The experiment's file folder. See: \ref{fcn:cExperimentSetHomeDirectory}}\\
+        &\\
+        \texttt{experimentDate} & \mclass{datetime}\\
+        \propd{The date of the experiment}\\
+        &\\
+        \texttt{Code} & \mclass{table}\\
+        \propd{The git repositories associated with the experiment and their status}\\
+    \end{PropFlag}\vspace{0.5ex}
+
+    \begin{PropFlag}[Dependent, GetAccess=public]
+        \texttt{epochIDs} & \mclass{double}\\
+        \propd{The IDs of all epochs in the experiment.}\\
+        &\\
+        \texttt{numEpochs} & \mclass{double}\\
+        \propd{The number of epochs in the experiment.}\\
+    \end{PropFlag}\vspace{1ex}
+    
+    \begin{AttrFlag}
+        \texttt{Administrator} & \mclass{string}\\
+        \propd{The person(s) who ran the experiment}\\
+        &\\
+        \texttt{Laboratory} & \mclass{string}\\
+        \propd{The laboratory where the experiment was performed}\\
+    \end{AttrFlag}\vspace{1ex}
+    
+    \mybreak 
+
+%* EXPERIMENT
+    \begin{CtorTab}[Experiment()]
+        \customlabel{fcn:cExperimentConstructor}{\mymethod{Experiment()}}
+        \textbf{Constructor} for \ref{cls:cExperiment}.
+    \end{CtorTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        obj = \textbf{aod.core.Experiment}(name, filePath, experimentDate)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{name} & \mclass{string}\\
+        \propd{The experiment's name}\\
+        &\\
+        \texttt{filePath} & \mclass{char}\\
+        \propd{The full file path to the folder containing the experiment's data}\\
+        &\\
+        \texttt{experimentDate} & \mclass{datetime} or \mclass{char} in the format "YYYYmmDD"\\
+    \end{InputFlag}\vspace{1ex}
+
+    \mybreak
+
+%* ADD
+    \begin{MethodTab}[add()]
+        \customlabel{fcn:cExperimentAdd}{\mymethod{add()}}
+        Add a new child entity to the experiment. Must be a \ret{Analysis}, \ret{Annotation}, \ret{Calibration}, \ref{cls:cEpoch}, \ref{cls:cSource}, \ret{System}. The \texttt{Parent} property of the child entity will be set as well.
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{add}(obj, childEntity)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{childEnity} & \ret{Analysis}, \ret{Annotation}, \ret{Calibration}, \ref{cls:cEpoch}, \ref{cls:cSource}, or \ret{System}\\
+        \propd{The child entity to add}\\
+    \end{InputFlag}
+
+    \begin{SeeFlag}
+        \ref{fcn:cExperimentRemove}
+    \end{SeeFlag}
+    
+    \mybreak
+
+%* GETFROMEPOCH
+    \begin{MethodTab}[getFromEpoch()]
+        \customlabel{fcn:cExperimentGetFromEpoch}{\mymethod{getFromEpoch()}}
+        Search the child entities of a specific epoch(s).
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{getFromEpoch}(obj, epochIDs, entityType, \textit{varargin})
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{epochIDs} & \mclass{double} or \ctext{"all"}\\
+        \propd{Which epochs to search}\\
+        &\\
+        \texttt{entityType} & \mclass{char}\\
+        \propd{Which child entity type to search. Must be `EpochDataset', `Response', `Registration' or `Stimulus'}\\
+        &\\
+        \textbf{Optional inputs:}\\
+        \texttt{query} & \mclass{cell}\\
+        \propd{A query for sorting through the child entities.}\\
+    \end{InputFlag}
+
+    \mybreak
+   
+%* SETDATE
+    \begin{MethodTab}[setDate()]
+        \customlabel{fcn:cExperimentSetDate}{\mymethod{setDate()}}
+        Change the experiment's date. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setDate}(obj, expDate)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{expDate} & \mclass{datetime}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \mybreak
+
+%* SETHOMEDIRECTORY
+    \begin{MethodTab}[setHomeDirectory()]
+        \customlabel{fcn:cExperimentSetHomeDirectory}{\mymethod{setHomeDirectory()}}
+        Change the file folder path for the experiment. Useful when moving experiment file location or accessing with a different computer.
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setHomeDirectory}(obj, filePath)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{filePath} & \mclass{char}\\
+        \propd{The file path to the folder containing the experiment's data}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEntityGetExptFile}
+    \end{SeeFlag}
+    
+    \mybreak
+
+
+%* REMOVE
+    \begin{MethodTab}[remove()]
+        \customlabel{fcn:cExperimentRemove}{\mymethod{remove()}}
+        Remove a child entity or entities
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{remove}(obj, entityType, \textit{varargin})
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{entityType} & Child entity type (\ret{EpochDataset}, \ret{Registration}, \ret{Responses}, \ret{Stimulus})\\
+        \textbf{Optional inputs:}&\\
+        \texttt{query} & \mclass{cell}\\
+        \propd{A query to filter out specific entities to remove}\\
+    \end{InputFlag}
+
+    \begin{SeeFlag}
+        \ref{fcn:cExperimentRemove}
+    \end{SeeFlag}
+
+    \mybreak
+
+    \pagebreak
+
+%! --------------
+%! AOD.CORE.CALIBRATION
+%! --------------
+\section*{1.6 Calibration (\texttt{aod.core.Calibration})}
+        \customlabel{cls:cCalibration}{\myclass{aod.core.Calibration}}
+    \noindent{\large Represents a measurement of the system performance before, during or after the experiment.}\myspace 
+
+    \begin{SuperFlag}
+        \ref{cls:cEntity}, \mclass{matlab.mixin.Heterogeneous}, \mclass{handle}
+    \end{SuperFlag}\myspace 
+    
+    \begin{PropFlag}[GetAccess=public, SetAccess=private]
+        \texttt{calibrationDate} & \mclass{datetime}\\
+        \propd{The date the calibration was performed}\\
+        &\\
+        \texttt{Target} & \ret{System}, \ret{Channel}, \ret{Device}\\
+        \propd{The target of the calibration}\\
+    \end{PropFlag}\myspace 
+
+    \begin{AttrFlag}
+        \texttt{Administrator} & \mclass{string}\\
+        \propd{The person who performed the calibration}\\
+    \end{AttrFlag}\myspace 
+
+    \mybreak 
+
+    \begin{CtorTab}[Calibration()]
+        Constructor for \ref{cls:cCalibration}
+    \end{CtorTab}\myspace 
+
+    \begin{CtorBox}
+        obj = \textbf{aod.core.Calibration}(name, calibrationDate)\\
+        obj = \textbf{aod.core.Calibration}(name, calibrationDate,...\\
+        \ONE \textit{`Target', entity, `Administrator', value})
+    \end{CtorBox}\myspace 
+
+    \mybreak 
+    
+    %* SETDATE
+    \begin{MethodTab}[setDate()]
+        %\customlabel{fcn:cExperimentSetDate}{\mymethod{setDate()}}
+        Change the calibration's date. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setDate}(obj, calibrationDate)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{calibrationDate} & \mclass{datetime}\\
+        \propd{The date the calibration was performed.}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \mybreak
+
+%* SETTARGET
+    \begin{MethodTab}[setTarget()]
+    \end{MethodTab}\myspace 
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cCalibration}\\
+        &\\
+        \texttt{target} & \ref{cls:cEntity}\\
+        \propd{The target of the calibration (e.g., a channel or device).}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \mybreak
+
+%! --------------
+%! AOD.CORE.EPOCH
+%! --------------
+\section*{1.3. Epoch (\texttt{aod.core.Epoch})}\customlabel{cls:cEpoch}{\myclass{aod.core.Epoch}}
+    \noindent {\large Represents a single experiment and serves as the root of an AOData HDF5 file}
+
+    \begin{flagbox}(ul)[gray6]{Superclasses}
+        \ref{cls:cEntity}, \mclass{matlab.mixin.Heterogeneous}, \mclass{handle}
+    \end{flagbox}\vspace{1ex}
+
+    \begin{PropFlag}[GetAccess=public, SetAccess=private]
+        \texttt{ID} & \mclass{double} (must be integer)\\
+        \propd{The epoch's ID in the experiment. Replaces ``Name''}\\
+        &\\
+        \texttt{startTime} & \mclass{datetime}\\
+        \propd{The time the experiment started}\\
+        &\\
+        \texttt{Timing} & \mclass{duration}\\
+        \propd{The timing of each sample acquired during the Epoch}\\
+    \end{PropFlag}\vspace{0.5ex}
+
+    \begin{PropFlag}[GetAccess=public, SetAccess=protected]
+        \texttt{Source} & \ret{aod.core.Source} or \ret{aod.persistent.Source}\\
+        \propd{The Source imaged during the epoch.}\\
+        &\\
+        \texttt{System} & \ret{aod.core.System} or \ret{aod.persistent.System}\\
+        \propd{The system configuration used for the epoch.}\\
+    \end{PropFlag}\vspace{1ex}
+
+    \mybreak 
+
+    \begin{CtorTab}[Epoch()]
+        A continuous data acquisition within an \ref{cls:cExperiment}.
+    \end{CtorTab}
+    
+    \begin{CtorBox}
+        obj = \textbf{aod.core.Epoch}(ID)\\
+        obj = \textbf{aod.core.Epoch}(ID, \textit{`Parent', entity},...\\
+        \ONE \textit{`Source', entity, `System', entity})
+    \end{CtorBox}
+
+    \begin{InputFlag}
+        \texttt{ID} & \mclass{double}\\
+        \propd{Identifier for the Epoch, must be an integer.}\\
+        &\\
+        \textbf{Optional key/value inputs:} & \\
+        \texttt{Source} & \ref{cls:cSource}\\
+        \propd{The source of the acquired data.}\\
+        &\\
+        \texttt{System} & \ret{System}\\
+        \propd{The system configuration used for the epoch.}\\
+        &\\
+        \texttt{Parent} & \ref{cls:cExperiment}\\
+        \propd{The parent experiment. Set if constructor needs info from the experiment.}
+    \end{InputFlag}
+
+    \mybreak
+    
+%* ADD
+    \begin{MethodTab}[add()]
+        \customlabel{fcn:cEpochAdd}{\mymethod{add()}}
+        Add a new child entity to the experiment. Must be a \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}. The \texttt{Parent} property of the child entity will be set to the Epoch as well.
+    \end{MethodTab}\myspace
+
+    \begin{CtorBox}
+        \textbf{add}(obj, childEntity)
+    \end{CtorBox}\myspace
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{childEnity} & \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}\\
+        \propd{The child entity to add}\\
+    \end{InputFlag}\myspace
+
+    \begin{SeeFlag}
+        \ref{fcn:cEpochRemove}
+    \end{SeeFlag}\myspace
+
+    \mybreak
+
+%* GET 
+    \begin{MethodTab}[get()]
+        \customlabel{fcn:cEpochGet}{\mymethod{get()}}
+        Get a child entity or entities of a specific type.
+    \end{MethodTab}\myspace
+
+    \begin{CtorBox}
+        entities = \textbf{get}(obj, entityType)
+        entities = \textbf{get}(obj, entityType, \textit{query})
+    \end{CtorBox}\myspace 
+
+    \begin{InputFlag}
+        \argin{obj} & \ref{cls:cEpoch}\\
+        &\\
+        \argin{entityType} & \mclass{char} or \mclass{string}\\
+        \propd{The child entity type to get. Must be \ref{EpochDataset}, \ret{Registration}, \ret{Response}, \ret{Stimulus}}\\
+        &\\
+        \textbf{Optional inputs:}&\\
+        \argin{query} & \mclass{cell}\\
+        \propd{A query to select which child entities to return.}\\
+    \end{InputFlag}\myspace 
+
+    \begin{OutputBox}
+        \argin{entities} & \ret{EpochDataset}, \ret{Registration}, \ret{Response} or \ret{Stimulus}\\
+        \propd{The child entities (all if \propref{query} is undefined)}\\ 
+    \end{OutputBox}\myspace 
+
+    \mybreak 
+
+%* REMOVE
+    \begin{MethodTab}[remove()]
+        \customlabel{fcn:cEpochRemove}{\mymethod{remove()}}
+        Remove a child entity from the experiment. Must be a \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{remove}(obj, childEntity)\\
+        \textbf{remove}(obj, childEntity, \textit{selector});
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{childEnity} & \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}\\
+        \propd{The child entity type to remove}\\
+        &\\
+        \texttt{selector} & \mclass{cell} or \ctext{"all"}\\
+        \propd{A query to selectively remove specific child entities or "all" to remove all child entities of the designated type.}
+    \end{InputFlag}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEpochAdd}
+    \end{SeeFlag}
+
+    \mybreak
+
+    \pagebreak
+
+%! ---------------
+%! AOD.CORE.SOURCE
+%! ---------------
+\section*{1.4. Source (\texttt{aod.core.Source})}\customlabel{cls:cSource}{\myclass{aod.core.Source}}
+    \noindent {\large Represents the source of acquired data (e.g.) subject, eye, location etc.}\vspace{1ex}
+
+    \begin{flagbox}(ul)[gray6]{Superclasses}
+        \ref{cls:cEntity}, \mclass{matlab.mixin.Heterogeneous}, \mclass{handle}
+    \end{flagbox}\vspace{1ex}
+
+    \mybreak 
+
+    \begin{CtorTab}[Source()]
+        The source of the imaging data (e.g., eye, location, subject, etc.)
+    \end{CtorTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        obj = \textbf{aod.core.Source}(name)\\
+        obj = \textbf{aod.core.Source}(name, \textit{`Parent', entity})
+    \end{CtorBox}
+
+    \pagebreak 
+
+%! ---------------------
+%! AOD.PERSISTENT.ENTITY
+%! ---------------------
+\section*{2.1. Entity (\texttt{aod.persistent.Entity})}\customlabel{cls:pEntity}{\myclass{aod.persistent.Entity}}
+    \noindent {\large An \underline{abstract} class that provides a consistent interface to all AOData persistent classes.} %Note that the properties are largely identical to \ref{cls:cEntity} except where designated.}
+    
+    \begin{flagbox}(ul)[gray6]{Superclasses}
+        \mclass{handle}
+    \end{flagbox}\myspace
+    
+    %* Properties (aod.persistent.Entity)    
+    \begin{PropFlag}[GetAccess=public, SetAccess=private]
+        \oldarg{Name} & \mclass{string}\\
+        \propd{A user-defined name for the entity. See: \ref{fcn:cEntitySetName}}\\
+        &\\
+        \oldarg{description} & \mclass{string}\\
+        \propd{A description of the entity.}\\
+        &\\
+        \oldarg{notes} & \mclass{string}\\
+        \propd{Notes about the entity.}\\
+        &\\
+        \oldarg{attributes} & \ref{cls:KeyValueMap}\\
+        \propd{The entity's metadata specified as key/value pairs.}\\
+        &\\
+        \oldarg{files} & \ref{cls:KeyValueMap}\\
+        \propd{Files associated with the entity specified as key/value pairs.}\\
+        &\\
+        \oldarg{Parent} & \ref{cls:cEntity}\\
+        \propd{The Parent entity within the experiment hierarchy}\\
+        &\\
+        \oldarg{UUID} & \mclass{string}\\
+        \propd{A unique identifier for the entity}\\
+        &\\
+        \oldarg{dateCreated} & \mclass{datetime}\\
+        \propd{The date and time that the entity was created.}\\
+        &\\
+        \oldarg{lastModified} & \mclass{datetime}\\
+        \propd{The date and time that the entity was last modified.}\\
+        &\\
+        \newarg{hdfName} & \mclass{string}\\
+        \propd{The name of the underlying HDF5 file}\\
+        &\\
+        \newarg{coreClassName} & \mclass{char}\\
+        \propd{The name of the core class used to create the entity}\\
+    \end{PropFlag}
+
+    \begin{PropFlag}[Dependent, GetAccess=public]
+        \newarg{readOnly} & \mclass{logical}\\
+        \propd{Whether the underlying HDF5 file can be modified (default = false, see \ret{setReadOnlyMode})}\\
+    \end{PropFlag}
+
+    \begin{PropFlag}[Hidden, SetAccess=private]
+        %\oldarg{label} & \mclass{string}\\
+        %\propd{The generated label for the entity. See \ref{fcn:cEntityGetLabel}}\\
+        %&\\
+        \oldarg{entityType} & \ret{aod.common.EntityTypes}\\
+        \propd{The entity type}\\
+        &\\
+        \newarg{hdfPath} & \mclass{char}\\
+        \propd{The entity's full HDF5 path.}\\
+        &\\
+        \newarg{factory} & \ret{aod.persistent.EntityFactory}\\
+        \propd{The middle layer between the HDF5 file and the persistent interface.}\\
+    \end{PropFlag}
+
+    \begin{PropFlag}[Hidden, Dependent, GetAccess=public]
+        \oldarg{groupName} & \mclass{char}\\
+        \propd{The name of the entity's HDF5 group}\\
+    \end{PropFlag}\myspace
+
+    \mybreak 
+
+%* ADDPROP
+    \begin{MethodTab}[addProp()]
+        \customlabel{fcn:pEntityAddProp}{\mymethod{addProp()}}
+        Add a new property to the entity and write as an HDF5 dataset. New properties are those not found in \propref{expectedDatasets}.
+    \end{MethodTab}\myspace 
+
+    \begin{SeeFlag}
+        \ref{fcn:pEntitySetProp}
+    \end{SeeFlag}
+
+    \mybreak 
+
+%* REMOVEPROP
+    \begin{MethodTab}[removeProp()]
+        \customlabel{fcn:pEntityRemoveProp}{\mymethod{removeProp()}}
+        Remove a property (HDF5 dataset) from the entity. If the property is present in \propref{expectedDatasets}, the HDF5 dataset will be removed but the property will remain. If the property is not present in \propref{expectedDatasets}, both the property and the HDF5 dataset will be removed.
+    \end{MethodTab}\myspace 
+
+    \begin{CtorBox}
+        \textbf{removeProp}(obj, propName)
+    \end{CtorBox}\myspace 
+
+    \begin{InputFlag}
+        \newarg{obj} & \ref{cls:pEntity}\\
+        &\\
+        \newarg{propName} & \mclass{char}\\
+        \propd{The property name to remove/clear (case-sensitive)}\\
+    \end{InputFlag}
+
+    \mybreak 
+
+%* REPLACEENTITY
+    \begin{MethodTab}[replaceEntity()]
+        \customlabel{fcn:pEntityReplaceEntity}{\mymethod{replaceEntity()}}
+        Replace an entity with a new one from the persistent interface. This is preferable to deleting the entity, then adding a new one when the entity has child entities that should be preserved.
+    \end{MethodTab}\myspace 
+
+    \begin{CtorBox}
+        \textbf{replaceEntity}(obj, newObj)
+    \end{CtorBox}\myspace 
+
+    \begin{InputFlag}
+        \newarg{obj} & \ref{cls:pEntity}\\
+        &\\
+        \newarg{newObj} & \ref{cls:cEntity}\\
+        \propd{A new entity from the core interface. Must be the same entity type as \propref{obj}}\\
+    \end{InputFlag}
+
+        \mybreak 
+
+%* SETPROP
+        \begin{MethodTab}[setProp()]
+            \customlabel{fcn:pEntitySetProp}{\mymethod{setProp()}}
+            Set or change the value of an existing property (one that is in \propref{expectedDatasets}). The value will be validated with the specifications in \propref{expectedDatasets} before changing the property value and the underlying HDF5 dataset.
+        \end{MethodTab}\myspace 
+
+        \mybreak
+
+%* SETREADONLYMODE
+        \begin{MethodTab}[setReadOnlyMode()]
+            \customlabel{fcn:pEntitySetReadOnlyMode}{\mymethod{setReadOnlyMode()}}
+            Change value of the \propref{readOnly} property to enable making changes to the underlying HDF5 file.
+        \end{MethodTab}\myspace 
+
+        \begin{CtorBox}
+            \textbf{setReadOnlyMode}(obj, flag)
+        \end{CtorBox}\myspace 
+
+        \begin{InputFlag}
+            \argin{obj} & \ref{cls:pEntity}\\
+            &\\
+            \argin{flag} & \mclass{logical}\\
+            \propd{Whether to allow changes to the underlying HDF5 file or not}\\
+        \end{InputFlag}\myspace
+
+        \mybreak 
+    
+%* QUERY
+    \begin{MethodTab}[query()]
+            \customlabel{fcn:pEntityQuery}{\mymethod{query()}}
+        Query the full contents of the experiment.
+    \end{MethodTab}\myspace 
+
+
+        \mybreak 
+        \pagebreak
+
+\section*{3.1. FileReader (\texttt{aod.common.FileReader})}
+        \customlabel{cls:FileReader}{\myclass{aod.common.FileReader}}
+    \noindent {\large An \underline{abstract} class for encapsulation of file reading.}\vspace{1ex}
+
+    \noindent \textbf{Notes:} 
+    \begin{itemize}
+        \item \ref{cls:FileReader} is an \textbf{abstract} class. In the methods below, replace the names of subclasses (e.g., \ret{aod.util.readers.PngReader}) in the place of \ref{cls:FileReader}. 
+        \item To recreate the FileReader appropriately when reading from an HDF5 file, all user-defined properties must have \texttt{SetAccess = public} (the default for MATLAB's properties).
+    \end{itemize}
+    \vspace{1ex}
+
+    \begin{PropFlag}[SetAccess = protected]
+        \newarg{fullFile} & \mclass{char}\\
+        \propd{The full file name to be read.}\\
+    \end{PropFlag}
+
+    \begin{PropFlag}[Transient, SetAccess = protected]
+        \newarg{Data} & \\
+        \propd{The data read from the file, populated after running \ref{fcn:xFileReaderRead}.}\\
+        \propd{This property will not be written to the HDF5 file with the file reader.}\\
+    \end{PropFlag}
+    \mybreak 
+
+    \begin{CtorTab}[FileReader()]
+        The constructor for \ref{cls:FileReader}.
+    \end{CtorTab}
+
+    \begin{CtorBox}
+        obj = \textbf{aod.common.FileReader}(fileName)
+    \end{CtorBox}\myspace
+
+    \begin{InputFlag}
+        \texttt{fileName} & \mclass{string} or \mclass{char}\\
+        \propd{The name of the file to read. An error will be thrown if the file does not exist.}\\
+    \end{InputFlag}\myspace
+
+    \mybreak
+
+    \begin{MethodTab}[readFile()]
+        \customlabel{fcn:xFileReaderRead}{\mymethod{readFile()}}
+        Read the file, set to the \texttt{Data} property and return output. All subclasses must define this method! 
+    \end{MethodTab}\myspace 
+
+    \mybreak 
+
+    \begin{StaticTab}[read()]
+        Instantiate and run \ref{fcn:xFileReaderRead}.
+    \end{StaticTab}\myspace
+
+    \begin{CtorBox}
+        data = aod.common.FileReader.read()
+    \end{CtorBox}\myspace
+
+    \mybreak
+
+
+    \pagebreak 
+\section*{3.2. KeyValueMap (\texttt{aod.common.KeyValueMap})}\customlabel{cls:KeyValueMap}{\myclass{aod.common.KeyValueMap}}
+    \noindent {\large A wrapper for MATLAB's builtin \mclass{containers.map} with a more informative display.}\myspace
+
+    \begin{CtorTab}[KeyValueMap()]
+        Constructor for a key/value map.
+    \end{CtorTab}\myspace
+
+    \begin{CtorBox}
+        obj = \textbf{aod.common.KeyValueMap}();
+    \end{CtorBox}\myspace
+    
+    \mybreak
+
+%* TOMAP
+    \begin{MethodTab}[toMap()]
+        \customlabel{fcn:KeyValueMapToMap}{\mymethod{toMap()}}
+        Convert to a \mclass{containers.Map}
+    \end{MethodTab}\myspace
+
+    \mybreak
+
+%* TOSTRUCT
+    \begin{MethodTab}[toStruct()]%{\textbf{\Large toStruct()}}
+        \customlabel{fcn:KeyValueMapToStruct}{\mymethod{toStruct()}}
+        Convert to a \mclass{struct}
+    \end{MethodTab}\myspace
+
+    \pagebreak 
+
+%! --------------------------------------------
+%! AOD.BUILTIN.CALIBRATIONS.CHANNELOPTIMIZATION
+%! --------------------------------------------    
+\section*{4.2.1. ChannelOptimization\\(\texttt{\huge aod.builtin.calibrations.ChannelOptimization})}
+        \customlabel{cls:bChannelOpt}{\myclass{aod.builtin.calibrations.ChannelOptimization}}
+    \noindent {\large A calibration for the optimization of PMT positions and sources, both in the model eye before an experiment and \textit{in vivo} during an experiment.}\vspace{1ex}
+
+    \begin{PropFlag}[SetAccess = protected]
+        \newarg{positions} & \mclass{table}\\
+        \propd{Positions of the PMT and source, in vivo and model eye}\\
+        &\\
+        \newarg{iterations} & \mclass{double}\\
+        \propd{PMT positions and mean intensity values for optimization iteration}\\
+        &\\
+        \oldarg{calibrationDate} & \mclass{datetime}\\
+        \propd{Date the calibration was performed (inherited from \ret{Calibration})}\\
+    \end{PropFlag}\vspace{1ex}
+
+    \begin{AttrFlag}
+        \newarg{Wavelength} & \mclass{double}\\
+        \propd{The wavelength of light for the optimization}\\
+        &\\
+        \oldarg{Administrator} & \mclass{string}\\
+        \propd{The person(s) who performed the calibration (inherited from \ret{Calibration})}\\
+    \end{AttrFlag}\vspace{1ex}
+
+    \mybreak 
+    
+    \begin{CtorTab}[ChannelOptimization()]
+        A calibration for the optimization of PMT positions and sources.
+    \end{CtorTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        obj = \textbf{aod.builtin.calibrations.ChannelOptimization}(name, calibrationDate);\\
+        obj = \textbf{aod.builtin.calibrations.ChannelOptimization}(name, calibrationDate,...\\ 
+            \ONE\textit{`Wavelength', value, `Target', entity, `Administrator', value});
+    \end{CtorBox}\vspace{1ex}
+
+    \mybreak
+
+%* SETWAVELENGTH
+    \begin{MethodTab}[setWavelength()]
+        %\customlabel{fcn:ChannelOptSetWavelength}{\mymethod{setWavelength()}}
+        Set the attribute for the wavelength of light in the optimization
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setWavelength}(obj, value)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{wavelength} & \mclass{double}\\
+        \propd{The wavelength of light in nanometers}\\
+    \end{InputFlag}
+
+    \mybreak
+
+%* SETPOSITIONS
+    \begin{MethodTab}[setPositions()]
+        %\customlabel{fcn:ChannelOptSetPositions}{\mymethod{setPositions()}}
+        Set the positions for the model eye or \textit{in vivo}
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setPositions}(obj, modelEye, \textit{varargin})
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{modelEye} & \mclass{logical}\\
+        \propd{Whether to set positions for the model eye or \textit{in vivo} (true = modelEye, false = in vivo)}\\
+        &\\
+        \textbf{Optional key/value inputs:}&\\
+        \texttt{X} & \mclass{double}\\
+        \propd{The PMT X position}\\
+        \texttt{Y} & \mclass{double}\\
+        \propd{The PMT Y position}\\
+        \texttt{Z} & \mclass{double}\\
+        \propd{The PMT Z position}\\
+        \texttt{Source} & \mclass{double}\\
+        \propd{The source position}\\
+    \end{InputFlag}
+
+    \mybreak
+
+%* SETITERATIONS
+    \begin{MethodTab}[setIterations()]
+        %\customlabel{fcn:ChannelOptSetIterations}{\mymethod{setIterations()}}
+        Set the attribute for the wavelength of light in the optimization
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setIterations}(obj, value)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{iterations} & \mclass{double}\\
+        \propd{The PMT positions and mean light levels obtained during optimization}\\
+    \end{InputFlag}\vspace{1ex}
+
+    \mybreak
+\end{document}

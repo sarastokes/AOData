@@ -303,7 +303,7 @@ classdef EntitySearch < handle
             if isSubclass(entity, 'aod.core.Entity')
                 className = class(entity);
             elseif isSubclass(entity, 'aod.persistent.Entity')
-                className = entity.entityClassName;
+                className = entity.coreClassName;
             end
         end
     end

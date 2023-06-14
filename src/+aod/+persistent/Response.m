@@ -40,9 +40,10 @@ classdef Response < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
             end
             
             obj.Data = obj.loadDataset("Data");
-            obj.setDatasetsToDynProps();
-            
-            obj.setLinksToDynProps();
+
+            % Add user-defined datasets and links
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
     end
 end 

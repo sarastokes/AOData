@@ -234,10 +234,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     % Linked entity methods
     methods (Sealed)  
         function setSource(obj, source)
-            % SETSOURCE
-            %
-            % Description:
-            %   Set the Source for this epoch
+            % Set the Source for this epoch
             %
             % Syntax:
             %   obj.setSource(source)
@@ -261,10 +258,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function setSystem(obj, system)
-            % SETSYSTEM
-            % 
-            % Description:
-            %   Set the System used during this epoch
+            % Set the System used during this epoch
             %
             % Syntax:
             %   obj.setSystem(system)
@@ -380,16 +374,19 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Static)
-        function value = specifyAttributes()
-            value = specifyAttributes@aod.core.Entity();
+        function d = specifyDatasets(d)
+            d = specifyDatasets@aod.core.Entity(d);
 
-            value.add('SampleRate', [], @isnumeric,...
-                'Rate of data acquisition (Hz)');
-        end
-
-        function mngr = specifyDatasets(mngr)
-            mngr.set('ID',... 
+            %d.set('Timing',...
+            %    'Class', 'duration',...
+            %    'Description', 'The timing of samples acquired during th epoch');
+            d.set('ID',... 
+                'Size', '(1,1)',...
                 'Description', 'Epoch ID in the Experiment');
+            d.set('Source',...
+                'Size', '(1,1)',...
+                'Function', {@(x) aod.util.mustBeEntityType(x, 'Source')},...
+                'Description', 'The source of data acquired during the Epoch');
         end
     end
 end 

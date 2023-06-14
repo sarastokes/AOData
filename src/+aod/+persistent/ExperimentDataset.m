@@ -27,8 +27,9 @@ classdef ExperimentDataset < aod.persistent.Entity & matlab.mixin.Heterogeneous 
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
-            obj.setDatasetsToDynProps();
-            obj.setLinksToDynProps();
+            % Add user-defined datasets and links
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
     end
 end 

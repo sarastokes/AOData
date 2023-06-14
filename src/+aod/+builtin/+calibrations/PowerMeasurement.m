@@ -44,23 +44,26 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
 
     methods (Access = protected)
         function value = getLabel(obj)
-            value = [char(getClassWithoutPackages(obj)),... 
-                num2str(obj.getAttr('Wavelength')), 'nm'];
+            value = getLabel@aod.builtin.calibrations.MeasurementTable(obj);
+            wl = obj.getAttr('Wavelength');
+            if ~isempty(wl) && numel(wl) == 1
+                value = value + string(num2str(wl)) + "nm";
+            end
         end
     end
 
     methods (Static)
         function value = specifyAttributes()
-            value = specifyAttributes@aod.core.Calibration();
+            value = specifyAttributes@aod.builtin.calibrations.MeasurementTable();
 
-            value.add('Wavelength', double.empty(), @isnumeric,...
+            value.add('Wavelength', double.empty(), @isnumeric, ...
                 "The wavelength of the light source being measured");
         end
 
-        function mngr = specifyDatasets(mngr)
-            mngr = specifyDatasets@aod.core.Calibration(mngr);
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.builtin.calibrations.MeasurementTable(value);
 
-            mngr.set('Measurements',...
+            value.set('Measurements', ...
                 'Class', 'table');
         end
     end

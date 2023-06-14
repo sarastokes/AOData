@@ -32,8 +32,9 @@ classdef Registration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyn
 
             obj.registrationDate = obj.loadDataset("registrationDate");
 
-            obj.setDatasetsToDynProps();
-            obj.setLinksToDynProps();
+            % Add user-defined links and datasets
+            obj.populateDatasetsAsDynProps();
+            obj.populateLinksAsDynProps();
         end
     end
 end

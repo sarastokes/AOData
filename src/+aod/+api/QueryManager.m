@@ -192,7 +192,7 @@ classdef QueryManager < handle
             
             for i = 1:numel(expt)
                 if isa(expt(i), 'aod.persistent.Experiment')
-                    newName = expt(i).hdfFileName;
+                    newName = expt(i).hdfName;
                     newExpt = expt;
                 elseif istext(expt)
                     newName = getFullFile(expt(i));

@@ -85,7 +85,7 @@ classdef Rois < aod.core.Annotation
             %   rois            numeric, string/char, aod.common.FileReader
             % -------------------------------------------------------------
 
-            if ~isa(obj.Data, 'double')
+            if isnumeric(rois)
                 obj.setMap(rois);
                 return
             end

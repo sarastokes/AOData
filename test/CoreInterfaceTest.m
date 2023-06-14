@@ -135,7 +135,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Add a second calibration with an empty date
             cal2 = aod.builtin.calibrations.PowerMeasurement('Mustang', [], 488);
-            cal2.addMeasurements(22, 100);
+            cal2.addMeasurements({22, 100});
             testCase.EXPT.add(cal2);
             testCase.verifyEqual(numel(testCase.EXPT.Calibrations), 2);
 
@@ -260,8 +260,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Set a valid source
             setSource([annotation1, annotation2], aod.core.Source('Source1'));
-            testCase.verifyEqual(annotation1.Source.Name, 'Source1');
-            testCase.verifyEqual(annotation2.Source.Name, 'Source1');
+            testCase.verifyEqual(annotation1.Source.Name, "Source1");
+            testCase.verifyEqual(annotation2.Source.Name, "Source1");
 
             % Set an invalid source
             testCase.verifyError(...

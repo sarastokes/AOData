@@ -16,7 +16,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-%#ok<*MANU,*NASGU> 
+%#ok<*MANU,*NASGU,*ASGLU> 
 
     properties
         TEST_OBJ
@@ -289,7 +289,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEmpty(obj.Functions);
             testCase.verifyEmpty(obj.Class);
             testCase.verifyEmpty(obj.Size);
-            testCase.verifyFalse(obj.Required);
 
             % Test assignment
             obj.assign("Size", "(1,1)",...
@@ -302,9 +301,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Class.Value, ["string", "char"]);
             testCase.verifyEqual(obj.Size.SizeType, ...
                 aod.specification.SizeTypes.SCALAR);
-
-            obj.setRequired(true);
-            testCase.verifyTrue(obj.Required);
         end
     end
 
@@ -329,6 +325,12 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
             out = obj.text();
             testCase.verifySize(obj.table(), [4 6]);
+        end
+
+        function DatasetManagerAccess(testCase)
+            DM = aod.specification.util.getDatasetSpecification(...
+                'aod.builtin.devices.NeutralDensityFilter');
+            testCase.verifyClass(DM, 'aod.specification.DatasetManager');
         end
 
         function DatasetManagerError(testCase)
@@ -389,6 +391,19 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
+    methods (Test, TestTags="Access")
+
+        function AttributeManagerAccess(testCase)
+            AM = aod.specification.util.getAttributeSpecification(...
+                'aod.builtin.devices.NeutralDensityFilter');
+            testCase.verifyClass(AM, 'aod.util.AttributeManager');
+        end
+        
+        function PackageAccess(testCase)
+            [DM, S] = aod.specification.util.collectPackageSpecifications("aod.core", false);
+        end
+    end
+
     methods (Test, TestTags="Property")
         function PropertySpecification(testCase)
             prop = aod.util.templates.PropertySpecification("Test");
@@ -439,6 +454,16 @@ classdef SpecificationTest < matlab.unittest.TestCase
             [tf, idx] = obj.has('DsetName');
             testCase.verifyFalse(tf);
             testCase.verifyEmpty(idx);
+        end
+    end
+
+    methods (Test, TestTags="Utilities")
+        function PackageContents(testCase)
+            classNames = aod.specification.util.getPackageContents("aod.core", true);
+            testCase.verifyFalse(ismember('aod.core.MixedEntitySet', classNames));
+
+            classNames = aod.specification.util.getPackageContents("aod.core", false);
+            testCase.verifyTrue(ismember('aod.core.MixedEntitySet', classNames));
         end
     end
 end 
