@@ -30,7 +30,7 @@ function success = write(hdfName, pathName, dsetName, data, description)
 % See also:
 %   h5tools.write, aod.h5.read, aod.h5.writeExpectedAttributes
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     
         % Detailed input checking for first 4 is performed by h5tools
@@ -46,7 +46,7 @@ function success = write(hdfName, pathName, dsetName, data, description)
     
         if isa(data, 'aod.common.KeyValueMap')
             h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.common.KeyValueMap");
-            h5tools.writeatt(hdfName, fullPath, data);
+            h5tools.writeatt(hdfName, fullPath, 'Class', 'aod.common.KeyValueMap');
             success = true;
         elseif isa(data, 'aod.util.AttributeManager')
             success = aod.h5.writeExpectedAttributes(hdfName, pathName, dsetName, data);
@@ -56,6 +56,8 @@ function success = write(hdfName, pathName, dsetName, data, description)
             success = aod.h5.writeExpectedDatasets(hdfName, pathName, dsetName, data);
             h5tools.writeatt(hdfName, fullPath, 'Description',...
                 "Specification of expected data for the entity");
+        elseif isSubclass(data, 'aod.common.FileReader')
+            success = aod.h5.writeFileReader(hdfName, pathName, dsetName, data);
         else
             success = h5tools.write(hdfName, pathName, dsetName, data);
             % Description only written for datasets without mapped params

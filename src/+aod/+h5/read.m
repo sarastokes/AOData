@@ -23,11 +23,19 @@ function out = read(hdfName, pathName, dsetName, className)
     end
 
     fullPath = h5tools.util.buildPath(pathName, dsetName);
+    if aod.util.isempty(className) && h5tools.hasAttribute(hdfName, fullPath, 'Class')
+        className = h5tools.readatt(hdfName, fullPath, 'Class');
+    end
 
     % Deal with AOData-specific classes first
     if strcmp(className, "aod.common.KeyValueMap")
         out = h5tools.readatt(hdfName, fullPath, 'all');
         out = map2attributes(out);
+        return
+    end
+
+    if strcmp(className, "aod.common.FileReader")
+        out = aod.h5.readFileReader(hdfName, pathName, dsetName);
         return
     end
     
@@ -45,6 +53,11 @@ function out = read(hdfName, pathName, dsetName, className)
     out = h5tools.read(hdfName, pathName, dsetName);
 
     % Deal with AOData-specific classes that weren't flagged by user
-    if isstring(out) && isscalar(out) && isequal(out, "aod.common.KeyValueMap")
-        out = h5tools.readatt(hdfName, fullPath, 'all');
+    if isstring(out) && isscalar(out) 
+        if isequal(out, "aod.common.KeyValueMap")
+            out = h5tools.readatt(hdfName, fullPath, 'all');
+        elseif isSubclass(out, "aod.common.FileReader")
+            %! This has some redundancies to cut for speed
+            out = aod.h5.readFileReader(hdfName, pathName, dsetName);
+        end
     end

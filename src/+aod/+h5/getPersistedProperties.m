@@ -49,7 +49,6 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
    
     alwaysPersistedProps = ["notes", "Parent", "files", "description", "Name"];
     alwaysAttributeProps = ["UUID", "label", "parameters", "entityType", "dateCreated", "lastModified"];
-    alwaysAbandonedProps = "Reader";  %! TODO
     persistedProps = [];
     attributeProps = [];
     abandonedProps = [];
@@ -60,9 +59,6 @@ function [persistedProps, attributeProps, abandonedProps, emptyProps] ...
                 string(mc.PropertyList(i).Name));
         elseif ismember(mc.PropertyList(i).Name, alwaysPersistedProps)
             persistedProps = cat(1, persistedProps,...
-                string(mc.PropertyList(i).Name));
-        elseif ismember(mc.PropertyList(i).Name, alwaysAbandonedProps)
-            abandonedProps = cat(1, abandonedProps,...
                 string(mc.PropertyList(i).Name));
         elseif ismember(mc.PropertyList(i).Name, containerProps)
             % Containers are not persisted with containing entity

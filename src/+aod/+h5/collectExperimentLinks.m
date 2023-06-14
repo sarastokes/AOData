@@ -22,10 +22,12 @@ function T = collectExperimentLinks(hdfName, includeParent)
     end
 
     if isa(hdfName, 'aod.persistent.Experiment')
-        hdfName = hdfName.hdfFileName;
+        hdfFile = hdfName.hdfName;
+    else
+        hdfFile = hdfName;
     end
 
-    out = h5tools.collectSoftlinks(hdfName);
+    out = h5tools.collectSoftlinks(hdfFile);
     if ~includeParent
         out = out(~endsWith(out, "Parent"));
     end
@@ -33,7 +35,7 @@ function T = collectExperimentLinks(hdfName, includeParent)
     targets = string.empty();
 
     for i = 1:numel(out)
-        linkTarget = h5tools.readlink(hdfName,...
+        linkTarget = h5tools.readlink(hdfFile,...
             h5tools.util.getPathParent(out(i)),...
             h5tools.util.getPathEnd(out(i)));
         targets = cat(1, targets, linkTarget);

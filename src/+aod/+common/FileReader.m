@@ -18,8 +18,6 @@ classdef (Abstract) FileReader < handle
     properties (SetAccess = protected)
         % Full file name, including file path
         fullFile
-        % Key/value attributes related to file reading
-        attributes
     end
 
     properties (Transient, SetAccess = protected)
@@ -35,10 +33,9 @@ classdef (Abstract) FileReader < handle
     methods
         function obj = FileReader(fileName)
             if nargin > 0 && ~isempty(fileName)
-                fileName = completeFileName(fileName);
-                obj.fullFile = fileName;
+                obj.fullFile = completeFileName(fileName);
             end
-            obj.attributes = aod.common.KeyValueMap();
+            
             % Because some files may be time-consuming to load, readFile()
             % is not called bu default when the FileReader is created
         end
