@@ -21,7 +21,7 @@ classdef VisualStimulus < aod.core.Stimulus
     end
 
     methods (Access = protected)
-        function value = getLabel(obj)
+        function value = specifyLabel(obj)
             value = [];
             if contains(obj.protocolName, '_')
                 txt = strsplit(obj.protocolName, '_');

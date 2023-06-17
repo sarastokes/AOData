@@ -4,7 +4,7 @@
 
 
 #### Naming subclasses (```Name``` and ```label``` properties)
-Subclass names can be either *user-defined* or *automatically generated*. User-defined names are found in the ```Name``` property while automatically generated names are found in the ```label``` property. You can't set label directly, instead it is set to the output of the protected method ```getLabel()```. 
+Subclass names can be either *user-defined* or *automatically generated*. User-defined names are found in the ```Name``` property while automatically generated names are found in the ```label``` property. You can't set label directly, instead it is set to the output of the protected method ```specifyLabel()```. 
 
 By default, all AOData entities require user-defined names (i.e. have "Name" as a first input to the constructor), although you can provide an empty name ```[]```. 
 By default, ```label``` will be the class name.

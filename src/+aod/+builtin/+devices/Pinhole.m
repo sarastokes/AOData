@@ -47,8 +47,8 @@ classdef Pinhole < aod.core.Device
     end
 
     methods (Access = protected)
-        function value = getLabel(obj)
-            value = ['Pinhole_', num2str(obj.getAttr('Diameter')), 'microns'];
+        function value = specifyLabel(obj)
+            value = sprintf("Pinhole_%umicrons", num2str(obj.getAttr('Diameter')));
         end
     end
 

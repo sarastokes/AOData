@@ -75,7 +75,7 @@ classdef DichroicFilter < aod.core.Device
     end
 
     methods (Access = protected)
-        function value = getLabel(obj)
+        function value = specifyLabel(obj)
             value = sprintf('%unm%sPassFilter',... 
                 obj.getAttr('Wavelength'),...
                 appbox.capitalize(obj.getAttr('Pass')));

@@ -20,7 +20,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
 %   notes                       string
 %
 % Dependent properties:
-%   label                       string      (defined by getLabel)
+%   label                       string      (defined by specifyLabel)
 %   expectedAttributes          aod.util.AttributeManager
 %
 % Public methods:
@@ -45,7 +45,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
 %   tf = isequal(obj, other)
 %
 % Protected methods:
-%   value = getLabel(obj)
+%   value = specifyLabel(obj)
 %   parseAttributes(obj, varargin)
 %   sync(obj)
 %   validateName(obj)
@@ -92,7 +92,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
     end
     
     properties (Dependent)
-        % Automated name from getLabel(), used for HDF5 group name if the name property is not set
+        % Automated name from specifyLabel(), used for HDF5 group name if the name property is not set
         label                       char
         % Expected attribute names, optional default values and validation
         expectedAttributes          % aod.util.AttributeManager
@@ -153,7 +153,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
     % Dependent set/get methods
     methods 
         function value = get.label(obj)
-            value = obj.getLabel();
+            value = obj.specifyLabel();
         end
 
         function value = get.expectedAttributes(obj)
@@ -539,7 +539,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
 
     % Methods meant to be overwritten by subclasses, if needed
     methods (Access = protected)
-        function value = getLabel(obj)  
+        function value = specifyLabel(obj)  
             % Get entity's label
             %
             % Description:
@@ -550,7 +550,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
             %   name upon instantiation. Examples are below in "See also".
             %      
             % Syntax:
-            %   value = obj.getLabel();
+            %   value = obj.specifyLabel();
             %
             % See also:
             %   aod.builtin.devices.Pinhole, 

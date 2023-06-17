@@ -143,8 +143,8 @@ classdef RegionResponse < aod.core.Response
 
     % aod.core.Entity protected methods
     methods (Access = protected)
-        function value = getLabel(obj)
-            value = sprintf('Epoch%u_Responses', obj.Parent.ID);
+        function value = specifyLabel(obj)
+            value = sprintf("Epoch%u_Responses", obj.Parent.ID);
         end
     end
 

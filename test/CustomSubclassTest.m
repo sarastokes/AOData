@@ -213,7 +213,7 @@ classdef CustomSubclassTest < matlab.uitest.TestCase
             testCase.press(findByTag(fig, "UpdateButton"));
             % Test written class
             testCase.verifyTrue(any(contains(app.codeEditor.Value,...
-                'value = getLabel(obj)')));
+                'value = specifyLabel(obj)')));
             testCase.verifyTrue(any(contains(app.codeEditor.Value,...
                 'obj@aod.core.Device([], ')));
             
@@ -227,7 +227,7 @@ classdef CustomSubclassTest < matlab.uitest.TestCase
             testCase.verifyTrue(any(contains(app.codeEditor.Value,...
                 'obj@aod.core.Device([], ')));
             testCase.verifyFalse(any(contains(app.codeEditor.Value,...
-                'value = getLabel(obj)')));
+                'value = specifyLabel(obj)')));
             testCase.verifyFalse(any(contains(app.codeEditor.Value,...
                 'obj = DeviceSubclass(name, ')));
 

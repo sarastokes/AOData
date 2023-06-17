@@ -43,8 +43,8 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
     end
 
     methods (Access = protected)
-        function value = getLabel(obj)
-            value = getLabel@aod.builtin.calibrations.MeasurementTable(obj);
+        function value = specifyLabel(obj)
+            value = specifyLabel@aod.builtin.calibrations.MeasurementTable(obj);
             wl = obj.getAttr('Wavelength');
             if ~isempty(wl) && numel(wl) == 1
                 value = value + string(num2str(wl)) + "nm";

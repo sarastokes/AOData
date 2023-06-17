@@ -366,7 +366,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Access = protected)
-        function value = getLabel(obj) 
+        function value = specifyLabel(obj) 
             % Set the label to the epochID (with up to 3 leading zeros to
             % ensure alphabetical sorting doesn't get it out of order)
             value = int2fixedwidthstr(obj.ID, 4);

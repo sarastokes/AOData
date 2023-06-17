@@ -172,7 +172,7 @@ $\quad$\\
             \item \ref{fcn:cEntityRemoveFile} -- remove a file
             \item \ref{fcn:cEntityRemoveNote} -- remove a note from the entity by index
             \item[] \hspace{-2.2ex}\underline{Protected methods:}
-            \item \ref{fcn:cEntityGetLabel} -- define an automated group name 
+            \item \ref{fcn:cEntitySpecifyLabel} -- define an automated group name 
             \item[] \hspace{-2.2ex}\underline{Static methods:}
             \item \ref{fcn:cEntitySpecifyAttributes} -- define and add specifications for the class' attributes
             \item \ref{fcn:cEntitySpecifyDatasets} -- add or edit specifications for the class' properties
@@ -444,7 +444,7 @@ $\quad$\\
     
     \begin{PropFlag}[Dependent, GetAccess=public]
         \texttt{label} & \mclass{string}\\
-        \propd{l}{Automated group name used if \texttt{Name} is not set. See \ref{fcn:cEntityGetLabel}}\\
+        \propd{l}{Automated group name used if \texttt{Name} is not set. See \ref{fcn:cEntitySpecifyLabel}}\\
         &\\
         \texttt{expectedAttributes} & \ret{AttributeManager}\\
         \propd{Attribute specifications (see \ref{fcn:cEntitySpecifyAttributes})}\\
@@ -800,7 +800,7 @@ $\quad$\\
             >> disp(obj.groupName)\\
             \hspace{3ex}`NewAnalysis'\\
             $\quad$\\
-            \ccomm{\% Remove the name and group name will now be the output of \ref{fcn:cEntityGetLabel}.}\\
+            \ccomm{\% Remove the name and group name will now be the output of \ref{fcn:cEntitySpecifyLabel}.}\\
             obj.\textbf{setName}([]);\\
             >> disp(obj.groupName);\\
             \hspace{3ex}`Analysis'
@@ -808,7 +808,7 @@ $\quad$\\
     \end{example}\vspace{1ex}
     
     \begin{SeeFlag}
-        \ref{fcn:cEntityGetLabel}
+        \ref{fcn:cEntitySpecifyLabel}
     \end{SeeFlag}\vspace{1ex}
 
     \mybreak
@@ -943,19 +943,19 @@ $\quad$\\
     
     \mybreak
 
-%* GETLABEL
-    \begin{ProtectTab}[getLabel()]
-        \customlabel{fcn:cEntityGetLabel}{\mymethod{getLabel()}}
+%* SPECIFYLABEL
+    \begin{ProtectTab}[specifyLabel()]
+        \customlabel{fcn:cEntitySpecifyLabel}{\mymethod{specifyLabel()}}
         Populates the entity's \propref{label} property. The \propref{label} property is used for the entity's HDF5 group name if the user does not supply a value for the \propref{Name} property. The default output is the class name. 
     \end{ProtectTab}\myspace
 
     \begin{example}
-        Naming each pinhole individually would be time-consuming and could lead to heterogeneous naming conventions. The \ref{fcn:cEntityGetLabel} method is used by \ret{Pinhole} to define the \propref{label} property based on the pinhole diameter. 
+        Naming each pinhole individually would be time-consuming and could lead to heterogeneous naming conventions. The \ref{fcn:cEntitySpecifyLabel} method is used by \ret{Pinhole} to define the \propref{label} property based on the pinhole diameter. 
 
         $\quad$\\
         \noindent\texttt{\raggedright 
         \defblock{properties} \textit{(Access = protected)}\\
-        \ONE\defblock{function} value = \textbf{getLabel}(obj)\\
+        \ONE\defblock{function} value = \textbf{specifyLabel}(obj)\\
         \ONE\ONE value = [\ctext{`Pinhole\_'}, \mclass{num2str}(obj.diameter), \ctext{`um'}];\\ 
         \ONE\defblock{end}\\
         \defblock{end}}
@@ -1469,7 +1469,7 @@ $\quad$\\
 
     \begin{PropFlag}[Hidden, SetAccess=private]
         %\oldarg{label} & \mclass{string}\\
-        %\propd{The generated label for the entity. See \ref{fcn:cEntityGetLabel}}\\
+        %\propd{The generated label for the entity. See \ref{fcn:cEntitySpecifyLabel}}\\
         %&\\
         \oldarg{entityType} & \ret{aod.common.EntityTypes}\\
         \propd{The entity type}\\

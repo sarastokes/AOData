@@ -34,7 +34,7 @@ classdef StripRegistration < aod.core.Registration
         function obj = StripRegistration(name, registrationDate, varargin)
             if nargin < 1
                 % There is often only one strip registration per Epoch 
-                % so the class name (default from getLabel) could suffice
+                % so the class name (specifyLabel's default) may suffice
                 name = [];
             end
             if nargin < 2

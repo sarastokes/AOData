@@ -69,7 +69,7 @@ classdef LightSource < aod.core.Device
     end
 
     methods (Access = protected)
-        function value = getLabel(obj)
+        function value = specifyLabel(obj)
             if ~isempty(obj.Name)
                 value = [obj.Name, '_', num2str(obj.wavelength), 'nm'];
             else

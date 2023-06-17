@@ -541,7 +541,7 @@ obj = aod.core.Entity(name)
 		\end{itemize}
 		\docheader{Dependent Properties:} 
 		\begin{itemize}
-			\item \aodprop{label} - automatically generated label based on data and metadata. Set to the output of \aodfcn{getLabel()}
+			\item \aodprop{label} - automatically generated label based on data and metadata. Set to the output of \aodfcn{specifyLabel()}
 		\end{itemize}
 		\docheader{Public methods:}
 		\begin{itemize}
@@ -568,7 +568,7 @@ obj = aod.core.Entity(name)
 		\end{itemize}
 		\docheader{Protected methods:}
 		\begin{itemize}
-			\item \aodfcn{value = getLabel(obj)} - defines \aodprop{label}. Default value is the class name without packages but subclasses should tailor it, if needed.
+			\item \aodfcn{value = specifyLabel(obj)} - defines \aodprop{label}. Default value is the class name without packages but subclasses should tailor it, if needed.
 			\item \aodfcn{setParent(obj, entity)}
 			\item \aodfcn{sync(obj)} - For updating entity after added to the main experiment hierarchy. Use this is the entity needs information from other entities (e.g. \aodprop{Parent})
 		\end{itemize}
@@ -1287,7 +1287,7 @@ classdef BandPassFilter < aod.core.Entity
 	end
 	
 	methods (Access = protected)
-		function value = getLabel(obj)
+		function value = specifyLabel(obj)
 			value = sprintf('%ux%uBandpassFilter',...
 				obj.getAttr('Wavelength'), obj.getAttr('Bandwidth'));
 		end

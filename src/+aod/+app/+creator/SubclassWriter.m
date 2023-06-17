@@ -210,8 +210,8 @@ classdef SubclassWriter < handle
         function out = getSetLabel(obj)
             out = "";
             if obj.Model.groupNameMode == "DefinedInternally"                             
-                out = out + obj.indent(2) + "function value = getLabel(obj)" + newline;
-                out = out + obj.indent(3) + sprintf("value = getLabel@%s(obj);", obj.Model.SuperClass) + newline + newline;
+                out = out + obj.indent(2) + "function value = specifyLabel(obj)" + newline;
+                out = out + obj.indent(3) + sprintf("value = specifyLabel@%s(obj);", obj.Model.SuperClass) + newline + newline;
                 out = out + obj.indent(3) + "% Modify value as needed to set label" + newline;
                 out = out + obj.indent(2) + "end" + newline;
                 out = out + " " + newline;

@@ -159,7 +159,7 @@ classdef (Abstract) StimulusProtocol < aod.common.Protocol
 
     % Overwritten methods from Entity
     methods (Access = protected)
-        function value = getLabel(obj)
+        function value = specifyLabel(obj)
             value = obj.protocolName;
         end
     end
