@@ -2,6 +2,10 @@
 
 Documentation of changes prior to alpha release, beginning 30Apr2023
 
+#### 18-Jun-2023
+- Fell off logging changes... 
+- Adding events to specification framework to support future full file validation and specification comparison
+
 #### 3-May-2023
 - Restructured persistent interface to support HDF5 path changes that occur when changing a group's name
 

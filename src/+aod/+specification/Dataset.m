@@ -8,6 +8,10 @@ classdef Dataset < handle
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    events 
+        LoggableEvent
+    end
+
     properties (SetAccess = private)
         Name            (1,1)     string
         Size                      aod.specification.Size 
@@ -16,6 +20,10 @@ classdef Dataset < handle
         Functions       (1,1)     aod.specification.ValidationFunction
         Description               aod.specification.Description 
         Units           (1,1)     string        % For now
+    end
+
+    properties (Access = private)
+        listeners                 event.listener 
     end
 
     properties (Hidden, Constant)
@@ -30,6 +38,8 @@ classdef Dataset < handle
             obj.Default = aod.specification.DefaultValue([]);
             obj.Description = aod.specification.Description([]);
             obj.Functions = aod.specification.ValidationFunction([]);
+
+            obj.bind();
 
             if nargin == 0
                 return 
@@ -178,6 +188,22 @@ classdef Dataset < handle
             elseif contains(fcnText, "mustBeNonzeroLengthText")
                 obj.setClass("string, char");
             end
+        end
+    end
+
+    methods (Access = private)
+        function bind(obj)
+            obj.listeners = addlistener(obj.Size,... 
+                "ValidationFailed", @obj.onValidationFailed);
+            obj.listeners = cat(1, obj.listeners,...
+                addlistener(obj.Class, "ValidationFailed", @obj.onValidationFailed));
+            obj.listeners = cat(1, obj.listeners,...
+                addlistener(obj.Functions, "ValidationFailed", @obj.onValidationFailed));
+        end
+
+        function onValidationFailed(obj, ~, evt)
+            evt.assignPropName(obj.Name);
+            notify(obj, "LoggableEvent");
         end
     end
 

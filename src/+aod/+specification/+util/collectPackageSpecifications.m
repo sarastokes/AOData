@@ -28,7 +28,7 @@ function [DMs, S] = collectPackageSpecifications(pkgName, writeToFile)
     for i = 1:numel(classes)
         try
             DM = processClassDatasets(mp.ClassList(i));
-            AM = processClassAttributes();
+            AM = processClassAttributes(mp.ClassList(i));
         catch ME 
             if strcmp(ME.identifier, 'populate:InvalidInput')
                 % Class is not an aod.core.Entity subclass and does not
@@ -93,6 +93,6 @@ function DM = processClassDatasets(mc)
 end
 
 function AM = processClassAttributes(mc)
-    fcn = str2func(sprintf("%s.specifyAttributes()", mc.Name));
+    fcn = str2func(sprintf("@() %s.specifyAttributes()", mc.Name));
     AM = fcn();
 end

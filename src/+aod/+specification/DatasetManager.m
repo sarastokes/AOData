@@ -15,13 +15,17 @@ classdef DatasetManager < handle
         Datasets 
     end
 
+    properties (Access = private)
+        logger 
+        listeners               event.listener
+    end
+
     properties (Dependent)
-        numDatasets 
+        numDatasets     (1,1)   double      {mustBeInteger}
     end
 
     methods 
         function obj = DatasetManager(className)
-            
             if nargin > 0
                 obj.className = convertCharsToStrings(className);
             end
@@ -98,6 +102,17 @@ classdef DatasetManager < handle
                     'A dataset named %s is already present', dset.Name);
             end
             obj.Datasets = cat(1, obj.Datasets, dset);
+            % obj.listeners = cat(1, obj.listeners,...
+            %     "LoggableEvent", @obj.onLoggableEvent);
+        end
+
+        function remove(obj, dsetName)
+            [tf, idx] = obj.has(dsetName);
+            if ~tf
+                return
+            end
+            obj.Datasets(idx) = [];
+            obj.listeners(idx) = [];
         end
 
         function names = list(obj)
@@ -129,6 +144,21 @@ classdef DatasetManager < handle
             for i = 1:obj.numDatasets 
                 out = out + obj.Datasets(i).text();
             end
+        end
+    end
+
+    methods (Access = private)
+        function initializeLogger(obj)    
+            obj.logger = aod.specification.logger.SpecificationLogger(...
+                obj.className);
+            obj.logger.clearLog();
+        end
+
+        function onLoggableEvent(obj, ~, evt)
+            if isempty(obj.logger)
+                return
+            end
+            obj.logger.write(evt.Name, evt.Type);
         end
     end
 
@@ -193,6 +223,14 @@ classdef DatasetManager < handle
     methods
         function tf = isempty(obj)
             tf = (obj.numDatasets == 0);
+        end
+
+        function tf = isequal(obj, other)
+            if isa(other, 'aod.specification.DatasetManager')
+                tf = false;
+                return 
+            end
+            tf = strcmp(obj.text(), other.text());
         end
 
         function S = struct(obj)

@@ -4,14 +4,17 @@ classdef Size < aod.specification.Validator
 % Superclasses:
 %   aod.specification.Specification
 %
-% Static method constructor:
+% Constructor:
 %   obj = aod.specification.Size(input)
 %
 % Methods:
+%   idx = isfixed(obj)
+%
 %   tf = isempty(obj)
 %   tf = isequal(obj, other)
 %   tf = isscalar(obj)
 %   tf = isvector(obj)
+%   out = jsonencode(obj)
 %   x = ndims(obj)
 
 % By Sara Patterson, 2023 (AOData)
@@ -84,6 +87,9 @@ classdef Size < aod.specification.Validator
             % Check the dimensionality
             if numel(obj.Value) ~= ndims(input)
                 tf = false;
+                obj.notifyListeners(sprintf(...
+                    "Expected size %s, Actual size %s",...
+                    obj.text(), jsonencode(size(input))));
                 return
             end
 
@@ -91,6 +97,9 @@ classdef Size < aod.specification.Validator
             for i = 1:numel(obj.Value)
                 if ~validate(obj.Value(i), size(input, i))
                     tf = false;
+                    obj.notifyListeners(sprintf(...
+                        "Expected size %s, Actual size %s",...
+                        obj.text(), jsonencode(size(input))));
                     return
                 end
             end
@@ -101,6 +110,9 @@ classdef Size < aod.specification.Validator
 
         function out = text(obj)
             % Converts to a text representation
+            %
+            % Syntax:
+            %   out = text(obj)
             % -------------------------------------------------------------
             if isempty(obj.Value)
                 out = "[]";
@@ -124,6 +136,9 @@ classdef Size < aod.specification.Validator
     methods (Access = private)
         function setSizeType(obj)
             % Set aod.specification.SizeTypes
+            %
+            % Syntax:
+            %   setSizeType(obj)
             % -------------------------------------------------------------
             import aod.specification.SizeTypes
 
@@ -145,6 +160,12 @@ classdef Size < aod.specification.Validator
         end
 
         function idx = isfixed(obj, whichDim)
+            % Return an index of which dimensions are fixed
+            %
+            % Syntax:
+            %   idx = isfixed(obj, whichData)
+            % -------------------------------------------------------------
+
             idx = arrayfun(@(x) isa(x, 'aod.specification.size.FixedDimension'), obj.Value);
             if nargin > 1
                 idx = idx(whichDim);
@@ -246,6 +267,11 @@ classdef Size < aod.specification.Validator
         end
 
         function out = jsonencode(obj)
+            % Convert to JSON-formatted text
+            %
+            % Syntax:
+            %   out = jsonencode(obj)
+            % -------------------------------------------------------------
             if isempty(obj)
                 out = jsonencode([]);
             else
@@ -260,7 +286,7 @@ classdef Size < aod.specification.Validator
             %   value = ndims(obj)
             %
             % Notes:
-            %   - If Size is empty (aka undefined), value will be empty
+            %   - If Size is empty (a.k.a. undefined), value will be empty
             % -------------------------------------------------------------
             if isempty(obj.Value)
                 value = [];
@@ -288,7 +314,7 @@ classdef Size < aod.specification.Validator
             % Determine whether specification is a vector
             %
             % Syntax:
-            %   tf = isrow(obj)
+            %   tf = isvector(obj)
             % -------------------------------------------------------------
             if isempty(obj)
                 tf = false;

@@ -7,6 +7,7 @@ function initializeAOData(varargin)
 %   - BasePackage: the location of AOData folder
 %   - SearchPaths: the folder containing AOData or custom classes
 %   - GitRepos: the folders of all git repositories to log in HDF5 files
+%   - LogFolder: the default folder for loggers
 %
 % Syntax:
 %   initializeAOData()
@@ -31,11 +32,17 @@ function initializeAOData(varargin)
 
     thisDir = fileparts(mfilename('fullpath'));
 
+    % Create log folder
+    if ~isfolder(fullfile(thisDir, "logs"))
+        mkdir(fullfile(thisDir, "logs"));
+    end
+
     hasAODataPref = ispref('AOData');
     if ~hasAODataPref || resetFlag
         setpref('AOData', 'BasePackage', thisDir);
         setpref('AOData', 'SearchPaths', string(thisDir));
         setpref('AOData', 'SearchForMirrors', false);
+        setpref('AOData', 'LogFolder', fullfile(thisDir, 'logs'));
         % TODO: Check if .git is present
         setpref('AOData', 'GitRepos', thisDir);
         fprintf('AOData is already initialized, add custom packages in AODataManagerApp\n');
@@ -60,6 +67,10 @@ function initializeAOData(varargin)
             fprintf('AOData paths have been updated to new location, check custom packages in AODataManagerApp\n');
         end
         fprintf('AOData is already initialized, add custom packages in AODataManagerApp\n');
+    end
+
+    if ~isfolder(fullfile(thisDir, "logs"))
+        mkdir(fullfile(thisDir, "logs"));
     end
 
     if appFlag

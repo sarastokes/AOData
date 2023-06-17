@@ -50,46 +50,32 @@ classdef ValidationFunction < aod.specification.Validator
             end
         end
 
-        function tf = validate(obj, input)
+        function [tf, isValid, exceptions] = validate(obj, input)
+            % Validate an input according to function(s)
+            %
+            % Syntax:
+            %   [tf, isValid, exceptions] = validate(obj, input)
+            % -------------------------------------------------------------
+            exceptions = [];
+
             if isempty(obj.Value)
                 tf = true;
+                isValid = [];
                 return 
             end
 
-            % Validation functions like mustBeNumeric have no output but 
-            % will have errored if invalid. Other functions should return 
-            % true, so isValid should be a cell with empty or 1 (not 0)
             isValid = false(1, numel(obj.Value));
 
             for i = 1:numel(obj.Value)
-                iValid = [];
-                try
-                    % Validation function that returns true/false
-                    iValid = obj.Value{i}(input);
-                    % Make sure the validation function is appropriate
-                    if ~islogical(iValid)
-                        error('validate:InvalidValidationFunctions',...
-                            'Function %u returned type %s, but should return logical',...
-                            i, class(iValid));
-                    end
-                catch ME 
-                    % Skip errors by "mustBe" validation functions
-                    if ~strcmp(ME.identifier, "MATLAB:TooManyOutputs")
-                        iValid = false;
-                    end
+                [tf, ME] = runAnyValidation(obj.Value{i}, input);
+                isValid(i) = tf;
+                if ~tf && ~isempty(ME)
+                    exceptions = cat(1, exceptions, ME);    
+                    obj.notifyListeners(sprintf(...
+                        "%s failed.", func2str(obj.Value{i})));
                 end
-                if isempty(iValid)
-                    try
-                        obj.Value{i}(input);
-                        iValid = true;      % Would have errored if failed
-                    catch ME
-                        iValid = false;
-                        warning(ME.identifier, '%s', ME.message);
-                    end
-                end
-                isValid(i) = iValid;
             end
-            tf = all(iValid);
+            tf = all(isValid);
         end
 
         function out = text(obj)

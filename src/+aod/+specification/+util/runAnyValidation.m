@@ -1,4 +1,4 @@
-function [tf, ME] = runAnyValidation(fcn, value, errFlag)
+function [tf, exception] = runAnyValidation(fcn, value, errFlag)
 % Run true/false and error output validations agnostically
 %
 % Syntax:
@@ -21,18 +21,19 @@ function [tf, ME] = runAnyValidation(fcn, value, errFlag)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    if nargin < 2
+    if nargin < 3
         errFlag = false;
     end
 
-    hasOutput = (nargout(fcn) > 0);
+    hasOutput = (nargout(fcn) ~= 0);
 
     if hasOutput
         try
             tf = fcn(value);
             if ~islogical(tf)
-                error('runAnyValidation:InvalidOutput',...
-                    'Output should be logical, instead it was %s', class(tf));
+                error('validate:InvalidOutput',...
+                    'Function %s returned type %s, but should return logical',...
+                    func2str(fcn), class(tf));
             end
         catch ME
             error('runAnyValidation:InvalidFunction',...
@@ -41,21 +42,22 @@ function [tf, ME] = runAnyValidation(fcn, value, errFlag)
         end
 
         if tf 
-            ME = [];
+            exception = [];
         else
-            ME = MException('runAnyValidation:Failed',...
-                'Input did not pass %s', func2str(fcn));
+            exception = MException('runAnyValidation:ReturnedFalse',...
+                'Input did not pass "%s"', func2str(fcn));
             if errFlag 
-                throw(ME);
+                throw(exception);
             end
         end
     else
         try 
             fcn(value);
-            ME = [];
+            exception = [];
             tf = true;
         catch ME 
             tf = false;
+            exception = ME;
             if errFlag 
                 rethrow(ME);
             end
