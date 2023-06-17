@@ -744,15 +744,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.En
             obj.Name = obj.loadDataset('Name');
             obj.files = obj.loadDataset('files', 'aod.common.KeyValueMap');
 
-            expectedAttrs = obj.loadDataset('expectedAttributes');
-            if ~isempty(expectedAttrs)
-                obj.expectedAttributes = expectedAttrs;
-            end
-
-            expectedDsets = obj.loadDataset('expectedDatasets');
-            if ~isempty(expectedDsets)
-                obj.expectedDatasets = expectedDsets;
-            end
+            expectedAttrs = obj.assignProp('expectedAttributes');
+            expectedDsets = obj.assignProp('expectedDatasets');
 
             % LINKS -----------
             obj.Parent = obj.loadLink('Parent');
@@ -764,14 +757,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.En
             obj.UUID = obj.loadAttribute('UUID');
             obj.entityType = aod.common.EntityTypes.get(obj.loadAttribute('EntityType'));
             obj.coreClassName = obj.loadAttribute('Class');
-            lastModTime = obj.loadAttribute('lastModified');
-            if ~isempty(lastModTime)
-                obj.lastModified = datetime(lastModTime);
-            end
-            dateCreated = obj.loadAttribute('dateCreated');
-            if ~isempty(dateCreated)
-                obj.dateCreated = datetime(dateCreated);
-            end
+            obj.assignAttributeToProp('dateCreated');
+            obj.assignAttributeToProp('lastModified');
 
             % Parse the remaining attributes
             for i = 1:numel(obj.attNames)
@@ -858,6 +845,43 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.En
                 else
                     rethrow(ME);
                 end
+            end
+        end
+
+        function assignProp(obj, dsetName, varargin)
+            % Load dataset and assign property if valid
+            %
+            % Description:
+            %   This intermediate step prevents assignment of empty values
+            %   to properties with data type specifications that do not
+            %   accept generic [] inputs (ugh datetime)
+            % -----------------------------------------------------------
+            d = obj.loadDataset(dsetName, varargin{:});
+            if ~isempty(d)
+                obj.(dsetName) = d;
+            end
+        end
+
+        function assignLinkProp(obj, linkName, propName)
+            % Assign a link to a property, if not empty
+            if nargin < 3
+                propName = linkName;
+            end
+
+            l = obj.loadLink(linkName);
+            if ~isempty(l)
+                obj.(propName) = l;
+            end
+        end
+
+        function assignAttributeToProp(obj, hdfAttrName, propName)
+            % Assign an attribute to a property, if not empty
+            if nargin < 3
+                propName = hdfAttrName;
+            end
+            a = obj.loadAttribute(hdfAttrName);
+            if ~isempty(a)
+                obj.(propName) = a;
             end
         end
 

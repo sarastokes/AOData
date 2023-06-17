@@ -64,9 +64,9 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
 
     properties (SetAccess = private)
         % The Entity's parent Entity
-        Parent                      % aod.core.Entity subclass
+        Parent                      {mustBeScalarOrEmpty} % aod.core.Entity subclass
         % User-defined name for the entity, defines the HDF5 group name
-        Name                        string = string.empty()
+        Name                        string {mustBeScalarOrEmpty} = string.empty()
         % Unique identifier for the entity
         UUID                        string = string.empty()
         % A description of the entity
@@ -81,7 +81,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
 
     properties (Hidden, SetAccess = private)
         % The entity's type, aod.common.EntityTypes
-        entityType                  %aod.common.EntityTypes
+        entityType                  % aod.common.EntityTypes
     end
 
     properties (SetObservable, SetAccess = protected)
@@ -446,13 +446,13 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
             % Inputs:
             %   fileName       char
             % Optional inputs:
-            %   errorType      aod.infra.ErrorTypes (default = ERROR)            
+            %   errorType      aod.infra.ErrorTypes (default = NONE)            
             % -------------------------------------------------------------
 
             arguments
                 obj
                 fileName        char 
-                errorType       = []
+                errorType       = aod.common.ErrorTypes.NONE
             end
 
             import aod.infra.ErrorTypes
@@ -460,7 +460,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
 
             if ~isscalar(obj)
                 fileValue = aod.util.arrayfun(...
-                    @(x) string(getFile(x, fileName, ErrorTypes.NONE)), obj);
+                    @(x) string(getFile(x, fileName, ErrorTypes.MISSING)), obj);
                 fileValue = standardizeMissing(fileValue, "");
                 return
             end
@@ -630,10 +630,10 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
             end
 
             for i = 1:numel(propList)
+                if aod.util.isempty(obj.(propList(i)))
+                    continue
+                end
                 if isSubclass(obj.(propList(i)), 'aod.core.Entity')
-                    if isempty(obj.(propList(i)))
-                        continue
-                    end
                     propValue = obj.(propList(i));
                     propType = aod.common.EntityTypes.get(propValue);
                     matches = aod.util.findByUUID(propType.collectAll(h), propValue.UUID);
@@ -812,8 +812,8 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
             value = aod.util.AttributeManager();
         end
 
-        function mngr = specifyDatasets(mngr)
-            % Modifies DatasetManager, subclasses can extend
+        function value = specifyDatasets(value)
+            % Subclasses can extend to modify DatasetManager
             %
             % Syntax:
             %   mngr = specifyAttributes(mngr)

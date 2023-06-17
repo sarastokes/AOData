@@ -48,7 +48,7 @@ classdef EntityMixin < handle
             % -------------------------------------------------------------
             if nargin < 2
                 entityType = [];
-            else
+            elseif ~isempty(entityType)
                 entityType = aod.common.EntityTypes.get(entityType);
             end
 

@@ -15,7 +15,7 @@ classdef Calibration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyna
 % See also:
 %   aod.core.Calibration
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -32,7 +32,7 @@ classdef Calibration < aod.persistent.Entity & matlab.mixin.Heterogeneous & dyna
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
-            obj.calibrationDate = obj.loadDataset('calibrationDate');
+            obj.calibrationDate = obj.assignProp('calibrationDate');
             
             % Add additional user-defined datasets and links
             obj.populateDatasetsAsDynProps();

@@ -11,7 +11,7 @@ classdef RigidRegistration < aod.builtin.registrations.GeometricTransformation
 %   obj = RigidRegistration(data, varargin)
 %
 % Properties:
-%   tform
+%   transform
 %
 % Inherited properties:
 %   registrationDate
@@ -31,10 +31,6 @@ classdef RigidRegistration < aod.builtin.registrations.GeometricTransformation
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        tform                   
-    end
-
     methods
         function obj = RigidRegistration(name, registrationDate, data, varargin)
             obj@aod.builtin.registrations.GeometricTransformation(name, registrationDate, varargin{:});
@@ -49,7 +45,7 @@ classdef RigidRegistration < aod.builtin.registrations.GeometricTransformation
                     end
                 end
             end
-            obj.tform = data;
+            obj.setTransform(data);
         end
 
         function data = apply(obj, data, varargin)

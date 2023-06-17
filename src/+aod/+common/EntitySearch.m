@@ -6,7 +6,7 @@ classdef EntitySearch < handle
 %   of a specifc type with the queries listed below.
 %
 % Queries:
-%   Attribute, Dataset, File, Name, Class, Subclass
+%   Attribute, Dataset, File, GroupName, Name, Class, Subclass
 %
 % Constructor:
 %   obj = aod.common.EntitySearch(entityGroup, varargin)
@@ -17,7 +17,7 @@ classdef EntitySearch < handle
 % Examples:
 %   A comprehensive list of examples is provided in AOQuery's documentation 
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -114,6 +114,8 @@ classdef EntitySearch < handle
                     obj.subclassQuery(query{2:end});
                 case 'name'
                     obj.nameQuery(query{2:end});
+                case 'groupname'
+                    obj.groupNameQuery(query{2:end});
                 case {'dataset', 'property'}
                     obj.datasetQuery(query{2:end});
                 case {'attribute', 'attr'}
@@ -121,9 +123,6 @@ classdef EntitySearch < handle
                 case {'file'}
                     obj.fileQuery(query{2:end});
             end
-
-            % fprintf('\t%s query returned %u of %u entities\n',... 
-            %     queryType, nnz(obj.filterIdx), numel(obj.Group));
         end
     end 
 
@@ -147,16 +146,32 @@ classdef EntitySearch < handle
             end
         end
 
+        function groupNameQuery(obj, groupSpec)
+            % Find entities by the entity's HDF5 group name
+            if isa(groupSpec, 'function_handle')
+                for i = 1:numel(obj.Group)
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = obj.tryFilterFcn(groupSpec, obj.Group(i).groupName);
+                    end
+                end
+            else
+                for i = 1:numel(obj.Group)
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = strcmpi(obj.Group(i).groupName, groupSpec);
+                    end
+                end
+            end
+        end
+
         function nameQuery(obj, nameSpec)
             % Find entities by name
             if isa(nameSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
                     if obj.filterIdx(i) 
-                        obj.filterIdx(i) = nameSpec(obj.Group(i).Name);
+                        obj.filterIdx(i) = obj.tryFilterFcn(nameSpec, obj.Group(i).Name);
                     end
                 end
             else
-                nameSpec = convertStringsToChars(nameSpec);
                 for i = 1:numel(obj.Group)
                     if obj.filterIdx(i) 
                         obj.filterIdx(i) = strcmpi(obj.Group(i).Name, nameSpec);
@@ -191,17 +206,15 @@ classdef EntitySearch < handle
             % Filter by the value of dsetName
             if isa(dsetSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
-                    if ~obj.filterIdx(i)
-                        continue
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = obj.tryFilterFcn(dsetSpec, obj.Group(i).(dsetName));
                     end
-                    obj.filterIdx(i) = dsetSpec(obj.Group(i).(dsetName));
                 end
             else
                 for i = 1:numel(obj.Group)
-                    if ~obj.filterIdx(i)
-                        continue
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = isequal(obj.Group(i).(dsetName), dsetSpec);
                     end
-                    obj.filterIdx(i) = isequal(obj.Group(i).(dsetName), dsetSpec);
                 end
             end
         end
@@ -233,23 +246,15 @@ classdef EntitySearch < handle
             % Filter entities with fileName by their values
             if isa(fileSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
-                    if ~obj.filterIdx(i)
-                        continue
-                    end
-
-                    try
-                        obj.filterIdx(i) = fileSpec(obj.Group(i).getFile(fileName));
-                    catch
-                        warning('fileQuery:InvalidFileFcn',...
-                            'File function for %s was invalid', fileName);
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = obj.tryFilterFcn(fileSpec, obj.Group(i).getFile(fileName));
                     end
                 end
             else
                 for i = 1:numel(obj.Group)
-                    if ~obj.filterIdx(i)
-                        continue
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = isequal(obj.Group(i).getFile(fileName), fileSpec);
                     end
-                    obj.filterIdx(i) = isequal(obj.Group(i).getFile(fileName), fileSpec);
                 end
             end
         end
@@ -277,22 +282,15 @@ classdef EntitySearch < handle
             % Filter by the value of paramName
             if isa(paramSpec, 'function_handle')
                 for i = 1:numel(obj.Group)
-                    if ~obj.filterIdx(i)
-                        continue
-                    end
-                    try
-                        obj.filterIdx(i) = paramSpec(obj.Group(i).getAttr(paramName));
-                    catch
-                        warning('attributeQuery:InvalidParamFcn',...
-                            'attribute function for %s was invalid', paramName);
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = obj.tryFilterFcn(paramSpec, obj.Group(i).getAttr(paramName));
                     end
                 end
             else
                 for i = 1:numel(obj.Group)
-                    if ~obj.filterIdx(i)
-                        continue
+                    if obj.filterIdx(i)
+                        obj.filterIdx(i) = isequal(obj.Group(i).getAttr(paramName), paramSpec);
                     end
-                    obj.filterIdx(i) = isequal(obj.Group(i).getAttr(paramName), paramSpec);
                 end
             end
         end
@@ -300,10 +298,36 @@ classdef EntitySearch < handle
 
     methods (Static)
         function className = getEntityClass(entity)
+            % The main difference between core and persistent for searching
+            % is how the entity class is represented. 
+
             if isSubclass(entity, 'aod.core.Entity')
                 className = class(entity);
             elseif isSubclass(entity, 'aod.persistent.Entity')
                 className = entity.coreClassName;
+            end
+        end
+
+        function output = tryFilterFcn(fcn, input)
+            % Catches issues related to empty values and invalid functions
+            % (i.e. those that do not return "logical")
+            try
+                output = fcn(input);
+            catch ME 
+                % An empty value will throw an error for many 
+                % queries (e.g., contains or >). If the value is 
+                % empty, assume it isn't matching the query, 
+                % otherwise rethrow the error
+                if aod.util.isempty(input)
+                    output = false;
+                else
+                    rethrow(ME);
+                end
+            end
+            if ~islogical(output)
+                error('EntitySearch:InvalidFunction',...
+                    'Functions must return true or false, "%s" returned %s',...
+                    func2str(fcn), class(output));
             end
         end
     end

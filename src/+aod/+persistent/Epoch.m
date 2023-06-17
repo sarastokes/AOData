@@ -120,9 +120,9 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
             populate@aod.persistent.Entity(obj);
             
             % DATASETS
-            obj.ID = obj.loadDataset("ID");
-            obj.startTime = obj.loadDataset("startTime");
-            obj.Timing = obj.loadDataset("Timing");
+            obj.ID = obj.assignProp("ID");
+            obj.startTime = obj.assignProp("startTime");
+            obj.Timing = obj.assignProp("Timing");
             obj.populateDatasetsAsDynProps();
 
             % LINKS

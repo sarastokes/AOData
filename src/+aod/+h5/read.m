@@ -52,6 +52,8 @@ function out = read(hdfName, pathName, dsetName, className)
     % Generic HDF5 datasets
     out = h5tools.read(hdfName, pathName, dsetName);
 
+    
+
     % Deal with AOData-specific classes that weren't flagged by user
     if isstring(out) && isscalar(out) 
         if isequal(out, "aod.common.KeyValueMap")

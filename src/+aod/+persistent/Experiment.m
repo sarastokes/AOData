@@ -61,6 +61,11 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
             end
         end
 
+        function epoch = id2epoch(obj, ID)
+            idx = obj.id2index(ID);
+            epoch = obj.Epochs(ID);
+        end
+
         function setHomeDirectory(obj, homeDirectory)
             % SETHOMEDIRECTORY
             %
