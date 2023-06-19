@@ -27,7 +27,7 @@ classdef CommonApiTest < matlab.unittest.TestCase
             % - 2 Calibrations (base & PowerMeasurement)
             % - 1 Source with 2 subsources
             % - 1 System 
-            % - 2 Analyses
+            % - 2 Analyses (second has persisted prop: "AddHoc" = 2)
             % - 6 Epochs w/ varying attributes & files
             % - 4 Registrations ('RegType1' on 1/2, 'RegType2' on 6/7)
             % - 3 EpochDatasets ('Dset1' on 1/2, 'Dset2' on 1)
@@ -62,7 +62,7 @@ classdef CommonApiTest < matlab.unittest.TestCase
             epochIDs = [1, 2, 6, 7, 8, 9];
             pmtGains = [0.491, 0.5, 0.51, 0.51, 0.515, 0.515];
             for i = 1:numel(epochIDs)
-                testCase.EXPT.add(aod.core.Epoch(i));
+                testCase.EXPT.add(aod.core.Epoch(epochIDs(i)));
                 % Don't add a attribute and file to the last epoch
                 if i ~= numel(epochIDs)
                     testCase.EXPT.Epochs(i).setAttr('PmtGain', pmtGains(i));
@@ -85,10 +85,54 @@ classdef CommonApiTest < matlab.unittest.TestCase
 
             aod.h5.writeExperimentToFile("CommonApiTest.h5", testCase.EXPT, true);
             testCase.PRST = loadExperiment("CommonApiTest.h5");
+
+            % Put an ad-hoc property on the first analysis only
+            testCase.PRST.setReadOnlyMode(false);
+            testCase.PRST.Analyses(2).addProp("AddHoc", 2);
         end
     end
 
-    methods (Test)
+    methods (Test, TestTags="EntityMixin")
+        function ScalarPropCheck(testCase)
+            import aod.infra.ErrorTypes
+
+            % Get property
+            testCase.verifyEqual(getProp(testCase.PRST.Analyses(2), "AddHoc"), 2);
+
+            testCase.verifyEmpty(getProp(testCase.PRST.Analyses(1), "AddHoc", "None"));
+            testCase.verifyTrue(ismissing(getProp(...
+                testCase.PRST.Analyses(1), "AddHoc", ErrorTypes.MISSING)));
+            testCase.verifyError(...
+                @()getProp(testCase.PRST.Analyses(1), "AddHoc", ErrorTypes.ERROR),...
+                "getProp:PropertyNotFound");
+            testCase.verifyWarning(...
+                @()getProp(testCase.PRST.Analyses(1), "AddHoc", ErrorTypes.WARNING),...
+                "getProp:PropertyNotFound");
+        end
+
+        function NonScalarPropCheck(testCase)
+            import aod.infra.ErrorTypes
+
+            testCase.verifyFalse(all(testCase.EXPT.Epochs.hasProp("BadProp")));
+            testCase.verifyTrue(all(testCase.EXPT.Epochs.hasProp("ID")));
+
+            cPropValues = testCase.EXPT.Epochs.getProp("ID");
+            testCase.verifyEqual(cPropValues, [1, 2, 6, 7, 8, 9]');
+            pPropValues = testCase.PRST.Epochs.getProp("ID");
+            testCase.verifyEqual(pPropValues, cPropValues);
+            
+            propValues = testCase.PRST.Analyses.getProp("AddHoc", ErrorTypes.MISSING);
+            testCase.verifyTrue(nnz(ismissing(propValues)) == 1);
+            testCase.verifyError(...
+                @() testCase.PRST.Analyses.getProp("AddHoc", ErrorTypes.ERROR),... 
+                "getProp:PropertyNotFound");
+            testCase.verifyWarning(...
+                @() testCase.PRST.Analyses.getProp("AddHoc", ErrorTypes.WARNING),...
+                "getProp:PropertyNotFound");
+        end
+    end
+
+    methods (Test, TestTags="Search")
         function EmptySearch(testCase)
             testCase.verifyWarning(...
                 @() aod.common.EntitySearch.go('Response'), "go:NoQueries");
@@ -104,7 +148,7 @@ classdef CommonApiTest < matlab.unittest.TestCase
             testCase.verifyNumElements(out, 2);
 
 
-            testCase.verifyEmpty(testCase.PRST.Sources(1).Sources(1).has('Source'));
+            testCase.verifyFalse(testCase.PRST.Sources(1).Sources(1).has('Source'));
             testCase.verifyTrue(testCase.PRST.Sources(1).has('Source'));
             testCase.verifyTrue(testCase.PRST.Sources(1).has('Source', ...
                 {'Name', 'OS'}));

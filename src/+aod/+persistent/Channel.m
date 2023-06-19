@@ -17,7 +17,6 @@ classdef Channel < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicp
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        % Container for the Channel's Devices
         DevicesContainer
     end
 

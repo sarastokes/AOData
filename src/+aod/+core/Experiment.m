@@ -38,7 +38,7 @@ classdef Experiment < aod.core.Entity
 %   remove(obj, entityType, ID)
 %   out = get(obj, entityType, varargin)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -193,49 +193,25 @@ classdef Experiment < aod.core.Entity
 
             import aod.common.EntityTypes
             entityType = EntityTypes.get(entity);
+            if ~ismember(entityType, obj.entityType.validChildTypes())
+                error("Experiment:AddedInvalidEntity",...
+                    "Entity must be Analysis, Calibration, Annotation, Epoch, ExperimentDataset, Source or System");
+            end
 
             switch entityType 
-                case EntityTypes.ANALYSIS
-                    entity.setParent(obj);
-                    if isempty(obj.Analyses)
-                        obj.Analyses = entity;
-                    else
-                        obj.Analyses = cat(1, obj.Analyses, entity);
-                    end
-                case EntityTypes.ANNOTATION
-                    entity.setParent(obj);
-                    if isempty(obj.Annotations)
-                        obj.Annotations = entity;
-                    else
-                        obj.Annotations = cat(1, obj.Annotations, entity);
-                    end
-                case EntityTypes.CALIBRATION
-                    entity.setParent(obj);
-                    if isempty(obj.Calibrations)
-                        obj.Calibrations = entity;
-                    else
-                        obj.Calibrations = cat(1, obj.Calibrations, entity);
-                    end
                 case EntityTypes.EPOCH
-                    obj.addEpoch(entity);
-                case EntityTypes.EXPERIMENTDATASET
-                    if isempty(obj.ExperimentDatasets)
-                        obj.ExperimentDatasets = entity;
-                    else
-                        obj.ExperimentDatasets = cat(1, obj.ExperimentDatasets, entity);
-                    end
-                case EntityTypes.SYSTEM 
-                    entity.setParent(obj);
-                    if isempty(obj.Systems)
-                        obj.Systems = entity;
-                    else
-                        obj.Systems = cat(1, obj.Systems, entity);
-                    end
+                    obj.addEpoch(entity)
                 case EntityTypes.SOURCE 
                     obj.addSource(entity);
                 otherwise
-                    error("Experiment:AddedInvalidEntity",...
-                        "Entity must be Analysis, Calibration, Annotation, Epoch, ExperimentDataset, Source or System");
+                    entity.setParent(obj);
+                    parentContainer = entityType.parentContainer;
+                    if isempty(obj.(parentContainer))
+                        obj.(parentContainer) = entity;
+                    else
+                        obj.(parentContainer) = cat(1, obj.(parentContainer), entity);
+                    end
+                    
             end
         end
 

@@ -1,0 +1,113 @@
+{
+    "_schemaVersion": "1.0.0",
+    
+    "aod.common.mixins.Entity.hasAttr":
+    {
+        "inputs": 
+        [
+            {"name": "obj", 
+                "kind": "required", 
+                "type":[["aod.core.Entity"], ["aod.persistent.Entity"]]},
+            {"name": "attrName", 
+                "kind": "required", 
+                "type":[["string"], ["char"]],
+                "purpose": "The name of the attribute (case sensitive)"}
+        ]
+    },
+    "aod.common.mixins.Entity.getAttr":{
+        "inputs": [
+            {"name": "obj", 
+                "kind":"required", 
+                "type":[["aod.core.Entity"], ["aod.persistent.Entity"]]},
+            {"name": "attrName", 
+                "kind": "required", 
+                "type": ["char"], 
+                "purpose":"The name of the attribute (case sensitive)"},
+            {"name": "errorType", 
+                "kind": "ordered", 
+                "type": [["char", "choices={'none', 'missing', 'warning', 'error'}"], ["aod.infra.ErrorTypes"]],
+                "purpose": "How to handle missing values"}
+        ]
+    },
+    "aod.common.mixins.Entity.hasProp": 
+    {
+        "inputs": [
+            {"name": "obj",
+                "kind": "required", "type": [["aod.core.Entity"], ["aod.persistent.Entity"]]},
+            {"name": "propName",
+                "kind": "required", "type":[["char"], ["string"]],
+                "purpose": "The property/HDF5 dataset name"}
+        ]
+    },
+    "aod.core.Entity.Entity":
+    {
+        "inputs":[
+            {"name": "name", 
+                "kind": "positional", 
+                "type": ["string", "char"]},
+            {"name": "parent", 
+                "kind": "namevalue", 
+                "type":[["aod.core.Entity"], ["aod.persistent.Entity"]]}
+        ]
+    },
+    "aod.core.Epoch.Epoch":
+    {
+        "inputs":[
+            {"name": "ID", 
+                "kind": "required", 
+                "type":["integer"]},
+            {"name": "Source", 
+                "kind": "namevalue", 
+                "type":["aod.core.Source", "aod.persistent.Source"]},
+            {"name": "System", 
+                "kind": "namevalue", 
+                "type":["aod.core.System", "aod.persistent.System"], 
+                "purpose": "The Source from which data was acquired during the Epoch"},
+            {"name": "Parent",
+                "kind": "namevalue",
+                "type":["aod.core.Experiment", "aod.persistent.Experiment"],
+                "purpose": "The Epoch's parent experiment"}
+        ]
+    },
+    "aod.core.Epoch.has":
+    {
+        "inputs": [
+            {"name": "obj",
+                "kind": "required",
+                "type":[["aod.core.Entity"], ["aod.persistent.Entity"]]},
+            {"name": "entityType",
+                "kind": "required",
+                "type": [["char"], ["string"], ["aod.common.EntityTypes"]]},
+            {"mutuallyExclusiveGroup":
+                [
+                    [
+                        {"name": "query", 
+                            "kind": "ordered", 
+                            "type": "cell",
+                            "repeating": true,
+                            "purpose": "AOQuery cells"}
+                    ],
+                    [
+                        {"name": "query",
+                            "kind": "ordered",
+                            "type": ["char", "choices={'all'}"],
+                            "purpose": "Returns all of the child entity type"}
+                    ]
+                ]
+            }
+        ]
+    },
+    "aod.h5.writeExperimentToFile": {
+        "inputs": [
+            {"name": "hdfName", 
+                "kind":"required", 
+                "type":["char","string"]},
+            {"name": "obj", 
+                "kind": "required", 
+                "type": ["aod.core.Experiment"]},
+            {"name": "overwriteFlag", 
+                "kind":"ordered", 
+                "type":["logical"]}
+        ]
+    }
+}

@@ -13,7 +13,7 @@ classdef Analysis < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = {?aod.persistent.Entity, ?aod.persistent.Epoch})
         analysisDate                    
     end
 
@@ -27,7 +27,7 @@ classdef Analysis < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
         function populate(obj)
             populate@aod.persistent.Entity(obj);
 
-            obj.analysisDate = obj.loadDataset("analysisDate");
+            obj.assignProp("analysisDate");
 
             % Add user-defined datasets and links
             obj.populateDatasetsAsDynProps();

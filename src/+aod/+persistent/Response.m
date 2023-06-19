@@ -16,8 +16,11 @@ classdef Response < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamic
 %   aod.core.Response
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = private)    
         Data
+    end
+
+    properties (SetAccess = {?aod.persistent.Entity, ?aod.persistent.Epoch})
         Timing 
     end
 

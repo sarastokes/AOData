@@ -1,4 +1,4 @@
-classdef (Abstract) Entity < handle & aod.common.EntityMixin
+classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 % ENTITY (Abstract)
 %
 % Description:
@@ -287,10 +287,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
     % Attribute methods
     methods (Sealed)
         function setAttr(obj, varargin)
-            % Add or change attribute(s)
-            %
-            % Description:
-            %   Add attribute(s) to the attribute property
+            % Add attribute(s) to the attribute property
             %
             % Syntax:
             %   obj.setAttr(attrName, value)
@@ -334,10 +331,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
         end
 
         function removeAttr(obj, attrName)
-            % Remove a attribute by name
-            %
-            % Description:
-            %   Remove a attribute by name from attributes property
+            % Remove a attribute by name from attributes property
             %
             % Syntax:
             %   removeAttr(obj, attrName)
@@ -403,10 +397,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
         end
 
         function removeFile(obj, fileName)
-            % Remove a file by name or clear all files
-            %
-            % Description:
-            %   Remove a file by name from files property
+            % Remove a file by name from files property
             %
             % Syntax:
             %   removeFile(obj, fileName)
@@ -437,9 +428,6 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
         function fileValue = getFile(obj, fileName, errorType)
             % Get a file by name (use for absolute file paths)
             %
-            % Description:
-            %   Return the value of a specific file name 
-            %
             % Syntax:
             %   fileValue = getFile(obj, fileName, messageType)
             %
@@ -452,7 +440,7 @@ classdef (Abstract) Entity < handle & aod.common.EntityMixin
             arguments
                 obj
                 fileName        char 
-                errorType       = aod.common.ErrorTypes.NONE
+                errorType       = aod.infra.ErrorTypes.NONE
             end
 
             import aod.infra.ErrorTypes

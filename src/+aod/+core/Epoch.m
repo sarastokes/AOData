@@ -1,4 +1,4 @@
-classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
+classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixins.Epoch
 % A period of data acquision during an experiment
 %
 % Description:
@@ -47,9 +47,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
     % Entity link properties
     properties (SetAccess = protected)
         % The Source of data acquired during the Epoch
-        Source              {mustBeScalarOrEmpty, aod.util.mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
+        Source      {mustBeScalarOrEmpty, mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
         % The System used for data acquisition during the Epoch
-        System              {mustBeScalarOrEmpty, aod.util.mustBeEntityType(System, 'System')} = aod.core.System.empty()
+        System      {mustBeScalarOrEmpty, mustBeEntityType(System, 'System')} = aod.core.System.empty()
     end
     
     % Containers for child entities
@@ -93,7 +93,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
-            %   One or more cells containing queries (TODO: doc)
+            %   One or more cells containing queries
             % -------------------------------------------------------------
             out = obj.get(entityType, varargin{:});
             tf = ~isempty(out);
@@ -111,26 +111,18 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous
             % Notes: Only entities contained by Epoch can be added:
             %   EpochDataset, Response, Registration, Stimulus
             % ------------------------------------------------------------- 
-            import aod.common.EntityTypes
 
-            entityType = EntityTypes.get(entity);
-            if ~ismember(entityType, obj.entityType.validChildTypes())
-                error('add:InvalidEntityType',...
-                    'Entity must be EpochDataset, Registration, Response and Stimulus');
+            if ~isscalar(entity)
+                arrayfun(@(x) add(obj, x), entity);
+                return
             end
-
+            add@aod.common.mixins.Epoch(obj, entity);
+            
+            import aod.common.EntityTypes
             entity.setParent(obj);
 
-            switch entityType
-                case EntityTypes.EPOCHDATASET
-                    obj.EpochDatasets = cat(1, obj.EpochDatasets, entity);
-                case EntityTypes.REGISTRATION 
-                    obj.Registrations = cat(1, obj.Registrations, entity);
-                case EntityTypes.RESPONSE 
-                    obj.Responses = cat(1, obj.Responses, entity);
-                case EntityTypes.STIMULUS
-                    obj.Stimuli = cat(1, obj.Stimuli, entity);
-            end
+            parentContainer = entity.entityType.parentContainer;
+            obj.(parentContainer) = cat(1, obj.(parentContainer), entity);
         end
 
         function remove(obj, entityType, varargin)

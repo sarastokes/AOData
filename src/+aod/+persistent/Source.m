@@ -184,6 +184,20 @@ classdef Source < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpr
         end
     end
 
+    
+    methods (Sealed, Access = private)
+        function allSources = iterSource(obj, source, allSources)
+            % Used to recursively identify all Sources
+            if isempty(source.Sources)
+                return
+            end
+            for i = 1:numel(source.Sources)
+                allSources = cat(1, allSources, source.Sources(i));
+                allSources = iterSource(obj, source.Sources(i), allSources);
+            end
+        end
+    end
+
     % Container abstraction methods
     methods (Sealed)
         function out = Sources(obj, idx)

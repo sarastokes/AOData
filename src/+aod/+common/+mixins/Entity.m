@@ -1,10 +1,19 @@
-classdef EntityMixin < handle
+classdef Entity < handle
 % Shared implementation between the core and persistent interface
 %
 % Description:
 %   The core and persistent entities have several methods with identical
 %   implementation. To reduce code duplication, they are provided as a
 %   separate mixin class
+%
+% Superclasses:
+%   handle
+%
+% Constructor:
+%   N/A
+%
+% See also:
+%   aod.core.Entity, aod.persistent.Entity
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -57,6 +66,12 @@ classdef EntityMixin < handle
                 return
             end
 
+            % This will catch "Experiment" with no parent
+            if entityType == entity.entityType %#ok<MCNPN>
+                parent = entity;
+                return
+            end
+
             if isempty(entity.Parent) %#ok<MCNPN>
                 parent = [];
                 return
@@ -65,11 +80,6 @@ classdef EntityMixin < handle
             if isempty(entityType)
                 parent = entity.Parent; %#ok<MCNPN>
                 return 
-            end
-
-            if entityType == entity.entityType %#ok<MCNPN>
-                parent = entity;
-                return
             end
 
             out = entity;
@@ -100,7 +110,7 @@ classdef EntityMixin < handle
             %   tf = hasProp(obj, propName)
             %
             % See also:
-            %   findprop
+            %   findprop, aod.common.mixins.Entity.getProp
             % -------------------------------------------------------------
             arguments 
                 obj 
@@ -108,7 +118,7 @@ classdef EntityMixin < handle
             end
 
             if ~isscalar(obj)
-                tf = aod.util.arrayfun(@(x) hasProp(x, propName), x);
+                tf = aod.util.arrayfun(@(x) hasProp(x, propName), obj);
                 return 
             end
 
@@ -120,13 +130,13 @@ classdef EntityMixin < handle
             % Return an entity property (works with arrays of entities)
             %
             % Syntax:
-            %   propValue = getProp(obj, propValue)
-            %   propValue = getProp(obj, propName
+            %   propValue = getProp(obj, propName)
+            %   propValue = getProp(obj, propName, errorType)
             % -----------------------------------------------------------
             arguments 
                 obj     
                 propName        char 
-                errorType           = aod.infra.ErrorTypes.NONE
+                errorType               = aod.infra.ErrorTypes.NONE
             end
 
             import aod.infra.ErrorTypes
@@ -138,13 +148,15 @@ classdef EntityMixin < handle
                 
                 % Parse missing values
                 isMissing = getMissing(propValue);
-                if all(isMissing)
+                if any(isMissing)
                     if errorType == ErrorTypes.ERROR 
-                        error("getProp:PropNotFound",... 
-                            "Did not find prop %s", propName);
+                        error("getProp:PropertyNotFound",... 
+                            "%u of %u entities did not have property ""%s""",... 
+                            nnz(isMissing), numel(obj), propName);
                     elseif errorType == ErrorTypes.WARNING 
-                        warning("getProp:PropNotFound",... 
-                            "Did not find prop %s", propName);
+                        warning("getProp:PropertyNotFound",... 
+                            "%u of %u entities did not have property ""%s""",... 
+                            nnz(isMissing), numel(obj), propName);
                     end
                 end
                 
@@ -160,11 +172,11 @@ classdef EntityMixin < handle
             else
                 switch errorType 
                     case ErrorTypes.ERROR 
-                        error('getProp:NotFound',... 
-                            'Did not find %s in attributes', propName);
+                        error('getProp:PropertyNotFound',... 
+                            'Entity did not have property named "%s"', propName);
                     case ErrorTypes.WARNING 
-                        warning('getProp:NotFound',... 
-                            'Did not find %s in attributes', propName);
+                        warning('getProp:PropertyNotFound',... 
+                            'Entity did not have property named "%s"', propName);
                         propValue = [];
                     case ErrorTypes.MISSING
                         propValue = missing;
@@ -301,7 +313,11 @@ classdef EntityMixin < handle
                 return
             end
 
-            tf = obj.files.isKey(fileName); %#ok<MCNPN>
+            if isempty(obj.files) %#ok<MCNPN>
+                tf = false;
+            else
+                tf = obj.files.isKey(fileName); %#ok<MCNPN>
+            end
         end
     end
 

@@ -1,4 +1,4 @@
-classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.EntityMixin
+classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mixins.Entity
 % The base class for all AOData persistent objects
 %
 % Description:
@@ -744,8 +744,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.En
             obj.Name = obj.loadDataset('Name');
             obj.files = obj.loadDataset('files', 'aod.common.KeyValueMap');
 
-            expectedAttrs = obj.assignProp('expectedAttributes');
-            expectedDsets = obj.assignProp('expectedDatasets');
+            obj.assignProp('expectedAttributes');
+            obj.assignProp('expectedDatasets');
 
             % LINKS -----------
             obj.Parent = obj.loadLink('Parent');
