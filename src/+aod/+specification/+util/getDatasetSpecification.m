@@ -2,9 +2,9 @@ function DM = getDatasetSpecification(className)
 % Get the data specification for a specific class
 %
 % Syntax:
-%   DM = getDatasetSpecification(className)
+%   DM = aod.specification.util.getDatasetSpecification(className)
 %
-%  Inputs:
+% Inputs:
 %   className       meta.class, text or object
 %
 % Outputs:
@@ -22,10 +22,8 @@ function DM = getDatasetSpecification(className)
     end
 
     if ~isSubclass(mc, 'aod.core.Entity')
-        DM = [];
-        warning('getDatasetSpecification:InvalidClass',...
+        error('getDatasetSpecification:InvalidClass',...
             'Only subclasses of aod.core.Entity have specifications');
-        return
     end
 
     expectedDatasets = aod.specification.DatasetManager.populate(mc);

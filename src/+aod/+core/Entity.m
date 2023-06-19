@@ -101,6 +101,10 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     end
 
     properties (Hidden, Dependent)
+        expectedAttributes2         % aod.specification.AttributeManager
+    end
+
+    properties (Hidden, Dependent)
         % The name that will be used for the HDF5 group
         groupName                   char
     end
@@ -158,6 +162,11 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
         function value = get.expectedAttributes(obj)
             value = obj.specifyAttributes();
+        end
+
+        function value = get.expectedAttributes2(obj)
+            value = obj.specifyAttributes2();
+            value.setClassName(class(obj));
         end
 
         function value = get.expectedDatasets(obj)
@@ -458,9 +467,11 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             else
                 switch errorType 
                     case ErrorTypes.ERROR 
-                        error('getFile:NotFound', 'Did not find %s in files', fileName);
+                        error('getFile:NotFound',... 
+                            'Did not find %s in files', fileName);
                     case ErrorTypes.WARNING 
-                        warning('getFile:NotFound', 'Did not find %s in files', fileName);
+                        warning('getFile:NotFound',... 
+                            'Did not find %s in files', fileName);
                         fileValue = char.empty();
                     case ErrorTypes.MISSING
                         fileValue = missing;
@@ -798,6 +809,10 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %   value = specifyAttributes()
             % -------------------------------------------------------------
             value = aod.util.AttributeManager();
+        end
+
+        function value = specifyAttributes2()
+            value = aod.specification.AttributeManager();
         end
 
         function value = specifyDatasets(value)

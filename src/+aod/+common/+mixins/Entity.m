@@ -145,6 +145,15 @@ classdef Entity < handle
             if ~isscalar(obj)
                 propValue = aod.util.arrayfun(...
                     @(x) x.getProp(propName, ErrorTypes.MISSING), obj);
+
+                if iscell(propValue)
+                    if isnumeric(propValue{1}) || islogical(propValue{1})
+                        if ~isvector(propValue{1})
+                            N = ndims(propValue{1});
+                            propValue = cat(N+1, propValue{:});
+                        end
+                    end
+                end
                 
                 % Parse missing values
                 isMissing = getMissing(propValue);
@@ -253,7 +262,7 @@ classdef Entity < handle
                 % Parse missing values
                 isMissing = getMissing(attrValue);
                 if all(isMissing)
-                    if ErrorTypes.ERROR
+                    if errorType == ErrorTypes.ERROR
                         error('getAttr:NotFound',... 
                             'Did not find attribute %s', attrName);
                     elseif errorType == ErrorTypes.WARNING

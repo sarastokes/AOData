@@ -67,7 +67,13 @@ classdef ValidationFunction < aod.specification.Validator
             isValid = false(1, numel(obj.Value));
 
             for i = 1:numel(obj.Value)
-                [tf, ME] = runAnyValidation(obj.Value{i}, input);
+                [tf, ME] = aod.specification.util.runAnyValidation(obj.Value{i}, input);
+                if numel(tf) > 1
+                    warning("validate:TooManyOutputs",...
+                        "%s returned %u outputs not 1, assuming value is invalid",...
+                        func2str(obj.Value{i}), numel(tf));
+                    tf = false;
+                end
                 isValid(i) = tf;
                 if ~tf && ~isempty(ME)
                     exceptions = cat(1, exceptions, ME);    

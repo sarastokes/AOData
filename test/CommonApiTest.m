@@ -282,17 +282,17 @@ classdef CommonApiTest < matlab.unittest.TestCase
     methods (Test, TestTags=["CoreApi"])
         function EmptyEpochs(testCase)
             testCase.verifyNumElements(...
-                testCase.EXPT.getFromEpoch('all', 'Registration'), 4);
+                testCase.EXPT.getByEpoch('all', 'Registration'), 4);
             testCase.verifyNumElements(...
-                testCase.EXPT.getFromEpoch([], 'Registration'), 4);
+                testCase.EXPT.getByEpoch([], 'Registration'), 4);
         end
 
         function SubEpochEntities(testCase)
-            out = testCase.EXPT.getFromEpoch('all', 'EpochDataset', 1);
+            out = testCase.EXPT.getByEpoch('all', 'EpochDataset', 1);
             testCase.verifyNumElements(out, 1);
             testCase.verifyTrue(strcmp(out.Name, 'Dset1'));
             
-            out = testCase.EXPT.getFromEpoch(...
+            out = testCase.EXPT.getByEpoch(...
                 'all', 'Registration', {'Name', 'RegType1'});
             testCase.verifyNumElements(out, 2);
         end

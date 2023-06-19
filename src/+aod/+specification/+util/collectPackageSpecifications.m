@@ -1,4 +1,4 @@
-function [DMs, S] = collectPackageSpecifications(pkgName, writeToFile)
+function [DMs, AMs, S] = collectPackageSpecifications(pkgName, writeToFile)
 % Collect all the specifications for a package 
 %
 % Syntax:
@@ -9,6 +9,14 @@ function [DMs, S] = collectPackageSpecifications(pkgName, writeToFile)
 %       Package name
 %   writeToFile         logical
 %       Whether to write the specification 
+%
+% Outputs:
+%   DMs                 aod.specification.DatasetManager
+%       All the dataset managers
+%   AMs                 aod.specification.AttributeManager
+%       All the attribute managers
+%   S                   struct
+%       The structure written to JSON
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -18,26 +26,43 @@ function [DMs, S] = collectPackageSpecifications(pkgName, writeToFile)
     end
 
     mp = meta.package.fromName(pkgName);
+    if isempty(mp)
+        error('collectPackageSpecification:PackageDoesNotExist',...
+            "Package ""%s"" not found.", pkgName);
+    end
     [pkgs, fullNames] = collectPackages(mp);
 
     classes = string({mp.ClassList.Name})';
 
+    
+    logger = aod.specification.logger.SpecificationLogger(...
+        sprintf("Package_%s", pkgName));
     S = struct();
     S.Classes = struct();
     DMs = []; AMs = [];
     for i = 1:numel(classes)
         try
-            DM = processClassDatasets(mp.ClassList(i));
-            AM = processClassAttributes(mp.ClassList(i));
+            DM = aod.specification.util.getDatasetSpecification(...
+                mp.ClassList(i));
         catch ME 
-            if strcmp(ME.identifier, 'populate:InvalidInput')
-                % Class is not an aod.core.Entity subclass and does not
-                % need a written specification.
+            if strcmp(ME.identifier, 'getDatasetSpecification:InvalidClass')
                 continue
             else
-                rethrow(ME);
+                logger.write(classes(i), "Dataset", "ERROR", ME);
             end
         end
+
+        try 
+            AM = aod.specification.util.getAttributeSpecification(...
+                mp.ClassList(i));
+        catch ME 
+            logger.write(classes(i), "Attribute", "ERROR", ME);
+        end
+
+        if isempty(DM) && isempty(AM)
+            continue
+        end
+
         DMs = cat(1, DMs, DM);
         AMs = cat(1, AMs, AM);
 
@@ -84,15 +109,4 @@ function [pkgs, fullNames] = collectPackages(mp)
         end
         fullNames = cat(1, fullNames, fullName);
     end
-end
-
-function DM = processClassDatasets(mc)
-    expectedDatasets = aod.specification.DatasetManager.populate(mc);
-    fcn = str2func(sprintf("@(x) %s.specifyDatasets(x)", mc.Name));
-    DM = fcn(expectedDatasets);
-end
-
-function AM = processClassAttributes(mc)
-    fcn = str2func(sprintf("@() %s.specifyAttributes()", mc.Name));
-    AM = fcn();
 end

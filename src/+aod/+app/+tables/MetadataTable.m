@@ -4,10 +4,14 @@ classdef MetadataTable < handle
 % -------------------------------------------------------------------------
 
     properties 
-        Expt 
+        Expt                aod.persistent.Experiment
         Entities
         ClassName 
         EntityType
+    end
+
+    properties (SetAccess = private)
+        SpecificationType       {mustBeMember(SpecificationType, ["Attribute", "Dataset"])} = "Attribute"
     end 
 
     properties
@@ -17,22 +21,21 @@ classdef MetadataTable < handle
     end
 
     methods
-        function obj = MetadataTable(expt, className)
+        function obj = MetadataTable(expt)
             obj.Expt = expt;
-            if nargin > 1
-                obj.ClassName = className;
-            end
+            obj.SpecificationType = "Attribute";
+            
             obj.createUi();
         end
     end
 
     methods (Access = private)
         function createUi(obj)
-            
             obj.Figure = uifigure("Name", "MetadataTable", ...
                 "Color", lighten(hex2rgb('bfd3f8'),0.6));
-            layout = uigridlayout(obj.Figure, [2 2], ...
-                'RowHeight', {30, '1x'}, 'ColumnWidth', {'fit', '1x'},...
+            layout = uigridlayout(obj.Figure, [3 3], ...
+                'RowHeight', {30, '1x'},... 
+                'ColumnWidth', {'fit', '1x', 'fit'},...
                 "BackgroundColor", lighten(hex2rgb('bfd3f8'), 0.6));
 
             T = obj.Expt.factory.entityManager.Table;
@@ -49,12 +52,44 @@ classdef MetadataTable < handle
                 'Items', [""; T.Class],...
                 'ItemsData', [""; T.Class+"_"+T.Entity],...
                 'ValueChangedFcn', @obj.onChanged_Class);
-            obj.classListBox.Layout.Row = 1; obj.classListBox.Layout.Column = 2;
+            obj.classListBox.Layout.Row = 1; 
+            obj.classListBox.Layout.Column = 2;
+
+            h = uidropdown(layout,...
+                "BackgroundColor", "w",...
+                "Editable", "off",...
+                "Items", ["Attribute", "Dataset"],...
+                "ValueChangedFcn", @obj.onChanged_Specification);
+            h.Layout.Row = 1; h.Layout.Column = 3;
 
             obj.Table = uitable(layout,...
                 "Multiselect", "on",...
                 'CellEditCallback', @obj.onEdited_Cell);
-            obj.Table.Layout.Row = 2; obj.Table.Layout.Column = [1 2];
+            obj.Table.Layout.Row = 2; obj.Table.Layout.Column = [1 3];
+
+            h = uibutton(layout,...
+                "Text", "Send to workspace",...
+                "Icon", [],...
+                "ButtonPushedFcn", @obj.onPush_SendEntity);
+            h.Layout.Row = 3; h.Layout.Column = 2;
+        end
+
+        function resetTable(obj)
+            % Reset the table
+            obj.Table.Data=[];
+            obj.Table.ColumnName = "numbered";
+            removeStyle(obj.Table);
+        end
+
+        function onPush_SendEntity(obj, ~, ~)
+            if isempty(obj.Table.Selection)
+                return
+            end
+            idx = obj.Table.Selection(1);
+            entity = obj.Entities(idx);
+
+            assignin('base', entity.groupName, entity);
+            fprintf('Send entity to workspace as "%s"\n', entity.groupName);
         end
 
         function onEdited_Cell(obj, ~, evt)
@@ -69,13 +104,20 @@ classdef MetadataTable < handle
                 evt.NewData);
         end
 
+        function onChanged_Specification(obj, ~, evt)
+            obj.SpecificationType = string(evt.Value);
+            obj.resetTable();
+
+            if strcmp(evt.Value, "Dataset")
+                obj.populateDatasets();
+            else
+                obj.populateAttributes();
+            end
+        end
+
         function onChanged_Class(obj, ~, evt)
 
-            % Reset the table
-            obj.Table.Data=[];
-            obj.Table.ColumnName = "numbered";
-            removeStyle(obj.Table);
-
+            obj.resetTable();
             if evt.Value == ""
                 obj.Entities = [];
                 return
@@ -87,6 +129,31 @@ classdef MetadataTable < handle
 
             obj.Entities = obj.Expt.get(obj.EntityType, {'Class', obj.ClassName});
 
+            if obj.SpecificationType == "Dataset"
+                obj.populateDatasets();
+            else
+                obj.populateAttributes();
+            end
+        end
+
+        function populateDatasets(obj)
+            allParams = ["Name"; "Parent";... 
+                obj.Entities(1).expectedDatasets.list()];
+            obj.Table.ColumnName = allParams;
+
+            if obj.EntityType == "Experiment"
+                parentNames = repmat("[]", [numel(obj.Entities), 1]);
+            else
+                parentNames = arrayfun(@(x) string(x.Parent.groupName), obj.Entities);
+            end
+
+            obj.Table.Data = table(...
+                arrayfun(@(x) string(x.groupName), obj.Entities), parentNames);
+            obj.Table.ColumnEditable = false(1, numel(allParams));
+
+        end
+
+        function populateAttributes(obj)
             adhocNames = [];
             for i = 1:numel(obj.Entities)
                 newNames = obj.getAdhocParameters(obj.Entities(i));

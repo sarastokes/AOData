@@ -1,8 +1,20 @@
-classdef Dataset < handle 
-% Represents the specifications for a single dataset (aka property)
+classdef Entry < handle 
+% Represents the specifications for a single entry (aka property)
 %
 % Constructor:
-%   obj = aod.specification.Dataset(prop, varargin)
+%   obj = aod.specification.Entry(prop, varargin)
+%
+% Inputs:
+%   prop        string, char or meta.property
+%       The dataset or attribute
+% Optional key/value inputs:
+%   Size                    string or double
+%   Class                   string
+%   Default                 
+%   Functions               cell of function handles
+%   Description             string
+%   Units                   string
+%   
 %
 
 % By Sara Patterson, 2023 (AOData)
@@ -19,7 +31,7 @@ classdef Dataset < handle
         Default         (1,1)     aod.specification.DefaultValue
         Functions       (1,1)     aod.specification.ValidationFunction
         Description               aod.specification.Description 
-        Units                     string = string.empty
+        Units                     string {mustBeScalarOrEmpty} = string.empty()
     end
 
     properties (Access = private)
@@ -31,14 +43,13 @@ classdef Dataset < handle
     end
 
     methods
-        function obj = Dataset(prop, varargin)
+        function obj = Entry(prop, varargin)
             % Defaults (prevents issues w/ instantiation in property block)
             obj.Size = aod.specification.Size([]); 
             obj.Class = aod.specification.MatlabClass([]);
             obj.Default = aod.specification.DefaultValue([]);
             obj.Description = aod.specification.Description([]);
             obj.Functions = aod.specification.ValidationFunction([]);
-            obj.Units = "";
 
             obj.bind();
 
@@ -151,7 +162,7 @@ classdef Dataset < handle
                 case 'units'
                     % Leave alone for now
                 otherwise
-                    error('Dataset:InvalidType',...
+                    error('parse:InvalidSpecificationType',...
                         'Specification type must be size, function class, default or description');
             end
         end

@@ -126,7 +126,7 @@
 
 % Code markup
 \newcommand{\defblock}[1]{\textbt{\textcolor{blue}{#1}}}
-\newcommand{\ctext}[1]{\texttt{\textcolor{green4}{#1}}}
+\newcommand{\ctext}[1]{\texttt{\textcolor{violet5}{#1}}}
 \newcommand{\ccomm}[1]{\texttt{\textit{\textcolor{codegreen}{#1}}}}
 \newcommand{\ret}[1]{\textcolor{purple5}{\texttt{#1}}}
 \newcommand{\ONE}{$\qquad$}
@@ -180,9 +180,9 @@ $\quad$\\
         \item {\large\textbf{Experiment} (\ref{cls:cExperiment})}
         \begin{itemize}
             \item \ref{fcn:cExperimentAdd} -- add a child entity
-            \item \ref{fcn:cExperimentGetFromEpoch} -- search child entities of specific epoch(s)
+            \item \ref{fcn:cExperimentGetByEpoch} -- search child entities of specific epoch(s)
             \item \ret{id2epoch}
-            \item \ret{id2index}
+            %\item \ret{id2index}
             \item \ref{fcn:cExperimentRemove} -- remove a child entity or entities of a specific type
             \item \ret{removeByEpoch}
             \item \ref{fcn:cExperimentSetDate} -- change the experiment's date
@@ -224,10 +224,10 @@ $\quad$\\
                 \item \ret{remove}
             \end{itemize}
         \item {\large\textbf{Device}}
-        \item {\large\textbf{Calibration}}
+        \item {\large\textbf{Calibration} (\ref{cls:cCalibration})}
             \begin{itemize}
-                \item \ret{setDate}
-                \item \ret{setTarget}
+                \item \ref{fcn:cCalibrationSetDate} -- change the date the calibration was performed
+                \item \ref{fcn:cCalibrationSetTarget} -- set the target entity for the calibration
             \end{itemize}
         \item {\large\textbf{ExperimentDataset}}
             \begin{itemize}
@@ -237,9 +237,9 @@ $\quad$\\
             \begin{itemize}
                 \item \ret{setData}
             \end{itemize}
-        \item {\large\textbf{Registration}}
+        \item {\large\textbf{Registration} (\ref{cls:cRegistration})}
             \begin{itemize}
-                \item \ret{setDate}
+                \item \ref{fcn:cRegistrationSetDate} -- change the date that the registration was performed
                 \item \ret{setData}
             \end{itemize}
         \item {\large\textbf{Response}}
@@ -270,6 +270,8 @@ $\quad$\\
         \item {\large\textbf{Entity} (\ref{cls:pEntity})}
         \begin{itemize}
             \item \ref{fcn:pEntityAddProp} -- add a new property/HDF5 dataset
+            \item \ret{hasProp}
+            \item \ret{getProp}
             \item \ref{fcn:pEntityRemoveProp} -- remove or clear the value of a property/HDF5 dataset 
             \item \ref{fcn:pEntityReplaceEntity} -- replace an entity with a new one from the core interface
             \item \ref{fcn:pEntitySetProp} -- set the value of an existing property/HDF5 dataset 
@@ -450,7 +452,7 @@ $\quad$\\
         \propd{Attribute specifications (see \ref{fcn:cEntitySpecifyAttributes})}\\
         &\\
         \texttt{expectedDatasets} & \ret{DatasetManager}\\
-        \propd{Dataset specifications (see \ret{specifyDatasets})}\\
+        \propd{Dataset specifications (see \ref{fcn:cEntitySpecifyDatasets})}\\
     \end{PropFlag}
 
     \begin{PropFlag}[Hidden, Dependent, GetAccess=public]
@@ -949,6 +951,15 @@ $\quad$\\
         Populates the entity's \propref{label} property. The \propref{label} property is used for the entity's HDF5 group name if the user does not supply a value for the \propref{Name} property. The default output is the class name. 
     \end{ProtectTab}\myspace
 
+    \begin{InputFlag}
+        \argin{obj} & \ref{cls:cEntity}\\
+    \end{InputFlag}\myspace 
+
+    \begin{OutputBox}
+        \argin{value} & \mclass{string}\\
+        \propd{A name for the entity determined automatically from entity's properties/attributes}
+    \end{OutputBox}
+
     \begin{example}
         Naming each pinhole individually would be time-consuming and could lead to heterogeneous naming conventions. The \ref{fcn:cEntitySpecifyLabel} method is used by \ret{Pinhole} to define the \propref{label} property based on the pinhole diameter. 
 
@@ -956,9 +967,26 @@ $\quad$\\
         \noindent\texttt{\raggedright 
         \defblock{properties} \textit{(Access = protected)}\\
         \ONE\defblock{function} value = \textbf{specifyLabel}(obj)\\
-        \ONE\ONE value = [\ctext{`Pinhole\_'}, \mclass{num2str}(obj.diameter), \ctext{`um'}];\\ 
+        \ONE\ONE value = sprintf(\ctext{"Pinhole\_\%u um}, obj.diameter);\\ 
         \ONE\defblock{end}\\
         \defblock{end}}
+
+        Create a 20 micron pinhole and explore group naming:
+        \begin{CodeBox}
+            obj = aod.builtin.devices.Pinhole(20);\\
+            >> disp(obj.Name)\\
+            \ONE []\\
+            >> disp(obj.label)\\
+            \ONE "Pinhole20um"\\
+            >> disp(obj.groupName)\\
+            \ONE "Pinhole20um"\\
+        \end{CodeBox}
+        The \propref{Name} property takes precedence over \propref{label}. The \propref{label} is only used when \propref{Name} is empty. See below by setting the pinhole's \propref{Name} property with \ref{fcn:cEntitySetName}.
+        \begin{CodeBox}
+            obj.setName(\ctext{"MyPinhole"})\\
+            >> disp(obj.groupName)\\
+            \ONE "MyPinhole"
+        \end{CodeBox}
     \end{example}\myspace
 
     \mybreak
@@ -1061,7 +1089,7 @@ $\quad$\\
         \texttt{filePath} & \mclass{char}\\
         \propd{The full file path to the folder containing the experiment's data}\\
         &\\
-        \texttt{experimentDate} & \mclass{datetime} or \mclass{char} in the format "YYYYmmDD"\\
+        \texttt{experimentDate} & \mclass{datetime} or \mclass{char} in the format "yyyyMMdd"\\
     \end{InputFlag}\vspace{1ex}
 
     \mybreak
@@ -1089,14 +1117,14 @@ $\quad$\\
     
     \mybreak
 
-%* GETFROMEPOCH
-    \begin{MethodTab}[getFromEpoch()]
-        \customlabel{fcn:cExperimentGetFromEpoch}{\mymethod{getFromEpoch()}}
+%* GETBYEPOCH
+    \begin{MethodTab}[getByEpoch()]
+        \customlabel{fcn:cExperimentGetByEpoch}{\mymethod{getByEpoch()}}
         Search the child entities of a specific epoch(s).
     \end{MethodTab}\vspace{1ex}
 
     \begin{CtorBox}
-        \textbf{getFromEpoch}(obj, epochIDs, entityType, \textit{varargin})
+        \textbf{getByEpoch}(obj, epochIDs, entityType, \textit{varargin})
     \end{CtorBox}\vspace{1ex}
 
     \begin{InputFlag}
@@ -1128,8 +1156,17 @@ $\quad$\\
     \begin{InputFlag}
         \texttt{obj} & \ref{cls:cEntity}\\
         &\\
-        \texttt{expDate} & \mclass{datetime}\\
+        \texttt{expDate} & \mclass{datetime} or \mclass{char} in the format `yyyyMMdd'\\
     \end{InputFlag}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\To simplify setting dates, \mclass{char} and \mclass{string} inputs in the format `yyyyMMdd' are accepted. 
+        \begin{CodeBox}
+            EXPT.\textbf{setDate}(\ctext{`20230619'});\\
+            \ccomm{\% Equivalent to:}\\
+            EXPT.\textbf{setDate}(\mclass{datetime}(\ctext{`20230619'}, \ctext{`Format'}, \ctext{`yyyyMMdd'}));
+        \end{CodeBox}
+    \end{example}
 
     \mybreak
 
@@ -1222,9 +1259,9 @@ $\quad$\\
 
     \mybreak 
     
-    %* SETDATE
+%* SETDATE
     \begin{MethodTab}[setDate()]
-        %\customlabel{fcn:cExperimentSetDate}{\mymethod{setDate()}}
+        \customlabel{fcn:cCalibrationSetDate}{\mymethod{setDate()}}
         Change the calibration's date. 
     \end{MethodTab}\vspace{1ex}
 
@@ -1235,28 +1272,227 @@ $\quad$\\
     \begin{InputFlag}
         \texttt{obj} & \ref{cls:cEntity}\\
         &\\
-        \texttt{calibrationDate} & \mclass{datetime}\\
+        \texttt{calibrationDate} & \mclass{datetime} or \mclass{char} with format `yyyyMMdd'\\
         \propd{The date the calibration was performed.}\\
     \end{InputFlag}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\Calibration date is a required input for \ref{cls:cCalibration}, but it can be left empty and set later.
+        \begin{CodeBox}
+            reg = aod.core.Calibration(\ctext{`MyCalibration'}, []);
+        \end{CodeBox}
+        To simplify setting dates, \mclass{char} and \mclass{string} inputs in the format `yyyyMMdd' are accepted. 
+        \begin{CodeBox}
+            cal.\textbf{setDate}(\ctext{`20230619'});\\
+            \ccomm{\% Equivalent to:}\\
+            cal.\textbf{setDate}(\mclass{datetime}(\ctext{`20230619'}, \ctext{`Format'}, \ctext{`yyyyMMdd'}));
+        \end{CodeBox}
+    \end{example}
 
     \mybreak
 
 %* SETTARGET
     \begin{MethodTab}[setTarget()]
+        \customlabel{fcn:cCalibrationSetTarget}{\mymethod{setTarget()}}
+        Set a target entity for the calibration.
     \end{MethodTab}\myspace 
+
+    \begin{CtorBox}
+        \textbf{setTarget}(entity)
+    \end{CtorBox}
 
     \begin{InputFlag}
         \texttt{obj} & \ref{cls:cCalibration}\\
         &\\
-        \texttt{target} & \ref{cls:cEntity}\\
+        \texttt{target} & \ret{System, Channel or Device}\\
         \propd{The target of the calibration (e.g., a channel or device).}\\
-    \end{InputFlag}\vspace{1ex}
+    \end{InputFlag}\myspace
+
+    \begin{example}
+        $\quad$\\Set the target of a calibration to a specific channel.
+        \begin{CodeBox}
+            cal = aod.core.Calibration(\ctext{`MyCalibration'}, \ctext{`20230619'});\\
+            chan = aod.core.Channel(\ctext{`MyChannel'});\\
+            cal.\textbf{setTarget}(chan);
+        \end{CodeBox}
+        \noindent The target is also an optional argument to the constructor
+        \begin{CodeBox}
+            cal2 = aod.core.Calibration(\ctext{`OtherCalibration'}, \ctext{`20230619'},...\\
+            \ONE \ctext{`Target'}, chan);
+        \end{CodeBox}
+    \end{example}
 
     \mybreak
+
+    \pagebreak
 
 %! --------------
 %! AOD.CORE.EPOCH
 %! --------------
+\section*{1.3. Epoch (\texttt{aod.core.Epoch})}\customlabel{cls:cEpoch}{\myclass{aod.core.Epoch}}
+    \noindent {\large Represents a single experiment and serves as the root of an AOData HDF5 file}
+
+    \begin{flagbox}(ul)[gray6]{Superclasses}
+        \ref{cls:cEntity}, \mclass{matlab.mixin.Heterogeneous}, \mclass{handle}
+    \end{flagbox}\vspace{1ex}
+
+    \begin{PropFlag}[GetAccess=public, SetAccess=private]
+        \texttt{ID} & \mclass{double} (must be integer)\\
+        \propd{The epoch's ID in the experiment. Replaces ``Name''}\\
+        &\\
+        \texttt{startTime} & \mclass{datetime}\\
+        \propd{The time the experiment started}\\
+        &\\
+        \texttt{Timing} & \mclass{duration}\\
+        \propd{The timing of each sample acquired during the Epoch}\\
+    \end{PropFlag}\vspace{0.5ex}
+
+    \begin{PropFlag}[GetAccess=public, SetAccess=protected]
+        \texttt{Source} & \ret{aod.core.Source} or \ret{aod.persistent.Source}\\
+        \propd{The Source imaged during the epoch.}\\
+        &\\
+        \texttt{System} & \ret{aod.core.System} or \ret{aod.persistent.System}\\
+        \propd{The system configuration used for the epoch.}\\
+    \end{PropFlag}\vspace{1ex}
+
+    \mybreak 
+
+    \begin{CtorTab}[Epoch()]
+        A continuous data acquisition within an \ref{cls:cExperiment}.
+    \end{CtorTab}
+    
+    \begin{CtorBox}
+        obj = \textbf{aod.core.Epoch}(ID)\\
+        obj = \textbf{aod.core.Epoch}(ID, \textit{`Parent', entity},...\\
+        \ONE \textit{`Source', entity, `System', entity})
+    \end{CtorBox}
+
+    \begin{InputFlag}
+        \texttt{ID} & \mclass{double}\\
+        \propd{Identifier for the Epoch, must be an integer.}\\
+        &\\
+        \textbf{Optional key/value inputs:} & \\
+        \texttt{Source} & \ref{cls:cSource}\\
+        \propd{The source of the acquired data.}\\
+        &\\
+        \texttt{System} & \ret{System}\\
+        \propd{The system configuration used for the epoch.}\\
+        &\\
+        \texttt{Parent} & \ref{cls:cExperiment}\\
+        \propd{The parent experiment. Set if constructor needs info from the experiment.}
+    \end{InputFlag}
+
+    \mybreak
+    
+%* ADD
+    \begin{MethodTab}[add()]
+        \customlabel{fcn:cEpochAdd}{\mymethod{add()}}
+        Add a new child entity to the experiment. Must be a \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}. The \texttt{Parent} property of the child entity will be set to the Epoch as well.
+    \end{MethodTab}\myspace
+
+    \begin{CtorBox}
+        \textbf{add}(obj, childEntity)
+    \end{CtorBox}\myspace
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{childEnity} & \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}\\
+        \propd{The child entity to add}\\
+    \end{InputFlag}\myspace
+
+    \begin{SeeFlag}
+        \ref{fcn:cEpochRemove}
+    \end{SeeFlag}\myspace
+
+    \mybreak
+
+%* GET 
+    \begin{MethodTab}[get()]
+        \customlabel{fcn:cEpochGet}{\mymethod{get()}}
+        Get a child entity or entities of a specific type.
+    \end{MethodTab}\myspace
+
+    \begin{CtorBox}
+        entities = \textbf{get}(obj, entityType)\\
+        entities = \textbf{get}(obj, entityType, \textit{query})
+    \end{CtorBox}\myspace 
+
+    \begin{InputFlag}
+        \argin{obj} & \ref{cls:cEpoch}\\
+        &\\
+        \argin{entityType} & \mclass{char} or \mclass{string}\\
+        \propd{The child entity type to get. Must be \ret{EpochDataset}, \ref{cls:cRegistration}, \ret{Response}, \ret{Stimulus}}\\
+        &\\
+        \textbf{Optional repeating inputs:}&\\
+        \argin{query} & \mclass{cell}\\
+        \propd{One or more queries to select which child entities to return.}\\
+    \end{InputFlag}\myspace 
+
+    \begin{OutputBox}
+        \argin{entities} & \ret{EpochDataset}, \ret{Registration}, \ret{Response} or \ret{Stimulus}\\
+        \propd{The child entities (all if \propref{query} is undefined)}\\ 
+    \end{OutputBox}\myspace 
+
+    \mybreak 
+
+%* REMOVE
+    \begin{MethodTab}[remove()]
+        \customlabel{fcn:cEpochRemove}{\mymethod{remove()}}
+        Remove a child entity from the experiment. Must be a \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{remove}(obj, childEntity)\\
+        \textbf{remove}(obj, childEntity, \textit{selector});
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+        &\\
+        \texttt{childEnity} & \ret{EpochDataset}, \ret{Registration}, \ret{Response}, or \ret{Stimulus}\\
+        \propd{The child entity type to remove}\\
+        &\\
+        \texttt{selector} & \mclass{cell} or \ctext{"all"}\\
+        \propd{A query to selectively remove specific child entities or "all" to remove all child entities of the designated type.}
+    \end{InputFlag}
+
+    \begin{SeeFlag}
+        \ref{fcn:cEpochAdd}
+    \end{SeeFlag}
+
+    \mybreak
+
+    \pagebreak
+
+%! ---------------
+%! AOD.CORE.SOURCE
+%! ---------------
+\section*{1.4. Source (\texttt{aod.core.Source})}
+        \customlabel{cls:cSource}{\myclass{aod.core.Source}}
+    \noindent {\large Represents the source of acquired data (e.g. subject, eye, location etc.)}\myspace
+
+    \begin{flagbox}(ul)[gray6]{Superclasses}
+        \ref{cls:cEntity}, \mclass{matlab.mixin.Heterogeneous}, \mclass{handle}
+    \end{flagbox}\myspace
+
+    \mybreak 
+
+    \begin{CtorTab}[Source()]
+        Constructor for \ref{cls:cSource}. 
+    \end{CtorTab}\myspace
+
+    \begin{CtorBox}
+        obj = \textbf{aod.core.Source}(name)\\
+        obj = \textbf{aod.core.Source}(name, \textit{`Parent', entity})
+    \end{CtorBox}\myspace
+
+    \pagebreak 
+
+
+%! ---------------
+%! AOD.CORE.EPOCH
+%! ---------------
 \section*{1.3. Epoch (\texttt{aod.core.Epoch})}\customlabel{cls:cEpoch}{\myclass{aod.core.Epoch}}
     \noindent {\large Represents a single experiment and serves as the root of an AOData HDF5 file}
 
@@ -1393,28 +1629,98 @@ $\quad$\\
 
     \pagebreak
 
-%! ---------------
-%! AOD.CORE.SOURCE
-%! ---------------
-\section*{1.4. Source (\texttt{aod.core.Source})}\customlabel{cls:cSource}{\myclass{aod.core.Source}}
-    \noindent {\large Represents the source of acquired data (e.g.) subject, eye, location etc.}\vspace{1ex}
+%! ---------------------
+%! AOD.CORE.REGISTRATION
+%! ---------------------
+\section*{1.11. Registration (\texttt{aod.core.Registration})}
+        \customlabel{cls:cRegistration}{\myclass{aod.core.Registration}}
+    \noindent {\large Represents any correction applied to the data acquired during an Epoch}\myspace
 
     \begin{flagbox}(ul)[gray6]{Superclasses}
         \ref{cls:cEntity}, \mclass{matlab.mixin.Heterogeneous}, \mclass{handle}
-    \end{flagbox}\vspace{1ex}
+    \end{flagbox}\myspace
+
+    \begin{PropFlag}[SetAccess = protected]
+        \newarg{registrationDate} & \mclass{datetime} or \mclass{char} in format `yyyyMMdd'\\
+        \propd{The date the registration was performed}\\
+        &\\
+        \newarg{data} & \\
+        \propd{Data associated with the registration}\\
+    \end{PropFlag}\myspace 
+
+    
+    \begin{AttrFlag}
+        \texttt{Administrator} & \mclass{string}\\
+        \propd{The person who performed the registration}\\
+        &\\
+        \newarg{Software} & \mclass{string}\\
+        \propd{The software used to perform the registration}
+    \end{AttrFlag}\myspace 
 
     \mybreak 
 
-    \begin{CtorTab}[Source()]
-        The source of the imaging data (e.g., eye, location, subject, etc.)
-    \end{CtorTab}\vspace{1ex}
+    \begin{CtorTab}[Registration()]
+        Constructor for \ref{cls:cRegistration}. 
+    \end{CtorTab}\myspace
 
     \begin{CtorBox}
-        obj = \textbf{aod.core.Source}(name)\\
-        obj = \textbf{aod.core.Source}(name, \textit{`Parent', entity})
-    \end{CtorBox}
+        obj = \textbf{aod.core.Registration}(name, registrationDate)\\
+        obj = \textbf{aod.core.Registration}(name, registrationDate,...\\
+            \ONE\textit{`Administrator', value, `Software', value})
+    \end{CtorBox}\myspace
+
+    
+    \begin{InputFlag}
+        \newarg{name} & \mclass{string}\\
+        \propd{The registration's name}\\
+        &\\
+        \newarg{registrationDate} & \mclass{datetime} or \mclass{char} in format `yyyyMMdd'\\
+        \propd{The date the registration was performed}\\
+        &\\
+        \textbf{Optional key/value inputs:}&\\
+        \texttt{Administrator} & \mclass{string}\\
+        \propd{The person who performed the registration}\\
+        &\\
+        \newarg{Software} & \mclass{string}\\
+        \propd{The software used to perform the registration}
+    \end{InputFlag}\myspace 
+
+    \mybreak 
+    
+%* SETDATE
+    \begin{MethodTab}[setDate()]
+        \customlabel{fcn:cRegistrationSetDate}{\mymethod{setDate()}}
+        Change the registration's date. 
+    \end{MethodTab}\vspace{1ex}
+
+    \begin{CtorBox}
+        \textbf{setDate}(obj, registrationDate)
+    \end{CtorBox}\vspace{1ex}
+
+    \begin{InputFlag}
+        \texttt{obj} & \ref{cls:cEntity}\\
+        &\\
+        \texttt{registrationDate} & \mclass{datetime} or \mclass{char} in the format `yyyyMMdd'\\
+        \propd{The date the registration was performed}
+    \end{InputFlag}\vspace{1ex}
+
+    \begin{example}
+        $\quad$\\Registration date is a required input for \ref{cls:cRegistration}, but it can be left empty and set later.
+        \begin{CodeBox}
+            reg = aod.core.Registration(\ctext{`MyRegistration'}, []);
+        \end{CodeBox}
+        To simplify setting dates, \mclass{char} and \mclass{string} inputs in the format `yyyyMMdd' are accepted. 
+        \begin{CodeBox}
+            reg.\textbf{setDate}(\ctext{`20230619'});\\
+            \ccomm{\% Equivalent to:}\\
+            reg.\textbf{setDate}(\mclass{datetime}(\ctext{`20230619'}, \ctext{`Format'}, \ctext{`yyyyMMdd'}));
+        \end{CodeBox}
+    \end{example}
+
+    \mybreak
 
     \pagebreak 
+
 
 %! ---------------------
 %! AOD.PERSISTENT.ENTITY

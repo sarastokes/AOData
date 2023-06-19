@@ -112,9 +112,9 @@ classdef EntitySearch < handle
                     obj.classQuery(query{2:end});
                 case 'subclass'
                     obj.subclassQuery(query{2:end});
-                case 'name'
-                    obj.nameQuery(query{2:end});
-                case 'groupname'
+                case {'name', 'groupname'}
+                %    obj.nameQuery(query{2:end});
+                %case {'groupname', 'group'}
                     obj.groupNameQuery(query{2:end});
                 case {'dataset', 'property'}
                     obj.datasetQuery(query{2:end});

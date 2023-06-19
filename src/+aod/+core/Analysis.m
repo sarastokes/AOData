@@ -16,7 +16,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 %   Date                    datetime or text in format 'yyyyMMdd'
 %       Date analysis was performed (default = today)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -33,17 +33,17 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
             parse(ip, varargin{:});
 
             if ~isempty(ip.Results.Date)
-                obj.setAnalysisDate(ip.Results.Date);
+                obj.setDate(ip.Results.Date);
             end
         end
     end
 
     methods (Sealed)
-        function setAnalysisDate(obj, analysisDate)
+        function setDate(obj, analysisDate)
             % Set the analysisDate property
             %
             % Syntax:
-            %   setAnalysisDate(obj, analysisDate)
+            %   setDate(obj, analysisDate)
             %
             % Inputs:
             %   analysisDate            datetime, or char: 'yyyyMMdd'
@@ -59,8 +59,17 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Static)
-        function mngr = specifyDatasets(mngr)
-            specifyDatasets@aod.core.Entity(mngr);
+        function value = specifyAttributes2()
+            value = specifyAttributes2@aod.core.Entity();
+
+            value.add("Administrator",...
+                "Class", "string",...
+                "Size", "(1,1)",...
+                "Description", "Person(s) who performed the analysis");
+            value.add("Software",...
+                "Class", "string",...
+                "Size", "(1,1)",...
+                "Description", "Software used for the registration");
         end
     end
 end 

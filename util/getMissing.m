@@ -11,7 +11,7 @@ function isMissing = getMissing(input)
 % -------------------------------------------------------------------------
 
     if iscell(input)
-        isMissing = cellfun(@ismissing, input);
+        isMissing = cellfun(@(x) all(ismissing(x)), input);
     else
         isMissing = ismissing(input);
     end

@@ -17,6 +17,9 @@
 *.vscode
 *.vs
 
+## Logging specific to individual users
+logs/
+
 ## Development folders
 dev/
 deprecated/
@@ -41,6 +44,8 @@ test/HdfTest.h5
 test/SmallExperiment.h5
 test/SmallExperiment2.h5
 test/ShellExperiment.h5
+
+test/Test.json
 
 test/ToyExperiment.mat
 

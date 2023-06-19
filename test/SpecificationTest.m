@@ -315,8 +315,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
         function DatasetManager(testCase)
             obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
-            testCase.verifyEqual(obj.numDatasets, 4);
-            testCase.verifyNumElements(obj.Datasets, 4);
+            testCase.verifyEqual(obj.Count, 4);
+            testCase.verifyNumElements(obj.Entries, 4);
             testCase.verifyEqual("aod.core.Epoch", obj.className);
 
             testCase.verifyTrue(obj.has('ID'));
@@ -338,7 +338,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             ep = aod.core.Epoch(1);
 
             testCase.verifyError(...
-                @() obj.add(findprop(ep, 'ID')), "add:DatasetExists");
+                @() obj.add(findprop(ep, 'ID')), "add:EntryExists");
         end
     end
 
@@ -400,7 +400,16 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
         
         function PackageAccess(testCase)
-            [DM, S] = aod.specification.util.collectPackageSpecifications("aod.core", false);
+            [DM, AM, S] = aod.specification.util.collectPackageSpecifications("aod.core", false);
+            testCase.verifyEqual(numel(DM), numel(AM));
+            
+            f = fieldnames(S);
+            testCase.verifyNumElements(f, 2);
+            testCase.verifyEqual(f{1}, 'Namespace');
+
+            f = fieldnames(S.Namespace);
+            testCase.verifyNumElements(f, 1);
+            testCase.verifyEqual(f{1}, 'aod');
         end
     end
 
@@ -419,8 +428,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
             % Populated DatasetManager
             cEXPT = ToyExperiment(false);
             DM = aod.specification.DatasetManager.populate(cEXPT);
-            testCase.verifyEqual(DM.numDatasets, 4);
-            testCase.verifyNumElements(DM.list, 4);
+            testCase.verifyEqual(DM.Count, 4);
+            testCase.verifyNumElements(DM.list(), 4);
 
             % Hard to test, but make sure it's error free
             DM.text();
@@ -442,7 +451,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             DM2 = aod.specification.DatasetManager.populate( ...
                 meta.class.fromName('aod.core.Experiment'));
 
-            testCase.verifyEqual(DM1.numDatasets, DM2.numDatasets);
+            testCase.verifyEqual(DM1.Count, DM2.Count);
         end
 
         function EmptyDatasetManager(testCase)

@@ -92,5 +92,10 @@ classdef ExpectedAttribute < handle
                 tf = true;
             end
         end
+
+        function S = struct(obj)
+            S = struct();
+            S.Name = jsonencode(S.Name);
+        end
     end
 end 

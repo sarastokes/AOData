@@ -36,9 +36,14 @@ function [tf, exception] = runAnyValidation(fcn, value, errFlag)
                     func2str(fcn), class(tf));
             end
         catch ME
-            error('runAnyValidation:InvalidFunction',...
-                'The validation function %s errored: %s',...
-                func2str(fcn), ME.message);
+            if strcmp(ME.identifier, 'MATLAB:TooManyOutputs')
+                tf = true;
+            else
+                tf = false;
+                warning('runAnyValidation:InvalidFunction',...
+                    'The validation function %s errored:\n\t%s',...
+                    func2str(fcn), [ME.identifier, ' --> ', ME.message]);
+            end
         end
 
         if tf 

@@ -238,8 +238,8 @@ classdef AttributeManager < handle & matlab.mixin.CustomDisplay
     % matlab.mixin.CustomDisplay methods
     methods (Access = protected)
         function header = getHeader(obj)
-            if isempty(obj)
-                header = getHeader@matlab.mixin.CustomDisplay(obj);
+            if ~isscalar(obj)
+                header  = getHeader@matlab.mixin.CustomDisplay(obj);
             else
                 headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
                 headerStr = sprintf('%s with %u attributes:',... 
@@ -249,7 +249,7 @@ classdef AttributeManager < handle & matlab.mixin.CustomDisplay
         end
 
         function propgrp = getPropertyGroups(obj)
-            if isempty(obj)
+            if ~isscalar(obj)
                 propgrp = getPropertyGroups@matlab.mixin.CustomDisplay(obj);
             else                
                 propList = struct();
@@ -283,7 +283,11 @@ classdef AttributeManager < handle & matlab.mixin.CustomDisplay
     % Builtin methods
     methods
         function tf = isempty(obj)
-            tf = isempty(obj.ExpectedAttributes);
+            if ~isscalar(obj)
+                tf = arrayfun(@(x) isempty(x), obj);
+                return
+            end
+            tf = obj.Count > 0;
         end
 
         function tf = isequal(obj, other)

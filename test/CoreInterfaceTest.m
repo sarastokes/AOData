@@ -69,10 +69,10 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
         function ExperimentErrors(testCase)
             % Miscellaneous errors not tested elsewhere
             testCase.verifyError(...
-                @() testCase.EXPT.getFromEpoch('all', 'Calibration'),...
-                'getFromEpoch:NonChildEntityType');
+                @() testCase.EXPT.getByEpoch('all', 'Calibration'),...
+                'getByEpoch:NonChildEntityType');
 
-            testCase.verifyEmpty(testCase.EXPT.getFromEpoch('all', 'Response'));
+            testCase.verifyEmpty(testCase.EXPT.getByEpoch('all', 'Response'));
 
             % Check entity checks for remove
             testCase.verifyError(...
@@ -186,11 +186,11 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Add a date to the analysis
             dateYMD = getDateYMD();
-            analysis2.setAnalysisDate(dateYMD);
+            analysis2.setDate(dateYMD);
             test.util.verifyDatesEqual(testCase, analysis2.analysisDate, dateYMD);
 
             % Add an empty date to the analysis
-            testCase.EXPT.Analyses(1).setAnalysisDate();
+            testCase.EXPT.Analyses(1).setDate();
             testCase.verifyEmpty(testCase.EXPT.Analyses(1).analysisDate);
 
             % Remove analyses one by one
@@ -420,9 +420,9 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             
             % Add to an epoch and test various access methods
             testCase.EXPT.Epochs(1).add([response1, response2]);
-            testCase.verifyNumElements(testCase.EXPT.getFromEpoch(1, 'Response'), 2);
+            testCase.verifyNumElements(testCase.EXPT.getByEpoch(1, 'Response'), 2);
             testCase.verifyNumElements(testCase.EXPT.Epochs(1).get('Response'), 2);
-            testCase.verifyNumElements(testCase.EXPT.getFromEpoch('all', 'Response'), 2);
+            testCase.verifyNumElements(testCase.EXPT.getByEpoch('all', 'Response'), 2);
             testCase.verifyNumElements(testCase.EXPT.get('Response'), 2);
 
             % Clear the timing from the first response
@@ -437,12 +437,12 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
             % Remove a response
             testCase.EXPT.Epochs(1).remove('Response', 1);
-            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch(1, 'Response')), 1);
+            testCase.verifyEqual(numel(testCase.EXPT.getByEpoch(1, 'Response')), 1);
             
             % Clear the responses
             testCase.EXPT.removeByEpoch('all', 'Response');
-            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch(1, 'Response')), 0);
-            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'Response')), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.getByEpoch(1, 'Response')), 0);
+            testCase.verifyEqual(numel(testCase.EXPT.getByEpoch('all', 'Response')), 0);
 
             % Clear the epochs
             testCase.EXPT.remove('Epoch', 'all');
@@ -474,7 +474,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             testCase.verifyNumElements(testCase.EXPT.Epochs(1).get(...
                 'EpochDataset', {'Name', 'TestDataset1'}), 1);
             % Test Experiment's get access
-            testCase.verifyEqual(numel(testCase.EXPT.getFromEpoch('all', 'EpochDataset')), 2);
+            testCase.verifyEqual(numel(testCase.EXPT.getByEpoch('all', 'EpochDataset')), 2);
             testCase.verifyNumElements(testCase.EXPT.get('EpochDataset'), 2);
 
             % Check dataset data
@@ -589,8 +589,8 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Test various access methods
             testCase.verifyNumElements(epoch1.Stimuli, 1);
             testCase.verifyNumElements(testCase.EXPT.get('Stimulus'), 2);
-            testCase.verifyNumElements(testCase.EXPT.getFromEpoch('all', 'Stimulus'), 2);
-            testCase.verifyNumElements(testCase.EXPT.getFromEpoch(1, 'Stimulus'), 1);
+            testCase.verifyNumElements(testCase.EXPT.getByEpoch('all', 'Stimulus'), 2);
+            testCase.verifyNumElements(testCase.EXPT.getByEpoch(1, 'Stimulus'), 1);
         end
 
         function StimulusErrors(testCase)

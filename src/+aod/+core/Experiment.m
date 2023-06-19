@@ -126,7 +126,7 @@ classdef Experiment < aod.core.Entity
             %   setDate(obj, expDate)
             %
             % Inputs:
-            %   expDate         datetime or text in format 'YYYYMMdd'
+            %   expDate         datetime or text in format 'yyyyMMdd'
             % -------------------------------------------------------------
             obj.experimentDate = aod.util.validateDate(expDate);
         end
@@ -358,7 +358,7 @@ classdef Experiment < aod.core.Entity
                     group = obj.(entityType.parentContainer());
                 end
             elseif ismember(entityType, EntityTypes.EPOCH.validChildTypes)
-                group = obj.getFromEpoch('all', entityType);
+                group = obj.getByEpoch('all', entityType);
             else 
                 switch entityType 
                     case EntityTypes.CHANNEL 
@@ -389,11 +389,11 @@ classdef Experiment < aod.core.Entity
 
     % Epoch methods
     methods
-        function out = getFromEpoch(obj, ID, entityType, varargin)
+        function out = getByEpoch(obj, ID, entityType, varargin)
             % Get entities from one, multiple or all epochs
             %
             % Syntax:
-            %   out = getFromEpoch(obj, ID, entityType, varargin)
+            %   out = getByEpoch(obj, ID, entityType, varargin)
             %
             % Inputs:
             %   ID          integer or empty
@@ -406,20 +406,20 @@ classdef Experiment < aod.core.Entity
             %
             % Examples:
             %   % Get all epoch datasets for all epochs
-            %   out = obj.getFromEpoch('all', 'EpochDataset')
+            %   out = obj.getByEpoch('all', 'EpochDataset')
             %
             %   % Get responses from epoch #1
-            %   out = obj.getFromEpoch(1, 'Responses')
+            %   out = obj.getByEpoch(1, 'Responses')
             %
             %   % Get stimuli from epochs 1:3 matching a query
-            %   out = obj.getFromEpoch(1:3, 'Stimulus', {'Name', 'Mustang'})
+            %   out = obj.getByEpoch(1:3, 'Stimulus', {'Name', 'Mustang'})
             % -------------------------------------------------------------
             
             import aod.common.EntityTypes
             
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
-                error('getFromEpoch:NonChildEntityType',...
+                error('getByEpoch:NonChildEntityType',...
                     'Can only access child entities of Epoch');
             end
 
@@ -614,6 +614,19 @@ classdef Experiment < aod.core.Entity
                 'Person(s) performed the experiment');
             value.add('Laboratory', string.empty(), @isstring,... 
                 'Lab where the experiment was performed');
+        end
+
+        function value = specifyAttributes2()
+            value = specifyAttributes2@aod.core.Entity();
+
+            value.add("Administrator",...
+                "Class", "string",...
+                "Size", "(1,1)",...
+                "Description", "Person(s) who performed the experiment");
+            value.add("Laboratory",...
+                "Class", "string",...
+                "Size", "(1,1)",...
+                "Description", "Lab where experiment was performed.");
         end
     end
 end

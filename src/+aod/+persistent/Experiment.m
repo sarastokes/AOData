@@ -63,7 +63,7 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
         function epoch = id2epoch(obj, ID)
             idx = obj.id2index(ID);
-            epoch = obj.Epochs(ID);
+            epoch = obj.Epochs(idx);
         end
 
         function setHomeDirectory(obj, homeDirectory)
@@ -163,7 +163,7 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
                     out = obj;  % There is only one experiment
                     return 
                 case {EntityTypes.RESPONSE, EntityTypes.STIMULUS, EntityTypes.EPOCHDATASET, EntityTypes.REGISTRATION}
-                    group = obj.getFromEpoch('all', entityType, varargin{:});
+                    group = obj.getByEpoch('all', entityType, varargin{:});
                 otherwise             
                     group = obj.(entityType.parentContainer());
             end
@@ -211,12 +211,12 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
 
     % Child methods
     methods 
-        function out = getFromEpoch(obj, ID, entityType, varargin)
+        function out = getByEpoch(obj, ID, entityType, varargin)
             import aod.common.EntityTypes
             
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
-                error('getFromEpoch:NonChildEntityType',...
+                error('getByEpoch:NonChildEntityType',...
                     'Can only access child entities of Epoch');
             end
 
@@ -294,6 +294,10 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
     end
 
     % Container abstraction methods
+    % To support lazy-loading of child entities while maintaining a 
+    % consistent interface, the properties containing the child 
+    % entities are Hidden and methods matching the properties in the core
+    % interface are provided as pseudo-properties for accessing contents
     methods (Sealed)
         function out = Analyses(obj, idx)
             if nargin < 2
