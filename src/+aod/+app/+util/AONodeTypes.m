@@ -304,7 +304,7 @@ classdef AONodeTypes
                     obj = AONodeTypes.DESCRIPTION;
                 case 'homedirectory'
                     obj = AONodeTypes.HOMEDIRECTORY;
-                case {'attributemanager', 'aod.util.attributemanager'}
+                case {'attributemanager', 'aod.specification.attributemanager'}
                     obj = AONodeTypes.ATTRIBUTEMANAGER;
                 case {'datasetmanager', 'aod.specification.datasetmanager'}
                     obj = AONodeTypes.DATASETMANAGER;

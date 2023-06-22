@@ -51,7 +51,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
         end
 
         function DichroicFilter(testCase)
-            obj = aod.builtin.devices.DichroicFilter(470, 'high',...
+            obj = aod.builtin.devices.DichroicFilter(470, "high",...
                 'Manufacturer', "Semrock", 'Model', "FF470-Di01");
             obj.setTransmission(sara.resources.getResource('FF470_Di01.txt'));
         end
@@ -110,7 +110,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.calibrations.ChannelOptimization(...
                 'Mustang', getDateYMD());
             obj.setWavelength(488);
-            obj.setPosition(true, 'X', 1, 'Y', 2, 'Z', 3, 'Source', 4);
+            obj.setPositions(true, 'X', 1, 'Y', 2, 'Z', 3, 'Source', 4);
             testCase.verifyEqual(obj.getAttr('Wavelength'), 488);
             testCase.verifyEqual(obj.positions{1,1}, 1);
             
@@ -167,10 +167,9 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
     methods (Test, TestTags = {'Stimuli'})
         function ImagingLight(testCase)
-            obj = aod.builtin.stimuli.ImagingLight('Mustang', 22,...
-                'IntensityUnits', "%");
+            obj = aod.builtin.stimuli.ImagingLight('Mustang', 22);
             testCase.verifyEqual(obj.intensity, 22);
-            obj.setIntensity(23, "%");
+            obj.setIntensity(23);
             testCase.verifyEqual(obj.intensity, 23);
         end
 
@@ -221,10 +220,10 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
         function RoisFromReader(testCase)
             reader = aod.builtin.readers.ImageJRoiReader(...
                 fullfile(testCase.dataFolder, 'RoiSet.zip'), [242, 360]);
-            obj = aod.builtin.annotations.Rois('851_OSR_20230314', reader,...
+            obj = aod.builtin.annotations.Rois('851_OSR_20230314',  reader,...
                 'Source', aod.core.Source('RoiSource'));
             testCase.verifyEqual(obj.files('AnnotationData'), reader.fullFile);
-            testCase.verifyEqual(obj.Source.Name, 'RoiSource');
+            testCase.verifyEqual(obj.Source.Name, "RoiSource");
         end
 
         function RoiErrors(testCase)

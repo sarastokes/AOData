@@ -21,7 +21,7 @@ classdef Pinhole < aod.core.Device
 % Sealed methods:
 %   setDiameter(obj, diameter)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     methods
@@ -55,9 +55,10 @@ classdef Pinhole < aod.core.Device
     methods (Static)
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
-            
-            value.add('Diameter', [], @isnumeric,...
-                'Pinhole diameter in microns');
+
+            value.add("Diameter",...
+                "Class", "double", "Size", "(1,1)", "Units", "micron",...
+                "Description", "Pinhole diameter");
         end
     end
 end

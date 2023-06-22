@@ -250,30 +250,30 @@ classdef SpecificationTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags="Dataset")
-        function DatasetFromMetaclass(testCase)
+        function EntryFromMetaclass(testCase)
             % All but size
-            obj1 = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropC'));
+            obj1 = aod.specification.Entry(findprop(testCase.TEST_OBJ, 'PropC'));
             testCase.verifyTrue(obj1.validate(123));
             testCase.verifyFalse(obj1.validate("bad"));
             testCase.verifyEmpty(obj1.Size);
             testCase.verifyEqual(obj1.Default.Value, 1);
             testCase.verifyEqual(obj1.Class.Value, "double");
 
-            %objD = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropD'));
+            %objD = aod.specification.Entry(findprop(testCase.TEST_OBJ, 'PropD'));
             %testCase.verifyEqual(obj1.Description.Value, "This is PropD");
 
             % All fields
-            obj2 = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropB'));
+            obj2 = aod.specification.Entry(findprop(testCase.TEST_OBJ, 'PropB'));
             testCase.verifyTrue(obj2.validate([1 2 3]'));
             testCase.verifyFalse(obj2.validate([1 2 3]));
 
             % No description
-            objA = aod.specification.Dataset(findprop(testCase.TEST_OBJ, 'PropA'));
+            objA = aod.specification.Entry(findprop(testCase.TEST_OBJ, 'PropA'));
             testCase.verifyEmpty(objA.Description);
         end
 
         function DatasetFromInput(testCase)
-            obj = aod.specification.Dataset('test',...
+            obj = aod.specification.Entry('test',...
                 "Size", "(1,2)",...
                 "Class", "double",...
                 "Function", {@mustBeNumeric},...
@@ -282,9 +282,9 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function EmptyDataset(testCase)
-            obj0 = aod.specification.Dataset();
+            obj0 = aod.specification.Entry();
 
-            obj = aod.specification.Dataset("MyProp");
+            obj = aod.specification.Entry("MyProp");
             testCase.verifyEmpty(obj.Default);
             testCase.verifyEmpty(obj.Functions);
             testCase.verifyEmpty(obj.Class);
@@ -346,36 +346,24 @@ classdef SpecificationTest < matlab.unittest.TestCase
         function AttributeNameSearch(testCase)
             import aod.infra.ErrorTypes
 
-            PM = aod.util.AttributeManager();
-            PM.add('NewParam');
+            AM = aod.specification.util.getAttributeSpecification(...
+                "aod.builtin.devices.DichroicFilter");
+            testCase.verifyTrue(AM.has("Wavelength"));
 
-            % Search for attribute that doesn't exist
-            p0 = PM.get('NewParam');
-            testCase.verifyTrue(strcmp(p0.Name, "NewParam"));
-            
-            % Search for attribute that exists
-            p1 = PM.get('BadParam', ErrorTypes.NONE);
-            testCase.verifyEmpty(p1);
-            testCase.verifyError(...
-                @() PM.get('BadParam', ErrorTypes.ERROR),...
-                "get:AttributeNotFound");
+            testCase.verifyFalse(AM.has("BadInput"));
             testCase.verifyWarning(...
-                @() PM.get('BadParam', ErrorTypes.WARNING),...
-                "get:AttributeNotFound");
-        end
-
-        function AttributeAddition(testCase)
-            PM = aod.util.AttributeManager();
+                @()AM.get("BadInput", ErrorTypes.WARNING),...
+                "get:EntryNotFound");
         end
 
         function CoreEntityAttributes(testCase)
             obj = aod.builtin.devices.BandpassFilter(510, 20);
             p = obj.expectedAttributes.get('Bandwidth');
-            testCase.verifyEqual(p.Name, 'Bandwidth');
+            testCase.verifyEqual(p.Name, "Bandwidth");
             expAtt = aod.specification.util.getAttributeSpecification( ...
                 'aod.builtin.devices.BandpassFilter');
             p2 = expAtt.get('Bandwidth');
-            testCase.verifyEqual(p2.Name, 'Bandwidth');
+            testCase.verifyEqual(p2.Name, "Bandwidth");
 
             % Set/remove expected attribute
             obj.setAttr('Bandwidth', 30);
@@ -391,16 +379,26 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
+    methods (Test, TestTags="Parser")
+        function Parser(testCase)
+            AM = aod.specification.util.getAttributeSpecification("aod.core.Experiment");
+            ip = AM.parse("Administrator", "test1", "Laboratory", "test2");
+            testCase.verifyEqual(ip.Results.Administrator, "test1");
+            testCase.verifyEqual(ip.Results.Laboratory, "test2");
+        end
+    end
+
     methods (Test, TestTags="Access")
 
         function AttributeManagerAccess(testCase)
             AM = aod.specification.util.getAttributeSpecification(...
                 'aod.builtin.devices.NeutralDensityFilter');
-            testCase.verifyClass(AM, 'aod.util.AttributeManager');
+            testCase.verifyClass(AM, 'aod.specification.AttributeManager');
         end
         
         function PackageAccess(testCase)
-            [DM, AM, S] = aod.specification.util.collectPackageSpecifications("aod.core", false);
+            [DM, AM, S] = aod.specification.util.collectPackageSpecifications(...
+                "aod.core", "Write", false);
             testCase.verifyEqual(numel(DM), numel(AM));
             
             f = fieldnames(S);

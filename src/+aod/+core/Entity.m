@@ -21,7 +21,8 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 %
 % Dependent properties:
 %   label                       string      (defined by specifyLabel)
-%   expectedAttributes          aod.util.AttributeManager
+%   expectedAttributes          aod.specification.AttributeManager
+%   expectedDatasets            aod.specification.DatasetManager
 %
 % Public methods:
 %   h = getParent(obj, className)
@@ -94,14 +95,10 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     properties (Dependent)
         % Automated name from specifyLabel(), used for HDF5 group name if the name property is not set
         label                       char
-        % Expected attribute names, optional default values and validation
-        expectedAttributes          % aod.util.AttributeManager
-        % Expected dataset names
+        % Attribute specifications
+        expectedAttributes          % aod.specification.AttributeManager
+        % Dataset specifications
         expectedDatasets            % aod.specification.DatasetManager
-    end
-
-    properties (Hidden, Dependent)
-        expectedAttributes2         % aod.specification.AttributeManager
     end
 
     properties (Hidden, Dependent)
@@ -162,10 +159,6 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
         function value = get.expectedAttributes(obj)
             value = obj.specifyAttributes();
-        end
-
-        function value = get.expectedAttributes2(obj)
-            value = obj.specifyAttributes2();
             value.setClassName(class(obj));
         end
 
@@ -359,7 +352,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
             if obj.hasAttr(attrName)
                 % Set to empty if expected, remove if ad-hoc
-                if obj.expectedAttributes.hasAttr(attrName)
+                if obj.expectedAttributes.has(attrName)
                     obj.attributes(attrName) = [];
                 else
                     remove(obj.attributes, attrName);
@@ -786,7 +779,8 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
 
             for i = 1:numel(idx)
-                addlistener(obj, mc.PropertyList(idx(i)).Name, 'PostSet', @obj.onPropertyChange);
+                addlistener(obj, mc.PropertyList(idx(i)).Name,... 
+                    'PostSet', @obj.onPropertyChange);
             end
         end
 
@@ -802,16 +796,12 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     end
 
     methods (Static)
-        function value = specifyAttributes() 
+        function value = specifyAttributes()
             % Initializes AttributeManager, subclasses can extend
             %
             % Syntax:
             %   value = specifyAttributes()
             % -------------------------------------------------------------
-            value = aod.util.AttributeManager();
-        end
-
-        function value = specifyAttributes2()
             value = aod.specification.AttributeManager();
         end
 

@@ -52,7 +52,7 @@ classdef CommonApiTest < matlab.unittest.TestCase
             testCase.EXPT.add(aod.core.System('TestSystem1'));
             testCase.EXPT.Systems(1).add(aod.core.Channel('TestChannel1'));
             testCase.EXPT.Systems(1).Channels(1).add(...
-                aod.builtin.devices.DichroicFilter(510, 'Low'));
+                aod.builtin.devices.DichroicFilter(510, "Low"));
 
             % Add analyses
             testCase.EXPT.add(aod.core.Analysis('Analysis1'));

@@ -1,8 +1,8 @@
-function DM = readExpectedDatasets(hdfName, pathName, dsetName)
-% Read aod.specification.DatasetManager
+function SM = readSpecificationManager(hdfName, pathName, dsetName)
+% Read aod.specification.SpecificationManager
 %
 % Syntax:
-%   DM = aod.h5.readExpectedDatasets(hdfName, pathName, dsetName)
+%   SM = aod.h5.readSpecificationManager(hdfName, pathName, dsetName)
 %
 % Inputs:
 %   hdfName         char or H5ML.id
@@ -13,10 +13,10 @@ function DM = readExpectedDatasets(hdfName, pathName, dsetName)
 %       Name of the dataset
 %
 % Outputs:
-%   DM              aod.specification.DatasetManager
+%   SM              aod.specification.SpecificationManager
 %
 % See also:
-%   aod.h5.writeExpectedDatasets, aod.specification.DatasetManager
+%   aod.h5.writeSpecificationManager, aod.specification.SpecificationManager
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -28,11 +28,15 @@ function DM = readExpectedDatasets(hdfName, pathName, dsetName)
     className = h5tools.readatt(hdfName, ...
         h5tools.util.buildPath(pathName, dsetName), 'ParentClass');
 
-    % Convert to DatasetManager
-    DM = aod.specification.DatasetManager(className);
-    numDatasets = height(T);
+    % Convert to DatasetManager/AttributeManager
+    if strcmp(dsetName, "expectedDatasets")
+        SM = aod.specification.DatasetManager(className);
+    else
+        SM = aod.specification.AttributeManager(className);
+    end
+    numEntries = height(T);
 
-    for i = 1:numDatasets
+    for i = 1:numEntries
         name = T.Name(i);
         description = T.Description(i);
         matClass = T.Class(i);
@@ -48,11 +52,11 @@ function DM = readExpectedDatasets(hdfName, pathName, dsetName)
             eval(sprintf('fcns = %s;', T.Functions(i)));
         end
 
-        D = aod.specification.Dataset(name,...
+        D = aod.specification.Entry(name,...
             "Description", description,...
             "Class", matClass,...
             "Size", sizing,...
             "Function", fcns,...
             "Default", default);
-        DM.add(D);
+        SM.add(D);
     end

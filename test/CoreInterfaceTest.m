@@ -608,7 +608,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             stim1 = aod.core.Stimulus('StimWithProtocol', protocol1);
 
             % Verify Stimulus protocol properties are correct
-            testCase.verifyEqual(stim1.protocolName, 'TestStimProtocol');
+            testCase.verifyEqual(stim1.protocolName, "TestStimProtocol");
             testCase.verifyTrue(strcmp(stim1.protocolClass, class(protocol1)));
 
             % Verify protocol output is correct

@@ -16,13 +16,10 @@ classdef Epoch < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynamicpro
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = {?aod.persistent.Entity, ?aod.persistent.Epoch})
         ID
         Source
         System 
-    end
-
-    properties (SetAccess = {?aod.persistent.Entity, ?aod.persistent.Epoch})
         startTime   
         Timing 
     end

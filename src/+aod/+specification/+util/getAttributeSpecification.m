@@ -15,7 +15,8 @@ function AM = getAttributeSpecification(aoClass, verbose)
 %   AM              aod.specification.AttributeManager
 %
 % See also:
-%   aod.specification.util.getDatasetSpecification
+%   aod.specification.util.getDatasetSpecification, 
+%   aod.specification.AttributeManager
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -40,6 +41,7 @@ function AM = getAttributeSpecification(aoClass, verbose)
     end
 
     eval(sprintf('AM = %s.specifyAttributes();', aoClass));
+    AM.setClassName(aoClass);
 
     if verbose 
         disp(p.table());

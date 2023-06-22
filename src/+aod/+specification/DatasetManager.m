@@ -21,6 +21,15 @@ classdef DatasetManager < aod.specification.SpecificationManager
             end
             obj = obj@aod.specification.SpecificationManager(className);
         end
+
+        function add(obj, varargin)
+            if istext(varargin{1})
+                error('add:InvalidInput',...
+                    'Ad-hoc property addition is not supported. Use set() to modify an existing property defined or inherited by the class.');
+            else
+                add@aod.specification.SpecificationManager(obj, varargin{:});
+            end
+        end
     end
 
     methods (Static)

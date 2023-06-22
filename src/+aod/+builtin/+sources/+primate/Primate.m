@@ -39,9 +39,18 @@ classdef Primate < aod.core.sources.Subject
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.sources.Subject();
 
-            value.remove('Age');
-            value.add('DateOfBirth', datetime.empty(), @isdatetime,...
-                'Date of birth of the subject');
+            value.remove("Age");
+            value.add("DateOfBirth",...
+                "Class", "datetime", "Size", "(1,1)",... 
+                "Description", "Date of birth of the subject");
+        end
+
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.sources.Subject(value);
+
+            value.set("ID",...
+                "Class", "string", "Size", [1 1],...
+                "Description", "A comprehensive identifier with parent source(s) appended");
         end
     end
 end

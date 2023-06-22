@@ -10,6 +10,8 @@ function deleteTestFiles()
 
     cd(test.util.getAODataTestFolder());
 
+    warning('off', 'MATLAB:DELETE:FileNotFound');
+
     if exist('ToyExperiment.h5', 'file')
         delete('ToyExperiment.h5');
     end
@@ -57,5 +59,7 @@ function deleteTestFiles()
     if exist('Demo2.m', 'file')
         delete('Demo2.m');
     end
+
+    warning('on', 'MATLAB:DELETE:FileNotFound');
     
     cd(currentPWD);

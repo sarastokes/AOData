@@ -18,6 +18,8 @@ classdef StripRegistration < aod.core.Registration
 %   usedFrame (logical; whether strip or frame reg was ultimately used)
 % Derived Properties:
 %   corrCoef regFlag stripX stripY frameXY regDescription rotationAngle
+
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
@@ -101,9 +103,10 @@ classdef StripRegistration < aod.core.Registration
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Registration();
 
-            value.add('RegistrationType', [],... 
-                @(x) ismember(x, ["frame", "strip"]),...
-                "Whether frame or strip registration was used");
+            value.add("RegistrationType",...
+                "Class", "string", "Size", "(1,1)",...
+                "Function", @(x) ismember(x, ["frame", "strip"]),...
+                "Description", "Whether frame or strip registration was chosen for subsequent processing.");
         end
     end
 end 

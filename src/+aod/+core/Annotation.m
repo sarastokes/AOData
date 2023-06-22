@@ -9,8 +9,10 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = aod.core.Annotation(name, varargin)
-%   obj = aod.core.Annotation(name, 'Data', data, 'Source', source)
+%   obj = aod.core.Annotation(name)
+%   obj = aod.core.Annotation(name, annotationDate)
+%   obj = aod.core.Annotation(name, annotationDate,...
+%       'Data', data, 'Source', source)
 %
 % Inputs:
 %   name            char or string
@@ -40,6 +42,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
+        annotationDate          datetime = datetime.empty();
         % The annotation data
         Data   
         % Source associated with the Annotation
@@ -53,13 +56,13 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
             % Parse inputs (save validation for set functions)
             ip = aod.util.InputParser();
             addOptional(ip, 'Data', []);
+            addParameter(ip, 'Date', getDateYMD(), @(x) isdatetime(x) || istext(x));
             addParameter(ip, 'Source', []);
-            addParameter(ip, 'Date', getDateYMD(), @isdatetime);
             parse(ip, varargin{:});
 
+            obj.setDate(ip.Results.Date);
             obj.setData(ip.Results.Data);
             obj.setSource(ip.Results.Source);
-            obj.setDate(ip.Results.Date);
         end
     end
 
@@ -103,7 +106,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function setDate(obj, annotationDate)
-            % Sets the AnnotationDate attribute
+            % Change the annotation's date
             %
             % Syntax:
             %   setAnnotationDate(obj, annotationDate)
@@ -115,25 +118,25 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.setAnnotationDate('20230318')
             % -------------------------------------------------------------
             if nargin < 2 || isempty(annotationDate)
-                obj.setAttr('AnnotationDate', datetime.empty());
+                obj.annotationDate = datetime.empty();
+                return
             end
-            annotationDate = aod.util.validateDate(annotationDate);
-            obj.setAttr('AnnotationDate', annotationDate);
+            obj.annotationDate = aod.util.validateDate(annotationDate);
         end
     end
     
     methods (Static)
-        function value = specifyAttributes()
-            value = specifyAttributes@aod.core.Entity();
 
-            value.add('Administrator', string.empty(), @isstring,... 
-                'Who performed the annotation');
-            value.add('AnnotationDate', datetime.empty(), @isdatetime,...
-                'Date annotation was performed');
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Entity(value);
+        
+            value.set("annotationDate",...
+                "Class", "datetime", "Size", "(1,1)",...
+                "Description", "Date the annotation was performed");
         end
 
-        function value = specifyAttributes2()
-            value = specifyAttributes2@aod.core.Entity();
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Entity();
             
             value.add("Administrator",...
                 "Class", "string",...
@@ -143,10 +146,6 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
                 "Class", "string",...
                 "Size", "(1,1)",...
                 "Description", "Software used for the registration");
-            value.add("AnnotationDate",...
-                "Class", "datetime",...
-                "Size", "(1,1)",...
-                "Description", "The date the annotation was performed");
         end
     end
 end

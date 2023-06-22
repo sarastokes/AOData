@@ -15,7 +15,7 @@ classdef (Abstract) SpecificationManager < handle
         Entries
     end
 
-    properties (Hidden, SetAccess=private) 
+    properties (Hidden, SetAccess = private) 
         lastModified            datetime = datetime.empty()
         %version                 string  {mustBeScalarOrEmpty} = string.empty()
     end
@@ -88,18 +88,50 @@ classdef (Abstract) SpecificationManager < handle
             tf = ~isempty(idx);
         end
 
-        function d = get(obj, entryName)
+        function entry = get(obj, entryName, errorType)
             % Get a dataset by name
             %
             % Syntax:
-            %   d = get(obj, entryName)
+            %   entry = get(obj, entryName)
+            %   entry = get(obj, entryName, errorType)
+            %
+            % Inputs:
+            %   entryName           char
+            %       The name of the dataset or attribute (case-sensitive)
+            % Optional inputs:
+            %   errorType           char or aod.infra.ErrorTypes
+            %       How to handle missing property: 'none', 'error', or 
+            %       'warning'. Default is 'none' and the output will be []
+            %
+            % Outputs:
+            %   entry               aod.specification.Entry
             % -------------------------------------------------------------
+            arguments 
+                obj 
+                entryName       char 
+                errorType       = aod.infra.ErrorTypes.NONE
+            end
+
             [tf, idx] = obj.has(entryName);
 
             if tf
-                d = obj.Entries(idx);
+                entry = obj.Entries(idx);
             else
-                d = [];
+                switch errorType 
+                    case aod.infra.ErrorTypes.NONE 
+                        entry = [];
+                    case aod.infra.ErrorTypes.ERROR
+                        error('get:EntryNotFound',... 
+                            'Entry %s not found in %sManager',...
+                            entryName, obj.specType);
+                    case aod.infra.ErrorTypes.WARNING 
+                        warning('get:EntryNotFound',...
+                            'Entry %s not found in %sManager',...
+                            entryName, obj.specType);
+                    case aod.infra.ErrorTypes.MISSING 
+                        error("get:InvalidInput",...
+                            "Missing error type is not supported");
+                end
             end
         end
 
@@ -113,7 +145,7 @@ classdef (Abstract) SpecificationManager < handle
             %   entry          aod.specification.Entry
             %
             % See also:
-            %   aod.specification.Dataset
+            %   aod.specification.Entry
             % -------------------------------------------------------------
             arguments 
                 obj
@@ -198,11 +230,15 @@ classdef (Abstract) SpecificationManager < handle
         end
 
         function tf = isequal(obj, other)
-            if isa(other, class(obj))
+            if ~isa(other, class(obj))
                 tf = false;
                 return 
             end
-            tf = strcmp(obj.text(), other.text());
+            if obj.className ~= other.className
+                tf = false;
+            else
+                tf = isequal(obj.table(), other.table());
+            end
         end
 
         function S = struct(obj)

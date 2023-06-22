@@ -11,8 +11,10 @@ classdef LightSource < aod.core.Device
 %   obj = aod.builtin.devices.LightSource(wavelength, varargin)
 %
 % Properties:
-%   wavelength
 %   spectra
+%
+% Attributes:
+%   Wavelength  
 %
 % Inherited attributes:
 %   Manufacturer
@@ -26,8 +28,6 @@ classdef LightSource < aod.core.Device
 % -------------------------------------------------------------------------
     
     properties (SetAccess = protected)
-        % The peak wavelength of the light source (nm)
-        wavelength      double
         % The spectra of the light source (nm, [])
         spectra         double 
     end 
@@ -51,7 +51,7 @@ classdef LightSource < aod.core.Device
             %   wavelength      double
             %       The light source wavelength (nm)
             % -------------------------------------------------------------
-            obj.wavelength = wavelength;
+            obj.setAttr('Wavelength', wavelength);
         end
         
         function setSpectra(obj, spectra)
@@ -71,10 +71,30 @@ classdef LightSource < aod.core.Device
     methods (Access = protected)
         function value = specifyLabel(obj)
             if ~isempty(obj.Name)
-                value = [obj.Name, '_', num2str(obj.wavelength), 'nm'];
+                value = sprintf("%s_%unm", obj.Name, obj.wavelength);
             else
-                value = [num2str(obj.wavelength), 'nm_LightSource'];
+                value = sprintf("%unmLight", obj.getAttr('wavelength'));
             end
+        end
+    end
+
+    methods (Static)
+        function value = specifyAttributes()
+            value = specifyAttributes@aod.core.Device();
+            
+            value.add("Wavelength",...
+                "Class", "double", "Size", "(1,1)", "Units", "nm",...
+                "Function", @mustBePositive,...
+                "Description", "The peak wavelength of the light source");
+        end
+
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Device(value);
+
+            value.set("spectra",...
+                "Class", "double", "Size", "(:, 2)",... 
+                "Units", ["nm", "microwatt"],...
+                "Description", "Spectra of the light source");
         end
     end
 end

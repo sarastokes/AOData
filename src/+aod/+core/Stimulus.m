@@ -17,8 +17,8 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         Calibration                 {aod.util.mustBeEntityType(Calibration, 'Calibration')} = aod.core.Calibration.empty()
 
-        protocolClass               char = char.empty()
-        protocolName                char = char.empty()
+        protocolClass               string = string.empty()
+        protocolName                string = string.empty()
         DateProtocolCreated         datetime = datetime.empty()
     end
     
@@ -118,6 +118,20 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
                     end
                 end
             end
+        end
+    end
+
+    methods (Static)
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Entity(value);
+
+            value.set("Calibration",...
+                "Class", ["aod.core.Calibration", "aod.persistent.Calibration"],...
+                "Size", "(1,1)", "Default", aod.core.Calibration.empty(),...
+                "Description", "The calibration used to design the stimulus");
+            value.set("protocolName",...
+                "Class", "string", "Size", "(1,1)",...
+                "Description", "The name of the protocol used.");
         end
     end
 end

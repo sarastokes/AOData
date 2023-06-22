@@ -28,7 +28,7 @@ function success = write(hdfName, pathName, dsetName, data, description)
 % AOData also adds support for aod.common.KeyValueMap and aod.common.FileReader
 %
 % See also:
-%   h5tools.write, aod.h5.read, aod.h5.writeExpectedAttributes
+%   h5tools.write, aod.h5.read, h5write
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -48,12 +48,12 @@ function success = write(hdfName, pathName, dsetName, data, description)
             h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.common.KeyValueMap");
             h5tools.writeatt(hdfName, fullPath, 'Class', 'aod.common.KeyValueMap');
             success = true;
-        elseif isa(data, 'aod.util.AttributeManager')
-            success = aod.h5.writeExpectedAttributes(hdfName, pathName, dsetName, data);
+        elseif isa(data, 'aod.specification.AttributeManager')
+            success = aod.h5.writeSpecificationManager(hdfName, pathName, dsetName, data);
             h5tools.writeatt(hdfName, fullPath, 'Description',...
                 "Specification of expected metadata for the entity")
         elseif isa(data, 'aod.specification.DatasetManager')
-            success = aod.h5.writeExpectedDatasets(hdfName, pathName, dsetName, data);
+            success = aod.h5.writeSpecificationManager(hdfName, pathName, dsetName, data);
             h5tools.writeatt(hdfName, fullPath, 'Description',...
                 "Specification of expected data for the entity");
         elseif isSubclass(data, 'aod.common.FileReader')

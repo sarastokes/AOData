@@ -20,7 +20,7 @@ classdef RigidRegistration < aod.builtin.registrations.GeometricTransformation
 %   data = apply(obj, data)
 %
 % Static methods:
-%   tform = affine2d_to_3d(tform)
+%   transform = affine2d_to_3d(tform)
 %
 % Inherited methods:
 %   setDate(obj, regDate)
@@ -51,10 +51,10 @@ classdef RigidRegistration < aod.builtin.registrations.GeometricTransformation
         function data = apply(obj, data, varargin)
             if ismatrix(data)
                 refObj = imref2d([size(data, 1), size(data, 2)]);
-                data = imwarp(data, refObj, obj.tform,...
+                data = imwarp(data, refObj, obj.transform,...
                     'OutputView', refObj, varargin{:});
             else
-                tForm = obj.affine2d_to_3d(obj.tform);
+                tForm = obj.affine2d_to_3d(obj.transform);
                 viewObj = affineOutputView(size(data), tForm,...
                     'BoundsStyle', 'SameAsInput');
                 data = imwarp(data, tForm, 'OutputView', viewObj, varargin{:});

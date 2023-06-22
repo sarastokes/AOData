@@ -56,15 +56,16 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
         function value = specifyAttributes()
             value = specifyAttributes@aod.builtin.calibrations.MeasurementTable();
 
-            value.add('Wavelength', double.empty(), @isnumeric, ...
-                "The wavelength of the light source being measured");
+            value.add("Wavelength",...
+                "Class", "double", "Size", "(1,1)", ...
+                "Description", "The wavelength of the light source being measured",...
+                "Units", "nm");
         end
 
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.builtin.calibrations.MeasurementTable(value);
 
-            value.set('Measurements', ...
-                'Class', 'table');
+            value.set("Measurements", "Class", "table");
         end
     end
 end

@@ -18,7 +18,7 @@ classdef PMT < aod.core.Device
 %   Manufacturer
 %   Model
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     methods 
@@ -31,9 +31,10 @@ classdef PMT < aod.core.Device
     methods (Static)
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
-            
-            value.add('SerialNumber', string.empty(), @isstring,... 
-                'Serial number of the light source');
+
+            value.add("SerialNumber",...
+                "Class", "string", "Size", "(1,1)",...
+                "Description", "Serial number of the light source");
         end
     end
 end 

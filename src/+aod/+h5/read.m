@@ -40,12 +40,12 @@ function out = read(hdfName, pathName, dsetName, className)
     end
     
     if strcmp(dsetName, "expectedAttributes")
-        out = aod.h5.readExpectedAttributes(hdfName, pathName, dsetName);
+        out = aod.h5.readSpecificationManager(hdfName, pathName, dsetName);
         return
     end
 
     if strcmp(dsetName, "expectedDatasets")
-        out = aod.h5.readExpectedDatasets(hdfName, pathName, dsetName);
+        out = aod.h5.readSpecificationManager(hdfName, pathName, dsetName);
         return
     end
 

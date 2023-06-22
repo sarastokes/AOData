@@ -122,7 +122,9 @@ classdef InterfaceTest < matlab.unittest.TestCase
             cDevice = testCase.cEXPT.Systems(1).Channels(1).Devices(1);
             pDevice = testCase.pEXPT.query({'UUID', cDevice.UUID});
 
-            testCase.verifyEqual(cDevice.wavelength, pDevice.wavelength);
+            % Restoration of empty properties
+            testCase.verifyEmpty(pDevice.spectra);
+            % Attribute -> property
             testCase.verifyEqual(cDevice.label, pDevice.label);
         end
 
@@ -141,8 +143,8 @@ classdef InterfaceTest < matlab.unittest.TestCase
                 testCase.cEXPT.Epochs(1).Registrations(1).registrationDate,...
                 testCase.pEXPT.Epochs(1).Registrations(1).registrationDate);
             testCase.verifyEqual(...
-                testCase.cEXPT.Epochs(1).Registrations.tform,... 
-                testCase.pEXPT.Epochs(1).Registrations.tform);
+                testCase.cEXPT.Epochs(1).Registrations.transform,... 
+                testCase.pEXPT.Epochs(1).Registrations.transform);
         end
     end
 end

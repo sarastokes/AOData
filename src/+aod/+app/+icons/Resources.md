@@ -14,7 +14,7 @@ Entity icons:
 - Response: <a target="_blank" href="https://icons8.com/icon/26284/electrical-threshold">Electrical Threshold</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - Registration: <a target="_blank" href="https://icons8.com/icon/26236/motion-detector">Motion Detector</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - **EpochDataset**: <a target="_blank" href="https://icons8.com/icon/31500/hashtag-activity-grid">Hashtag Activity Grid</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
-- Stimulus: <a target="_blank" href="https://icons8.com/icon/26335/spotlight">Spotlight</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+- **Stimulus**: <a target="_blank" href="https://icons8.com/icon/26335/spotlight">Spotlight</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - **Annotation**: <a target="_blank" href="https://icons8.com/icon/21145/comments">Comments</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - **Analysis**: <a target="_blank" href="https://icons8.com/icon/-fcp7PY7LOpz/graph">Graph</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 

@@ -181,11 +181,11 @@ classdef Persistor < handle
 
                 % Update specifications
                 if ~isequal(newObj.expectedDatasets, oldObj.expectedDatasets)
-                    aod.h5.writeExpectedDatasets(obj.hdfName, hdfPath,... 
+                    aod.h5.writeSpecificationManager(obj.hdfName, hdfPath,... 
                         'expectedDatasets', newObj.expectedDatasets);
                 end
                 if ~isequal(newObj.expectedAttributes, oldObj.expectedAttributes)
-                    aod.h5.writeExpectedAttributes(obj.hdfName, hdfPath,...
+                    aod.h5.writeSpecificationManager(obj.hdfName, hdfPath,...
                         'expectedAttributes', newObj.expectedAttributes);
                 end
 

@@ -33,13 +33,17 @@ classdef AttributeManager < aod.specification.SpecificationManager
     end
 
     methods 
-        function add(obj, attrName, varargin)
+        function add(obj, attr, varargin)
             % Add a new attribute
             %
             % Syntax:
             %   add(obj, attrName, varargin)
             % -------------------------------------------------------------
-            entry = aod.specification.Entry(attrName, varargin{:});
+            if istext(attr)
+                entry = aod.specification.Entry(attr, varargin{:});
+            else
+                entry = attr;
+            end
             add@aod.specification.SpecificationManager(obj, entry);
         end
     
@@ -69,36 +73,21 @@ classdef AttributeManager < aod.specification.SpecificationManager
                 if aod.util.isempty(obj.Entries(i).Default) 
                     defaultValue = [];
                 else
-                    defaultValue = obj.Entries(i).Default;
+                    defaultValue = obj.Entries(i).Default.Value;
                 end
 
-                if isempty(obj.Entries(i).Class)
-                    classFcn = {};
-                else
-                    eval(sprintf("classFcn = @(x) mustBeA(x, %s);",...
-                        value2string(obj.Entries(i).Class.text())));
-                end
-                if isempty(obj.Entries(i).Functions)
-                    if ~isempty(classFcn)
-                        validators = classFcn;
-                    else
-                        validators = [];
-                    end
-                else
-                    validators = cat(2, obj.Entries(i).Functions.Value, {classFcn});
-                end
+                validators = obj.Entries(i).getFullValidation();
 
                 if isempty(validators)
                     addParameter(ip, obj.Entries(i).Name, defaultValue);
                 else
-                    addParameter(ip, obj.Entries(i).Name, defaultValue,... 
-                        aod.specification.util.combineFunctionHandles(validators));
+                    addParameter(ip, obj.Entries(i).Name, defaultValue, validators);
                 end
             end
         end
     end
 
-    methods (Access = {?aod.core.Entity})
+    methods
         function setClassName(obj, className)
             % Set the class name
             %

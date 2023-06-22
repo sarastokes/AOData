@@ -126,13 +126,6 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
             
-            value.add('Administrator', "", @isstring,... 
-                'Person(s) who performed the calibration');
-        end
-
-        function value = specifyAttributes2()
-            value = specifyAttributes2@aod.core.Entity();
-            
             value.add("Administrator",...
                 "Class", "string",...
                 "Size", "(1,1)",...

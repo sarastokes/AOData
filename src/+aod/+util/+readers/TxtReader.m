@@ -175,7 +175,7 @@ classdef (Abstract) TxtReader < aod.common.FileReader
         end
     end
 
-    methods (Static)
+    methods (Static, Access = protected)
         function out = strtrim(txt)
             % Identical to MATLAB strtrim but no error for empty txt
             %
@@ -191,6 +191,13 @@ classdef (Abstract) TxtReader < aod.common.FileReader
             else
                 out = strtrim(txt);
             end
+        end
+    end
+
+    methods (Static)
+        function out = read(fName)
+            obj = aod.util.readers.TxtReader(fName);
+            out = obj.readFile();
         end
     end
 end

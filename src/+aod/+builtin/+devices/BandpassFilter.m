@@ -64,11 +64,23 @@ classdef BandpassFilter < aod.core.Device
     end
 
     methods (Static)
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Device(value);
+
+            value.set("transmission",...
+                "Class", "double", "Size", "(:,1)", "Units", ["nm", "percent"],...
+                "Description", "The transmission spectrum of the filter");
+        end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
 
-            value.add('Wavelength', [], @isnumeric, 'Wavelength in nm');
-            value.add('Bandwidth', [], @isnumeric, 'Bandwidth in nm');
+            value.add("Wavelength",...
+                "Class", "double", "Size", "(1,1)", "Units", "nm",...
+                "Description", "The peak wavelength of the filter");
+            value.add("Bandwidth",...
+                "Class", "double", "Size", "(1,1)", "Units", "nm",...
+                "Description", "The bandwidth of the filter");
         end
     end
 end 

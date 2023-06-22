@@ -1,8 +1,5 @@
 classdef DichroicFilter < aod.core.Device
-% DICHROICFILTER
-%
-% Description:
-%   A dichroic filter within the system
+% A dichroic filter within a system
 %
 % Parent:
 %   aod.core.Device
@@ -28,8 +25,7 @@ classdef DichroicFilter < aod.core.Device
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        % Filter transmission (nm, [])
-        transmission        double 
+        transmission         
     end
     
     methods
@@ -43,7 +39,7 @@ classdef DichroicFilter < aod.core.Device
     
     methods
         function setWavelength(obj, wavelength)
-            % SETWAVELENGTH
+            % Set the cutoff wavelength for the filter
             %
             % Syntax:
             %   setWavelength(obj, wavelength)
@@ -53,10 +49,14 @@ classdef DichroicFilter < aod.core.Device
         end
         
         function setPassType(obj, passType)
-            % SETPASSTYPE
+            % Change the pass type of the filter
             %
             % Syntax:
             %   setPassType(obj, passType)
+            %
+            % Inputs:
+            %   passType        string
+            %       Must be either "low" or "high"
             % -------------------------------------------------------------
             passType = lower(passType);
             assert(ismember(passType, {'low', 'high'}),...
@@ -65,7 +65,7 @@ classdef DichroicFilter < aod.core.Device
         end
 
         function setTransmission(obj, spectra)
-            % SETSPECTRUM
+            % Set the dichroic filter's transmission
             %
             % Syntax:
             %   setSpectrum(obj, spectrum)
@@ -83,11 +83,25 @@ classdef DichroicFilter < aod.core.Device
     end
 
     methods (Static)
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Device(value);
+
+            value.set("transmission",...
+                "Class", "double", "Size", "(:,2)",...
+                "Units", ["nm", "%"],...
+                "Description", "Transmission spectra of filter");
+        end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
 
-            value.add('Pass', [], @(x) ismember(lower(x), ["low", "high"]));
-            value.add('Wavelength', [], @isnumeric);
+            value.add("Wavelength",...
+                "Class", "double", "Size", "(1,1)", "Units", "nm",...
+                "Description", "The cutoff wavelength of the filter");
+            value.add("Pass",...
+                "Class", "string", "Size", "(1,1)",...
+                "Function", @(x) mustBeMember(x, ["low", "high"]),...
+                "Description", "Whether the dichroic is low or high pass");
         end
     end
 end

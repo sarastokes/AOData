@@ -53,6 +53,15 @@ classdef ChannelOptimization < aod.core.Calibration
             obj.setAttr('Wavelength', value);
         end
 
+        function setIterations(obj, value)
+            if istext(value) && isfile(value)
+                reader = aod.util.findFileReader(value);
+                obj.iterations = reader.read();
+            else
+                obj.iterations = value;
+            end
+        end
+
         function setPositions(obj, modelEye, varargin)
             % Set positions for model eye or in vivo
             %
@@ -97,8 +106,9 @@ classdef ChannelOptimization < aod.core.Calibration
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Calibration();
             
-            value.add('Wavelength', [], @isnumeric,...
-                'The wavelength of the light source in the optimization (nm)');
+            value.add("Wavelength",...
+                "Class", "double", "Size", "(1,1)", "Units", "nm",...
+                "Description", "The wavelength of the light source in the optimization");
         end
 
         function d = specifyDatasets(d)

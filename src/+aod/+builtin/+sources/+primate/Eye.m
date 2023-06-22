@@ -1,25 +1,22 @@
 classdef Eye < aod.core.sources.Eye 
 % Primate eye
 %
-% Description:
-%   Primate eye
-%
 % Parent:
 %   aod.core.sources.Eye
 %
 % Constructor:
-%   obj = Eye(whichEye, varargin)
+%   obj = aod.builtin.sources.Eye(whichEye, varargin)
 %
 % Attributes:
 %   AxialLength                 double
 %       Axial length in mm
-%   PupilSize                   double
+%   PupilDiameter                   double
 %       Pupil size in mm (default = 6.7 mm)
 %   ContactLens                 string
 %       Contact lens used for the eye
 %
 % Dependent properties:
-%   micronsPerDegree
+%   micronsPerDegree                double
 %       Microns per degree of visual angle
 %
 % Methods:
@@ -27,31 +24,26 @@ classdef Eye < aod.core.sources.Eye
 %   value = um2deg(obj, um)
 %   otf = getOTF(obj, wavelength, sf)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (Dependent)
-        micronsPerDegree
+        micronsPerDegree            double
     end
 
     methods
         function obj = Eye(whichEye, varargin)
             obj = obj@aod.core.sources.Eye(whichEye, varargin{:});
-
-            if obj.hasAttr('AxialLength')
-                obj.setAttr('MicronsPerDegree', obj.micronsPerDegree());
-            end
         end
 
         function value = get.micronsPerDegree(obj)
-            if isempty(obj.getAttr('AxialLength'))
-                value = [];
-            else
+            if obj.hasAttr('AxialLength')
                 value = 291.2 * (obj.getAttr('AxialLength') / 24.2);
+            else
+                value = [];
             end
         end
     end
-
     
     methods
         function value = deg2um(obj, deg)
@@ -81,9 +73,9 @@ classdef Eye < aod.core.sources.Eye
             % Syntax:
             %   otf = getOTF(obj, wavelength, sf)
             % -------------------------------------------------------------
-            if ~isempty(obj.getAttr('PupilSize'))
-                error('getOTF:NoPupilSize',...
-                    'OTF calculation requires pupilSize property!');
+            if ~isempty(obj.getAttr('PupilDiameter'))
+                error('getOTF:NoPupilDiameter',...
+                    'OTF calculation requires pupilDiameter property!');
             end
 
             u0 = (obj.getAttr('PupilSize') * pi * 10e5) / (wavelength * 180);
@@ -95,14 +87,25 @@ classdef Eye < aod.core.sources.Eye
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.sources.Eye();
 
-            value.add('ContactLens', [], @istext,...
-                'Contact lens used for the eye');
-            value.add('AxialLength', [], @isnumeric,...
-                'Axial length of the eye in mm');
-            value.add('PupilSize', 6.7, @isnumeric,...
-                'Pupil size of the eye in mm');
-            value.add('MicronsPerDegree', [], @isnumeric,...
-                'Microns per degree of visual angle calculated from axial length');
+            value.add("ContactLens",...  % TODO
+                "Class", "string", "Size", "(1,1)",...
+                "Description", "Contact lens used for the eye");
+            value.add("AxialLength",...
+                "Class", "double", "Size", [1,1], "Units", "millimeter",...
+                "Description", "Axial length of the eye");
+            value.add("PupilDiameter",...
+                "Class", "double", "Default", 6.7,... 
+                "Size", [1 1], "Units", "millimeter",...
+                "Description", "Diameter of the pupil");
+        end
+
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.sources.Eye(value);
+
+            value.set("micronsPerDegree",...
+                "Class", "double", "Size", [1 1],... 
+                "Units", "microns/degree",...
+                "Description", "Microns per degree of visual angle, calculated from AxialLength");
         end
     end
 

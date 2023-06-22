@@ -9,26 +9,20 @@ classdef ImagingLight < aod.core.Stimulus
 %
 % Constructor:
 %   obj = ImagingLight(name, intensity)
-%   obj = ImagingLight(name, intensity, units)
 %
 % Properties:
 %   Intensity               double
 %       Imaging light intensity
 %
-% Attributes:
-%   IntensityUnits          string
-%       Units for the specified imaging light intensity
-%
 % Methods:
-%   setIntensity(obj, intensity, units)
-%   setUnits(obj, units)
+%   setIntensity(obj, intensity)
 
-% By Sara Patterson, 2022 (AOData)
+% By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         % Intensity of the imaging light 
-        intensity                           double
+        intensity               double
     end
     
     methods
@@ -38,35 +32,24 @@ classdef ImagingLight < aod.core.Stimulus
             obj.setIntensity(intensity);
         end
 
-        function setIntensity(obj, intensity, units)
+        function setIntensity(obj, intensity)
             % Set imaging light intensity and, optionally, units
             %
             % Syntax:
             %   obj.setIntensity(intensity)
-            %   obj.setIntensity(intensity, units)
             % -------------------------------------------------------------
             obj.intensity = intensity;
-            if nargin == 3
-                obj.setUnits(units);
-            end
-        end
-
-        function setUnits(obj, units)
-            % Set units for imaging light intensity
-            %
-            % Syntax:
-            %   obj.setUnits(units)
-            % -------------------------------------------------------------
-            obj.setAttr('IntensityUnits', units);
         end
     end
 
     methods (Static)
-        function value = specifyAttributes()
-            value = specifyAttributes@aod.core.Stimulus();
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Stimulus(value);
 
-            value.add('IntensityUnits', [], @istext,...
-                "Units for the imaging light intensity");
+            % Subclasses should change the units if needed
+            value.set("intensity",...
+                "Class", "double", "Size", [1 1], "Units", "Percent",...
+                "Description", "Intensity of the imaging light");
         end
     end
 end

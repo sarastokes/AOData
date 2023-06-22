@@ -31,7 +31,7 @@ classdef Entry < handle
         Default         (1,1)     aod.specification.DefaultValue
         Functions       (1,1)     aod.specification.ValidationFunction
         Description               aod.specification.Description 
-        Units                     string {mustBeScalarOrEmpty} = string.empty()
+        Units           (1,:)     string = string.empty(1,0)
     end
 
     properties (Access = private)
@@ -93,13 +93,17 @@ classdef Entry < handle
         end
 
         function out = text(obj)
-
-            out = "Name: " + obj.Name + newline;
-            out = out + "    Description: " + obj.Description.text() + newline;
-            out = out + "    Class: " + obj.Class.text() + newline;
-            out = out + "    Size: " + obj.Size.text() + newline;
-            out = out + "    Validators: " + obj.Functions.text() + newline;
-            out = out + "    Default: " + obj.Default.text() + newline;
+            out = obj.Name + newline;
+            out = out + sprintf("\tDescription:\t%s", obj.Description.text()) + newline;
+            out = out + sprintf("\tClass:\t\t\t%s", obj.Class.text()) + newline;
+            out = out + sprintf("\tSize:\t\t\t%s", obj.Size.text()) + newline;
+            out = out + sprintf("\tValidators:\t\t%s", obj.Functions.text()) + newline;
+            out = out + sprintf("\tDefault:\t\t%s", obj.Default.text()) + newline;
+            if isempty(obj.Units)  % TODO
+                out = out + sprintf("\tUnits:\t\t\t%s", "[]") + newline;
+            else
+                out = out + sprintf("\tUnits:\t\t\t%s", obj.Units) + newline;
+            end
         end
     end
 
@@ -138,6 +142,46 @@ classdef Entry < handle
             obj.Default.setValue(input);
             obj.checkIntegrity();
         end
+
+        function setUnits(obj, input)
+            input = convertCharsToStrings(input);
+            if ~isa(input, 'meta.property')
+                obj.Units = input;
+            end
+        end
+    end
+
+    % Getters
+    methods
+        function [fcnHandle, validators] = getFullValidation(obj)
+            % Combine validators and class type into fcn handles
+            %
+            % Syntax:
+            %   fcnHandle = getFullValidation(obj)
+            % -------------------------------------------------------------
+
+            if isempty(obj.Class)
+                classFcn = {};
+            else
+                eval(sprintf("classFcn = @(x) aod.util.isa(x, %s);", ...
+                    value2string(obj.Class.text())));
+            end
+
+            if isempty(obj.Functions)
+
+                if ~isempty(classFcn)
+                    validators = classFcn;
+                else
+                    validators = [];
+                    return 
+                end
+
+            else
+                validators = cat(2, obj.Functions.Value, {classFcn});
+            end
+
+            fcnHandle = aod.specification.util.combineFunctionHandles(validators);
+        end
     end
 
     methods (Access = private)
@@ -160,7 +204,7 @@ classdef Entry < handle
                 case 'description'
                     obj.setDescription(specValue);
                 case 'units'
-                    % Leave alone for now
+                    obj.setUnits(specValue);
                 otherwise
                     error('parse:InvalidSpecificationType',...
                         'Specification type must be size, function class, default or description');
@@ -233,6 +277,7 @@ classdef Entry < handle
             addParameter(ip, 'Class', []);
             addParameter(ip, 'Function', {});
             addParameter(ip, 'Default', []);
+            addParameter(ip, 'Units', "none");
             parse(ip, varargin{:});
         end 
     end

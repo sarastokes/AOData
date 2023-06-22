@@ -62,7 +62,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
         % When the entity's HDF5 group was last modified
         lastModified            datetime
         % Specification of expected metadata 
-        expectedAttributes      = aod.util.AttributeManager
+        expectedAttributes      = aod.specification.AttributeManager
         % Specification of expected datasets
         expectedDatasets        = aod.specification.DatasetManager
         % The underlying HDF5 file
@@ -1058,7 +1058,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             if isempty(linkValue)
                 obj.deleteDynProp(linkName);
             else
-                obj.(linkName) = obj.loadLink(linkName);
+                obj.assignLinkProp(linkName);
             end
 
             obj.updateModificationTimestamp();

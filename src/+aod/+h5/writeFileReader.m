@@ -19,7 +19,7 @@ function success = writeFileReader(hdfName, pathName, dsetName, reader)
 %       Whether the DatasetManager was written or not
 %
 % See also:
-%   aod.specification.DatasetManager, aod.h5.readExpectedDatasets
+%   aod.common.FileManager, aod.h5.readFileReader
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

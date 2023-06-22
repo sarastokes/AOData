@@ -1,6 +1,9 @@
 function reader = readFileReader(hdfName, pathName, dsetName)
 % Read a file reader from an HDF5 file
 %
+% Description:
+%   Creates the FileReader and assigns any attributes to properties
+%
 % Syntax:
 %   reader = aod.h5.readFileReader(hdfName, pathName, dsetName)
 %

@@ -242,7 +242,11 @@ classdef SubclassWriter < handle
                 out = out + obj.indent(3) + "% Add new attributes" + newline;
                 for i = 1:numel(obj.Model.Attributes)
                     iAttr = obj.Model.Attributes(i);
-                    out = out + obj.indent(3)  + sprintf("value.add('%s'", iAttr.Name);
+                    
+                    if isempty(iAttr.Default) && isempty(iAttr.Validation) && isempty(iAttr.Description) && isempty(iAttr.Class)
+                        continue 
+                    end
+                    out = out + obj.indent(3)  + sprintf("value.add(""%s""", iAttr.Name);
                     if isempty(iAttr.Default)
                         out = out + ", []";
                     else
@@ -267,19 +271,29 @@ classdef SubclassWriter < handle
             end
 
             if ~isempty(obj.Model.Datasets)
-                out = out + obj.indent(2) + "function mngr = specifyDatasets(mngr)" + newline;
-                out = out + obj.indent(3) + sprintf("mngr = specifyDatasets@%s(mngr);", obj.Model.SuperClass);
+                out = out + obj.indent(2) + "function value = specifyDatasets(value)" + newline;
+                out = out + obj.indent(3) + sprintf("value = specifyDatasets@%s(value);", obj.Model.SuperClass);
                 out = out + newline + newline;
 
                 for i = 1:numel(obj.Model.Datasets)
                     iDataset = obj.Model.Datasets(i);
-                    if isempty(iDataset.Default) && isempty(iDataset.Validation) && isempty(iDataset.Description)
+                    if isempty(iDataset.Default) && isempty(iDataset.Validation) && isempty(iDataset.Description) && isempty(iDataset.Class)
                         continue 
                     end
-                    out = out + obj.indent(3) + sprintf("mngr.set(""%s""", iDataset.Name);
+                    out = out + obj.indent(3) + sprintf("value.set(""%s""", iDataset.Name);
+                    if ~isempty(iDataset.Class)
+                        out = out + ",..." + newline;
+                        out = out + sprintf("""Class"", %s, ", iDataset.Class.text());
+                    end
+
+                    if ~isempty(iDataset.Size)
+                        out = out + ",...";
+                        out = out + sprintf("""Size"", %s, ", iDataset.Size.text());
+                    end
+
                     if ~isempty(iDataset.Description)
                         out = out + ",..." + newline;
-                        out = out + "Description, " + iDataset.Description;
+                        out = out + "Description, " + value2string(iDataset.Description.Value);
                     end
                     out = out + ");" + newline;
                 end

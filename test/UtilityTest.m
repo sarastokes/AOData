@@ -76,49 +76,6 @@ classdef UtilityTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags=["Attributes", "Utility"])
-        function ParamManager(testCase)
-            PM = aod.util.AttributeManager();
-            testCase.verifyEqual(PM.Count, 0);
-            testCase.verifyEmpty(PM.table());
-
-            % Add param info
-            PM.add('MyParam1');
-            testCase.verifyEqual(PM.Count, 1);
-            testCase.verifyTrue(PM.hasAttr('MyParam1'));
-
-            % Error for existing attribute
-            testCase.verifyError(@() PM.add('MyParam1'), "add:AttributeExists");
-
-            % Add an ExpectedAttribute
-            EP = aod.util.templates.ExpectedAttribute('MyParam2');
-            PM.add(EP);
-            testCase.verifyEqual(PM.Count, 2);
-            testCase.verifyEqual(height(PM.table()), 2);
-
-            % Add a AttributeManager
-            PM2 = aod.util.AttributeManager();
-            PM2.add(PM);
-            testCase.verifyEqual(PM2.Count, 2);
-            
-            % Remove attributes
-            PM.remove('MyParam1');
-            testCase.verifyEqual(PM.Count, 1);
-            testCase.verifyFalse(PM.hasAttr('MyParam1'));
-
-            % Warning for wrong attribute name
-            testCase.verifyWarning(...
-                @() PM.remove('BadParamName'), "remove:ParamNotFound");
-
-            % Clear attributes
-            PM2.clear();
-            testCase.verifyEqual(PM2.Count, 0);
-
-            % No error for empty attribute manager
-            PM2.remove('MyParam1');
-        end
-    end
-
     methods (Test, TestTags=["Validation", "Utility"])
         function ValidateUUID(testCase)
             testCase.verifyError(...

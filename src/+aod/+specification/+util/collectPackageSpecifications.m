@@ -1,4 +1,4 @@
-function [DMs, AMs, S] = collectPackageSpecifications(pkgName, writeToFile)
+function [DMs, AMs, S] = collectPackageSpecifications(pkgName, varargin)
 % Collect all the specifications for a package 
 %
 % Syntax:
@@ -21,9 +21,10 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, writeToFile)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    if nargin < 2
-        writeToFile = false;
-    end
+    ip = aod.util.InputParser();
+    addParameter(ip, 'Write', false, @islogical);
+    addParameter(ip, 'Subpackages', false, @islogical);
+    parse(ip, varargin{:});
 
     mp = meta.package.fromName(pkgName);
     if isempty(mp)
@@ -32,8 +33,11 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, writeToFile)
     end
     [pkgs, fullNames] = collectPackages(mp);
 
-    classes = string({mp.ClassList.Name})';
-
+    if ip.Results.Subpackages
+        classes = collectPackageSpecifications(pkgName);
+    else
+        classes = string({mp.ClassList.Name})';
+    end
     
     logger = aod.specification.logger.SpecificationLogger(...
         sprintf("Package_%s", pkgName));
@@ -84,7 +88,7 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, writeToFile)
 
     S.DateCreated = jsonencode(datetime('now'));
 
-    if writeToFile
+    if ip.Results.Write
         pkgFileName = strrep(pkgName, ".", "_") + ".json";
         if ~exist(pkgFileName, 'file')
             savejson('', S, pkgFileName);

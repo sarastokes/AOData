@@ -28,15 +28,6 @@ classdef CustomDisplayTest < matlab.unittest.TestCase
             disp(paramObj);
         end
 
-        function AttributeManager(testCase)
-            PM = aod.util.AttributeManager();
-            disp(PM);
-
-            PM.add('Wavelength', [], [], 'Description');
-            PM.add('Bandwidth', 20, @isnumeric, 'Description');
-            disp(PM);
-        end
-
         function HierarchyDisplay(testCase)
             cEXP = ToyExperiment(false);
             aod.util.displayHierarchy(cEXP);

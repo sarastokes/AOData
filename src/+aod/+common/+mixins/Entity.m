@@ -339,7 +339,7 @@ classdef Entity < handle
             %
             % See also:
             %   aod.core.Entity.specifyAttributes,
-            %   aod.util.AttributeManager
+            %   aod.specification.AttributeManager
             % -------------------------------------------------------------
             ip = obj.expectedAttributes.parse(varargin{:}); %#ok<MCNPN>
             f = fieldnames(ip.Results);
