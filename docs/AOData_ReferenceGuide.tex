@@ -123,6 +123,7 @@
 \newcommand{\mclass}[1]{\textcolor{blue}{\texttt{#1}}}
 \newcommand{\myclass}[1]{\textcolor{blue4}{\texttt{\textbf{\underline{#1}}}}}
 \newcommand{\mymethod}[1]{\textcolor{violet4}{\texttt{\textbf{#1}}}}
+\newcommand{\mfcn}[1]{\mclass{#1}}
 
 % Code markup
 \newcommand{\defblock}[1]{\textbt{\textcolor{blue}{#1}}}
@@ -481,6 +482,32 @@ $\quad$\\
         \propd{The attribute's key}\\
     \end{InputFlag}\myspace
 
+    \mybreak
+
+%* DELETE
+    \begin{MethodTab}[delete()]
+        Overloads MATLAB's built-in \mclass{delete()} function. Deletes the handle and if the entity is part of the experiment hierarchy, it is deleted from the parent container to avoid retaining a handle to an invalid object
+    \end{MethodTab}
+
+    \begin{CtorBox}
+        \textbf{delete}(obj)
+    \end{CtorBox}\myspace
+
+    \begin{InputFlag}
+        \texttt{obj} & \mclass{\ref{cls:cEntity}}\\
+    \end{InputFlag}\myspace
+
+    \begin{example}
+        $\quad$\\ Deleting an entity will also remove it from the parent. 
+        \begin{CodeBox}
+            expt = aod.core.Experiment(\ctext{"Test"}, cd, \ctext{"20230623"});\\
+            expt.add([aod.core.Source(\ctext{"A"}), aod.core.Source(\ctext{"B"})]);\\
+            \textbf{delete}(expt.Sources(1));\\
+            >>> numel(expt.Sources)\\
+            \ONE 1
+        \end{CodeBox}
+        \noindent The standard MATLAB \mfcn{delete()} behavior would leave an invalid handle and the number of Sources would remain 2. 
+    \end{example}
     \mybreak
 
 %* HASATTR

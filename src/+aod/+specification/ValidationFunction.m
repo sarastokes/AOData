@@ -90,29 +90,39 @@ classdef ValidationFunction < aod.specification.Validator
                 out = "[]";
                 return
             end
-            
-            indiv = cellfun(@(x) string(func2str(x)), obj.Value);
-            if numel(indiv) > 1
-                out = "{";
-                for i = 1:numel(indiv)
-                    out = out + formatFcn(indiv(i));
-                    if i < numel(indiv)
-                        out = out + ", ";
-                    end
-                end
-                out = out + "}";
-            else
-                out = "{" + formatFcn(indiv) + "}";
-            end
 
-            function y = formatFcn(x)
-                if ~startsWith(x, "@")
-                    y = "@" + x;
-                else
-                    y = x;
-                end
-            end
+            out = func2str(aod.specification.util.combineFunctionHandles(...
+                obj.Value));
         end
+
+        % function out = text(obj)
+        %     if isempty(obj)
+        %         out = "[]";
+        %         return
+        %     end
+            
+        %     indiv = cellfun(@(x) string(func2str(x)), obj.Value);
+        %     if numel(indiv) > 1
+        %         out = "{";
+        %         for i = 1:numel(indiv)
+        %             out = out + formatFcn(indiv(i));
+        %             if i < numel(indiv)
+        %                 out = out + ", ";
+        %             end
+        %         end
+        %         out = out + "}";
+        %     else
+        %         out = "{" + formatFcn(indiv) + "}";
+        %     end
+
+        %     function y = formatFcn(x)
+        %         if ~startsWith(x, "@")
+        %             y = "@" + x;
+        %         else
+        %             y = x;
+        %         end
+        %     end
+        % end
     end
 
     methods (Static, Access = private)
@@ -141,7 +151,26 @@ classdef ValidationFunction < aod.specification.Validator
     % MATLAB built-in methods
     methods 
         function tf = isempty(obj)
+            if ~isscalar(obj)
+                tf = arrayfun(@isempty, obj);
+                return
+            end
+
             tf = isempty(obj.Value);
+        end
+
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.specification.ValidationFunction')
+                tf = false;
+                return
+            end
+
+            if nnz(isempty([obj, other])) == 1
+                tf = false;
+                return
+            end
+
+            tf = strcmp(text(obj), text(other));
         end
         
         function out = jsonencode(obj)

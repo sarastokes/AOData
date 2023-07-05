@@ -50,6 +50,16 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj.setSpectra([1:10; 11:20]);
         end
 
+        function Beamsplitter(testCase)
+            obj = aod.builtin.devices.Beamsplitter([30, 70]);
+            testCase.verifyEqual(obj.getAttr('SplittingRatio'), [30 70]);
+            testCase.verifyEqual(obj.label, "30:70Beamsplitter");
+
+            obj.setReflectance([300:700; randn(1, numel(300:700))]');
+            testCase.verifySize(obj.reflectance, [numel(300:700), 2]);
+
+        end
+
         function DichroicFilter(testCase)
             obj = aod.builtin.devices.DichroicFilter(470, "high",...
                 'Manufacturer', "Semrock", 'Model', "FF470-Di01");

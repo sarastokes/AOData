@@ -59,6 +59,26 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyNotEqual(obj4, obj5);
         end
 
+        function SizeComparison(testCase)
+            import aod.specification.actors.ViolationType
+
+            refObj1 = aod.specification.Size("(1,1)");
+            refObj2 = aod.specification.Size([]);
+
+            testCase.verifyEqual(ViolationType.CHANGED,...
+                refObj1.compare(aod.specification.Size("(1,:)")));
+            testCase.verifyEqual(ViolationType.SAME,...
+                refObj1.compare(refObj1));
+            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+                refObj1.compare(refObj2));
+            testCase.verifyEqual(ViolationType.MISSING,...
+                refObj2.compare(refObj1));
+            
+            testCase.verifyError(...
+                @() refObj1.compare(aod.specification.MatlabClass("string")),...
+                "compare:UnlikeSpecificationTypes");
+        end
+
         function SizeErrors(testCase)
             testCase.verifyError(...
                 @() aod.specification.Size(1),...
@@ -170,6 +190,22 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyNotEqual(obj3, obj2);
         end
 
+        function MatlabClassComparison(testCase)
+            import aod.specification.actors.ViolationType
+
+            refObj1 = aod.specification.MatlabClass("string");
+            refObj2 = aod.specification.MatlabClass([]);
+
+            testCase.verifyEqual(ViolationType.CHANGED,...
+                refObj1.compare(aod.specification.MatlabClass("double")));
+            testCase.verifyEqual(ViolationType.SAME,...
+                refObj1.compare(refObj1));
+            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+                refObj1.compare(refObj2));
+            testCase.verifyEqual(ViolationType.MISSING,...
+                refObj2.compare(refObj1));
+        end
+
         function MatlabClassError(testCase)
             testCase.verifyError(...
                 @() aod.specification.MatlabClass("badclass"),...
@@ -193,6 +229,23 @@ classdef SpecificationTest < matlab.unittest.TestCase
             obj.setValue(3);
             testCase.verifyEqual(obj.Value, 3);
         end
+
+        function DefaultValueComparison(testCase)
+            import aod.specification.actors.ViolationType
+
+            refObj1 = aod.specification.DefaultValue(3);
+            refObj2 = aod.specification.DefaultValue([]);
+
+            
+            testCase.verifyEqual(ViolationType.CHANGED,...
+                refObj1.compare(aod.specification.DefaultValue("hey")));
+            testCase.verifyEqual(ViolationType.SAME,...
+                refObj1.compare(refObj1));
+            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+                refObj1.compare(refObj2));
+            testCase.verifyEqual(ViolationType.MISSING,...
+                refObj2.compare(refObj1));
+        end
     end
 
     methods (Test, TestTags="Description")
@@ -213,7 +266,22 @@ classdef SpecificationTest < matlab.unittest.TestCase
         function EmptyDescription(testCase)
             obj = aod.specification.Description([]);
             testCase.verifyEqual(obj.Value, "");
+        end
 
+        function DescriptionComparison(testCase)
+            import aod.specification.actors.ViolationType
+
+            refObj1 = aod.specification.Description("test");
+            refObj2 = aod.specification.Description([]);
+
+            testCase.verifyEqual(ViolationType.CHANGED,...
+                refObj1.compare(aod.specification.Description("text")));
+            testCase.verifyEqual(ViolationType.SAME,...
+                refObj1.compare(refObj1));
+            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+                refObj1.compare(refObj2));
+            testCase.verifyEqual(ViolationType.MISSING,...
+                refObj2.compare(refObj1));
         end
     end
 
@@ -240,6 +308,42 @@ classdef SpecificationTest < matlab.unittest.TestCase
             obj = aod.specification.ValidationFunction();
             testCase.verifyEmpty(obj);
             testCase.verifyTrue(obj.validate(123)); 
+        end
+
+        function FunctionEquality(testCase)
+            obj1 = aod.specification.ValidationFunction(...
+                {@(x) x > 100, @mustBeNumeric});
+            obj2 = aod.specification.ValidationFunction(...
+                {@(y) y > 100, @mustBeNumeric});
+            obj3 = aod.specification.ValidationFunction(@(x) x > 100);
+
+            testCase.verifyEqual(obj1, obj2);
+            testCase.verifyNotEqual(obj1, obj3);
+            testCase.verifyNotEqual(obj1,...
+                aod.specification.ValidationFunction([]));
+            testCase.verifyNotEqual(obj1,...
+                aod.specification.MatlabClass("string"));
+        end
+
+        function FunctionComparison(testCase)
+            import aod.specification.actors.ViolationType
+
+            refObj1 = aod.specification.ValidationFunction(...
+                {@(x) x > 100, @mustBeNumeric});
+            refObj2 = aod.specification.ValidationFunction(...
+                {@(y) y > 100, @mustBeNumeric});
+            refObj3 = aod.specification.ValidationFunction([]);
+
+            testCase.verifyEqual(ViolationType.SAME,...
+                refObj1.compare(refObj2));
+            testCase.verifyEqual(ViolationType.SAME,...
+                refObj1.compare(refObj1));
+            testCase.verifyEqual(ViolationType.MISSING,...
+                refObj3.compare(refObj1));
+            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+                refObj1.compare(refObj3));
+            testCase.verifyEqual(ViolationType.CHANGED,...
+                refObj1.compare(aod.specification.ValidationFunction(@(x) x > 100)));
         end
 
         function FunctionErrors(testCase)

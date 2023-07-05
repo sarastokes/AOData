@@ -255,6 +255,8 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
 
         function addEntity(testCase)
+            testCase.SMALL_EXPT.setReadOnlyMode(false);
+            
             % Analysis
             analysis = aod.core.Analysis("TestAnalysis");
             testCase.SMALL_EXPT.add(analysis);
@@ -298,6 +300,8 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
 
         function AddEpoch(testCase)
+            testCase.SMALL_EXPT.setReadOnlyMode(false);
+
             % Add system
             testCase.SMALL_EXPT.add(aod.core.System("EpochSystem"));
             % Add epoch

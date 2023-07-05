@@ -31,8 +31,7 @@ classdef ResponseTest < matlab.unittest.TestCase
     methods (Test, TestTags=["Response", "Operators"])
         function Equals(testCase)
             testCase.verifyTrue(testCase.RESP3 == testCase.RESP3);
-            testCase.verifyTrue(testCase.RESP3 == 3);
-            testCase.verifyTrue(3 == testCase.RESP3);
+            testCase.verifyTrue(eq(3, testCase.RESP3));
 
             testCase.verifyFalse(isequal(testCase.RESP2, testCase.DATA2));
         end

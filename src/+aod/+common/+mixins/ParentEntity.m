@@ -109,7 +109,7 @@ classdef ParentEntity < handle
                 return
             end
 
-            entityType = EntityTypes.get(entity);
+            entityType = aod.common.EntityTypes.get(entity);
             if ~ismember(entityType, obj.entityType.validChildTypes())
                 error('remove:InvalidEntityType',...
                     'Entity must be %s', string(obj.entityType.validChildTypes()));
@@ -156,7 +156,7 @@ classdef ParentEntity < handle
             
             childType = aod.common.EntityTypes.get(childType);
             if ~ismember(childType, obj(1).entityType.validChildTypes())
-                error('remove:InvalidEntityType',...
+                error('validateChildType:InvalidEntityType',...
                     'Entity must be %s',... 
                     strjoin(string(obj.entityType.validChildTypes()), ', ')); 
             end

@@ -84,7 +84,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
     properties (Hidden, SetAccess = private)
         % Entity properties
         Name                    string
-        label                   char 
+        label                   string 
         entityType              % aod.common.EntityTypes
         % The entity's HDF5 path
         hdfPath                 char

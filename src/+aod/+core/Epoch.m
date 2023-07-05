@@ -124,7 +124,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             childType = obj.validateChildType(childType);
 
             if ~isscalar(obj)
-                arrayfun(@(x) remove(x, entityType, varargin{:}), obj);
+                arrayfun(@(x) remove(x, childType, varargin{:}), obj);
                 return 
             end
 

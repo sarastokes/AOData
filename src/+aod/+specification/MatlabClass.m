@@ -33,7 +33,7 @@ classdef MatlabClass < aod.specification.Validator
 
         function [tf, ME] = validate(obj, value)
             if isempty(obj)
-                tf = true;
+                tf = true; ME = [];
                 return
             end
             tf = isSubclass(value, obj.Value);
@@ -55,7 +55,6 @@ classdef MatlabClass < aod.specification.Validator
                 out = obj.Value;
             end        
         end
-
     end
 
     methods (Static, Access = private)
