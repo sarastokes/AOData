@@ -212,17 +212,17 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             out = obj.Data;
         end
 
-        function out = eq(obj1, obj2)
-            obj1 = aod.core.Response.extractData(obj1);
-            obj2 = aod.core.Response.extractData(obj2);
-            out = obj1 == obj2;
-        end
-
-        function out = ne(obj1, obj2)
-            obj1 = aod.core.Response.extractData(obj1);
-            obj2 = aod.core.Response.extractData(obj2);
-            out = obj1 ~= obj2;
-        end
+        % function out = eq(obj1, obj2)
+        %     obj1 = aod.core.Response.extractData(obj1);
+        %     obj2 = aod.core.Response.extractData(obj2);
+        %     out = obj1 == obj2;
+        % end
+        % 
+        % function out = ne(obj1, obj2)
+        %     obj1 = aod.core.Response.extractData(obj1);
+        %     obj2 = aod.core.Response.extractData(obj2);
+        %     out = obj1 ~= obj2;
+        % end
         
         function out = ge(obj1, obj2)
             obj1 = aod.core.Response.extractData(obj1);

@@ -244,6 +244,34 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyError(...
                 @() SizeTypes.NDARRAY.getSizing(), "getSizing:NotEnoughInfo");
         end
+
+        function SizeTypesValidator(testCase)
+            import aod.specification.SizeTypes
+
+            fcn = SizeTypes.SCALAR.getValidator();
+            testCase.verifyTrue(fcn(1));
+            testCase.verifyFalse(fcn(eye(3)));
+
+            fcn = SizeTypes.ROW.getValidator();
+            testCase.verifyTrue(fcn([1 1 1]));
+            testCase.verifyFalse(fcn([1 1 1]'));
+
+            fcn = SizeTypes.COLUMN.getValidator();
+            testCase.verifyTrue(fcn([1 1 1]'));
+            testCase.verifyFalse(fcn([1 1 1]));
+
+            fcn = SizeTypes.MATRIX.getValidator();
+            testCase.verifyTrue(fcn(eye(3)));
+            testCase.verifyFalse(fcn(zeros(3,3,3)));
+            
+            fcn = SizeTypes.NDARRAY.getValidator(zeros(3,3,3));
+            testCase.verifyFalse(fcn(eye(3)));
+            testCase.verifyTrue(fcn(zeros(3,3,3)));
+
+            fcn = SizeTypes.UNDEFINED.getValidator();
+            testCase.verifyEmpty(fcn);
+
+        end
     end
 
     methods (Test, TestTags={'EntityTypes'})

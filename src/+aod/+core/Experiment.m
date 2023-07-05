@@ -1,4 +1,4 @@
-classdef Experiment < aod.core.Entity
+classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
 % An adaptive optics imaging session
 %
 % Description:
@@ -50,7 +50,7 @@ classdef Experiment < aod.core.Entity
         Code                    table
     end
 
-    properties (SetAccess = protected)
+    properties (SetAccess = {?aod.common.mixins.Entity, ?aod.common.mixins.ParentEntity})
         % Container for Experiment's Analyses
         Analyses                aod.core.Analysis  
         % Container for Experiment's Annotations     
@@ -131,18 +131,13 @@ classdef Experiment < aod.core.Entity
             obj.experimentDate = aod.util.validateDate(expDate);
         end
         
-        
         function epoch = id2epoch(obj, IDs)
             % Input epoch ID(s), get Epoch(s)
             %
             % Syntax:
             %   epoch = id2epoch(obj, IDs)
             % -------------------------------------------------------------
-            if ~isscalar(IDs)
-                epoch = aod.util.arrayfun(@(x) obj.Epochs(find(obj.epochIDs==x)), IDs);
-            else
-                epoch = obj.Epochs(find(obj.epochIDs == IDs));
-            end
+            epoch = obj.Epochs(obj.id2index(IDs));
         end
 
         function idx = id2index(obj, IDs)
@@ -155,9 +150,11 @@ classdef Experiment < aod.core.Entity
             %   idx = id2index(obj, IDs)
             % -------------------------------------------------------------
             if ~isscalar(IDs)
+                mustBeMember(IDs, obj.epochIDs);
                 idx = arrayfun(@(x) id2index(obj, x), IDs);
                 return
             end
+
             idx = find(obj.epochIDs == IDs);
         end
     end 
@@ -215,7 +212,7 @@ classdef Experiment < aod.core.Entity
             end
         end
 
-        function remove(obj, entityType, varargin)
+        function remove(obj, childType, varargin)
             % Remove specific entites or clear all entities of a given type
             %
             % Syntax:
@@ -225,98 +222,27 @@ classdef Experiment < aod.core.Entity
             %   % Remove the 2nd calibration
             %   remove(obj, 'Calibration', 2);
             %
-            %   % Remove all systems
-            %   remove(obj, 'System', 'all');
+            %   % Remove System most recently added (last in obj.Systems)
+            %   remove(obj, 'System', 'last')
+            %   
+            %
+            %   % Remove all Epochs
+            %   remove(obj, 'Epoch', 'all');
             % -------------------------------------------------------------
 
-            import aod.common.EntityTypes
+            if ~isscalar(obj)
+                arrayfun(@(x) remove(x, childType, varargin{:}), obj);
+                return
+            end
 
             % Identify and validate entity type to remove
-            entityType = EntityTypes.get(entityType);
-            if ~ismember(entityType, obj.entityType.validChildTypes())
-                error('remove:NonChildEntityType',...
-                    'Entity must be Analysis, Annotation, Calibration, Epoch, ExperimentDataset, Source or System');
+            childType = obj.validateChildType(childType);
+
+            if childType == aod.common.EntityTypes.EPOCH && isnumeric(varargin{1})
+                varargin{1} = obj.id2index(varargin{1});
             end
 
-            % Identify which members of entityType to remove
-            if istext(varargin{1}) && strcmp(varargin{1}, "all")
-                % Remove all entities
-                obj.(entityType.parentContainer) = entityType.empty();
-                return
-            elseif isnumeric(varargin{1})
-                % Remove entities by ID
-                ID = varargin{1};
-                % Validate IDs
-                mustBeInteger(ID);
-                if entityType == EntityTypes.EPOCH
-                    mustBeMember(ID, obj.epochIDs);
-                else
-                    mustBeInRange(ID, 1, numel(obj.(entityType.parentContainer)));
-                end
-                ID = sort(ID, 'descend');
-            elseif iscell(varargin{1})
-                % Remove entities matching one or more queries
-                out = aod.common.EntitySearch.go(obj.(entityType.parentContainer), varargin{:});
-                if isempty(out)
-                    warning('remove:NoMatches', 'Query did not return any matches');
-                    return
-                end
-                % Identify IDs corresponding to matched entities
-                ID = [];
-                for i = 1:numel(out)
-                    ID = cat(1, ID, find(obj.(entityType.parentContainer) == out(i)));
-                end
-            else
-                error('remove:InvalidId',...
-                    'ID must be "all", an integer indices of entities to remove');
-            end
-
-            switch entityType
-                case EntityTypes.ANALYSIS
-                    removeParent(obj.Analyses(ID));
-                    obj.Analyses(ID) = [];
-                case EntityTypes.ANNOTATION 
-                    removeParent(obj.Annotations(ID));
-                    obj.Annotations(ID) = [];
-                case EntityTypes.CALIBRATION
-                    removeParent(obj.Calibrations(ID));
-                    obj.Calibrations(ID) = [];
-                case EntityTypes.EPOCH 
-                    aod.util.mustBeEpochID(obj, ID);
-                    removeParent(obj.Epochs(obj.id2index(ID)));
-                    obj.Epochs(obj.id2index(ID)) = [];
-                case EntityTypes.EXPERIMENTDATASET
-                    removeParent(obj.ExperimentDatasets(ID));
-                    obj.ExperimentDatasets(ID) = [];
-                case EntityTypes.SOURCE
-                    removeParent(obj.Sources(ID));
-                    obj.Sources(ID) = [];
-                case EntityTypes.SYSTEM
-                    removeParent(obj.Systems(ID));
-                    obj.Systems(ID) = [];
-            end
-        end
-        
-        function tf = has(obj, entityType, varargin)
-            % Search Experiment's child entities & return if matches exist
-            %
-            % Description:
-            %   Search all entities of a specific type that match the given
-            %   criteria & return if matches exist
-            %
-            % Syntax:
-            %   tf = has(obj, entityType, varargin)
-            %
-            % Inputs:
-            %   entityType          char or aod.common.EntityTypes
-            % Optional inputs:
-            %   One or more cells containing queries
-            %
-            % See also:
-            %   aod.core.Experiment/get
-            % -------------------------------------------------------------
-            out = obj.get(entityType, varargin{:});
-            tf = ~isempty(out);
+            remove@aod.common.mixins.ParentEntity(obj, childType, varargin{:});
         end
 
         function out = get(obj, entityType, varargin)
@@ -525,7 +451,7 @@ classdef Experiment < aod.core.Entity
 
             epoch.setParent(obj);
 
-            obj.Epochs = cat(1, obj.Epochs, epoch);
+            obj.Epochs = [obj.Epochs, epoch];
             obj.sortEpochs();
         end
 

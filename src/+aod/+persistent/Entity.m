@@ -92,7 +92,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
         factory                 % aod.persistent.EntityFactory
     end
     
-    properties (Access = private)
+    properties (Access = {?aod.persistent.Entity, ?aod.app.viewer.ExperimentPresenter})
         linkNames
         dsetNames
         attNames
@@ -493,6 +493,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                 obj
                 noteID      
             end
+
+            obj.verifyReadOnlyMode();
 
             if isempty(obj.notes)
                 warning('removeNote:NoNotes',...
@@ -1138,18 +1140,28 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Syntax:
             %   deleteEntity(obj)
             % -------------------------------------------------------------
-            obj.verifyReadOnlyMode();
-
-            evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
-            notify(obj, 'GroupChanged', evtData);
-
-            delete(obj);
+            obj.dissociateEntity()
         end
     end
 
     methods (Access = private)
         function validateGroupNames(obj, groupName)
             
+        end
+    end
+
+    methods (Access = {?aod.common.mixins.Entity})
+        function dissociateEntity(obj, entity)
+
+            if ~isscalar(entity)
+                arrayfun(@(x) dissociateEntity(obj, x), x);
+                return
+            end
+            
+            evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
+            notify(obj, 'GroupChanged', evtData);
+
+            delete(obj);
         end
     end
 

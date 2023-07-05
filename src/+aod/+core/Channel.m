@@ -20,7 +20,8 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+
+    properties (SetAccess = {?aod.common.mixins.Entity, ?aod.common.mixins.ParentEntity})
         % Container for the Channel's Devices
         Devices         aod.core.Device = aod.core.Device.empty()
     end

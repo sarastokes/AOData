@@ -116,7 +116,7 @@ classdef EntityTypes
             end
         end
 
-        function out = parentContainer(obj)
+        function out = parentContainer(obj, entity)
             % Returns the container name for an entity type
             % 
             % Syntax:
@@ -125,6 +125,12 @@ classdef EntityTypes
             % Example:
             %   For SYSTEM, parentContainer returns 'Systems'
             % -------------------------------------------------------------
+
+            if nargin > 1 && isSubclass(entity, 'aod.persistent.Entity')
+                out = obj.persistentParentContainer();
+                return
+            end
+
             import aod.common.EntityTypes
 
             switch obj

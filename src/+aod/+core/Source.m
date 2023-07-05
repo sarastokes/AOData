@@ -17,7 +17,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetAccess = {?aod.common.mixins.Entity, ?aod.common.mixins.ParentEntity})
         % Container for Source's sub-Sources
         Sources                 aod.core.Source = aod.core.Source.empty()
     end

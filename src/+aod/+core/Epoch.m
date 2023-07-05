@@ -1,4 +1,4 @@
-classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixins.Epoch
+classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixins.ParentEntity
 % A period of data acquision during an experiment
 %
 % Description:
@@ -31,21 +31,21 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (GetAccess = public, SetAccess = private)
         % Epoch ID number in Experiment
         ID (1,1)            double          {mustBeInteger}
         % Time the Epoch (i.e. data acquisition) began
         startTime           datetime        {mustBeScalarOrEmpty} = datetime.empty()   
     end
 
-    properties (SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})                       
+    properties (GetAccess = public, SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})                       
         % The timing of samples during Epoch                             
         Timing (:,1)        duration = seconds([])
     end
 
 
     % Entity link properties
-    properties (SetAccess = protected)
+    properties (GetAccess = public, SetAccess = protected)
         % The Source of data acquired during the Epoch
         Source      {mustBeScalarOrEmpty, mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
         % The System used for data acquisition during the Epoch
@@ -53,7 +53,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
     end
     
     % Containers for child entities
-    properties (SetAccess = private)
+    properties (GetAccess = public, SetAccess = {?aod.common.mixins.ParentEntity, ?aod.core.Entity})
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
         % Container for Epoch's Responses
@@ -80,25 +80,6 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
     end 
 
     methods (Sealed)
-        function tf = has(obj, entityType, varargin)
-            % Search Epoch's child entities and return if matches exist
-            %
-            % Description:
-            %   Search all entities of a specific type that match the given
-            %   criteria (see Epoch.get) and return whether matches exist
-            %
-            % Syntax:
-            %   tf = has(obj, entityType, varargin)
-            %
-            % Inputs:
-            %   entityType          char or aod.common.EntityTypes
-            % Optional inputs:
-            %   One or more cells containing queries
-            % -------------------------------------------------------------
-            out = obj.get(entityType, varargin{:});
-            tf = ~isempty(out);
-        end
-
         function add(obj, entity)
             % Add an entity to the Epoch 
             %
@@ -116,20 +97,21 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
                 arrayfun(@(x) add(obj, x), entity);
                 return
             end
-            add@aod.common.mixins.Epoch(obj, entity);
-            
-            import aod.common.EntityTypes
-            entity.setParent(obj);
 
+            add@aod.common.mixins.ParentEntity(obj, entity);
+            
+            % Register the parent
+            entity.setParent(obj);
+            % Add to the parent's hierarchy
             parentContainer = entity.entityType.parentContainer;
             obj.(parentContainer) = cat(1, obj.(parentContainer), entity);
         end
 
-        function remove(obj, entityType, varargin)
+        function remove(obj, childType, varargin)
             % Remove an entity from the Epoch
             %
             % Syntax:
-            %   remove(obj, entityType, ID)
+            %   remove(obj, childType, ID)
             %
             % Inputs:
             %   ID          integer(s), "all" or query cell
@@ -139,87 +121,14 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             %   Dataset, Response, Registration, Stimulus
             % ------------------------------------------------------------- 
 
+            childType = obj.validateChildType(childType);
+
             if ~isscalar(obj)
                 arrayfun(@(x) remove(x, entityType, varargin{:}), obj);
                 return 
             end
 
-            import aod.common.EntityTypes
-
-            entityType = aod.common.EntityTypes.get(entityType);
-            if ~ismember(entityType, obj.entityType.validChildTypes())
-                error('remove:InvalidEntityType',...
-                    'Entity must be EpochDataset, Registration, Response and Stimulus');
-            end
-
-            % Remove all entities?
-            if istext(varargin{1}) && strcmpi(varargin{1}, 'all')
-                obj.(entityType.parentContainer()) = entityType.empty();
-                return
-            end  
-
-            % Remove specific entities, by ID or by query
-            if isnumeric(varargin{1})
-                mustBeInteger(varargin{1});
-                mustBeInRange(varargin{1}, 0, numel(obj.(entityType.parentContainer())));
-                idx = varargin{1};
-            elseif iscell(varargin{1})
-                % Get the indices of entities matching query
-                [~, idx] = aod.common.EntitySearch.go(obj.get(entityType), varargin{:});
-                if isempty(idx)
-                    warning('remove:NoQueryMatches',...
-                        'The query returned no matches, no entities removed.');
-                    return
-                end
-            else
-                error('remove:InvalidID',...
-                    'ID must be "all", query or integer index of entities to remove');
-            end
-    
-            switch entityType 
-                case EntityTypes.EPOCHDATASET
-                    removeParent(obj.EpochDatasets(idx));
-                    obj.EpochDatasets(idx) = []; 
-                case EntityTypes.REGISTRATION
-                    removeParent(obj.Registrations(idx));
-                    obj.Registrations(idx) = [];
-                case EntityTypes.RESPONSE
-                    removeParent(obj.Responses(idx));
-                    obj.Responses(idx) = [];
-                case EntityTypes.STIMULUS 
-                    removeParent(obj.Stimuli(idx));
-                    obj.Stimuli(idx) = [];
-            end
-        end
-
-        function out = get(obj, entityType, varargin)
-            % Search Epoch's child entities and return matches
-            %
-            % Description:
-            %   Search all entities of a specific type that match the given
-            %   criteria (described below in examples)
-            %
-            % Inputs:
-            %   entityType          char or aod.common.EntityTypes
-            % Optional inputs:
-            %   One or more cells containing queries (TODO: doc)
-            % -------------------------------------------------------------
-            
-            import aod.common.EntityTypes
-
-            entityType = EntityTypes.get(entityType);
-            if ~ismember(entityType, obj.entityType.validChildTypes())
-                error('get:InvalidEntityType',...
-                    'Entity must be EpochDataset, Registration, Response and Stimulus');
-            end
-
-            group = obj.(entityType.parentContainer());
-
-            if nargin > 2 && ~isempty(group)
-                out = aod.common.EntitySearch.go(group, varargin{:});
-            else
-                out = group;
-            end
+            remove@aod.common.mixins.ParentEntity(obj, childType, varargin{:});
         end
     end
 
@@ -297,9 +206,9 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
 
             if isempty(startTime)
                 obj.startTime = datetime.empty();
+            else
+                obj.startTime = startTime;
             end
-
-            obj.startTime = startTime;
         end
 
         function tf = hasTiming(obj)

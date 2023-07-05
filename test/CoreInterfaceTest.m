@@ -28,6 +28,13 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
                 '851_20221117', cd, '20221117',...
                 'Administrator', "Sara Patterson",... 
                 'Laboratory', "1P Primate");
+            warning('off', 'remove:NoEntitiesToRemove');
+        end
+    end
+
+    methods (TestClassTeardown)
+        function methodTeardown(testCase)
+            warning('on', 'remove:NoEntitiesToRemove');
         end
     end
 
@@ -77,7 +84,7 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
             % Check entity checks for remove
             testCase.verifyError(...
                 @()testCase.EXPT.remove('Response', 'all'),...
-                "remove:NonChildEntityType");
+                "remove:InvalidEntityType");
             
             % Confirm error for invalid file
             testCase.verifyError(...
@@ -87,6 +94,15 @@ classdef CoreInterfaceTest < matlab.unittest.TestCase
 
         function Equality(testCase)
             testCase.verifyTrue(isequal(testCase.EXPT, testCase.EXPT));
+        end
+
+        function PropertyAccess(testCase)
+            obj = aod.builtin.devices.Beamsplitter(30, 70);
+            value = [1:5; 5:-1:1]';
+            obj.setTransmission(value);
+            testCase.verifyEqual(obj.transmission, value);
+            testCase.verifyError(...
+                @(x) setTransmission(x, value'), "setProp:InvalidValue") 
         end
 
         function AttributeAccess(testCase)

@@ -352,7 +352,15 @@ classdef Entity < handle
     end
 
     % Overloaded MATLAB functions
-    methods
+    methods (Sealed)
+        function tf = ne(obj, other)
+            tf = ~isequal(obj, other);
+        end
+
+        function tf = eq(obj, other)
+            tf = isequal(obj, other);
+        end
+
         function tf = isequal(obj, other)
             % Test whether two entities have the same UUID. If 2nd input 
             % is not an entity, returns false
@@ -363,6 +371,14 @@ classdef Entity < handle
             arguments
                 obj
                 other
+            end
+
+            if ~isscalar(obj)
+                tf = arrayfun(@(x) isequal(x, other), obj);
+                return
+            elseif ~isscalar(other)
+                tf = arrayfun(@(x) isequal(obj, x), other);
+                return
             end
 
             if aod.util.isEntitySubclass(other)

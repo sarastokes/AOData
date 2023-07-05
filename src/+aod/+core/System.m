@@ -21,7 +21,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
     
-    properties (SetAccess = protected)
+    properties (SetAccess = {?aod.common.mixins.Entity, ?aod.common.mixins.ParentEntity})
         Channels           aod.core.Channel = aod.core.Channel.empty();
     end
     

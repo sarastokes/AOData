@@ -286,6 +286,46 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         end
     end
 
+    % Dataset methods
+    methods (Sealed)
+        function setProp(obj, propName, propValue, errorType)
+            
+            arguments
+                obj
+                propName        char 
+                propValue       
+                errorType               = aod.infra.ErrorTypes.ERROR 
+            end
+
+            errorType = aod.infra.ErrorTypes.init(errorType);
+
+            if ~isscalar(obj)
+                arrayfun(@(x) setProp(x, propName, propValue, errorType), propValue);
+                return 
+            end
+
+            % Check whether the property is in specs
+            propSpec = obj.expectedDatasets.get(propName);
+            if isempty(propSpec)
+                error('setProp:PropertyNotFound',...
+                    'The property "%s" was not found', propName);
+            end
+
+            isValid = propSpec.validate(propValue);
+            if ~isValid 
+                id = 'setProp:InvalidValue';
+                msg = "Value did not pass specification validation";
+                if errorType == aod.infra.ErrorTypes.ERROR 
+                    error(id, msg);
+                elseif errorType == aod.infra.ErrorTypes.WARNING 
+                    warning(id, msg);
+                end
+            end
+
+            obj.(propName) = propValue;
+        end
+    end
+
     % Attribute methods
     methods (Sealed)
         function setAttr(obj, varargin)
@@ -701,7 +741,18 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         end
     end
 
-    methods (Sealed, Access = {?aod.core.Entity, ?aod.persistent.Entity})
+    methods (Sealed, Access = {?aod.core.Entity, ?aod.persistent.Entity, ?aod.common.mixins.ParentEntity})
+        function dissociateEntity(obj)
+            if ~isscalar(obj)
+                arrayfun(@dissociateEntity, obj);
+                return
+            end
+            parentContainerName = obj.entityType.parentContainer(obj);
+            idx = obj.Parent.(parentContainerName) == obj;
+            obj.Parent.(parentContainerName)(idx) = []; 
+            removeParent(obj);
+        end
+
         function setParent(obj, parent)
             % Set the parent property of an entity
             %   
@@ -784,7 +835,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
         end
 
-        function onPropertyChange(obj, ~, ~)
+        function onPropertyChange(obj, src, evt)
             % Callback to update lastModified when property changes
             %
             % Description:
@@ -792,6 +843,16 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %   updated the lastModified property to current date/time
             % -------------------------------------------------------------
             obj.lastModified = datetime("now");
+        end
+    end
+
+% MATLAB builtin functions
+    methods
+        function delete(obj)
+            if ~isempty(obj.Parent) && isvalid(obj.Parent)
+                idx = obj.Parent.(obj.entityType.parentContainer()) == obj;
+                obj.Parent.(obj.entityType.parentContainer())(idx) = [];
+            end
         end
     end
 

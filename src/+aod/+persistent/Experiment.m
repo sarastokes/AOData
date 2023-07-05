@@ -191,6 +191,8 @@ classdef Experiment < aod.persistent.Entity & matlab.mixin.Heterogeneous & dynam
                 entity      {mustBeA(entity, 'aod.core.Entity')}
             end
 
+            obj.verifyReadOnlyMode();
+
             if ~isscalar(entity)
                 arrayfun(@(x) add(obj, x), entity);
                 return

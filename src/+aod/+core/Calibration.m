@@ -92,6 +92,10 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             %   setTarget(obj, target)
             % -------------------------------------------------------------
             import aod.common.EntityTypes
+            if isempty(target)
+                obj.Target = aod.core.Channel.empty();
+                return
+            end
             entityType = EntityTypes.get(target);
             
             switch entityType 
