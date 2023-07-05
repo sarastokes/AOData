@@ -36,6 +36,37 @@ classdef SizeTypes
                         "NDARRAY does not provide enough info to specify size");
             end
         end
+
+        function fcn = getValidator(obj, value)
+            import aod.specification.SizeTypes
+
+            isFixed = isfixed(value);
+
+            if all(isFixed)
+                fcn = @(x) size(x) == horcat(obj.Value.Length);
+                return 
+            end
+        
+            switch obj 
+                case SizeTypes.SCALAR 
+                    out = @(x) isscalar(x);
+                case SizeTypes.ROW 
+                    out = @(x) isrow(x);
+                case SizeTypes.COLUMN 
+                    out = @(x) iscolumn(x);
+                case SizeTypes.MATRIX 
+                    out = @(x) ismatrix(x);
+                case SizeTypes.NDARRAY
+                    out = @(x) ndims(x) == value;
+                case SizeTypes.UNDEFINED 
+                    out = {};
+            end
+            
+            if any(isFixed) && ismember(obj, [SizeTypes.MATRIX, SizeTypes.NDARRAY])
+                out = cat(2, out, @(x) size(x, find(isFixed)) == ... 
+                    horzcat(obj.Value(isFixed)).Length);
+            end
+        end
     end
 
     methods (Static)

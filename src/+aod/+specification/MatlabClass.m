@@ -31,12 +31,19 @@ classdef MatlabClass < aod.specification.Validator
             obj.Value = obj.parse(input);
         end
 
-        function tf = validate(obj, value)
+        function [tf, ME] = validate(obj, value)
             if isempty(obj)
                 tf = true;
                 return
             end
             tf = isSubclass(value, obj.Value);
+            if tf
+                ME = [];
+            else
+                ME = MException("MatlabClass:validate",...
+                    "Expected class: %s. Actual class: %s",...
+                    obj.text(), class(value));
+            end
         end
 
         function out = text(obj)

@@ -71,12 +71,14 @@ classdef Size < aod.specification.Validator
             end 
         end
 
-        function tf = validate(obj, input)
+        function [tf, ME] = validate(obj, input)
             % Validate whether input size is consistent with specs
             %
             % Syntax:
             %   tf = validate(obj, input)
             % -----------------------------------------------------------
+
+            ME = [];
 
             % Check whether size is specified
             if isempty(obj)
@@ -87,9 +89,9 @@ classdef Size < aod.specification.Validator
             % Check the dimensionality
             if numel(obj.Value) ~= ndims(input)
                 tf = false;
-                obj.notifyListeners(sprintf(...
-                    "Expected size %s, Actual size %s",...
-                    obj.text(), jsonencode(size(input))));
+                ME = MException("Size:InvalidDimensionality",...
+                    "Expected: %s. Actual: %s.",...
+                    obj.text(), jsonencode(size(input)));
                 return
             end
 
@@ -97,9 +99,9 @@ classdef Size < aod.specification.Validator
             for i = 1:numel(obj.Value)
                 if ~validate(obj.Value(i), size(input, i))
                     tf = false;
-                    obj.notifyListeners(sprintf(...
-                        "Expected size %s, Actual size %s",...
-                        obj.text(), jsonencode(size(input))));
+                    ME = MException("Size:InvalidSize",...
+                        "Expected: %s. Actual: %s.",...
+                        obj.text(), jsonencode(size(input)));
                     return
                 end
             end
@@ -163,7 +165,11 @@ classdef Size < aod.specification.Validator
             % Return an index of which dimensions are fixed
             %
             % Syntax:
-            %   idx = isfixed(obj, whichData)
+            %   idx = isfixed(obj, whichDim)
+            %
+            % Optional Inputs:
+            %   whichDim        double, integer
+            %       A specific dimension to return (default all dims)
             % -------------------------------------------------------------
 
             idx = arrayfun(@(x) isa(x, 'aod.specification.size.FixedDimension'), obj.Value);
@@ -174,7 +180,6 @@ classdef Size < aod.specification.Validator
     end
 
     methods (Static, Access = private)
-
         function value = parseText(input)
             input = convertStringsToChars(input);
 

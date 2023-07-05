@@ -70,6 +70,19 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
         end
     end
 
+    methods (Test, TestTags="Experiment")
+        function EpochAccess(testCase)
+            epochs = testCase.EXPT.id2epoch(1:2);
+            testCase.verifyClass(epochs, 'aod.persistent.Epoch');
+        end
+
+        function EntityAccess(testCase)
+            testCase.verifyTrue(testCase.EXPT.has("Source"));
+            testCase.verifyTrue(testCase.EXPT.has("Epoch", {"Dataset", "ID", 1}));
+            testCase.verifyFalse(testCase.EXPT.has("Epoch", {"Dataset", "ID", 3}));
+        end
+    end
+
     
     methods (Test, TestTags="Containers")
         function EntityContainerContents(testCase)

@@ -90,7 +90,7 @@ classdef AONodeTypes
                     out = data.T;
                 case {AONodeTypes.ATTRIBUTEMANAGER, AONodeTypes.DATASETMANAGER}
                     out = data.table();
-                case AONodeTypes.NUMERIC
+                case {AONodeTypes.NUMERIC, AONodeTypes.LOGICAL}
                     if ~ismatrix(data)
                         out = sprintf("Data size = %u", size(data,1));
                         for i = 2:ndims(data)
@@ -128,6 +128,7 @@ classdef AONodeTypes
                 AONodeTypes.TABLE,...
                 AONodeTypes.TIMETABLE,...
                 AONodeTypes.NUMERIC,...
+                AONodeTypes.LOGICAL,...
                 AONodeTypes.NOTES,...       % non-scalar string
                 AONodeTypes.TRANSFORM,...
                 AONodeTypes.ATTRIBUTEMANAGER,...
@@ -173,7 +174,7 @@ classdef AONodeTypes
                 case AONodeTypes.ENUM
                     out = 'list.png';
                 case AONodeTypes.LOGICAL
-                    out = 'icon8-binary-file.png';
+                    out = 'binary-file.png';
                 case AONodeTypes.FILES 
                     out = 'filecabinet.png';
                 case AONodeTypes.NOTES
@@ -266,7 +267,7 @@ classdef AONodeTypes
             import aod.app.util.AONodeTypes;
 
             switch lower(nodeName)
-                case {'double', 'uint8', 'int8', 'uint16', 'int16', 'uint32', 'int32', 'uint64', 'int64'}
+                case {'duration', 'double', 'uint8', 'int8', 'uint16', 'int16', 'uint32', 'int32', 'uint64', 'int64'}
                     obj = AONodeTypes.NUMERIC;
                 case {'char', 'string'}
                     obj = AONodeTypes.TEXT;

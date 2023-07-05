@@ -50,13 +50,13 @@ classdef ValidationFunction < aod.specification.Validator
             end
         end
 
-        function [tf, isValid, exceptions] = validate(obj, input)
+        function [tf, ME, isValid] = validate(obj, input)
             % Validate an input according to function(s)
             %
             % Syntax:
-            %   [tf, isValid, exceptions] = validate(obj, input)
+            %   [tf, ME, isValid] = validate(obj, input)
             % -------------------------------------------------------------
-            exceptions = [];
+            ME = [];
 
             if isempty(obj.Value)
                 tf = true;
@@ -67,7 +67,7 @@ classdef ValidationFunction < aod.specification.Validator
             isValid = false(1, numel(obj.Value));
 
             for i = 1:numel(obj.Value)
-                [tf, ME] = err2tf(obj.Value{i}, input);
+                [tf, iME] = err2tf(obj.Value{i}, input);
                 if numel(tf) > 1
                     warning("validate:TooManyOutputs",...
                         "%s returned %u outputs not 1, assuming value is invalid",...
@@ -75,10 +75,11 @@ classdef ValidationFunction < aod.specification.Validator
                     tf = false;
                 end
                 isValid(i) = tf;
-                if ~tf && ~isempty(ME)
-                    exceptions = cat(1, exceptions, ME);    
-                    obj.notifyListeners(sprintf(...
-                        "%s failed.", func2str(obj.Value{i})));
+
+                if ~tf && ~isempty(iME)
+                    ME = cat(2, ME, iME);    
+                    % obj.notifyListeners(sprintf(...
+                    %     "%s failed.", func2str(obj.Value{i})));
                 end
             end
             tf = all(isValid);
@@ -123,6 +124,10 @@ classdef ValidationFunction < aod.specification.Validator
                     output = input.Validation.ValidatorFunctions;
                 end
                 return
+            end
+
+            if istext(input)
+                eval(sprintf("input = %s;", input));
             end
 
             [tf, output] = isfunctionhandle(input);

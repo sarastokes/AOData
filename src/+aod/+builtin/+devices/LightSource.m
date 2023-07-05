@@ -70,11 +70,7 @@ classdef LightSource < aod.core.Device
 
     methods (Access = protected)
         function value = specifyLabel(obj)
-            if ~isempty(obj.Name)
-                value = sprintf("%s_%unm", obj.Name, obj.wavelength);
-            else
-                value = sprintf("%unmLight", obj.getAttr('wavelength'));
-            end
+            value = sprintf("%unmLight", obj.getAttr('Wavelength'));
         end
     end
 
@@ -86,6 +82,9 @@ classdef LightSource < aod.core.Device
                 "Class", "double", "Size", "(1,1)", "Units", "nm",...
                 "Function", @mustBePositive,...
                 "Description", "The peak wavelength of the light source");
+            value.add("SerialNumber",...
+                "Class", "string", "Size", "(1,1)",...
+                "Description", "The light source's serial number");
         end
 
         function value = specifyDatasets(value)

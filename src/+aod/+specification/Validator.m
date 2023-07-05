@@ -4,7 +4,7 @@ classdef (Abstract) Validator < aod.specification.Specification
 % -------------------------------------------------------------------------
 
     methods (Abstract)
-        tf = validate(obj, input)
+        [tf, ME] = validate(obj, input)
     end
 
     methods

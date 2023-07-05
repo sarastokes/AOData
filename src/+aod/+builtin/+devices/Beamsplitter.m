@@ -18,8 +18,8 @@ classdef Beamsplitter < aod.core.Device
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        reflectance
+    properties (SetObservable, SetAccess = protected)
+        reflectance             
         transmission
     end
 
@@ -27,7 +27,7 @@ classdef Beamsplitter < aod.core.Device
         function obj = Beamsplitter(splittingRatio, varargin)
             obj = obj@aod.core.Device([], varargin{:});
 
-            obj.setSplittingRatio(trRatio);
+            obj.setSplittingRatio(splittingRatio);
         end
     end
 
@@ -37,7 +37,8 @@ classdef Beamsplitter < aod.core.Device
         end
 
         function setReflectance(obj, value)
-            obj.reflectance = value;
+            obj.setProp('reflectance', value);
+            % obj.reflectance = value;
         end
 
         function setTransmission(obj, value)

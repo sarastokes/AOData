@@ -23,6 +23,9 @@ function out = combineFunctionHandles(fcns)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    if istext(fcns)
+        eval(sprintf('fcns=%s;', fcns));
+    end
     if isa(fcns, 'function_handle')
         fcns = {fcns};
     end

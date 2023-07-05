@@ -50,6 +50,28 @@ classdef (Abstract) SpecificationManager < handle
         end
     end
 
+    methods 
+        function [tf, ME] = validate(obj, specName, value)
+            % Validate a specification by name
+            %
+            % Syntax:
+            %   tf = validate(obj, specName, value)
+            %
+            % Inputs:
+            %   specName            char
+            %       Name of the specification
+            %   value 
+            %       Value to validate
+            % -------------------------------------------------------------
+            p = obj.get(specName);
+            if isempty(p)
+                error('validate:EntryNotFound',...
+                    'Entry named %s not found', specName);
+            end
+            [tf, ME] = p.validate(value);
+        end
+    end
+
     methods
         function set(obj, entryName, varargin)
             % Set aspects of an existing specification

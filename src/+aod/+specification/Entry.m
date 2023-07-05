@@ -15,7 +15,6 @@ classdef Entry < handle
 %   Description             string
 %   Units                   string
 %   
-%
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -85,11 +84,14 @@ classdef Entry < handle
             obj.checkIntegrity();
         end
 
-        function tf = validate(obj, input)
-            tf1 = obj.Size.validate(input);
-            tf2 = obj.Class.validate(input);
-            tf3 = obj.Functions.validate(input);
+        function [tf, ME] = validate(obj, input)
+            [tf1, ME1] = obj.Size.validate(input);
+            [tf2, ME2] = obj.Class.validate(input);
+            [tf3, ME3] = obj.Functions.validate(input);
+            % Determine whether all tests were passed 
             tf = all([tf1, tf2, tf3]);
+            % Combine exceptions, if present
+            ME = [ME1, ME2, ME3];
         end
 
         function out = text(obj)
@@ -104,6 +106,45 @@ classdef Entry < handle
             else
                 out = out + sprintf("\tUnits:\t\t\t%s", obj.Units) + newline;
             end
+        end
+
+        function out = code(obj)
+            out = sprintf('value.set("%s"', obj.Name);
+            if ~isempty(obj.Class)
+                out = appendParam(out);
+                out = out + sprintf('"Class", %s', obj.Class.jsonencode());
+            end
+            if ~isempty(obj.Size)
+                out = appendParam(out);
+                out = out + sprintf('"Size", %s', obj.Size.jsonencode());
+            end
+            if ~isempty(obj.Default)
+                out = appendParam(out);
+                out = out + sprintf('"Default", %s', obj.Default.jsonencode());
+            end
+            if ~isempty(obj.Functions)
+                out = appendParam(out);
+                out = out + sprintf('"Functions", %s', obj.Functions.text());
+            end
+            if ~isempty(obj.Description)
+                out = appendParam(out);
+                out = out + sprintf('"Description", %s', obj.Description.jsonencode());
+            end
+            if ~isempty(obj.Units)
+                out = appendParam(out);
+                out = out + sprintf('"Units", "%s"', obj.Units);
+            end
+            out = out + sprintf(');') + newline;
+
+            function txt = appendParam(input)
+                txt = input + ",..." + newline + "    ";
+            end
+        end
+
+        function tf = isSpecified(obj)
+            tf = [isempty(obj.Class), isempty(obj.Size),...
+                isempty(obj.Default), isempty(obj.Units),...
+                isempty(obj.Functions), isempty(obj.Description)];
         end
     end
 

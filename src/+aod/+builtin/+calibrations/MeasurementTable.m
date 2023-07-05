@@ -97,15 +97,6 @@ classdef MeasurementTable < aod.core.Calibration
 
     % MATLAB builtin methods
     methods
-        function tf = isempty(obj)
-            % Whether the measurement table is empty
-            % 
-            % Syntax:
-            %   tf = isempty(obj)
-            % -------------------------------------------------------------
-            tf = isempty(obj.Measurements);
-        end
-
         function T = table(obj)
             % Return the measurement table
             % 
