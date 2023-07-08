@@ -16,8 +16,13 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 
     methods
         function out = compare(obj, other)
-            
-            import aod.specification.actors.ViolationType
+            % Compare two specifications
+            %
+            % Syntax:
+            %   out = compare(obj, other)
+            % -------------------------------------------------------------
+
+            import aod.specification.ViolationType
 
             if ~isa(other, class(obj))
                 error('compare:UnlikeSpecificationTypes',...

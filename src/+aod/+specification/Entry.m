@@ -146,6 +146,20 @@ classdef Entry < handle
                 isempty(obj.Default), isempty(obj.Units),...
                 isempty(obj.Functions), isempty(obj.Description)];
         end
+
+        function details = compare(obj, other)
+            arguments
+                obj 
+                other           aod.specification.Entry 
+            end
+
+            details = aod.common.KeyValueMap();
+            details('Description') = obj.Description.compare(other.Description);
+            details('Size') = obj.Size.compare(other.Size);
+            details('Class') = obj.Class.compare(other.Class);
+            details('Functions') = obj.Functions.compare(other.Functions);
+            details('Default') = obj.Default.compare(other.Default);
+        end
     end
 
     % Setters

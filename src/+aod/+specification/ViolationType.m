@@ -10,7 +10,9 @@ classdef ViolationType
 
     methods
         function obj = get(input)
-            if isa(input, 'aod.specification.actors.ViolationType')
+            import aod.specification.ViolationType 
+            
+            if isa(input, 'aod.specification.ViolationType')
                 obj = input;
                 return 
             end

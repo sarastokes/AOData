@@ -60,7 +60,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function SizeComparison(testCase)
-            import aod.specification.actors.ViolationType
+            import aod.specification.ViolationType
 
             refObj1 = aod.specification.Size("(1,1)");
             refObj2 = aod.specification.Size([]);
@@ -191,7 +191,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function MatlabClassComparison(testCase)
-            import aod.specification.actors.ViolationType
+            import aod.specification.ViolationType
 
             refObj1 = aod.specification.MatlabClass("string");
             refObj2 = aod.specification.MatlabClass([]);
@@ -231,7 +231,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function DefaultValueComparison(testCase)
-            import aod.specification.actors.ViolationType
+            import aod.specification.ViolationType
 
             refObj1 = aod.specification.DefaultValue(3);
             refObj2 = aod.specification.DefaultValue([]);
@@ -269,7 +269,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function DescriptionComparison(testCase)
-            import aod.specification.actors.ViolationType
+            import aod.specification.ViolationType
 
             refObj1 = aod.specification.Description("test");
             refObj2 = aod.specification.Description([]);
@@ -326,7 +326,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function FunctionComparison(testCase)
-            import aod.specification.actors.ViolationType
+            import aod.specification.ViolationType
 
             refObj1 = aod.specification.ValidationFunction(...
                 {@(x) x > 100, @mustBeNumeric});
@@ -518,6 +518,26 @@ classdef SpecificationTest < matlab.unittest.TestCase
             f = fieldnames(S.Namespace);
             testCase.verifyNumElements(f, 1);
             testCase.verifyEqual(f{1}, 'aod');
+        end
+
+        function AttributeManagerComparison(testCase)
+            import aod.specification.ViolationType
+
+            obj = aod.builtin.devices.Pellicle([30 70]);
+            model = obj.expectedAttributes.get('Model');
+            manufacturer = obj.expectedAttributes.get('Manufacturer');
+
+            fields = ["Description", "Class", "Functions", "Size", "Default"];
+
+            % Equal in all but description
+            details = model.compare(manufacturer);
+            for i = 1:numel(fields)
+                if fields(i) == "Description"
+                    testCase.verifyEqual(details(fields(i)), ViolationType.CHANGED);
+                else
+                    testCase.verifyEqual(details(fields(i)), ViolationType.SAME);
+                end
+            end
         end
     end
 
