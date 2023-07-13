@@ -22,7 +22,7 @@ classdef BandpassFilter < aod.core.Device
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         % Filter transmission (nm, [])
         transmission        double
     end
@@ -51,7 +51,7 @@ classdef BandpassFilter < aod.core.Device
             % Syntax:
             %   setTransmission(obj, transmission)
             % -------------------------------------------------------------
-            obj.transmission = transmission;
+            obj.setProp('transmission', transmission);
         end
     end
 

@@ -44,11 +44,11 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetObservable, SetAccess = private)
         calibrationDate   datetime  {mustBeScalarOrEmpty}
     end
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         Target       {mustBeScalarOrEmpty}
     end
 
@@ -91,20 +91,11 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setTarget(obj, target)
             % -------------------------------------------------------------
-            import aod.common.EntityTypes
             if isempty(target)
                 obj.Target = aod.core.Channel.empty();
                 return
             end
-            entityType = EntityTypes.get(target);
-            
-            switch entityType 
-                case {EntityTypes.SYSTEM, EntityTypes.CHANNEL, EntityTypes.DEVICE}
-                    obj.Target = target;
-                otherwise
-                    error("Calibration:InvalidTarget",...
-                        "Calibration Target must be a System, Channel or Device");
-            end
+            obj.setProp('Target', target);
         end
 
         function setDate(obj, calDate)
@@ -121,7 +112,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                 return
             end
             calDate = aod.util.validateDate(calDate);
-            obj.calibrationDate = calDate;
+            obj.setProp('calibrationDate', calDate);
         end
     end
 
@@ -136,16 +127,16 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                 "Description", "Person(s) who performed the calibration");
         end
 
-        function mngr = specifyDatasets(mngr)
-            mngr = specifyDatasets@aod.core.Entity(mngr);
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Entity(value);
 
-            mngr.set("Target",...
+            value.set("Target",...
                 "Size", "(1,1)",...
                 "Function", {@mustBeScalarOrEmpty, ...
                     @(x) aod.util.mustBeEntityType(x, ["System", "Channel", "Device"])},...
                 "Description", "Target of the calibration");
-            mngr.set("calibrationDate",...
-                "Size", "(1,1)",...
+            value.set("calibrationDate",...
+                "Class", "datetime", "Size", "(1,1)",...
                 "Description", "Date the calibration was performed");
         end
     end

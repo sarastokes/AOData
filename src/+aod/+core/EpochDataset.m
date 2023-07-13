@@ -23,7 +23,7 @@ classdef EpochDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         Data 
     end
 
@@ -41,7 +41,8 @@ classdef EpochDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Sealed, Access = protected)
         function setData(obj, data)
-            obj.Data = data;
+            % Validate with any specifications defined in subclasses
+            obj.setProp('Data', data);
         end
     end
 end

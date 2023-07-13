@@ -57,7 +57,16 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
             obj.setReflectance([300:700; randn(1, numel(300:700))]');
             testCase.verifySize(obj.reflectance, [numel(300:700), 2]);
+        end
 
+        function Pellicle(testCase)
+            obj = aod.builtin.devices.Pellicle([30, 70]);
+            testCase.verifyEqual(obj.getAttr('SplittingRatio', [30 70]));
+            testCase.verifyEqual(obj.label, "30:70Pellicle");
+
+            value = [300:700, randn(1, numel(300:700))]';
+            obj.setTransmission(value);
+            testCase.verifyEqual(obj.transmission, value);
         end
 
         function DichroicFilter(testCase)
@@ -115,7 +124,9 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj.addMeasurements({"12:20", 71.2, 28});
             testCase.verifyEqual(size(obj.Measurements), [2 3]);
         end
+    end
 
+    methods (Test, TestTags=["Calibration", "ChannelOptimization"])
         function ChannelOptimization(testCase)
             obj = aod.builtin.calibrations.ChannelOptimization(...
                 'Mustang', getDateYMD());
@@ -133,9 +144,18 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj.setIterations(eye(3));
             testCase.verifyEqual(obj.iterations, eye(3));
 
+        end
+
+        function ChannelOptimizationErrors(testCase)
+        
+            obj = aod.builtin.calibrations.ChannelOptimization(...
+                'Mustang', getDateYMD());
             testCase.verifyError(...
                 @()obj.setAttr('Wavelength', 'badinput'),...
                 'MATLAB:InputParser:ArgumentFailedValidation');
+            testCase.verifyError(...
+                @()obj.setIterations("badInput"),...
+                "setProp:InvalidValue");
         end
     end
 
@@ -145,12 +165,22 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
                 'SIFT', '20220822', eye(3));
             testCase.verifyClass(obj.affine2d_to_3d(eye(3)), 'affine3d');
             testCase.verifyClass(obj.affine2d_to_3d(affine2d(eye(3))), 'affine3d');
+
+            obj.setReference(1);
+            testCase.verifyEqual(obj.reference, 1);
         end
 
         function RigidRegistrationErrors(testCase)
             testCase.verifyError(...
                 @() aod.builtin.registrations.RigidRegistration('Reg', getDateYMD(), [2 2; 2 2]),...
                 "RigidRegistration:IncorrectSize");
+
+                
+            obj = aod.builtin.registrations.RigidRegistration(...
+                'SIFT', '20220822', eye(3));
+            testCase.verifyError(...
+                @()obj.apply(zeros(3,3,3)),...
+                "Apply:NotYetImplemented");
         end
 
         function RigidRegistrationApply(testCase)
@@ -172,6 +202,16 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
         function StripRegistration(testCase)
             obj = aod.builtin.registrations.StripRegistration([]);
+
+            fPath = fullfile(test.util.getAODataTestFolder(), 'test_data');
+            obj.loadData(fPath, 3);
+            testCase.verifyTrue(obj.hasFile('RegistrationOutput'));
+
+            obj.loadParameters(fPath, 3);
+            testCase.verifyTrue(obj.hasFile('RegistrationParameters'));
+
+            testCase.verifyError(...
+                @() obj.apply(zeros(3,3,3)), "StripRegistration:AlreadyApplied")
         end
     end
 

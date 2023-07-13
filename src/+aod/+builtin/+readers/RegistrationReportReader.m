@@ -66,7 +66,7 @@ classdef RegistrationReportReader < aod.common.FileReader
             end
 
             if obj.Data.hasStrip || obj.Data.hasFrame
-                obj.Data.corrCoef = T{:, contains(V, "coef")};
+                obj.Data.correlationCoefficient = T{:, contains(V, "coef")};
                 obj.Data.regFlag = T{:, contains(V, "flag")};
                 obj.Data.regDescription = string(T{:, contains(V, "description")});
             end

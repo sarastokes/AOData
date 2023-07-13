@@ -26,7 +26,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         % The date the registration was performed
         registrationDate    datetime    {mustBeScalarOrEmpty} = datetime.empty()
     end
@@ -62,7 +62,7 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             regDate = aod.util.validateDate(regDate);
-            obj.registrationDate = regDate;
+            obj.setProp('registrationDate', regDate);
         end
     end
 

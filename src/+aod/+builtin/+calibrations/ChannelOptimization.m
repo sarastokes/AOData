@@ -32,7 +32,7 @@ classdef ChannelOptimization < aod.core.Calibration
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         % Rows: ModelEye, InVivo. Columns: X, Y, Z, Source
         positions               table = table.empty()
         % Optimization iterations and mean light levels
@@ -56,10 +56,9 @@ classdef ChannelOptimization < aod.core.Calibration
         function setIterations(obj, value)
             if istext(value) && isfile(value)
                 reader = aod.util.findFileReader(value);
-                obj.iterations = reader.read();
-            else
-                obj.iterations = value;
+                value = reader.read();
             end
+            obj.setProp('iterations', value);
         end
 
         function setPositions(obj, modelEye, varargin)

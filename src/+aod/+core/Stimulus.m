@@ -14,7 +14,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         Calibration                 {aod.util.mustBeEntityType(Calibration, 'Calibration')} = aod.core.Calibration.empty()
 
         protocolClass               string = string.empty()

@@ -20,7 +20,7 @@ classdef ImagingLight < aod.core.Stimulus
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetObservable, SetAccess = private)
         % Intensity of the imaging light 
         intensity               double
     end
@@ -38,7 +38,7 @@ classdef ImagingLight < aod.core.Stimulus
             % Syntax:
             %   obj.setIntensity(intensity)
             % -------------------------------------------------------------
-            obj.intensity = intensity;
+            obj.setProp('intensity', intensity);
         end
     end
 
@@ -48,7 +48,7 @@ classdef ImagingLight < aod.core.Stimulus
 
             % Subclasses should change the units if needed
             value.set("intensity",...
-                "Class", "double", "Size", [1 1], "Units", "Percent",...
+                "Class", "double", "Size", "(1,1)", "Units", "Percent",...
                 "Description", "Intensity of the imaging light");
         end
     end

@@ -4,7 +4,7 @@ classdef StripRegistration < aod.core.Registration
 % Description:
 %   Registration performed with Qiang's registration software
 %
-% Parent:
+% Superclasses:
 %   aod.core.Registration
 %
 % Constructor:
@@ -19,11 +19,11 @@ classdef StripRegistration < aod.core.Registration
 % Derived Properties:
 %   corrCoef regFlag stripX stripY frameXY regDescription rotationAngle
 
-% By Sara Patterson, 2023 (AOData)
+% By Sara Patterson, 2023 (sara-aodata-package)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        corrCoef 
+        correlationCoefficient 
         regFlag 
         stripX 
         stripY
@@ -107,6 +107,31 @@ classdef StripRegistration < aod.core.Registration
                 "Class", "string", "Size", "(1,1)",...
                 "Function", @(x) ismember(x, ["frame", "strip"]),...
                 "Description", "Whether frame or strip registration was chosen for subsequent processing.");
+        end
+
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Registration();
+            
+            value.add("correlationCoefficient",...
+                "Class", "double", "Size", "(:,1)",...
+                "Description", "The correlation coefficient between each frame and the reference image");
+            value.add("rotationAngle",...
+                "Description", "The angle in degrees for torsion correction, per frame");
+            value.add("frameXY",...
+                "Class", "double", "Size", "(:,2)", "Units", "pixels",...
+                "Description", "The X and Y offset from frame registration, per frame");
+            value.add("stripX",...
+                "Class", "double", "Units", "pixels",...
+                "Description", "The X offsets for each registered strip, per frame");
+            value.add("stripY", ...
+                "Class", "double", "Units", "pixels", ...
+                "Description", "The Y offsets for each registered strip, per frame");
+            value.add("regDescription",...
+                "Class", "string", "Size", "(:,1)",...
+                "Description", "Whether registration succeeded or failed, per frame");
+            value.add("regFlag",...
+                "Class", "logical", "Size", "(:,1)",...
+                "Description", "Whether registration failed");
         end
     end
 end 

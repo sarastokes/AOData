@@ -106,4 +106,13 @@ classdef MeasurementTable < aod.core.Calibration
             T = obj.Measurements;
         end
     end
+
+    methods (Static)
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Calibration(value)
+
+            value.add("Measurements",...
+                "Class", "table");
+        end
+    end
 end 

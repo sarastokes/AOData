@@ -43,7 +43,7 @@ classdef Rois < aod.core.Annotation
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         % The image used to annotate the ROIs
         Image
         % The FileReader used to import ROIs
@@ -137,7 +137,7 @@ classdef Rois < aod.core.Annotation
                     'Input must be a subclass of aod.common.FileReader');
             end
             
-            obj.Reader = reader;
+            obj.setProp('Reader', reader);
         end
 
         function setImage(obj, img)
@@ -147,10 +147,12 @@ classdef Rois < aod.core.Annotation
             %   setImage(obj, img)
             % -------------------------------------------------------------
             if istext(img)
-                obj.Image = imread(img);
+                reader = aod.util.findFileReader(img);
+                data = reader.readFile();
+                obj.setProp('Image', data);
                 obj.setFile('Image', img);
             else
-                obj.Image = img;
+                obj.setProp('Image', img);
             end
         end
     end
@@ -181,6 +183,16 @@ classdef Rois < aod.core.Annotation
                 "Size", "(:,:)", ...
                 "Function", @mustBeNumeric, ...
                 "Description", "The image used for the annotation");
+            d.set("Reader",...
+                "Size", "(1,1)", "Class", "aod.util.FileReader",...
+                "Description", "File reader used to load ROIs");
+            d.set("roiIDs",...
+                "Size", "(:,1)",...
+                "Description", "A list of each ROI's IDs");
+            d.set("numRois",...
+                "Size", "(1,1)", "double",...
+                "Function", @mustBeInteger,...
+                "Description", "The number of unique ROI annotations");
         end
     end
 end

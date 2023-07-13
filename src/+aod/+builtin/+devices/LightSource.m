@@ -27,7 +27,7 @@ classdef LightSource < aod.core.Device
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         % The spectra of the light source (nm, [])
         spectra         double 
     end 
@@ -64,7 +64,7 @@ classdef LightSource < aod.core.Device
             %   spectra         double
             %       Spectra for light source (first column, nm)
             % -------------------------------------------------------------
-            obj.spectra = spectra;
+            obj.setProp('spectra', spectra);
         end
     end
 

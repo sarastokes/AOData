@@ -37,8 +37,16 @@ classdef Beamsplitter < aod.core.Device
         end
 
         function setReflectance(obj, value)
+            % Set the beamsplitter reflectance
+            %
+            % Syntax:
+            %   setReflectance(obj, value)
+            %
+            % Inputs:
+            %   value           data or filename
+            %       Column order: wavelength, reflectance
+            % -------------------------------------------------------------
             obj.setProp('reflectance', value);
-            % obj.reflectance = value;
         end
 
         function setTransmission(obj, value)
@@ -51,7 +59,7 @@ classdef Beamsplitter < aod.core.Device
             %   value           data or filename
             %       Column order: wavelength, transmission
             % -------------------------------------------------------------
-            obj.transmission = value;
+            obj.setProp('transmission', value);
         end
 
         function setProperties(obj, value)

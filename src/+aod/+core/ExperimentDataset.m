@@ -23,7 +23,7 @@ classdef ExperimentDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = protected)
         Data 
     end
 
@@ -43,8 +43,8 @@ classdef ExperimentDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Sealed, Access = protected)
         function setData(obj, data)
-            % Set the "Data" property
-            obj.Data = data;
+            % Set after validation with any specifications set by subclasses
+            obj.setProp('Data', data);
         end
     end
 end

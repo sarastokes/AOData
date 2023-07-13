@@ -37,7 +37,8 @@ classdef (Abstract) StimulusProtocol < aod.common.Protocol
 %   - Contrast can be set by passing 'contrast', value to constructor or 
 %     calculated from absolute intensity by passing 'intensity', value
 % -------------------------------------------------------------------------
-    properties
+    
+    properties (SetObservable)
         preTime  
         stimTime   
         tailTime 

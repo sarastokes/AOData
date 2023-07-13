@@ -24,7 +24,7 @@ classdef DichroicFilter < aod.core.Device
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetObservable, SetAccess = private)
         transmission         
     end
     
@@ -44,7 +44,6 @@ classdef DichroicFilter < aod.core.Device
             % Syntax:
             %   setWavelength(obj, wavelength)
             % -------------------------------------------------------------
-            assert(isnumeric(wavelength),  'Wavelength must be a number')
             obj.setAttr('Wavelength', wavelength);
         end
         
@@ -59,8 +58,6 @@ classdef DichroicFilter < aod.core.Device
             %       Must be either "low" or "high"
             % -------------------------------------------------------------
             passType = lower(passType);
-            assert(ismember(passType, {'low', 'high'}),...
-                'PassType must be either ''low'' or ''high''');
             obj.setAttr('Pass', passType);
         end
 
@@ -70,7 +67,7 @@ classdef DichroicFilter < aod.core.Device
             % Syntax:
             %   setSpectrum(obj, spectrum)
             % -------------------------------------------------------------
-            obj.transmission = spectra;
+            obj.setProp('transmission', spectra);
         end
     end
 
@@ -88,7 +85,8 @@ classdef DichroicFilter < aod.core.Device
 
             value.set("transmission",...
                 "Class", "double", "Size", "(:,2)",...
-                "Units", ["nm", "%"],...
+                "Function", @(x) isdouble01(x(:,2)),...
+                "Units", ["nm", "percent"],...
                 "Description", "Transmission spectra of filter");
         end
 

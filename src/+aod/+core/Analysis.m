@@ -70,5 +70,13 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
                 "Default", "MATLAB",...
                 "Description", "Software used for the registration");
         end
+
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Entity(value);
+
+            value.add("analysisDate",...
+                "Class", "datetime", "Size", "(1,1)",...
+                "Description", "The date the analysis was performed");
+        end
     end
 end 
