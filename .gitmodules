@@ -21,3 +21,6 @@
 [submodule "lib/advanced-logger"]
 	path = lib/advanced-logger
 	url = https://github.com/mathworks/advanced-logger.git
+[submodule "lib/jsonlab"]
+	path = lib/jsonlab
+	url = https://github.com/fangq/jsonlab.git
