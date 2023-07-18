@@ -243,7 +243,7 @@ classdef AONodeTypes
             end
 
             % Is the node type in the dataset itself
-            if istext(data) && strcmp(data, 'FileReader')
+            if (isStringScalar(data) || ischar(data)) && strcmp(data, 'FileReader')
                 obj = AONodeTypes.FILEREADER;
                 return
             end

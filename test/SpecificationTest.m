@@ -60,18 +60,18 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function SizeComparison(testCase)
-            import aod.specification.ViolationType
+            import aod.specification.MatchType
 
             refObj1 = aod.specification.Size("(1,1)");
             refObj2 = aod.specification.Size([]);
 
-            testCase.verifyEqual(ViolationType.CHANGED,...
+            testCase.verifyEqual(MatchType.CHANGED,...
                 refObj1.compare(aod.specification.Size("(1,:)")));
-            testCase.verifyEqual(ViolationType.SAME,...
+            testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.UNEXPECTED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(ViolationType.MISSING,...
+            testCase.verifyEqual(MatchType.MISSING,...
                 refObj2.compare(refObj1));
             
             testCase.verifyError(...
@@ -191,18 +191,18 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function MatlabClassComparison(testCase)
-            import aod.specification.ViolationType
+            import aod.specification.MatchType
 
             refObj1 = aod.specification.MatlabClass("string");
             refObj2 = aod.specification.MatlabClass([]);
 
-            testCase.verifyEqual(ViolationType.CHANGED,...
+            testCase.verifyEqual(MatchType.CHANGED,...
                 refObj1.compare(aod.specification.MatlabClass("double")));
-            testCase.verifyEqual(ViolationType.SAME,...
+            testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.UNEXPECTED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(ViolationType.MISSING,...
+            testCase.verifyEqual(MatchType.MISSING,...
                 refObj2.compare(refObj1));
         end
 
@@ -231,19 +231,19 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function DefaultValueComparison(testCase)
-            import aod.specification.ViolationType
+            import aod.specification.MatchType
 
             refObj1 = aod.specification.DefaultValue(3);
             refObj2 = aod.specification.DefaultValue([]);
 
             
-            testCase.verifyEqual(ViolationType.CHANGED,...
+            testCase.verifyEqual(MatchType.CHANGED,...
                 refObj1.compare(aod.specification.DefaultValue("hey")));
-            testCase.verifyEqual(ViolationType.SAME,...
+            testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.UNEXPECTED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(ViolationType.MISSING,...
+            testCase.verifyEqual(MatchType.MISSING,...
                 refObj2.compare(refObj1));
         end
     end
@@ -269,18 +269,18 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function DescriptionComparison(testCase)
-            import aod.specification.ViolationType
+            import aod.specification.MatchType
 
             refObj1 = aod.specification.Description("test");
             refObj2 = aod.specification.Description([]);
 
-            testCase.verifyEqual(ViolationType.CHANGED,...
+            testCase.verifyEqual(MatchType.CHANGED,...
                 refObj1.compare(aod.specification.Description("text")));
-            testCase.verifyEqual(ViolationType.SAME,...
+            testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.UNEXPECTED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(ViolationType.MISSING,...
+            testCase.verifyEqual(MatchType.MISSING,...
                 refObj2.compare(refObj1));
         end
     end
@@ -326,7 +326,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function FunctionComparison(testCase)
-            import aod.specification.ViolationType
+            import aod.specification.MatchType
 
             refObj1 = aod.specification.ValidationFunction(...
                 {@(x) x > 100, @mustBeNumeric});
@@ -334,15 +334,15 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 {@(y) y > 100, @mustBeNumeric});
             refObj3 = aod.specification.ValidationFunction([]);
 
-            testCase.verifyEqual(ViolationType.SAME,...
+            testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(ViolationType.SAME,...
+            testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(ViolationType.MISSING,...
+            testCase.verifyEqual(MatchType.MISSING,...
                 refObj3.compare(refObj1));
-            testCase.verifyEqual(ViolationType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.UNEXPECTED,...
                 refObj1.compare(refObj3));
-            testCase.verifyEqual(ViolationType.CHANGED,...
+            testCase.verifyEqual(MatchType.CHANGED,...
                 refObj1.compare(aod.specification.ValidationFunction(@(x) x > 100)));
         end
 
@@ -521,7 +521,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function AttributeManagerComparison(testCase)
-            import aod.specification.ViolationType
+            import aod.specification.MatchType
 
             obj = aod.builtin.devices.Pellicle([30 70]);
             model = obj.expectedAttributes.get('Model');
@@ -533,9 +533,9 @@ classdef SpecificationTest < matlab.unittest.TestCase
             details = model.compare(manufacturer);
             for i = 1:numel(fields)
                 if fields(i) == "Description"
-                    testCase.verifyEqual(details(fields(i)), ViolationType.CHANGED);
+                    testCase.verifyEqual(details(fields(i)), MatchType.CHANGED);
                 else
-                    testCase.verifyEqual(details(fields(i)), ViolationType.SAME);
+                    testCase.verifyEqual(details(fields(i)), MatchType.SAME);
                 end
             end
         end

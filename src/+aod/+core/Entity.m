@@ -284,6 +284,38 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 obj.notes(ID) = [];
             end
         end
+
+        function tf = isExpected(obj, propName, specType)
+            % Determine if attribute/dataset is in entity's specification
+            %
+            % Syntax:
+            %   tf = isExpected(obj, propName)
+            %   tf = isExpected(obj, propName, specType)
+            %
+            % Inputs:
+            %   propName        char
+            %   specType        char    (default = "both")
+            %       Either "dataset", "attribute" or "both"
+            % 
+            % Outputs:
+            %   tf              logical
+            %       Whether the dataset/attribute is expected
+            % --------------------------------------------------------------
+
+            if nargin < 3 || strcmpi(specType, "both")
+                tf = any([obj.expectedDatasets.has(propName), obj.expectedAttributes.has(propName)]);
+                return
+            end
+
+            if ismember(lower(specType), ["attr", "attribute", "attributes"])
+                tf = obj.expectedAttributes.has(propName);
+            elseif ismember(lower(specType), ["dset", "dataset", "datasets", "prop", "property"])
+                tf = obj.expectedDatasets.has(propName);
+            else
+                error('isExpected:InvalidSpecType', ...
+                    'Invalid specification type "%s", should be dataset or attribute', specType);
+            end
+        end
     end
 
     % Dataset methods
@@ -856,6 +888,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         end
     end
 
+% Static specification methods
     methods (Static)
         function value = specifyAttributes()
             % Initializes AttributeManager, subclasses can extend

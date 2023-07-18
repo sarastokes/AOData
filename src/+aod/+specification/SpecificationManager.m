@@ -11,11 +11,11 @@ classdef (Abstract) SpecificationManager < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        className       (1,1)   string 
+        className       (1,1)   string
         Entries
     end
 
-    properties (Hidden, SetAccess = private) 
+    properties (Hidden, SetAccess = private)
         lastModified            datetime = datetime.empty()
         %version                 string  {mustBeScalarOrEmpty} = string.empty()
     end
@@ -34,7 +34,7 @@ classdef (Abstract) SpecificationManager < handle
         specType            string
     end
 
-    methods 
+    methods
         function obj = SpecificationManager(className)
             if nargin > 0 && ~aod.util.isempty(className)
                 obj.className = convertCharsToStrings(className);
@@ -50,7 +50,7 @@ classdef (Abstract) SpecificationManager < handle
         end
     end
 
-    methods 
+    methods
         function [tf, ME] = validate(obj, specName, value)
             % Validate a specification by name
             %
@@ -60,7 +60,7 @@ classdef (Abstract) SpecificationManager < handle
             % Inputs:
             %   specName            char
             %       Name of the specification
-            %   value 
+            %   value
             %       Value to validate
             % -------------------------------------------------------------
             p = obj.get(specName);
@@ -86,7 +86,7 @@ classdef (Abstract) SpecificationManager < handle
                     '%sManager for %s does not have dataset %s', ...
                     obj.specType, obj.className, entryName);
             end
-            
+
             entry.assign(varargin{:});
         end
 
@@ -122,15 +122,15 @@ classdef (Abstract) SpecificationManager < handle
             %       The name of the dataset or attribute (case-sensitive)
             % Optional inputs:
             %   errorType           char or aod.infra.ErrorTypes
-            %       How to handle missing property: 'none', 'error', or 
+            %       How to handle missing property: 'none', 'error', or
             %       'warning'. Default is 'none' and the output will be []
             %
             % Outputs:
             %   entry               aod.specification.Entry
             % -------------------------------------------------------------
-            arguments 
-                obj 
-                entryName       char 
+            arguments
+                obj
+                entryName       char
                 errorType       = aod.infra.ErrorTypes.NONE
             end
 
@@ -139,18 +139,18 @@ classdef (Abstract) SpecificationManager < handle
             if tf
                 entry = obj.Entries(idx);
             else
-                switch errorType 
-                    case aod.infra.ErrorTypes.NONE 
+                switch errorType
+                    case aod.infra.ErrorTypes.NONE
                         entry = [];
                     case aod.infra.ErrorTypes.ERROR
-                        error('get:EntryNotFound',... 
+                        error('get:EntryNotFound',...
                             'Entry %s not found in %sManager',...
                             entryName, obj.specType);
-                    case aod.infra.ErrorTypes.WARNING 
+                    case aod.infra.ErrorTypes.WARNING
                         warning('get:EntryNotFound',...
                             'Entry %s not found in %sManager',...
                             entryName, obj.specType);
-                    case aod.infra.ErrorTypes.MISSING 
+                    case aod.infra.ErrorTypes.MISSING
                         error("get:InvalidInput",...
                             "Missing error type is not supported");
                 end
@@ -169,14 +169,14 @@ classdef (Abstract) SpecificationManager < handle
             % See also:
             %   aod.specification.Entry
             % -------------------------------------------------------------
-            arguments 
+            arguments
                 obj
-                entry         aod.specification.Entry 
+                entry         aod.specification.Entry
             end
 
             if obj.Count > 0 && ismember(lower(entry.Name), lower(obj.list()))
                 error('add:EntryExists',...
-                    'A %s named %s is already present',... 
+                    'A %s named %s is already present',...
                     obj.specType, entry.Name);
             end
             obj.Entries = cat(1, obj.Entries, entry);
@@ -195,7 +195,7 @@ classdef (Abstract) SpecificationManager < handle
                 return
             end
             obj.Entries(idx) = [];
-            % obj.listeners(idx) = [];
+            % obj.listeners(idx) = []
         end
 
         function names = list(obj)
@@ -206,9 +206,9 @@ classdef (Abstract) SpecificationManager < handle
             % -------------------------------------------------------------
             if obj.Count == 0
                 names = [];
-                return 
+                return
             end
-        
+
             names = arrayfun(@(x) x.Name, obj.Entries);
         end
 
@@ -220,18 +220,30 @@ classdef (Abstract) SpecificationManager < handle
             % -------------------------------------------------------------
             if isempty(obj)
                 out = sprintf("Empty %sManager", obj.specType);
-                return 
+                return
             end
 
             out = "";
-            for i = 1:obj.Count 
+            for i = 1:obj.Count
                 out = out + obj.Entries(i).text();
             end
         end
     end
 
+    % Non-scalar property access
+    methods
+        function out = getClassName(obj)
+            if ~isscalar(obj)
+                out = arrayfun(@(x) x.className, obj);
+                return
+            end
+            out = obj.className;
+        end
+
+    end
+
     % methods (Access = private)
-    %     function initializeLogger(obj)    
+    %     function initializeLogger(obj)
     %         obj.logger = aod.specification.logger.SpecificationLogger(...
     %             obj.className);
     %         obj.logger.clearLog();
@@ -254,7 +266,7 @@ classdef (Abstract) SpecificationManager < handle
         function tf = isequal(obj, other)
             if ~isa(other, class(obj))
                 tf = false;
-                return 
+                return
             end
             if obj.className ~= other.className
                 tf = false;
@@ -293,7 +305,7 @@ classdef (Abstract) SpecificationManager < handle
             % -------------------------------------------------------------
             if isempty(obj)
                 T = table.empty();
-                return 
+                return
             end
 
             names = arrayfun(@(x) x.Name, obj.Entries);
@@ -307,4 +319,4 @@ classdef (Abstract) SpecificationManager < handle
                 'VariableNames', {'Name', 'Description', 'Class', 'Size', 'Functions', 'Default'});
         end
     end
-end 
+end

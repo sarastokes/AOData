@@ -1,5 +1,5 @@
 function [DMs, AMs, S] = collectPackageSpecifications(pkgName, varargin)
-% Collect all the specifications for a package 
+% Collect all the specifications for a package
 %
 % Syntax:
 %   [DM, S] = aod.specification.collectPackageSpecifications(pkgName, writeToFile)
@@ -8,7 +8,7 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, varargin)
 %   pkgName             string
 %       Package name
 %   writeToFile         logical
-%       Whether to write the specification 
+%       Whether to write the specification
 %
 % Outputs:
 %   DMs                 aod.specification.DatasetManager
@@ -21,6 +21,8 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, varargin)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    pkgName = convertCharsToStrings(pkgName);
+
     ip = aod.util.InputParser();
     addParameter(ip, 'Write', false, @islogical);
     addParameter(ip, 'Subpackages', false, @islogical);
@@ -31,16 +33,39 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, varargin)
         error('collectPackageSpecification:PackageDoesNotExist',...
             "Package ""%s"" not found.", pkgName);
     end
-    [pkgs, fullNames] = collectPackages(mp);
 
-    if ip.Results.Subpackages
-        classes = collectPackageSpecifications(pkgName);
-    else
-        classes = string({mp.ClassList.Name})';
-    end
-    
     logger = aod.specification.logger.SpecificationLogger(...
         sprintf("Package_%s", pkgName));
+
+    if ip.Results.Subpackages
+        [classes, pkgs] = aod.specification.util.collectAllPackageClasses(pkgName);
+        S = struct('DateCreated', jsonencode(datetime('now')));
+        DMs = []; AMs = [];
+        for i = 1:numel(pkgs)
+            [iS, iAMs, iDMs] = getPkgStruct(pkgs(i), logger);
+            AMs = cat(1, AMs, iAMs);
+            DMs = cat(1, DMs, iDMs);
+            S = mergeNestedStructs(S, iS);
+        end
+    else
+        classes = string({mp.ClassList.Name})';
+        [S, AMs, DMs] = getPkgStruct(pkgName, logger);
+        S.DateCreated = jsonencode(datetime('now'));
+    end
+
+
+    if ip.Results.Write
+        pkgFileName = strrep(pkgName, ".", "_") + ".json";
+        if ~exist(pkgFileName, 'file')
+            savejson('', S, pkgFileName);
+        end
+    end
+end
+
+function [S, AMs, DMs] = getPkgStruct(pkgName, logger)
+    mp = meta.package.fromName(pkgName);
+    classes = string({mp.ClassList.Name})';
+
     S = struct();
     S.Classes = struct();
     DMs = []; AMs = [];
@@ -48,18 +73,20 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, varargin)
         try
             DM = aod.specification.util.getDatasetSpecification(...
                 mp.ClassList(i));
-        catch ME 
+        catch ME
             if strcmp(ME.identifier, 'getDatasetSpecification:InvalidClass')
                 continue
             else
+                DM = [];
                 logger.write(classes(i), "Dataset", "ERROR", ME);
             end
         end
 
-        try 
+        try
             AM = aod.specification.util.getAttributeSpecification(...
                 mp.ClassList(i));
-        catch ME 
+        catch ME
+            AM = [];
             logger.write(classes(i), "Attribute", "ERROR", ME);
         end
 
@@ -73,26 +100,24 @@ function [DMs, AMs, S] = collectPackageSpecifications(pkgName, varargin)
         soloName = extractAfter(classes(i), [mp.Name, '.']);
 
         S.Classes.(soloName) = struct();
-        S.Classes.(soloName).Datasets = DM.struct();
+        if ~isempty(DM)
+            S.Classes.(soloName).Datasets = DM.struct();
+        end
+        if ~isempty(AM)
+            S.Classes.(soloName).Attributes = AM.struct();
+        end
         S.Classes.(soloName).Name = soloName;
     end
 
+    [pkgs, fullNames] = collectPackages(meta.package.fromName(pkgName));
+
     for i = 1:numel(pkgs)
         tmpStruct = struct();
-        tmpStruct.Namespace = struct();
-        tmpStruct.Namespace.(pkgs(i)) = S;
-        tmpStruct.Namespace.(pkgs(i)).Name = pkgs(i);
-        tmpStruct.Namespace.(pkgs(i)).Namespace = fullNames(i);
+        tmpStruct.Namespaces = struct();
+        tmpStruct.Namespaces.(pkgs(i)) = S;
+        tmpStruct.Namespaces.(pkgs(i)).Name = pkgs(i);
+        tmpStruct.Namespaces.(pkgs(i)).Package = fullNames(i);
         S = tmpStruct;
-    end
-
-    S.DateCreated = jsonencode(datetime('now'));
-
-    if ip.Results.Write
-        pkgFileName = strrep(pkgName, ".", "_") + ".json";
-        if ~exist(pkgFileName, 'file')
-            savejson('', S, pkgFileName);
-        end
     end
 end
 

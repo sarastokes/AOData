@@ -1,4 +1,4 @@
-function [classNames, subPkgNames] = collectAllPackageClasses(pkgName)
+function [classNames, pkgNames] = collectAllPackageClasses(pkgName, entityFlag)
 % Collect all subpackage classnames
 %
 % Syntax:
@@ -11,16 +11,35 @@ function [classNames, subPkgNames] = collectAllPackageClasses(pkgName)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    classNames = string.empty(); subPkgNames = string.empty();
+    arguments 
+        pkgName             string
+        entityFlag          logical = true
+    end
+
+    classNames = string.empty(); pkgNames = string.empty();
     mp = meta.package.fromName(pkgName);
-    [classNames, subPkgNames] = processPackage(mp, classNames, subPkgNames);
+    [classNames, pkgNames] = processPackage(mp, classNames, pkgNames);
+
+    % Extract only the entities
+
+    if entityFlag
+        idx = arrayfun(@(x) isSubclass(x, 'aod.core.Entity'), classNames);
+        classNames = classNames(idx);
+
+        idx = arrayfun(@(x) any(startsWith(classNames, x)), pkgNames);
+        pkgNames = pkgNames(idx);
+    end
+
+    if ~ismember(pkgName, pkgNames)
+        pkgNames = [pkgName; pkgNames];
+    end
 end
 
 function [classNames, subPkgNames] = processPackage(mp, classNames, subPkgNames)
     classNames = cat(1, classNames, string({mp.ClassList.Name})');
     subPkgNames = [subPkgNames; string({mp.PackageList.Name})'];
     for i = 1:numel(mp.PackageList)
-        classNames = processPackage(...
+        [classNames, subPkgNames] = processPackage(...
             mp.PackageList(i), classNames, subPkgNames);
     end
 end

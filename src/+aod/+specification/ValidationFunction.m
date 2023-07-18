@@ -93,36 +93,8 @@ classdef ValidationFunction < aod.specification.Validator
 
             out = func2str(aod.specification.util.combineFunctionHandles(...
                 obj.Value));
+            out = convertCharsToStrings(out);
         end
-
-        % function out = text(obj)
-        %     if isempty(obj)
-        %         out = "[]";
-        %         return
-        %     end
-            
-        %     indiv = cellfun(@(x) string(func2str(x)), obj.Value);
-        %     if numel(indiv) > 1
-        %         out = "{";
-        %         for i = 1:numel(indiv)
-        %             out = out + formatFcn(indiv(i));
-        %             if i < numel(indiv)
-        %                 out = out + ", ";
-        %             end
-        %         end
-        %         out = out + "}";
-        %     else
-        %         out = "{" + formatFcn(indiv) + "}";
-        %     end
-
-        %     function y = formatFcn(x)
-        %         if ~startsWith(x, "@")
-        %             y = "@" + x;
-        %         else
-        %             y = x;
-        %         end
-        %     end
-        % end
     end
 
     methods (Static, Access = private)

@@ -158,6 +158,32 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
                 @() ReturnTypes.init('Bad'), "init:InvalidInput");
         end
     end
+
+    methods (Test, TestTags="MatchType")
+        function MatchTypeInit(testCase)
+            import aod.specification.MatchType
+
+            testCase.verifyEqual(MatchType.get('same'),...
+                MatchType.SAME);
+            testCase.verifyEqual(MatchType.get('missing'),...
+                MatchType.MISSING);
+            testCase.verifyEqual(MatchType.get('changed'),...
+                MatchType.CHANGED);
+            testCase.verifyEqual(MatchType.get('unexpected'),...
+                MatchType.UNEXPECTED);
+            testCase.verifyEqual(MatchType.get('unknown'),...
+                MatchType.UNKNOWN);
+            testCase.verifyEqual(MatchType.get(MatchType.SAME),...
+                MatchType.SAME);
+        end
+
+        function MatchTypeError(testCase)
+            testCase.verifyError(...
+                @()MatchType.get('badinput'), "get:InvalidInput");
+            testCase.verifyError(...
+                @()MatchType.get(123), 'get.InvalidInput');
+        end
+    end
     
     methods (Test, TestTags=["GroupNameType"])
         function GroupNameTypeInit(testCase)

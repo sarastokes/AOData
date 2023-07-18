@@ -1,4 +1,14 @@
 classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
+% An abstract class for all specification fields
+%
+% Superclasses:
+%   handle, matlab.mixin.Heterogeneous
+%
+% Constructor:
+%   N/A
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     events 
         ValidationFailed
@@ -22,7 +32,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
             %   out = compare(obj, other)
             % -------------------------------------------------------------
 
-            import aod.specification.ViolationType
+            import aod.specification.MatchType
 
             if ~isa(other, class(obj))
                 error('compare:UnlikeSpecificationTypes',...
@@ -30,14 +40,14 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
             end
 
             if isequal(obj, other)
-                out = ViolationType.SAME;
+                out = MatchType.SAME;
             else
                 if isempty(obj)
-                    out = ViolationType.MISSING;
+                    out = MatchType.MISSING;
                 elseif isempty(other)
-                    out = ViolationType.UNEXPECTED;
+                    out = MatchType.UNEXPECTED;
                 else
-                    out = ViolationType.CHANGED;
+                    out = MatchType.CHANGED;
                 end
             end
         end
