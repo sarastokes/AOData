@@ -15,6 +15,10 @@ classdef HdfTest < matlab.unittest.TestCase
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+    
+%#ok<*MANU>
+%#ok<*NASGU>
+
     properties
         dataFolder
         FILE 
@@ -33,8 +37,7 @@ classdef HdfTest < matlab.unittest.TestCase
         function PropertyHandling(testCase)
             obj = test.TestDevice();
 
-            [dsetProps, attProps, abandonedProps] = ...
-                aod.h5.getPersistedProperties(obj);
+            [dsetProps, ~, abandonedProps] = aod.h5.getPersistedProperties(obj);
 
             % Ensure empty properties are not flagged for persistence
             testCase.verifyTrue(ismember('EmptyProp', abandonedProps));

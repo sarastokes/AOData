@@ -33,8 +33,9 @@ function reader = readFileReader(hdfName, pathName, dsetName)
     if ~exist(readerName, 'class')
         warning('readFileReader:OffPath',...
             'No class named %s found on MATLAB path, reading as a keyvaluemap', readerName);
-        S = map2attributes(allAttrs);
-        S('Reader') = readerName;
+        reader = map2attributes(allAttrs);
+        reader('Reader') = readerName;
+        return
     end
 
     constructor = str2func(readerName);

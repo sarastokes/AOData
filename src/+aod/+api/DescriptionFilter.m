@@ -46,13 +46,6 @@ classdef DescriptionFilter < aod.api.DatasetFilter
         function txt = code(obj, varargin)
             txt = code@aod.api.DatasetFilter(obj);
             txt = strrep(txt, 'DatasetFilter', 'DescriptionFilter');
-            return
-
-            txt = sprintf("aod.api.DescriptionFilter(%s, %s)",... 
-                input, value2string(obj.Name));
-            if ~isempty(output)
-                txt = sprintf("%s = %s;", output, txt);
-            end
         end
 
     end

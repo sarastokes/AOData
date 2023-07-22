@@ -2,7 +2,7 @@ function mustBeEntityType(obj, entityType)
 % Validate entity is of a specific type
 %
 % Description:
-%   Argument validation function to determine whether input is a 
+%   Argument validation function to determine whether input is a
 %   specific entity type (either core or persistent interface)
 %
 % Syntax:
@@ -20,23 +20,10 @@ function mustBeEntityType(obj, entityType)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    entityType = convertCharsToStrings(entityType);
+    tf = aod.util.isEntityType(obj, entityType);
 
-    if ~isscalar(obj)
-        for i = 1:numel(obj)
-            aod.util.mustBeEntityType(obj(i), entityType);
-        end
+    if ~tf
+        eidType = 'mustBeEntityType:InvalidEntityType';
+        msgType = sprintf('Entity must be %s', array2commalist(entityType));
+        throwAsCaller(MException(eidType, msgType));
     end
-
-
-    for i = 1:numel(entityType)
-        iType = aod.common.EntityTypes.get(entityType(i));
-        if isSubclass(obj, iType.getCoreClassName()) || ...
-            isSubclass(obj, iType.getPersistentClassName())
-            return
-        end
-    end
-
-    eidType = 'mustBeEntityType:InvalidEntityType';
-    msgType = sprintf('Entity must be %s', array2commalist(entityType));
-    throwAsCaller(MException(eidType, msgType));

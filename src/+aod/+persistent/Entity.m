@@ -253,7 +253,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Confirm this is a new property
             p = findprop(obj, propName);
             if ~isempty(p)
-                if ismember(lower(propName), lower(aod.util.getAllPropNames(obj)));
+                if ismember(lower(propName), lower(aod.util.getAllPropNames(obj)))
                     error('addProp:DatasetExist',...
                         'Property %s exists, use setProp', propName);
                 end
@@ -521,17 +521,18 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 
     % Attribute methods
     methods (Sealed)
-        function setAttr(obj, attrName, attrValue, ignoreValidation)
+        function setAttr(obj, attrName, attrValue)
             % Add new attribute or change the value of existing attribute
             %
             % Syntax:
             %   setAttr(obj, attrName, attrValue)
+            %
+            % TODO: Validation?
             % -------------------------------------------------------------
             arguments
                 obj
                 attrName            char
                 attrValue                  = []
-                ignoreValidation    logical = false
             end
 
             obj.verifyReadOnlyMode();
@@ -773,7 +774,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             obj.populateContainers();
         end
 
-        function populateContainers(obj)
+        function populateContainers(~)
             % Implemented by subclasses, if needed
         end
     end
@@ -1145,7 +1146,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
     end
 
     methods (Access = private)
-        function validateGroupNames(obj, groupName)
+        function validateGroupNames(obj, groupName) %#ok
             
         end
     end

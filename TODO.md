@@ -19,6 +19,7 @@
 ##### Minor
 - [ ] How to handle FileReader associations
 - [ ] Pull parameters from FileReader
+- [ ] Initialize user package
 
 ##### Documentation
 - [ ] Date formats

@@ -1,5 +1,8 @@
 classdef TestDevice < aod.core.Device 
 
+
+%#ok<*MANU,*NASGU,*ASGLU> 
+
     properties (SetObservable=true)
         EmptyProp 
         PublicProp = 123;

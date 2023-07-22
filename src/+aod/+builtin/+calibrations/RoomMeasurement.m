@@ -41,24 +41,6 @@ classdef RoomMeasurement < aod.builtin.calibrations.MeasurementTable
                 varargin{i} = iArg;
             end
             addMeasurements@aod.builtin.calibrations.MeasurementTable(obj, varargin{:});
-            return
-            % z = reshape([timestamp; temperature; humidity], 1, []);
-
-            if isdatetime(timestamp)
-                datestamp = arrayfun(@(x) datetime(x, 'Format', 'HH:mm'), timestamp);
-            end
-
-            for i = numel(timestamp)
-                datestamp = datetime(timestamp(i), 'Format', 'HH:mm');
-                T = cell2table({datestamp, temperature(i), humidity(i)});
-                T.Properties.VariableNames = {'Time', 'Temperature', 'Humidity'};
-                T.Properties.VariableUnits = ["HH:mm", "Degrees F", "%"];
-                if isempty(obj.measurements)
-                    obj.measurements = T;
-                else
-                    obj.measurements = [obj.measurements; T];
-                end
-            end
         end
     end
 end 

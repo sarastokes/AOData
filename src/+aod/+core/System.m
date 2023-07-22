@@ -2,7 +2,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 % A configuration of an AO imaging system
 %
 % Description:
-%    A configuration of the AO imaging system 
+%    A configuration of the AO imaging system
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
@@ -20,17 +20,36 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
-    
+
+    properties (SetObservable, SetAccess = {?aod.common.Entity})
+        extends             {aod.util.mustBeEntityType(extends, 'System')} = aod.core.System.empty()
+    end
+
     properties (SetAccess = {?aod.common.mixins.Entity, ?aod.common.mixins.ParentEntity})
         Channels           aod.core.Channel = aod.core.Channel.empty();
     end
-    
+
     methods
         function obj = System(name, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
-        end      
+
+            ip = aod.util.InputParser();
+            addParameter(ip, 'extends', []);
+            parse(ip, varargin{:});
+
+            if ~isempty(ip.Results.extends)
+                obj.setExtends(ip.Results.extends);
+            end
+        end
     end
-    
+
+    methods (Sealed)
+        function setExtends(obj, system)
+
+            obj.setProp('extends', system);
+        end
+    end
+
     methods (Sealed)
         function tf = has(obj, entityType, varargin)
             % Search Systems's child entities and return if matches exist
@@ -45,12 +64,12 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % Inputs:
             %   entityType          char or aod.common.EntityTypes
             % Optional inputs:
-            %   One or more cells containing queries 
+            %   One or more cells containing queries
             %
             % See also:
             %   aod.core.System/get
             % -------------------------------------------------------------
-            
+
             out = obj.get(entityType, varargin{:});
             tf = ~isempty(out);
         end
@@ -59,7 +78,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % Get System's channels and devices
             %
             % Description:
-            %   Return all the channels or devices within the system or 
+            %   Return all the channels or devices within the system or
             %   just the ones that match the one or more queries
             %
             % Syntax:
@@ -73,15 +92,15 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             entityType = EntityTypes.get(entityType);
 
             switch entityType
-                case EntityTypes.CHANNEL 
+                case EntityTypes.CHANNEL
                     group = obj.Channels;
-                case EntityTypes.DEVICE 
+                case EntityTypes.DEVICE
                     group = obj.getChannelDevices();
                 otherwise
                     error('get:InvalidEntityType',...
                         'Only Channel and Device can be searched from System');
             end
-            
+
             if nargin > 2
                 out = aod.common.EntitySearch.go(group, varargin{:});
             else
@@ -111,7 +130,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % Remove a channel
             %
             % Description:
-            %   Remove the specfied channel, all channels or channels that 
+            %   Remove the specfied channel, all channels or channels that
             %   match a specific query
             %
             % Syntax:
@@ -119,8 +138,8 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             %   remove(obj, entityType, ID)
             %
             % Notes:
-            %   Because System has only one child entity, remove() can be 
-            %   called without specifying the entityType (assumed to be 
+            %   Because System has only one child entity, remove() can be
+            %   called without specifying the entityType (assumed to be
             %   Channel). It will also work if entityType is specified
             %
             % Example:
@@ -143,7 +162,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
                     'Only Channels can be removed from System');
                 ID = varargin{2};
             end
-            
+
             if ~isscalar(obj)
                 arrayfun(@(x) remove(x, ID), obj);
                 return
@@ -191,7 +210,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   clearAllDevices(obj)
             % -------------------------------------------------------------
-            
+
             if ~isscalar(obj)
                 arrayfun(@(x) clearAllDevices(x), obj);
                 return

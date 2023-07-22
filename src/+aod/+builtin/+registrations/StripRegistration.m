@@ -110,7 +110,7 @@ classdef StripRegistration < aod.core.Registration
         end
 
         function value = specifyDatasets(value)
-            value = specifyDatasets@aod.core.Registration();
+            value = specifyDatasets@aod.core.Registration(value);
             
             value.set("correlationCoefficient",...
                 "Class", "double", "Size", "(:,1)",...

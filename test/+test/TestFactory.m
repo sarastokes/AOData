@@ -8,7 +8,7 @@ classdef TestFactory < aod.util.Factory
             % Do nothing
         end
 
-        function newObj = get(obj, varargin)
+        function newObj = get(~, varargin)
             newObj = 123;
         end
     end

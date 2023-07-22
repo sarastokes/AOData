@@ -38,7 +38,7 @@ function success = writeFileReader(hdfName, pathName, dsetName, reader)
         'Class', 'aod.common.FileReader');
 
     % Write user-defined properties that have public get access
-    expectedProperties = ["Data"];
+    expectedProperties = "Data";
     mc = metaclass(reader);
     for i = 1:numel(mc.PropertyList)
         if ~ismember(mc.PropertyList(i).Name, expectedProperties) ...

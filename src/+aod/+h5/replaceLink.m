@@ -34,7 +34,7 @@ function replaceLink(entity, linkName, newTarget)
     elseif istext(newTarget)
         if ~h5tools.exist(entity.hdfName, newTarget)
             error('fixLink:PathDoesNotExist', ...
-                'Path %s not found in %s', newPath, entity.hdfName);
+                'Path %s not found in %s', newTarget, entity.hdfName);
         end
         newPath = newTarget;
     end

@@ -101,7 +101,7 @@ classdef ExperimentPanel < aod.app.Component
         function onPush_RemoveButton(obj, ~, ~)
             value = obj.exptListbox.Value;
             if isempty(value)
-                error('onPush_RemoveButton:',...
+                error('onPush_RemoveButton:NoExperimentSelected',...
                     'Select an experiment to remove');
             end
             numExpts = numel(obj.exptListbox.Items);

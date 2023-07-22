@@ -41,6 +41,12 @@ classdef MeasurementTable < aod.core.Calibration
     end
 
     methods 
+        function editTable(obj)
+            T = obj.Measurements;
+            openvar('T');
+            % TODO: Add a listener to update the table when it is changed
+        end
+
         function addMeasurements(obj, varargin)
             % Add measurements by row
             %

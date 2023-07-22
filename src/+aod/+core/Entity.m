@@ -2,7 +2,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 % ENTITY (Abstract)
 %
 % Description:
-%   Parent class providing a consistent interface to all entities in 
+%   Abstract superclass providing a consistent interface to all entities in 
 %   AOData's object model
 %
 % Constructor:
@@ -61,7 +61,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 %   tf = validateParent(obj, parent)
 
 % By Sara Patterson, 2023 (AOData)
-% -------------------------------------------------------------------------
+% --------------------------------------------------------------------------
 
     properties (SetAccess = private)
         % The Entity's parent Entity
@@ -867,7 +867,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
         end
 
-        function onPropertyChange(obj, src, evt)
+        function onPropertyChange(obj, ~, ~)
             % Callback to update lastModified when property changes
             %
             % Description:

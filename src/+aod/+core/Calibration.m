@@ -44,7 +44,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetObservable, SetAccess = private)
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         calibrationDate   datetime  {mustBeScalarOrEmpty}
     end
 

@@ -5,7 +5,7 @@ classdef TestFileManager < aod.util.FileManager
             obj@aod.util.FileManager(varargin{:});
         end
 
-        function entity = populateFileNames(obj, entity)
+        function entity = populateFileNames(~, entity)
             % Do nothing
         end
 
