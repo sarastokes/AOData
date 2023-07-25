@@ -31,7 +31,12 @@ classdef ValidationFunction < aod.specification.Validator
     end
 
     methods
-        function obj = ValidationFunction(input)
+        function obj = ValidationFunction(input, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.specification.Validator(parent);
+            
             if nargin > 0 
                 if ~isempty(input)
                     obj.setValue(input);

@@ -14,7 +14,11 @@ classdef Description < aod.specification.Descriptor
     end
 
     methods
-        function obj = Description(input)
+        function obj = Description(input, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.specification.Descriptor(parent);
             if nargin < 1 || aod.util.isempty(input) || input == "[]"
                 input = "";
             end

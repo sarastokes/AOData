@@ -16,7 +16,7 @@ classdef FailureTypes
             
             switch lower(input)
                 case 'class'
-                    obj.FailureTypes.CLASS;
+                    obj = FailureTypes.CLASS;
                 case 'size'
                     obj = FailureTypes.SIZE;
                 case 'function'

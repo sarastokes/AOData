@@ -2,11 +2,19 @@ classdef FixedDimension < aod.specification.Validator
 % A fixed dimension (must equal a specific number)
 %
 % Description:
-%   Similar to MATLAB's meta.FixedDimension class, which isn't accessible 
+%   Similar to MATLAB's meta.FixedDimension class, which isn't accessible
 %   outside their metaclass interface
 %
 % Constructor:
 %   obj = aod.specification.size.FixedDimension(dimSize)
+%   obj = aod.specification.size.FixedDimension(dimSize, optional)
+%
+% Inputs:
+%   dimSize         double
+%       The size of the dimension (must be an integer)
+% Optional inputs:
+%   optional        logical
+%       Whether the dimension is optional (default: false)
 %
 % See also:
 %   meta.FixedDimension, aod.specification.size.UnrestrictedDimension
@@ -15,22 +23,31 @@ classdef FixedDimension < aod.specification.Validator
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Length  (1,1)           {mustBeInteger, mustBeNonnegative}
+        Length   (1,1)      double     {mustBeInteger, mustBeNonnegative}
+        optional (1,1)      logical     = false
     end
 
     methods
-        function obj = FixedDimension(dimSize)
+        function obj = FixedDimension(dimSize, optional)
+            if nargin < 2
+                optional = false;
+            end
             if istext(dimSize)
                 dimSize = str2double(dimSize);
             end
             obj.Length = dimSize;
+            obj.optional = optional;
         end
 
     end
 
-    methods 
+    methods
         function setValue(obj, input)
             obj.Length = input;
+        end
+
+        function setOptional(obj, input)
+            obj.optional = input;
         end
 
         function tf = validate(obj, input)
@@ -48,7 +65,7 @@ classdef FixedDimension < aod.specification.Validator
     % MATLAB built-in methods
     methods
         function tf = isequal(obj, other)
-            if isa(other, class(obj)) && obj.Length == other.Length 
+            if isa(other, class(obj)) && obj.Length == other.Length
                 tf = true;
             else
                 tf = false;

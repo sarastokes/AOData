@@ -28,7 +28,12 @@ classdef Size < aod.specification.Validator
     end
 
     methods
-        function obj = Size(input)
+        function obj = Size(input, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.specification.Validator(parent);
+            
             if nargin > 0
                 obj.setValue(input);
             end
@@ -132,6 +137,12 @@ classdef Size < aod.specification.Validator
             end
 
             out = string(out);
+        end
+    end
+
+    methods (Access = protected)
+        function out = toYAML(obj)
+            out = obj.text();
         end
     end
 
@@ -242,7 +253,7 @@ classdef Size < aod.specification.Validator
             % Syntax:
             %   tf = isempty(obj)
             % -------------------------------------------------------------
-            tf = isempty(obj.Value);
+            tf = obj.SizeType == aod.specification.SizeTypes.UNDEFINED;
         end
 
         function tf = isequal(obj, other)
@@ -307,6 +318,9 @@ classdef Size < aod.specification.Validator
             %   tf = isscalar(obj)
             % -------------------------------------------------------------
             tf = false;
+            if obj.isempty()
+                return
+            end
 
             if ndims(obj) == 2 && all(obj.isfixed())
                 if all(arrayfun(@(x) x.Length == 1, obj.Value))

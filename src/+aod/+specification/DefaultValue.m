@@ -1,4 +1,13 @@
-classdef DefaultValue < aod.specification.Validator 
+classdef DefaultValue < aod.specification.Validator
+% Specifies a default value for a property
+%
+% Superclasses:
+%   aod.specification.Validator
+%
+% Constructor:
+%   aod.specification.DefaultValue(input)
+%
+% TODO: Should this be a "validator"?
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -8,14 +17,19 @@ classdef DefaultValue < aod.specification.Validator
     end
 
     methods
-        function obj = DefaultValue(input)
+        function obj = DefaultValue(input, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.specification.Validator(parent);
+
             if nargin > 0
                 obj.setValue(input);
             end
         end
     end
 
-    methods 
+    methods
         function setValue(obj, input)
             if isa(input, 'meta.property')
                 if input.HasDefault
@@ -39,7 +53,7 @@ classdef DefaultValue < aod.specification.Validator
     end
 
     % MATLAB built-in methods
-    methods 
+    methods
         function tf = isempty(obj)
             tf = aod.util.isempty(obj.Value);
         end

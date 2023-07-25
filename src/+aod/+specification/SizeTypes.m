@@ -43,7 +43,7 @@ classdef SizeTypes
             isFixed = isfixed(value);
 
             if all(isFixed)
-                fcn = @(x) size(x) == horcat(obj.Value.Length);
+                fcn = @(x) size(x) == horzcat(obj.Value.Length);
                 return 
             end
         

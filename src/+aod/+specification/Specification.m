@@ -5,13 +5,16 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 %   handle, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   N/A
+%   obj = aod.specification.Specification(parent)
+%
+% See also:
+%   aod.specification.Validator, aod.specification.Descriptor
 
 % By Sara Patterson, 2023 (AOData)
-% -------------------------------------------------------------------------
+% --------------------------------------------------------------------------
 
-    events 
-        ValidationFailed
+    properties (SetAccess = private)
+        Parent
     end
 
     methods (Abstract)
@@ -20,7 +23,10 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
     end
 
     methods
-        function obj = Specification()
+        function obj = Specification(parent)
+            if nargin > 0 && ~isempty(parent)
+                obj.setParent(parent);
+            end
         end
     end
 
@@ -30,7 +36,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
             %
             % Syntax:
             %   out = compare(obj, other)
-            % -------------------------------------------------------------
+            % --------------------------------------------------------------
 
             import aod.specification.MatchType
 
@@ -54,10 +60,42 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
     end
 
     methods (Access = protected)
+        function out = toYAML(obj)
+            % Overwrite by subclasses, if needed
+            out = {obj.Value};
+        end
+
         function notifyListeners(obj, msg)
             evtData = aod.specification.events.ValidationEvent(...
                 class(obj), msg);
             notify(obj, 'ValidationFailed', evtData);
+        end
+    end
+
+    methods (Sealed, Access = {?aod.specification.types.Primitive})
+        function setParent(obj, primitive)
+            obj.Parent = primitive;
+        end
+
+        function out = getValueForYAML(obj)
+            % Note that values need to be wrapped in a cell array to
+            % ensure proper conversion to YAML
+            if isempty(obj)
+                out = {yaml.Null};
+            else
+                out = {obj.toYAML()};
+            end
+        end
+    end
+
+    methods (Static, Access = protected)
+        function tf = isInputEmpty(input)
+            input = convertCharsToStrings(input);
+            if aod.util.isempty(input) || isequal(input, "[]")
+                tf = true;
+            else
+                tf = false;
+            end
         end
     end
 end

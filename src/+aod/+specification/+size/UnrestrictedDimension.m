@@ -6,13 +6,23 @@ classdef UnrestrictedDimension < aod.specification.Validator
 %
 % Constructor:
 %   obj = aod.specification.size.UnrestrictedDimension()
+%   obj = aod.specification.size.UnrestrictedDimension()
 %
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    properties (SetAccess = private)
+        optional    (1,1)       logical = false;
+    end
+
+
     methods
-        function obj = UnrestrictedDimension()
+        function obj = UnrestrictedDimension(optional)
+            if nargin < 1
+                optional = false;
+            end
+            obj.optional = optional;
         end
     end
 
@@ -24,7 +34,7 @@ classdef UnrestrictedDimension < aod.specification.Validator
             tf = true;
         end
 
-        function output = text(obj)
+        function output = text(~)
             output = ":";
         end
     end

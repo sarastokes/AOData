@@ -18,7 +18,12 @@ classdef MatlabClass < aod.specification.Validator
     end
 
     methods
-        function obj = MatlabClass(classes)
+        function obj = MatlabClass(classes, parent)
+            if nargin < 2
+                parent = [];
+            end
+            obj = obj@aod.specification.Validator(parent);
+            
             if nargin > 0
                 obj.Value = obj.parse(classes);
             end
