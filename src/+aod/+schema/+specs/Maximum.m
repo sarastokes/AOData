@@ -18,10 +18,10 @@ classdef Maximum < aod.specification.Validator
     end
 
     methods
-        function obj = Maximum(value, parent)
-            arguments 
-                value       {mustBeNumeric}         = []
+        function obj = Maximum(parent, value)
+            arguments
                 parent      {mustBeScalarOrEmpty}   = []
+                value       {mustBeNumeric}         = []
             end
 
             obj = obj@aod.specification.Validator(parent);

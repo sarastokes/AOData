@@ -1,4 +1,4 @@
-classdef Enum < aod.specification.Specification
+classdef Enum < aod.specification.Validator
 % ENUM
 %
 % Superclasses:
@@ -8,15 +8,15 @@ classdef Enum < aod.specification.Specification
 %   obj = aod.schema.specs.Enum(parent, value)
 
 % By Sara Patterson, 2023 (AOData)
-% ---------------------------------------------------------------------
+% -------------------------------------------------------------------------
 
-    properties
-        Value   {mustBeText} = ""
+    properties (SetAccess = private)
+        Value   {mustBeText, mustBeVector} = ""
     end
 
     methods
         function obj = Enum(parent, value)
-            obj = obj@aod.specification.Specification(parent);
+            obj = obj@aod.specification.Validator(parent);
             obj.setValue(value);
         end
     end
@@ -26,13 +26,21 @@ classdef Enum < aod.specification.Specification
         function setValue(obj, input)
             arguments
                 obj
-                input  (1,:)    string {mustBeText, mustBeVector}
+                input  (1,:)    string {mustBeText, mustBeVector} = []
             end
 
+            if isvector(input) && ~isrow(input)
+                input = input';
+            end
             obj.Value = input;
         end
 
         function [tf, ME] = validate(obj, input)
+            if isempty(obj)
+                tf = true; ME = [];
+                return
+            end
+
             if ~istext(input)
                 tf = false;
                 ME = MException('validate:InvalidClass',...
@@ -48,12 +56,28 @@ classdef Enum < aod.specification.Specification
                 ME = [];
             end
         end
+
+        function out = text(obj)
+            if obj.isempty()
+                out = "[]";
+            else
+                out = obj.Value;
+            end
+        end
     end
 
+    % MATLAB builtin methods
     methods
         function tf = isempty(obj)
             tf = aod.util.isempty(obj.Value);
         end
-    end
 
+        function out = jsonencode(obj)
+            if isempty(obj)
+                out = jsonencode([]);
+            else
+                out = jsonencode(obj.Value);
+            end
+        end
+    end
 end

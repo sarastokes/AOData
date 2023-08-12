@@ -6,8 +6,8 @@ classdef Text < aod.schema.primitives.Primitive
 
     properties (SetAccess = private)
         Length          aod.schema.specs.Length
-        NumItems
-        Enum
+        Count           aod.schema.specs.Count
+        Enum            aod.schema.specs.Enum
     end
 
     properties (Hidden, SetAccess = protected)
@@ -19,7 +19,9 @@ classdef Text < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, varargin{:});
 
             % Initialization
-            obj.Length = aod.schema.specis.Length([], obj);
+            obj.Length = aod.schema.specs.Length([], obj);
+            obj.Enum = aod.schema.specs.Enum([], obj);
+            obj.Count = aod.schema.specs.Count([], obj);
 
             % Defaults
             obj.setFormat("string");
@@ -27,7 +29,7 @@ classdef Text < aod.schema.primitives.Primitive
     end
 
     methods
-        function setNumItems(obj, value)
+        function setCount(obj, value)
             arguments
                 obj
                 value     {mustBeScalarOrEmpty, mustBeInteger, mustBePositive} = []
@@ -38,6 +40,15 @@ classdef Text < aod.schema.primitives.Primitive
             else
                 obj.NumItems = value;
             end
+        end
+
+        function setEnum(obj, value)
+            arguments
+                obj
+                value  (1,:)  string = ""
+            end
+
+            obj.Enum.setValue(value);
         end
 
         function setLength(obj, value)

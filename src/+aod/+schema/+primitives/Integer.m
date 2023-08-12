@@ -29,8 +29,8 @@ classdef Integer < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, varargin{:});
 
             % Initialization
-            obj.Minimum = aod.schema.specs.Minimum([], obj);
-            obj.Maximum = aod.schema.specs.Maximum([], obj);
+            obj.Minimum = aod.schema.specs.Minimum(obj, []);
+            obj.Maximum = aod.schema.specs.Maximum(obj, []);
 
             obj.parseInputs(varargin{:});
         end

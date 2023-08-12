@@ -5,10 +5,10 @@ classdef Minimum < aod.specification.Validator
     end
 
     methods
-        function obj = Minimum(value, parent)
-            arguments 
-                value       {mustBeNumeric}         = []
+        function obj = Minimum(parent, value)
+            arguments
                 parent      {mustBeScalarOrEmpty}   = []
+                value       {mustBeNumeric}         = []
             end
 
             obj = obj@aod.specification.Validator(parent);

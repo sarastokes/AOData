@@ -23,7 +23,7 @@ classdef Link < aod.schema.primitives.Primitive
     methods
         function obj = Link(name, varargin)
             obj = obj@aod.schema.primitives.Primitive(name);
-            obj.EntityType = aod.schema.specs.EntityType([], obj);
+            obj.EntityType = aod.schema.specs.EntityType(obj, []);
 
             if nargin > 2
                 obj.setEntityType(entityType);

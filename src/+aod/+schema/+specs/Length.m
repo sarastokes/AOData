@@ -17,8 +17,13 @@ classdef Length < aod.specification.Validator
     end
 
     methods
-        function obj = Length(value)
-            if nargin > 0
+        function obj = Length(parent, value)
+            arguments
+                parent      {mustBeScalarOrEmpty}   = []
+                value       {mustBeInteger}         = []
+            end
+            obj = obj@aod.specification.Validator(parent);
+            if ~isempty(value)
                 obj.setValue(value);
             end
         end
@@ -33,11 +38,24 @@ classdef Length < aod.specification.Validator
             end
         end
 
-        function tf = validate(obj, input)
+        function [tf, ME] = validate(obj, input)
             if obj.isempty()
-                tf = true;
+                tf = true; ME = [];
+                return
+            end
+
+            if ~isstring(input)
+                tf = false;
+                ME = MException('validate:InvalidClass',...
+                    'Expected string not %s', class(input));
             else
                 tf = all(strlength(input) == obj.Value);
+                if ~tf
+                    ME = MException('validate:InvalidLength',...
+                        'Expected %u length', obj.Value);
+                else
+                    ME = [];
+                end
             end
         end
 

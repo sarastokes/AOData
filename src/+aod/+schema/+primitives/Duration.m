@@ -7,6 +7,10 @@ classdef Duration < aod.schema.primitives.Primitive
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    properties (SetAccess = private)
+        Units           aod.schema.specs.Units
+    end
+
     properties (Hidden, SetAccess = protected)
         OPTIONS = ["Size", "Units", "Description"];
     end
@@ -15,6 +19,7 @@ classdef Duration < aod.schema.primitives.Primitive
         function obj = Duration(name, parent, varargin)
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
+            obj.Units = aod.schema.specs.Units(obj, []);
             obj.setFormat("duration");
             obj.setUnits("s");
 
@@ -28,13 +33,13 @@ classdef Duration < aod.schema.primitives.Primitive
                 return
             end
 
-            value = obj.getFormat(value);
+            value = obj.getUnitsFormat(value);
             obj.setUnits(value);
         end
     end
 
     methods (Static)
-        function out = getFormat(input)
+        function out = getUnitsFormat(input)
             switch lower(input)
                 case {'s', 'seconds'}
                     out = 's';

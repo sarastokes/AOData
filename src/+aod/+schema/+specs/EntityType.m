@@ -22,7 +22,7 @@ classdef EntityType < aod.specification.Validator
     end
 
     methods
-        function obj = EntityType(value, parent)
+        function obj = EntityType(parent, value)
             obj = obj@aod.specification.Validator(parent);
             obj.setValue(value);
         end
@@ -39,17 +39,17 @@ classdef EntityType < aod.specification.Validator
 
         function [tf, ME] = validate(obj, input)
             ME = [];
-            if obj.isempty()
+            if obj.isempty() || aod.util.isempty(input)
                 tf = true;
-            elseif ~isSubclass(input, 'aod.common.Entity')
+            elseif ~aod.util.isEntity(input)
                 tf = false;
                 ME = MException('AOData:EntityType:Invalid', ...
                     'Links must be to AOData entities, class was %s.', class(input));
             else
-                tf = aod.util.isEntityType(input, obj.Value);
+                tf = isequal(obj.Value, input.entityType)
                 if ~tf
                     ME = MException('AOData:EntityType:Invalid', ...
-                        'Invalid entity type (%s).', input.entityType);
+                        'Invalid entity type (%s).', string(input.entityType));
                 else
                     ME = [];
                 end

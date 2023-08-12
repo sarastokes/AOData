@@ -21,7 +21,7 @@ classdef Number < aod.schema.primitives.Primitive
     properties (SetAccess = private)
         Minimum             aod.schema.specs.Minimum
         Maximum             aod.schema.specs.Maximum
-        Units       (1,:)   string = ""
+        Units               aod.schema.specs.Units
     end
 
     properties (Hidden, SetAccess = protected)
@@ -35,6 +35,7 @@ classdef Number < aod.schema.primitives.Primitive
             % Initialize
             obj.Minimum = aod.schema.specs.Minimum([], obj);
             obj.Maximum = aod.schema.specs.Maximum([], obj);
+            obj.Units = aod.schema.specs.Units([], obj);
 
             % Fixed values for numeric
             obj.Format.setValue('double');
