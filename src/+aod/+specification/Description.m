@@ -1,10 +1,14 @@
-classdef Description < aod.specification.Descriptor 
+classdef Description < aod.specification.Decorator
+% DESCRIPTION
+%
+% Description:
+%   A open-ended text field for describing a variable
 %
 % Superclass:
-%   aod.specification.Descriptor
+%   aod.specification.Decorator
 %
 % Constructor:
-%   obj = aod.specification.Description(input)
+%   obj = aod.specification.Decorator(input)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -18,7 +22,7 @@ classdef Description < aod.specification.Descriptor
             if nargin < 2
                 parent = [];
             end
-            obj = obj@aod.specification.Descriptor(parent);
+            obj = obj@aod.specification.Decorator(parent);
             if nargin < 1 || aod.util.isempty(input) || input == "[]"
                 input = "";
             end
@@ -26,20 +30,20 @@ classdef Description < aod.specification.Descriptor
         end
     end
 
-    % aod.specification.Descriptor methods
+    % aod.specification.Decorator methods
     methods
         function setValue(obj, input)
             if aod.util.isempty(input) || input == "[]"
                 obj.Value = "";
-                return 
+                return
             end
 
             if isa(input, 'meta.property')
                 input = input.Description;
             end
-            
+
             input = convertCharsToStrings(input);
-            
+
             obj.Value = input;
         end
 
@@ -66,4 +70,4 @@ classdef Description < aod.specification.Descriptor
             end
         end
     end
-end 
+end

@@ -1,17 +1,17 @@
-classdef (Abstract) Descriptor < aod.specification.Specification
-% (Abstract) Parent class for metadata descriptions
+classdef (Abstract) Decorator < aod.specification.Specification
+% (Abstract) Parent class for metadata decorators
 %
 % Description:
-%   Descriptors describe the data but are not used in validation
+%   Decorators describe the data but are not used in validation
 %
 % See also:
-%   aod.specification.Validator
+%   aod.specification.Specification
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     methods
-        function obj = Descriptor(parent)
+        function obj = Decorator(parent)
             if nargin == 0
                 parent = [];
             end

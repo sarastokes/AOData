@@ -8,7 +8,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 %   obj = aod.specification.Specification(parent)
 %
 % See also:
-%   aod.specification.Validator, aod.specification.Descriptor
+%   aod.specification.Validator, aod.specification.Decorator
 
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------

@@ -1,7 +1,7 @@
-classdef Units < aod.specification.Descriptor
+classdef Units < aod.specification.Decorator
 %
 % Superclasses:
-%   aod.specification.Descriptor
+%   aod.specification.Decorator
 %
 % Constructor:
 %   obj = aod.schema.specs.Units(parent, value)
@@ -16,7 +16,7 @@ classdef Units < aod.specification.Descriptor
 
     methods
         function obj = Units(parent, value)
-            obj = obj@aod.specification.Descriptor(parent);
+            obj = obj@aod.specification.Decorator(parent);
             if ~aod.util.isempty(value)
                 obj.setValue(value);
             end

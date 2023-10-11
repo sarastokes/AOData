@@ -10,7 +10,7 @@
 **Representation**
 - [ ] Combine `expectedAttributes` and `expectedDatasets` into a single property (`schema`?)
 - [ ] Add `expectedFiles` with descriptions or is that too excessive?
-- [ ] Units Descriptor (implement siunitx)?
+- [ ] Units Decorator (implement siunitx)?
 
 **Methods of schema validation**
 - [ ] Check an individual file before writing
@@ -60,7 +60,7 @@ The each parent-child relationship in the hierarchy is one-to-many. Parent class
 - **`aod.common.Entity`**
   - `SchemaManager` (`AttributeManager` and `DatasetManager`)
     - `Entry`: a specific attribute or dataset defined by a `Primitive` which has a specific `PrimitiveType`
-      - `Specification` (`Validator` and `Descriptor`) - the PrimitiveType determines specifications for a given Entry
+      - `Specification` (`Validator` and `Decorator`) - the PrimitiveType determines specifications for a given Entry
 
 ### Primitives
 Each primitive inherits from `aod.specification.primitives.Primitive` and include a specific set of validators (discussed below).
