@@ -17,6 +17,7 @@ classdef Link < aod.schema.primitives.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.LINK
         OPTIONS = ["EntityType", "Description"];
     end
 

@@ -14,14 +14,14 @@ classdef Maximum < aod.specification.Validator
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value           {mustBeNumeric} = []
+        Value           {mustBeScalarOrEmpty, mustBeNumeric}        = []
     end
 
     methods
         function obj = Maximum(parent, value)
             arguments
-                parent      {mustBeScalarOrEmpty}   = []
-                value       {mustBeNumeric}         = []
+                parent      {mustBeScalarOrEmpty}                   = []
+                value       {mustBeScalarOrEmpty, mustBeNumeric}    = []
             end
 
             obj = obj@aod.specification.Validator(parent);

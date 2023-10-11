@@ -1,14 +1,26 @@
 classdef Minimum < aod.specification.Validator
+% MINIMUM - An inclusive minimum specification
+%
+% Superclasses:
+%   aod.specification.Validator
+%
+% Constructor:
+%   obj = aod.schema.specs.Minimum(parent, value)
+%
+%
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value           {mustBeNumeric} = []
+        Value           {mustBeScalarOrEmpty, mustBeNumeric} = []
     end
 
     methods
         function obj = Minimum(parent, value)
             arguments
-                parent      {mustBeScalarOrEmpty}   = []
-                value       {mustBeNumeric}         = []
+                parent      {mustBeScalarOrEmpty}                   = []
+                value       {mustBeScalarOrEmpty, mustBeNumeric}    = []
             end
 
             obj = obj@aod.specification.Validator(parent);

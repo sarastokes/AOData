@@ -25,6 +25,7 @@ classdef Number < aod.schema.primitives.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.NUMBER
         OPTIONS =  ["Default", "Description", "Size", "Minimum", "Maximum", "Units"];
     end
 
@@ -33,9 +34,9 @@ classdef Number < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name);
 
             % Initialize
-            obj.Minimum = aod.schema.specs.Minimum([], obj);
-            obj.Maximum = aod.schema.specs.Maximum([], obj);
-            obj.Units = aod.schema.specs.Units([], obj);
+            obj.Minimum = aod.schema.specs.Minimum(obj, []);
+            obj.Maximum = aod.schema.specs.Maximum(obj, []);
+            obj.Units = aod.schema.specs.Units(obj, []);
 
             % Fixed values for numeric
             obj.Format.setValue('double');
@@ -49,13 +50,10 @@ classdef Number < aod.schema.primitives.Primitive
         function setUnits(obj, units)
             arguments
                 obj
-                units       string {mustBeScalarOrEmpty}
+                units       string          {mustBeScalarOrEmpty}
             end
 
-            if ~aod.util.isempty(units)
-                units = convertStringsToChars(units);
-            end
-            obj.Units = units;
+            obj.Units.setValue(units);
         end
 
         function setMinimum(obj, value)
@@ -95,7 +93,7 @@ classdef Number < aod.schema.primitives.Primitive
                 if obj.Minimum > obj.Maximum
                     error('checkIntegrity:InvalidRange',...
                         'Minimum (%.2f) must be less than or equal to maximum (%.2f).',...
-                        obj.Minimum, obj.Maximum);
+                        obj.Minimum.Value, obj.Maximum.Value);
                 end
             end
         end

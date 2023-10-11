@@ -1,5 +1,16 @@
 classdef Text < aod.schema.primitives.Primitive
-
+% TEXT - Defines a string or string array input
+%
+% Superclasses:
+%   aod.schema.primitives.Primitive
+%
+% Constructor:
+%   obj = aod.schema.primitives.Text(name)
+%   obj = aod.schema.primitives.Text(name, 'Length', value,...
+%       'Count', value, 'Enum', value, 'Description', value)
+%
+% Allowed parents:
+%   aod.specification.Entry, aod.schema.primitives.Table
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -11,6 +22,7 @@ classdef Text < aod.schema.primitives.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.TEXT
         OPTIONS = ["NumItems", "Length", "Enum", "Description"]
     end
 

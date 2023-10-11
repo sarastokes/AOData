@@ -17,10 +17,11 @@ classdef Integer < aod.schema.primitives.Primitive
     properties (SetAccess = private)
         Minimum     aod.schema.specs.Minimum
         Maximum     aod.schema.specs.Maximum
-        Units       (1,:)   string = ""
+        Units       aod.schema.specs.Units
     end
 
     properties (Hidden, SetAccess = protected)
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.INTEGER
         OPTIONS = ["Format", "Size", "Minimum", "Maximum", "Default", "Units", "Description"]
     end
 
@@ -31,6 +32,7 @@ classdef Integer < aod.schema.primitives.Primitive
             % Initialization
             obj.Minimum = aod.schema.specs.Minimum(obj, []);
             obj.Maximum = aod.schema.specs.Maximum(obj, []);
+            obj.Units = aod.schema.specs.Units(obj, []);
 
             obj.parseInputs(varargin{:});
         end
@@ -106,10 +108,10 @@ classdef Integer < aod.schema.primitives.Primitive
         function setUnits(obj, value)
             arguments
                 obj
-                value      string
+                value      string = ""
             end
 
-            obj.Units = value;
+            obj.Units.setValue(value);
         end
     end
 
@@ -137,20 +139,20 @@ classdef Integer < aod.schema.primitives.Primitive
                 end
             end
             if ~isempty(obj.Minimum)
-                if obj.Default.Value < obj.Minimum.Value
+                if all(obj.Default.Value < obj.Minimum.Value)
                     error('checkIntegrity:InvalidDefault',...
                         'Default value is smaller than the minimum value');
                 end
                 if ~isempty(obj.Maximum)
-                    if obj.Maximum.Value < obj.Minimum.Value
+                    if all(obj.Maximum.Value < obj.Minimum.Value)
                         error('checkIntegrity:InvalidRange',...
                             'Minimum value %d is larger than Maximum value %d', obj.Minimum.Value, obj.Maximum.Value);
                     end
                 end
             end
 
-            checkIntegrity@aod.specification.types.Primitive(obj);
-            if ~isempty(obj.Maximum) && obj.Default.Value > obj.Maximum.Value
+            checkIntegrity@aod.schema.primitives.Primitive(obj);
+            if ~isempty(obj.Maximum) && all(obj.Default.Value > obj.Maximum.Value)
                 error('checkIntegrity:InvalidDefault',...
                     'Default value is larger than the maximum value');
             end
@@ -163,10 +165,8 @@ classdef Integer < aod.schema.primitives.Primitive
                 intType = intType.Value;
             end
 
-            if contains(intType, 'int')
-                minValue = intmin(intType);
-                maxValue = intmax(intType);
-            end
+            minValue = intmin(intType);
+            maxValue = intmax(intType);
         end
     end
 end

@@ -8,15 +8,15 @@ classdef Date < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (Hidden, SetAccess = protected)
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATE
         OPTIONS = "Description";
     end
 
     methods
         function obj = Date(name, parent, varargin)
             obj = obj@aod.schema.primitives.Primitive(name, parent);
-            obj.OPTIONS = "Description";
             obj.setSize("(1,1)");
-            obj.setFormat("datetime");
+            obj.setFormat("datetime");  %% TODO - yymmdd
 
             obj.parseInputs(varargin{:});
         end

@@ -1,12 +1,23 @@
-classdef Boolean < aod.specification.primitives.Primitive
+classdef Boolean < aod.schema.primitives.Primitive
+% BOOLEAN - Specify a logical value (true/false or 0/1)
+%
+% Superclasses:
+%   aod.schema.primitives.Primitive
+%
+% Constructor:
+%   obj = aod.schema.primitives.Primitive(name, parent)
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     properties (Hidden, SetAccess = protected)
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.BOOLEAN
         OPTIONS = ["Size", "Default", "Description"]
     end
 
     methods
         function obj = Boolean(name, parent, varargin)
-            obj = obj@aod.specification.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             obj.setFormat("logical");
             obj.parseInputs(varargin{:});

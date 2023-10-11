@@ -8,7 +8,7 @@ classdef Wrapper < handle & matlab.mixin.indexing.RedefinesParen
 %   The goal is to be fully transparent to the user (i.e. acts like the
 %   Primitive in the "Value" property). The need for this wrapper is
 %   because we don't want to deal with a new object when the underlying
-%   Primitive type is changed.
+%   PrimitiveType is changed.
 %
 % Constructor:
 %   obj = aod.schema.primitives.Wrapper(name, parent)
@@ -30,6 +30,7 @@ classdef Wrapper < handle & matlab.mixin.indexing.RedefinesParen
 
     properties (Hidden, Dependent)
         OPTIONS
+        PRIMITIVE_TYPE
     end
 
     methods
@@ -46,12 +47,11 @@ classdef Wrapper < handle & matlab.mixin.indexing.RedefinesParen
             parse(ip, varargin{:});
 
             if isempty(ip.Results.Type)
-                obj.Value = aod.specification.types.Unknown(...
+                obj.Value = aod.schema.types.Unknown(...
                     name, parent, varargin{:});
             else
-                % TODO: Fill out primitive type creation
-                error('PrimitiveWrapper:NotYetImplemented',...
-                    'Specific type creation not yet implemented');
+                fcn = aod.schema.types.PrimitiveTypes.getFcnHandle(ip.Results.Type);
+                obj.Value = fcn(name, parent, varargin{:});
             end
         end
 
@@ -64,7 +64,7 @@ classdef Wrapper < handle & matlab.mixin.indexing.RedefinesParen
         end
 
         function value = get.Type(obj)
-            value = getClassWithoutPackages(obj.Value);
+            value = obj.Value.PRIMITIVE_TYPE;
         end
 
         function value = get.OPTIONS(obj)
@@ -72,6 +72,14 @@ classdef Wrapper < handle & matlab.mixin.indexing.RedefinesParen
                 value = [];
             else
                 value = obj.Value.OPTIONS;
+            end
+        end
+
+        function value = get.PRIMITIVE_TYPE(obj)
+            if isempty(obj.Value)
+                value = [];
+            else
+                value = obj.Value.PRIMITIVE_TYPE;
             end
         end
     end

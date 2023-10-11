@@ -8,7 +8,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 %   obj = aod.specification.Primitive(name, varargin)
 
 % By Sara Patterson, 2023 (AOData)
-% ----------------------------------------------------------------------
+% --------------------------------------------------------------------------
 
     properties (SetAccess = private)
         Parent                  aod.specification.Entry
@@ -30,6 +30,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         % They are assigned in the order listed, so one option can be
         % used to validate or assign values to a later option.
         OPTIONS     (1,:)       string
+        PRIMITIVE_TYPE          aod.schema.primitives.PrimitiveTypes
     end
 
     methods
@@ -49,9 +50,17 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Default = aod.specification.DefaultValue([], obj);
             obj.Description = aod.specification.Description([], obj);
         end
-    end
 
-    methods (Sealed)
+        function tf = isValid(obj)
+            tf = aod.util.isempty(obj.Name) || strcmp(obj.Name, "UNDEFINED");
+        end
+
+        function displayOptions(obj)
+            disp(obj.OPTIONS);
+        end
+   end
+
+    methods %(Sealed)
         function assign(obj, varargin)
             % Assign specifications with key/value inputs
             %
@@ -234,6 +243,12 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 return
             end
 
+            mustBeA(parent, ["aod.specification.Entry", "aod.schema.primitives.Container"]);
+            if isa(parent, 'aod.schema.primitives.Container')
+                % Check if table is allowed, throw error if not
+
+            end
+
             if isempty(parent)
                 return
             end
@@ -265,7 +280,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                     out = prop;
                 end
             end
-
         end
     end
 end

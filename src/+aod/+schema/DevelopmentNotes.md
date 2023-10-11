@@ -43,7 +43,7 @@
 - [ ] Show schema for a specific data type in UI (as a tree? text?)
 
 
-### Schema JSON
+### Schema JSON (or YAML)
 Should entire package be in one file or separate files referenced by a "schema registry"? If the files are large, might want to serialize with msgpack.
 - Schema UUID
   - *Versions*
@@ -59,8 +59,8 @@ Should entire package be in one file or separate files referenced by a "schema r
 The each parent-child relationship in the hierarchy is one-to-many. Parent classes have properties for containing the child classes. The child classes maintain a reference to the parent class with a property called `Parent`.
 - **`aod.common.Entity`**
   - `SchemaManager` (`AttributeManager` and `DatasetManager`)
-    - `Primitive`
-      - `Specification` (`Validator` and `Descriptor`)
+    - `Entry`: a specific attribute or dataset defined by a `Primitive` which has a specific `PrimitiveType`
+      - `Specification` (`Validator` and `Descriptor`) - the PrimitiveType determines specifications for a given Entry
 
 ### Primitives
 Each primitive inherits from `aod.specification.primitives.Primitive` and include a specific set of validators (discussed below).
@@ -93,7 +93,7 @@ Some primitives will set default values (unless user provides something more spe
 - _Categorical_ sets the *Enum* validator to the provided names.
 
 ### Components
-Basic types (**validator**, *annotation*):
+Basic types (**validator**, *decorator*):
 - Shared between all types
     - *Description* - information on the paramter
     - **Format** - this is the underlying MATLAB class
@@ -113,7 +113,6 @@ Basic types (**validator**, *annotation*):
 - Time
 - Duration
     - **Units**
-
 - Table
     - **NumFields**
     - **Length**

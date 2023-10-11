@@ -11,7 +11,7 @@ classdef Units < aod.specification.Descriptor
 % -------------------------------------------------------------------------
 
     properties
-        Value   string      {mustBeVector} = ""
+        Value       string      = ""
     end
 
     methods
@@ -23,7 +23,14 @@ classdef Units < aod.specification.Descriptor
         end
 
         function setValue(obj, input)
-            input = convertCharsToStrings(input);
+            arguments
+                obj
+                input       string      = ""
+            end
+
+            if ~aod.util.isempty(input)
+                mustBeVector(input);
+            end
             if numel(input) > 1 && iscolumn(input)
                 input = input';
             end

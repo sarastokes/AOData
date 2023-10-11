@@ -18,12 +18,12 @@ classdef SchemaTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Integer")
         function Integer(testCase)
-            obj = aod.specification.types.Integer("Test");
+            obj = aod.schema.primitives.Integer("Test");
             testCase.verifyEqual(obj.Name, "Test");
 
             testCase.verifyEmpty(obj.Units);
             obj.assign("Units", "mV");
-            testCase.verifyEqual(obj.Units, "mV");
+            testCase.verifyEqual(obj.Units.Value, "mV");
 
             testCase.verifyEmpty(obj.Description);
             obj.assign('Description', "Test");
@@ -51,12 +51,14 @@ classdef SchemaTest < matlab.unittest.TestCase
             obj.assign("Minimum", 1);
             testCase.verifyEqual(obj.Minimum.Value, uint8(1));
 
+            % TODO: Implement wrapper class
             obj.assign("Format", "double");
             testCase.verifyEqual(obj.Minimum.Value, 1);
             testCase.verifyEmpty(obj.Maximum.Value);
         end
 
         function IntegerErrors(testCase)
+            obj = aod.schema.primitives.Integer("Test");
             testCase.verifyError(...
                 @() obj.assign('Size', "(1,2)", 'Default', 2),...
                 "checkIntegrity:InvalidDefault");
@@ -65,24 +67,32 @@ classdef SchemaTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Number")
         function Number(testCase)
-            obj = aod.specification.types.Number("Test");
+            obj = aod.schema.primitives.Number("Test");
+            testCase.verifyEqual(obj.Format.Value, "double");
+
+            obj.assign('Minimum', 1, 'Maximum', 3);
+            testCase.verifyEqual(obj.Minimum.Value, 1);
+            testCase.verifyEqual(obj.Minimum.Value, 3);
             
-            testCase.verifyEqual(obj.Format, "double");
+            testCase.verifyTrue(obj.validate(2));
+            
         end
     end
 
     methods (Test, TestTags="Link")
         function Link(testCase)
-            obj = aod.specification.types.Link("Test");
+            obj = aod.schema.primitives.Link("Test");
 
             testCase.verifyEmpty(obj.EntityType);
             testCase.verifyEmpty(obj.Format);
             obj.assign('EntityType', 'epoch');
-            testCase.verifyEqual(obj.entityType, aod.common.EntityTypes.EPOCH);
-            testCase.verifyEqual(obj.Format, ["aod.core.Epoch", "aod.persistent.Epoch"]);
+            testCase.verifyEqual(obj.EntityType.Value, aod.common.EntityTypes.EPOCH);
+            testCase.verifyEqual(obj.Format.Value, ["aod.core.Epoch", "aod.persistent.Epoch"]);
 
             testCase.verifyError(...
-                @() obj.assign('Default'), "assign:InvalidParameter");
+                @() obj.assign('Default'), 'MATLAB:InputParser:ParamMissingValue');
+            testCase.verifyError(...
+                @() obj.assign('Default', 1), "assign:InvalidParameter");
         end
     end
 end
