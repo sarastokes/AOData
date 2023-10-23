@@ -25,11 +25,11 @@ classdef NeutralDensityFilter < aod.core.Device
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
-    properties (SetObservable, SetAccess = protected)
+
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         transmission
     end
-    
+
     methods
         function obj = NeutralDensityFilter(attenuation, varargin)
             obj = obj@aod.core.Device([], varargin{:});
@@ -37,7 +37,7 @@ classdef NeutralDensityFilter < aod.core.Device
             obj.setAttenuation(attenuation);
         end
     end
-    
+
     methods
         function setAttenuation(obj, attenuation)
             % Set the NDF attenuation value
@@ -47,7 +47,7 @@ classdef NeutralDensityFilter < aod.core.Device
             % -------------------------------------------------------------
             obj.setAttr('Attenuation', attenuation);
         end
-        
+
         function setTransmission(obj, spectra)
             % Set NDF transmission spectra
             %
@@ -62,7 +62,7 @@ classdef NeutralDensityFilter < aod.core.Device
         function value = specifyLabel(obj)
             value = sprintf("%.2gNDF", obj.getAttr('Attenuation'));
         end
-    end 
+    end
 
     methods (Static)
         function value = specifyDatasets(value)

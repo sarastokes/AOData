@@ -97,7 +97,7 @@ classdef MeasurementTable < aod.core.Calibration
             elseif istable(measurementTable)
                 T = measurementTable;
             end
-            % Check column names
+            % TODO: Check column names
         end
     end 
 
@@ -115,9 +115,9 @@ classdef MeasurementTable < aod.core.Calibration
 
     methods (Static)
         function value = specifyDatasets(value)
-            value = specifyDatasets@aod.core.Calibration(value)
+            value = specifyDatasets@aod.core.Calibration(value);
 
-            value.add("Measurements",...
+            value.set("Measurements",...
                 "Class", "table");
         end
     end

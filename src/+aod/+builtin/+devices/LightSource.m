@@ -14,7 +14,7 @@ classdef LightSource < aod.core.Device
 %   spectra
 %
 % Attributes:
-%   Wavelength  
+%   Wavelength
 %
 % Inherited attributes:
 %   Manufacturer
@@ -26,21 +26,21 @@ classdef LightSource < aod.core.Device
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
-    properties (SetObservable, SetAccess = protected)
+
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         % The spectra of the light source (nm, [])
-        spectra         double 
-    end 
+        spectra         double
+    end
 
     methods
         function obj = LightSource(wavelength, varargin)
-            obj = obj@aod.core.Device([], varargin{:});   
-            
+            obj = obj@aod.core.Device([], varargin{:});
+
             obj.setWavelength(wavelength);
         end
     end
-    
-    methods 
+
+    methods
         function setWavelength(obj, wavelength)
             % Set the wavelength in nm
             %
@@ -53,7 +53,7 @@ classdef LightSource < aod.core.Device
             % -------------------------------------------------------------
             obj.setAttr('Wavelength', wavelength);
         end
-        
+
         function setSpectra(obj, spectra)
             % Set the light source's spectra
             %
@@ -77,7 +77,7 @@ classdef LightSource < aod.core.Device
     methods (Static)
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
-            
+
             value.add("Wavelength",...
                 "Class", "double", "Size", "(1,1)", "Units", "nm",...
                 "Function", @mustBePositive,...
@@ -91,7 +91,7 @@ classdef LightSource < aod.core.Device
             value = specifyDatasets@aod.core.Device(value);
 
             value.set("spectra",...
-                "Class", "double", "Size", "(:, 2)",... 
+                "Class", "double", "Size", "(:, 2)",...
                 "Units", ["nm", "microwatt"],...
                 "Description", "Spectra of the light source");
         end

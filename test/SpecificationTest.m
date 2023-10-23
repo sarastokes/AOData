@@ -513,7 +513,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             
             f = fieldnames(S);
             testCase.verifyNumElements(f, 2);
-            testCase.verifyEqual(f{1}, 'Namespace');
+            testCase.verifyEqual(f{1}, 'Namespaces');
 
             f = fieldnames(S.Namespace);
             testCase.verifyNumElements(f, 1);

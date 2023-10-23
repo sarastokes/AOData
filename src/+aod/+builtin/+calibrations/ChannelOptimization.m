@@ -1,4 +1,4 @@
-classdef ChannelOptimization < aod.core.Calibration 
+classdef ChannelOptimization < aod.core.Calibration
 % Optimization of PMT and source position
 %
 % Description:
@@ -27,12 +27,12 @@ classdef ChannelOptimization < aod.core.Calibration
 % Methods:
 %   setPositions(obj, modelEye, varargin)
 %   setIterations(obj, data)
-%   setWavelength(obj, wl) 
+%   setWavelength(obj, wl)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetObservable, SetAccess = protected)
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         % Rows: ModelEye, InVivo. Columns: X, Y, Z, Source
         positions               table = table.empty()
         % Optimization iterations and mean light levels
@@ -83,12 +83,12 @@ classdef ChannelOptimization < aod.core.Calibration
             addParameter(ip, 'Source', [], @isnumeric);
             parse(ip, varargin{:});
 
-            if modelEye 
+            if modelEye
                 rowName = "ModelEye";
             else
                 rowName = "InVivo";
             end
-            
+
             % Only change the inputs that were specified by user
             changedInputs = setdiff(ip.Parameters, ip.UsingDefaults);
             for i = 1:numel(changedInputs)
@@ -104,7 +104,7 @@ classdef ChannelOptimization < aod.core.Calibration
     methods (Static)
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Calibration();
-            
+
             value.add("Wavelength",...
                 "Class", "double", "Size", "(1,1)", "Units", "nm",...
                 "Description", "The wavelength of the light source in the optimization");
@@ -121,4 +121,4 @@ classdef ChannelOptimization < aod.core.Calibration
                 "Description", "PMT xyz and source positions (columns) for model eye and in vivo (rows)");
         end
     end
-end 
+end

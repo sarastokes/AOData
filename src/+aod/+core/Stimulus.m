@@ -6,7 +6,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 %
 % Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
-% 
+%
 % Constructor:
 %   obj = aod.core.Stimulus(name)
 %   obj = aod.core.Stimulus(name, protocol)
@@ -14,18 +14,18 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetObservable, SetAccess = protected)
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         Calibration                 {aod.util.mustBeEntityType(Calibration, 'Calibration')} = aod.core.Calibration.empty()
 
         protocolClass               string = string.empty()
         protocolName                string = string.empty()
         DateProtocolCreated         datetime = datetime.empty()
     end
-    
+
     methods
         function obj = Stimulus(name, protocol, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
-            
+
             if nargin > 1 && ~isempty(protocol)
                 obj.setProtocol(protocol);
             end
@@ -43,6 +43,9 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   setCalibration(obj, calibration)
             % -------------------------------------------------------------
+            if isempty(calibration)
+                obj.Calibration = aod.core.Calibration.empty();
+            end
             assert(isSubclass(calibration, 'aod.core.Calibration'),...
                 'calibration must be subclass of aod.core.Calibration');
 
@@ -59,10 +62,10 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             %   setProtocol(obj, protocol)
             % -------------------------------------------------------------
             arguments
-                obj 
+                obj
                 protocol        {mustBeA(protocol, 'aod.common.Protocol')}
-            end 
-            
+            end
+
             obj.protocolClass = class(protocol);
             obj.DateProtocolCreated = protocol.dateCreated;
             obj.setFile('Protocol', fileparts(protocol.getFileName()));

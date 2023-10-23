@@ -20,7 +20,7 @@ classdef ImagingLight < aod.core.Stimulus
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetObservable, SetAccess = private)
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         % Intensity of the imaging light 
         intensity               double
     end

@@ -1,5 +1,5 @@
 classdef Beamsplitter < aod.core.Device
-% A beamsplitter 
+% A beamsplitter
 %
 % Constructor:
 %   obj = aod.builtin.devices.BeamSplitter(name, splittingRatio)
@@ -18,12 +18,12 @@ classdef Beamsplitter < aod.core.Device
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetObservable, SetAccess = protected)
-        reflectance             
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
+        reflectance
         transmission
     end
 
-    methods 
+    methods
         function obj = Beamsplitter(splittingRatio, varargin)
             obj = obj@aod.core.Device([], varargin{:});
 
@@ -63,8 +63,8 @@ classdef Beamsplitter < aod.core.Device
         end
 
         function setProperties(obj, value)
-            % Set reflectance and transmission together (useful for data 
-            % imported from optics websites). 
+            % Set reflectance and transmission together (useful for data
+            % imported from optics websites).
             %
             % Syntax:
             %   setBothTR(obj, value)
@@ -73,7 +73,7 @@ classdef Beamsplitter < aod.core.Device
             %   value           data or filename
             %       Column order: wavelength, reflectance, transmission
             % -------------------------------------------------------------
-            
+
             if isfile(value)
                 reader = aod.util.findFileReader(value);
                 data = reader.readFile();
@@ -87,7 +87,7 @@ classdef Beamsplitter < aod.core.Device
 
     methods (Access = protected)
         function value = specifyLabel(obj)
-            value = sprintf("%u:%uBeamsplitter",... 
+            value = sprintf("%u:%uBeamsplitter",...
                 obj.getAttr('SplittingRatio'));
         end
     end
@@ -113,4 +113,4 @@ classdef Beamsplitter < aod.core.Device
                 "Description", "The transmission and reflectance split");
         end
     end
-end 
+end

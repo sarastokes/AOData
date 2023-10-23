@@ -29,6 +29,7 @@ function tf = isEntityType(obj, entityType)
         if isSubclass(obj, iType.getCoreClassName()) || ...
             isSubclass(obj, iType.getPersistentClassName())
             tf = true;
+            return
         end
     end
 

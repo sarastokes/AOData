@@ -182,7 +182,7 @@ classdef EpochTest < matlab.unittest.TestCase
             testCase.verifyError(@() epoch1.remove('Response', 'badID'),...
                 "remove:InvalidID");
             testCase.verifyError(@() epoch1.remove('Calibration'),...
-                "remove:InvalidEntityType");
+                "validateChildType:InvalidEntityType");
 
             % Test Stimulus additions
             epoch1.add(aod.core.Stimulus('Stim1'));

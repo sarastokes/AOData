@@ -6,7 +6,7 @@ classdef DichroicFilter < aod.core.Device
 %
 % Constructor:
 %   obj = DichroicFilter(wavelength, passType, varargin)
-%   
+%
 % Attributes:
 %   Wavelength                      numeric
 %   PassType                        char, 'low' or 'high'
@@ -24,19 +24,19 @@ classdef DichroicFilter < aod.core.Device
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetObservable, SetAccess = private)
-        transmission         
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
+        transmission
     end
-    
+
     methods
         function obj = DichroicFilter(wavelength, passType, varargin)
             obj = obj@aod.core.Device([], varargin{:});
-            
+
             obj.setWavelength(wavelength);
             obj.setPassType(passType);
         end
     end
-    
+
     methods
         function setWavelength(obj, wavelength)
             % Set the cutoff wavelength for the filter
@@ -46,7 +46,7 @@ classdef DichroicFilter < aod.core.Device
             % -------------------------------------------------------------
             obj.setAttr('Wavelength', wavelength);
         end
-        
+
         function setPassType(obj, passType)
             % Change the pass type of the filter
             %
@@ -73,7 +73,7 @@ classdef DichroicFilter < aod.core.Device
 
     methods (Access = protected)
         function value = specifyLabel(obj)
-            value = sprintf('%unm%sPassFilter',... 
+            value = sprintf('%unm%sPassFilter',...
                 obj.getAttr('Wavelength'),...
                 appbox.capitalize(obj.getAttr('Pass')));
         end

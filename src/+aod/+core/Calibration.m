@@ -48,7 +48,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
         calibrationDate   datetime  {mustBeScalarOrEmpty}
     end
 
-    properties (SetObservable, SetAccess = protected)
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         Target       {mustBeScalarOrEmpty}
     end
 
@@ -74,12 +74,12 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
             %       Who performed the calibration
             % -------------------------------------------------------------
             obj = obj@aod.core.Entity(name, varargin{:});
-            
+
             if nargin > 1 && ~isempty(calibrationDate)
                 obj.setDate(calibrationDate);
             end
         end
-    end 
+    end
 
     methods (Sealed)
         function setTarget(obj, target)
@@ -100,7 +100,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 
         function setDate(obj, calDate)
             % Set the date where the calibration was performed
-            % 
+            %
             % Syntax:
             %   obj.setDate(calDate)
             %
@@ -120,7 +120,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
     methods (Static)
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
-            
+
             value.add("Administrator",...
                 "Class", "string",...
                 "Size", "(1,1)",...

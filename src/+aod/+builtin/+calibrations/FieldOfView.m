@@ -1,10 +1,10 @@
-classdef FieldOfView < aod.builtin.calibrations.FieldOfView  
+classdef FieldOfView < aod.builtin.calibrations.MeasurementTable  
 
     methods 
         function obj = FieldOfView(name, calibrationDate, varargin)
             colNames = ["Scanner", "Voltage", "FOV"];
             colUnits = ["", "V", "degrees of visual angle"];
-            obj = obj@aod.builtin.calibrations.FieldOfView(...
+            obj = obj@aod.builtin.calibrations.MeasurementTable(...
                 name, calibrationDate, colNames, colUnits, varargin{:});
         end
 

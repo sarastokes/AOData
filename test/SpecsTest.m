@@ -53,7 +53,7 @@ classdef SpecsTest < matlab.unittest.TestCase
 
             [tf, ME] = obj.validate("d");
             testCase.verifyFalse(tf);
-            testCase.verifyEqual(ME.identifier, 'validate:InvalidEnum');
+            testCase.verifyEqual(ME.identifier, 'Enum:validate:InvalidEnum');
         end
 
         function EmptyEnum(testCase)

@@ -2,7 +2,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 % ENTITY (Abstract)
 %
 % Description:
-%   Abstract superclass providing a consistent interface to all entities in 
+%   Abstract superclass providing a consistent interface to all entities in
 %   AOData's object model
 %
 % Constructor:
@@ -36,7 +36,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 %   setAttr(obj, varargin)
 %   value = getAttr(obj, attrName, msgLevel)
 %   removeAttr(obj, attrName)
-%   
+%
 %   tf = hasFile(obj, fileName)
 %   setFile(obj, fileName, filePath)
 %   value = getFile(obj, fileName, errorType)
@@ -71,7 +71,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         % Unique identifier for the entity
         UUID                        string = string.empty()
         % A description of the entity
-        description                 string = string.empty() 
+        description                 string = string.empty()
         % Notes about the entity
         notes           (:,1)       string = string.empty()
         % The date the entity was created
@@ -91,7 +91,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         % Metadata for the entity which maps to HDF5 attributes
         attributes                  % aod.common.KeyValueMap
     end
-    
+
     properties (Dependent)
         % Automated name from specifyLabel(), used for HDF5 group name if the name property is not set
         label                       char
@@ -117,7 +117,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             addOptional(ip, 'Name', [], @(x) istext(x) | isempty(x));
             addParameter(ip, 'Parent', []);
             parse(ip, varargin{:});
-            
+
             if ~isempty(ip.Results.Name)
                 obj.setName(ip.Results.Name);
             end
@@ -135,11 +135,11 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             if ~isempty(ip.Results.Parent)
                 obj.setParent(ip.Results.Parent);
             end
-            
+
             % Initialize containers
             obj.files = aod.common.KeyValueMap();
             obj.attributes = aod.common.KeyValueMap();
-            
+
             % Parse unmatched inputs
             obj.parseAttributes(ip.Unmatched);
 
@@ -152,7 +152,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     end
 
     % Dependent set/get methods
-    methods 
+    methods
         function value = get.label(obj)
             value = obj.specifyLabel();
         end
@@ -180,7 +180,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %
             % Inputs:
             %   name            string
-            %       Name of entity 
+            %       Name of entity
             % -------------------------------------------------------------
             if ~isscalar(obj)
                 arrayfun(@(x) setName(x, name), obj);
@@ -204,7 +204,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %       Description
             % Optional inputs:
             %   overwrite   logical (default = false)
-            %       Whether to overwrite existing description 
+            %       Whether to overwrite existing description
             %
             % Notes:
             %   Running setDescription(obj) without providing the 2nd input
@@ -217,10 +217,10 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
             obj.description = txt;
         end
-        
+
         function setNote(obj, txt, ID)
             % Append a note to the entity
-            % 
+            %
             % Syntax:
             %   obj.setNote(txt)
             %   obj.setNote(txt, ID)
@@ -257,7 +257,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
         function removeNote(obj, ID)
             % Remove note(s) from the entity
-            % 
+            %
             % Description:
             %   Remove a specific note by ID or clear all notes
             %
@@ -276,7 +276,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 arrayfun(@(x) removeNote(x, ID), obj);
                 return
             end
-            
+
             if istext(ID) && strcmpi(ID, 'all')
                 obj.notes = string.empty();
             elseif isnumeric(ID)
@@ -296,7 +296,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %   propName        char
             %   specType        char    (default = "both")
             %       Either "dataset", "attribute" or "both"
-            % 
+            %
             % Outputs:
             %   tf              logical
             %       Whether the dataset/attribute is expected
@@ -321,19 +321,19 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     % Dataset methods
     methods (Sealed)
         function setProp(obj, propName, propValue, errorType)
-            
+
             arguments
                 obj
-                propName        char 
-                propValue       
-                errorType               = aod.infra.ErrorTypes.ERROR 
+                propName        char
+                propValue
+                errorType               = aod.infra.ErrorTypes.ERROR
             end
 
             errorType = aod.infra.ErrorTypes.init(errorType);
 
             if ~isscalar(obj)
                 arrayfun(@(x) setProp(x, propName, propValue, errorType), propValue);
-                return 
+                return
             end
 
             % Check whether the property is in specs
@@ -344,12 +344,12 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
 
             isValid = propSpec.validate(propValue);
-            if ~isValid 
+            if ~isValid
                 id = 'setProp:InvalidValue';
                 msg = "Value did not pass specification validation";
-                if errorType == aod.infra.ErrorTypes.ERROR 
+                if errorType == aod.infra.ErrorTypes.ERROR
                     error(id, msg);
-                elseif errorType == aod.infra.ErrorTypes.WARNING 
+                elseif errorType == aod.infra.ErrorTypes.WARNING
                     warning(id, msg);
                 end
             end
@@ -436,7 +436,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     % File methods
     methods (Sealed)
         function setFile(obj, fileName, filePath)
-            % Add or modify a file 
+            % Add or modify a file
             %
             % Description:
             %   Adds to files prop, stripping out homeDirectory and
@@ -508,12 +508,12 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Inputs:
             %   fileName       char
             % Optional inputs:
-            %   errorType      aod.infra.ErrorTypes (default = NONE)            
+            %   errorType      aod.infra.ErrorTypes (default = NONE)
             % -------------------------------------------------------------
 
             arguments
                 obj
-                fileName        char 
+                fileName        char
                 errorType       = aod.infra.ErrorTypes.NONE
             end
 
@@ -530,12 +530,12 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             if obj.hasFile(fileName)
                 fileValue = obj.files(fileName);
             else
-                switch errorType 
-                    case ErrorTypes.ERROR 
-                        error('getFile:NotFound',... 
+                switch errorType
+                    case ErrorTypes.ERROR
+                        error('getFile:NotFound',...
                             'Did not find %s in files', fileName);
-                    case ErrorTypes.WARNING 
-                        warning('getFile:NotFound',... 
+                    case ErrorTypes.WARNING
+                        warning('getFile:NotFound',...
                             'Did not find %s in files', fileName);
                         fileValue = char.empty();
                     case ErrorTypes.MISSING
@@ -571,7 +571,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 error("getExptFile:NoHomeDirectory",...
                     "Add entity to experiment to use getExptFile");
             end
-            
+
             fileValue = obj.getFile(fileName, varargin{:});
             if ~isempty(fileValue) || ~ismissing(fileValue)
                 fileValue = fullfile(fPath, fileValue);
@@ -589,7 +589,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %   out = getHomeDirectory(obj)
             %
             % Notes:
-            %   If multiple entities are provided, they are assumed to be 
+            %   If multiple entities are provided, they are assumed to be
             %   from the same Experiment
             % -------------------------------------------------------------
             h = getParent(obj(1), 'Experiment');
@@ -603,21 +603,21 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
     % Methods meant to be overwritten by subclasses, if needed
     methods (Access = protected)
-        function value = specifyLabel(obj)  
+        function value = specifyLabel(obj)
             % Get entity's label
             %
             % Description:
-            %   Determines dependent property label. Returns "name" if set 
-            %   or class name without packages if "name" is empty. 
-            %   Subclasses can overload this method to define automated 
-            %   naming for entities rather than requiring user to input a 
+            %   Determines dependent property label. Returns "name" if set
+            %   or class name without packages if "name" is empty.
+            %   Subclasses can overload this method to define automated
+            %   naming for entities rather than requiring user to input a
             %   name upon instantiation. Examples are below in "See also".
-            %      
+            %
             % Syntax:
             %   value = obj.specifyLabel();
             %
             % See also:
-            %   aod.builtin.devices.Pinhole, 
+            %   aod.builtin.devices.Pinhole,
             %   aod.builtin.devices.DichroicFilter
             % -------------------------------------------------------------
             if isempty(obj.Name)
@@ -626,9 +626,9 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 value = obj.Name;
             end
         end
-        
+
         function value = specifyGroupName(obj)
-            % Determines the HDF5 group name for the entity. 
+            % Determines the HDF5 group name for the entity.
             %
             % Description:
             %   Subclasses can overwrite the default rules if needed, which
@@ -641,7 +641,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % See also:
             %   aod.core.Epoch.specifyGroupName
             % -------------------------------------------------------------
-            
+
             if aod.util.isempty(obj.Name)
                 value = obj.label;
             else
@@ -653,17 +653,17 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     methods (Access = protected)
         function sync(obj)
             % Sync entity with experiment hierarchy, check for conflicts
-            % 
+            %
             % Description:
-            %   Sync is called when an object's Parent is set. Use for 
-            %   aspects of entity building that require access to the 
+            %   Sync is called when an object's Parent is set. Use for
+            %   aspects of entity building that require access to the
             %   experiment hierarchy.
             %   By default, sync ensures the homeDirectory is purged from
-            %   file names containing the homeDirectory to facilitate 
+            %   file names containing the homeDirectory to facilitate
             %   relative file paths later on. Any properties containing an
             %   aod.core.Entity subclass that are not Parent or a container
-            %   are checked against the full experiment hierarchy to 
-            %   ensure a matching UUID is present (will be needed when 
+            %   are checked against the full experiment hierarchy to
+            %   ensure a matching UUID is present (will be needed when
             %   writing to HDF5 as a link)
             % -------------------------------------------------------------
             h = obj.getParent('Experiment');
@@ -679,7 +679,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 end
             end
 
-            % Identify properties that will be written as links and check 
+            % Identify properties that will be written as links and check
             % whether the linked entity exists in the experiment
             mc = metaclass(obj);
             propList = string({mc.PropertyList.Name});
@@ -721,7 +721,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
         function isUnique = validateGroupNames(obj)
             % Check whether an entity group name is unique
-            % 
+            %
             % Description:
             %   Checks whether entity shares a label with existing entities
             %   in the experiment (meaning that the newest entity will
@@ -781,13 +781,13 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
             parentContainerName = obj.entityType.parentContainer(obj);
             idx = obj.Parent.(parentContainerName) == obj;
-            obj.Parent.(parentContainerName)(idx) = []; 
+            obj.Parent.(parentContainerName)(idx) = [];
             removeParent(obj);
         end
 
         function setParent(obj, parent)
             % Set the parent property of an entity
-            %   
+            %
             % Syntax:
             %   obj.setParent(parent)
             % -------------------------------------------------------------
@@ -799,7 +799,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             if isempty(parent)
                 return
             end
-            
+
             if obj.validateParent(parent)
                 obj.Parent = parent;
             else
@@ -827,7 +827,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 arrayfun(@(x) removeParent(x), obj);
                 return;
             end
-            
+
             obj.Parent = [];
         end
     end
@@ -846,9 +846,9 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Create PostSet listeners for SetObservable properties
             %
             % Description:
-            %   Any property marked SetObservable will be assigned a 
-            %   'PostSet' listener with a callback to update the 
-            %   lastChanged property. Useful when a property change might 
+            %   Any property marked SetObservable will be assigned a
+            %   'PostSet' listener with a callback to update the
+            %   lastChanged property. Useful when a property change might
             %   impact the properties of other objects
             %
             % Syntax:
@@ -862,7 +862,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
 
             for i = 1:numel(idx)
-                addlistener(obj, mc.PropertyList(idx(i)).Name,... 
+                addlistener(obj, mc.PropertyList(idx(i)).Name,...
                     'PostSet', @obj.onPropertyChange);
             end
         end
@@ -871,7 +871,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Callback to update lastModified when property changes
             %
             % Description:
-            %   Triggered by the setting of a "SetObservable" property and 
+            %   Triggered by the setting of a "SetObservable" property and
             %   updated the lastModified property to current date/time
             % -------------------------------------------------------------
             obj.lastModified = datetime("now");
@@ -910,4 +910,4 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % -------------------------------------------------------------
         end
     end
-end 
+end

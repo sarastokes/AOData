@@ -1,9 +1,9 @@
 classdef Rois < aod.core.Annotation
 % Regions of interest
-% 
+%
 % Description:
 %   ROIs in physiology experiment
-% 
+%
 % Parent:
 %   aod.core.Annotation
 %
@@ -27,7 +27,7 @@ classdef Rois < aod.core.Annotation
 %   setMap(obj, map);
 %
 % Examples:
-%   % Load ROIs from a know file type 
+%   % Load ROIs from a know file type
 %   obj = aod.builtin.annotations.Rois('MyRois', 'rois.csv');
 %   obj.load();
 %
@@ -36,14 +36,14 @@ classdef Rois < aod.core.Annotation
 %       aod.builtin.readers.ImageJRoiReader('rois.zip', [100 200]));
 %   obj.load();
 %
-%   % Load data without associated file 
+%   % Load data without associated file
 %   roiData = magic(5);
 %   obj = aod.builtin.annotations.Rois('MyRois', roiData);
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetObservable, SetAccess = protected)
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         % The image used to annotate the ROIs
         Image
         % The FileReader used to import ROIs
@@ -105,15 +105,15 @@ classdef Rois < aod.core.Annotation
                 obj.setFile('AnnotationData', obj.Reader.fullFile);
             end
         end
-           
+
         function reload(obj)
             % Reload ROIs (if loaded from a specific file)
             %
             % Syntax:
             %   reload(obj)
             % -------------------------------------------------------------
-            if isempty(obj.Reader) 
-                error('reload:NoReader',... 
+            if isempty(obj.Reader)
+                error('reload:NoReader',...
                     'No Reader found for reloading ROIs from a file!');
             end
             newMap = obj.Reader.reload();
@@ -129,14 +129,14 @@ classdef Rois < aod.core.Annotation
 
             if nargin < 2 || isempty(reader)
                 obj.Reader = [];
-                return 
+                return
             end
 
             if ~isSubclass(reader, 'aod.common.FileReader')
                 error('setReader:InvalidType',...
                     'Input must be a subclass of aod.common.FileReader');
             end
-            
+
             obj.setProp('Reader', reader);
         end
 
@@ -157,7 +157,7 @@ classdef Rois < aod.core.Annotation
         end
     end
 
-    methods (Access = protected)     
+    methods (Access = protected)
         function setMap(obj, map)
             % Assigns ROI map to Data property and gets derived metadata
             %
