@@ -13,26 +13,26 @@ classdef PrimitiveTypes
 
     enumeration
         BOOLEAN
+        CATEGORICAL
         DATE
         DURATION
         INTEGER
         LINK
         NUMBER
-        TEXT
-        CATEGORICAL
         TABLE
+        TEXT
         UNKNOWN
     end
 
     methods
-        function primitive = create(obj, name, parent, varargin)
+        function primitive = create(obj, name, varargin)
             import aod.schema.primitives.PrimitiveTypes
 
             switch obj
                 case PrimitiveTypes.BOOLEAN
-                    primitive = aod.schema.primitives.Boolean(name);%, parent, varargin{:});
+                    primitive = aod.schema.primitives.Boolean(name, varargin{:});
                 case PrimitiveTypes.NUMBER
-                    primitive = aod.schema.primitives.Number(name);%, parent, varargin{:});
+                    primitive = aod.schema.primitives.Number(name, varargin{:});
             end
             % Going to need to create indiv functions instead of this
             % primitive = aod.schema.primitives.Wrapper(name, parent,...
@@ -40,8 +40,9 @@ classdef PrimitiveTypes
         end
 
         function tf = isTableAllowedParent(obj)
+            %% TODO: choose between this and allowableChild property
             txt = string(obj);
-            if ismember(txt, ["BOOLEAN", "NUMBER", "INTEGER", "TEXT"])
+            if ismember(txt, ["BOOLEAN", "DATE", "DURATION", "NUMBER", "INTEGER", "TEXT"])
                 tf = true;
             else
                 tf = false;
@@ -68,7 +69,7 @@ classdef PrimitiveTypes
                     obj = PrimitiveTypes.DATE;
                 case 'duration'
                     obj = PrimitiveTypes.DURATION;
-                case 'number'
+                case {'number', 'numeric'}
                     obj = PrimitiveTypes.NUMBER;
                 case 'integer'
                     obj = PrimitiveTypes.INTEGER;

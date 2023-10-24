@@ -72,7 +72,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Sealed, Access = {?aod.specification.types.Primitive})
+    methods (Sealed, Access = {?aod.schema.types.Primitive})
         function setParent(obj, primitive)
             obj.Parent = primitive;
         end

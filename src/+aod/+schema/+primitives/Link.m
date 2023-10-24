@@ -19,6 +19,7 @@ classdef Link < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.LINK
         OPTIONS = ["EntityType", "Description"];
+        VALIDATORS = ["Size", "EntityType"];
     end
 
     methods
@@ -31,7 +32,7 @@ classdef Link < aod.schema.primitives.Primitive
             end
 
             obj.Size.setValue("(1,1)");
-            % TODO: Set default value?
+            % TODO: Set default value of empty class?
 
             % Restrict parent types
             obj.ALLOWABLE_PARENT_TYPES = "Dataset";

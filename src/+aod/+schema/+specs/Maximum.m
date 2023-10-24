@@ -40,11 +40,16 @@ classdef Maximum < aod.specification.Validator
             end
         end
 
-        function tf = validate(obj, input)
+        function [tf, ME] = validate(obj, input)
+            ME = [];
             if obj.isempty()
                 tf = true;
             else
                 tf = all(input <= obj.Value);
+                if ~tf
+                    ME = MException('validate:MaximumExceeded',...
+                        'Value exceeds maximum of %s', num2str(obj.Value));
+                end
             end
         end
 

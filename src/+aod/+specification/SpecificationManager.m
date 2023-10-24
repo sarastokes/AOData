@@ -239,7 +239,6 @@ classdef (Abstract) SpecificationManager < handle
             end
             out = obj.className;
         end
-
     end
 
     % methods (Access = private)

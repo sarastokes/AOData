@@ -1,4 +1,4 @@
-classdef AttributeManager < aod.specification.SpecificationManager 
+classdef AttributeManager < aod.specification.SpecificationManager
 % Manage expected attributes
 %
 % Superclasses:
@@ -28,11 +28,10 @@ classdef AttributeManager < aod.specification.SpecificationManager
                 className = "Unknown";
             end
             obj@aod.specification.SpecificationManager(className);
-            %obj.specType = "Attribute";
         end
     end
 
-    methods 
+    methods
         function add(obj, attr, varargin)
             % Add a new attribute
             %
@@ -46,10 +45,10 @@ classdef AttributeManager < aod.specification.SpecificationManager
             end
             add@aod.specification.SpecificationManager(obj, entry);
         end
-    
+
         function ip = parse(obj, varargin)
             % Parse key/value inputs according to specified attributes
-            % 
+            %
             % Syntax:
             %   ip = parse(obj, varargin)
             % -------------------------------------------------------------
@@ -63,14 +62,14 @@ classdef AttributeManager < aod.specification.SpecificationManager
             %
             % Syntax:
             %   ip = getParser(obj)
-            % 
+            %
             % See also:
             %   aod.util.InputParser, inputParser
             % -------------------------------------------------------------
             ip = aod.util.InputParser();
 
             for i = 1:obj.Count
-                if aod.util.isempty(obj.Entries(i).Default) 
+                if aod.util.isempty(obj.Entries(i).Default)
                     defaultValue = [];
                 else
                     defaultValue = obj.Entries(i).Default.Value;
@@ -101,4 +100,4 @@ classdef AttributeManager < aod.specification.SpecificationManager
             obj.className = className;
         end
     end
-end 
+end

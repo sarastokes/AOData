@@ -5,9 +5,7 @@ classdef DefaultValue < aod.specification.Validator
 %   aod.specification.Validator
 %
 % Constructor:
-%   aod.specification.DefaultValue(input)
-%
-% TODO: Should this be a "validator"?
+%   aod.specification.DefaultValue(input
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

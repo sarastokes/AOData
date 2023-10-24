@@ -19,6 +19,7 @@ classdef Categorical < aod.schema.primitives.Primitive
 
     properties (Hidden, SetAccess = protected)
         OPTIONS = ["Enum", "Size", "Default", "Description"]
+        VALIDATORS = ["Format", "Enum", "Size"];
     end
 
     methods
@@ -29,7 +30,8 @@ classdef Categorical < aod.schema.primitives.Primitive
             obj.Enum = aod.schema.specs.Enum(obj, []);
 
             % Fixed values
-            obj.Format.setValue('categorical');  % or isenum etc...
+            % TODO: necessary to restrict to categorical?
+            obj.Format.setValue('categorical');
 
             obj.setName(name);
             obj.parseInputs(varargin{:});

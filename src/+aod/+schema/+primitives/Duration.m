@@ -14,6 +14,7 @@ classdef Duration < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DURATION
         OPTIONS = ["Size", "Units", "Description"];
+        VALIDATORS = ["Format", "Size"];
     end
 
     methods

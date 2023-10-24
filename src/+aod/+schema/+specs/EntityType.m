@@ -46,7 +46,7 @@ classdef EntityType < aod.specification.Validator
                 ME = MException('AOData:EntityType:Invalid', ...
                     'Links must be to AOData entities, class was %s.', class(input));
             else
-                tf = isequal(obj.Value, input.entityType)
+                tf = isequal(obj.Value, input.entityType);
                 if ~tf
                     ME = MException('AOData:EntityType:Invalid', ...
                         'Invalid entity type (%s).', string(input.entityType));

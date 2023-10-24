@@ -6,6 +6,9 @@ classdef Enum < aod.specification.Validator
 %
 % Constructor:
 %   obj = aod.schema.specs.Enum(parent, value)
+%
+% Example:
+%   obj = aod.schema.specs.Enum([], ["low", "medium", "high"])
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -22,7 +25,6 @@ classdef Enum < aod.specification.Validator
     end
 
     methods
-
         function setValue(obj, input)
             arguments
                 obj
@@ -43,14 +45,14 @@ classdef Enum < aod.specification.Validator
 
             if ~istext(input)
                 tf = false;
-                ME = MException('validate:InvalidClass',...
+                ME = MException('Enum:validate:InvalidClass',...
                     'Input must be string or char, not %s', class(input));
                 return
             end
 
             tf = ismember(input, obj.Value);
             if ~tf
-                ME = MException('validate:InvalidEnum',...
+                ME = MException('Enum:validate:InvalidEnum',...
                     'Input must be one of %s', strjoin(obj.Value, ', '));
             else
                 ME = [];

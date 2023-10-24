@@ -10,6 +10,7 @@ classdef Date < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATE
         OPTIONS = "Description";
+        VALIDATORS = ["Format", "Size"];
     end
 
     methods

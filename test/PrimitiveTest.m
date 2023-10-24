@@ -1,14 +1,14 @@
-classdef SchemaTest < matlab.unittest.TestCase
-% Tests schemas for AOData subclasses
+classdef PrimitiveTest < matlab.unittest.TestCase
+% Tests primitives for AOData schemas
 %
 % Description:
-%   Tests the individual components for schema creation and management
+%   Tests the primitives for dataset/attribute specification
 %
 % Superclass:
 %    matlab.unittest.TestCase
 %
 % Use:
-%   result = runtests('SchemaTest.m')
+%   result = runtests('PrimitiveTest.m')
 %
 % See also:
 %   runAODataTestSuite
@@ -28,7 +28,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyEmpty(obj.Description);
             obj.assign('Description', "Test");
             testCase.verifyEqual(obj.Description.Value, "Test");
-            
+
             testCase.verifyEmpty(obj.Size);
             obj.setSize("(1,2)");
             testCase.verifyEqual(obj.Size.text(), "(1,2)");
@@ -73,9 +73,9 @@ classdef SchemaTest < matlab.unittest.TestCase
             obj.assign('Minimum', 1, 'Maximum', 3);
             testCase.verifyEqual(obj.Minimum.Value, 1);
             testCase.verifyEqual(obj.Minimum.Value, 3);
-            
+
             testCase.verifyTrue(obj.validate(2));
-            
+
         end
     end
 

@@ -24,6 +24,7 @@ classdef Text < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.TEXT
         OPTIONS = ["NumItems", "Length", "Enum", "Description"]
+        VALIDATORS = ["Format", "NumItems", "Length", "Enum"];
     end
 
     methods

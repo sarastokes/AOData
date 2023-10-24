@@ -39,8 +39,17 @@ classdef Minimum < aod.specification.Validator
             end
         end
 
-        function tf = validate(obj, input)
-            tf = all(input >= obj.Value);
+        function [tf, ME] = validate(obj, input)
+            ME = [];
+            if isempty(obj)
+                tf = true;
+            else
+                tf = all(input >= obj.Value);
+                if ~tf
+                    ME = MException('validate:MinimumExceeded',...
+                        'Value was lower than Minimum of %s', num2str(obj.Value));
+                end
+            end
         end
 
         function out = text(obj)

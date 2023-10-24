@@ -30,6 +30,11 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         % They are assigned in the order listed, so one option can be
         % used to validate or assign values to a later option.
         OPTIONS     (1,:)       string
+        % These are the fields that will be used to validate data. This may
+        % differ from OPTIONS which can contain decorators and validators
+        % that are set automatically and thus absent fromm OPTIONS.
+        VALIDATORS  (1,:)       string
+        % The primitive type
         PRIMITIVE_TYPE          aod.schema.primitives.PrimitiveTypes
     end
 
@@ -53,6 +58,16 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 
         function tf = isValid(obj)
             tf = aod.util.isempty(obj.Name) || strcmp(obj.Name, "UNDEFINED");
+            try
+                obj.checkIntegrity();
+            catch ME
+                if contains(ME.identifier, "checkIntegrity")
+                    tf = false;
+                    warning("isValid:IntegrityFailure", "%s", ME.message);
+                else
+                    rethrow(ME);
+                end
+            end
         end
 
         function displayOptions(obj)
