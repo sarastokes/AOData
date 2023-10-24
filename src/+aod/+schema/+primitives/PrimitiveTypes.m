@@ -16,6 +16,7 @@ classdef PrimitiveTypes
         CATEGORICAL
         DATE
         DURATION
+        FILE
         INTEGER
         LINK
         NUMBER
@@ -25,20 +26,6 @@ classdef PrimitiveTypes
     end
 
     methods
-        function primitive = create(obj, name, varargin)
-            import aod.schema.primitives.PrimitiveTypes
-
-            switch obj
-                case PrimitiveTypes.BOOLEAN
-                    primitive = aod.schema.primitives.Boolean(name, varargin{:});
-                case PrimitiveTypes.NUMBER
-                    primitive = aod.schema.primitives.Number(name, varargin{:});
-            end
-            % Going to need to create indiv functions instead of this
-            % primitive = aod.schema.primitives.Wrapper(name, parent,...
-            %     'Type', lower(string(obj)), varargin{:});
-        end
-
         function tf = isTableAllowedParent(obj)
             %% TODO: choose between this and allowableChild property
             txt = string(obj);
@@ -69,6 +56,8 @@ classdef PrimitiveTypes
                     obj = PrimitiveTypes.DATE;
                 case 'duration'
                     obj = PrimitiveTypes.DURATION;
+                case 'file'
+                    obj = PrimitiveTypes.FILE;
                 case {'number', 'numeric'}
                     obj = PrimitiveTypes.NUMBER;
                 case 'integer'
@@ -106,6 +95,12 @@ classdef PrimitiveTypes
                 obj = PrimitiveTypes.TEXT;
             elseif istable(data)
                 obj = PrimitiveTypes.TABLE;
+            elseif istext(data)
+                if isfile(data)
+                    obj = PrimitiveTypes.FILE;
+                else
+                    obj = PrimitiveTypes.TEXT;
+                end
             elseif isenum(data) || iscategorical(data)
                 error('find:NotYetImplemented', 'Enum type not yet implemented');
             end

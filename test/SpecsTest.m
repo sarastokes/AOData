@@ -16,7 +16,7 @@ classdef SpecsTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="EntityType")
         function EntityType(testCase)
-            obj = aod.schema.specs.EntityType([], 'Calibration');
+            obj = aod.schema.validators.EntityType([], 'Calibration');
             testCase.verifyFalse(obj.isempty());
 
             [tf, ME] = obj.validate(aod.core.Calibration('Test', getDateYMD()));
@@ -35,7 +35,7 @@ classdef SpecsTest < matlab.unittest.TestCase
         end
 
         function EmptyEntityType(testCase)
-            obj = aod.schema.specs.EntityType([], []);
+            obj = aod.schema.validators.EntityType([], []);
             testCase.verifyEmpty(obj);
 
             [tf, ME] = obj.validate(aod.core.Calibration("Test", getDateYMD()));
@@ -45,7 +45,7 @@ classdef SpecsTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Enum")
         function Enum(testCase)
-            obj = aod.schema.specs.Enum([], ["a", "b", "c"]);
+            obj = aod.schema.validators.Enum([], ["a", "b", "c"]);
             testCase.verifyFalse(obj.isempty());
 
             [tf, ME] = obj.validate("a");
@@ -57,7 +57,7 @@ classdef SpecsTest < matlab.unittest.TestCase
         end
 
         function EmptyEnum(testCase)
-            obj = aod.schema.specs.Enum([], []);
+            obj = aod.schema.validators.Enum([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
 
@@ -67,7 +67,7 @@ classdef SpecsTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Length")
         function Length(testCase)
-            obj = aod.schema.specs.Length([], 3);
+            obj = aod.schema.validators.Length([], 3);
             testCase.verifyFalse(obj.isempty());
             testCase.verifyEqual(obj.text(), "3");
 
@@ -85,7 +85,7 @@ classdef SpecsTest < matlab.unittest.TestCase
         end
 
         function EmptyLength(testCase)
-            obj = aod.schema.specs.Length([], []);
+            obj = aod.schema.validators.Length([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
 
@@ -96,7 +96,7 @@ classdef SpecsTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Count")
         function Count(testCase)
-            obj = aod.schema.specs.Count([], 3);
+            obj = aod.schema.validators.Count([], 3);
             testCase.verifyFalse(isempty(obj));
 
             [tf, ME] = obj.validate(["a", "b", "c"]);
@@ -112,7 +112,7 @@ classdef SpecsTest < matlab.unittest.TestCase
         end
 
         function EmptyCount(testCase)
-            obj = aod.schema.specs.Count([], []);
+            obj = aod.schema.validators.Count([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
 
@@ -123,7 +123,7 @@ classdef SpecsTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Units")
         function Units(testCase)
-            obj = aod.schema.specs.Units([], "mV");
+            obj = aod.schema.decorators.Units([], "mV");
             testCase.verifyFalse(obj.isempty());
 
             obj.setValue(["mV"; "sec"]);
@@ -131,9 +131,36 @@ classdef SpecsTest < matlab.unittest.TestCase
         end
 
         function EmptyUnits(testCase)
-            obj = aod.schema.specs.Units([], []);
+            obj = aod.schema.decorators.Units([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
+        end
+    end
+
+    methods (Test, TestTags="ExtensionType")
+        function ExtensionType(testCase)
+
+            obj = aod.schema.validators.ExtensionType([], ".txt");
+            testCase.verifyNotEmpty(obj);
+
+            [tf, ME] = obj.validate("test.txt");
+            testCase.verifyTrue(tf);
+            testCase.verifyEmpty(ME);
+
+            [tf, ME] = obj.validate("test.csv");
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:InvalidExtension');
+
+            [tf, ME] = obj.validate("test");
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:NoExtensionFound');
+        end
+
+        function ExtensionTypeErrors(testCase)
+
+            testCase.verifyError(...
+                @() aod.schema.validators.ExtensionType([], [".txt", "csv"]),...
+                "setExtensionType:InvalidExtension");
         end
     end
 end

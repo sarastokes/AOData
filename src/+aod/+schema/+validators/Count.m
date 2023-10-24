@@ -5,7 +5,7 @@ classdef Count < aod.specification.Validator
 %   aod.specification.Validator
 %
 % Constructor:
-%   obj = aod.schema.specs.Count(parent, value)
+%   obj = aod.schema.validators.Count(parent, value)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -29,20 +29,20 @@ classdef Count < aod.specification.Validator
         function setValue(obj, value)
             if aod.util.isempty(value)
                 obj.Value = [];
+                return
             end
 
             obj.Value = value;
         end
 
         function [tf, ME] = validate(obj, input)
+            tf = true; ME = [];
+
             if aod.util.isempty(input) || isempty(obj)
-                tf = true; ME = [];
                 return
             end
 
-            if numel(input) == obj.Value
-                tf = true; ME = [];
-            else
+            if numel(input) ~= obj.Value
                 tf = false;
                 ME = MException('validate:InvalidCount',...
                     'Expected count to be %u, was %u', obj.Value, numel(input));

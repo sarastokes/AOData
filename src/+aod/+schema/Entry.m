@@ -9,14 +9,16 @@ classdef Entry < handle
 
     properties (Dependent)
         Name                (1,1)   string
-        PrimitiveType           % aod.schema.primitives.PrimitiveTypes
+        primitiveType           % aod.schema.primitives.PrimitiveTypes
         ParentPath          (1,1)   string
     end
 
     methods
         function obj = Entry(parent, name, type, varargin)
-            obj.Parent = parent;
-            % TODO: Get defining class from parent
+            if ~isempty(parent)
+                obj.setParent(parent);  % empty parent support for testing
+            end
+
             obj.Primitive = aod.schema.util.createPrimitive(...
                 type, name, varargin{:});
         end
@@ -25,7 +27,7 @@ classdef Entry < handle
             value = obj.Primitive.Name;
         end
 
-        function value = get.PrimitiveType(obj)
+        function value = get.primitiveType(obj)
             value = obj.Primitive.PRIMITIVE_TYPE;
         end
 
@@ -83,6 +85,31 @@ classdef Entry < handle
             % if verbose
             %     fprintf(summary + "\n");
             % end
+        end
+    end
+
+    methods (Access = private)
+        function setParent(obj, parent)
+            arguments
+                obj
+                parent      {mustBeSubclass(parent, 'aod.schema.SchemaCollection')}
+            end
+
+            obj.Parent = parent;
+            if ~isempty(parent.Parent)
+                obj.definingClassName = class(parent.Parent);
+            end
+        end
+    end
+
+    % MATLAB builtin functions
+    methods
+        function tf = isequal(obj, other)
+            if ~isSubclass(other, 'aod.schema.Entry')
+                tf = false;
+            else
+                tf = isequal(obj.Primitive, other.Primitive);
+            end
         end
     end
 end

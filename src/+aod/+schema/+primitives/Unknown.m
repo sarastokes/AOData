@@ -2,7 +2,7 @@ classdef Unknown < aod.schema.primitives.Primitive
 % A placeholder for unspecified datasets/attributes
 %
 % Superclasses:
-%   aod.schema.specs.Primitive
+%   aod.schema.validators.Primitive
 %
 % Constructor:
 %   obj = aod.schema.primitives.Unknown(name, parent, varargin)

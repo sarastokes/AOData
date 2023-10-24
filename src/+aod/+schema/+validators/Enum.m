@@ -5,10 +5,10 @@ classdef Enum < aod.specification.Validator
 %   aod.specification.Specification
 %
 % Constructor:
-%   obj = aod.schema.specs.Enum(parent, value)
+%   obj = aod.schema.validators.Enum(parent, value)
 %
 % Example:
-%   obj = aod.schema.specs.Enum([], ["low", "medium", "high"])
+%   obj = aod.schema.validators.Enum([], ["low", "medium", "high"])
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

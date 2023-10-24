@@ -15,9 +15,9 @@ classdef Integer < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Minimum     aod.schema.specs.Minimum
-        Maximum     aod.schema.specs.Maximum
-        Units       aod.schema.specs.Units
+        Minimum     aod.schema.validators.Minimum
+        Maximum     aod.schema.validators.Maximum
+        Units       aod.schema.decorators.Units
     end
 
     properties (Hidden, SetAccess = protected)
@@ -31,9 +31,9 @@ classdef Integer < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, varargin{:});
 
             % Initialization
-            obj.Minimum = aod.schema.specs.Minimum(obj, []);
-            obj.Maximum = aod.schema.specs.Maximum(obj, []);
-            obj.Units = aod.schema.specs.Units(obj, []);
+            obj.Minimum = aod.schema.validators.Minimum(obj, []);
+            obj.Maximum = aod.schema.validators.Maximum(obj, []);
+            obj.Units = aod.schema.decorators.Units(obj, []);
 
             obj.parseInputs(varargin{:});
         end

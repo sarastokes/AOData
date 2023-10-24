@@ -27,7 +27,7 @@ classdef Categorical < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name);
 
             % Initialize
-            obj.Enum = aod.schema.specs.Enum(obj, []);
+            obj.Enum = aod.schema.validators.Enum(obj, []);
 
             % Fixed values
             % TODO: necessary to restrict to categorical?

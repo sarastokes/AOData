@@ -7,7 +7,7 @@ classdef Length < aod.specification.Validator
 %   Validates the length of a string
 %
 % Constructor:
-%   obj = aod.schema.specs.Length(value)
+%   obj = aod.schema.validators.Length(value)
 
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------

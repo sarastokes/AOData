@@ -8,7 +8,7 @@ classdef Duration < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Units           aod.schema.specs.Units
+        Units           aod.schema.decorators.Units
     end
 
     properties (Hidden, SetAccess = protected)
@@ -21,7 +21,7 @@ classdef Duration < aod.schema.primitives.Primitive
         function obj = Duration(name, parent, varargin)
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
-            obj.Units = aod.schema.specs.Units(obj, []);
+            obj.Units = aod.schema.decorators.Units(obj, []);
             obj.setFormat("duration");
             obj.setUnits("s");
 

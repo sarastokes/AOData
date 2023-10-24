@@ -5,7 +5,7 @@ classdef EntityType < aod.specification.Validator
 %   aod.specification.Validator
 %
 % Constructor:
-%   obj = aod.schema.specs.EntityType(value)
+%   obj = aod.schema.validators.EntityType(value)
 %
 % See also:
 %   aod.common.EntityTypes

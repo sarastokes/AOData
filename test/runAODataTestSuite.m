@@ -2,7 +2,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 % Customized unit testing for AOData
 %
 % Description:
-%   Runs the full test suite with options for code coverage reports, 
+%   Runs the full test suite with options for code coverage reports,
 %   debugging and keeping files produced during testing
 %
 % Syntax:
@@ -22,7 +22,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 %   results             matlab.unittest.TestResult
 %       The results of each test case
 %   coverageTable       table
-%       A table containing the statement/function coverage summary, 
+%       A table containing the statement/function coverage summary,
 %       empty if the Coverage parameter was false.
 %
 % See also:
@@ -31,7 +31,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    tic 
+    tic
     setpref('AOData', 'TestMode', true);
 
     ip = inputParser();
@@ -77,7 +77,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
         packageTable = struct2table(packageCoverage);
         packageTable.Total = [coverageTable{1,[2,1,4]}, coverageTable{2,[2,1,4]}]';
         packageTable.Properties.RowNames = [...
-            "ExecutedStatements", "TotalStatements", "StatementCoverage",... 
+            "ExecutedStatements", "TotalStatements", "StatementCoverage",...
             "ExecutedFunctions", "TotalFunctions", "FunctionCoverage"];
         writetable(packageTable, 'PackageCoverage.txt', 'WriteRowNames', true);
         % Code coverage without app package
@@ -106,7 +106,7 @@ end
 
 function results = testWithoutCoverageReport(debugFlag, reportFlag)
     import matlab.unittest.plugins.StopOnFailuresPlugin
-    import matlab.unittest.plugins.TestReportPlugin 
+    import matlab.unittest.plugins.TestReportPlugin
     suite = testsuite(pwd);
     runner = testrunner("textoutput");
 
@@ -129,10 +129,10 @@ end
 
 function results = testWithCoverageReport(debugFlag, reportFlag)
     import matlab.unittest.plugins.CodeCoveragePlugin
-    import matlab.unittest.plugins.codecoverage.CoverageReport    
+    import matlab.unittest.plugins.codecoverage.CoverageReport
     import matlab.unittest.plugins.StopOnFailuresPlugin
-    import matlab.unittest.plugins.TestReportPlugin 
-    
+    import matlab.unittest.plugins.TestReportPlugin
+
     if ~exist('coverage_report', 'dir')
         mkdir('coverage_report');
     end

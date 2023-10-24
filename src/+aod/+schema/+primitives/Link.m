@@ -13,7 +13,7 @@ classdef Link < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        EntityType        aod.schema.specs.EntityType
+        EntityType        aod.schema.validators.EntityType
     end
 
     properties (Hidden, SetAccess = protected)
@@ -25,7 +25,7 @@ classdef Link < aod.schema.primitives.Primitive
     methods
         function obj = Link(name, varargin)
             obj = obj@aod.schema.primitives.Primitive(name);
-            obj.EntityType = aod.schema.specs.EntityType(obj, []);
+            obj.EntityType = aod.schema.validators.EntityType(obj, []);
 
             if nargin > 2
                 obj.setEntityType(entityType);
@@ -50,13 +50,5 @@ classdef Link < aod.schema.primitives.Primitive
                     string(obj.EntityType.Value.getPersistentClassName())]);
             end
         end
-
-        % function setFormat(obj, value)
-        %     if ~aod.util.isEntityType(value, obj.EntityType.Value)
-        %         error("setFormat:InvalidClass",...
-        %             "Format must be a valid %s subclass", value);
-        %     end
-        %     obj.setFormat(value);
-        % end
     end
 end

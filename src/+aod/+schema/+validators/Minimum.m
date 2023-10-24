@@ -5,7 +5,7 @@ classdef Minimum < aod.specification.Validator
 %   aod.specification.Validator
 %
 % Constructor:
-%   obj = aod.schema.specs.Minimum(parent, value)
+%   obj = aod.schema.validators.Minimum(parent, value)
 %
 %
 

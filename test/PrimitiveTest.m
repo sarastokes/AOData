@@ -95,4 +95,16 @@ classdef PrimitiveTest < matlab.unittest.TestCase
                 @() obj.assign('Default', 1), "assign:InvalidParameter");
         end
     end
+
+    methods (Test, TestTags="File")
+        function File(testCase)
+            obj = aod.schema.primitives.File("Test");
+            testCase.verifyEmpty(obj.ExtensionType);
+
+            obj = aod.schema.primitives.File("Test", "ExtensionType", ".csv");
+            testCase.verifyEqual(obj.ExtensionType.Value, ".csv");
+
+            testCase.verifyError(@() obj.assign('Default', 1), "assign:InvalidParameter");
+        end
+    end
 end

@@ -297,4 +297,33 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             end
         end
     end
+
+    % MATLAB builtin methods
+    methods
+        function tf = isequal(obj, other)
+            % Determine if two primitives are equal
+            %
+            % Syntax:
+            %   tf = isequal(obj, other)
+            % -------------------------------------------------------------
+            if ~isa(other, 'aod.schema.primitives.Primitive')
+                tf = false;
+                return
+            end
+
+            if ~isequal(obj.primitiveType, other.primitiveType)
+                tf = false;
+                return
+            end
+
+            for i = 1:numel(obj.OPTIONS)
+                if ~isequal(obj.(obj.OPTIONS(i)), other.(obj.OPTIONS(i)))
+                    tf = false;
+                    return
+                end
+            end
+
+            tf = true;  % At this point, they're equal.
+        end
+    end
 end

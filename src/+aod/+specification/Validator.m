@@ -1,4 +1,4 @@
-classdef (Abstract) Validator < aod.specification.Specification 
+classdef (Abstract) Validator < aod.specification.Specification
 % Validator (abstract)
 %
 % Superclasses:
@@ -26,10 +26,24 @@ classdef (Abstract) Validator < aod.specification.Specification
 
     methods
         function obj = Validator(parent)
-            arguments 
+            arguments
                 parent          = []
             end
             obj = obj@aod.specification.Specification(parent);
         end
     end
-end 
+
+    methods
+        function tf = isequal(obj, other)
+            if ~isa(other, class(obj))
+                tf = false;
+                return
+            end
+
+            % If a subclass doesn't have Value, they should override this
+            if isprop(obj, 'Value') && isprop(other, 'Value')
+                tf = isequal(obj.Value, other.Value);
+            end
+        end
+    end
+end

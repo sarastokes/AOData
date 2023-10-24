@@ -16,9 +16,9 @@ classdef Text < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Length          aod.schema.specs.Length
-        Count           aod.schema.specs.Count
-        Enum            aod.schema.specs.Enum
+        Length          aod.schema.validators.Length
+        Count           aod.schema.validators.Count
+        Enum            aod.schema.validators.Enum
     end
 
     properties (Hidden, SetAccess = protected)
@@ -32,9 +32,9 @@ classdef Text < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, varargin{:});
 
             % Initialization
-            obj.Length = aod.schema.specs.Length([], obj);
-            obj.Enum = aod.schema.specs.Enum([], obj);
-            obj.Count = aod.schema.specs.Count([], obj);
+            obj.Length = aod.schema.validators.Length([], obj);
+            obj.Enum = aod.schema.validators.Enum([], obj);
+            obj.Count = aod.schema.validators.Count([], obj);
 
             % Defaults
             obj.setFormat("string");
@@ -77,5 +77,4 @@ classdef Text < aod.schema.primitives.Primitive
             end
         end
     end
-
 end

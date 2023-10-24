@@ -4,7 +4,7 @@ classdef Units < aod.specification.Decorator
 %   aod.specification.Decorator
 %
 % Constructor:
-%   obj = aod.schema.specs.Units(parent, value)
+%   obj = aod.schema.decorators.Units(parent, value)
 %
 
 % By Sara Patterson, 2023 (AOData)
