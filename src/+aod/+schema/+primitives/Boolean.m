@@ -20,8 +20,13 @@ classdef Boolean < aod.schema.primitives.Primitive
         function obj = Boolean(name, parent, varargin)
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
+            % Set default values
             obj.setFormat("logical");
+
+            % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
     end
 

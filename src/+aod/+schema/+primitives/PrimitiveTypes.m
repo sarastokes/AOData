@@ -27,7 +27,7 @@ classdef PrimitiveTypes
 
     methods
         function tf = isTableAllowedParent(obj)
-            %% TODO: choose between this and allowableChild property
+            % TODO: choose between this and allowableChild property
             txt = string(obj);
             if ismember(txt, ["BOOLEAN", "DATE", "DURATION", "NUMBER", "INTEGER", "TEXT"])
                 tf = true;
@@ -46,32 +46,15 @@ classdef PrimitiveTypes
         function obj = get(input)
             import aod.schema.primitives.PrimitiveTypes
 
-            input = convertStringsToChars(input);
-            input = lower(input);
-
-            switch input
-                case 'boolean'
-                    obj = PrimitiveTypes.BOOLEAN;
-                case 'date'
-                    obj = PrimitiveTypes.DATE;
-                case 'duration'
-                    obj = PrimitiveTypes.DURATION;
-                case 'file'
-                    obj = PrimitiveTypes.FILE;
-                case {'number', 'numeric'}
-                    obj = PrimitiveTypes.NUMBER;
-                case 'integer'
-                    obj = PrimitiveTypes.INTEGER;
-                case 'link'
-                    obj = PrimitiveTypes.LINK;
-                case 'text'
-                    obj = PrimitiveTypes.TEXT;
-                case 'table'
-                    obj = PrimitiveTypes.TABLE;
-                case 'unknown'
-                    obj = PrimitiveTypes.UNKNOWN;
-                otherwise
-                    error('get:InvalidInput', 'Unrecognized input: %s', input);
+            if isa(input, 'aod.schema.primitives.PrimitiveTypes')
+                obj = input;
+                return
+            end
+            try 
+                obj = aod.schema.primitives.PrimitiveTypes.(upper(input));
+            catch
+                error('get:UnrecognizedPrimitiveType',... 
+                    'Unrecognized input %s', input);
             end
         end
 

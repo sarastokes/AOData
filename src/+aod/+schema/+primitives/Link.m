@@ -23,19 +23,21 @@ classdef Link < aod.schema.primitives.Primitive
     end
 
     methods
-        function obj = Link(name, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name);
-            obj.EntityType = aod.schema.validators.EntityType(obj, []);
+        function obj = Link(name, parent, varargin)
+            obj = obj@aod.schema.primitives.Primitive(name, parent);
 
-            if nargin > 2
-                obj.setEntityType(entityType);
-            end
+            obj.EntityType = aod.schema.validators.EntityType(obj, []);
 
             obj.Size.setValue("(1,1)");
             % TODO: Set default value of empty class?
 
             % Restrict parent types
             obj.ALLOWABLE_PARENT_TYPES = "Dataset";
+
+            % Complete setup and ensure schema consistency
+            obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
     end
 
@@ -48,6 +50,24 @@ classdef Link < aod.schema.primitives.Primitive
                 obj.setFormat([...
                     string(obj.EntityType.Value.getCoreClassName()),...
                     string(obj.EntityType.Value.getPersistentClassName())]);
+            end
+        end
+    end
+
+    methods
+        function [tf, ME] = checkIntegrity(obj, throwError)
+            arguments
+                obj
+                throwError          logical = false
+            end
+
+            if obj.isInitializing
+                tf = true; ME = [];
+            end
+
+            [tf, ME] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            if throwError && ~tf
+                throw(ME);
             end
         end
     end

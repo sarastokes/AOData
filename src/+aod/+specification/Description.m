@@ -13,9 +13,9 @@ classdef Description < aod.specification.Decorator
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        Value (1,1)         string      = ""
-    end
+    % properties (SetAccess = private)
+    %     Value (1,1)         string      = ""
+    % end
 
     methods
         function obj = Description(input, parent)
@@ -43,6 +43,7 @@ classdef Description < aod.specification.Decorator
             end
 
             input = convertCharsToStrings(input);
+            mustBeTextScalar(input);
 
             obj.Value = input;
         end
@@ -58,10 +59,6 @@ classdef Description < aod.specification.Decorator
 
     % MATLAB built-in methods
     methods
-        function tf = isempty(obj)
-            tf = aod.util.isempty(obj.Value);
-        end
-
         function out = jsonencode(obj)
             if isempty(obj)
                 out = jsonencode([]);

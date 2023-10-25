@@ -20,7 +20,7 @@ classdef Length < aod.specification.Validator
         function obj = Length(parent, value)
             arguments
                 parent      {mustBeScalarOrEmpty}   = []
-                value       {mustBeInteger}         = []
+                value       {mustBeScalarOrEmpty, mustBeInteger}   = []
             end
             obj = obj@aod.specification.Validator(parent);
             if ~isempty(value)

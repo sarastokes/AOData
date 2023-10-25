@@ -28,8 +28,8 @@ classdef Text < aod.schema.primitives.Primitive
     end
 
     methods
-        function obj = Text(name, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, varargin{:});
+        function obj = Text(name, parent, varargin)
+            obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             % Initialization
             obj.Length = aod.schema.validators.Length([], obj);
@@ -38,10 +38,25 @@ classdef Text < aod.schema.primitives.Primitive
 
             % Defaults
             obj.setFormat("string");
+
+            % Complete setup and ensure schema consistency
+            obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
     end
 
     methods
+        function setDefault(obj, value)
+            arguments
+                obj
+                value       string = ""
+            end
+
+            obj.Default.setValue(value);
+            obj.checkIntegrity(true);
+        end
+
         function setCount(obj, value)
             arguments
                 obj
@@ -53,6 +68,7 @@ classdef Text < aod.schema.primitives.Primitive
             else
                 obj.NumItems = value;
             end
+            obj.checkIntegrity(true);
         end
 
         function setEnum(obj, value)
@@ -62,6 +78,7 @@ classdef Text < aod.schema.primitives.Primitive
             end
 
             obj.Enum.setValue(value);
+            obj.checkIntegrity(true);
         end
 
         function setLength(obj, value)
@@ -74,6 +91,56 @@ classdef Text < aod.schema.primitives.Primitive
                 obj.Length.Value = [];
             else
                 obj.Length.setValue(value);
+            end
+            obj.checkIntegrity(true);
+        end
+    end
+
+    methods
+        function [tf, ME] = checkIntegrity(obj, throwErrors)
+            if nargin < 2
+                throwErrors = false;
+            end
+            if obj.isInitializing
+                tf = true; ME = [];
+                return
+            end
+            [~, ~, excObj] = checkIntegrity@aod.schema.Primitive(obj);
+
+            if ~aod.util.isempty(obj.Default)
+                if ~isempty(obj.Length)
+                    if all(strlength(obj.Default.Value) == obj.Length.Value)
+                        excObj.addCause(MException(...
+                            'checkIntegrity:InvalidDefaultLength',...
+                            'Default value did not match Length (%u)', obj.Length.Value));
+                    end
+                elseif ~isempty(obj.Enum)
+                    if ~any(ismember(obj.Default.Value, obj.Enum.Value))
+                        excObj.addCause(MException(...
+                            'checkIntegrity:InvalidDefaultValue',...
+                            'Default value was not in Enum: %s', strjoin(obj.Enum.Value, ', ')));
+                    end
+                elseif ~isempty(obj.Count)
+                    if numel(obj.Default.Value) ~= obj.Count.Value
+                        excObj.addCause(MException(...
+                            'checkIntegrity:InvalidDefaultCount',...
+                            'Default value did not match Count (%u)', obj.Count.Value));
+                    end
+                end
+            end
+
+            if ~isempty(obj.Enum)
+                if any(strlength(obj.Enum.Value) ~= obj.Length.Value)
+                    excObj.addCause(MException(...
+                        'checkIntegrity:InvalidEnumLength',...
+                        'Enum values did not match Length (%u)', obj.Length.Value));
+                end
+            end
+
+            ME = excObj.getException();
+            tf = isempty(ME);
+            if ~tf && throwErrors
+                throw(ME);
             end
         end
     end

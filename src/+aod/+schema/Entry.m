@@ -1,90 +1,79 @@
 classdef Entry < handle
 % This is where primitive type changes would be handled
 
-    properties
-        Parent                  % aod.schema.SpecificationManager
+    properties (SetAccess = private)
+        Parent                  % aod.schema.SchemaCollection
         Primitive               % aod.schema.primitives.Primitive
-        definingClassName   (1,1)   string  = "UndefinedClass"
     end
 
     properties (Dependent)
-        Name                (1,1)   string
-        primitiveType           % aod.schema.primitives.PrimitiveTypes
-        ParentPath          (1,1)   string
+        Name            (1,1)   string
+        className       (1,1)   string
+        primitiveType   (1,1)   aod.schema.primitives.PrimitiveTypes
+        ParentPath      (1,1)   string
     end
 
     methods
         function obj = Entry(parent, name, type, varargin)
-            if ~isempty(parent)
+            if isobject(parent) || ~isempty(parent)
                 obj.setParent(parent);  % empty parent support for testing
             end
 
             obj.Primitive = aod.schema.util.createPrimitive(...
-                type, name, varargin{:});
+                type, name, obj, varargin{:});
         end
 
         function value = get.Name(obj)
-            value = obj.Primitive.Name;
+            if isempty(obj.Primitive)
+                value = [];
+            else
+                value = obj.Primitive.Name;
+            end
         end
 
         function value = get.primitiveType(obj)
             value = obj.Primitive.PRIMITIVE_TYPE;
         end
 
-        function value = get.ParentPath(obj)
-            if ~isempty(obj.Parent)
-                value = obj.Parent.Path;
+        function value = get.ParentPath(obj) %#ok<MANU>
+            value = ""; % TODO: implement parent identifier
+        end
+
+        function value = get.className(obj)
+            if isobject(obj.Parent)
+                value = obj.Parent.className;
             else
                 value = "";
             end
         end
+
+        function p = getPrimitive(obj)
+            p = obj.Primitive;
+        end
     end
 
     methods
-        function [tf, ME] = validate(obj, value)
-            % Exception should contain:
-            %   - Class and entry name
-            %   - Number of failures
-            %   - Names of failed validators
-            % TODO: Keep summary???
-
-            % if nargin < 3
-            %     verbose = true; % suppress when running lots of Entry objs
-            % end
-
-            tf = true; MEs = []; % summary = "";
-            numFailures = 0;
-            for i = 1:numel(obj.Primitive.VALIDATORS)
-                [itf, iME] = obj.Primitive.(obj.Primitive.VALIDATORS(i)).validate(value);
-                if ~itf
-                    tf = false;
-                    numFailures = numFailures + 1;
-                    MEs = cat(1, MEs, iME);
-                    % summary = summary + sprintf("\t%s - %s: %s\n",...
-                    %     obj.Primitive.VALIDATORS(i), iME.identifier, iME.message);
-                end
-            end
-
-            if numFailures == 0
-                ME = [];
-                % summary = summary + sprintf("%s - %s: passed",...
-                %     obj.definingClassName, obj.Name);
+        function setType(obj, primitiveType)
+            primitiveType = aod.schema.primitives.PrimitiveTypes.get(primitiveType);
+            if isequal(obj.primitiveType, primitiveType)
                 return
             end
-            % summary = summary + sprintf("%s - %s: %u failures (%s)\n",...
-            %     obj.definingClassName, obj.Name, numFailures,...
-            %     strjoin(obj.Primitive.VALIDATORS(~itf), ", "));
+            newPrimitive = aod.schema.util.createPrimitive(...
+                primitiveType, obj.Name, obj);
+            obj.Primitive = newPrimitive;
+        end
 
-            ME = MException('validate:Failed',...
-                'Failed validation for "%s/%s" in %s',...
-                    obj.definingClassName, obj.Name, obj.ParentPath);
-            for i = 1:numel(MEs)
-                ME = addCause(ME, MEs(i));
+        function assign(obj, varargin)
+            obj.Primitive.assign(varargin{:});
+        end
+
+        function [tf, ME] = validate(obj, input, errorType)
+            if nargin < 3
+                errorType = aod.infra.ErrorTypes.ERROR;
+            else
+                errorType = aod.infra.ErrorTypes.get(errorType);
             end
-
-            % if verbose
-            %     fprintf(summary + "\n");
-            % end
+            [tf, ME] = obj.Primitive.validate(input, errorType);
         end
     end
 
@@ -96,19 +85,16 @@ classdef Entry < handle
             end
 
             obj.Parent = parent;
-            if ~isempty(parent.Parent)
-                obj.definingClassName = class(parent.Parent);
-            end
         end
     end
 
     % MATLAB builtin functions
     methods
         function tf = isequal(obj, other)
-            if ~isSubclass(other, 'aod.schema.Entry')
+            if ~isa(other, class(obj))
                 tf = false;
             else
-                tf = isequal(obj.Primitive, other.Primitive);
+                tf = isequal(obj.getPrimitive(), other.getPrimitive());
             end
         end
     end

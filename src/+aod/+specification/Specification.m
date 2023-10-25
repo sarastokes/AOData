@@ -14,7 +14,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 % --------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent
+        Parent                  % aod.schema.primitives.Primitive
     end
 
     methods (Abstract)

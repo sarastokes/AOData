@@ -22,10 +22,15 @@ classdef Duration < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             obj.Units = aod.schema.decorators.Units(obj, []);
+
+            % Set default values
             obj.setFormat("duration");
             obj.setUnits("s");
 
+            % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
 
         function setUnits(obj, value)

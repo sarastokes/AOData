@@ -27,15 +27,18 @@ classdef Integer < aod.schema.primitives.Primitive
     end
 
     methods
-        function obj = Integer(name, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, varargin{:});
+        function obj = Integer(name, parent, varargin)
+            obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             % Initialization
             obj.Minimum = aod.schema.validators.Minimum(obj, []);
             obj.Maximum = aod.schema.validators.Maximum(obj, []);
             obj.Units = aod.schema.decorators.Units(obj, []);
 
+            % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
     end
 
@@ -53,6 +56,7 @@ classdef Integer < aod.schema.primitives.Primitive
                 value = cast(value, obj.Format.Value);
             end
             obj.Default.setValue(value);
+            obj.checkIntegrity(true);
         end
 
         function setMinimum(obj, value)
@@ -64,7 +68,10 @@ classdef Integer < aod.schema.primitives.Primitive
             if ~isempty(obj.Format) && ~strcmp(obj.Format.Value, class(value))
                 value = cast(value, obj.Format.Value);
             end
+
             obj.Maximum.setValue(value);
+
+            obj.checkIntegrity(true);
         end
 
         function setMaximum(obj, value)
@@ -76,7 +83,10 @@ classdef Integer < aod.schema.primitives.Primitive
             if ~isempty(obj.Format) && ~strcmp(obj.Format.Value, class(value))
                 value = cast(value, obj.Format.Value);
             end
+
             obj.Maximum.setValue(value);
+
+            obj.checkIntegrity(true);
         end
 
         function setFormat(obj, value)
@@ -101,9 +111,8 @@ classdef Integer < aod.schema.primitives.Primitive
                 error('setFormat:InvalidFormat',...
                     'Format must be an integer type');
             end
-            %% TODO: Remove integer defaults on switch to double
             obj.Format.setValue(value);
-            obj.checkIntegrity();
+            obj.checkIntegrity(true);
         end
 
         function setUnits(obj, value)
@@ -117,8 +126,18 @@ classdef Integer < aod.schema.primitives.Primitive
     end
 
     methods (Access = protected)
-        function checkIntegrity(obj)
+        function [tf, ME] = checkIntegrity(obj, throwErrors)
+            arguments
+                obj
+                throwErrors         logical     = false
+            end
 
+            if obj.isInitializing
+                tf = true; ME = [];
+                return
+            end
+
+            excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
             % Refactor - this runs too often, but may be useful in one place
             if ~isempty(obj.Format)
                 % Check if minimum and maximum are valid
@@ -126,14 +145,14 @@ classdef Integer < aod.schema.primitives.Primitive
                 if isempty(obj.Minimum)
                     obj.Minimum.setValue(minValue);
                 elseif obj.Minimum.Value < minValue
-                    error('checkIntegrity:InvalidMinimum',...
-                        'Minimum value is smaller than the minimum value of the format');
+                    excObj.addCause(MException('checkIntegrity:InvalidMinimum',...
+                        'Minimum value is smaller than the minimum value of the format'));
                 end
                 if isempty(obj.Maximum)
                     obj.Maximum.setValue(maxValue);
                 elseif obj.Minimum.Value > maxValue
-                    error('checkIntegrity:InvalidMaximum',...
-                        'Maximum value is larger than the maximum value of the format');
+                    excObj.addCause(MException('checkIntegrity:InvalidMaximum',...
+                        'Maximum value is larger than the maximum value of the format'));
                 end
                 if ~isempty(obj.Default) && ~isa(obj.Default.Value, obj.Format.Value)
                     obj.Default.setValue(cast(obj.Default.Value, obj.Format.Value));
@@ -141,21 +160,29 @@ classdef Integer < aod.schema.primitives.Primitive
             end
             if ~isempty(obj.Minimum)
                 if all(obj.Default.Value < obj.Minimum.Value)
-                    error('checkIntegrity:InvalidDefault',...
-                        'Default value is smaller than the minimum value');
+                    excObj.addCause(MException('checkIntegrity:InvalidDefault',...
+                        'Default value is smaller than the minimum value'));
                 end
                 if ~isempty(obj.Maximum)
                     if all(obj.Maximum.Value < obj.Minimum.Value)
-                        error('checkIntegrity:InvalidRange',...
-                            'Minimum value %d is larger than Maximum value %d', obj.Minimum.Value, obj.Maximum.Value);
+                        excObj.addCause(MException('checkIntegrity:InvalidRange',...
+                            'Minimum value %d is larger than Maximum value %d', obj.Minimum.Value, obj.Maximum.Value));
                     end
                 end
             end
 
-            checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [tf, ME, ~] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            if ~tf
+                arrayfun(@(x) addCause(excObj, x), ME.cause);
+            end
             if ~isempty(obj.Maximum) && all(obj.Default.Value > obj.Maximum.Value)
-                error('checkIntegrity:InvalidDefault',...
-                    'Default value is larger than the maximum value');
+                excObj.addCause(MException('checkIntegrity:InvalidDefault',...
+                    'Default value is larger than the maximum value'));
+            end
+            ME = excObj.getException();
+            tf = isempty(ME);
+            if ~tf && throwErrors
+                throw(ME);
             end
         end
     end

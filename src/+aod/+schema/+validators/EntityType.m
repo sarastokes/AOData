@@ -63,6 +63,14 @@ classdef EntityType < aod.specification.Validator
                 out = jsonencode(string(obj.Value));
             end
         end
+
+        function out = jsonencode(obj)
+            if obj.isempty()
+                out = jsonencode([]);
+            else
+                out = jsonencode(string(obj.Value));
+            end
+        end
     end
 
     % Matlab builtin methods

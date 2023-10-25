@@ -903,11 +903,23 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Subclasses can extend to modify DatasetManager
             %
             % Syntax:
-            %   mngr = specifyAttributes(mngr)
+            %   mngr = specifyDatasets(mngr)
             %
             % Inputs:
             %   mngr        aod.specification.DatasetManager
             % -------------------------------------------------------------
+        end
+
+        function value = specifyFiles()
+            % Subclasses can extend to modify the FileCollection schema
+            %
+            % Syntax:
+            %   value = specifyFiles()
+            %
+            % Output:
+            %   value       aod.schema.FileCollection
+            % -------------------------------------------------------------
+            value = aod.schema.FileCollection();
         end
     end
 end

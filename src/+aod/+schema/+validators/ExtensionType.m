@@ -25,26 +25,37 @@ classdef ExtensionType < aod.specification.Validator
     methods
         function obj = ExtensionType(parent, value)
             arguments
-                parent          {mustBeScalarOrEmpty} = []
-                value   string  {mustBeVector}        = []
+                parent          {mustBeScalarOrEmpty}
+                value   string                        = []
             end
 
             obj = obj@aod.specification.Validator(parent);
-            if nargin > 1 && ~aod.util.isempty(value)
+            if nargin > 1
                 obj.setValue(value);
             end
         end
 
         function setValue(obj, value)
-            if aod.util.isempty(value)
-                obj.Value = "";
-                return
+            arguments
+                obj
+                value       string
             end
 
-            if ~isvector(value)
-                error('setExtensionType:InvalidSize',...
-                    'Extensions must be a vector, size was %u x %u', size(value));
+            if numel(value) == 1 && aod.util.isempty(value)
+                obj.Value = "";
+                return
+            elseif numel(value) > 1 
+                if any(arrayfun(@aod.util.isempty, value))
+                    error('setExtensionType:SomeValuesEmpty',...
+                        "%u of %u values were empty, empty values must be singular",...
+                        nnz(value == ""), numel(value));
+                elseif ~isvector(value)
+                    error('setExtensionType:InvalidSize',...
+                        'Extensions must be a vector, size was %s',... 
+                        value2string(size(value)));
+                end
             end
+
             if iscolumn(value)
                 value = value';
             end
@@ -53,7 +64,6 @@ classdef ExtensionType < aod.specification.Validator
                 error('setExtensionType:InvalidExtensionFormat',...
                     'Each extension must start with a period');
             end
-            obj.extensionType = value;
 
             obj.Value = value;
         end
@@ -68,7 +78,7 @@ classdef ExtensionType < aod.specification.Validator
             if ~endsWith(input, obj.Value)
                 tf = false;
                 [~, ~, actualExt] = fileparts(input);
-                if isempty(actualExt)
+                if aod.util.isempty(actualExt)
                     ME = MException('validate:NoExtensionFound',...
                         'No extension found in %s', input);
                 else
@@ -96,7 +106,7 @@ classdef ExtensionType < aod.specification.Validator
 
         function out = jsonencode(obj)
             if isempty(obj)
-                out = "[]";
+                out = jsonencode([]);
             else
                 out = jsonencode(obj.Value);
             end

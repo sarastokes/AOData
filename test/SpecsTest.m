@@ -37,6 +37,8 @@ classdef SpecsTest < matlab.unittest.TestCase
         function EmptyEntityType(testCase)
             obj = aod.schema.validators.EntityType([], []);
             testCase.verifyEmpty(obj);
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
 
             [tf, ME] = obj.validate(aod.core.Calibration("Test", getDateYMD()));
             testCase.confirmValid(tf, ME);
@@ -60,6 +62,7 @@ classdef SpecsTest < matlab.unittest.TestCase
             obj = aod.schema.validators.Enum([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
 
             testCase.verifyTrue(obj.validate("d"));
         end
@@ -88,9 +91,18 @@ classdef SpecsTest < matlab.unittest.TestCase
             obj = aod.schema.validators.Length([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
 
             [tf, ME] = obj.validate("d");
             testCase.confirmValid(tf, ME);
+
+            obj.setValue(3);
+            testCase.verifyNotEmpty(obj);
+            testCase.verifyEqual(obj.Value, 3);
+            testCase.verifyEqual(obj.text(), "3");
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj);
         end
     end
 
@@ -115,9 +127,17 @@ classdef SpecsTest < matlab.unittest.TestCase
             obj = aod.schema.validators.Count([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
 
             [tf, ME] = obj.validate("d");
             testCase.confirmValid(tf, ME);
+
+            obj.setValue(3);
+            testCase.verifyNotEmpty(obj);
+            testCase.verifyEqual(obj.text(), "3");
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj);
         end
     end
 
@@ -134,6 +154,15 @@ classdef SpecsTest < matlab.unittest.TestCase
             obj = aod.schema.decorators.Units([], []);
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            obj.setValue("mV");
+            testCase.verifyNotEmpty(obj);
+            testCase.verifyEqual(obj.Value, "mV");
+            testCase.verifyEqual(obj.text(), string('"mV"'));
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj);
         end
     end
 
@@ -143,9 +172,11 @@ classdef SpecsTest < matlab.unittest.TestCase
             obj = aod.schema.validators.ExtensionType([], ".txt");
             testCase.verifyNotEmpty(obj);
 
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
+
             [tf, ME] = obj.validate("test.txt");
-            testCase.verifyTrue(tf);
-            testCase.verifyEmpty(ME);
+            testCase.confirmValid(tf, ME);
 
             [tf, ME] = obj.validate("test.csv");
             testCase.verifyFalse(tf);
@@ -156,11 +187,122 @@ classdef SpecsTest < matlab.unittest.TestCase
             testCase.verifyEqual(ME.identifier, 'validate:NoExtensionFound');
         end
 
-        function ExtensionTypeErrors(testCase)
+        function ExtensionTypeEmpty(testCase)
+            obj = aod.schema.validators.ExtensionType([], []);
+            testCase.verifyEmpty(obj);
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
 
+            [tf, ME] = obj.validate("test.txt");
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(".txt");
+            testCase.verifyNotEmpty(obj);
+
+            obj.setValue("");
+            testCase.verifyEmpty(obj);
+
+        end
+
+        function ExtensionTypeErrors(testCase)
             testCase.verifyError(...
                 @() aod.schema.validators.ExtensionType([], [".txt", "csv"]),...
-                "setExtensionType:InvalidExtension");
+                "setExtensionType:InvalidExtensionFormat");
+
+            testCase.verifyError(...
+                @() aod.schema.validators.ExtensionType([], [".txt", "csv"; ".dat", ".json"]),...
+                "setExtensionType:InvalidSize");
+
+            testCase.verifyError(...
+                @() aod.schema.validators.ExtensionType([], ["", ".json"]),...
+                "setExtensionType:SomeValuesEmpty");
+        end
+    end
+
+    methods (Test, TestTags="Minimum")
+        function Minimum(testCase)
+            obj = aod.schema.validators.Minimum([], 0);
+            testCase.verifyNotEmpty(obj);
+
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(-1);
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:MinimumExceeded');
+        end
+
+        function MinimumEquality(testCase)
+            obj = aod.schema.validators.Minimum([], 0);
+            testCase.verifyEqual(obj, aod.schema.validators.Minimum([], 0));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Minimum([], 1));
+        end
+
+        function MinimumEmpty(testCase)
+            obj = aod.schema.validators.Minimum([], []);
+            testCase.verifyEmpty(obj);
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(1);
+            testCase.verifyNotEmpty(obj);
+            testCase.verifyEqual(obj.text(), "1");
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj);
+
+            obj.setValue("[]");
+            testCase.verifyEmpty(obj);
+        end
+    end
+
+    methods (Test, TestTags="Maximum")
+        function Maximum(testCase)
+            obj = aod.schema.validators.Maximum([], 3);
+            testCase.verifyNotEmpty(obj);
+
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(4);
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:MaximumExceeded');
+        end
+
+        function MaximumEquality(testCase)
+            obj = aod.schema.validators.Maximum([], 0);
+            testCase.verifyEqual(obj, aod.schema.validators.Maximum([], 0));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Maximum([], 1));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Minimum([], 0));
+        end
+
+        function MaximumEmpty(testCase)
+            obj = aod.schema.validators.Maximum([], []);
+            testCase.verifyEmpty(obj);
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(1);
+            testCase.verifyNotEmpty(obj);
+            testCase.verifyEqual(obj.text(), "1");
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj);
+
+            obj.setValue("[]");
+            testCase.verifyEmpty(obj);
         end
     end
 end

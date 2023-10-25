@@ -9,22 +9,27 @@ classdef Date < aod.schema.primitives.Primitive
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATE
-        OPTIONS = "Description";
+        OPTIONS = ["Size", "Description"];
         VALIDATORS = ["Format", "Size"];
     end
 
     methods
         function obj = Date(name, parent, varargin)
             obj = obj@aod.schema.primitives.Primitive(name, parent);
+
             obj.setSize("(1,1)");
             obj.setFormat("datetime");  %% TODO - yymmdd
 
+            % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
     end
 
     methods (Access = protected)
-        function checkIntegrity(~)
+        function tf = checkIntegrity(~, ~)
+            tf = true; ME = [];
         end
     end
 end

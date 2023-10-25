@@ -17,7 +17,7 @@ classdef Count < aod.specification.Validator
     methods
         function obj = Count(parent, value)
             arguments
-                parent      {mustBeScalarOrEmpty}   = []
+                parent      {mustBeScalarOrEmpty}
                 value       {mustBeInteger}         = []
             end
             obj = obj@aod.specification.Validator(parent);
@@ -53,7 +53,7 @@ classdef Count < aod.specification.Validator
             if isempty(obj)
                 out = "[]";
             else
-                out = string(num2str(obj));
+                out = string(num2str(obj.Value));
             end
         end
     end
@@ -65,7 +65,7 @@ classdef Count < aod.specification.Validator
 
         function out = jsonencode(obj)
             if isempty(obj)
-                out = "[]";
+                out = jsonencode([]);
             else
                 out = jsonencode(obj.Value);
             end

@@ -65,7 +65,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
         [coverageTable, detailTable] = test.util.readCoverageReport(fullfile(pwd, 'coverage_report'));
         % Summarize the results by package
         packageNames = ["+api", "+app", "+builtin", "+core", "+infra", ...
-            "+h5", "+persistent", "+specification", "+util"];
+            "+h5", "+persistent", "+schema", "+specification", "+util"];
         packageCoverage = struct();
         for i = 1:numel(packageNames)
             idx = startsWith(detailTable.Name, packageNames(i));

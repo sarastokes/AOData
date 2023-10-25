@@ -12,7 +12,7 @@ function tf = isempty(input)
 
     if isempty(input)
         tf = true;
-    elseif isstring(input) && all(input == "")
+    elseif isstring(input) && all(input(:) == "")
         tf = true;
     else
         tf = false;

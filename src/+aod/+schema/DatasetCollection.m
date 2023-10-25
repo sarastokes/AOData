@@ -1,0 +1,103 @@
+classdef DatasetCollection < aod.schema.SchemaCollection
+% DATASETSCHEMA  A collection of attribute schemas
+%
+% Superclasses:
+%   aod.schema.SchemaCollection
+%
+% Constructor:
+%   obj = aod.schema.DatasetSchema(className)
+%
+% Notes:
+%   The workflow for DatasetCollection is as follows:
+%   - populate() is called to create in the constructor of aod.core.Entity
+%   - set() is called in specifyDatasets() to modify default values
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
+
+    properties (Hidden, SetAccess = protected)
+        schemaType        = "Dataset"
+    end
+
+    methods
+        function obj = DatasetCollection(className)
+            if nargin < 1
+                className = [];
+            end
+            obj = obj@aod.schema.SchemaCollection(className);
+        end
+    end
+
+    methods
+        function add(obj, varargin)
+            if istext(varargin{1})
+                error('add:AdditionNotSupported',...
+                    'Ad-hoc property addition is not supported. Datasets must be defined in a property block. Use set() to modify an existing property defined or inherited by the class.');
+            elseif isa(varargin{1}, 'aod.schema.Entry')  % Internal use only
+                add@aod.schema.SchemaCollection(obj, varargin{:});
+            end
+        end
+
+        function remove(~)
+            error('remove:DatasetRemovalNotSupported',...
+                'Datasets defined in a property block cannot be removed from schema');
+        end
+    end
+
+    methods (Static)
+        function obj = populate(className)
+            % Populate and create a DatasetManager from a class name
+            % Syntax:
+            %   obj = aod.schema.EntityDatasets.populate(className)
+            %
+            % Inputs:
+            %   className           string/char, meta.class, object
+            %       Class (must be aod.core.Entity subclass)
+            %
+            % Examples:
+            %   obj = aod.schema.EntityDatasets.populate('aod.core.Epoch')
+            % -------------------------------------------------------------
+
+            if ~isSubclass(className, "aod.core.Entity")
+                if isa(className, 'meta.class')
+                    className = className.Name;
+                end
+                error('populate:InvalidInput',...
+                    'Class %s is not a subclass of aod.core.Entity', className);
+            end
+
+            if istext(className)
+                mc = meta.class.fromName(className);
+            elseif isa(className, 'meta.class')
+                mc = className;
+            elseif isobject(className)
+                mc = metaclass(className);
+            else
+                error('populate:InvalidInput',...
+                    'Input must be class name or meta.class, not %s', ...
+                    class(className));
+            end
+
+
+            propList = mc.PropertyList;
+            classProps = aod.h5.getPersistedProperties(mc.Name);
+            systemProps = aod.infra.getSystemProperties();
+
+            obj = aod.schema.DatasetCollection(mc.Name);
+            for i = 1:numel(propList)
+                % Skip system properties
+                if ismember(propList(i).Name, systemProps)
+                    continue
+                end
+
+                % Skip properties that will not be persisted
+                if ~ismember(propList(i).Name, classProps)
+                    continue
+                end
+
+                dataObj = aod.schema.Entry(obj, propList(i).Name, 'Unknown');
+                obj.add(dataObj);
+            end
+        end
+    end
+end

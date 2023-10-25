@@ -17,7 +17,7 @@ classdef (Abstract) Validator < aod.specification.Specification
 % -------------------------------------------------------------------------
 
     events
-        ValidationFailed
+        ValidationFailed  %% TODO: Keep events?
     end
 
     methods (Abstract)

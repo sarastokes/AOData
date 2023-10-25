@@ -16,12 +16,12 @@ classdef SpecificationTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-%#ok<*MANU,*NASGU,*ASGLU> 
+%#ok<*MANU,*NASGU,*ASGLU>
 
     properties
         TEST_OBJ
     end
-    
+
     methods (TestClassSetup)
         function setup(testCase)
             testCase.TEST_OBJ = test.TestSpecificationObject();
@@ -38,7 +38,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
                  aod.specification.size.FixedDimension(2).Length]);
         end
 
-        function EmptySize(testCase) 
+        function EmptySize(testCase)
             emptyObj = aod.specification.Size();
             testCase.verifyEmpty(emptyObj);
             testCase.verifyEqual(emptyObj.text(), "[]");
@@ -73,7 +73,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 refObj1.compare(refObj2));
             testCase.verifyEqual(MatchType.MISSING,...
                 refObj2.compare(refObj1));
-            
+
             testCase.verifyError(...
                 @() refObj1.compare(aod.specification.MatlabClass("string")),...
                 "compare:UnlikeSpecificationTypes");
@@ -83,7 +83,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyError(...
                 @() aod.specification.Size(1),...
                 "Size:InvalidDimensions");
-            
+
             testCase.verifyError(...
                 @() aod.specification.Size("(1)"),...
                 "Size:InvalidDimensions");
@@ -94,7 +94,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
                    aod.specification.size.FixedDimension(2)];
             testCase.verifyNotEqual(ref1(1), ref1(2));
             testCase.verifyEqual(ref1(1), ref1(1));
-            
+
             rowSize1a = aod.specification.Size([1,2]);
             testCase.verifyEqual(rowSize1a.text(), "(1,2)");
             testCase.verifyEqual(rowSize1a.Value(1), ref1(1));
@@ -236,9 +236,37 @@ classdef SpecificationTest < matlab.unittest.TestCase
             refObj1 = aod.specification.DefaultValue(3);
             refObj2 = aod.specification.DefaultValue([]);
 
-            
+
             testCase.verifyEqual(MatchType.CHANGED,...
                 refObj1.compare(aod.specification.DefaultValue("hey")));
+            testCase.verifyEqual(MatchType.SAME,...
+                refObj1.compare(refObj1));
+            testCase.verifyEqual(MatchType.UNEXPECTED,...
+                refObj1.compare(refObj2));
+            testCase.verifyEqual(MatchType.MISSING,...
+                refObj2.compare(refObj1));
+        end
+
+        function Default(testCase)
+
+            obj = aod.schema.Default([], 2);
+            testCase.verifyEqual("2", obj.text());
+            testCase.verifyFalse(isempty(obj));
+
+            % Change value
+            obj.setValue(3);
+            testCase.verifyEqual(obj.Value, 3);
+        end
+
+        function DefaultComparison(testCase)
+            import aod.specification.MatchType
+
+            refObj1 = aod.schema.Default([], 3);
+            refObj2 = aod.schema.Default([], []);
+
+
+            testCase.verifyEqual(MatchType.CHANGED,...
+                refObj1.compare(aod.schema.Default([], "hey")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
             testCase.verifyEqual(MatchType.UNEXPECTED,...
@@ -307,7 +335,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         function EmptyFunctions(testCase)
             obj = aod.specification.ValidationFunction();
             testCase.verifyEmpty(obj);
-            testCase.verifyTrue(obj.validate(123)); 
+            testCase.verifyTrue(obj.validate(123));
         end
 
         function FunctionEquality(testCase)
@@ -410,7 +438,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Specification")
         function Specification(testCase)
-            sizeSpec = aod.specification.Size("(1,:)"); 
+            sizeSpec = aod.specification.Size("(1,:)");
             classSpec = aod.specification.MatlabClass("double");
             descSpec = aod.specification.Description("This is a description");
             defaultSpec = aod.specification.DefaultValue(1);
@@ -505,17 +533,17 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 'aod.builtin.devices.NeutralDensityFilter');
             testCase.verifyClass(AM, 'aod.specification.AttributeManager');
         end
-        
+
         function PackageAccess(testCase)
             [DM, AM, S] = aod.specification.util.collectPackageSpecifications(...
                 "aod.core", "Write", false);
             testCase.verifyEqual(numel(DM), numel(AM));
-            
+
             f = fieldnames(S);
             testCase.verifyNumElements(f, 2);
             testCase.verifyEqual(f{1}, 'Namespaces');
 
-            f = fieldnames(S.Namespace);
+            f = fieldnames(S.Namespaces);
             testCase.verifyNumElements(f, 1);
             testCase.verifyEqual(f{1}, 'aod');
         end
@@ -603,4 +631,4 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyTrue(ismember('aod.core.MixedEntitySet', classNames));
         end
     end
-end 
+end

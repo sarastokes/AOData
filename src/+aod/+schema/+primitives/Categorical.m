@@ -18,13 +18,14 @@ classdef Categorical < aod.schema.primitives.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
-        OPTIONS = ["Enum", "Size", "Default", "Description"]
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.CATEGORICAL
+        OPTIONS = ["Enum", "Size", "Default", "Units", "Description"]
         VALIDATORS = ["Format", "Enum", "Size"];
     end
 
     methods
-        function obj = Categorical(name, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name);
+        function obj = Categorical(name, parent, varargin)
+            obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             % Initialize
             obj.Enum = aod.schema.validators.Enum(obj, []);
@@ -33,8 +34,10 @@ classdef Categorical < aod.schema.primitives.Primitive
             % TODO: necessary to restrict to categorical?
             obj.Format.setValue('categorical');
 
-            obj.setName(name);
+            % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
 
         function tf = isValid(obj)
@@ -49,19 +52,36 @@ classdef Categorical < aod.schema.primitives.Primitive
     methods
         function setEnum(obj, valueSet)
             obj.Enum.setValue(valueSet);
-            obj.setFormat(class(valueSet));
+
+            obj.setFormat(class(valueSet));  % runs checkIntegrity()
         end
     end
 
     methods (Access = protected)
-        function checkIntegrity(obj)
-            checkIntegrity@aod.schema.primitives.Primitive(obj);
+        function [tf, ME] = checkIntegrity(obj, throwErrors)
+            arguments
+                obj
+                throwErrors         logical     = false
+            end
+
+            if obj.isInitializing
+                tf = true; ME = [];
+                return
+            end
+
+            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
             if ~isempty(obj.Enum) && ~isempty(obj.Default)
                 if ~ismember(obj.Default, obj.Enum)
-                    error('checkIntegrity:InvalidItem',...
+                    excObj.addCause(MException('checkIntegrity:InvalidItem',...
                         'Default value %s was not in enumeration',...
-                        value2string(obj.Default));
+                        value2string(obj.Default)));
                 end
+            end
+
+            ME = excObj.getException();
+            tf = isempty(ME);
+            if ~tf && throwErrors
+                throw(ME);
             end
         end
     end

@@ -31,8 +31,8 @@ classdef Number < aod.schema.primitives.Primitive
     end
 
     methods
-        function obj = Number(name, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name);
+        function obj = Number(name, parent, varargin)
+            obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             % Initialize
             obj.Minimum = aod.schema.validators.Minimum(obj, []);
@@ -43,8 +43,10 @@ classdef Number < aod.schema.primitives.Primitive
             %% TODO: Add support for single?
             obj.Format.setValue('double');
 
-            obj.setName(name);
+            % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
+            obj.isInitializing = false;
+            obj.checkIntegrity(true);
         end
     end
 
@@ -59,16 +61,10 @@ classdef Number < aod.schema.primitives.Primitive
         end
 
         function setMinimum(obj, value)
-            %SETMINIMUM
-            %
-            % Description:
-            %   Set the minimum allowed value of the number.
+            %SETMINIMUM Set the minimum allowed value of the number.
             %
             % Syntax:
             %   setMinimum(obj, value)
-            %
-            % See also:
-            %   setMaximum
             % -----------------------------------------------------------------
 
             arguments
@@ -89,14 +85,30 @@ classdef Number < aod.schema.primitives.Primitive
         end
     end
 
-    methods (Access = protected)
-        function checkIntegrity(obj)
+    methods
+        function [tf, ME] = checkIntegrity(obj, throwErrors)
+            arguments
+                obj
+                throwErrors         logical     = false
+            end
+
+            if obj.isInitializing
+                tf = true; ME = [];
+                return
+            end
+
+            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
             if ~isempty(obj.Minimum) && ~isempty(obj.Maximum)
                 if obj.Minimum > obj.Maximum
-                    error('checkIntegrity:InvalidRange',...
+                    excObj.addCause(MException('checkIntegrity:InvalidRange',...
                         'Minimum (%.2f) must be less than or equal to maximum (%.2f).',...
-                        obj.Minimum.Value, obj.Maximum.Value);
+                        obj.Minimum.Value, obj.Maximum.Value));
                 end
+            end
+            tf = excObj.hasErrors();
+            ME = excObj.getException();
+            if ~tf && throwErrors
+                throw(ME);
             end
         end
     end

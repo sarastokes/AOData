@@ -11,9 +11,9 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 % --------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent                  aod.specification.Entry
+        Parent                  % aod.specification.Entry
         Name        (1,1)       string
-        Default     (1,1)       aod.specification.DefaultValue
+        Default     (1,1)       aod.schema.Default
         Format      (1,1)       aod.specification.MatlabClass
         Description (1,1)       aod.specification.Description
         Size                    aod.specification.Size
@@ -23,6 +23,8 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         % Determines which aspects of an AOData entity the primitive can
         % be used to describe. Some may not be valid for attributes.
         ALLOWABLE_PARENT_TYPES = ["Dataset", "Attribute"];
+        % Holds integrity checks until object is constructed
+        isInitializing  (1,1)   logical = true
     end
 
     properties (Abstract, Hidden, SetAccess = protected)
@@ -52,7 +54,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             % Initialize
             obj.Size = aod.specification.Size([], obj);
             obj.Format = aod.specification.MatlabClass([], obj);
-            obj.Default = aod.specification.DefaultValue([], obj);
+            obj.Default = aod.schema.Default(obj, []);
             obj.Description = aod.specification.Description([], obj);
         end
 
@@ -127,6 +129,89 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         end
     end
 
+    methods
+        function setDefault(obj, value)
+            % Set the default value
+            %
+            % Syntax:
+            %   setDefault(obj, value)
+            % ----------------------------------------------------------
+            if isempty(value)
+                obj.Default.setValue([]);
+            end
+
+            obj.Default.setValue(value);
+            obj.checkIntegrity(true);
+        end
+
+        function setSize(obj, value)
+            % Set the size of the number.
+            %
+            % Syntax:
+            %   setSize(obj, value)
+            %
+            % See also:
+            %   aod.specification.Size
+            % ----------------------------------------------------------
+            obj.Size = aod.specification.Size(value);
+            obj.checkIntegrity(true);
+        end
+
+        function setFormat(obj, value)
+            obj.Format.setValue(value);
+            obj.checkIntegrity(true);
+        end
+
+
+        function [tf, ME] = validate(obj, value, errorType)
+            % Exception should contain:
+            %   - Class and entry name
+            %   - Number of failures
+            %   - Names of failed validators
+
+            if nargin < 3
+                errorType = aod.infra.ErrorTypes.ERROR;
+            else
+                errorType = aod.infra.ErrorTypes.get(errorType);
+            end
+
+            tf = true; MEs = [];
+            numFailures = 0;
+            for i = 1:numel(obj.VALIDATORS)
+                [itf, iME] = obj.(obj.VALIDATORS(i)).validate(value);
+                if ~itf
+                    tf = false;
+                    numFailures = numFailures + 1;
+                    MEs = cat(1, MEs, iME);
+                end
+            end
+
+            if numFailures == 0
+                ME = [];
+                return
+            end
+
+            if ~isempty(obj.Parent)
+                msg = sprintf('Failed validation for %s/%s in %s',...
+                    obj.Parent.className, obj.Name, obj.Parent.ParentPath);
+            else
+                msg = sprintf('Failed validation for %s', obj.Name);
+            end
+            ME = MException('validate:Failed', msg);
+            for i = 1:numel(MEs)
+                ME = addCause(ME, MEs(i));
+            end
+
+            switch errorType
+                case aod.infra.ErrorTypes.ERROR
+                    throw(ME);
+                case aod.infra.ErrorTypes.WARNING
+                    warning(ME.identifier, ME.message);
+            end
+        end
+    end
+
+
     methods (Sealed)
         function setName(obj, name)
             % Set the primitive's name, ensuring valid variable name
@@ -163,37 +248,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         end
     end
 
-    methods
-        function setDefault(obj, value)
-            % Set the default value
-            %
-            % Syntax:
-            %   setDefault(obj, value)
-            % ----------------------------------------------------------
-            if isempty(value)
-                obj.Default.setValue([]);
-            end
-
-            obj.Default.setValue(value);
-        end
-
-        function setSize(obj, value)
-            % Set the size of the number.
-            %
-            % Syntax:
-            %   setSize(obj, value)
-            %
-            % See also:
-            %   aod.specification.Size
-            % ----------------------------------------------------------
-            obj.Size = aod.specification.Size(value);
-        end
-
-        function setFormat(obj, value)
-            obj.Format.setValue(value);
-        end
-    end
-
     methods (Sealed, Access = protected)
         function parse(obj, key, value)
             fcn = str2func("@(obj, x) set" + key + "(obj, x)");
@@ -226,24 +280,28 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         end
     end
 
-    methods (Access = protected)
-        function checkIntegrity(obj)
+    methods
+        function [tf, ME, excObj] = checkIntegrity(obj, ~)
+            excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
             if ~isempty(obj.Default)
                 if ~isempty(obj.Size)
                     if ~obj.Size.validate(obj.Default.Value)
-                        error('checkIntegrity:InvalidDefault',...
-                            "Default is not the correct size: %s", obj.Size.text());
+                        excObj.addCause(MException('checkIntegrity:InvalidDefault',...
+                            "Default is not the correct size: %s", obj.Size.text()));
                     end
                 end
                 if ~isempty(obj.Format)
                     if ~obj.Format.validate(obj.Default.Value)
-                        error('checkIntegrity:InvalidClass',...
+                        excObj.addCause(MException('checkIntegrity:InvalidClass',...
                             "Default was class %s, but Format is %s", ...
-                            class(obj.Default.Value), obj.Format.text());
+                            class(obj.Default.Value), obj.Format.text()));
                     end
                 end
             end
+            tf = ~excObj.hasErrors();
+            ME = excObj.getException();
         end
+
     end
 
     methods (Access = {?aod.specification.Entry, ?aod.schema.primitives.Primitive})
@@ -258,14 +316,15 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 return
             end
 
-            mustBeA(parent, ["aod.specification.Entry", "aod.schema.primitives.Container"]);
+            if aod.util.isempty(parent)
+                obj.Parent = [];
+                return
+            end
+
+            mustBeSubclass(parent, ["aod.schema.Entry", "aod.schema.primitives.Container"]);
             if isa(parent, 'aod.schema.primitives.Container')
                 % Check if table is allowed, throw error if not
 
-            end
-
-            if isempty(parent)
-                return
             end
             obj.Parent = parent;
         end

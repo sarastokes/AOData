@@ -10,10 +10,6 @@ classdef Units < aod.specification.Decorator
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties
-        Value       string      = ""
-    end
-
     methods
         function obj = Units(parent, value)
             obj = obj@aod.specification.Decorator(parent);
@@ -21,7 +17,9 @@ classdef Units < aod.specification.Decorator
                 obj.setValue(value);
             end
         end
+    end
 
+    methods
         function setValue(obj, input)
             arguments
                 obj
