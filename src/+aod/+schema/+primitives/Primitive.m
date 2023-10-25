@@ -13,6 +13,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
     properties (SetAccess = private)
         Parent                  % aod.schema.Entry
         Name        (1,1)       string
+        isRequired  (1,1)       logical = false
         Default     (1,1)       aod.schema.Default
         Format      (1,1)       aod.specification.MatlabClass
         Description (1,1)       aod.specification.Description
@@ -21,8 +22,9 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 
     properties (Hidden, SetAccess = protected)
         % Determines which aspects of an AOData entity the primitive can
-        % be used to describe. Some may not be valid for attributes.
-        ALLOWABLE_PARENT_TYPES = ["Dataset", "Attribute"];
+        % be used to describe. Some may not be valid for attributes and
+        % almost all are not valid for files.
+        ALLOWABLE_PARENT_TYPES = ["Dataset", "Attribute", "File"];
         % Holds integrity checks until object is constructed
         isInitializing  (1,1)   logical = true
     end
@@ -58,22 +60,12 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Description = aod.specification.Description([], obj);
         end
 
-        % function tf = isValid(obj)
-        %     tf = aod.util.isempty(obj.Name) || strcmp(obj.Name, "UNDEFINED");
-        %     try
-        %         obj.checkIntegrity();
-        %     catch ME
-        %         if contains(ME.identifier, "checkIntegrity")
-        %             tf = false;
-        %             warning("isValid:IntegrityFailure", "%s", ME.message);
-        %         else
-        %             rethrow(ME);
-        %         end
-        %     end
-        % end
-
-        function displayOptions(obj)
-            disp(obj.OPTIONS);
+        function opts = getOptions(obj)
+            % Required is always an option, others are subclass-specific
+            opts = [obj.OPTIONS, "Required"];
+            if nargout == 0
+                disp(opts);
+            end
         end
    end
 
@@ -126,6 +118,17 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                     S.(obj.Name).(iProp) = obj.(iProp).getValueForYAML();
                 end
             end
+        end
+    end
+
+    methods (Sealed)
+        function setRequired(obj, value)
+            arguments
+                obj
+                value   (1,1)    logical
+            end
+
+            obj.isRequired = value;
         end
     end
 
@@ -250,6 +253,9 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 
     methods (Sealed, Access = protected)
         function parse(obj, key, value)
+            % Parse value for key, assuming key has a method starting with
+            % the word "set" and ending with the key name.
+            % ----------------------------------------------------------
             fcn = str2func("@(obj, x) set" + key + "(obj, x)");
             fcn(obj, value);
         end
@@ -277,25 +283,30 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             for i = 1:numel(obj.OPTIONS)
                 ip.addParameter(obj.OPTIONS(i), []);
             end
+            ip.addParameter('Required', false, @islogical);
         end
     end
 
     methods
         function [tf, ME, excObj] = checkIntegrity(obj, ~)
             excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
-            if ~isempty(obj.Default)
-                if ~isempty(obj.Size)
-                    if ~obj.Size.validate(obj.Default.Value)
-                        excObj.addCause(MException('checkIntegrity:InvalidDefault',...
-                            "Default is not the correct size: %s", obj.Size.text()));
-                    end
+
+            if obj.isInitializing || isempty(obj.Default)
+                tf = true; ME = [];
+                return
+            end
+
+            if ~isempty(obj.Size)
+                if ~obj.Size.validate(obj.Default.Value)
+                    excObj.addCause(MException('checkIntegrity:InvalidDefaultSize',...
+                        "Default is not the correct size: %s", obj.Size.text()));
                 end
-                if ~isempty(obj.Format)
-                    if ~obj.Format.validate(obj.Default.Value)
-                        excObj.addCause(MException('checkIntegrity:InvalidClass',...
-                            "Default was class %s, but Format is %s", ...
-                            class(obj.Default.Value), obj.Format.text()));
-                    end
+            end
+            if ~isempty(obj.Format)
+                if ~obj.Format.validate(obj.Default.Value)
+                    excObj.addCause(MException('checkIntegrity:InvalidDefaultClass',...
+                        "Default was class %s, but Format is %s", ...
+                        class(obj.Default.Value), obj.Format.text()));
                 end
             end
             tf = ~excObj.hasErrors();

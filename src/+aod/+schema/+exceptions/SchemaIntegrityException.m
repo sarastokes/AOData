@@ -47,15 +47,10 @@ classdef SchemaIntegrityException < handle
         function addCause(obj, exception)
             arguments
                 obj
-                exception       
+                exception
             end
 
-            if ~isscalar(exception)
-                arrayfun(@(x) obj.addCause(x), exception);
-                return
-            end
-
-            obj.Exception.addCause(exception);
+            obj.Exception = addCause(obj.Exception, exception);
         end
 
         function value = getException(obj)
