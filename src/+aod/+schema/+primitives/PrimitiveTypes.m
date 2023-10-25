@@ -50,12 +50,18 @@ classdef PrimitiveTypes
                 obj = input;
                 return
             end
-            try 
+            try
                 obj = aod.schema.primitives.PrimitiveTypes.(upper(input));
             catch
-                error('get:UnrecognizedPrimitiveType',... 
+                error('get:UnrecognizedPrimitiveType',...
                     'Unrecognized input %s', input);
             end
+        end
+
+        function out = list()
+            mc = meta.class.fromName('aod.schema.primitives.PrimitiveTypes');
+            names = arrayfun(@(x) string(x.Name), mc.EnumerationMemberList);
+            out = arrayfun(@(x) aod.schema.primitives.PrimitiveTypes.get(x), names);
         end
 
         function fcn = getFcnHandle(input)

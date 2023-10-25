@@ -55,8 +55,26 @@ classdef Boolean < aod.schema.primitives.Primitive
                     obj.Default.setValue(logical(value));
                 end
             end
-
             obj.checkIntegrity(true);
+        end
+    end
+
+    methods
+        function [tf, ME] = checkIntegrity(obj, throwError)
+            arguments
+                obj
+                throwError      (1,1)       logical = false
+            end
+
+            if obj.isInitializing
+                tf = true; ME = [];
+                return
+            end
+
+            [tf, ME, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            if ~tf && throwError
+                throw(ME);
+            end
         end
     end
 end

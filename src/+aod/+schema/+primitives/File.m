@@ -15,7 +15,7 @@ classdef File < aod.schema.primitives.Primitive
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.FILE
-        OPTIONS = ["ExtensionType", "Description"];
+        OPTIONS = ["ExtensionType", "Default", "Description"];
         VALIDATORS = ["Format", "ExtensionType"];
     end
 

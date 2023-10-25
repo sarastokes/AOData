@@ -67,25 +67,27 @@ Each primitive inherits from `aod.specification.primitives.Primitive` and includ
 
 |Name|Matlab Classes| Description|
 |----|--------------|------------|
-|Text|string, char| |
-|Link|aod.common.Entity subclasses||
-|Number|double||
-|Integer|uint8, int8, etc...||
 |Boolean|logical||
 |Date|datetime||
 |Duration|duration||
+|File|string||
+|Integer|uint8, int8, etc...||
+|Link|aod.common.Entity subclasses||
+|Number|double||
+|Text|string, char| |
 
-You can have a `double` that is specified as an __Integer__.
+You can have a `double` that is specified as an __Integer__. Nevermind?? Just removed support for this on 25Oct2023.
 
 
 ### Validators
 | Name | Types | Description |
 |------|-------|-------------|
-|Length|Text   | Specifies the length of a string (e.g., "test" is 4)|
-|Minimium|Number, Integer| Specifies the inclusive minimum allowable number (e.g., `0` enforces only positive numbers and 0)|
-|Maximum|Number, Integer| Specifies the inclusive maximum allowable number (e.g., `-1` enforces only negative numbers and not 0)|
 |EntityType|Link|Specifies the allowable entity types for a link (e.g., `["System", "Channel"]` enforces only systems and channels)|
 |Enum|Text| Specifies an allowable set of answers (e.g., `["Low", "Medium", "High"]` restricts the value to only those three words) |
+|ExtensionType|File| Specifies allowable file extensions (e.g., `[".json", ".txt"]`|
+|Length|Text   | Specifies the length of a string (e.g., "test" is 4)|
+|Maximum|Number, Integer| Specifies the inclusive maximum allowable number (e.g., `-1` enforces only negative numbers and not 0)|
+|Minimium|Number, Integer| Specifies the inclusive minimum allowable number (e.g., `0` enforces only positive numbers and 0)|
 
 
 Some primitives will set default values (unless user provides something more specific). This includes:
@@ -119,9 +121,15 @@ Basic types (**validator**, *decorator*):
     - _Fields_ (consists of other objects)
 
 
+### Writing an AOData HDF5 file
+1. `checkSchemaIntegrity` - are schemas viable
+2. `checkGitRepo` - are classes committed? Only prompt if schemas are viable
+3. `updateSchemas` - update schemas before writing
+
 ### Misc notes
 - Don't use numeric indexing for tables, use the column names so it's clear what data is used (and how to modify the code if the table changes in the future)
 - Values are only validated if not empty (or not "" in the case of `string`)
+- Avoid `char`, `struct` and `containers.Map`
 
 
 ### Interaction

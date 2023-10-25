@@ -69,7 +69,7 @@ classdef Integer < aod.schema.primitives.Primitive
                 value = cast(value, obj.Format.Value);
             end
 
-            obj.Maximum.setValue(value);
+            obj.Minimum.setValue(value);
             obj.checkIntegrity(true);
         end
 
@@ -177,13 +177,12 @@ classdef Integer < aod.schema.primitives.Primitive
 
             [tf, ME, ~] = checkIntegrity@aod.schema.primitives.Primitive(obj);
             if ~tf
-                arrayfun(@(x) addCause(excObj, x), ME.cause);
+                cellfun(@(x) addCause(excObj, x), ME.cause);
             end
             if ~isempty(obj.Maximum) && all(obj.Default.Value > obj.Maximum.Value)
                 excObj.addCause(MException('checkIntegrity:InvalidDefault',...
                     'Default value is larger than the maximum value'));
             end
-
 
             tf = ~excObj.hasErrors();
             ME = excObj.getException();

@@ -16,6 +16,7 @@ classdef (Abstract) SchemaCollection < handle
     properties (Abstract, Hidden, SetAccess = protected)
         % The specification type
         schemaType          string
+        ALLOWABLE_PRIMITIVE_TYPES
     end
 
     properties (SetAccess = protected)

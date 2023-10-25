@@ -16,6 +16,59 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
 
+    methods (Test, TestTags="Primitive")
+        function PrimitiveErrors(testCase)
+            testCase.verifyError(...
+                @() aod.schema.primitives.Boolean("123", []),...
+                "setName:InvalidName");
+        end
+    end
+
+    methods (Test, TestTags="Text")
+        function Text(testCase)
+            obj = aod.schema.primitives.Text("Test", []);
+            testCase.verifyFalse(obj.isRequired);
+
+            testCase.verifyEmpty(obj.Description);
+            obj.assign('Description', 'This is my test description');
+            testCase.verifyNotEmpty(obj.Description);
+        end
+
+        function TextWithOptions(testCase)
+            obj = aod.schema.primitives.Text("Test", [],...
+                "Enum", ["a", "b", "c"], "Count", 1, "Default", "b");
+            testCase.verifyError(...
+                @()obj.validate("d"), "validate:Failed");
+        end
+    end
+
+    methods (Test, TestTags="Boolean")
+        function Boolean(testCase)
+            obj = aod.schema.primitives.Boolean("Test", []);
+
+            % Some tests for the "Required" option
+            testCase.verifyTrue(ismember("Required", obj.getOptions));
+            testCase.verifyFalse(obj.isRequired);
+            obj.setRequired(true);
+            testCase.verifyTrue(obj.isRequired);
+            obj.assign('Required', false);
+            testCase.verifyFalse(obj.isRequired);
+
+            % Back to testing the rest of the class
+            obj.assign('Size', '(1,1)');
+            testCase.verifyTrue(obj.validate(true));
+            testCase.verifyFalse(obj.validate([true, true], aod.infra.ErrorTypes.NONE));
+        end
+
+        function BooleanWithOptions(testCase)
+            obj = aod.schema.primitives.Boolean("Test", [],...
+                "Default", false, "Required", true);
+            testCase.verifyError(...
+                @() obj.setSize("(1,2)"),...
+                'checkIntegrity:SchemaConflictsDetected');
+        end
+    end
+
     methods (Test, TestTags="Integer")
         function Integer(testCase)
             obj = aod.schema.primitives.Integer("Test", []);
@@ -61,7 +114,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj = aod.schema.primitives.Integer("Test", []);
             testCase.verifyError(...
                 @() obj.assign('Size', "(1,2)", 'Default', 2),...
-                "checkIntegrity:InvalidDefault");
+                'checkIntegrity:SchemaConflictsDetected');
         end
     end
 
@@ -72,7 +125,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
             obj.assign('Minimum', 1, 'Maximum', 3);
             testCase.verifyEqual(obj.Minimum.Value, 1);
-            testCase.verifyEqual(obj.Minimum.Value, 3);
+            testCase.verifyEqual(obj.Maximum.Value, 3);
 
             testCase.verifyTrue(obj.validate(2));
 
@@ -101,10 +154,35 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj = aod.schema.primitives.File("Test", []);
             testCase.verifyEmpty(obj.ExtensionType);
 
-            obj = aod.schema.primitives.File("Test", "ExtensionType", ".csv");
+            obj = aod.schema.primitives.File("Test", [], "ExtensionType", ".csv");
             testCase.verifyEqual(obj.ExtensionType.Value, ".csv");
 
-            testCase.verifyError(@() obj.assign('Default', 1), "assign:InvalidParameter");
+            testCase.verifyError(@() obj.assign('Default', 1), 'checkIntegrity:SchemaConflictsDetected');
+            testCase.verifyError(@() obj.assign('Format', 'char'), 'assign:InvalidParameter');
+        end
+
+        function File2(testCase)
+            obj = aod.schema.primitives.File("Test", []);
+
+            testCase.verifyTrue(obj.validate("myfile.csv"));
+            obj.assign('ExtensionType', [".json", ".txt"]);
+            testCase.verifyTrue(obj.validate("myfile.json"));
+            testCase.verifyError(...
+                @() obj.validate("myfile.csv"),...
+                "validate:Failed");
+
+        end
+
+        function FileWithOptions(testCase)
+            obj = aod.schema.primitives.File("Test", [],...
+                "Default", "myfile.json", "Required", true,...
+                "Description", "this is a test");
+
+            testCase.verifyError(...
+                @() obj.assign('ExtensionType', '.csv'),...
+                "checkIntegrity:SchemaConflictsDetected");
+            obj.assign("ExtensionType", ".json");
+            obj.assign("Default", []);
         end
     end
 end
