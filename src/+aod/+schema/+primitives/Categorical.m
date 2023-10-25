@@ -78,9 +78,10 @@ classdef Categorical < aod.schema.primitives.Primitive
                 end
             end
 
+
+            tf = ~excObj.hasErrors();
             ME = excObj.getException();
-            tf = isempty(ME);
-            if ~tf && throwErrors
+            if excObj.hasErrors() && throwErrors
                 throw(ME);
             end
         end

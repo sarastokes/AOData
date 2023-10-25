@@ -26,14 +26,19 @@ classdef FileCollection < aod.schema.SchemaCollection
                 % File doesn't need to be specified as it's the only
                 % primitive type that can be added to a FileCollection, but
                 % don't penalize users for being thorough...
-                if strcmp(varargin{1}, 'file')
+                if strcmpi(varargin{1}, 'file')
                     startIdx = 2;
                 else % Make sure a non-file primitive type wasn't specified
                     try
-                        primitiveType = aod.schema.util.getPrimitiveType(varargin{1});
-                        error('add:InvalidPrimitiveType',...
-                            'FileCollection only accepts File primitives, not %s', char(primitiveType));
+                        primitiveType = aod.schema.primitives.PrimitiveTypes.get(varargin{1});
+                        if primitiveType ~= aod.schema.primitives.PrimitiveTypes.FILE
+                            error('add:InvalidPrimitiveType',...
+                                'FileCollection only accepts File primitives, not %s', char(primitiveType));
+                        end
                     catch ME
+                        if strcmp(ME.identifier, 'add:InvalidPrimitiveType')
+                            rethrow(ME);
+                        end
                         startIdx = 1;
                         % No need to do anything, this line wasn't supposed to run
                     end

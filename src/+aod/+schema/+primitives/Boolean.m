@@ -56,7 +56,7 @@ classdef Boolean < aod.schema.primitives.Primitive
                 end
             end
 
-            obj.checkIntegrity();
+            obj.checkIntegrity(true);
         end
     end
 end

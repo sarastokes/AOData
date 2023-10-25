@@ -11,7 +11,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 % --------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent                  % aod.specification.Entry
+        Parent                  % aod.schema.Entry
         Name        (1,1)       string
         Default     (1,1)       aod.schema.Default
         Format      (1,1)       aod.specification.MatlabClass
@@ -58,19 +58,19 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Description = aod.specification.Description([], obj);
         end
 
-        function tf = isValid(obj)
-            tf = aod.util.isempty(obj.Name) || strcmp(obj.Name, "UNDEFINED");
-            try
-                obj.checkIntegrity();
-            catch ME
-                if contains(ME.identifier, "checkIntegrity")
-                    tf = false;
-                    warning("isValid:IntegrityFailure", "%s", ME.message);
-                else
-                    rethrow(ME);
-                end
-            end
-        end
+        % function tf = isValid(obj)
+        %     tf = aod.util.isempty(obj.Name) || strcmp(obj.Name, "UNDEFINED");
+        %     try
+        %         obj.checkIntegrity();
+        %     catch ME
+        %         if contains(ME.identifier, "checkIntegrity")
+        %             tf = false;
+        %             warning("isValid:IntegrityFailure", "%s", ME.message);
+        %         else
+        %             rethrow(ME);
+        %         end
+        %     end
+        % end
 
         function displayOptions(obj)
             disp(obj.OPTIONS);
@@ -172,7 +172,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             if nargin < 3
                 errorType = aod.infra.ErrorTypes.ERROR;
             else
-                errorType = aod.infra.ErrorTypes.get(errorType);
+                errorType = aod.infra.ErrorTypes.init(errorType);
             end
 
             tf = true; MEs = [];

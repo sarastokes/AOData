@@ -33,7 +33,12 @@ classdef (Abstract) Validator < aod.specification.Specification
         end
     end
 
+    % MATLAB builtin methods
     methods
+        function tf = isempty(obj)
+            tf = isempty(obj.Value);
+        end
+
         function tf = isequal(obj, other)
             if ~isa(other, class(obj))
                 tf = false;
@@ -43,6 +48,14 @@ classdef (Abstract) Validator < aod.specification.Specification
             % If a subclass doesn't have Value, they should override this
             if isprop(obj, 'Value') && isprop(other, 'Value')
                 tf = isequal(obj.Value, other.Value);
+            end
+        end
+
+        function out = jsonencode(obj)
+            if isempty(obj)
+                out = jsonencode([]);
+            else
+                out = jsonencode(obj.Value);
             end
         end
     end

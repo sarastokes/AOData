@@ -64,6 +64,13 @@ classdef FixedDimension < aod.specification.Validator
 
     % MATLAB built-in methods
     methods
+        function tf = isempty(obj)
+            if ~isscalar(obj)
+                tf = arrayfun(@(x) builtin('isempty', x), obj);
+                return
+            end
+        end
+
         function tf = isequal(obj, other)
             if isa(other, class(obj)) && obj.Length == other.Length
                 tf = true;

@@ -70,7 +70,6 @@ classdef Integer < aod.schema.primitives.Primitive
             end
 
             obj.Maximum.setValue(value);
-
             obj.checkIntegrity(true);
         end
 
@@ -85,7 +84,6 @@ classdef Integer < aod.schema.primitives.Primitive
             end
 
             obj.Maximum.setValue(value);
-
             obj.checkIntegrity(true);
         end
 
@@ -103,16 +101,24 @@ classdef Integer < aod.schema.primitives.Primitive
 
             if isempty(value)
                 obj.Format.setValue([]);
+                obj.checkIntegrity(true);
                 return
             end
 
             % Validate format
-            if ~strcmp(value, 'double') && ~contains(value, 'int')
+            if strcmp(value, 'double') || ~contains(value, 'int')
                 error('setFormat:InvalidFormat',...
-                    'Format must be an integer type');
+                    'Format must be an integer type, not %s', value);
             end
             obj.Format.setValue(value);
-            obj.checkIntegrity(true);
+
+            [minValue, maxValue] = obj.getIntegerRange(obj.Format);
+            if isempty(obj.Minimum)
+                obj.Minimum.setValue(minValue);
+            end
+            if isempty(obj.Maximum)
+                obj.Maximum.setValue(maxValue);
+            end
         end
 
         function setUnits(obj, value)
@@ -125,7 +131,7 @@ classdef Integer < aod.schema.primitives.Primitive
         end
     end
 
-    methods (Access = protected)
+    methods
         function [tf, ME] = checkIntegrity(obj, throwErrors)
             arguments
                 obj
@@ -140,17 +146,14 @@ classdef Integer < aod.schema.primitives.Primitive
             excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
             % Refactor - this runs too often, but may be useful in one place
             if ~isempty(obj.Format)
-                % Check if minimum and maximum are valid
+                % Minimum and maximum are set by the format if not already
+                % set by the user so isempty not required.
                 [minValue, maxValue] = obj.getIntegerRange(obj.Format);
-                if isempty(obj.Minimum)
-                    obj.Minimum.setValue(minValue);
-                elseif obj.Minimum.Value < minValue
+                if obj.Minimum.Value < minValue
                     excObj.addCause(MException('checkIntegrity:InvalidMinimum',...
                         'Minimum value is smaller than the minimum value of the format'));
                 end
-                if isempty(obj.Maximum)
-                    obj.Maximum.setValue(maxValue);
-                elseif obj.Minimum.Value > maxValue
+                if obj.Minimum.Value > maxValue
                     excObj.addCause(MException('checkIntegrity:InvalidMaximum',...
                         'Maximum value is larger than the maximum value of the format'));
                 end
@@ -159,14 +162,15 @@ classdef Integer < aod.schema.primitives.Primitive
                 end
             end
             if ~isempty(obj.Minimum)
-                if all(obj.Default.Value < obj.Minimum.Value)
+                if any(obj.Default.Value < obj.Minimum.Value)
                     excObj.addCause(MException('checkIntegrity:InvalidDefault',...
                         'Default value is smaller than the minimum value'));
                 end
                 if ~isempty(obj.Maximum)
-                    if all(obj.Maximum.Value < obj.Minimum.Value)
+                    if obj.Maximum.Value < obj.Minimum.Value
                         excObj.addCause(MException('checkIntegrity:InvalidRange',...
-                            'Minimum value %d is larger than Maximum value %d', obj.Minimum.Value, obj.Maximum.Value));
+                            'Minimum value %d is larger than Maximum value %d', ...
+                            obj.Minimum.Value, obj.Maximum.Value));
                     end
                 end
             end
@@ -179,9 +183,11 @@ classdef Integer < aod.schema.primitives.Primitive
                 excObj.addCause(MException('checkIntegrity:InvalidDefault',...
                     'Default value is larger than the maximum value'));
             end
+
+
+            tf = ~excObj.hasErrors();
             ME = excObj.getException();
-            tf = isempty(ME);
-            if ~tf && throwErrors
+            if excObj.hasErrors() && throwErrors
                 throw(ME);
             end
         end

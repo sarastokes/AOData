@@ -40,7 +40,7 @@ classdef Number < aod.schema.primitives.Primitive
             obj.Units = aod.schema.decorators.Units(obj, []);
 
             % Fixed values for numeric
-            %% TODO: Add support for single?
+            % TODO: Add support for single?
             obj.Format.setValue('double');
 
             % Complete setup and ensure schema consistency
@@ -105,9 +105,10 @@ classdef Number < aod.schema.primitives.Primitive
                         obj.Minimum.Value, obj.Maximum.Value));
                 end
             end
-            tf = excObj.hasErrors();
+
+            tf = ~excObj.hasErrors();
             ME = excObj.getException();
-            if ~tf && throwErrors
+            if excObj.hasErrors() && throwErrors
                 throw(ME);
             end
         end

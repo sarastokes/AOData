@@ -44,14 +44,14 @@ classdef ExtensionType < aod.specification.Validator
             if numel(value) == 1 && aod.util.isempty(value)
                 obj.Value = "";
                 return
-            elseif numel(value) > 1 
+            elseif numel(value) > 1
                 if any(arrayfun(@aod.util.isempty, value))
                     error('setExtensionType:SomeValuesEmpty',...
                         "%u of %u values were empty, empty values must be singular",...
                         nnz(value == ""), numel(value));
                 elseif ~isvector(value)
                     error('setExtensionType:InvalidSize',...
-                        'Extensions must be a vector, size was %s',... 
+                        'Extensions must be a vector, size was %s',...
                         value2string(size(value)));
                 end
             end
@@ -102,14 +102,6 @@ classdef ExtensionType < aod.specification.Validator
     methods
         function tf = isempty(obj)
             tf = aod.util.isempty(obj.Value);
-        end
-
-        function out = jsonencode(obj)
-            if isempty(obj)
-                out = jsonencode([]);
-            else
-                out = jsonencode(obj.Value);
-            end
         end
     end
 end

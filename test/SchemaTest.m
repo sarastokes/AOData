@@ -24,7 +24,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyTrue(tf);
             testCase.verifyEmpty(ME);
 
-            [tf, ME] = obj.validate(4);
+            [tf, ME] = obj.validate(4, aod.infra.ErrorTypes.NONE);
             testCase.verifyFalse(tf);
             testCase.verifyNotEmpty(ME);
             if ~isempty(ME)  % avoid error cutting test short
@@ -33,7 +33,9 @@ classdef SchemaTest < matlab.unittest.TestCase
                 testCase.verifyEqual(ME.cause{1}.identifier, 'validate:MaximumExceeded');
             end
 
-            [tf, ME] = obj.validate([4 4]);
+            testCase.verifyError(...
+                @() obj.validate([4 4]), 'validate:Failed');
+            [tf, ME] = obj.validate([4 4], aod.infra.ErrorTypes.NONE);
             testCase.verifyFalse(tf);
             testCase.verifyNotEmpty(ME);
             if ~isempty(ME)
@@ -48,7 +50,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyNotEmpty(obj);
 
             testCase.verifyEqual(2, obj.Count);
-            testCase.verifyEqual(["calibration", "Target"], obj.Contents);
+            testCase.verifyEqual(["calibrationDate", "Target"], obj.Contents);
 
             testCase.verifyClass(obj.Entries(1).Parent, 'aod.schema.DatasetCollection');
         end
@@ -64,7 +66,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             obj.add('TestFile', 'Description', 'A test file', 'ExtensionType', '.txt');
             testCase.verifyNotEmpty(obj);
             testCase.verifyEqual(obj.Count, 1);
-            testCase.verifyEqual(obj.Entries(1).Name, 'TestFile');
+            testCase.verifyEqual(obj.Entries(1).Name, "TestFile");
             testCase.verifyEqual(obj.Contents, "TestFile");
 
             obj.remove('TestFile');
@@ -76,7 +78,8 @@ classdef SchemaTest < matlab.unittest.TestCase
             % Add in an unecessary "file" primitiveType specification as '
             % used for DatasetCollection and AttributeCollection to ensure
             % it doesn't throw an error
-            testCase.add('TestFile2', 'File', 'Description', 'A test file');
+            obj.add('TestFile2', 'File', 'Description', 'A test file');
+            testCase.verifyEqual(obj.Count, 1);
         end
 
         function FileCollectionErrors(testCase)

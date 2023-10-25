@@ -16,6 +16,8 @@ classdef Size < aod.specification.Validator
 %   tf = isvector(obj)
 %   out = jsonencode(obj)
 %   x = ndims(obj)
+%
+% TODO: isempty is acting oddly for the Value classes, coded around for now
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -155,7 +157,7 @@ classdef Size < aod.specification.Validator
             % -------------------------------------------------------------
             import aod.specification.SizeTypes
 
-            if isempty(obj.Value)
+            if numel(obj.Value) == 0
                 obj.SizeType = SizeTypes.UNDEFINED;
             elseif ndims(obj) > 2
                 obj.SizeType = SizeTypes.NDARRAY;
@@ -304,7 +306,7 @@ classdef Size < aod.specification.Validator
             % Notes:
             %   - If Size is empty (a.k.a. undefined), value will be empty
             % -------------------------------------------------------------
-            if isempty(obj.Value)
+            if numel(obj) == 0
                 value = [];
             else
                 value = numel(obj.Value);

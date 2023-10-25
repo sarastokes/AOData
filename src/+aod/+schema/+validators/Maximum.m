@@ -62,19 +62,4 @@ classdef Maximum < aod.specification.Validator
             out = convertCharsToStrings(out);
         end
     end
-
-    % MATLAB builtin methods
-    methods
-        function tf = isempty(obj)
-            tf = isempty(obj.Value);
-        end
-
-        function out = jsonencode(obj)
-            if isempty(obj)
-                out = jsonencode([]);
-            else
-                out = jsonencode(obj.Value);
-            end
-        end
-    end
 end

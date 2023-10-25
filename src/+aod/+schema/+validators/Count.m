@@ -57,18 +57,4 @@ classdef Count < aod.specification.Validator
             end
         end
     end
-
-    methods
-        function tf = isempty(obj)
-            tf = isempty(obj.Value);
-        end
-
-        function out = jsonencode(obj)
-            if isempty(obj)
-                out = jsonencode([]);
-            else
-                out = jsonencode(obj.Value);
-            end
-        end
-    end
 end

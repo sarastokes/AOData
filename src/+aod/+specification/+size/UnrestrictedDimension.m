@@ -16,7 +16,6 @@ classdef UnrestrictedDimension < aod.specification.Validator
         optional    (1,1)       logical = false;
     end
 
-
     methods
         function obj = UnrestrictedDimension(optional)
             if nargin < 1
@@ -41,6 +40,10 @@ classdef UnrestrictedDimension < aod.specification.Validator
 
     % MATLAB builtin methods
     methods
+        function tf = isempty(obj)
+            tf = builtin('isempty', obj);
+        end
+
         function tf = isequal(obj, other)
             tf = isa(other, class(obj));
         end

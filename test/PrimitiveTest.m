@@ -18,7 +18,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Integer")
         function Integer(testCase)
-            obj = aod.schema.primitives.Integer("Test");
+            obj = aod.schema.primitives.Integer("Test", []);
             testCase.verifyEqual(obj.Name, "Test");
 
             testCase.verifyEmpty(obj.Units);
@@ -52,13 +52,13 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Minimum.Value, uint8(1));
 
             % TODO: Implement wrapper class
-            obj.assign("Format", "double");
-            testCase.verifyEqual(obj.Minimum.Value, 1);
-            testCase.verifyEmpty(obj.Maximum.Value);
+            testCase.verifyError(...
+                @() obj.assign("Format", "double"),...
+                "setFormat:InvalidFormat");
         end
 
         function IntegerErrors(testCase)
-            obj = aod.schema.primitives.Integer("Test");
+            obj = aod.schema.primitives.Integer("Test", []);
             testCase.verifyError(...
                 @() obj.assign('Size', "(1,2)", 'Default', 2),...
                 "checkIntegrity:InvalidDefault");
@@ -67,7 +67,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Number")
         function Number(testCase)
-            obj = aod.schema.primitives.Number("Test");
+            obj = aod.schema.primitives.Number("Test", []);
             testCase.verifyEqual(obj.Format.Value, "double");
 
             obj.assign('Minimum', 1, 'Maximum', 3);
@@ -81,7 +81,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Link")
         function Link(testCase)
-            obj = aod.schema.primitives.Link("Test");
+            obj = aod.schema.primitives.Link("Test", []);
 
             testCase.verifyEmpty(obj.EntityType);
             testCase.verifyEmpty(obj.Format);
@@ -98,7 +98,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="File")
         function File(testCase)
-            obj = aod.schema.primitives.File("Test");
+            obj = aod.schema.primitives.File("Test", []);
             testCase.verifyEmpty(obj.ExtensionType);
 
             obj = aod.schema.primitives.File("Test", "ExtensionType", ".csv");

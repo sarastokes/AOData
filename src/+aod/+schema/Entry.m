@@ -1,13 +1,14 @@
 classdef Entry < handle
 % This is where primitive type changes would be handled
+% TODO: Name is currently duplicated in Entry and child Primitive
 
     properties (SetAccess = private)
+        Name            (1,1)   string
         Parent                  % aod.schema.SchemaCollection
         Primitive               % aod.schema.primitives.Primitive
     end
 
     properties (Dependent)
-        Name            (1,1)   string
         className       (1,1)   string
         primitiveType   (1,1)   aod.schema.primitives.PrimitiveTypes
         ParentPath      (1,1)   string
@@ -18,17 +19,10 @@ classdef Entry < handle
             if isobject(parent) || ~isempty(parent)
                 obj.setParent(parent);  % empty parent support for testing
             end
+            obj.setName(name);
 
             obj.Primitive = aod.schema.util.createPrimitive(...
-                type, name, obj, varargin{:});
-        end
-
-        function value = get.Name(obj)
-            if isempty(obj.Primitive)
-                value = [];
-            else
-                value = obj.Primitive.Name;
-            end
+                type, obj.Name, obj, varargin{:});
         end
 
         function value = get.primitiveType(obj)
@@ -71,7 +65,7 @@ classdef Entry < handle
             if nargin < 3
                 errorType = aod.infra.ErrorTypes.ERROR;
             else
-                errorType = aod.infra.ErrorTypes.get(errorType);
+                errorType = aod.infra.ErrorTypes.init(errorType);
             end
             [tf, ME] = obj.Primitive.validate(input, errorType);
         end
@@ -85,6 +79,27 @@ classdef Entry < handle
             end
 
             obj.Parent = parent;
+        end
+
+        function setName(obj, name)
+            % Set the primitive's name, ensuring valid variable name
+            %
+            % Syntax:
+            %   setName(obj, name)
+            %
+            % See also:
+            %   isvarname
+            % -------------------------------------------------------------
+            arguments
+                obj
+                name    (1,1)       string
+            end
+
+            if ~isvarname(name)
+                error('setName:InvalidName',...
+                    'Property names must be valid MATLAB variables');
+            end
+            obj.Name = name;
         end
     end
 
