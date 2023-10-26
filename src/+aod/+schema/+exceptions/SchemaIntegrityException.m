@@ -33,7 +33,7 @@ classdef SchemaIntegrityException < handle
                     entry = entry.Parent;
                 end
             end
-            if isa(entry, 'aod.schema.Entry')
+            if isa(entry, 'aod.schema.Record')
                 obj.Exception = MException('checkIntegrity:SchemaConflictsDetected',...
                     'Schema conflicts detected for "%s/%s" in %s',...
                     entry.className, string(entry.Name), entry.ParentPath);

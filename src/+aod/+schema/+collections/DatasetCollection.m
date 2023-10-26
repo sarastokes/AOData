@@ -31,7 +31,7 @@ classdef DatasetCollection < aod.schema.SchemaCollection
             if istext(varargin{1})
                 error('add:AdditionNotSupported',...
                     'Ad-hoc property addition is not supported. Datasets must be defined in a property block. Use set() to modify an existing property defined or inherited by the class.');
-            elseif isa(varargin{1}, 'aod.schema.Entry')  % Internal use only
+            elseif isa(varargin{1}, 'aod.schema.Record')  % Internal use only
                 add@aod.schema.SchemaCollection(obj, varargin{:});
             end
         end
@@ -94,7 +94,7 @@ classdef DatasetCollection < aod.schema.SchemaCollection
                     continue
                 end
 
-                dataObj = aod.schema.Entry(obj, propList(i).Name, 'Unknown');
+                dataObj = aod.schema.Record(obj, propList(i).Name, 'Unknown');
                 obj.add(dataObj);
             end
         end

@@ -22,7 +22,7 @@ classdef (Abstract) SchemaCollection < handle
     properties (SetAccess = protected)
         Parent
         className
-        Entries
+        Records
     end
 
     properties (Hidden, SetAccess = private)
@@ -49,7 +49,7 @@ classdef (Abstract) SchemaCollection < handle
     % Dependent methods
     methods
         function value = get.Count(obj)
-            value = numel(obj.Entries);
+            value = numel(obj.Records);
         end
 
         function value = get.Contents(obj)
@@ -60,7 +60,7 @@ classdef (Abstract) SchemaCollection < handle
     methods
         function [tf, ME] = validate(obj, specName, value)
             % Exception should contain:
-            %   - Class and entry name
+            %   - Class and record name
             %   - Number of failures
             %   - Names of failed validators
             % The addCause function looks valuable in this regard
@@ -69,8 +69,8 @@ classdef (Abstract) SchemaCollection < handle
             [tf, ME] = p.validate(value);
         end
 
-        function [tf, ME, failedEntries] = checkIntegrity(obj, specName)
-            failedEntries = [];
+        function [tf, ME, failedRecords] = checkIntegrity(obj, specName)
+            failedRecords = [];
             if nargin < 1 || isempty(specName)
                 if obj.Count == 0
                     tf = true; ME = [];
@@ -78,47 +78,47 @@ classdef (Abstract) SchemaCollection < handle
                 end
                 didPass = true(obj.Count, 1);
                 for i = 1:obj.Count
-                    [iPassed, iME] = obj.Entries(i).checkIntegrity();
+                    [iPassed, iME] = obj.Records(i).checkIntegrity();
                     didPass(i) = iPassed;
                     ME = cat(1, ME, iME);
                 end
-                failedEntries = obj.Contents(didPass);
+                failedRecords = obj.Contents(didPass);
             else
                 p = obj.get(specName, aod.infra.ErrorTypes.ERROR);
                 [tf, ME] = p.checkIntegrity();
             end
         end
 
-        function set(obj, entryName, primitiveType, varargin)
-            % SET Set the type and options of an entry's primitive
+        function set(obj, recordName, primitiveType, varargin)
+            % SET Set the type and options of an record's primitive
             % -------------------------------------------------------------
 
 
-            entry = obj.get(entryName);
-            if isempty(entry)
+            record = obj.get(recordName);
+            if isempty(record)
                 error('set:EntryNotFound',...
                     '%s does not have the %s "%s"', ...
-                    obj.className, obj.schemaType, entryName);
+                    obj.className, obj.schemaType, recordName);
             end
 
             primitiveType = aod.schema.primitives.PrimitiveTypes.init(primitiveType);
             % TODO: Ensure type is valid for collection
-            if primitiveType ~= entry.primitiveType
-                entry.setType(primitiveType);
+            if primitiveType ~= record.primitiveType
+                record.setType(primitiveType);
             end
 
-            entry.assign(varargin{:});
+            record.assign(varargin{:});
         end
 
-        function [tf, idx] = has(obj, entryName)
-            % Determine whether Manager has a entry
+        function [tf, idx] = has(obj, recordName)
+            % Determine whether Manager has a record
             %
             % Syntax:
-            %   [tf, idx] = has(obj, entryName)
+            %   [tf, idx] = has(obj, recordName)
             % -------------------------------------------------------------
             arguments
                 obj
-                entryName        string
+                recordName        string
             end
 
             if obj.Count == 0
@@ -126,19 +126,19 @@ classdef (Abstract) SchemaCollection < handle
                 return
             end
             allNames = obj.list();
-            idx = find(allNames == entryName);
+            idx = find(allNames == recordName);
             tf = ~isempty(idx);
         end
 
-        function entry = get(obj, entryName, errorType)
+        function record = get(obj, recordName, errorType)
             % Get a dataset by name
             %
             % Syntax:
-            %   entry = get(obj, entryName)
-            %   entry = get(obj, entryName, errorType)
+            %   record = get(obj, recordName)
+            %   record = get(obj, recordName, errorType)
             %
             % Inputs:
-            %   entryName           char
+            %   recordName           char
             %       The name of the dataset or attribute (case-sensitive)
             % Optional inputs:
             %   errorType           char or aod.infra.ErrorTypes
@@ -146,30 +146,30 @@ classdef (Abstract) SchemaCollection < handle
             %       'warning'. Default is 'none' and the output will be []
             %
             % Outputs:
-            %   entry               aod.specification.Entry
+            %   record               aod.specification.Entry
             % -------------------------------------------------------------
             arguments
                 obj
-                entryName       char
+                recordName       char
                 errorType       = aod.infra.ErrorTypes.NONE
             end
 
-            [tf, idx] = obj.has(entryName);
+            [tf, idx] = obj.has(recordName);
 
             if tf
-                entry = obj.Entries(idx);
+                record = obj.Records(idx);
             else
                 switch errorType
                     case aod.infra.ErrorTypes.NONE
-                        entry = [];
+                        record = [];
                     case aod.infra.ErrorTypes.ERROR
                         error('get:EntryNotFound',...
                             'Entry %s not found in %sManager',...
-                            entryName, obj.schemaType);
+                            recordName, obj.schemaType);
                     case aod.infra.ErrorTypes.WARNING
                         warning('get:EntryNotFound',...
                             'Entry %s not found in %sManager',...
-                            entryName, obj.schemaType);
+                            recordName, obj.schemaType);
                     case aod.infra.ErrorTypes.MISSING
                         error("get:InvalidInput",...
                             "Missing error type is not supported");
@@ -177,41 +177,41 @@ classdef (Abstract) SchemaCollection < handle
             end
         end
 
-        function add(obj, entry)
+        function add(obj, record)
             % Add a new dataset/attribute
             %
             % Syntax:
-            %   add(obj, entry)
+            %   add(obj, record)
             %
             % Inputs:
-            %   entry          aod.specification.Entry
+            %   record          aod.schema.Record
             %
             % See also:
-            %   aod.specification.Entry
+            %   aod.schema.Record
             % -------------------------------------------------------------
             arguments
                 obj
-                entry         aod.schema.Entry
+                record         aod.schema.Record
             end
 
-            if obj.Count > 0 && ismember(lower(entry.Name), lower(obj.list()))
-                error('add:EntryExists',...
-                    'A %s named %s is already present', entry.schemaType, entry.Name);
+            if obj.Count > 0 && ismember(lower(record.Name), lower(obj.list()))
+                error('add:RecordExists',...
+                    'A %s named %s is already present', record.schemaType, record.Name);
             end
-            obj.Entries = [obj.Entries; entry];
+            obj.Records = [obj.Records; record];
         end
 
-        function remove(obj, entryName)
-            % Remove an entry
+        function remove(obj, recordName)
+            % Remove an record
             %
             % Syntax:
-            %   remove(obj, entryName)
+            %   remove(obj, recordName)
             % -------------------------------------------------------------
-            [tf, idx] = obj.has(entryName);
+            [tf, idx] = obj.has(recordName);
             if ~tf
                 return
             end
-            obj.Entries(idx) = [];
+            obj.Records(idx) = [];
             % obj.listeners(idx) = []
         end
 
@@ -226,7 +226,7 @@ classdef (Abstract) SchemaCollection < handle
                 return
             end
 
-            names = arrayfun(@(x) x.Name, obj.Entries);
+            names = arrayfun(@(x) x.Name, obj.Records);
         end
 
         function out = text(obj)
@@ -242,7 +242,7 @@ classdef (Abstract) SchemaCollection < handle
 
             out = "";
             for i = 1:obj.Count
-                out = out + obj.Entries(i).text();
+                out = out + obj.Records(i).text();
             end
         end
     end
@@ -304,7 +304,7 @@ classdef (Abstract) SchemaCollection < handle
         end
 
         function S = struct(obj)
-            % Convert specified entries to a structure
+            % Convert specified records to a structure
             %
             % Syntax:
             %   S = struct(obj)
@@ -315,9 +315,9 @@ classdef (Abstract) SchemaCollection < handle
             end
 
             for i = 1:obj.Count
-                iStruct = obj.Entries(i).struct();
+                iStruct = obj.Records(i).struct();
                 % Place into a struct named for the dataset
-                S.(obj.Entries(i).Name) = iStruct;
+                S.(obj.Records(i).Name) = iStruct;
             end
         end
     end

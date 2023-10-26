@@ -17,7 +17,7 @@ classdef FileCollection < aod.schema.SchemaCollection
 
     methods
         function add(obj, fileName, varargin)
-            if isa(fileName, 'aod.schema.Entry')
+            if isa(fileName, 'aod.schema.Record')
                 entry = fileName;
                 if ~aod.schema.util.isPrimitiveType(entry, 'file')
                     error('add:InvalidPrimitiveType',...
@@ -44,7 +44,7 @@ classdef FileCollection < aod.schema.SchemaCollection
                         % No need to do anything, this line wasn't supposed to run
                     end
                 end
-                entry = aod.schema.Entry(obj, fileName, 'file', varargin{startIdx:end});
+                entry = aod.schema.Record(obj, fileName, 'file', varargin{startIdx:end});
             end
 
             add@aod.schema.SchemaCollection(obj, entry);

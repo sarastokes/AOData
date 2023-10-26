@@ -5,7 +5,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
 %   aod.schema.SchemaCollection
 %
 % Constructor:
-%   obj = aod.schema.AttributeCollection(className)
+%   obj = aod.schema.collections.AttributeCollection(className)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -37,14 +37,14 @@ classdef AttributeCollection < aod.schema.SchemaCollection
             %   add(obj, attrNameName, primitiveType, varargin)
             % --------------------------------------------------------------
 
-            if isa(attrName, 'aod.schema.Entry')
+            if isa(attrName, 'aod.schema.Record')
                 entry = attrName;
             else
                 if nargin < 3
                     error('add:InsufficientInput',...
                         'Must at least specify attribute name and type');
                 end
-                entry = aod.schema.Entry(obj, attrName, primitiveType, varargin{:});
+                entry = aod.schema.Record(obj, attrName, primitiveType, varargin{:});
             end
 
             add@aod.schema.SchemaCollection(obj, entry);
@@ -55,8 +55,8 @@ classdef AttributeCollection < aod.schema.SchemaCollection
             % TODO: Not sure this will work...
 
             for i = 1:obj.Count
-                addParameter(ip, obj.Entries(i).Name,...
-                    obj.Entries(i).DefaultValue, @(x) obj.Entries(i).validate(x));
+                addParameter(ip, obj.Records(i).Name,...
+                    obj.Records(i).DefaultValue, @(x) obj.Records(i).validate(x));
             end
         end
     end
@@ -78,7 +78,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
 
     methods (Static)
         function obj = populate(className)
-
+            % TODO: Modify entity framework
         end
     end
 end

@@ -11,7 +11,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 % --------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent                  % aod.schema.Entry
+        Parent                  % aod.schema.Record, aod.schema.primitives.Container
         Name        (1,1)       string
         isRequired  (1,1)       logical = false
         Default     (1,1)       aod.schema.Default
@@ -332,7 +332,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 return
             end
 
-            mustBeSubclass(parent, ["aod.schema.Entry", "aod.schema.primitives.Container"]);
+            mustBeSubclass(parent, ["aod.schema.Record", "aod.schema.primitives.Container"]);
             if isa(parent, 'aod.schema.primitives.Container')
                 % Check if table is allowed, throw error if not
 

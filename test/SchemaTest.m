@@ -18,7 +18,7 @@ classdef SchemaTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Entry")
         function Entry(testCase)
-            obj = aod.schema.Entry([], 'Test', 'Number',...
+            obj = aod.schema.Record([], 'Test', 'Number',...
                 'Maximum', 3, 'Size', '(1,1)');
             [tf, ME] = obj.validate(3);
             testCase.verifyTrue(tf);
@@ -52,7 +52,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyEqual(2, obj.Count);
             testCase.verifyEqual(["calibrationDate", "Target"], obj.Contents);
 
-            testCase.verifyClass(obj.Entries(1).Parent, 'aod.schema.collections.DatasetCollection');
+            testCase.verifyClass(obj.Records(1).Parent, 'aod.schema.collections.DatasetCollection');
         end
 
         function DatasetCollectionErrors(testCase)
@@ -80,7 +80,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             obj.add('TestFile', 'Description', 'A test file', 'ExtensionType', '.txt');
             testCase.verifyNotEmpty(obj);
             testCase.verifyEqual(obj.Count, 1);
-            testCase.verifyEqual(obj.Entries(1).Name, "TestFile");
+            testCase.verifyEqual(obj.Records(1).Name, "TestFile");
             testCase.verifyEqual(obj.Contents, "TestFile");
 
             obj.remove('TestFile');
@@ -106,7 +106,7 @@ classdef SchemaTest < matlab.unittest.TestCase
 
     methods
         function IsPrimitiveType(testCase)
-            obj = aod.schema.Entry([], 'Test', 'Number',...
+            obj = aod.schema.Record([], 'Test', 'Number',...
                 'Maximum', 3, 'Size', '(1,1)');
             testCase.verifyTrue(aod.schema.util.isPrimitiveType(obj, 'number'));
             testCase.verifyFalse(aod.schema.util.isPrimitiveType(obj, 'text'));

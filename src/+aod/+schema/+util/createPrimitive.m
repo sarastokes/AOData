@@ -11,7 +11,7 @@ function primitive = createPrimitive(primitiveType, name, parent, varargin)
 %   primitiveType       string/char or aod.schema.primitives.PrimitiveType
 %   name                string
 % Optional inputs:
-%   parent              aod.schema.Entry
+%   parent              aod.schema.Record
 % Any options defined by the chosen primitiveType can be passed as well
 %
 

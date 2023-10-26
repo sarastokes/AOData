@@ -1,5 +1,5 @@
 classdef MatchType
-% Enumeration of possible outputs when comparing two schema entries
+% Enumeration of possible outputs when comparing two schema records
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

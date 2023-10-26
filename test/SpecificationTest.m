@@ -314,74 +314,75 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
-    % methods (Test, TestTags="Functions")
-    %     function FunctionValidation(testCase)
-    %         obj = aod.specification.ValidationFunction(...
-    %             {@mustBeNumeric, @(x) x > 100});
-    %         testCase.verifyFalse(isempty(obj));
-    %         testCase.verifyTrue(obj.validate(123))
-    %         testCase.verifyFalse(obj.validate(50));
-    %         testCase.verifyFalse(obj.validate("test"));
+    methods (Test, TestTags="Functions")
+        function FunctionValidation(testCase)
+            obj = aod.specification.ValidationFunction(...
+                {@mustBeNumeric, @(x) x > 100});
+            testCase.verifyFalse(isempty(obj));
+            testCase.verifyTrue(obj.validate(123))
+            testCase.verifyFalse(obj.validate(50));
+            testCase.verifyFalse(obj.validate("test"));
 
-    %         obj.setValue([]);
-    %         testCase.verifyTrue(obj.validate("test"));
-    %     end
+            obj.setValue([]);
+            testCase.verifyTrue(obj.validate("test"));
+        end
 
-    %     function EntityValidation(testCase)
-    %         expt = aod.core.Experiment("test", cd, getDateYMD());
-    %         p = findprop(expt, "epochIDs");
-    %         obj2 = aod.specification.ValidationFunction(p);
-    %         testCase.verifyEmpty(obj2.Value);
-    %     end
+        function EntityValidation
 
-    %     function EmptyFunctions(testCase)
-    %         obj = aod.specification.ValidationFunction();
-    %         testCase.verifyEmpty(obj);
-    %         testCase.verifyTrue(obj.validate(123));
-    %     end
+            expt = aod.core.Experiment("test", cd, getDateYMD());
+            p = findprop(expt, "epochIDs");
+            obj2 = aod.specification.ValidationFunction(p);
+            testCase.verifyEmpty(obj2.Value);
+        end
 
-    %     function FunctionEquality(testCase)
-    %         obj1 = aod.specification.ValidationFunction(...
-    %             {@(x) x > 100, @mustBeNumeric});
-    %         obj2 = aod.specification.ValidationFunction(...
-    %             {@(y) y > 100, @mustBeNumeric});
-    %         obj3 = aod.specification.ValidationFunction(@(x) x > 100);
+        function EmptyFunctions(testCase)
+            obj = aod.specification.ValidationFunction();
+            testCase.verifyEmpty(obj);
+            testCase.verifyTrue(obj.validate(123));
+        end
 
-    %         testCase.verifyEqual(obj1, obj2);
-    %         testCase.verifyNotEqual(obj1, obj3);
-    %         testCase.verifyNotEqual(obj1,...
-    %             aod.specification.ValidationFunction([]));
-    %         testCase.verifyNotEqual(obj1,...
-    %             aod.schema.validators.Class("string"));
-    %     end
+        function FunctionEquality(testCase)
+            obj1 = aod.specification.ValidationFunction(...
+                {@(x) x > 100, @mustBeNumeric});
+            obj2 = aod.specification.ValidationFunction(...
+                {@(y) y > 100, @mustBeNumeric});
+            obj3 = aod.specification.ValidationFunction(@(x) x > 100);
 
-    %     function FunctionComparison(testCase)
-    %         import aod.schema.MatchType
+            testCase.verifyEqual(obj1, obj2);
+            testCase.verifyNotEqual(obj1, obj3);
+            testCase.verifyNotEqual(obj1,...
+                aod.specification.ValidationFunction([]));
+            testCase.verifyNotEqual(obj1,...
+                aod.schema.validators.Class("string"));
+        end
 
-    %         refObj1 = aod.specification.ValidationFunction(...
-    %             {@(x) x > 100, @mustBeNumeric});
-    %         refObj2 = aod.specification.ValidationFunction(...
-    %             {@(y) y > 100, @mustBeNumeric});
-    %         refObj3 = aod.specification.ValidationFunction([]);
+        function FunctionComparison(testCase)
+            import aod.schema.MatchType
 
-    %         testCase.verifyEqual(MatchType.SAME,...
-    %             refObj1.compare(refObj2));
-    %         testCase.verifyEqual(MatchType.SAME,...
-    %             refObj1.compare(refObj1));
-    %         testCase.verifyEqual(MatchType.MISSING,...
-    %             refObj3.compare(refObj1));
-    %         testCase.verifyEqual(MatchType.UNEXPECTED,...
-    %             refObj1.compare(refObj3));
-    %         testCase.verifyEqual(MatchType.CHANGED,...
-    %             refObj1.compare(aod.specification.ValidationFunction(@(x) x > 100)));
-    %     end
+            refObj1 = aod.specification.ValidationFunction(...
+                {@(x) x > 100, @mustBeNumeric});
+            refObj2 = aod.specification.ValidationFunction(...
+                {@(y) y > 100, @mustBeNumeric});
+            refObj3 = aod.specification.ValidationFunction([]);
 
-    %     function FunctionErrors(testCase)
-    %         testCase.verifyError(...
-    %             @() aod.specification.ValidationFunction(123),...
-    %             "validateFunctionHandles:InvalidInput");
-    %     end
-    % end
+            testCase.verifyEqual(MatchType.SAME,...
+                refObj1.compare(refObj2));
+            testCase.verifyEqual(MatchType.SAME,...
+                refObj1.compare(refObj1));
+            testCase.verifyEqual(MatchType.MISSING,...
+                refObj3.compare(refObj1));
+            testCase.verifyEqual(MatchType.UNEXPECTED,...
+                refObj1.compare(refObj3));
+            testCase.verifyEqual(MatchType.CHANGED,...
+                refObj1.compare(aod.specification.ValidationFunction(@(x) x > 100)));
+        end
+
+        function FunctionErrors(testCase)
+            testCase.verifyError(...
+                @() aod.specification.ValidationFunction(123),...
+                "validateFunctionHandles:InvalidInput");
+        end
+    end
 
     methods (Test, TestTags="Dataset")
         function EntryFromMetaclass(testCase)
@@ -447,39 +448,39 @@ classdef SpecificationTest < matlab.unittest.TestCase
             % fcnSpec = aod.specification.ValidationFunction(@mjstBeNumeric);
         end
 
-        % function DatasetManager(testCase)
-        %     obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
-        %     testCase.verifyEqual(obj.Count, 4);
-        %     testCase.verifyNumElements(obj.Entries, 4);
-        %     testCase.verifyEqual("aod.core.Epoch", obj.className);
+        function DatasetManager(testCase)
+            obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
+            testCase.verifyEqual(obj.Count, 4);
+            testCase.verifyNumElements(obj.Entries, 4);
+            testCase.verifyEqual("aod.core.Epoch", obj.className);
 
-        %     testCase.verifyTrue(obj.has('ID'));
-        %     testCase.verifyEmpty(obj.get('Blah'));
-        %     testCase.verifyFalse(obj.has('Blah'));
+            testCase.verifyTrue(obj.has('ID'));
+            testCase.verifyEmpty(obj.get('Blah'));
+            testCase.verifyFalse(obj.has('Blah'));
 
-        %     out = obj.text();
-        %     testCase.verifySize(obj.table(), [4 6]);
-        % end
+            out = obj.text();
+            testCase.verifySize(obj.table(), [4 6]);
+        end
 
-        % function DatasetManagerAccess(testCase)
-        %     DM = aod.specification.util.getDatasetSpecification(...
-        %         'aod.builtin.devices.NeutralDensityFilter');
-        %     testCase.verifyClass(DM, 'aod.specification.DatasetManager');
-        % end
+        function DatasetManagerAccess(testCase)
+            DM = aod.specification.util.getDatasetSpecification(...
+                'aod.builtin.devices.NeutralDensityFilter');
+            testCase.verifyClass(DM, 'aod.specification.DatasetManager');
+        end
 
-        % function DatasetManagerError(testCase)
-        %     obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
-        %     ep = aod.core.Epoch(1);
+        function DatasetManagerError(testCase)
+            obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
+            ep = aod.core.Epoch(1);
 
-        %     testCase.verifyError(...
-        %         @() obj.add(findprop(ep, 'ID')), "add:EntryExists");
-        %     testCase.verifyError(...
-        %         @() obj.add("NewProp"), "add:InvalidInput");
+            testCase.verifyError(...
+                @() obj.add(findprop(ep, 'ID')), "add:EntryExists");
+            testCase.verifyError(...
+                @() obj.add("NewProp"), "add:InvalidInput");
 
-        %     testCase.verifyError(...
-        %         @() aod.specification.DatasetManager.populate("aod.common.FileReader"),...
-        %         "populate:InvalidInput");
-        % end
+            testCase.verifyError(...
+                @() aod.specification.DatasetManager.populate("aod.common.FileReader"),...
+                "populate:InvalidInput");
+        end
     end
 
     methods (Test, TestTags="Attribute")
