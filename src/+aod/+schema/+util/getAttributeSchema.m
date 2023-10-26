@@ -12,18 +12,18 @@ function attrCollection = getAttributeSchema(aoClass)
 %   AM              aod.specification.AttributeManager
 %
 % See also:
-%   aod.schema.AttributeCollection, aod.core.Entity.specifyAttributes 
+%   aod.schema.collections.AttributeCollection, specifyAttributes
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
+
     if ~istext(aoClass)
         if isa(aoClass, "meta.class")
             aoClass = aoClass.Name;
         elseif isobject(aoClass)
             aoClass = class(aoClass);
         end
-    end 
+    end
     aoClass = convertCharsToStrings(aoClass);
     if ~isSubclass(aoClass, 'aod.core.Entity')
         warning('getAttributeSpecification:InvalidClass',...

@@ -54,18 +54,14 @@ classdef Number < aod.schema.primitives.Primitive
         function setUnits(obj, units)
             arguments
                 obj
-                units       string          {mustBeScalarOrEmpty}
+                units       string          {mustBeTextScalar} = ""
             end
 
             obj.Units.setValue(units);
         end
 
         function setMinimum(obj, value)
-            %SETMINIMUM Set the minimum allowed value of the number.
-            %
-            % Syntax:
-            %   setMinimum(obj, value)
-            % -----------------------------------------------------------------
+            %SETMINIMUM  Set the minimum allowed value (inclusive).
 
             arguments
                 obj
@@ -76,6 +72,7 @@ classdef Number < aod.schema.primitives.Primitive
         end
 
         function setMaximum(obj, value)
+            %SETMINIMUM  Set the minimum allowed value (inclusive).
             arguments
                 obj
                 value       {mustBeScalarOrEmpty}
@@ -89,7 +86,7 @@ classdef Number < aod.schema.primitives.Primitive
         function [tf, ME] = checkIntegrity(obj, throwErrors)
             arguments
                 obj
-                throwErrors         logical     = false
+                throwErrors    (1,1)     logical     = false
             end
 
             if obj.isInitializing

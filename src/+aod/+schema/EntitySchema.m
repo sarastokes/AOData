@@ -1,5 +1,6 @@
 classdef EntitySchema < handle
 % TODO: distinct schema classes for core vs. persistent
+% TODO: requirements reporting
 
     properties (SetAccess = private)
         Parent      % aod.core.Entity
@@ -18,7 +19,7 @@ classdef EntitySchema < handle
     methods
         function obj = EntitySchema(parent)
             obj.setParent(parent);
-            obj.DatasetCollection = aod.schema.DatasetCollection.populate(class(obj.Parent));
+            obj.DatasetCollection = aod.schema.collections.DatasetCollection.populate(class(obj.Parent));
         end
 
         function value = get.Datasets(obj)
@@ -72,7 +73,7 @@ classdef EntitySchema < handle
                 ME = MException("checkSchemaIntegrity:InconsistenciesFound",...
                     "Inconsistent schemas in %u datasets, %u attributes and %u files",...
                     numel(dsetME.cause), numel(attrME.cause), numel(fileME.cause));
-                
+
                 for i = 1:numel(dsetME.cause)
                     ME = addCause(ME, dsetME.cause{i});
                 end

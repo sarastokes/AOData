@@ -5,7 +5,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
 %   aod.schema.SchemaCollection
 %
 % Constructor:
-%   obj = aod.schema.AttributeSchema(className)
+%   obj = aod.schema.AttributeCollection(className)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -78,7 +78,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
 
     methods (Static)
         function obj = populate(className)
-            
+
         end
     end
 end

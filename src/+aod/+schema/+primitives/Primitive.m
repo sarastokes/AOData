@@ -155,7 +155,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             %
             % See also:
             %   aod.schema.validators.Size
-            % ----------------------------------------------------------
+            % --------------------------------------------------------------
             obj.Size = aod.schema.validators.Size(value);
             obj.checkIntegrity(true);
         end
@@ -213,7 +213,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             end
         end
     end
-
 
     methods (Sealed)
         function setName(obj, name)

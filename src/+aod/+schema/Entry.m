@@ -1,5 +1,11 @@
 classdef Entry < handle
-% This is where primitive type changes would be handled
+% ENTRY
+%
+% Description:
+%   A wrapper for Primitive that ensures a consistent interface when
+%   working with aod.common.Entity and schema collections. Having a wrapper
+%   means that the primitive type can be changed in-place.
+%
 % TODO: Name is currently duplicated in Entry and child Primitive
 
     properties (SetAccess = private)
@@ -9,6 +15,8 @@ classdef Entry < handle
     end
 
     properties (Dependent)
+        % TODO: isNested
+        isRequired      (1,1)   logical
         className       (1,1)   string
         primitiveType   (1,1)   aod.schema.primitives.PrimitiveTypes
         ParentPath      (1,1)   string
@@ -21,11 +29,16 @@ classdef Entry < handle
             end
             obj.setName(name);
 
+            % Create the primitive and confirm that it is valid
             obj.Primitive = aod.schema.util.createPrimitive(...
                 type, obj.Name, obj, varargin{:});
             if isobject(parent)
                 obj.checkPrimitiveType();
             end
+        end
+
+        function value = get.isRequired(obj)
+            value = obj.Primitive.isRequired;
         end
 
         function value = get.primitiveType(obj)
@@ -51,6 +64,11 @@ classdef Entry < handle
 
     methods
         function setType(obj, primitiveType)
+            % SETTYPE  Assigns a primitive type to an entry
+            %
+            % Notes:
+            %   Anything specified by the existing primitive is lost
+            % -------------------------------------------------------------
             primitiveType = aod.schema.primitives.PrimitiveTypes.get(primitiveType);
             if isequal(obj.primitiveType, primitiveType)
                 return
@@ -59,7 +77,10 @@ classdef Entry < handle
                 primitiveType, obj.Name, obj);
             obj.Primitive = newPrimitive;
         end
+    end
 
+    % Methods that pass to primitive
+    methods
         function assign(obj, varargin)
             obj.Primitive.assign(varargin{:});
         end
@@ -71,6 +92,14 @@ classdef Entry < handle
                 errorType = aod.infra.ErrorTypes.init(errorType);
             end
             [tf, ME] = obj.Primitive.validate(input, errorType);
+        end
+
+        function [tf, ME] = checkIntegrity(obj, throwError)
+            if nargin < 2
+                throwError = false;
+            end
+
+            [tf, ME] = obj.Primitive.checkIntegrity(throwError);
         end
     end
 
@@ -90,7 +119,6 @@ classdef Entry < handle
             % Syntax:
             %   checkPrimitiveType(obj)
             % -------------------------------------------------------------
-            parentCollection = extractBefore(class(obj.Parent), 'Collection');
             if ~ismember(obj.primitiveType, obj.Parent.ALLOWABLE_PRIMITIVE_TYPES)
                 error('checkPrimitiveType:InvalidTypeForCollection',...
                     '%s does not support primitives of type %s',...

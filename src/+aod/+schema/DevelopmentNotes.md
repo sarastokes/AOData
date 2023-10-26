@@ -122,7 +122,7 @@ Basic types (**validator**, *decorator*):
     - *Units*
 - String:
     - **Enum**
-    - **Regexp** - accepts MATLAB function handles
+    - **Regexp** - standard regular expression string or can convert some MATLAB function handles
     - **Length** - characters in the string
 - Datetime
     - Format: 'yyyyMMdd HH:mm:ss'
@@ -155,4 +155,97 @@ Basic types (**validator**, *decorator*):
     function value = specifyAttributes(obj)
         value.add("Name", "type", varargin{:});
     end
+```
+
+### Syntax
+##### Number
+```matlab
+obj.set('DsetName', 'NUMBER',...
+    'Description', 'This is an example');
+
+% Examples
+3.14159
+[1 2 3; 4 5 6]
+zeros(3, 3, 3)
+
+obj.set('DsetName', 'NUMBER',...
+    'Minimum', 2, 'Maximum', 3,...
+    'Units', 'mV', 'Description', 'Must be between 2 and 3 (inclusive)');
+
+% Examples
+2.5
+[2, 2.4; 3, 2.9]
+2:0.1:3
+
+obj.set('DsetName', 'NUMBER',...
+    'Minimum', 2, 'Maximum', 3, 'Size', '(1,:)',...
+    'Units', 'mV', 'Description', 'Must be a row between 2 and 3 (inclusive)');
+
+% Examples
+2.5
+2:0.1:3
+```
+
+##### Text
+TODO: Add regexp demos, enum
+```matlab
+obj.set('TextData', 'TEXT',...
+    'Description', 'One or more strings');
+
+% Examples
+"hey"
+["hey", "hello", "hi"]
+["hey", "hej"; "hey", "hej"]
+
+obj.set('TextData', 'TEXT',...
+    'Length', 3,...
+    'Description', 'One or more 3 character strings');
+
+% Examples
+"hey"
+["hey", "hej"; "hey", "hej"]
+
+obj.set('TextData', 'TEXT',...
+    'Count', 3, 'Size', '(1,1)',...
+    'Description', 'One three character string');
+
+% Examples
+"hey"
+```
+
+##### Object
+Note that some validators are set automatically. For the example below, "Count" is set to 3.
+
+To define items starting from scratch:
+1. When initializing, a cell containing other cells (1 per item) could be passed to `parse` via the `set` method.
+2. The same could be performed to totally reset the Items field (subclass action)
+
+To modify existing or inherited items without reseting;
+1. An existing field could be changed with `set` and sent to `parse` (?) as a cell that does not contain other cells.
+2. A new field could be added with `addField`
+3. A field could be removed with `removeField`
+4. Existing fields could be reordered with `reorderFields`
+
+```matlab
+obj.set('ArrayData', 'OBJECT',...
+    'Items', {
+        {'NUMBER', 'Size', '(1,1)', 'Description', 'A number'},
+        {'TEXT', 'Length', 3, 'Description', 'A three letter string'},
+        {'INTEGER', 'Class', 'uint8', 'Default', uint8(3), 'Description', 'An integer'}},...
+    'Description', 'An object that is a number, a 3 letter string, then an integer');
+
+% Examples
+{3.5, "abc", uint8(4)}
+
+obj.setItem(1, 'Maximum', 3);
+
+% Examples
+{2.5, "abc", uint8(4)}
+
+obj.addItem(4, 'TEXT', 'Enum', ["low", "medium", "high"],...
+    'Description', 'A text value limited to low medium or high');
+
+% Examples
+{2.5, "abc", uint8(4), "low"}
+
 ```

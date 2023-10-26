@@ -46,17 +46,17 @@ classdef SchemaTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="DatasetCollection")
         function DatasetCollection(testCase)
-            obj = aod.schema.DatasetCollection.populate('aod.core.Calibration');
+            obj = aod.schema.collections.DatasetCollection.populate('aod.core.Calibration');
             testCase.verifyNotEmpty(obj);
 
             testCase.verifyEqual(2, obj.Count);
             testCase.verifyEqual(["calibrationDate", "Target"], obj.Contents);
 
-            testCase.verifyClass(obj.Entries(1).Parent, 'aod.schema.DatasetCollection');
+            testCase.verifyClass(obj.Entries(1).Parent, 'aod.schema.collections.DatasetCollection');
         end
 
         function DatasetCollectionErrors(testCase)
-            obj = aod.schema.DatasetCollection.populate('aod.core.Calibration');
+            obj = aod.schema.collections.DatasetCollection.populate('aod.core.Calibration');
             testCase.verifyError(...
                 @() obj.remove('Target'), "remove:DatasetRemovalNotSupported");
 
@@ -65,7 +65,7 @@ classdef SchemaTest < matlab.unittest.TestCase
                 "add:AdditionNotSupported");
 
             testCase.verifyError(...
-                @() aod.schema.DatasetCollection.populate(123),...
+                @() aod.schema.collections.DatasetCollection.populate(123),...
                 "populate:InvalidInput");
         end
     end

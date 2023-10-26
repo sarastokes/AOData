@@ -3,15 +3,22 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
 %
 % Superclasses:
 %   aod.schema.primitives.Primitive
+%
+% Notes:
+%   - Subclasses need to decide whether to create a new field or assign to
+%   an existing field. Container takes indices into the Collection property
+%   and if the subclass identifies fields in another way (e.g., keys), that
+%   must be handled before passing to a Container function. 
 
 % By Sara Patterson, 2023 (AOData)
-% ----------------------------------------------------------------------
+% -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        Fields
+    properties (Abstract, SetAccess = protected)
+        Collection              %aod.schema.PrimitiveCollection
     end
 
     properties (Hidden, SetAccess = protected)
+        % Basically no nested data (e.g., struct inside a struct)
         ALLOWABLE_CHILD_TYPES = [...
             aod.schema.primitives.PrimitiveTypes.TEXT,...
             aod.schema.primitives.PrimitiveTypes.NUMBER,...
@@ -28,46 +35,88 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             end
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
-            obj.addField(varargin{:});
+            obj.addItem(varargin{:});
         end
     end
 
     methods
-        function component = getField(obj, fieldName)
-            idx = find(strcmp(fieldName, vertcat(obj.Fields.Name)));
-
-            if isempty(idx)
-                error('getField:InvalidField',...
-                    'Field %s not found in %s', fieldName, obj.Name);
-            end
-            component = obj.Components(idx);
+        function primitive = getItem(obj, ID)
+            primitive = obj.Collection.get(ID);
         end
 
-        function addField(obj, field)
+        function setItem(obj, varargin)
+            if isnumeric(varargin{1}) || istext(varargin{1})
+                ID = varargin{1};
+                obj.Collection.set(ID, varargin{2:end});
+            elseif iscell(varargin{1})
+                if nargin > 2
+                    cellfun(@(x) setItem(obj, x), varargin{:});
+                else
+                    obj.setItem(uncell(varargin{1}));
+                end
+            end
+        end
+
+        function addItem(obj, newItem)
             arguments
                 obj
-                field           aod.schema.primitives.Primitive
+                newItem           aod.schema.primitives.Primitive
             end
 
-            if ~isscalar(field)
-                arrayfun(@(x) addField(obj, x), field);
+            if ~isscalar(newItem)
+                arrayfun(@(x) addItem(obj, x), newItem);
                 return;
             end
 
-            if ~ismember(field.PRIMITIVE_TYPE, obj.ALLOWABLE_CHILD_TYPES)
-                error('addField:InvalidPrimitive',...
+            if ~ismember(newItem.PRIMITIVE_TYPE, obj.ALLOWABLE_CHILD_TYPES)
+                error('addItem:InvalidPrimitive',...
                     'Field %s cannot be added to %s because it has a primitive type (%s) that is not supported for containers',...
-                    field.Name, obj.Name, string(field.PRIMITIVE_TYPE));
+                    newItem.Name, obj.Name, string(newItem.PRIMITIVE_TYPE));
             end
 
-            obj.Fields = [obj.Fields; field];
+            obj.Collection = [obj.Collection; newItem];
+            if ~obj.Size.isSpecified
+                obj.setSize(sprintf("(:,%u", obj.Count));
+            else
+                obj.Size.Value(2).setValue(obj.Count);
+            end
+        end
+
+        function removeItem(obj, ID)
+            obj.Collection.remove(ID);
+            % TODO: This is table-specific
+            if obj.Count == 0
+                obj.Size.Value(2) = aod.schema.validators.size.UnrestrictedDimension();
+            else
+                obj.Size.Value(2).setValue(obj.Count);
+            end
         end
     end
 
     methods
-        function assign(obj, fieldName, varargin)
-            f = obj.getField(fieldName);
-            f.assign(varargin{:});
+        function [tf, ME] = checkIntegrity(obj, throwError)
+            arguments
+                obj
+                throwError     (1,1)   logical = false
+            end
+
+            if obj.isInitializing || isempty(obj.Collection)
+                tf = true; ME = [];
+                return
+            end
+
+            excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
+            for i = 1:obj.Count
+                [iTF, iME] = obj.Collection(i).checkIntegrity(false);
+                if ~iTF
+                    excObj.addCause(iME);
+                end
+            end
+
+            ME = excObj.getException();
+            if ~tf && throwError
+                throw(ME);
+            end
         end
     end
 end

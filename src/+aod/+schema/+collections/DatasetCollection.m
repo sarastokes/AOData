@@ -5,7 +5,7 @@ classdef DatasetCollection < aod.schema.SchemaCollection
 %   aod.schema.SchemaCollection
 %
 % Constructor:
-%   obj = aod.schema.DatasetSchema(className)
+%   obj = aod.schema.collections.DatasetCollections(className)
 %
 % Notes:
 %   The workflow for DatasetCollection is as follows:
@@ -82,7 +82,7 @@ classdef DatasetCollection < aod.schema.SchemaCollection
             classProps = aod.h5.getPersistedProperties(mc.Name);
             systemProps = aod.infra.getSystemProperties();
 
-            obj = aod.schema.DatasetCollection(mc.Name);
+            obj = aod.schema.collections.DatasetCollection(mc.Name);
             for i = 1:numel(propList)
                 % Skip system properties
                 if ismember(propList(i).Name, systemProps)
