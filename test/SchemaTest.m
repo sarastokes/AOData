@@ -54,6 +54,20 @@ classdef SchemaTest < matlab.unittest.TestCase
 
             testCase.verifyClass(obj.Entries(1).Parent, 'aod.schema.DatasetCollection');
         end
+
+        function DatasetCollectionErrors(testCase)
+            obj = aod.schema.DatasetCollection.populate('aod.core.Calibration');
+            testCase.verifyError(...
+                @() obj.remove('Target'), "remove:DatasetRemovalNotSupported");
+
+            testCase.verifyError(...
+                @() obj.add('NewProp', 'text', 'Description', 'this is a test'),...
+                "add:AdditionNotSupported");
+
+            testCase.verifyError(...
+                @() aod.schema.DatasetCollection.populate(123),...
+                "populate:InvalidInput");
+        end
     end
 
     methods (Test, TestTags="FileCollection")

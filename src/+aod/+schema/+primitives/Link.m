@@ -45,9 +45,9 @@ classdef Link < aod.schema.primitives.Primitive
         function setEntityType(obj, value)
             obj.EntityType.setValue(value);
             if isempty(value)
-                obj.setFormat([]);
+                obj.setClass([]);
             else
-                obj.setFormat([...
+                obj.setClass([...
                     string(obj.EntityType.Value.getCoreClassName()),...
                     string(obj.EntityType.Value.getPersistentClassName())]);
             end

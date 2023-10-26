@@ -90,13 +90,13 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj.assign('Default', [1,2]);
             testCase.verifyEqual(obj.Default.Value, [1,2]);
 
-            testCase.verifyEmpty(obj.Format);
+            testCase.verifyEmpty(obj.Class);
             testCase.verifyEmpty(obj.Minimum);
             testCase.verifyEmpty(obj.Maximum);
             testCase.verifyClass(obj.Default.Value, "double");
 
-            obj.assign('Format', 'uint8');
-            testCase.verifyEqual(obj.Format.Value, "uint8");
+            obj.assign('Class', 'uint8');
+            testCase.verifyEqual(obj.Class.Value, "uint8");
             testCase.verifyEqual(obj.Minimum.Value, uint8(0));
             testCase.verifyEqual(obj.Maximum.Value, uint8(255));
             testCase.verifyClass(obj.Default.Value, "uint8");
@@ -106,8 +106,8 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
             % TODO: Implement wrapper class
             testCase.verifyError(...
-                @() obj.assign("Format", "double"),...
-                "setFormat:InvalidFormat");
+                @() obj.assign("Class", "double"),...
+                "setClass:InvalidFormat");
         end
 
         function IntegerErrors(testCase)
@@ -121,7 +121,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
     methods (Test, TestTags="Number")
         function Number(testCase)
             obj = aod.schema.primitives.Number("Test", []);
-            testCase.verifyEqual(obj.Format.Value, "double");
+            testCase.verifyEqual(obj.Class.Value, "double");
 
             obj.assign('Minimum', 1, 'Maximum', 3);
             testCase.verifyEqual(obj.Minimum.Value, 1);
@@ -137,10 +137,10 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj = aod.schema.primitives.Link("Test", []);
 
             testCase.verifyEmpty(obj.EntityType);
-            testCase.verifyEmpty(obj.Format);
+            testCase.verifyEmpty(obj.Class);
             obj.assign('EntityType', 'epoch');
             testCase.verifyEqual(obj.EntityType.Value, aod.common.EntityTypes.EPOCH);
-            testCase.verifyEqual(obj.Format.Value, ["aod.core.Epoch", "aod.persistent.Epoch"]);
+            testCase.verifyEqual(obj.Class.Value, ["aod.core.Epoch", "aod.persistent.Epoch"]);
 
             testCase.verifyError(...
                 @() obj.assign('Default'), 'MATLAB:InputParser:ParamMissingValue');

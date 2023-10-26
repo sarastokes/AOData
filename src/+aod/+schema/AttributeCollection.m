@@ -15,7 +15,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
         ALLOWABLE_PRIMITIVE_TYPES = [...
             aod.schema.primitives.PrimitiveTypes.TEXT,...
             aod.schema.primitives.PrimitiveTypes.BOOLEAN,...
-            aod.schema.primitives.PrimitiveTypes.NUMERIC,...
+            aod.schema.primitives.PrimitiveTypes.NUMBER,...
             aod.schema.primitives.PrimitiveTypes.INTEGER];
     end
 
@@ -61,7 +61,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
         end
     end
 
-    methods (Access = ?aod.core.Entity)
+    methods (Access = ?aod.schema.EntitySchema)
         function setClassName(obj, className)
             % Set the class name
             %
@@ -73,6 +73,12 @@ classdef AttributeCollection < aod.schema.SchemaCollection
             %   setClassName(obj, className)
             % -------------------------------------------------------------
             obj.className = className;
+        end
+    end
+
+    methods (Static)
+        function obj = populate(className)
+            
         end
     end
 end

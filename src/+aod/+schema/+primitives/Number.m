@@ -27,7 +27,7 @@ classdef Number < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.NUMBER
         OPTIONS =  ["Default", "Description", "Size", "Minimum", "Maximum", "Units"];
-        VALIDATORS = ["Format", "Size", "Minimum", "Maximum"];
+        VALIDATORS = ["Class", "Size", "Minimum", "Maximum"];
     end
 
     methods
@@ -41,7 +41,7 @@ classdef Number < aod.schema.primitives.Primitive
 
             % Fixed values for numeric
             % TODO: Add support for single?
-            obj.Format.setValue('double');
+            obj.Class.setValue('double');
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});

@@ -7,7 +7,7 @@ classdef Integer < aod.schema.primitives.Primitive
 % Constructor:
 %   obj = aod.schema.primitives.Integer(name, varargin)
 %   obj = aod.schema.primitives.Integer(name,...
-%       "Format", format, "Size", size, "Minimum", minimum,...
+%       "Class", format, "Size", size, "Minimum", minimum,...
 %       "Maximum", maximum, "Default", default, "Units", units,...
 %       "Description", description)
 
@@ -22,8 +22,8 @@ classdef Integer < aod.schema.primitives.Primitive
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.INTEGER
-        OPTIONS = ["Format", "Size", "Minimum", "Maximum", "Default", "Units", "Description"]
-        VALIDATORS = ["Format", "Size", "Minimum", "Maximum"];
+        OPTIONS = ["Class", "Size", "Minimum", "Maximum", "Default", "Units", "Description"]
+        VALIDATORS = ["Class", "Size", "Minimum", "Maximum"];
     end
 
     methods
@@ -52,8 +52,8 @@ classdef Integer < aod.schema.primitives.Primitive
                 obj.Default.setValue([]);
                 return
             end
-            if ~isempty(obj.Format) && ~strcmp(obj.Format.Value, class(value))
-                value = cast(value, obj.Format.Value);
+            if ~isempty(obj.Class) && ~strcmp(obj.Class.Value, class(value))
+                value = cast(value, obj.Class.Value);
             end
             obj.Default.setValue(value);
             obj.checkIntegrity(true);
@@ -65,8 +65,8 @@ classdef Integer < aod.schema.primitives.Primitive
                 value       {mustBeInteger, mustBeScalarOrEmpty}
             end
 
-            if ~isempty(obj.Format) && ~strcmp(obj.Format.Value, class(value))
-                value = cast(value, obj.Format.Value);
+            if ~isempty(obj.Class) && ~strcmp(obj.Class.Value, class(value))
+                value = cast(value, obj.Class.Value);
             end
 
             obj.Minimum.setValue(value);
@@ -79,15 +79,15 @@ classdef Integer < aod.schema.primitives.Primitive
                 value       {mustBeInteger, mustBeScalarOrEmpty}
             end
 
-            if ~isempty(obj.Format) && ~strcmp(obj.Format.Value, class(value))
-                value = cast(value, obj.Format.Value);
+            if ~isempty(obj.Class) && ~strcmp(obj.Class.Value, class(value))
+                value = cast(value, obj.Class.Value);
             end
 
             obj.Maximum.setValue(value);
             obj.checkIntegrity(true);
         end
 
-        function setFormat(obj, value)
+        function setClass(obj, value)
             % Set the format of the integer
 
             if isa(value, 'meta.property')
@@ -100,19 +100,19 @@ classdef Integer < aod.schema.primitives.Primitive
             end
 
             if isempty(value)
-                obj.Format.setValue([]);
+                obj.Class.setValue([]);
                 obj.checkIntegrity(true);
                 return
             end
 
             % Validate format
             if strcmp(value, 'double') || ~contains(value, 'int')
-                error('setFormat:InvalidFormat',...
+                error('setClass:InvalidFormat',...
                     'Format must be an integer type, not %s', value);
             end
-            obj.Format.setValue(value);
+            obj.Class.setValue(value);
 
-            [minValue, maxValue] = obj.getIntegerRange(obj.Format);
+            [minValue, maxValue] = obj.getIntegerRange(obj.Class);
             if isempty(obj.Minimum)
                 obj.Minimum.setValue(minValue);
             end
@@ -145,10 +145,10 @@ classdef Integer < aod.schema.primitives.Primitive
 
             excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
             % Refactor - this runs too often, but may be useful in one place
-            if ~isempty(obj.Format)
+            if ~isempty(obj.Class)
                 % Minimum and maximum are set by the format if not already
                 % set by the user so isempty not required.
-                [minValue, maxValue] = obj.getIntegerRange(obj.Format);
+                [minValue, maxValue] = obj.getIntegerRange(obj.Class);
                 if obj.Minimum.Value < minValue
                     excObj.addCause(MException('checkIntegrity:InvalidMinimum',...
                         'Minimum value is smaller than the minimum value of the format'));
@@ -157,8 +157,8 @@ classdef Integer < aod.schema.primitives.Primitive
                     excObj.addCause(MException('checkIntegrity:InvalidMaximum',...
                         'Maximum value is larger than the maximum value of the format'));
                 end
-                if ~isempty(obj.Default) && ~isa(obj.Default.Value, obj.Format.Value)
-                    obj.Default.setValue(cast(obj.Default.Value, obj.Format.Value));
+                if ~isempty(obj.Default) && ~isa(obj.Default.Value, obj.Class.Value)
+                    obj.Default.setValue(cast(obj.Default.Value, obj.Class.Value));
                 end
             end
             if ~isempty(obj.Minimum)

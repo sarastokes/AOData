@@ -11,7 +11,7 @@ classdef EntitySchema < handle
         Files
     end
 
-    properties %(Hidden, Access = private)
+    properties (Hidden, Access = private)
         DatasetCollection
     end
 
@@ -35,23 +35,73 @@ classdef EntitySchema < handle
             value.setClassName(class(obj.Parent));
         end
 
-        function tf = checkSchemaIntegrity(obj, entryName)
-            fileSchema = obj.Files;
-            if ~isempty(fileSchema)
-                fileSchema.checkIntegrity();
-            end
-            attrSchema = obj.Attributes;
-            if ~isempty(attrSchema)
-                attrSchema.checkIntegrity();
-            end
-            dsetSchema = obj.Datasets;
-            if ~isempty(datasetSchema)
-                dsetSchema.checkIntegrity();
+        function out = getSchemaByType(obj, schemaType)
+            switch lower(schemaType)
+                case 'attribute'
+                    out = obj.Attributes;
+                case 'dataset'
+                    out = obj.Datasets;
+                case 'file'
+                    out = obj.Files;
             end
         end
 
-        function [tf, ME] = validate(obj, entryName)
+        function [tf, ME] = checkSchemaIntegrity(obj, schemaType, entryName)
+            if nargin > 1
+                schema = obj.getSchemaByType(schemaType);
+                p = schema.get(entryName, aod.infra.ErrorTypes.ERROR);
+                [tf, ME] = p.checkSchemaIntegrity();
+                return
+            end
 
+            fileSchema = obj.Files;
+            if ~isempty(fileSchema)
+                [tfFile, fileME] = fileSchema.checkIntegrity();
+            end
+            attrSchema = obj.Attributes;
+            if ~isempty(attrSchema)
+                [tfAttr, attrME] = attrSchema.checkIntegrity();
+            end
+            dsetSchema = obj.Datasets;
+            if ~isempty(datasetSchema)
+                [tfDset, dsetME] = dsetSchema.checkIntegrity();
+            end
+
+            tf = all([tfFile, tfAttr, tfDset]);
+            if ~tf
+                ME = MException("checkSchemaIntegrity:InconsistenciesFound",...
+                    "Inconsistent schemas in %u datasets, %u attributes and %u files",...
+                    numel(dsetME.cause), numel(attrME.cause), numel(fileME.cause));
+                
+                for i = 1:numel(dsetME.cause)
+                    ME = addCause(ME, dsetME.cause{i});
+                end
+                for i = 1:numel(attrME.cause)
+                    ME = addCause(ME, dsetME.cause{i});
+                end
+                for i = 1:numel(fileME.cause)
+                    ME = addCause(ME, fileME.cause{i});
+                end
+            end
+        end
+
+        function [tf, ME] = validate(obj, schemaType, entryName)
+
+        end
+
+        function [tf, ME] = validateDataset(obj, dsetName)
+            schema = obj.Datasets.get(dsetName);
+            [tf, ME] = schema.validate(obj.Parent.(dsetName));
+        end
+
+        function [tf, ME] = validateAttribute(obj, attrName)
+            schema = obj.Attributes.get(attrName);
+            [tf, ME] = schema.validate(obj.Parent.getAttr(attrName));
+        end
+
+        function [tf, ME] = validateFile(obj, fileName)
+            schema = obj.Files.get(fileName);
+            [tf, ME] = schema.validate(obj.Parent.getFile(fileName));
         end
     end
 

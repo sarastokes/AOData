@@ -2,7 +2,7 @@ classdef FileCollection < aod.schema.SchemaCollection
 
     properties (Hidden, SetAccess = protected)
         schemaType = "File";
-        ALLOWABLE_PRIMITIVE_TYPES = aod.schema.primitives.PrimitiveTypes
+        ALLOWABLE_PRIMITIVE_TYPES = aod.schema.primitives.PrimitiveTypes.FILE
     end
 
     methods
@@ -48,6 +48,22 @@ classdef FileCollection < aod.schema.SchemaCollection
             end
 
             add@aod.schema.SchemaCollection(obj, entry);
+        end
+    end
+
+
+    methods (Access = ?aod.schema.EntitySchema)
+        function setClassName(obj, className)
+            % Set the class name
+            %
+            % Description:
+            %   Used by core interface to support the use of a static method
+            %   for determining inherited and specified attributes
+            %
+            % Syntax:
+            %   setClassName(obj, className)
+            % -------------------------------------------------------------
+            obj.className = className;
         end
     end
 end

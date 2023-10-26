@@ -8,7 +8,7 @@ classdef Categorical < aod.schema.primitives.Primitive
 %   aod.schema.primitives.Primitive
 %
 % Notes:
-%   "Enum" determines the value of "Format"
+%   "Enum" determines the value of "Class"
 
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
@@ -20,7 +20,7 @@ classdef Categorical < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.CATEGORICAL
         OPTIONS = ["Enum", "Size", "Default", "Units", "Description"]
-        VALIDATORS = ["Format", "Enum", "Size"];
+        VALIDATORS = ["Class", "Enum", "Size"];
     end
 
     methods
@@ -32,7 +32,7 @@ classdef Categorical < aod.schema.primitives.Primitive
 
             % Fixed values
             % TODO: necessary to restrict to categorical?
-            obj.Format.setValue('categorical');
+            obj.Class.setValue('categorical');
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
@@ -53,7 +53,7 @@ classdef Categorical < aod.schema.primitives.Primitive
         function setEnum(obj, valueSet)
             obj.Enum.setValue(valueSet);
 
-            obj.setFormat(class(valueSet));  % runs checkIntegrity()
+            obj.setClass(class(valueSet));  % runs checkIntegrity()
         end
     end
 

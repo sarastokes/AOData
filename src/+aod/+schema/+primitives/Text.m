@@ -24,7 +24,7 @@ classdef Text < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.TEXT
         OPTIONS = ["Count", "Length", "Enum", "Default", "Description"]
-        VALIDATORS = ["Format", "Count", "Length", "Enum"];
+        VALIDATORS = ["Class", "Count", "Length", "Enum"];
     end
 
     methods
@@ -37,7 +37,7 @@ classdef Text < aod.schema.primitives.Primitive
             obj.Count = aod.schema.validators.Count(obj, []);
 
             % Defaults
-            obj.setFormat("string");
+            obj.setClass("string");
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});

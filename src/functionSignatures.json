@@ -1,6 +1,28 @@
 {
     "_schemaVersion": "1.0.0",
     
+    "aod.specification.types.Number.assign": 
+    {
+        "inputs": [
+            {"name": "obj",
+                "kind": "required", "type": "aod.specification.types.Number"},
+            {"name": "Size",
+                "kind": "keyvalue", "type": [["double"], ["string"]]},
+            {"name": "Minimum",
+                "kind": "keyvalue", "type": "double",
+                "purpose": "The minimum allowable value of the number"},
+            {"name": "Maximum",
+                "kind": "keyvalue", "type": "double",
+                "purpose": "The maximum allowable value of the number"},
+            {"name": "Default",
+                "kind": "keyvalue", "type": "double",
+                "purpose": "A default value for the number"},
+            {"name": "Description",
+                "kind": "keyvalue", "type": "string"},
+            {"name": "Units",
+                "kind": "keyvalue", "type": "string"}
+        ]
+    },
     "aod.common.mixins.Entity.hasAttr":
     {
         "inputs": 

@@ -23,7 +23,7 @@ classdef Entry < handle
 
             obj.Primitive = aod.schema.util.createPrimitive(...
                 type, obj.Name, obj, varargin{:});
-            if isobject(parent) == 0
+            if isobject(parent)
                 obj.checkPrimitiveType();
             end
         end
@@ -91,10 +91,10 @@ classdef Entry < handle
             %   checkPrimitiveType(obj)
             % -------------------------------------------------------------
             parentCollection = extractBefore(class(obj.Parent), 'Collection');
-            if ~ismember(parentCollection, obj.Primitive.ALLOWABLE_PARENT_TYPES)
+            if ~ismember(obj.primitiveType, obj.Parent.ALLOWABLE_PRIMITIVE_TYPES)
                 error('checkPrimitiveType:InvalidTypeForCollection',...
                     '%s does not support primitives of type %s',...
-                    class(obj.Parent), char(obj.primitiveType));
+                    getClassWithoutPackages(obj.Parent), char(obj.primitiveType));
             end
         end
 

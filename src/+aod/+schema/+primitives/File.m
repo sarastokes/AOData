@@ -16,7 +16,7 @@ classdef File < aod.schema.primitives.Primitive
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.FILE
         OPTIONS = ["ExtensionType", "Default", "Description"];
-        VALIDATORS = ["Format", "ExtensionType"];
+        VALIDATORS = ["Class", "ExtensionType"];
     end
 
     methods
@@ -27,7 +27,7 @@ classdef File < aod.schema.primitives.Primitive
             obj.ExtensionType = aod.schema.validators.ExtensionType(obj, []);
 
             % Defaults
-            obj.setFormat("string");  % TODO: is char ok?
+            obj.setClass("string");  % TODO: is char ok?
             obj.setSize('(1,:)');
 
             % Complete setup and ensure schema consistency

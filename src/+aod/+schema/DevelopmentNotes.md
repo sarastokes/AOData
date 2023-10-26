@@ -65,34 +65,46 @@ The each parent-child relationship in the hierarchy is one-to-many. Parent class
 ### Primitives
 Each primitive inherits from `aod.specification.primitives.Primitive` and include a specific set of validators (discussed below).
 
-|Name|Matlab Classes| Description|
-|----|--------------|------------|
-|Boolean|logical||
-|Date|datetime||
+|Name|Matlab|Python| Description|
+|----|------|--------|------------|
+|Boolean|logical|bool|True or false|
+|Date|datetime|||
 |Duration|duration||
-|File|string||
-|Integer|uint8, int8, etc...||
-|Link|aod.common.Entity subclasses||
-|Number|double||
-|Text|string, char| |
+|File|string|string|An absolute or relative file path|
+|Integer|uint8, int8, etc...|int||
+|Link|aod.common.Entity subclasses|||
+|Number|double|float||
+|Object|struct, handle|dict||
+|Text|string| string||
 
 You can have a `double` that is specified as an __Integer__. Nevermind?? Just removed support for this on 25Oct2023.
 
+Currently not supporting `char` as it can cause issues with the queries (e.g., each character can be considered equal to a double).
 
 ### Validators
 | Name | Types | Description |
 |------|-------|-------------|
+|Count|Text||
 |EntityType|Link|Specifies the allowable entity types for a link (e.g., `["System", "Channel"]` enforces only systems and channels)|
 |Enum|Text| Specifies an allowable set of answers (e.g., `["Low", "Medium", "High"]` restricts the value to only those three words) |
 |ExtensionType|File| Specifies allowable file extensions (e.g., `[".json", ".txt"]`|
 |Length|Text   | Specifies the length of a string (e.g., "test" is 4)|
-|Maximum|Number, Integer| Specifies the inclusive maximum allowable number (e.g., `-1` enforces only negative numbers and not 0)|
-|Minimium|Number, Integer| Specifies the inclusive minimum allowable number (e.g., `0` enforces only positive numbers and 0)|
+|Maximum|Number, Integer| Specifies the *inclusive* maximum allowable number (e.g., `-1` enforces only negative numbers and not 0)|
+|Minimium|Number, Integer| Specifies the *inclusive* minimum allowable number (e.g., `0` enforces only positive numbers and 0)|
+|Regexp|Text| Uses regular expressions to validate text |
 
 
 Some primitives will set default values (unless user provides something more specific). This includes:
 - _Integer_: if the class is an integer class, the appropriate *Minimum* and *Maximum* values will be set (e.g., `uint8` sets the minimum to 0 and the maximum to 255).
 - _Categorical_ sets the *Enum* validator to the provided names.
+
+### Decorators
+Decorators add metadata but do not perform any validation on user-provided values.
+|Name|Primitives|Description|
+|----|----------|-----------|
+|Description| all | Text scalar describing the entry.|
+|Units|Number, Integer|Units for a number (preferrably SI)|
+
 
 ### Components
 Basic types (**validator**, *decorator*):
@@ -103,6 +115,10 @@ Basic types (**validator**, *decorator*):
 - Number: (double/float)
     - **Minimum** - inclusive minimum
     - **Maximum** - inclusive maximum
+    - *Units*
+- Integer:
+    - **Minimum**
+    - **Maximum**
     - *Units*
 - String:
     - **Enum**
@@ -123,8 +139,10 @@ Basic types (**validator**, *decorator*):
 
 ### Writing an AOData HDF5 file
 1. `checkSchemaIntegrity` - are schemas viable
-2. `checkGitRepo` - are classes committed? Only prompt if schemas are viable
-3. `updateSchemas` - update schemas before writing
+2. `validate` - do provided values pass schema validation?
+3. `checkRequirements` - are required values provided? AOData sticks to soft requirements and users can choose to leave a required value blank.
+4. `checkGitRepo` - are classes committed? Only prompt if schemas are viable
+5. `updateSchemas` - update schemas before writing
 
 ### Misc notes
 - Don't use numeric indexing for tables, use the column names so it's clear what data is used (and how to modify the code if the table changes in the future)

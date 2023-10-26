@@ -22,9 +22,6 @@ classdef DatasetCollection < aod.schema.SchemaCollection
 
     methods
         function obj = DatasetCollection(className)
-            if nargin < 1
-                className = [];
-            end
             obj = obj@aod.schema.SchemaCollection(className);
         end
     end
@@ -39,7 +36,8 @@ classdef DatasetCollection < aod.schema.SchemaCollection
             end
         end
 
-        function remove(~)
+        function remove(~, ~)
+            % TODO: Should I allow this? Seems too error-prone
             error('remove:DatasetRemovalNotSupported',...
                 'Datasets defined in a property block cannot be removed from schema');
         end

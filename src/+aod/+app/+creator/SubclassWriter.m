@@ -286,10 +286,10 @@ classdef SubclassWriter < handle
                         out = out + sprintf("""Class"", %s, ", iDataset.Class.text());
                     end
 
-                    if ~isempty(iDataset.Size)
-                        out = out + ",...";
-                        out = out + sprintf("""Size"", %s, ", iDataset.Size.text());
-                    end
+                    %if ~isempty(iDataset.Size)
+                    %    out = out + ",...";
+                    %    out = out + sprintf("""Size"", %s, ", iDataset.Size.text());
+                    %end
 
                     if ~isempty(iDataset.Description)
                         out = out + ",..." + newline;

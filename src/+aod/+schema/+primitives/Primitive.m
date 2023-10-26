@@ -15,7 +15,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         Name        (1,1)       string
         isRequired  (1,1)       logical = false
         Default     (1,1)       aod.schema.Default
-        Format      (1,1)       aod.specification.MatlabClass
+        Class       (1,1)       aod.specification.MatlabClass
         Description (1,1)       aod.specification.Description
         Size                    aod.specification.Size
     end
@@ -55,7 +55,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 
             % Initialize
             obj.Size = aod.specification.Size([], obj);
-            obj.Format = aod.specification.MatlabClass([], obj);
+            obj.Class = aod.specification.MatlabClass([], obj);
             obj.Default = aod.schema.Default(obj, []);
             obj.Description = aod.specification.Description([], obj);
         end
@@ -160,8 +160,8 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.checkIntegrity(true);
         end
 
-        function setFormat(obj, value)
-            obj.Format.setValue(value);
+        function setClass(obj, value)
+            obj.Class.setValue(value);
             obj.checkIntegrity(true);
         end
 
@@ -302,11 +302,11 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                         "Default is not the correct size: %s", obj.Size.text()));
                 end
             end
-            if ~isempty(obj.Format)
-                if ~obj.Format.validate(obj.Default.Value)
+            if ~isempty(obj.Class)
+                if ~obj.Class.validate(obj.Default.Value)
                     excObj.addCause(MException('checkIntegrity:InvalidDefaultClass',...
-                        "Default was class %s, but Format is %s", ...
-                        class(obj.Default.Value), obj.Format.text()));
+                        "Default was class %s, but Class is %s", ...
+                        class(obj.Default.Value), obj.Class.text()));
                 end
             end
             tf = ~excObj.hasErrors();
