@@ -29,9 +29,9 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj = aod.schema.primitives.Text("Test", []);
             testCase.verifyFalse(obj.isRequired);
 
-            testCase.verifyEmpty(obj.Description);
+            testCase.verifyFalse(obj.Description.isSpecified());
             obj.assign('Description', 'This is my test description');
-            testCase.verifyNotEmpty(obj.Description);
+            testCase.verifyTrue(obj.Description.isSpecified());
         end
 
         function TextWithOptions(testCase)
@@ -74,25 +74,25 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj = aod.schema.primitives.Integer("Test", []);
             testCase.verifyEqual(obj.Name, "Test");
 
-            testCase.verifyEmpty(obj.Units);
+            testCase.verifyFalse(obj.Units.isSpecified());
             obj.assign("Units", "mV");
             testCase.verifyEqual(obj.Units.Value, "mV");
 
-            testCase.verifyEmpty(obj.Description);
+            testCase.verifyFalse(obj.Description.isSpecified());
             obj.assign('Description', "Test");
             testCase.verifyEqual(obj.Description.Value, "Test");
 
-            testCase.verifyEmpty(obj.Size);
+            testCase.verifyFalse(obj.Size.isSpecified());
             obj.setSize("(1,2)");
             testCase.verifyEqual(obj.Size.text(), "(1,2)");
 
-            testCase.verifyEmpty(obj.Default);
+            testCase.verifyFalse(obj.Default.isSpecified());
             obj.assign('Default', [1,2]);
             testCase.verifyEqual(obj.Default.Value, [1,2]);
 
-            testCase.verifyEmpty(obj.Class);
-            testCase.verifyEmpty(obj.Minimum);
-            testCase.verifyEmpty(obj.Maximum);
+            testCase.verifyFalse(obj.Class.isSpecified());
+            testCase.verifyFalse(obj.Minimum.isSpecified());
+            testCase.verifyFalse(obj.Maximum.isSpecified());
             testCase.verifyClass(obj.Default.Value, "double");
 
             obj.assign('Class', 'uint8');
@@ -128,7 +128,6 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Maximum.Value, 3);
 
             testCase.verifyTrue(obj.validate(2));
-
         end
     end
 
@@ -136,8 +135,8 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         function Link(testCase)
             obj = aod.schema.primitives.Link("Test", []);
 
-            testCase.verifyEmpty(obj.EntityType);
-            testCase.verifyEmpty(obj.Class);
+            testCase.verifyFalse(obj.EntityType.isSpecified());
+            testCase.verifyFalse(obj.Class.isSpecified());
             obj.assign('EntityType', 'epoch');
             testCase.verifyEqual(obj.EntityType.Value, aod.common.EntityTypes.EPOCH);
             testCase.verifyEqual(obj.Class.Value, ["aod.core.Epoch", "aod.persistent.Epoch"]);
@@ -152,7 +151,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
     methods (Test, TestTags="File")
         function File(testCase)
             obj = aod.schema.primitives.File("Test", []);
-            testCase.verifyEmpty(obj.ExtensionType);
+            testCase.verifyFalse(obj.ExtensionType.isSpecified());
 
             obj = aod.schema.primitives.File("Test", [], "ExtensionType", ".csv");
             testCase.verifyEqual(obj.ExtensionType.Value, ".csv");

@@ -73,7 +73,7 @@ classdef File < aod.schema.primitives.Primitive
 
             [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
 
-            if ~isempty(obj.ExtensionType) && ~isempty(obj.Default)
+            if obj.ExtensionType.isSpecified() && obj.Default.isSpecified()
                 if ~endsWith(obj.Default.Value, obj.ExtensionType.Value)
                     excObj.addCause(MException(...
                         'checkIntegrity:InvalidDefaultExtension',...

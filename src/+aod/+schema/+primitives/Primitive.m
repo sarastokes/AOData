@@ -15,9 +15,9 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         Name        (1,1)       string
         isRequired  (1,1)       logical = false
         Default     (1,1)       aod.schema.Default
-        Class       (1,1)       aod.specification.MatlabClass
-        Description (1,1)       aod.specification.Description
-        Size                    aod.specification.Size
+        Class       (1,1)       aod.schema.validators.Class
+        Description (1,1)       aod.schema.decorators.Description
+        Size                    aod.schema.validators.Size
     end
 
     properties (Hidden, SetAccess = protected)
@@ -54,10 +54,10 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             end
 
             % Initialize
-            obj.Size = aod.specification.Size([], obj);
-            obj.Class = aod.specification.MatlabClass([], obj);
+            obj.Size = aod.schema.validators.Size([], obj);
+            obj.Class = aod.schema.validators.Class([], obj);
             obj.Default = aod.schema.Default(obj, []);
-            obj.Description = aod.specification.Description([], obj);
+            obj.Description = aod.schema.decorators.Description([], obj);
         end
 
         function opts = getOptions(obj)
@@ -114,7 +114,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             currentProps = string(properties(obj));
             for i = 1:numel(currentProps)
                 iProp = currentProps(i);
-                if isSubclass(obj.(iProp), 'aod.specification.Specification')
+                if isSubclass(obj.(iProp), 'aod.schema.Specification')
                     S.(obj.Name).(iProp) = obj.(iProp).getValueForYAML();
                 end
             end
@@ -154,9 +154,9 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             %   setSize(obj, value)
             %
             % See also:
-            %   aod.specification.Size
+            %   aod.schema.validators.Size
             % ----------------------------------------------------------
-            obj.Size = aod.specification.Size(value);
+            obj.Size = aod.schema.validators.Size(value);
             obj.checkIntegrity(true);
         end
 
@@ -291,18 +291,19 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         function [tf, ME, excObj] = checkIntegrity(obj, ~)
             excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
 
-            if obj.isInitializing || isempty(obj.Default)
+            % These checks revolve around Default, skip if unset
+            if obj.isInitializing || ~obj.Default.isSpecified()
                 tf = true; ME = [];
                 return
             end
 
-            if ~isempty(obj.Size)
+            if obj.Size.isSpecified()
                 if ~obj.Size.validate(obj.Default.Value)
                     excObj.addCause(MException('checkIntegrity:InvalidDefaultSize',...
                         "Default is not the correct size: %s", obj.Size.text()));
                 end
             end
-            if ~isempty(obj.Class)
+            if obj.Class.isSpecified()
                 if ~obj.Class.validate(obj.Default.Value)
                     excObj.addCause(MException('checkIntegrity:InvalidDefaultClass',...
                         "Default was class %s, but Class is %s", ...
@@ -357,9 +358,9 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             end
 
             function out = convertProp(prop)
-                if isa(prop, 'aod.specification.Size')
+                if isa(prop, 'aod.schema.validator.Size')
                     out = prop.text();
-                elseif isa(prop, 'aod.specification.Specification')
+                elseif isa(prop, 'aod.schema.Specification')
                     out = prop.Value;
                 else
                     out = prop;

@@ -1,7 +1,7 @@
-classdef Length < aod.specification.Validator
+classdef Length < aod.schema.Validator
 %
 % Superclasses:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Description:
 %   Validates the length of a string
@@ -22,7 +22,7 @@ classdef Length < aod.specification.Validator
                 parent      {mustBeScalarOrEmpty}   = []
                 value       {mustBeScalarOrEmpty, mustBeInteger}   = []
             end
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
             if ~isempty(value)
                 obj.setValue(value);
             end
@@ -39,7 +39,7 @@ classdef Length < aod.specification.Validator
         end
 
         function [tf, ME] = validate(obj, input)
-            if obj.isempty()
+            if ~obj.isSpecified()
                 tf = true; ME = [];
                 return
             end
@@ -60,7 +60,7 @@ classdef Length < aod.specification.Validator
         end
 
         function out = text(obj)
-            if obj.isempty()
+            if ~obj.isSpecified()
                 out = "[]";
             else
                 out = string(num2str(obj.Value));

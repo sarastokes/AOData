@@ -1,8 +1,8 @@
-classdef Count < aod.specification.Validator
+classdef Count < aod.schema.Validator
 % COUNT
 %
 % Superclasses:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
 %   obj = aod.schema.validators.Count(parent, value)
@@ -20,7 +20,7 @@ classdef Count < aod.specification.Validator
                 parent      {mustBeScalarOrEmpty}
                 value       {mustBeInteger}         = []
             end
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
             if nargin > 1 && ~isempty(value)
                 obj.setValue(value);
             end
@@ -38,7 +38,7 @@ classdef Count < aod.specification.Validator
         function [tf, ME] = validate(obj, input)
             tf = true; ME = [];
 
-            if aod.util.isempty(input) || isempty(obj)
+            if aod.util.isempty(input) || ~obj.isSpecified
                 return
             end
 
@@ -50,7 +50,7 @@ classdef Count < aod.specification.Validator
         end
 
         function out = text(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = "[]";
             else
                 out = string(num2str(obj.Value));

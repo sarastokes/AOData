@@ -1,8 +1,8 @@
-classdef Minimum < aod.specification.Validator
+classdef Minimum < aod.schema.Validator
 % MINIMUM - An inclusive minimum specification
 %
 % Superclasses:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
 %   obj = aod.schema.validators.Minimum(parent, value)
@@ -23,7 +23,7 @@ classdef Minimum < aod.specification.Validator
                 value       {mustBeScalarOrEmpty, mustBeNumeric}    = []
             end
 
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
             if ~isempty(value)
                 obj.setValue(value);
             end
@@ -41,7 +41,7 @@ classdef Minimum < aod.specification.Validator
 
         function [tf, ME] = validate(obj, input)
             ME = [];
-            if isempty(obj)
+            if ~obj.isSpecified
                 tf = true;
             else
                 tf = all(input >= obj.Value);

@@ -7,7 +7,7 @@ classdef Integer < aod.schema.primitives.Primitive
 % Constructor:
 %   obj = aod.schema.primitives.Integer(name, varargin)
 %   obj = aod.schema.primitives.Integer(name,...
-%       "Class", format, "Size", size, "Minimum", minimum,...
+%       "Format", format, "Size", size, "Minimum", minimum,...
 %       "Maximum", maximum, "Default", default, "Units", units,...
 %       "Description", description)
 
@@ -52,7 +52,7 @@ classdef Integer < aod.schema.primitives.Primitive
                 obj.Default.setValue([]);
                 return
             end
-            if ~isempty(obj.Class) && ~strcmp(obj.Class.Value, class(value))
+            if obj.Class.isSpecified() && ~strcmp(obj.Class.Value, class(value))
                 value = cast(value, obj.Class.Value);
             end
             obj.Default.setValue(value);
@@ -65,7 +65,7 @@ classdef Integer < aod.schema.primitives.Primitive
                 value       {mustBeInteger, mustBeScalarOrEmpty}
             end
 
-            if ~isempty(obj.Class) && ~strcmp(obj.Class.Value, class(value))
+            if obj.Class.isSpecified() && ~strcmp(obj.Class.Value, class(value))
                 value = cast(value, obj.Class.Value);
             end
 
@@ -79,7 +79,7 @@ classdef Integer < aod.schema.primitives.Primitive
                 value       {mustBeInteger, mustBeScalarOrEmpty}
             end
 
-            if ~isempty(obj.Class) && ~strcmp(obj.Class.Value, class(value))
+            if obj.Class.isSpecified() && ~strcmp(obj.Class.Value, class(value))
                 value = cast(value, obj.Class.Value);
             end
 
@@ -113,10 +113,10 @@ classdef Integer < aod.schema.primitives.Primitive
             obj.Class.setValue(value);
 
             [minValue, maxValue] = obj.getIntegerRange(obj.Class);
-            if isempty(obj.Minimum)
+            if ~obj.Minimum.isSpecified()
                 obj.Minimum.setValue(minValue);
             end
-            if isempty(obj.Maximum)
+            if ~obj.Maximum.isSpecified()
                 obj.Maximum.setValue(maxValue);
             end
         end
@@ -145,9 +145,9 @@ classdef Integer < aod.schema.primitives.Primitive
 
             excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
             % Refactor - this runs too often, but may be useful in one place
-            if ~isempty(obj.Class)
+            if obj.Class.isSpecified()
                 % Minimum and maximum are set by the format if not already
-                % set by the user so isempty not required.
+                % set by the user so isSpecified not required.
                 [minValue, maxValue] = obj.getIntegerRange(obj.Class);
                 if obj.Minimum.Value < minValue
                     excObj.addCause(MException('checkIntegrity:InvalidMinimum',...
@@ -157,16 +157,16 @@ classdef Integer < aod.schema.primitives.Primitive
                     excObj.addCause(MException('checkIntegrity:InvalidMaximum',...
                         'Maximum value is larger than the maximum value of the format'));
                 end
-                if ~isempty(obj.Default) && ~isa(obj.Default.Value, obj.Class.Value)
+                if obj.Default.isSpecified() && ~isa(obj.Default.Value, obj.Class.Value)
                     obj.Default.setValue(cast(obj.Default.Value, obj.Class.Value));
                 end
             end
-            if ~isempty(obj.Minimum)
+            if obj.Minimum.isSpecified()
                 if any(obj.Default.Value < obj.Minimum.Value)
                     excObj.addCause(MException('checkIntegrity:InvalidDefault',...
                         'Default value is smaller than the minimum value'));
                 end
-                if ~isempty(obj.Maximum)
+                if obj.Maximum.isSpecified()
                     if obj.Maximum.Value < obj.Minimum.Value
                         excObj.addCause(MException('checkIntegrity:InvalidRange',...
                             'Minimum value %d is larger than Maximum value %d', ...
@@ -179,7 +179,7 @@ classdef Integer < aod.schema.primitives.Primitive
             if ~tf
                 cellfun(@(x) addCause(excObj, x), ME.cause);
             end
-            if ~isempty(obj.Maximum) && all(obj.Default.Value > obj.Maximum.Value)
+            if obj.Maximum.isSpecified() && all(obj.Default.Value > obj.Maximum.Value)
                 excObj.addCause(MException('checkIntegrity:InvalidDefault',...
                     'Default value is larger than the maximum value'));
             end
@@ -194,7 +194,7 @@ classdef Integer < aod.schema.primitives.Primitive
 
     methods (Static)
         function [minValue, maxValue] = getIntegerRange(intType)
-            if isa(intType, 'aod.specification.MatlabClass')
+            if isa(intType, 'aod.schema.validators.Class')
                 intType = intType.Value;
             end
 

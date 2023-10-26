@@ -1,8 +1,8 @@
-classdef ExtensionType < aod.specification.Validator
+classdef ExtensionType < aod.schema.Validator
 % EXTENSIONTYPE
 %
 % Superclasses:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
 %   obj = aod.schema.validators.ExtensionType(parent, value)
@@ -29,7 +29,7 @@ classdef ExtensionType < aod.specification.Validator
                 value   string                        = []
             end
 
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
             if nargin > 1
                 obj.setValue(value);
             end
@@ -70,7 +70,7 @@ classdef ExtensionType < aod.specification.Validator
 
         function [tf, ME] = validate(obj, input)
             tf = true; ME = [];
-            if aod.util.isempty(input) || isempty(obj)
+            if aod.util.isempty(input) || ~obj.isSpecified()
                 return
             end
 
@@ -90,7 +90,7 @@ classdef ExtensionType < aod.specification.Validator
         end
 
         function out = text(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = "[]";
             else
                 out = strjoin(obj.Value, ", ");
@@ -100,8 +100,8 @@ classdef ExtensionType < aod.specification.Validator
 
     % MATLAB builtin functions
     methods
-        function tf = isempty(obj)
-            tf = aod.util.isempty(obj.Value);
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
         end
     end
 end

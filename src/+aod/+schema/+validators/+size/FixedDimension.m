@@ -1,4 +1,4 @@
-classdef FixedDimension < aod.specification.Validator
+classdef FixedDimension < aod.schema.Validator
 % A fixed dimension (must equal a specific number)
 %
 % Description:
@@ -6,8 +6,8 @@ classdef FixedDimension < aod.specification.Validator
 %   outside their metaclass interface
 %
 % Constructor:
-%   obj = aod.specification.size.FixedDimension(dimSize)
-%   obj = aod.specification.size.FixedDimension(dimSize, optional)
+%   obj = aod.schema.validators.size.FixedDimension(dimSize)
+%   obj = aod.schema.validators.size.FixedDimension(dimSize, optional)
 %
 % Inputs:
 %   dimSize         double
@@ -17,7 +17,7 @@ classdef FixedDimension < aod.specification.Validator
 %       Whether the dimension is optional (default: false)
 %
 % See also:
-%   meta.FixedDimension, aod.specification.size.UnrestrictedDimension
+%   meta.FixedDimension, aod.schema.validators.size.UnrestrictedDimension
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -60,17 +60,18 @@ classdef FixedDimension < aod.specification.Validator
         function output = text(obj)
             output = string(num2str(obj.Length));
         end
+
+        function tf = isSpecified(obj)
+            if ~isscalar(obj)
+                tf = any(arrayfun(@(x) isSpecified(x), obj));
+                return
+            end
+            tf = ~isempty(obj.Value);
+        end
     end
 
     % MATLAB built-in methods
     methods
-        function tf = isempty(obj)
-            if ~isscalar(obj)
-                tf = arrayfun(@(x) builtin('isempty', x), obj);
-                return
-            end
-        end
-
         function tf = isequal(obj, other)
             if isa(other, class(obj)) && obj.Length == other.Length
                 tf = true;

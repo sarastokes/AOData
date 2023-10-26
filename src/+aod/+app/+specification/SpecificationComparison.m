@@ -1,14 +1,14 @@
-classdef SpecificationComparison < handle 
+classdef SpecificationComparison < handle
 
     properties
         refSpec
-        testSpec 
+        testSpec
 
         details
-        keys                    string 
-        values 
+        keys                    string
+        values
 
-        testListbox             matlab.ui.control.ListBox 
+        testListbox             matlab.ui.control.ListBox
         refListbox              matlab.ui.control.ListBox
         actionButton            matlab.ui.control.Button
 
@@ -35,7 +35,7 @@ classdef SpecificationComparison < handle
         function obj = SpecificationComparison(testSpec, refSpec, parent)
             arguments
                 testSpec        aod.specification.Entry
-                refSpec         aod.specification.Entry 
+                refSpec         aod.specification.Entry
                 parent          = []
             end
 
@@ -50,7 +50,7 @@ classdef SpecificationComparison < handle
         end
     end
 
-    methods 
+    methods
         function onValueSelected(obj, ~, evt)
             param = strsplit(evt.Value, ' - ');
             obj.currentParam = param{1};
@@ -58,18 +58,18 @@ classdef SpecificationComparison < handle
             obj.currentComparison = obj.details(obj.currentParam);
 
             switch obj.currentComparison
-                case aod.specification.MatchType.SAME
+                case aod.schema.MatchType.SAME
                     obj.actionButton.Text = "Specifications Match";
                     obj.actionButton.Visible = "off";
-                case aod.specification.MatchType.CHANGED
+                case aod.schema.MatchType.CHANGED
                     set(obj.actionButton,...
                         "Text", "Set to Reference Value",...
                         "Visible", "on");
-                case aod.specification.MatchType.MISSING
+                case aod.schema.MatchType.MISSING
                     set(obj.actionButton,...
                         "Text", "Set to Reference Value",...
                         "Visible", "on");
-                case aod.specification.MatchType.CLEAR
+                case aod.schema.MatchType.CLEAR
                     set(obj.actionButton,...
                         "Text", "Clear Value",...
                         "Visible", "on");
@@ -78,16 +78,16 @@ classdef SpecificationComparison < handle
 
         function onActionSelected(obj, ~, ~)
             switch obj.currentComparison
-                case aod.specification.MatchType.SAME
+                case aod.schema.MatchType.SAME
                     return
-                case aod.specification.MatchType.MISSING
-                case aod.specification.MatchType.CHANGED
+                case aod.schema.MatchType.MISSING
+                case aod.schema.MatchType.CHANGED
                     disp('hey')
             end
         end
 
         function createUi(obj, parent)
-            import aod.specification.MatchType 
+            import aod.schema.MatchType
 
             if nargin < 2 || isempty(parent)
                 parent = uifigure("Name", obj.testSpec.Name);
@@ -115,10 +115,10 @@ classdef SpecificationComparison < handle
                 "ColumnWidth", {60, "1x", 60},...
                 "BackgroundColor", [1 1 1]);
             obj.actionButton = uibutton(actionLayout,...
-                "Icon", "", "Text", "", "Visible", "off",... 
+                "Icon", "", "Text", "", "Visible", "off",...
                 "ButtonPushedFcn", @obj.onActionSelected);
             obj.actionButton.Layout.Column = 2;
-            
+
             reportLayout = uigridlayout(mainGrid, [1 5],...
                 "ColumnWidth", {"1x", "1x", "1x", "1x", "1x"},...
                 "RowHeight", "fit", "RowSpacing", 5,...
@@ -148,7 +148,7 @@ classdef SpecificationComparison < handle
                 addStyle(obj.refListbox, obj.CHANGED, 'Item', idx);
             end
             obj.changedField.Text = sprintf("%u Changed", numel(idx));
-            
+
             idx = find(obj.values == MatchType.MISSING);
             if ~isempty(idx)
                 addStyle(obj.testListbox, obj.MISSING, 'Item', idx);
@@ -178,4 +178,4 @@ classdef SpecificationComparison < handle
             end
         end
     end
-end 
+end

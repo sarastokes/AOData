@@ -38,6 +38,7 @@ classdef Text < aod.schema.primitives.Primitive
 
             % Defaults
             obj.setClass("string");
+            obj.setDefault("");
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
@@ -107,20 +108,20 @@ classdef Text < aod.schema.primitives.Primitive
             end
             [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
 
-            if ~aod.util.isempty(obj.Default)
-                if ~isempty(obj.Length)
+            if obj.Default.isSpecified()
+                if obj.Length.isSpecified()
                     if all(strlength(obj.Default.Value) == obj.Length.Value)
                         excObj.addCause(MException(...
                             'checkIntegrity:InvalidDefaultLength',...
                             'Default value did not match Length (%u)', obj.Length.Value));
                     end
-                elseif ~isempty(obj.Enum)
+                elseif obj.Enum.isSpecified()
                     if ~any(ismember(obj.Default.Value, obj.Enum.Value))
                         excObj.addCause(MException(...
                             'checkIntegrity:InvalidDefaultValue',...
                             'Default value was not in Enum: %s', strjoin(obj.Enum.Value, ', ')));
                     end
-                elseif ~isempty(obj.Count)
+                elseif obj.Count.isSpecified()
                     if numel(obj.Default.Value) ~= obj.Count.Value
                         excObj.addCause(MException(...
                             'checkIntegrity:InvalidDefaultCount',...
@@ -129,8 +130,8 @@ classdef Text < aod.schema.primitives.Primitive
                 end
             end
 
-            if ~isempty(obj.Enum)
-                if ~isempty(obj.Length) && any(arrayfun(@(x) ~isequal(strlength(obj.Enum.Value), obj.Length.Value)))
+            if obj.Enum.isSpecified()
+                if obj.Length.isSpecified() && any(arrayfun(@(x) ~isequal(strlength(obj.Enum.Value), obj.Length.Value)))
                     excObj.addCause(MException(...
                         'checkIntegrity:InvalidEnumLength',...
                         'Enum values did not match Length (%u)', obj.Length.Value));

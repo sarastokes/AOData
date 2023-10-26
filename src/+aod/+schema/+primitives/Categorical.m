@@ -41,11 +41,12 @@ classdef Categorical < aod.schema.primitives.Primitive
         end
 
         function tf = isValid(obj)
+            % TODO: Not using this
             tf = isValid@aod.schema.primitives.Categorical(obj);
             if ~tf
                 return
             end
-            tf = isempty(obj.Enum);
+            tf = obj.Enum.isSpecified();
         end
     end
 

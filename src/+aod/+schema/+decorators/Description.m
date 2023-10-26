@@ -1,14 +1,14 @@
-classdef Description < aod.specification.Decorator
+classdef Description < aod.schema.Decorator
 % DESCRIPTION
 %
 % Description:
 %   A open-ended text field for describing a variable
 %
 % Superclass:
-%   aod.specification.Decorator
+%   aod.schema.Decorator
 %
 % Constructor:
-%   obj = aod.specification.Decorator(input)
+%   obj = aod.schema.Description(input)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -22,7 +22,7 @@ classdef Description < aod.specification.Decorator
             if nargin < 2
                 parent = [];
             end
-            obj = obj@aod.specification.Decorator(parent);
+            obj = obj@aod.schema.Decorator(parent);
             if nargin < 1 || aod.util.isempty(input) || input == "[]"
                 input = "";
             end
@@ -30,7 +30,7 @@ classdef Description < aod.specification.Decorator
         end
     end
 
-    % aod.specification.Decorator methods
+    % aod.schema.Decorator methods
     methods
         function setValue(obj, input)
             if aod.util.isempty(input) || input == "[]"
@@ -49,7 +49,7 @@ classdef Description < aod.specification.Decorator
         end
 
         function output = text(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 output = "[]";
             else
                 output = obj.Value;
@@ -60,7 +60,7 @@ classdef Description < aod.specification.Decorator
     % MATLAB built-in methods
     methods
         function out = jsonencode(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = jsonencode([]);
             else
                 out = jsonencode(obj.Value);

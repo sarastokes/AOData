@@ -1,11 +1,11 @@
-classdef (Abstract) Decorator < aod.specification.Specification
+classdef (Abstract) Decorator < aod.schema.Specification
 % (Abstract) Parent class for metadata decorators
 %
 % Description:
 %   Decorators describe the data but are not used in validation
 %
 % See also:
-%   aod.specification.Specification
+%   aod.schema.Specification
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -19,7 +19,7 @@ classdef (Abstract) Decorator < aod.specification.Specification
             if nargin == 0
                 parent = [];
             end
-            obj = obj@aod.specification.Specification(parent);
+            obj = obj@aod.schema.Specification(parent);
         end
     end
 
@@ -35,8 +35,8 @@ classdef (Abstract) Decorator < aod.specification.Specification
 
     % MATLAB built-in methods
     methods
-        function tf = isempty(obj)
-            tf = aod.util.isempty(obj.Value);
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
         end
 
         function tf = isequal(obj, other)

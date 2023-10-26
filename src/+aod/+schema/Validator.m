@@ -1,11 +1,11 @@
-classdef (Abstract) Validator < aod.specification.Specification
+classdef (Abstract) Validator < aod.schema.Specification
 % Validator (abstract)
 %
 % Superclasses:
-%   aod.specification.Specification
+%   aod.schema.Specification
 %
 % Constructor:
-%   obj = aod.specification.Validator(parent)
+%   obj = aod.schema.Validator(parent)
 %
 % Events:
 %   ValidationFailed
@@ -29,14 +29,14 @@ classdef (Abstract) Validator < aod.specification.Specification
             arguments
                 parent          = []
             end
-            obj = obj@aod.specification.Specification(parent);
+            obj = obj@aod.schema.Specification(parent);
         end
     end
 
     % MATLAB builtin methods
     methods
-        function tf = isempty(obj)
-            tf = isempty(obj.Value);
+        function tf = isSpecified(obj)
+            tf = ~isempty(obj.Value);
         end
 
         function tf = isequal(obj, other)
@@ -52,7 +52,7 @@ classdef (Abstract) Validator < aod.specification.Specification
         end
 
         function out = jsonencode(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = jsonencode([]);
             else
                 out = jsonencode(obj.Value);

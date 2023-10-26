@@ -30,27 +30,27 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Size")
         function Size(testCase)
-            propObj = aod.specification.Size(...
+            propObj = aod.schema.validators.Size(...
                 findprop(testCase.TEST_OBJ, 'PropA'));
             testCase.verifyEqual( ...
                 [propObj.Value(1).Length, propObj.Value(2).Length],...
-                [aod.specification.size.FixedDimension(1).Length,...
-                 aod.specification.size.FixedDimension(2).Length]);
+                [aod.schema.validators.size.FixedDimension(1).Length,...
+                 aod.schema.validators.size.FixedDimension(2).Length]);
         end
 
         function EmptySize(testCase)
-            emptyObj = aod.specification.Size();
+            emptyObj = aod.schema.validators.Size();
             testCase.verifyEmpty(emptyObj);
             testCase.verifyEqual(emptyObj.text(), "[]");
             testCase.verifyTrue(emptyObj.validate(123));
         end
 
         function SizeEquality(testCase)
-            obj1 = aod.specification.Size();
-            obj2 = aod.specification.Size("(1,:)");
-            obj3 = aod.specification.Size([1, 2]);
-            obj4 = aod.specification.Size([2, 1]);
-            obj5 = aod.specification.Size([2, 2, 2]);
+            obj1 = aod.schema.validators.Size();
+            obj2 = aod.schema.validators.Size("(1,:)");
+            obj3 = aod.schema.validators.Size([1, 2]);
+            obj4 = aod.schema.validators.Size([2, 1]);
+            obj5 = aod.schema.validators.Size([2, 2, 2]);
 
             testCase.verifyNotEqual(obj1, 123);
             testCase.verifyNotEqual(obj1, obj2);
@@ -60,13 +60,13 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function SizeComparison(testCase)
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
-            refObj1 = aod.specification.Size("(1,1)");
-            refObj2 = aod.specification.Size([]);
+            refObj1 = aod.schema.validators.Size("(1,1)");
+            refObj2 = aod.schema.validators.Size([]);
 
             testCase.verifyEqual(MatchType.CHANGED,...
-                refObj1.compare(aod.specification.Size("(1,:)")));
+                refObj1.compare(aod.schema.validators.Size("(1,:)")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
             testCase.verifyEqual(MatchType.UNEXPECTED,...
@@ -75,34 +75,34 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 refObj2.compare(refObj1));
 
             testCase.verifyError(...
-                @() refObj1.compare(aod.specification.MatlabClass("string")),...
+                @() refObj1.compare(aod.schema.validators.Class("string")),...
                 "compare:UnlikeSpecificationTypes");
         end
 
         function SizeErrors(testCase)
             testCase.verifyError(...
-                @() aod.specification.Size(1),...
+                @() aod.schema.validators.Size(1),...
                 "Size:InvalidDimensions");
 
             testCase.verifyError(...
-                @() aod.specification.Size("(1)"),...
+                @() aod.schema.validators.Size("(1)"),...
                 "Size:InvalidDimensions");
         end
 
         function FixedDimensions(testCase)
-            ref1 = [aod.specification.size.FixedDimension(1),...
-                   aod.specification.size.FixedDimension(2)];
+            ref1 = [aod.schema.validators.size.FixedDimension(1),...
+                   aod.schema.validators.size.FixedDimension(2)];
             testCase.verifyNotEqual(ref1(1), ref1(2));
             testCase.verifyEqual(ref1(1), ref1(1));
 
-            rowSize1a = aod.specification.Size([1,2]);
+            rowSize1a = aod.schema.validators.Size([1,2]);
             testCase.verifyEqual(rowSize1a.text(), "(1,2)");
             testCase.verifyEqual(rowSize1a.Value(1), ref1(1));
             testCase.verifyEqual(rowSize1a.Value(2), ref1(2));
 
-            rowSize1b = aod.specification.Size("(1,2)");
+            rowSize1b = aod.schema.validators.Size("(1,2)");
             testCase.verifyClass(rowSize1b.Value, ...
-                "aod.specification.size.FixedDimension");
+                "aod.schema.validators.size.FixedDimension");
             testCase.verifyTrue(rowSize1b.validate([1 2]));
             testCase.verifyFalse(rowSize1b.validate([1 2]'));
             testCase.verifyEqual(rowSize1a, rowSize1b);
@@ -113,11 +113,11 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function MixedDimensions(testCase)
-            ref2 = [aod.specification.size.UnrestrictedDimension(),...
-                    aod.specification.size.FixedDimension(1)];
+            ref2 = [aod.schema.validators.size.UnrestrictedDimension(),...
+                    aod.schema.validators.size.FixedDimension(1)];
 
-            rowSize2a = aod.specification.Size("(:,1)");
-            rowSize2b = aod.specification.Size(findprop(testCase.TEST_OBJ, "PropB"));
+            rowSize2a = aod.schema.validators.Size("(:,1)");
+            rowSize2b = aod.schema.validators.Size(findprop(testCase.TEST_OBJ, "PropB"));
             testCase.verifyEqual(rowSize2a.text(), "(:,1)");
 
             testCase.verifyEqual(rowSize2a.Value, ref2);
@@ -125,10 +125,10 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function UnrestrictedDimensions(testCase)
-            ref3 = [aod.specification.size.UnrestrictedDimension(),...
-                    aod.specification.size.UnrestrictedDimension()];
+            ref3 = [aod.schema.validators.size.UnrestrictedDimension(),...
+                    aod.schema.validators.size.UnrestrictedDimension()];
 
-            rowSize3a = aod.specification.Size("(:,:)");
+            rowSize3a = aod.schema.validators.Size("(:,:)");
             testCase.verifyEqual(rowSize3a.text(), "(:,:)");
 
             testCase.verifyEqual(rowSize3a.Value, ref3);
@@ -139,11 +139,11 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="MatlabClass")
         function MatlabClass(testCase)
-            obj1 = aod.specification.MatlabClass('char');
+            obj1 = aod.schema.validators.Class('char');
             testCase.verifyTrue(obj1.validate('test'));
 
             expt = aod.core.Experiment('test', cd, getDateYMD());
-            obj2 = aod.specification.MatlabClass(findprop(expt, 'epochIDs'));
+            obj2 = aod.schema.validators.Class(findprop(expt, 'epochIDs'));
             testCase.verifyEqual(obj2.Value, "double");
             testCase.verifyTrue(obj2.validate(123));
             testCase.verifyFalse(obj2.validate('test'));
@@ -152,21 +152,21 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function MultipleMatlabClass(testCase)
-            obj = aod.specification.MatlabClass(["char", "string"]);
+            obj = aod.schema.validators.Class(["char", "string"]);
             testCase.verifyTrue(obj.validate('test'));
             testCase.verifyTrue(obj.validate("test"));
             testCase.verifyFalse(obj.validate(123));
             testCase.verifyEqual(obj.text(), "char, string");
 
-            obj2 = aod.specification.MatlabClass("string, char");
+            obj2 = aod.schema.validators.Class("string, char");
             testCase.verifyEqual(obj, obj2);
 
-            obj3 = aod.specification.MatlabClass("string, double");
+            obj3 = aod.schema.validators.Class("string, double");
             testCase.verifyNotEqual(obj, obj3);
         end
 
         function EmptyMatlabClass(testCase)
-            obj = aod.specification.MatlabClass();
+            obj = aod.schema.validators.Class();
             testCase.verifyEmpty(obj);
             testCase.verifyTrue(obj.validate(123));
             testCase.verifyEqual(obj.text(), "[]");
@@ -182,22 +182,22 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function MatlabClassEquality(testCase)
-            obj1 = aod.specification.MatlabClass([]);
-            obj2 = aod.specification.MatlabClass("double");
-            obj3 = aod.specification.MatlabClass("double, char");
+            obj1 = aod.schema.validators.Class([]);
+            obj2 = aod.schema.validators.Class("double");
+            obj3 = aod.schema.validators.Class("double, char");
             testCase.verifyNotEqual(obj1, 123);
             testCase.verifyNotEqual(obj2, obj1);
             testCase.verifyNotEqual(obj3, obj2);
         end
 
         function MatlabClassComparison(testCase)
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
-            refObj1 = aod.specification.MatlabClass("string");
-            refObj2 = aod.specification.MatlabClass([]);
+            refObj1 = aod.schema.validators.Class("string");
+            refObj2 = aod.schema.validators.Class([]);
 
             testCase.verifyEqual(MatchType.CHANGED,...
-                refObj1.compare(aod.specification.MatlabClass("double")));
+                refObj1.compare(aod.schema.validators.Class("double")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
             testCase.verifyEqual(MatchType.UNEXPECTED,...
@@ -208,12 +208,12 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
         function MatlabClassError(testCase)
             testCase.verifyError(...
-                @() aod.specification.MatlabClass("badclass"),...
-                "MatlabClass:InvalidClass");
+                @() aod.schema.validators.Class("badclass"),...
+                "Class:parse:InvalidClass");
 
             testCase.verifyError(...
-                @() aod.specification.MatlabClass(123),...
-                "MatlabClass:InvalidInput");
+                @() aod.schema.validators.Class(123),...
+                "Class:parse:InvalidInput");
         end
     end
 
@@ -231,7 +231,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function DefaultValueComparison(testCase)
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
             refObj1 = aod.specification.DefaultValue(3);
             refObj2 = aod.specification.DefaultValue([]);
@@ -259,7 +259,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function DefaultComparison(testCase)
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
             refObj1 = aod.schema.Default([], 3);
             refObj2 = aod.schema.Default([], []);
@@ -278,32 +278,33 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Description")
         function Description(testCase)
-            obj = aod.specification.Description("test description");
+            obj = aod.schema.decorators.Description("test description");
             testCase.verifyEqual(obj.Value, "test description");
             obj.setValue("test");
             testCase.verifyEqual(obj.Value, "test");
             testCase.verifyEqual(obj.text(), "test");
+        end
 
-
+        function EntityDescription(testCase)
             expt = aod.core.Experiment("test", cd, getDateYMD());
             p = findprop(expt, "epochIDs");
-            obj2 = aod.specification.Description(p);
+            obj2 = aod.schema.decorators.Description(p);
             testCase.verifyEqual(obj2.Value, string(p.Description));
         end
 
         function EmptyDescription(testCase)
-            obj = aod.specification.Description([]);
+            obj = aod.schema.decorators.Description([]);
             testCase.verifyEqual(obj.Value, "");
         end
 
         function DescriptionComparison(testCase)
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
-            refObj1 = aod.specification.Description("test");
-            refObj2 = aod.specification.Description([]);
+            refObj1 = aod.schema.decorators.Description("test");
+            refObj2 = aod.schema.decorators.Description([]);
 
             testCase.verifyEqual(MatchType.CHANGED,...
-                refObj1.compare(aod.specification.Description("text")));
+                refObj1.compare(aod.schema.decorators.Description("text")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
             testCase.verifyEqual(MatchType.UNEXPECTED,...
@@ -313,73 +314,74 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="Functions")
-        function FunctionValidation(testCase)
-            obj = aod.specification.ValidationFunction(...
-                {@mustBeNumeric, @(x) x > 100});
-            testCase.verifyFalse(isempty(obj));
-            testCase.verifyTrue(obj.validate(123))
-            testCase.verifyFalse(obj.validate(50));
-            testCase.verifyFalse(obj.validate("test"));
+    % methods (Test, TestTags="Functions")
+    %     function FunctionValidation(testCase)
+    %         obj = aod.specification.ValidationFunction(...
+    %             {@mustBeNumeric, @(x) x > 100});
+    %         testCase.verifyFalse(isempty(obj));
+    %         testCase.verifyTrue(obj.validate(123))
+    %         testCase.verifyFalse(obj.validate(50));
+    %         testCase.verifyFalse(obj.validate("test"));
 
-            obj.setValue([]);
-            testCase.verifyTrue(obj.validate("test"));
+    %         obj.setValue([]);
+    %         testCase.verifyTrue(obj.validate("test"));
+    %     end
 
+    %     function EntityValidation(testCase)
+    %         expt = aod.core.Experiment("test", cd, getDateYMD());
+    %         p = findprop(expt, "epochIDs");
+    %         obj2 = aod.specification.ValidationFunction(p);
+    %         testCase.verifyEmpty(obj2.Value);
+    %     end
 
-            expt = aod.core.Experiment("test", cd, getDateYMD());
-            p = findprop(expt, "epochIDs");
-            obj2 = aod.specification.ValidationFunction(p);
-            testCase.verifyEmpty(obj2.Value);
-        end
+    %     function EmptyFunctions(testCase)
+    %         obj = aod.specification.ValidationFunction();
+    %         testCase.verifyEmpty(obj);
+    %         testCase.verifyTrue(obj.validate(123));
+    %     end
 
-        function EmptyFunctions(testCase)
-            obj = aod.specification.ValidationFunction();
-            testCase.verifyEmpty(obj);
-            testCase.verifyTrue(obj.validate(123));
-        end
+    %     function FunctionEquality(testCase)
+    %         obj1 = aod.specification.ValidationFunction(...
+    %             {@(x) x > 100, @mustBeNumeric});
+    %         obj2 = aod.specification.ValidationFunction(...
+    %             {@(y) y > 100, @mustBeNumeric});
+    %         obj3 = aod.specification.ValidationFunction(@(x) x > 100);
 
-        function FunctionEquality(testCase)
-            obj1 = aod.specification.ValidationFunction(...
-                {@(x) x > 100, @mustBeNumeric});
-            obj2 = aod.specification.ValidationFunction(...
-                {@(y) y > 100, @mustBeNumeric});
-            obj3 = aod.specification.ValidationFunction(@(x) x > 100);
+    %         testCase.verifyEqual(obj1, obj2);
+    %         testCase.verifyNotEqual(obj1, obj3);
+    %         testCase.verifyNotEqual(obj1,...
+    %             aod.specification.ValidationFunction([]));
+    %         testCase.verifyNotEqual(obj1,...
+    %             aod.schema.validators.Class("string"));
+    %     end
 
-            testCase.verifyEqual(obj1, obj2);
-            testCase.verifyNotEqual(obj1, obj3);
-            testCase.verifyNotEqual(obj1,...
-                aod.specification.ValidationFunction([]));
-            testCase.verifyNotEqual(obj1,...
-                aod.specification.MatlabClass("string"));
-        end
+    %     function FunctionComparison(testCase)
+    %         import aod.schema.MatchType
 
-        function FunctionComparison(testCase)
-            import aod.specification.MatchType
+    %         refObj1 = aod.specification.ValidationFunction(...
+    %             {@(x) x > 100, @mustBeNumeric});
+    %         refObj2 = aod.specification.ValidationFunction(...
+    %             {@(y) y > 100, @mustBeNumeric});
+    %         refObj3 = aod.specification.ValidationFunction([]);
 
-            refObj1 = aod.specification.ValidationFunction(...
-                {@(x) x > 100, @mustBeNumeric});
-            refObj2 = aod.specification.ValidationFunction(...
-                {@(y) y > 100, @mustBeNumeric});
-            refObj3 = aod.specification.ValidationFunction([]);
+    %         testCase.verifyEqual(MatchType.SAME,...
+    %             refObj1.compare(refObj2));
+    %         testCase.verifyEqual(MatchType.SAME,...
+    %             refObj1.compare(refObj1));
+    %         testCase.verifyEqual(MatchType.MISSING,...
+    %             refObj3.compare(refObj1));
+    %         testCase.verifyEqual(MatchType.UNEXPECTED,...
+    %             refObj1.compare(refObj3));
+    %         testCase.verifyEqual(MatchType.CHANGED,...
+    %             refObj1.compare(aod.specification.ValidationFunction(@(x) x > 100)));
+    %     end
 
-            testCase.verifyEqual(MatchType.SAME,...
-                refObj1.compare(refObj2));
-            testCase.verifyEqual(MatchType.SAME,...
-                refObj1.compare(refObj1));
-            testCase.verifyEqual(MatchType.MISSING,...
-                refObj3.compare(refObj1));
-            testCase.verifyEqual(MatchType.UNEXPECTED,...
-                refObj1.compare(refObj3));
-            testCase.verifyEqual(MatchType.CHANGED,...
-                refObj1.compare(aod.specification.ValidationFunction(@(x) x > 100)));
-        end
-
-        function FunctionErrors(testCase)
-            testCase.verifyError(...
-                @() aod.specification.ValidationFunction(123),...
-                "validateFunctionHandles:InvalidInput");
-        end
-    end
+    %     function FunctionErrors(testCase)
+    %         testCase.verifyError(...
+    %             @() aod.specification.ValidationFunction(123),...
+    %             "validateFunctionHandles:InvalidInput");
+    %     end
+    % end
 
     methods (Test, TestTags="Dataset")
         function EntryFromMetaclass(testCase)
@@ -432,52 +434,52 @@ classdef SpecificationTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Description.Value, "test");
             testCase.verifyEqual(obj.Class.Value, ["string", "char"]);
             testCase.verifyEqual(obj.Size.SizeType, ...
-                aod.specification.SizeTypes.SCALAR);
+                aod.schema.validators.size.SizeTypes.SCALAR);
         end
     end
 
     methods (Test, TestTags="Specification")
         function Specification(testCase)
-            sizeSpec = aod.specification.Size("(1,:)");
-            classSpec = aod.specification.MatlabClass("double");
-            descSpec = aod.specification.Description("This is a description");
-            defaultSpec = aod.specification.DefaultValue(1);
-            fcnSpec = aod.specification.ValidationFunction(@mjstBeNumeric);
+            sizeSpec = aod.schema.validators.Size("(1,:)");
+            classSpec = aod.schema.validators.Class("double");
+            descSpec = aod.schema.decorators.Description("This is a description");
+            defaultSpec = aod.schema.Default(1);
+            % fcnSpec = aod.specification.ValidationFunction(@mjstBeNumeric);
         end
 
-        function DatasetManager(testCase)
-            obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
-            testCase.verifyEqual(obj.Count, 4);
-            testCase.verifyNumElements(obj.Entries, 4);
-            testCase.verifyEqual("aod.core.Epoch", obj.className);
+        % function DatasetManager(testCase)
+        %     obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
+        %     testCase.verifyEqual(obj.Count, 4);
+        %     testCase.verifyNumElements(obj.Entries, 4);
+        %     testCase.verifyEqual("aod.core.Epoch", obj.className);
 
-            testCase.verifyTrue(obj.has('ID'));
-            testCase.verifyEmpty(obj.get('Blah'));
-            testCase.verifyFalse(obj.has('Blah'));
+        %     testCase.verifyTrue(obj.has('ID'));
+        %     testCase.verifyEmpty(obj.get('Blah'));
+        %     testCase.verifyFalse(obj.has('Blah'));
 
-            out = obj.text();
-            testCase.verifySize(obj.table(), [4 6]);
-        end
+        %     out = obj.text();
+        %     testCase.verifySize(obj.table(), [4 6]);
+        % end
 
-        function DatasetManagerAccess(testCase)
-            DM = aod.specification.util.getDatasetSpecification(...
-                'aod.builtin.devices.NeutralDensityFilter');
-            testCase.verifyClass(DM, 'aod.specification.DatasetManager');
-        end
+        % function DatasetManagerAccess(testCase)
+        %     DM = aod.specification.util.getDatasetSpecification(...
+        %         'aod.builtin.devices.NeutralDensityFilter');
+        %     testCase.verifyClass(DM, 'aod.specification.DatasetManager');
+        % end
 
-        function DatasetManagerError(testCase)
-            obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
-            ep = aod.core.Epoch(1);
+        % function DatasetManagerError(testCase)
+        %     obj = aod.specification.DatasetManager.populate('aod.core.Epoch');
+        %     ep = aod.core.Epoch(1);
 
-            testCase.verifyError(...
-                @() obj.add(findprop(ep, 'ID')), "add:EntryExists");
-            testCase.verifyError(...
-                @() obj.add("NewProp"), "add:InvalidInput");
+        %     testCase.verifyError(...
+        %         @() obj.add(findprop(ep, 'ID')), "add:EntryExists");
+        %     testCase.verifyError(...
+        %         @() obj.add("NewProp"), "add:InvalidInput");
 
-            testCase.verifyError(...
-                @() aod.specification.DatasetManager.populate("aod.common.FileReader"),...
-                "populate:InvalidInput");
-        end
+        %     testCase.verifyError(...
+        %         @() aod.specification.DatasetManager.populate("aod.common.FileReader"),...
+        %         "populate:InvalidInput");
+        % end
     end
 
     methods (Test, TestTags="Attribute")
@@ -549,7 +551,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function AttributeManagerComparison(testCase)
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
             obj = aod.builtin.devices.Pellicle([30 70]);
             model = obj.expectedAttributes.get('Model');

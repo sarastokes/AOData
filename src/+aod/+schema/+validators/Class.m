@@ -1,10 +1,14 @@
-classdef MatlabClass < aod.specification.Validator
+classdef Class < aod.schema.Validator
+% CLASS
+%
+% Description:
+%   Specifies the underlying MATLAB class, or classes
 %
 % Superclass:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
-%   obj = aod.specification.MatlabClass(input)
+%   obj = aod.specification.Class(input)
 %
 % Inputs:
 %   input           char, string, cellstr or meta.property
@@ -18,26 +22,26 @@ classdef MatlabClass < aod.specification.Validator
     end
 
     methods
-        function obj = MatlabClass(classes, parent)
+        function obj = Class(classes, parent)
             if nargin < 2
                 parent = [];
             end
-            obj = obj@aod.specification.Validator(parent);
-            
+            obj = obj@aod.schema.Validator(parent);
+
             if nargin > 0
                 obj.Value = obj.parse(classes);
             end
         end
     end
 
-    % aod.specification.Specification methods
-    methods 
+    % aod.schema.Specification methods
+    methods
         function setValue(obj, input)
             obj.Value = obj.parse(input);
         end
 
         function [tf, ME] = validate(obj, value)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 tf = true; ME = [];
                 return
             end
@@ -45,20 +49,24 @@ classdef MatlabClass < aod.specification.Validator
             if tf
                 ME = [];
             else
-                ME = MException("MatlabClass:validate",...
+                ME = MException("Class:validate",...
                     "Expected class: %s. Actual class: %s",...
                     obj.text(), class(value));
             end
         end
 
         function out = text(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = "[]";
             elseif numel(obj.Value) > 1
                 out = array2commalist(obj.Value);
             else
                 out = obj.Value;
-            end        
+            end
+        end
+
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
         end
     end
 
@@ -78,7 +86,7 @@ classdef MatlabClass < aod.specification.Validator
                 end
                 return
             elseif ~istext(input)
-                error('MatlabClass:InvalidInput',...
+                error('Class:parse:InvalidInput',...
                     'Inputs must be char, string or meta.property');
             end
 
@@ -93,7 +101,7 @@ classdef MatlabClass < aod.specification.Validator
                 if exist(input(i), 'builtin') || exist(input(i), 'class')
                     classes(i) = input(i);
                 else
-                    error('MatlabClass:InvalidClass',...
+                    error('Class:parse:InvalidClass',...
                         'Class %s not recognized', input(i));
                 end
             end
@@ -101,33 +109,29 @@ classdef MatlabClass < aod.specification.Validator
     end
 
     % MATLAB built-in methods
-    methods 
-        function tf = isempty(obj)
-            tf = (obj.Value == "");
-        end
-
+    methods
         function tf = isequal(obj, other)
-            if ~isa(other, 'aod.specification.MatlabClass')
+            if ~isa(other, 'aod.schema.validators.Class')
                 tf = false;
-                return 
+                return
             end
-            
+
             if numel(obj.Value) ~= numel(other.Value)
-                tf = false; 
-                return 
+                tf = false;
+                return
             end
 
             for i = 1:numel(obj.Value)
                 if ~ismember(obj.Value(i), other.Value)
                     tf = false;
-                    return 
+                    return
                 end
             end
             tf = true;
         end
 
         function out = jsonencode(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = jsonencode([]);
             else
                 out = jsonencode(obj.Value);

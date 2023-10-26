@@ -1,4 +1,4 @@
-classdef Entry < handle 
+classdef Entry < handle
 % Represents the specifications for a single entry (aka property)
 %
 % Constructor:
@@ -10,31 +10,31 @@ classdef Entry < handle
 % Optional key/value inputs:
 %   Size                    string or double
 %   Class                   string
-%   Default                 
+%   Default
 %   Functions               cell of function handles
 %   Description             string
 %   Units                   string
-%   
+%
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    events 
+    events
         LoggableEvent
     end
 
     properties (SetAccess = private)
         Name            (1,1)     string
-        Size                      aod.specification.Size 
-        Class           (1,1)     aod.specification.MatlabClass
+        Size                      aod.specification.Size
+        Class           (1,1)     aod.schema.validators.Class
         Default         (1,1)     aod.specification.DefaultValue
         Functions       (1,1)     aod.specification.ValidationFunction
-        Description               aod.specification.Description 
+        Description               aod.schema.decorators.Description
         Units           (1,:)     string = string.empty(1,0)
     end
 
     properties (Access = private)
-        listeners                 event.listener 
+        listeners                 event.listener
     end
 
     properties (Hidden, Constant)
@@ -44,16 +44,16 @@ classdef Entry < handle
     methods
         function obj = Entry(prop, varargin)
             % Defaults (prevents issues w/ instantiation in property block)
-            obj.Size = aod.specification.Size([]); 
-            obj.Class = aod.specification.MatlabClass([]);
+            obj.Size = aod.schema.validators.Size([]);
+            obj.Class = aod.schema.validators.Class([]);
             obj.Default = aod.specification.DefaultValue([]);
-            obj.Description = aod.specification.Description([]);
+            obj.Description = aod.schema.decorators.Description([]);
             obj.Functions = aod.specification.ValidationFunction([]);
 
             obj.bind();
 
             if nargin == 0
-                return 
+                return
             end
 
             % Initialize from meta.property
@@ -74,7 +74,7 @@ classdef Entry < handle
         end
     end
 
-    methods 
+    methods
         function assign(obj, varargin)
             ip = obj.getParser(varargin{:});
 
@@ -88,7 +88,7 @@ classdef Entry < handle
             [tf1, ME1] = obj.Size.validate(input);
             [tf2, ME2] = obj.Class.validate(input);
             [tf3, ME3] = obj.Functions.validate(input);
-            % Determine whether all tests were passed 
+            % Determine whether all tests were passed
             tf = all([tf1, tf2, tf3]);
             % Combine exceptions, if present
             ME = [ME1, ME2, ME3];
@@ -142,15 +142,16 @@ classdef Entry < handle
         end
 
         function tf = isSpecified(obj)
-            tf = [isempty(obj.Class), isempty(obj.Size),...
-                isempty(obj.Default), isempty(obj.Units),...
-                isempty(obj.Functions), isempty(obj.Description)];
+            tf = true;
+            % tf = [isempty(obj.Class), isempty(obj.Size),...
+            %     isempty(obj.Default), isempty(obj.Units),...
+            %     isempty(obj.Functions), isempty(obj.Description)];
         end
 
         function details = compare(obj, other)
             arguments
-                obj 
-                other           aod.specification.Entry 
+                obj
+                other           aod.specification.Entry
             end
 
             details = aod.common.KeyValueMap();
@@ -181,7 +182,7 @@ classdef Entry < handle
             obj.Class.setValue(input);
             obj.checkIntegrity();
         end
-    
+
         function setSize(obj, input)
             obj.Size.setValue(input);
             obj.checkIntegrity();
@@ -228,7 +229,7 @@ classdef Entry < handle
                     validators = classFcn;
                 else
                     validators = [];
-                    return 
+                    return
                 end
 
             else
@@ -244,10 +245,10 @@ classdef Entry < handle
             arguments
                 obj
                 specType        char
-                specValue 
+                specValue
             end
 
-            switch lower(specType) 
+            switch lower(specType)
                 case 'size'
                     obj.setSize(specValue);
                 case 'function'
@@ -282,7 +283,7 @@ classdef Entry < handle
             % Does default value pass the validation functions
             if ~isempty(obj.Functions)
                 tf = obj.Functions.validate(obj.Default.Value);
-                if ~tf 
+                if ~tf
                     error('checkIntegrity:DefaultValueDoesNotValidate',...
                         'The default value did not pass the validation')
                 end
@@ -309,7 +310,7 @@ classdef Entry < handle
 
     methods (Access = private)
         function bind(obj)
-            obj.listeners = addlistener(obj.Size,... 
+            obj.listeners = addlistener(obj.Size,...
                 "ValidationFailed", @obj.onValidationFailed);
             obj.listeners = cat(1, obj.listeners,...
                 addlistener(obj.Class, "ValidationFailed", @obj.onValidationFailed));
@@ -334,11 +335,11 @@ classdef Entry < handle
             addParameter(ip, 'Default', []);
             addParameter(ip, 'Units', "none");
             parse(ip, varargin{:});
-        end 
+        end
     end
 
     % MATLAB builtin methods
-    methods 
+    methods
         function P = struct(obj)
             P = struct();
             P.Name = obj.Name;
@@ -349,4 +350,4 @@ classdef Entry < handle
             P.Function = obj.Functions.jsonencode();
         end
     end
-end 
+end

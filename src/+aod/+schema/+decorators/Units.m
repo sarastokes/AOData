@@ -1,7 +1,7 @@
-classdef Units < aod.specification.Decorator
+classdef Units < aod.schema.Decorator
 %
 % Superclasses:
-%   aod.specification.Decorator
+%   aod.schema.Decorator
 %
 % Constructor:
 %   obj = aod.schema.decorators.Units(parent, value)
@@ -12,7 +12,7 @@ classdef Units < aod.specification.Decorator
 
     methods
         function obj = Units(parent, value)
-            obj = obj@aod.specification.Decorator(parent);
+            obj = obj@aod.schema.Decorator(parent);
             if ~aod.util.isempty(value)
                 obj.setValue(value);
             end
@@ -37,7 +37,7 @@ classdef Units < aod.specification.Decorator
         end
 
         function out = text(obj)
-            if aod.util.isempty(obj)
+            if ~obj.isSpecified
                 out = "[]";
             else
                 out = value2string(obj.Value);
@@ -46,8 +46,8 @@ classdef Units < aod.specification.Decorator
     end
 
     methods
-        function tf = isempty(obj)
-            tf = aod.util.isempty(obj.Value);
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
         end
     end
 end

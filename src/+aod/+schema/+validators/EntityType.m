@@ -1,8 +1,8 @@
-classdef EntityType < aod.specification.Validator
+classdef EntityType < aod.schema.Validator
 % EntityType - Entity type validator
 %
 % Superclasses:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
 %   obj = aod.schema.validators.EntityType(value)
@@ -23,7 +23,7 @@ classdef EntityType < aod.specification.Validator
 
     methods
         function obj = EntityType(parent, value)
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
             obj.setValue(value);
         end
     end
@@ -39,7 +39,7 @@ classdef EntityType < aod.specification.Validator
 
         function [tf, ME] = validate(obj, input)
             ME = [];
-            if obj.isempty() || aod.util.isempty(input)
+            if ~obj.isSpecified || aod.util.isempty(input)
                 tf = true;
             elseif ~aod.util.isEntity(input)
                 tf = false;
@@ -57,7 +57,7 @@ classdef EntityType < aod.specification.Validator
         end
 
         function out = text(obj)
-            if obj.isempty()
+            if ~obj.isSpecified()
                 out = "[]";
             else
                 out = jsonencode(string(obj.Value));
@@ -69,7 +69,7 @@ classdef EntityType < aod.specification.Validator
     % Matlab builtin methods
     methods
         function out = jsonencode(obj)
-            if obj.isempty()
+            if ~obj.isSpecified()
                 out = jsonencode([]);
             else
                 out = jsonencode(string(obj.Value));

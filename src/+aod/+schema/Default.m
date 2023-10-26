@@ -1,8 +1,8 @@
-classdef Default < aod.specification.Specification
+classdef Default < aod.schema.Specification
 % Specifies a default value for a property
 %
 % Superclasses:
-%   aod.specification.Specification
+%   aod.schema.Specification
 %
 % Constructor:
 %   aod.schema.Default(parent, input)
@@ -21,7 +21,7 @@ classdef Default < aod.specification.Specification
                 input                             = []
             end
 
-            obj = obj@aod.specification.Specification(parent);
+            obj = obj@aod.schema.Specification(parent);
             obj.setValue(input);
         end
     end
@@ -49,16 +49,17 @@ classdef Default < aod.specification.Specification
 
     % MATLAB built-in methods
     methods
-        function tf = isempty(obj)
+        function tf = isSpecified(obj)
             if isstring(obj.Value) && all(isequal(obj.Value, ""))
-                tf = true;
+                tf = false;
             else
-                tf = isempty(obj.Value);
+                tf  = ~isempty(obj.Value);
+                %tf = ~all(aod.util.isempty(obj.Value));
             end
         end
 
         function tf = isequal(obj, other)
-            if ~isa(other, 'aod.schema.Default');
+            if ~isa(other, 'aod.schema.Default')
                 tf = false;
             else
                 tf = isequal(obj.Value, other.Value);
@@ -66,7 +67,7 @@ classdef Default < aod.specification.Specification
         end
 
         function out = jsonencode(obj)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = jsonencode([]);
             else
                 out = jsonencode(obj.Value);

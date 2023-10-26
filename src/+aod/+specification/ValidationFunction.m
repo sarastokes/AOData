@@ -1,8 +1,8 @@
-classdef ValidationFunction < aod.specification.Validator
+classdef ValidationFunction < aod.schema.Validator
 % Validation functions for dataset
 %
 % Superclass:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
 %   obj = aod.specification.ValdiationFunction(input)
@@ -35,9 +35,9 @@ classdef ValidationFunction < aod.specification.Validator
             if nargin < 2
                 parent = [];
             end
-            obj = obj@aod.specification.Validator(parent);
-            
-            if nargin > 0 
+            obj = obj@aod.schema.Validator(parent);
+
+            if nargin > 0
                 if ~isempty(input)
                     obj.setValue(input);
                 end
@@ -46,7 +46,7 @@ classdef ValidationFunction < aod.specification.Validator
     end
 
     % aod.specification.Specification methods
-    methods 
+    methods
         function setValue(obj, input)
             if aod.util.isempty(input)
                 obj.Value = {};
@@ -66,7 +66,7 @@ classdef ValidationFunction < aod.specification.Validator
             if isempty(obj.Value)
                 tf = true;
                 isValid = [];
-                return 
+                return
             end
 
             isValid = false(1, numel(obj.Value));
@@ -82,7 +82,7 @@ classdef ValidationFunction < aod.specification.Validator
                 isValid(i) = tf;
 
                 if ~tf && ~isempty(iME)
-                    ME = cat(2, ME, iME);    
+                    ME = cat(2, ME, iME);
                     % obj.notifyListeners(sprintf(...
                     %     "%s failed.", func2str(obj.Value{i})));
                 end
@@ -118,7 +118,7 @@ classdef ValidationFunction < aod.specification.Validator
             end
 
             [tf, output] = isfunctionhandle(input);
-            if ~tf 
+            if ~tf
                 error('validateFunctionHandles:InvalidInput',...
                     'Input must be function handle, cell of function handles or text convertable to a function handle');
             end
@@ -126,7 +126,7 @@ classdef ValidationFunction < aod.specification.Validator
     end
 
     % MATLAB built-in methods
-    methods 
+    methods
         function tf = isempty(obj)
             if ~isscalar(obj)
                 tf = arrayfun(@isempty, obj);
@@ -149,7 +149,7 @@ classdef ValidationFunction < aod.specification.Validator
 
             tf = strcmp(text(obj), text(other));
         end
-        
+
         function out = jsonencode(obj)
             if isempty(obj)
                 out = jsonencode([]);
@@ -158,4 +158,4 @@ classdef ValidationFunction < aod.specification.Validator
             end
         end
     end
-end 
+end

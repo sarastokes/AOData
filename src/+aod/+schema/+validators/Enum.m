@@ -1,8 +1,8 @@
-classdef Enum < aod.specification.Validator
+classdef Enum < aod.schema.Validator
 % ENUM
 %
 % Superclasses:
-%   aod.specification.Specification
+%   aod.schema.Validator
 %
 % Constructor:
 %   obj = aod.schema.validators.Enum(parent, value)
@@ -19,7 +19,7 @@ classdef Enum < aod.specification.Validator
 
     methods
         function obj = Enum(parent, value)
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
             obj.setValue(value);
         end
     end
@@ -38,7 +38,7 @@ classdef Enum < aod.specification.Validator
         end
 
         function [tf, ME] = validate(obj, input)
-            if isempty(obj)
+            if ~obj.isSpecified()
                 tf = true; ME = [];
                 return
             end
@@ -60,7 +60,7 @@ classdef Enum < aod.specification.Validator
         end
 
         function out = text(obj)
-            if obj.isempty()
+            if ~obj.isSpecified()
                 out = "[]";
             else
                 out = obj.Value;
@@ -70,8 +70,8 @@ classdef Enum < aod.specification.Validator
 
     % MATLAB builtin methods
     methods
-        function tf = isempty(obj)
-            tf = aod.util.isempty(obj.Value);
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
         end
     end
 end

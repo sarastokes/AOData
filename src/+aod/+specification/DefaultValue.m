@@ -1,8 +1,8 @@
-classdef DefaultValue < aod.specification.Validator
+classdef DefaultValue < aod.schema.Validator
 % Specifies a default value for a property
 %
 % Superclasses:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
 %   aod.specification.DefaultValue(input
@@ -19,7 +19,7 @@ classdef DefaultValue < aod.specification.Validator
             if nargin < 2
                 parent = [];
             end
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
 
             if nargin > 0
                 obj.setValue(input);

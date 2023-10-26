@@ -1,10 +1,10 @@
-classdef MatchType 
+classdef MatchType
 % Enumeration of possible outputs when comparing two schema entries
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    enumeration 
+    enumeration
         SAME
         CHANGED
         MISSING
@@ -12,7 +12,7 @@ classdef MatchType
         UNKNOWN
     end
 
-    methods 
+    methods
         function rgb = getColor(obj)
             switch obj
                 case MatchType.CHANGED
@@ -29,11 +29,11 @@ classdef MatchType
 
     methods (Static)
         function obj = get(input)
-            import aod.specification.MatchType 
+            import aod.schema.MatchType
 
-            if isa(input, 'aod.specification.MatchType')
+            if isa(input, 'aod.schema.MatchType')
                 obj = input;
-                return 
+                return
             end
 
             if ~istext(input)

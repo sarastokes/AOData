@@ -1,8 +1,8 @@
-classdef Maximum < aod.specification.Validator
+classdef Maximum < aod.schema.Validator
 % Specifies a maximum (inclusive) value for a property.
 %
 % Superclasses:
-%   aod.specification.Validator
+%   aod.schema.Validator
 %
 % Constructor:
 %   aod.specification.Maximum(value)
@@ -24,7 +24,7 @@ classdef Maximum < aod.specification.Validator
                 value       {mustBeScalarOrEmpty, mustBeNumeric}    = []
             end
 
-            obj = obj@aod.specification.Validator(parent);
+            obj = obj@aod.schema.Validator(parent);
             if ~isempty(value)
                 obj.setValue(value);
             end
@@ -42,7 +42,7 @@ classdef Maximum < aod.specification.Validator
 
         function [tf, ME] = validate(obj, input)
             ME = [];
-            if obj.isempty()
+            if ~obj.isSpecified()
                 tf = true;
             else
                 tf = all(input <= obj.Value);
@@ -54,7 +54,7 @@ classdef Maximum < aod.specification.Validator
         end
 
         function out = text(obj)
-            if obj.isempty()
+            if ~obj.isSpecified()
                 out = "[]";
             else
                 out = value2string(obj.Value);

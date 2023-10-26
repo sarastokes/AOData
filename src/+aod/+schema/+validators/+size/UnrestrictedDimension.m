@@ -1,12 +1,12 @@
-classdef UnrestrictedDimension < aod.specification.Validator
+classdef UnrestrictedDimension < aod.schema.Validator
 % An unrestricted dimension, equivalent of ":"
 %
 % Parent:
-%   aod.specification.Size
+%   aod.schema.validators.Size
 %
 % Constructor:
-%   obj = aod.specification.size.UnrestrictedDimension()
-%   obj = aod.specification.size.UnrestrictedDimension()
+%   obj = aod.schema.validators.size.UnrestrictedDimension()
+%   obj = aod.schema.validators.size.UnrestrictedDimension()
 %
 
 % By Sara Patterson, 2023 (AOData)
@@ -36,14 +36,14 @@ classdef UnrestrictedDimension < aod.specification.Validator
         function output = text(~)
             output = ":";
         end
+
+        function tf = isSpecified(obj)
+            tf = true;
+        end
     end
 
     % MATLAB builtin methods
     methods
-        function tf = isempty(obj)
-            tf = builtin('isempty', obj);
-        end
-
         function tf = isequal(obj, other)
             tf = isa(other, class(obj));
         end

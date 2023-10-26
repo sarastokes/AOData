@@ -1,4 +1,4 @@
-classdef EnumeratedTypeTest < matlab.unittest.TestCase 
+classdef EnumeratedTypeTest < matlab.unittest.TestCase
 % Test AOData's enumerated types
 %
 % Description:
@@ -66,7 +66,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEqual(out, FilterTypes.PATH);
             out = FilterTypes.init('uuid');
             testCase.verifyEqual(out, FilterTypes.UUID);
-            
+
             testCase.verifyError(...
                 @() FilterTypes.init('BadInput'),...
                 "init:UnknownType");
@@ -84,9 +84,9 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             out = H5NodeTypes.get('link');
             testCase.verifyEqual(out, H5NodeTypes.LINK);
 
-            testCase.verifyEqual(H5NodeTypes.get(H5NodeTypes.LINK),... 
+            testCase.verifyEqual(H5NodeTypes.get(H5NodeTypes.LINK),...
                 H5NodeTypes.LINK);
-            
+
             testCase.verifyError(...
                 @()H5NodeTypes.get('bad'), 'get:UnknownNodeType');
         end
@@ -94,7 +94,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
         function AODataNodesInit(testCase)
             import aod.app.util.AONodeTypes
-            
+
             out = AONodeTypes.init('Link');
             testCase.verifyEqual(out, AONodeTypes.LINK);
             out = AONodeTypes.init('entity');
@@ -161,7 +161,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="MatchType")
         function MatchTypeInit(testCase)
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
             testCase.verifyEqual(MatchType.get('same'),...
                 MatchType.SAME);
@@ -184,7 +184,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
                 @()MatchType.get(123), 'get.InvalidInput');
         end
     end
-    
+
     methods (Test, TestTags=["GroupNameType"])
         function GroupNameTypeInit(testCase)
             import aod.app.util.GroupNameType
@@ -223,7 +223,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             % Return if GroupLoadState
             testCase.verifyEqual(GroupLoadState.init(GroupLoadState.NAME),...
                 GroupLoadState.NAME);
-            
+
             % Error on unrecognized input
             testCase.verifyThat(...
                 @() GroupLoadState.init('badinput'),...
@@ -244,9 +244,9 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags="SizeTypes")
-    
+
         function SizeTypesInit(testCase)
-            import aod.specification.SizeTypes
+            import aod.schema.validators.size.SizeTypes
 
             testCase.verifyEqual(SizeTypes.get('scalar'), SizeTypes.SCALAR);
             testCase.verifyEqual(SizeTypes.get('row'), SizeTypes.ROW);
@@ -260,7 +260,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
 
         function SizeTypesConversion(testCase)
-            import aod.specification.SizeTypes
+            import aod.schema.validators.size.SizeTypes
 
             testCase.verifyEqual(SizeTypes.SCALAR.getSizing(), "(1,1)");
             testCase.verifyEqual(SizeTypes.ROW.getSizing(), "(1,:)");
@@ -272,7 +272,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
         end
 
         function SizeTypesValidator(testCase)
-            import aod.specification.SizeTypes
+            import aod.schema.validators.size.SizeTypes
 
             fcn = SizeTypes.SCALAR.getValidator();
             testCase.verifyTrue(fcn(1));
@@ -289,7 +289,7 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             fcn = SizeTypes.MATRIX.getValidator();
             testCase.verifyTrue(fcn(eye(3)));
             testCase.verifyFalse(fcn(zeros(3,3,3)));
-            
+
             fcn = SizeTypes.NDARRAY.getValidator(zeros(3,3,3));
             testCase.verifyFalse(fcn(eye(3)));
             testCase.verifyTrue(fcn(zeros(3,3,3)));
@@ -374,4 +374,4 @@ classdef EnumeratedTypeTest < matlab.unittest.TestCase
             testCase.verifyEmpty(expType.parentContainer());
         end
     end
-end 
+end

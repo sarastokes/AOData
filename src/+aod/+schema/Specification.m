@@ -5,10 +5,10 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 %   handle, matlab.mixin.Heterogeneous
 %
 % Constructor:
-%   obj = aod.specification.Specification(parent)
+%   obj = aod.schema.Specification(parent)
 %
 % See also:
-%   aod.specification.Validator, aod.specification.Decorator
+%   aod.schema.Validator, aod.schema.Decorator, aod.schema.Default
 
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
@@ -20,6 +20,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
     methods (Abstract)
         out = text(obj)
         setValue(obj, input)
+        tf = isSpecified(obj)
     end
 
     methods
@@ -38,7 +39,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
             %   out = compare(obj, other)
             % --------------------------------------------------------------
 
-            import aod.specification.MatchType
+            import aod.schema.MatchType
 
             if ~isa(other, class(obj))
                 error('compare:UnlikeSpecificationTypes',...
@@ -48,9 +49,9 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
             if isequal(obj, other)
                 out = MatchType.SAME;
             else
-                if isempty(obj)
+                if ~obj.isSpecified()
                     out = MatchType.MISSING;
-                elseif isempty(other)
+                elseif ~other.isSpecified()
                     out = MatchType.UNEXPECTED;
                 else
                     out = MatchType.CHANGED;
@@ -80,7 +81,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         function out = getValueForYAML(obj)
             % Note that values need to be wrapped in a cell array to
             % ensure proper conversion to YAML
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = {yaml.Null};
             else
                 out = {obj.toYAML()};

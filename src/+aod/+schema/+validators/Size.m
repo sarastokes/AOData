@@ -1,23 +1,21 @@
-classdef Size < aod.specification.Validator
+classdef Size < aod.schema.Validator
 % Container for the expected size of a dataset or attribute
 %
 % Superclasses:
-%   aod.specification.Specification
+%   aod.schema.Specification
 %
 % Constructor:
-%   obj = aod.specification.Size(input)
+%   obj = aod.schema.Size(input)
 %
 % Methods:
 %   idx = isfixed(obj)
+%   tf = isSpecified(obj)
 %
-%   tf = isempty(obj)
 %   tf = isequal(obj, other)
 %   tf = isscalar(obj)
 %   tf = isvector(obj)
 %   out = jsonencode(obj)
 %   x = ndims(obj)
-%
-% TODO: isempty is acting oddly for the Value classes, coded around for now
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -26,7 +24,7 @@ classdef Size < aod.specification.Validator
 
     properties (SetAccess = private)
         Value           = []
-        SizeType        aod.specification.SizeTypes = aod.specification.SizeTypes.UNDEFINED   
+        SizeType        aod.schema.validators.size.SizeTypes = aod.schema.validators.size.SizeTypes.UNDEFINED
     end
 
     methods
@@ -34,15 +32,15 @@ classdef Size < aod.specification.Validator
             if nargin < 2
                 parent = [];
             end
-            obj = obj@aod.specification.Validator(parent);
-            
+            obj = obj@aod.schema.Validator(parent);
+
             if nargin > 0
                 obj.setValue(input);
             end
         end
     end
 
-    % aod.specification.Specification methods
+    % aod.schema.Specification methods
     methods
         function setValue(obj, input)
             % Set the Size value
@@ -50,20 +48,20 @@ classdef Size < aod.specification.Validator
             % Syntax:
             %   setValue(obj, input)
             % -----------------------------------------------------------
-            
-            import aod.specification.SizeTypes
+
+            import aod.schema.validators.size.SizeTypes
 
             if aod.util.isempty(input) || (istext(input) && input == "[]")
                 obj.Value = [];
                 obj.SizeType = SizeTypes.UNDEFINED;
-                return 
+                return
             end
 
             try
                 obj.SizeType = SizeTypes.get(input);
                 input = obj.SizeType.getSizing();
             catch
-                
+
             end
 
             if istext(input)
@@ -75,7 +73,7 @@ classdef Size < aod.specification.Validator
             elseif isnumeric(input)
                 obj.Value = obj.parseNumeric(input);
                 obj.setSizeType();
-            end 
+            end
         end
 
         function [tf, ME] = validate(obj, input)
@@ -88,7 +86,7 @@ classdef Size < aod.specification.Validator
             ME = [];
 
             % Check whether size is specified
-            if isempty(obj)
+            if ~obj.isSpecified()
                 tf = true;
                 return
             end
@@ -140,6 +138,15 @@ classdef Size < aod.specification.Validator
 
             out = string(out);
         end
+
+        function tf = isSpecified(obj)
+            % Determine whether object is empty (aka UNDEFINED)
+            %
+            % Syntax:
+            %   tf = isSpecified(obj)
+            % -------------------------------------------------------------
+            tf = obj.SizeType ~= aod.schema.validators.size.SizeTypes.UNDEFINED;
+        end
     end
 
     methods (Access = protected)
@@ -150,12 +157,12 @@ classdef Size < aod.specification.Validator
 
     methods (Access = private)
         function setSizeType(obj)
-            % Set aod.specification.SizeTypes
+            % Set the SizeType
             %
             % Syntax:
             %   setSizeType(obj)
             % -------------------------------------------------------------
-            import aod.specification.SizeTypes
+            import aod.schema.validators.size.SizeTypes
 
             if numel(obj.Value) == 0
                 obj.SizeType = SizeTypes.UNDEFINED;
@@ -169,7 +176,7 @@ classdef Size < aod.specification.Validator
                 else
                     obj.SizeType = SizeTypes.COLUMN;
                 end
-            else 
+            else
                 obj.SizeType = SizeTypes.MATRIX;
             end
         end
@@ -185,7 +192,7 @@ classdef Size < aod.specification.Validator
             %       A specific dimension to return (default all dims)
             % -------------------------------------------------------------
 
-            idx = arrayfun(@(x) isa(x, 'aod.specification.size.FixedDimension'), obj.Value);
+            idx = arrayfun(@(x) isa(x, 'aod.schema.validators.size.FixedDimension'), obj.Value);
             if nargin > 1
                 idx = idx(whichDim);
             end
@@ -197,7 +204,7 @@ classdef Size < aod.specification.Validator
             input = convertStringsToChars(input);
 
             [startIdx, endIdx] = regexp(input, "[\d:]{1,10}");
-            if isempty(startIdx) 
+            if isempty(startIdx)
                 error('Size:InvalidTextInput',...
                     'Text input must be numeric specification, "row", "column", "scalar", "matrix", or "undefined"')
             elseif numel(startIdx) == 1
@@ -209,9 +216,9 @@ classdef Size < aod.specification.Validator
             for i = 1:numel(startIdx)
                 iSize = input(startIdx(i):endIdx(i));
                 if strcmp(iSize, ':')
-                   value = cat(2, value, aod.specification.size.UnrestrictedDimension());
+                   value = cat(2, value, aod.schema.validators.size.UnrestrictedDimension());
                 else
-                    value = cat(2, value, aod.specification.size.FixedDimension(iSize));
+                    value = cat(2, value, aod.schema.validators.size.FixedDimension(iSize));
                 end
             end
 
@@ -222,25 +229,25 @@ classdef Size < aod.specification.Validator
                 error('Size:InvalidDimensions', ...
                 'Dimensionality specification cannot be scalar');
             end
-            
+
             value = [];
             for i = 1:numel(input)
-                value = [value, aod.specification.size.FixedDimension(input(i))];
+                value = [value, aod.schema.validators.size.FixedDimension(input(i))];
             end
         end
 
         function value = parseMetaProperty(input)
             if isempty(input.Validation) || isempty(input.Validation.Size)
                 value = [];
-            else 
+            else
                 mcSize = input.Validation.Size;
                 value = [];
                 for i = 1:numel(mcSize)
                     if isa(mcSize(i), 'meta.FixedDimension')
-                        value = [value, aod.specification.size.FixedDimension(...
+                        value = [value, aod.schema.validators.size.FixedDimension(...
                             double(mcSize(i).Length))];
                     else
-                        value = [value, aod.specification.size.UnrestrictedDimension];
+                        value = [value, aod.schema.validators.size.UnrestrictedDimension];
                     end
                 end
             end
@@ -248,25 +255,16 @@ classdef Size < aod.specification.Validator
     end
 
     % MATLAB built-in methods
-    methods 
-        function tf = isempty(obj)
-            % Determine whether object is empty (aka UNDEFINED)
-            %
-            % Syntax:
-            %   tf = isempty(obj)
-            % -------------------------------------------------------------
-            tf = obj.SizeType == aod.specification.SizeTypes.UNDEFINED;
-        end
-
+    methods
         function tf = isequal(obj, other)
             % Determine whether two objects are equal
             %
             % Syntax:
             %   tf = isequal(obj, other)
             % -------------------------------------------------------------
-            if ~isa(other, 'aod.specification.Size')
+            if ~isa(other, 'aod.schema.Size')
                 tf = false;
-                return 
+                return
             end
 
             if numel(obj.Value) ~= numel(other.Value)
@@ -290,7 +288,7 @@ classdef Size < aod.specification.Validator
             % Syntax:
             %   out = jsonencode(obj)
             % -------------------------------------------------------------
-            if isempty(obj)
+            if ~obj.isSpecified()
                 out = jsonencode([]);
             else
                 out = jsonencode(obj.text());
@@ -306,7 +304,7 @@ classdef Size < aod.specification.Validator
             % Notes:
             %   - If Size is empty (a.k.a. undefined), value will be empty
             % -------------------------------------------------------------
-            if numel(obj) == 0
+            if numel(obj.Value) == 0
                 value = [];
             else
                 value = numel(obj.Value);
@@ -320,7 +318,7 @@ classdef Size < aod.specification.Validator
             %   tf = isscalar(obj)
             % -------------------------------------------------------------
             tf = false;
-            if obj.isempty()
+            if ~obj.isSpecified()
                 return
             end
 
@@ -337,13 +335,13 @@ classdef Size < aod.specification.Validator
             % Syntax:
             %   tf = isvector(obj)
             % -------------------------------------------------------------
-            if isempty(obj)
+            if ~obj.isSpecified()
                 tf = false;
-                return 
+                return
             end
 
             fixedDims = obj.isfixed();
-            if ndims(obj) ~= 2 || nnz(fixedDims) == 0 
+            if ndims(obj) ~= 2 || nnz(fixedDims) == 0
                 tf = false;
                 return
             end
@@ -354,7 +352,7 @@ classdef Size < aod.specification.Validator
                     idx(i) = true;
                 end
             end
-            
+
             tf = (nnz(idx) == 1);
         end
     end
