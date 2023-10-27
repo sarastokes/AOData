@@ -81,6 +81,35 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             record = parent;
         end
 
+        function parentObj = getParent(obj, parentType)
+            arguments
+                obj 
+                parentType      {mustBeMember(parentType, ["", "Record", "Collection", "Entity"])} = ""
+            end
+
+            parentObj = obj.Parent;
+            if isempty(parentObj) || parentType == ""
+                return
+            end
+
+            switch parentType
+                case "Record"
+                    parentClass = "aod.schema.Record";
+                case "Collection"
+                    parentClass = "aod.schema.SchemaCollection";
+                case "Entity"
+                    parentClass = "aod.common.Entity";
+            end
+
+            % Traverse hierarchy to match class
+            while ~isSubclass(parentObj, parentClass)
+                parentObj = parentObj.Parent;
+                if isempty(parentObj)
+                    break
+                end
+            end
+        end
+
         function opts = getOptions(obj)
             % Required is always an option, others are subclass-specific
             opts = [obj.OPTIONS, "Required"];
@@ -185,7 +214,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Class.setValue(value);
             obj.checkIntegrity(true);
         end
-
 
         function [tf, ME] = validate(obj, value, errorType)
             % Exception should contain:

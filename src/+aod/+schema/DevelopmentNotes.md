@@ -58,12 +58,13 @@ Should entire package be in one file or separate files referenced by a "schema r
 ### Class Hierarchy
 The each parent-child relationship in the hierarchy is one-to-many. Parent classes have properties for containing the child classes. The child classes maintain a reference to the parent class with a property called `Parent`.
 - **`aod.common.Entity`**
-  - `SchemaManager` (`AttributeManager` and `DatasetManager`)
-    - `Entry`: a specific attribute or dataset defined by a `Primitive` which has a specific `PrimitiveType`
-      - `Specification` (`Validator` and `Decorator`) - the PrimitiveType determines specifications for a given Entry
+  - `EntitySchema`
+    - *`SchemaCollection`*: three subclasses `AttributeCollection`, `FileCollection` and `DatasetCollection`
+      - `Record`: a specific attribute or dataset defined by a *`Primitive`* which has a specific `PrimitiveType`. Some primitive types can contain other primitives (*`Container`*)
+        - Multiple *`Specification`* (*`Validator`*, *`Decorator`* and `Default`) - the PrimitiveType determines specifications for a given Record
 
 ### Primitives
-Each primitive inherits from `aod.specification.primitives.Primitive` and include a specific set of validators (discussed below).
+Each primitive inherits from `aod.schema.primitives.Primitive` and include a specific set of validators (discussed below). Primitives in *italics* are Containers that hold other primitives (subclasses of `aod.schema.primitives.Container`). They map to H5T_COMPOUND so can only hold valid primitive types (boolean, date, duration, file, integer, number, text).
 
 |Name|Matlab|Python| Description|
 |----|------|--------|------------|
@@ -73,8 +74,9 @@ Each primitive inherits from `aod.specification.primitives.Primitive` and includ
 |File|string|string|An absolute or relative file path|
 |Integer|uint8, int8, etc...|int||
 |Link|aod.common.Entity subclasses|||
+|*List*|cell|list|Contains items of different types|
 |Number|double|float||
-|Object|struct, handle|dict||
+|*Object*|struct, handle|dict||
 |Text|string| string||
 
 You can have a `double` that is specified as an __Integer__. Nevermind?? Just removed support for this on 25Oct2023.
@@ -84,15 +86,16 @@ Currently not supporting `char` as it can cause issues with the queries (e.g., e
 ### Validators
 | Name | Types | Description |
 |------|-------|-------------|
-|Count|Text||
+|Class|all|Specifies allowable MATLAB classes (some primitives set automatically)|
 |EntityType|Link|Specifies the allowable entity types for a link (e.g., `["System", "Channel"]` enforces only systems and channels)|
-|Enum|Text| Specifies an allowable set of answers (e.g., `["Low", "Medium", "High"]` restricts the value to only those three words) |
+|Enum|Text, Integer, Number| Specifies an allowable set of answers (e.g., `["Low", "Medium", "High"]` restricts the value to only those three words) |
 |ExtensionType|File| Specifies allowable file extensions (e.g., `[".json", ".txt"]`|
+|Interval|duration|The time interval (seconds, minutes, etc see `IntervalTypes`)|
 |Length|Text   | Specifies the length of a string (e.g., "test" is 4)|
 |Maximum|Number, Integer| Specifies the *inclusive* maximum allowable number (e.g., `-1` enforces only negative numbers and not 0)|
 |Minimium|Number, Integer| Specifies the *inclusive* minimum allowable number (e.g., `0` enforces only positive numbers and 0)|
-|Regexp|Text| Uses regular expressions to validate text |
-
+|Regexp|Text, File| Uses regular expressions to validate text |
+|Size|all|The specific size or number of dimensions|
 
 Some primitives will set default values (unless user provides something more specific). This includes:
 - _Integer_: if the class is an integer class, the appropriate *Minimum* and *Maximum* values will be set (e.g., `uint8` sets the minimum to 0 and the maximum to 255).
@@ -149,6 +152,20 @@ Basic types (**validator**, *decorator*):
 - Values are only validated if not empty (or not "" in the case of `string`)
 - Avoid `char`, `struct` and `containers.Map`
 
+### Validation error messages
+For a Record that is not nested:
+- BOOLEAN Size violation for Dataset "DsetName" in EPOCH "Epoch1" of "ExptName" (\Experiment\Epochs\Epoch1)
+- `PrimitiveType` `ValidatorType` violation for  `CollectionType` **RecordName** in `EntityType` **EntityName** of **ExperimentName** (*EntityPath*)
+
+For a Primitive that is nested and named:
+- BOOLEAN Size violation for "ItemName" in TABLE Dataset "DsetName" in EPOCH "Epoch1" of "ExptName" (\Experiment\Epochs\Epoch1)
+- `PrimitiveType` `ValidatorType` violation for **ItemName** in `ContainerType` `CollectionType` **RecordName** in `EntityType` **EntityName** of **ExperimentName** (*EntityPath*)
+
+Necessary access from Validator (provides `ValidatorType` and exception message):
+- getPrimitive - provides `PrimitiveType` (if nested, **ItemName** or **ItemID**)
+- getRecord - provides **RecordName** (if nested extract `ContainerType`)
+- getCollection - provides `CollectionType`
+- getEntity - provides `EntityType`, **EntityName**, **ExperimentName** and *EntityPath*
 
 ### Interaction
 ```matlab
@@ -213,7 +230,7 @@ obj.set('TextData', 'TEXT',...
 "hey"
 ```
 
-##### Object
+##### List
 Note that some validators are set automatically. For the example below, "Count" is set to 3.
 
 To define items starting from scratch:
@@ -227,7 +244,7 @@ To modify existing or inherited items without reseting;
 4. Existing fields could be reordered with `reorderFields`
 
 ```matlab
-obj.set('ArrayData', 'OBJECT',...
+obj.set('ArrayData', 'LIST',...
     'Items', {
         {'NUMBER', 'Size', '(1,1)', 'Description', 'A number'},
         {'TEXT', 'Length', 3, 'Description', 'A three letter string'},

@@ -20,7 +20,7 @@ classdef PrimitiveTypes
         INTEGER
         LINK
         NUMBER
-        OBJECT
+        LIST
         TABLE
         TEXT
         UNKNOWN
@@ -84,7 +84,7 @@ classdef PrimitiveTypes
             elseif isstring(data)
                 obj = PrimitiveTypes.TEXT;
             elseif iscell(data)
-                obj = PrimitiveTypes.OBJECT;
+                obj = PrimitiveTypes.LIST;
             elseif istable(data)
                 obj = PrimitiveTypes.TABLE;
             elseif istext(data)

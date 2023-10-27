@@ -1,13 +1,13 @@
-classdef Object < aod.schema.primitives.Container
+classdef List < aod.schema.primitives.Container
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.OBJECT
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.LIST
         OPTIONS = ["Size", "Items", "Default", "Description"];
         VALIDATORS = ["Class", "Size"] % FIELDS
     end
 
     methods
-        function obj = Object(name, parent, varargin)
+        function obj = List(name, parent, varargin)
             obj = obj@aod.schema.primitives.Container(name, parent);
 
             % Default values

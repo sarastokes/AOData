@@ -1,5 +1,5 @@
-classdef TimeUnitTypes
-% TIMEUNITTYPES
+classdef IntervalTypes
+% INTERVALTYPES
 %
 % Description:
 %   Enumeration of time units
@@ -19,40 +19,40 @@ classdef TimeUnitTypes
 
     methods (Static)
         function obj = get(input)
-            import aod.schema.primitives.time.TimeUnitTypes
+            import aod.schema.validators.time.IntervalTypes
 
-            if isa(input, 'aod.schema.primitives.time.TimeUnitTypes')
+            if isa(input, 'aod.schema.validators.time.IntervalTypes')
                 obj = input;
                 return
             end
 
             try
-                obj = aod.schema.primitives.time.TimeUnitTypes(upper(input));
+                obj = aod.schema.validators.time.IntervalTypes(upper(input));
                 return
             catch
             end
 
             if ~istext(input)
                 error('get:InvalidInput',...
-                    'Input must be a TimeUnitTypes or a string/char of a TimeUnitTypes, was %s',...
+                    'Input must be a IntervalTypes or a string/char of a IntervalTypes, was %s',...
                     class(input));
             end
 
             switch lower(input)
                 case {'s', 'sec', 'second', 'seconds'}
-                    out = TimeUnitTypes.SECONDS;
+                    out = IntervalTypes.SECONDS;
                 case {'m', 'min', 'minute', 'minutes'}
-                    out = TimeUnitTypes.MINUTES;
+                    out = IntervalTypes.MINUTES;
                 case {'h', 'hr', 'hour', 'hours'}
-                    out = TimeUnitTypes.HOURS;
+                    out = IntervalTypes.HOURS;
                 case {'d', 'day', 'days'}
-                    out = TimeUnitTypes.DAYS;
+                    out = IntervalTypes.DAYS;
                 case {'y', 'yr', 'year', 'years'}
-                    out = TimeUnitTypes.YEARS;
+                    out = IntervalTypes.YEARS;
                 case {'ms', 'msec', 'millisecond', 'milliseconds'}
-                    out = TimeUnitTypes.MILLISECONDS;
+                    out = IntervalTypes.MILLISECONDS;
                 otherwise
-                    error('get:InvalidTimeUnitType',...
+                    error('get:InvalidIntervalType',...
                         'Invalid input "%s". Valid inputs are: seconds, minutes, hours, days, years or milliseconds', input);
             end
 
@@ -60,8 +60,8 @@ classdef TimeUnitTypes
         end
 
         function out = getFormatFcn(input)
-            out = aod.schema.primitives.time.TimeUnitTypes.get(input);
-            if out == aod.schema.primitives.time.TimeUnitTypes.UNDEFINED
+            out = aod.schema.validators.time.IntervalTypes.get(input);
+            if out == aod.schema.validators.time.IntervalTypes.UNDEFINED
                 out = @(x) x;
             else
                 eval(sprintf('out = @(x) %s(x);', input));
