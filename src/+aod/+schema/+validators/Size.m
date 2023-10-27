@@ -16,6 +16,8 @@ classdef Size < aod.schema.Validator
 %   tf = isvector(obj)
 %   out = jsonencode(obj)
 %   x = ndims(obj)
+%
+% TODO: custom display so human-readable size is shown in disp()
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

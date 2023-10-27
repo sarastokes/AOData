@@ -29,6 +29,11 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         isInitializing  (1,1)   logical = true
     end
 
+    properties (Hidden, SetAccess = private)
+        % Whether primitive is part of a Container subclass
+        isNested        (1,1)   logical = false
+    end
+
     properties (Abstract, Hidden, SetAccess = protected)
         % These are the fields users can set with key/value inputs.
         % They are assigned in the order listed, so one option can be
@@ -58,6 +63,22 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Class = aod.schema.validators.Class([], obj);
             obj.Default = aod.schema.Default(obj, []);
             obj.Description = aod.schema.decorators.Description([], obj);
+        end
+
+        function record = getRecord(obj)
+            if isempty(obj.Parent)
+                record = [];
+                return
+            end
+        
+            parent = obj.Parent;
+            while ~isa(parent, 'aod.schema.Record')
+                parent = parent.Parent;
+                if isempty(parent)
+                    break
+                end
+            end
+            record = parent;
         end
 
         function opts = getOptions(obj)
@@ -335,7 +356,9 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             mustBeSubclass(parent, ["aod.schema.Record", "aod.schema.primitives.Container"]);
             if isa(parent, 'aod.schema.primitives.Container')
                 % Check if table is allowed, throw error if not
-
+                obj.isNested = true;
+            else
+                obj.isNested = false;
             end
             obj.Parent = parent;
         end

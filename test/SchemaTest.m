@@ -16,6 +16,39 @@ classdef SchemaTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
 
+    methods (Test, TestTags="IndexedCollection")
+        function IndexedCollection(testCase)
+            obj = aod.schema.collections.IndexedCollection();
+            testCase.verifyEqual(obj.Count, 0);
+
+            % Add a primitive
+            obj.add(aod.schema.primitives.Boolean("Test", obj, "Size", "(1,1)"));
+            testCase.verifyEqual(obj.Count, 1);
+
+            % Remove a primitive
+            obj.remove("Test");
+            testCase.verifyEqual(obj.Count, 0);
+
+            % Re-add a primitive, then another
+            obj.add(aod.schema.primitives.Boolean("P1", obj, "Default", false));
+            obj.add(aod.schema.primitives.Number("P2", obj, "Size", "(1,1)", "Units", "mV"));
+            testCase.verifyEqual(obj.Count, 2);
+
+            testCase.verifyEqual(obj.has("P1"));
+            testCase.verifyClass(obj.get("P1"), "aod.schema.primitives.Boolean");
+            testCase.verifyClass(obj.get("P2"), "aod.schema.primitives.Number");
+        end
+
+        function IndexedCollectionErrors(testCase)
+            obj = aod.schema.collections.IndexedCollection([]);
+            testCase.verifyError(...
+                @() obj.get("P1"), "get:PrimitiveNotFound");
+            testCase.verifyWarning(...
+                @() obj.get("P1", "WARNING"));
+
+        end
+    end
+
     methods (Test, TestTags="Entry")
         function Entry(testCase)
             obj = aod.schema.Record([], 'Test', 'Number',...

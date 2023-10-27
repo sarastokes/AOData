@@ -8,13 +8,13 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
 %   - Subclasses need to decide whether to create a new field or assign to
 %   an existing field. Container takes indices into the Collection property
 %   and if the subclass identifies fields in another way (e.g., keys), that
-%   must be handled before passing to a Container function. 
+%   must be handled before passing to a Container function.
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (Abstract, SetAccess = protected)
-        Collection              %aod.schema.PrimitiveCollection
+    properties (SetAccess = protected)
+        Collection          aod.schema.collections.IndexedCollection
     end
 
     properties (Hidden, SetAccess = protected)
@@ -28,14 +28,24 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             aod.schema.primitives.PrimitiveTypes.BOOLEAN];
     end
 
+    properties (Dependent)
+        numItems        (1,1)
+    end
+
     methods
         function obj = Container(name, parent, varargin)
             if nargin < 3
                 parent = [];
             end
             obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj.Collection = aod.schema.collections.IndexedCollection(obj);
+        end
+    end
 
-            obj.addItem(varargin{:});
+    % Dependent set/get methods
+    methods
+        function value = get.numItems(obj)
+            value = obj.Collection.Count;
         end
     end
 
@@ -44,23 +54,32 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             primitive = obj.Collection.get(ID);
         end
 
-        function setItem(obj, varargin)
-            if isnumeric(varargin{1}) || istext(varargin{1})
-                ID = varargin{1};
-                obj.Collection.set(ID, varargin{2:end});
-            elseif iscell(varargin{1})
-                if nargin > 2
-                    cellfun(@(x) setItem(obj, x), varargin{:});
+        function setItems(obj, varargin)
+            if isempty(varargin{1})
+                return
+            end
+            if iscell(varargin{1})
+                for i = 1:numel(varargin)
+                    setItems(obj, varargin{i}{:});
+                end
+            else
+                if obj.isInitializing
+                    p = obj.createPrimitive(varargin{:});
+                    obj.addItem(p);
                 else
-                    obj.setItem(uncell(varargin{1}));
+                    obj.editItem(varargin{:});
                 end
             end
         end
 
+        function editItem(obj, ID, varargin)
+            obj.Collections.set(ID, varargin{:});
+        end
+
         function addItem(obj, newItem)
             arguments
-                obj
-                newItem           aod.schema.primitives.Primitive
+                obj         (1,1)   aod.schema.primitives.Container
+                newItem             aod.schema.primitives.Primitive
             end
 
             if ~isscalar(newItem)
@@ -74,27 +93,16 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
                     newItem.Name, obj.Name, string(newItem.PRIMITIVE_TYPE));
             end
 
-            obj.Collection = [obj.Collection; newItem];
-            if ~obj.Size.isSpecified
-                obj.setSize(sprintf("(:,%u", obj.Count));
-            else
-                obj.Size.Value(2).setValue(obj.Count);
-            end
+            obj.Collection.add(newItem);
         end
 
         function removeItem(obj, ID)
             obj.Collection.remove(ID);
-            % TODO: This is table-specific
-            if obj.Count == 0
-                obj.Size.Value(2) = aod.schema.validators.size.UnrestrictedDimension();
-            else
-                obj.Size.Value(2).setValue(obj.Count);
-            end
         end
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwError)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwError)
             arguments
                 obj
                 throwError     (1,1)   logical = false
@@ -104,19 +112,18 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
                 tf = true; ME = [];
                 return
             end
+            
+            [tf, ME, excObj] = obj.Collection.checkIntegrity();
 
-            excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
-            for i = 1:obj.Count
-                [iTF, iME] = obj.Collection(i).checkIntegrity(false);
-                if ~iTF
-                    excObj.addCause(iME);
-                end
-            end
-
-            ME = excObj.getException();
             if ~tf && throwError
                 throw(ME);
             end
+        end
+    end
+
+    methods (Access = protected)
+        function p = createPrimitive(obj, type, name, varargin)
+            p = aod.schema.util.createPrimitive(type, name, obj, varargin{:});
         end
     end
 end

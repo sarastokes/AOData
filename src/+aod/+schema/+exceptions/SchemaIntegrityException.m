@@ -15,6 +15,7 @@ classdef SchemaIntegrityException < handle
 
     properties (SetAccess = private)
         Exception
+        Triggers  % TODO: Log what triggered the MException causes
     end
 
     properties (Dependent)
@@ -22,22 +23,18 @@ classdef SchemaIntegrityException < handle
     end
 
     methods
-        function obj = SchemaIntegrityException(entry)
-            if isSubclass(entry, 'aod.schema.primitives.Primitive')
-                if isempty(entry.Parent)
-                    % This is for testing, perhaps eliminate bc messy
-                    obj.Exception = MException(...
-                        'checkIntegrity:SchemaConflictsDetected',...
-                        'Schema conflicts detected.');
-                else
-                    entry = entry.Parent;
-                end
+        function obj = SchemaIntegrityException(schemaObj)
+            record = schemaObj.getRecord();
+            if isempty(record)
+                % This is for testing, perhaps eliminate bc messy
+                obj.Exception = MException(...
+                    'checkIntegrity:SchemaConflictsDetected',...
+                    'Schema conflicts detected.');
+                return
             end
-            if isa(entry, 'aod.schema.Record')
-                obj.Exception = MException('checkIntegrity:SchemaConflictsDetected',...
-                    'Schema conflicts detected for "%s/%s" in %s',...
-                    entry.className, string(entry.Name), entry.ParentPath);
-            end
+            obj.Exception = MException('checkIntegrity:SchemaConflictsDetected',...
+                'Schema conflicts detected for "%s/%s" in %s',...
+                record.className, string(record.Name), record.ParentPath);
         end
 
         function value = get.hasErrors(obj)
