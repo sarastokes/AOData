@@ -33,8 +33,8 @@ classdef SchemaIntegrityException < handle
                 return
             end
             obj.Exception = MException('checkIntegrity:SchemaConflictsDetected',...
-                'Schema conflicts detected for "%s/%s" in %s',...
-                record.className, string(record.Name), record.ParentPath);
+                'Schema conflicts detected for "%s"',...
+                string(record.Name));
         end
 
         function value = get.hasErrors(obj)

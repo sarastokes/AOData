@@ -281,16 +281,13 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 
 
         function [tf, ME] = validate(obj, value, errorType)
-            % Exception should contain:
-            %   - Class and entry name
-            %   - Number of failures
-            %   - Names of failed validators
-
-            if nargin < 3
-                errorType = aod.infra.ErrorTypes.ERROR;
-            else
-                errorType = aod.infra.ErrorTypes.init(errorType);
+            arguments
+                obj
+                value
+                errorType           = aod.infra.ErrorTypes.ERROR
             end
+            
+            errorType = aod.infra.ErrorTypes.init(errorType);
 
             tf = true; MEs = [];
             numFailures = 0;

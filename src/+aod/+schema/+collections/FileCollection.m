@@ -49,6 +49,16 @@ classdef FileCollection < aod.schema.SchemaCollection
 
             add@aod.schema.SchemaCollection(obj, entry);
         end
+
+        function ip = getParser(obj)
+            % Amazingly this works
+            ip = aod.util.InputParser();
+            for i = 1:obj.Count
+                addParameter(ip, obj.Records(i).Name,...
+                    obj.Records(i).Primitive.Default, ...
+                    @(x) obj.Records(i).Primitive.validate(x));
+            end
+        end
     end
 
 

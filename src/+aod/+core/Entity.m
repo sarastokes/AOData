@@ -21,8 +21,6 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 %
 % Dependent properties:
 %   label                       string      (defined by specifyLabel)
-%   expectedAttributes          aod.specification.AttributeManager
-%   expectedDatasets            aod.specification.DatasetManager
 %
 % Public methods:
 %   h = getParent(obj, className)
@@ -80,6 +78,10 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         lastModified                datetime = datetime.empty()
     end
 
+    properties 
+        Schema
+    end
+
     properties (Hidden, SetAccess = private)
         % The entity's type, aod.common.EntityTypes
         entityType                  % aod.common.EntityTypes
@@ -95,10 +97,6 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     properties (Dependent)
         % Automated name from specifyLabel(), used for HDF5 group name if the name property is not set
         label                       char
-        % Attribute specifications
-        expectedAttributes          % aod.specification.AttributeManager
-        % Dataset specifications
-        expectedDatasets            % aod.specification.DatasetManager
     end
 
     properties (Hidden, Dependent)
@@ -137,6 +135,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
 
             % Initialize containers
+            obj.Schema = aod.schema.EntitySchema(obj);
             obj.files = aod.common.KeyValueMap();
             obj.attributes = aod.common.KeyValueMap();
 
@@ -145,9 +144,6 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
             % Set listeners for any SetObservable properties
             obj.assignListeners();
-
-            % Initialize DatasetManager for basis of expectedDatasets
-            obj.DatasetManager = aod.specification.DatasetManager.populate(class(obj));
         end
     end
 
@@ -155,15 +151,6 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     methods
         function value = get.label(obj)
             value = obj.specifyLabel();
-        end
-
-        function value = get.expectedAttributes(obj)
-            value = obj.specifyAttributes();
-            value.setClassName(class(obj));
-        end
-
-        function value = get.expectedDatasets(obj)
-            value = obj.specifyDatasets(obj.DatasetManager);
         end
 
         function value = get.groupName(obj)
@@ -294,26 +281,19 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %
             % Inputs:
             %   propName        char
-            %   specType        char    (default = "both")
-            %       Either "dataset", "attribute" or "both"
+            %   specType        char    (default = "all")
+            %       Either "dataset", "attribute", "file" or "all"
             %
             % Outputs:
             %   tf              logical
             %       Whether the dataset/attribute is expected
             % --------------------------------------------------------------
 
-            if nargin < 3 || strcmpi(specType, "both")
-                tf = any([obj.expectedDatasets.has(propName), obj.expectedAttributes.has(propName)]);
-                return
-            end
-
-            if ismember(lower(specType), ["attr", "attribute", "attributes"])
-                tf = obj.expectedAttributes.has(propName);
-            elseif ismember(lower(specType), ["dset", "dataset", "datasets", "prop", "property"])
-                tf = obj.expectedDatasets.has(propName);
+            if nargin < 3 || strcmpi(specType, "all")
+                % FIXME Add method to schema
+                tf = obj.Schema.has(propName);
             else
-                error('isExpected:InvalidSpecType', ...
-                    'Invalid specification type "%s", should be dataset or attribute', specType);
+                tf = obj.Schema.has(propName, specType);
             end
         end
     end
@@ -337,20 +317,20 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
 
             % Check whether the property is in specs
-            propSpec = obj.expectedDatasets.get(propName);
+            propSpec = obj.Schema.Datasets.get(propName, errorType);
             if isempty(propSpec)
                 error('setProp:PropertyNotFound',...
                     'The property "%s" was not found', propName);
             end
 
-            isValid = propSpec.validate(propValue);
+            [isValid, ME] = propSpec.validate(propValue);
             if ~isValid
-                id = 'setProp:InvalidValue';
-                msg = "Value did not pass specification validation";
+                %id = 'setProp:InvalidValue';
+                %msg = "Value did not pass specification validation";
                 if errorType == aod.infra.ErrorTypes.ERROR
-                    error(id, msg);
+                    throw(ME); % TODO: Change identifier
                 elseif errorType == aod.infra.ErrorTypes.WARNING
-                    warning(id, msg);
+                    throwWarning(ME);
                 end
             end
 
@@ -384,11 +364,11 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 return
             end
 
-            % Run through expectedAttributes parser
-            ip = obj.expectedAttributes.getParser();
+            % Run through attribute schema parser
+            ip = obj.Schema.Attributes.getParser();
             ip.parse(varargin{:});
 
-            % Set expected attributes, if needed
+            % Set specified attributes, if needed
             k1 = setdiff(ip.Parameters, ip.UsingDefaults);
             if ~isempty(k1)
                 for i = 1:numel(k1)
@@ -423,8 +403,8 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
 
             if obj.hasAttr(attrName)
-                % Set to empty if expected, remove if ad-hoc
-                if obj.expectedAttributes.has(attrName)
+                % Set to empty if in schema, remove if ad-hoc
+                if obj.Schema.Attributes.has(attrName)
                     obj.attributes(attrName) = [];
                 else
                     remove(obj.attributes, attrName);
@@ -461,6 +441,8 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
                 error('setFile:InvalidName',...
                     'The name "all" is reserved for operations on all files');
             end
+
+            % TODO: validate with schema
 
             fPath = obj.getHomeDirectory();
             if ~isempty(fPath)
@@ -896,7 +878,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Syntax:
             %   value = specifyAttributes()
             % -------------------------------------------------------------
-            value = aod.specification.AttributeManager();
+            value = aod.schema.collections.AttributeCollection([], []);
         end
 
         function value = specifyDatasets(value)
@@ -919,7 +901,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Output:
             %   value       aod.schema.FileCollection
             % -------------------------------------------------------------
-            value = aod.schema.FileCollection();
+            value = aod.schema.collections.FileCollection([], []);
         end
     end
 end

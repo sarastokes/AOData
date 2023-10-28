@@ -10,6 +10,7 @@ classdef EntitySchema < handle
         Datasets
         Attributes
         Files
+        className
     end
 
     properties (Hidden, Access = private)
@@ -20,6 +21,15 @@ classdef EntitySchema < handle
         function obj = EntitySchema(parent)
             obj.setParent(parent);
             obj.DatasetCollection = aod.schema.collections.DatasetCollection.populate(class(obj.Parent));
+            obj.DatasetCollection.setParent(obj.Parent);
+        end
+        
+        function value = get.className(obj)
+            if isempty(obj.Parent)
+                value = "";
+            else
+                value = string(class(obj.Parent));
+            end
         end
 
         function value = get.Datasets(obj)
@@ -29,21 +39,44 @@ classdef EntitySchema < handle
         function value = get.Files(obj)
             value = obj.Parent.specifyFiles();
             value.setClassName(class(obj.Parent));
+            value.setParent(obj.Parent);
         end
 
         function value = get.Attributes(obj)
             value = obj.Parent.specifyAttributes();
             value.setClassName(class(obj.Parent));
+            value.setParent(obj.Parent);
+        end
+    end
+
+    methods
+        function tf = has(obj, recordName, recordType)
+            if nargin == 3
+                collection = obj.getSchemaByType(recordType);
+                tf = collection.has(recordName);
+            else
+                schemaTypes = ["attribute", "dataset", "file"];
+                for i = 1:3
+                    tf = obj.has(recordName, schemaTypes(i));
+                    if tf
+                        return
+                    end
+                end
+            end
+
         end
 
         function out = getSchemaByType(obj, schemaType)
             switch lower(schemaType)
-                case 'attribute'
+                case {'attribute', 'attributes', 'attr', 'attrs'}
                     out = obj.Attributes;
-                case 'dataset'
+                case {'dataset', 'datasets', 'dset', 'dsets'}
                     out = obj.Datasets;
-                case 'file'
+                case {'file', 'files'}
                     out = obj.Files;
+                otherwise
+                    error('getSchemaType:UnknownSchemaType',...
+                        'Schema type %s was unrecognized; use datasets, attributes or files', schemaType);
             end
         end
 
@@ -91,6 +124,7 @@ classdef EntitySchema < handle
         end
 
         function [tf, ME] = validate(obj, schemaType, entryName)
+            
 
         end
 

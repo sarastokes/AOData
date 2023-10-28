@@ -1,12 +1,18 @@
-classdef Entry < handle
-% ENTRY
+classdef Record < handle
+% RECORD
 %
 % Description:
 %   A wrapper for Primitive that ensures a consistent interface when
 %   working with aod.common.Entity and schema collections. Having a wrapper
 %   means that the primitive type can be changed in-place.
 %
-% TODO: Name is currently duplicated in Entry and child Primitive
+% Constructor:
+%   obj = aod.schema.Record(parent, name, primitiveType, varargin)
+%
+% TODO: Name property is currently duplicated in Entry and child Primitive
+
+% By Sara Patterson, 2023 (AOData)
+% --------------------------------------------------------------------------
 
     properties (SetAccess = private)
         Name            (1,1)   string
@@ -23,7 +29,7 @@ classdef Entry < handle
     end
 
     methods
-        function obj = Entry(parent, name, type, varargin)
+        function obj = Record(parent, name, type, varargin)
             if isobject(parent) || ~isempty(parent)
                 obj.setParent(parent);  % empty parent support for testing
             end
@@ -86,11 +92,14 @@ classdef Entry < handle
         end
 
         function [tf, ME] = validate(obj, input, errorType)
-            if nargin < 3
-                errorType = aod.infra.ErrorTypes.ERROR;
-            else
-                errorType = aod.infra.ErrorTypes.init(errorType);
+            arguments
+                obj
+                input
+                errorType           = aod.infra.ErrorTypes.ERROR
             end
+            
+            errorType = aod.infra.ErrorTypes.init(errorType);
+
             [tf, ME] = obj.Primitive.validate(input, errorType);
         end
 

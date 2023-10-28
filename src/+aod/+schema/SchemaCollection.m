@@ -103,7 +103,7 @@ classdef (Abstract) SchemaCollection < handle
                     obj.className, obj.schemaType, recordName);
             end
 
-            primitiveType = aod.schema.primitives.PrimitiveTypes.init(primitiveType);
+            primitiveType = aod.schema.primitives.PrimitiveTypes.get(primitiveType);
             % TODO: Ensure type is valid for collection
             if primitiveType ~= record.primitiveType
                 record.setType(primitiveType);
@@ -166,11 +166,11 @@ classdef (Abstract) SchemaCollection < handle
                         record = [];
                     case aod.infra.ErrorTypes.ERROR
                         error('get:EntryNotFound',...
-                            'Entry %s not found in %sManager',...
+                            'Entry %s not found in %sCollection',...
                             recordName, obj.schemaType);
                     case aod.infra.ErrorTypes.WARNING
                         warning('get:EntryNotFound',...
-                            'Entry %s not found in %sManager',...
+                            'Entry %s not found in %sCollection',...
                             recordName, obj.schemaType);
                     case aod.infra.ErrorTypes.MISSING
                         error("get:InvalidInput",...
@@ -269,15 +269,14 @@ classdef (Abstract) SchemaCollection < handle
         end
     end
 
-    methods (Access = private)
+    methods (Access = {?aod.schema.EntitySchema})
         function setParent(obj, parent)
             if nargin < 2 || isempty(parent)
                 obj.Parent = [];
                 return
             end
 
-            assert(isa(parent, 'aod.schema.EntitySchema'),...
-                'Parent must be an EntitySchema');
+            mustBeSubclass(parent, "aod.common.mixins.Entity");
 
             obj.Parent = parent;
         end

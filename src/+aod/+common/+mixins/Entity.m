@@ -341,7 +341,8 @@ classdef Entity < handle
             %   aod.core.Entity.specifyAttributes,
             %   aod.specification.AttributeManager
             % -------------------------------------------------------------
-            ip = obj.expectedAttributes.parse(varargin{:}); %#ok<MCNPN>
+            
+            ip = obj.Schema.Attributes.getParser();
             f = fieldnames(ip.Results);
             for i = 1:numel(f)
                 if ~isempty(ip.Results.(f{i}))
