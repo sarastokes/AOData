@@ -90,8 +90,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function FixedDimensions(testCase)
-            ref1 = [aod.schema.validators.size.FixedDimension(1),...
-                   aod.schema.validators.size.FixedDimension(2)];
+            ref1 = [aod.schema.validators.size.FixedDimension([], 1),...
+                   aod.schema.validators.size.FixedDimension([], 2)];
             testCase.verifyNotEqual(ref1(1), ref1(2));
             testCase.verifyEqual(ref1(1), ref1(1));
 
@@ -113,8 +113,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function MixedDimensions(testCase)
-            ref2 = [aod.schema.validators.size.UnrestrictedDimension(),...
-                    aod.schema.validators.size.FixedDimension(1)];
+            ref2 = [aod.schema.validators.size.UnrestrictedDimension([]),...
+                    aod.schema.validators.size.FixedDimension([], 1)];
 
             rowSize2a = aod.schema.validators.Size("(:,1)");
             rowSize2b = aod.schema.validators.Size(findprop(testCase.TEST_OBJ, "PropB"));
@@ -125,8 +125,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
 
         function UnrestrictedDimensions(testCase)
-            ref3 = [aod.schema.validators.size.UnrestrictedDimension(),...
-                    aod.schema.validators.size.UnrestrictedDimension()];
+            ref3 = [aod.schema.validators.size.UnrestrictedDimension([]),...
+                    aod.schema.validators.size.UnrestrictedDimension([])];
 
             rowSize3a = aod.schema.validators.Size("(:,:)");
             testCase.verifyEqual(rowSize3a.text(), "(:,:)");

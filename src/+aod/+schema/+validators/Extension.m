@@ -1,19 +1,19 @@
-classdef ExtensionType < aod.schema.Validator
-% EXTENSIONTYPE
+classdef Extension < aod.schema.Validator
+% Extension
 %
 % Superclasses:
 %   aod.schema.Validator
 %
 % Constructor:
-%   obj = aod.schema.validators.ExtensionType(parent, value)
+%   obj = aod.schema.validators.Extension(parent, value)
 %
 % Examples:
 %   % Extension type must be .txt
-%   obj = aod.schema.validators.ExtensionType([], ".txt");
+%   obj = aod.schema.validators.Extension([], ".txt");
 %   % Extension type can be .txt or .csv
-%   obj = aod.schema.validators.ExtensionType([], [".txt", ".csv"]);
+%   obj = aod.schema.validators.Extension([], [".txt", ".csv"]);
 %   % Extension type is unrestricted
-%   obj = aod.schema.validators.ExtensionType([], []);
+%   obj = aod.schema.validators.Extension([], []);
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -23,7 +23,7 @@ classdef ExtensionType < aod.schema.Validator
     end
 
     methods
-        function obj = ExtensionType(parent, value)
+        function obj = Extension(parent, value)
             arguments
                 parent          {mustBeScalarOrEmpty}
                 value   string                        = []
@@ -46,11 +46,11 @@ classdef ExtensionType < aod.schema.Validator
                 return
             elseif numel(value) > 1
                 if any(arrayfun(@aod.util.isempty, value))
-                    error('setExtensionType:SomeValuesEmpty',...
+                    error('setExtension:SomeValuesEmpty',...
                         "%u of %u values were empty, empty values must be singular",...
                         nnz(value == ""), numel(value));
                 elseif ~isvector(value)
-                    error('setExtensionType:InvalidSize',...
+                    error('setExtension:InvalidSize',...
                         'Extensions must be a vector, size was %s',...
                         value2string(size(value)));
                 end
@@ -61,7 +61,7 @@ classdef ExtensionType < aod.schema.Validator
             end
 
             if any(arrayfun(@(x) ~startsWith(x, '.'), value))
-                error('setExtensionType:InvalidExtensionFormat',...
+                error('setExtension:InvalidExtensionFormat',...
                     'Each extension must start with a period');
             end
 

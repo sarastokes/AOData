@@ -6,51 +6,54 @@ classdef FixedDimension < aod.schema.Validator
 %   outside their metaclass interface
 %
 % Constructor:
-%   obj = aod.schema.validators.size.FixedDimension(dimSize)
-%   obj = aod.schema.validators.size.FixedDimension(dimSize, optional)
+%   obj = aod.schema.validators.size.FixedDimension(parent, value)
 %
 % Inputs:
-%   dimSize         double
+%   parent          aod.schema.Validator.Size
+%   value           double
 %       The size of the dimension (must be an integer)
-% Optional inputs:
-%   optional        logical
-%       Whether the dimension is optional (default: false)
 %
 % See also:
 %   meta.FixedDimension, aod.schema.validators.size.UnrestrictedDimension
+%
+% TODO: Should never be empty, if it is, should be UnrestrictedDimension
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Length   (1,1)      double     {mustBeInteger, mustBeNonnegative}
-        optional (1,1)      logical     = false
+        Length          double      {mustBeScalarOrEmpty}     = []
     end
 
     methods
-        function obj = FixedDimension(dimSize, optional)
-            if nargin < 2
-                optional = false;
+        function obj = FixedDimension(parent, value)
+            obj = obj@aod.schema.Validator(parent);
+            
+            if nargin == 2 && ~obj.isInputEmpty(value)
+                obj.setValue(value);
             end
-            if istext(dimSize)
-                dimSize = str2double(dimSize);
-            end
-            obj.Length = dimSize;
-            obj.optional = optional;
         end
 
     end
 
     methods
         function setValue(obj, input)
+            if obj.isInputEmpty(input)
+                obj.Length = [];
+                return
+            end
+            if istext(input)
+                input = str2double(input);
+            end
+            mustBeInteger(input); mustBeNonnegative(input);
             obj.Length = input;
         end
 
-        function setOptional(obj, input)
-            obj.optional = input;
-        end
-
         function tf = validate(obj, input)
+            if obj.isInputEmpty(input)
+                tf = true;
+                return
+            end
             if istext(input)
                 input = str2double(input);
             end

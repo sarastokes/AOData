@@ -5,23 +5,16 @@ classdef UnrestrictedDimension < aod.schema.Validator
 %   aod.schema.validators.Size
 %
 % Constructor:
-%   obj = aod.schema.validators.size.UnrestrictedDimension()
-%   obj = aod.schema.validators.size.UnrestrictedDimension()
+%   obj = aod.schema.validators.size.UnrestrictedDimension(parent)
 %
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = private)
-        optional    (1,1)       logical = false;
-    end
 
     methods
-        function obj = UnrestrictedDimension(optional)
-            if nargin < 1
-                optional = false;
-            end
-            obj.optional = optional;
+        function obj = UnrestrictedDimension(parent)
+            obj = obj@aod.schema.Validator(parent);
         end
     end
 
@@ -37,7 +30,7 @@ classdef UnrestrictedDimension < aod.schema.Validator
             output = ":";
         end
 
-        function tf = isSpecified(obj)
+        function tf = isSpecified(~)
             tf = true;
         end
     end
@@ -45,7 +38,7 @@ classdef UnrestrictedDimension < aod.schema.Validator
     % MATLAB builtin methods
     methods
         function tf = isequal(obj, other)
-            tf = isa(other, class(obj));
+            tf = isa(other, 'aod.schema.validators.size.UnrestrictedDimension');
         end
     end
 end

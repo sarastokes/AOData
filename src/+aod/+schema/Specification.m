@@ -75,6 +75,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 
     methods (Sealed, Access = {?aod.schema.types.Primitive})
         function setParent(obj, primitive)
+            % TODO: Validation
             obj.Parent = primitive;
         end
 
@@ -93,6 +94,8 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         function tf = isInputEmpty(input)
             input = convertCharsToStrings(input);
             if aod.util.isempty(input) || isequal(input, "[]")
+                tf = true;
+            elseif isstring(input) && all(isequal(input, "[]"))
                 tf = true;
             else
                 tf = false;

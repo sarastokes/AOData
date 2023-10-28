@@ -201,8 +201,8 @@ classdef Size < aod.schema.Validator
         end
     end
 
-    methods (Static, Access = private)
-        function value = parseText(input)
+    methods (Access = private)
+        function value = parseText(obj, input)
             input = convertStringsToChars(input);
 
             [startIdx, endIdx] = regexp(input, "[\d:]{1,10}");
@@ -218,9 +218,9 @@ classdef Size < aod.schema.Validator
             for i = 1:numel(startIdx)
                 iSize = input(startIdx(i):endIdx(i));
                 if strcmp(iSize, ':')
-                   value = cat(2, value, aod.schema.validators.size.UnrestrictedDimension());
+                   value = cat(2, value, aod.schema.validators.size.UnrestrictedDimension(obj));
                 else
-                    value = cat(2, value, aod.schema.validators.size.FixedDimension(iSize));
+                    value = cat(2, value, aod.schema.validators.size.FixedDimension(obj, iSize));
                 end
             end
 
@@ -234,7 +234,7 @@ classdef Size < aod.schema.Validator
 
             value = [];
             for i = 1:numel(input)
-                value = [value, aod.schema.validators.size.FixedDimension(input(i))];
+                value = [value, aod.schema.validators.size.FixedDimension(obj, input(i))];
             end
         end
 
@@ -247,9 +247,9 @@ classdef Size < aod.schema.Validator
                 for i = 1:numel(mcSize)
                     if isa(mcSize(i), 'meta.FixedDimension')
                         value = [value, aod.schema.validators.size.FixedDimension(...
-                            double(mcSize(i).Length))];
+                            obj, double(mcSize(i).Length))];
                     else
-                        value = [value, aod.schema.validators.size.UnrestrictedDimension];
+                        value = [value, aod.schema.validators.size.UnrestrictedDimension(obj)];
                     end
                 end
             end

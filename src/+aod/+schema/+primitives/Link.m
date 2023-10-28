@@ -55,7 +55,7 @@ classdef Link < aod.schema.primitives.Primitive
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwError)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwError)
             arguments
                 obj
                 throwError          logical = false
@@ -63,10 +63,11 @@ classdef Link < aod.schema.primitives.Primitive
 
             if obj.isInitializing
                 tf = true; ME = [];
+                return
             end
 
-            [tf, ME] = checkIntegrity@aod.schema.primitives.Primitive(obj);
-            if throwError && ~tf
+            [tf, ME, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            if throwError && excObj.hasErrors()
                 throw(ME);
             end
         end

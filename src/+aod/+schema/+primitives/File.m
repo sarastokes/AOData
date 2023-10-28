@@ -10,13 +10,14 @@ classdef File < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        ExtensionType           aod.schema.validators.ExtensionType
+        Extension           aod.schema.validators.Extension
+        Regexp              aod.schema.validators.Regexp
     end
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.FILE
-        OPTIONS = ["ExtensionType", "Default", "Description"];
-        VALIDATORS = ["Class", "ExtensionType"];
+        OPTIONS = ["Extension", "Size", "Default", "Description"];
+        VALIDATORS = ["Class", "Size", "Extension"];
     end
 
     methods
@@ -24,11 +25,12 @@ classdef File < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             % Initialize
-            obj.ExtensionType = aod.schema.validators.ExtensionType(obj, []);
+            obj.Extension = aod.schema.validators.Extension(obj, []);
+            obj.Regexp = aod.schema.validators.Regexp(obj, []);
 
             % Defaults
             obj.setClass("string");  % TODO: is char ok?
-            obj.setSize('(1,:)');
+            obj.setSize('(:,1)');
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
@@ -38,13 +40,23 @@ classdef File < aod.schema.primitives.Primitive
     end
 
     methods
-        function setExtensionType(obj, value)
+        function setExtension(obj, value)
             arguments
                 obj
                 value       string = ""
             end
 
-            obj.ExtensionType.setValue(value);
+            obj.Extension.setValue(value);
+            obj.checkIntegrity(true);
+        end
+
+        function setRegexp(obj, value)
+            arguments
+                obj
+                value       string = ""
+            end
+
+            obj.Regexp.setValue(value);
             obj.checkIntegrity(true);
         end
 
@@ -60,26 +72,26 @@ classdef File < aod.schema.primitives.Primitive
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwErrors)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwErrors)
             arguments
                 obj
                 throwErrors         logical     = false
             end
 
             if obj.isInitializing
-                tf = true; ME = [];
                 return
             end
 
             [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
 
-            if obj.ExtensionType.isSpecified() && obj.Default.isSpecified()
-                if ~endsWith(obj.Default.Value, obj.ExtensionType.Value)
+            if obj.Extension.isSpecified() && obj.Default.isSpecified()
+                if ~endsWith(obj.Default.Value, obj.Extension.Value)
                     excObj.addCause(MException(...
                         'checkIntegrity:InvalidDefaultExtension',...
-                        'Default extension value must be one of the following: %s', obj.ExtensionType.text()));
+                        'Default extension value must be one of the following: %s', obj.Extension.text()));
                 end
             end
+            % TODO: Regular expression checks
 
             tf = ~excObj.hasErrors();
             ME = excObj.getException();

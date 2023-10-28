@@ -171,10 +171,10 @@ classdef SpecsTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="ExtensionType")
-        function ExtensionType(testCase)
+    methods (Test, TestTags="Extension")
+        function Extension(testCase)
 
-            obj = aod.schema.validators.ExtensionType([], ".txt");
+            obj = aod.schema.validators.Extension([], ".txt");
             testCase.verifyTrue(obj.isSpecified());
 
             [tf, ME] = obj.validate([]);
@@ -192,8 +192,8 @@ classdef SpecsTest < matlab.unittest.TestCase
             testCase.verifyEqual(ME.identifier, 'validate:NoExtensionFound');
         end
 
-        function ExtensionTypeEmpty(testCase)
-            obj = aod.schema.validators.ExtensionType([], []);
+        function ExtensionEmpty(testCase)
+            obj = aod.schema.validators.Extension([], []);
             testCase.verifyFalse(obj.isSpecified());
             testCase.verifyEqual(obj.text(), "[]");
             testCase.verifyEqual(obj.jsonencode(), '[]');
@@ -209,18 +209,18 @@ classdef SpecsTest < matlab.unittest.TestCase
 
         end
 
-        function ExtensionTypeErrors(testCase)
+        function ExtensionErrors(testCase)
             testCase.verifyError(...
-                @() aod.schema.validators.ExtensionType([], [".txt", "csv"]),...
-                "setExtensionType:InvalidExtensionFormat");
+                @() aod.schema.validators.Extension([], [".txt", "csv"]),...
+                "setExtension:InvalidExtensionFormat");
 
             testCase.verifyError(...
-                @() aod.schema.validators.ExtensionType([], [".txt", "csv"; ".dat", ".json"]),...
-                "setExtensionType:InvalidSize");
+                @() aod.schema.validators.Extension([], [".txt", "csv"; ".dat", ".json"]),...
+                "setExtension:InvalidSize");
 
             testCase.verifyError(...
-                @() aod.schema.validators.ExtensionType([], ["", ".json"]),...
-                "setExtensionType:SomeValuesEmpty");
+                @() aod.schema.validators.Extension([], ["", ".json"]),...
+                "setExtension:SomeValuesEmpty");
         end
     end
 
@@ -308,6 +308,24 @@ classdef SpecsTest < matlab.unittest.TestCase
 
             obj.setValue("[]");
             testCase.verifyFalse(obj.isSpecified());
+        end
+    end
+
+    methods (Test, TestTags="SpecUtil")
+        function IsInputEmpty(testCase)
+            obj = aod.schema.validators.size.FixedDimension([]);
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj.Length);
+            obj.setValue("[]");
+            testCase.verifyEmpty(obj.Length);
+            obj.setValue("");
+            testCase.verifyEmpty(obj.Length);
+
+            obj.setValue(1);
+            testCase.verifyEqual(obj.Length, 1);
+            obj.setValue("1");
+            testCase.verifyEqual(obj.Length, 1);
         end
     end
 end

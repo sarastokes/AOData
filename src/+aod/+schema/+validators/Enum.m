@@ -1,6 +1,9 @@
 classdef Enum < aod.schema.Validator
 % ENUM
 %
+% Description:
+%   A vector of allowable values for Integer, Number and Text
+%
 % Superclasses:
 %   aod.schema.Validator
 %
@@ -9,12 +12,13 @@ classdef Enum < aod.schema.Validator
 %
 % Example:
 %   obj = aod.schema.validators.Enum([], ["low", "medium", "high"])
+%   obj = aod.schema.validators.Enum([], [1, 2, 3])
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value   {mustBeText, mustBeVector} = ""
+        Value
     end
 
     methods
@@ -26,14 +30,25 @@ classdef Enum < aod.schema.Validator
 
     methods
         function setValue(obj, input)
-            arguments
-                obj
-                input  (1,:)    string {mustBeText, mustBeVector} = []
+
+            if all(aod.util.isempty(input))
+                obj.Value = [];
+                return
+            end
+
+            input = convertCharsToStrings(input);
+            if ~isvector(input)
+                error('setValue:InvalidEnumSize',...
+                    'Input should be a vector, not a %s array', value2string(size(input)));
+            elseif ~isnumeric(input) && ~isstring(input)
+                error('setValue:InvalidEnumType',...
+                    'Input should be a numeric or text array, not a %s', class(input));
             end
 
             if isvector(input) && ~isrow(input)
                 input = input';
             end
+
             obj.Value = input;
         end
 

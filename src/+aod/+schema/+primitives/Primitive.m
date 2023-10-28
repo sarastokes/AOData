@@ -214,6 +214,71 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Class.setValue(value);
             obj.checkIntegrity(true);
         end
+    end
+
+    methods (Sealed)
+        function setName(obj, name)
+            % Set the primitive's name, ensuring valid variable name
+            %
+            % Syntax:
+            %   setName(obj, name)
+            %
+            % See also:
+            %   isvarname
+            % -------------------------------------------------------------
+            arguments
+                obj
+                name    (1,1)       string
+            end
+
+            if ~isvarname(name)
+                error('setName:InvalidName',...
+                    'Property names must be valid MATLAB variables');
+            end
+            obj.Name = name;
+        end
+
+        function setDescription(obj, description)
+            % Set the description of the dataset/property.
+            %
+            % Syntax:
+            %   obj.setDescription(description)
+            %
+            % Inputs:
+            %   description     string (1,1)
+            %       Description of the dataset/property.
+            % ----------------------------------------------------------
+            obj.Description.setValue(description);
+        end
+    end
+
+    methods
+        function [tf, ME, excObj] = checkIntegrity(obj, ~)
+            excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
+
+            % These checks revolve around Default, skip if unset
+            if obj.isInitializing || ~obj.Default.isSpecified()
+                tf = true; ME = [];
+                return
+            end
+
+            if obj.Size.isSpecified()
+                if ~obj.Size.validate(obj.Default.Value)
+                    excObj.addCause(MException('checkIntegrity:InvalidDefaultSize',...
+                        "Default is not the correct size: %s", obj.Size.text()));
+                end
+            end
+            if obj.Class.isSpecified()
+                if ~obj.Class.validate(obj.Default.Value)
+                    excObj.addCause(MException('checkIntegrity:InvalidDefaultClass',...
+                        "Default was class %s, but Class is %s", ...
+                        class(obj.Default.Value), obj.Class.text()));
+                end
+            end
+            tf = ~excObj.hasErrors();
+            ME = excObj.getException();
+        end
+
 
         function [tf, ME] = validate(obj, value, errorType)
             % Exception should contain:
@@ -263,42 +328,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         end
     end
 
-    methods (Sealed)
-        function setName(obj, name)
-            % Set the primitive's name, ensuring valid variable name
-            %
-            % Syntax:
-            %   setName(obj, name)
-            %
-            % See also:
-            %   isvarname
-            % -------------------------------------------------------------
-            arguments
-                obj
-                name    (1,1)       string
-            end
-
-            if ~isvarname(name)
-                error('setName:InvalidName',...
-                    'Property names must be valid MATLAB variables');
-            end
-            obj.Name = name;
-        end
-
-        function setDescription(obj, description)
-            % Set the description of the dataset/property.
-            %
-            % Syntax:
-            %   obj.setDescription(description)
-            %
-            % Inputs:
-            %   description     string (1,1)
-            %       Description of the dataset/property.
-            % ----------------------------------------------------------
-            obj.Description.setValue(description);
-        end
-    end
-
     methods (Sealed, Access = protected)
         function parse(obj, key, value)
             % Parse value for key, assuming key has a method starting with
@@ -333,35 +362,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             end
             ip.addParameter('Required', false, @islogical);
         end
-    end
-
-    methods
-        function [tf, ME, excObj] = checkIntegrity(obj, ~)
-            excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
-
-            % These checks revolve around Default, skip if unset
-            if obj.isInitializing || ~obj.Default.isSpecified()
-                tf = true; ME = [];
-                return
-            end
-
-            if obj.Size.isSpecified()
-                if ~obj.Size.validate(obj.Default.Value)
-                    excObj.addCause(MException('checkIntegrity:InvalidDefaultSize',...
-                        "Default is not the correct size: %s", obj.Size.text()));
-                end
-            end
-            if obj.Class.isSpecified()
-                if ~obj.Class.validate(obj.Default.Value)
-                    excObj.addCause(MException('checkIntegrity:InvalidDefaultClass',...
-                        "Default was class %s, but Class is %s", ...
-                        class(obj.Default.Value), obj.Class.text()));
-                end
-            end
-            tf = ~excObj.hasErrors();
-            ME = excObj.getException();
-        end
-
     end
 
     methods (Access = {?aod.specification.Entry, ?aod.schema.primitives.Primitive})

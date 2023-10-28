@@ -49,7 +49,7 @@ classdef Length < aod.schema.Validator
                 ME = MException('validate:InvalidClass',...
                     'Expected string not %s', class(input));
             else
-                tf = all(strlength(input) == obj.Value);
+                tf = all(arrayfun(@(x) isequal(strlength(x), obj.Value), input));
                 if ~tf
                     ME = MException('validate:InvalidLength',...
                         'Expected %u length', obj.Value);

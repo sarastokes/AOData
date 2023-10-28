@@ -36,9 +36,45 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
         function TextWithOptions(testCase)
             obj = aod.schema.primitives.Text("Test", [],...
-                "Enum", ["a", "b", "c"], "Count", 1, "Default", "b");
+                "Enum", ["a", "b", "c"], "Length", 1, "Default", "b");
             testCase.verifyError(...
                 @()obj.validate("d"), "validate:Failed");
+        end
+    end
+
+    methods (Test, TestTags="Duration")
+        function Duration(testCase)
+            obj = aod.schema.primitives.Duration("Test", []);
+
+            obj.assign("Format", "s");
+            testCase.verifyEqual(obj.Format.Value, "s");
+            testCase.verifyTrue(obj.validate(seconds(1)));
+            obj.assign('Default', seconds(1));
+        end
+
+        function DurationWithOptions(testCase)
+            obj = aod.schema.primitives.Duration("Test", [],...
+                "Size", "(1,1)", "Format", "s", "Default", seconds(1));
+            testCase.verifyTrue(obj.validate(seconds(2)));
+            testCase.verifyFalse(obj.validate(seconds(1:3), aod.infra.ErrorTypes.NONE));
+        end
+
+        function DurationErrors(testCase)
+            obj = aod.schema.primitives.Duration("Test", []);
+            testCase.verifyError(...
+                @() obj.assign('Format', 'badinput'),...
+                'setFormat:InvalidFormatForDuration');
+
+            obj.assign("Format", "s");
+            testCase.verifyError(...
+                @() obj.validate(minutes(1)), "validate:Failed");
+            testCase.verifyError( ...
+                @()obj.assign('Default', minutes(1)), ...
+                'checkIntegrity:SchemaConflictsDetected');
+            obj.assign('Default', seconds(1));
+            testCase.verifyError(...
+                @() obj.assign("Format", "minutes"),...
+                'checkIntegrity:SchemaConflictsDetected');
         end
     end
 
@@ -151,10 +187,10 @@ classdef PrimitiveTest < matlab.unittest.TestCase
     methods (Test, TestTags="File")
         function File(testCase)
             obj = aod.schema.primitives.File("Test", []);
-            testCase.verifyFalse(obj.ExtensionType.isSpecified());
+            testCase.verifyFalse(obj.Extension.isSpecified());
 
-            obj = aod.schema.primitives.File("Test", [], "ExtensionType", ".csv");
-            testCase.verifyEqual(obj.ExtensionType.Value, ".csv");
+            obj = aod.schema.primitives.File("Test", [], "Extension", ".csv");
+            testCase.verifyEqual(obj.Extension.Value, ".csv");
 
             testCase.verifyError(@() obj.assign('Default', 1), 'checkIntegrity:SchemaConflictsDetected');
             testCase.verifyError(@() obj.assign('Format', 'char'), 'assign:InvalidParameter');
@@ -164,7 +200,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj = aod.schema.primitives.File("Test", []);
 
             testCase.verifyTrue(obj.validate("myfile.csv"));
-            obj.assign('ExtensionType', [".json", ".txt"]);
+            obj.assign('Extension', [".json", ".txt"]);
             testCase.verifyTrue(obj.validate("myfile.json"));
             testCase.verifyError(...
                 @() obj.validate("myfile.csv"),...
@@ -178,9 +214,9 @@ classdef PrimitiveTest < matlab.unittest.TestCase
                 "Description", "this is a test");
 
             testCase.verifyError(...
-                @() obj.assign('ExtensionType', '.csv'),...
+                @() obj.assign('Extension', '.csv'),...
                 "checkIntegrity:SchemaConflictsDetected");
-            obj.assign("ExtensionType", ".json");
+            obj.assign("Extension", ".json");
             obj.assign("Default", []);
         end
     end

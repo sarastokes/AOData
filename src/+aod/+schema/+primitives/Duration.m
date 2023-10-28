@@ -8,24 +8,24 @@ classdef Duration < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Units           aod.schema.decorators.Units
+        Format          aod.schema.validators.Format
     end
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DURATION
-        OPTIONS = ["Size", "Units", "Description"];
-        VALIDATORS = ["Class", "Size"];
+        OPTIONS = ["Size", "Format", "Default", "Description"];
+        VALIDATORS = ["Class", "Format", "Size"];
     end
 
     methods
         function obj = Duration(name, parent, varargin)
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
-            obj.Units = aod.schema.decorators.Units(obj, []);
+            obj.Format = aod.schema.validators.Format(obj, []);
 
             % Set default values
-            obj.setClass("duration");
-            obj.setUnits("seconds");
+            %obj.setClass("duration");
+            %obj.setFormat(aod.schema.validators.Format.SECONDS);
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
@@ -33,33 +33,51 @@ classdef Duration < aod.schema.primitives.Primitive
             obj.checkIntegrity(true);
         end
 
-        function setUnits(obj, value)
-            if isempty(value)
-                warning('setUnits:EmptyInput',...
-                    'Input is empty. Using default value of "seconds".');
-                obj.setUnits("seconds");
+        function setFormat(obj, value)
+            arguments
+                obj
+                value          string      = ""
+            end
+
+            if aod.util.isempty(value)
+                obj.Format.setValue([]);
                 return
             end
 
-            value = obj.getUnitsFormat(value);
-            obj.setUnits(value);
+            try
+                intervalType = aod.schema.validators.time.IntervalTypes.get(value);
+            catch
+                error('setFormat:InvalidFormatForDuration',...
+                    'Duration format must convert to ms, s, m, h, d or y - was %s', value);
+            end
+
+            obj.Format.setValue(intervalType.getFormat());
+            obj.checkIntegrity(true);
         end
 
         function setDefault(obj, value)
             arguments
                 obj
-                value       duration
+                value       
             end
 
-            % Convert if does not match format
-            if isduration(value) && ~strcmp(obj.getUnitsFormat(value), obj.Format)
-                fcn = obj.getFormatFcn(obj.Format);
+            if aod.util.isempty(value)
+                obj.Default.setValue([]);
+                return
             end
+
+            if obj.Class.isSpecified()
+                mustBeA(value, obj.Class.Value)
+            end
+
+            obj.Default.setValue(value);
+            obj.checkIntegrity(true);
+            % TODO: Convert if does not match format?
         end
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwErrors)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwErrors)
             arguments
                 obj         (1,1)   aod.schema.primitives.Duration
                 throwErrors (1,1)   logical = false
@@ -70,9 +88,16 @@ classdef Duration < aod.schema.primitives.Primitive
                 return
             end
 
-            [tf, ME, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
 
-            % TODO: Check if units are undefined
+            if obj.Format.isSpecified() && obj.Default.isSpecified() && isduration(obj.Default.Value)
+                if ~obj.Format.validate(obj.Default.Value)
+                    excObj.addCause(MException( ...
+                        "checkIntegrity:InvalidDefaultForamt",...
+                        "Format is %s but default format was %s", ...
+                        obj.Format.text(), obj.Default.Value.Format));
+                end
+            end
 
             tf = ~excObj.hasErrors();
             ME = excObj.getException();

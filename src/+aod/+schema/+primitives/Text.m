@@ -7,7 +7,7 @@ classdef Text < aod.schema.primitives.Primitive
 % Constructor:
 %   obj = aod.schema.primitives.Text(name)
 %   obj = aod.schema.primitives.Text(name, 'Length', value,...
-%       'Count', value, 'Enum', value, 'Description', value)
+%       'Length', value, 'Enum', value, 'Description', value)
 %
 % Allowed parents:
 %   aod.specification.Entry, aod.schema.primitives.Table
@@ -17,14 +17,14 @@ classdef Text < aod.schema.primitives.Primitive
 
     properties (SetAccess = private)
         Length          aod.schema.validators.Length
-        Count           aod.schema.validators.Count
         Enum            aod.schema.validators.Enum
+        Regexp          aod.schema.validators.Regexp
     end
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.TEXT
-        OPTIONS = ["Count", "Length", "Enum", "Default", "Description"]
-        VALIDATORS = ["Class", "Count", "Length", "Enum"];
+        OPTIONS = ["Length", "Enum", "Regexp", "Default", "Description"]
+        VALIDATORS = ["Class", "Length", "Enum", "Regexp"];
     end
 
     methods
@@ -34,7 +34,7 @@ classdef Text < aod.schema.primitives.Primitive
             % Initialization
             obj.Length = aod.schema.validators.Length(obj, []);
             obj.Enum = aod.schema.validators.Enum(obj, []);
-            obj.Count = aod.schema.validators.Count(obj, []);
+            obj.Regexp = aod.schema.validators.Regexp(obj, []);
 
             % Defaults
             obj.setClass("string");
@@ -55,20 +55,6 @@ classdef Text < aod.schema.primitives.Primitive
             end
 
             obj.Default.setValue(value);
-            obj.checkIntegrity(true);
-        end
-
-        function setCount(obj, value)
-            arguments
-                obj
-                value     {mustBeScalarOrEmpty, mustBeInteger, mustBePositive} = []
-            end
-
-            if isempty(value)
-                obj.Count.setValue([]);
-            else
-                obj.Count.setValue(value);
-            end
             obj.checkIntegrity(true);
         end
 
@@ -95,6 +81,16 @@ classdef Text < aod.schema.primitives.Primitive
             end
             obj.checkIntegrity(true);
         end
+
+        function setRegexp(obj, value)
+            arguments
+                obj
+                value       string = ""
+            end
+
+            obj.Regexp.setValue(value);
+            obj.checkIntegrity(true);
+        end
     end
 
     methods
@@ -110,31 +106,42 @@ classdef Text < aod.schema.primitives.Primitive
 
             if obj.Default.isSpecified()
                 if obj.Length.isSpecified()
-                    if all(strlength(obj.Default.Value) == obj.Length.Value)
+                    if any(arrayfun(@(x) ~isequal(strlength(x), obj.Length.Value), obj.Default.Value))
                         excObj.addCause(MException(...
                             'checkIntegrity:InvalidDefaultLength',...
                             'Default value did not match Length (%u)', obj.Length.Value));
                     end
-                elseif obj.Enum.isSpecified()
+                end
+                if obj.Enum.isSpecified()
                     if ~any(ismember(obj.Default.Value, obj.Enum.Value))
                         excObj.addCause(MException(...
                             'checkIntegrity:InvalidDefaultValue',...
                             'Default value was not in Enum: %s', strjoin(obj.Enum.Value, ', ')));
                     end
-                elseif obj.Count.isSpecified()
-                    if numel(obj.Default.Value) ~= obj.Count.Value
+                end
+                if obj.Regexp.isSpecified()
+                    if ~obj.Regexp.validate(obj.Default.Value)
                         excObj.addCause(MException(...
-                            'checkIntegrity:InvalidDefaultCount',...
-                            'Default value did not match Count (%u)', obj.Count.Value));
+                            'checkIntegrity:InvalidDefaultRegexp',...
+                            'Default value did not pass regexp validation'));
                     end
                 end
             end
 
             if obj.Enum.isSpecified()
-                if obj.Length.isSpecified() && any(arrayfun(@(x) ~isequal(strlength(obj.Enum.Value), obj.Length.Value)))
-                    excObj.addCause(MException(...
-                        'checkIntegrity:InvalidEnumLength',...
-                        'Enum values did not match Length (%u)', obj.Length.Value));
+                if obj.Length.isSpecified() 
+                    if any(arrayfun(@(x) ~isequal(strlength(x), obj.Length.Value), obj.Enum.Value))
+                        excObj.addCause(MException(...
+                            'checkIntegrity:InvalidEnumLength',...
+                            'Enum values did not match Length (%u)', obj.Length.Value));
+                    end
+                end
+                if obj.Regexp.isSpecified
+                    if ~arrayfun(@(x) obj.Regexp.validate(x), obj.Enum.Value)
+                        excObj.addCause(MException(...
+                            'checkIntegrity:InvalidEnumRegexp',...
+                            'Enumeration values did not pass regexp validation'));
+                    end
                 end
             end
 

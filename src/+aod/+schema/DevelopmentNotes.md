@@ -68,18 +68,18 @@ Each primitive inherits from `aod.schema.primitives.Primitive` and include a spe
 
 |Name|Matlab|Python| Description|
 |----|------|--------|------------|
-|Boolean|logical|bool|True or false|
-|Date|datetime|||
-|Duration|duration||
-|File|string|string|An absolute or relative file path|
-|Integer|uint8, int8, etc...|int||
-|Link|aod.common.Entity subclasses|||
-|*List*|cell|list|Contains items of different types|
-|Number|double|float||
-|*Object*|struct, handle|dict||
-|Text|string| string||
+|`Boolean`|logical|bool|True or false|
+|`Date`|datetime|datetime||
+|`Duration`|duration|timedelta||
+|`File`|string|string|An absolute or relative file path|
+|`Integer`|uint8, int8, etc...|int||
+|`Link`|aod.common.Entity subclasses|||
+|_`List`_|cell|list|Contains items of different types or with different specifications. Unlike Object, they are not distinguished by name but by index, like a numbered list|
+|`Number`|double|float|Standard MATLAB numbers|
+|_`Object`_|struct, handle|dict| Use this when the dataset contains multiple data types distinguished by name|
+|`Text`|string| string||
 
-You can have a `double` that is specified as an __Integer__. Nevermind?? Just removed support for this on 25Oct2023.
+You can have a `double` that is specified as an __`Integer`__. Nevermind?? Just removed support for this on 25Oct2023. Should probably integrate `single` support into __`Number`__
 
 Currently not supporting `char` as it can cause issues with the queries (e.g., each character can be considered equal to a double).
 
@@ -89,7 +89,7 @@ Currently not supporting `char` as it can cause issues with the queries (e.g., e
 |Class|all|Specifies allowable MATLAB classes (some primitives set automatically)|
 |EntityType|Link|Specifies the allowable entity types for a link (e.g., `["System", "Channel"]` enforces only systems and channels)|
 |Enum|Text, Integer, Number| Specifies an allowable set of answers (e.g., `["Low", "Medium", "High"]` restricts the value to only those three words) |
-|ExtensionType|File| Specifies allowable file extensions (e.g., `[".json", ".txt"]`|
+|Extension|File| Specifies allowable file extensions (e.g., `[".json", ".txt"]`|
 |Interval|duration|The time interval (seconds, minutes, etc see `IntervalTypes`)|
 |Length|Text   | Specifies the length of a string (e.g., "test" is 4)|
 |Maximum|Number, Integer| Specifies the *inclusive* maximum allowable number (e.g., `-1` enforces only negative numbers and not 0)|
@@ -118,10 +118,12 @@ Basic types (**validator**, *decorator*):
 - Number: (double/float)
     - **Minimum** - inclusive minimum
     - **Maximum** - inclusive maximum
+    - __Enum__
     - *Units*
 - Integer:
     - **Minimum**
     - **Maximum**
+    - __Enum__
     - *Units*
 - String:
     - **Enum**

@@ -19,6 +19,7 @@ classdef Number < aod.schema.primitives.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        Enum                aod.schema.validators.Enum
         Minimum             aod.schema.validators.Minimum
         Maximum             aod.schema.validators.Maximum
         Units               aod.schema.decorators.Units
@@ -35,6 +36,7 @@ classdef Number < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             % Initialize
+            obj.Enum = aod.schema.validators.Enum(obj, []);
             obj.Minimum = aod.schema.validators.Minimum(obj, []);
             obj.Maximum = aod.schema.validators.Maximum(obj, []);
             obj.Units = aod.schema.decorators.Units(obj, []);
@@ -54,10 +56,19 @@ classdef Number < aod.schema.primitives.Primitive
         function setUnits(obj, units)
             arguments
                 obj
-                units       string          {mustBeTextScalar} = ""
+                units       string          = ""
             end
 
             obj.Units.setValue(units);
+        end
+
+        function setEnum(obj, value)
+            arguments
+                obj
+                value       {mustBeNumeric, mustBeVector} = []
+            end
+
+            obj.Enum.setValue(value);
         end
 
         function setMinimum(obj, value)

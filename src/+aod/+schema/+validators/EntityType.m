@@ -17,10 +17,6 @@ classdef EntityType < aod.schema.Validator
         Value           {mustBeScalarOrEmpty}
     end
 
-    properties (Hidden, SetAccess = protected)
-        OPTIONS = ["EntityType", "Description"]
-    end
-
     methods
         function obj = EntityType(parent, value)
             obj = obj@aod.schema.Validator(parent);

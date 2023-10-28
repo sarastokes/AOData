@@ -10,11 +10,14 @@ classdef Integer < aod.schema.primitives.Primitive
 %       "Format", format, "Size", size, "Minimum", minimum,...
 %       "Maximum", maximum, "Default", default, "Units", units,...
 %       "Description", description)
+%
+% TODO: Revist casting, it's messy
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
+        Enum        aod.schema.validators.Enum
         Minimum     aod.schema.validators.Minimum
         Maximum     aod.schema.validators.Maximum
         Units       aod.schema.decorators.Units
@@ -31,6 +34,7 @@ classdef Integer < aod.schema.primitives.Primitive
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
             % Initialization
+            obj.Enum = aod.schema.validators.Enum(obj, []);
             obj.Minimum = aod.schema.validators.Minimum(obj, []);
             obj.Maximum = aod.schema.validators.Maximum(obj, []);
             obj.Units = aod.schema.decorators.Units(obj, []);
@@ -56,6 +60,24 @@ classdef Integer < aod.schema.primitives.Primitive
                 value = cast(value, obj.Class.Value);
             end
             obj.Default.setValue(value);
+            obj.checkIntegrity(true);
+        end
+
+        function setEnum(obj, value)
+            arguments
+                obj
+                value       {mustBeInteger, mustBeVector} = []
+            end
+
+            if isempty(value)
+                obj.Enum.setValue([]);
+                return
+            end
+
+            if obj.Class.isSpecified() && ~isa(value, obj.Class.Value)
+                value = cast(value, obj.Class.Value);
+            end
+            obj.Enum.setValue(value);
             obj.checkIntegrity(true);
         end
 
@@ -112,12 +134,40 @@ classdef Integer < aod.schema.primitives.Primitive
             end
             obj.Class.setValue(value);
 
+            if ~obj.Class.isSpecified()
+                return
+            end
+
             [minValue, maxValue] = obj.getIntegerRange(obj.Class);
             if ~obj.Minimum.isSpecified()
                 obj.Minimum.setValue(minValue);
             end
             if ~obj.Maximum.isSpecified()
                 obj.Maximum.setValue(maxValue);
+            end
+
+            if obj.Enum.isSpecified() && ~isa(obj.Enum, value)
+                try
+                    obj.Enum.setValue(cast(obj.Enum.Value, value));
+                catch ME
+                    newME = MException('setClass:EnumCouldNotCase',...
+                        'Enum value is %s not %s and could not be cast', ...
+                        class(obj.Enum.Value), value);
+                    newME.addCause(ME);
+                    throw(newME);
+                end
+            end
+
+
+            if obj.Default.isSpecified() && ~isa(obj.Default.Value, obj.Class.Value)
+                try
+                    obj.Default.setValue(cast(obj.Default.Value, obj.Class.Value));
+                catch ME
+                    newME = MException('setClass:DefaultCouldNotCase',...
+                        'Default value is not %s and could not be cast', value);
+                    newME.addCause(ME);
+                    throw(newME);
+                end
             end
         end
 
@@ -156,9 +206,6 @@ classdef Integer < aod.schema.primitives.Primitive
                 if obj.Minimum.Value > maxValue
                     excObj.addCause(MException('checkIntegrity:InvalidMaximum',...
                         'Maximum value is larger than the maximum value of the format'));
-                end
-                if obj.Default.isSpecified() && ~isa(obj.Default.Value, obj.Class.Value)
-                    obj.Default.setValue(cast(obj.Default.Value, obj.Class.Value));
                 end
             end
             if obj.Minimum.isSpecified()

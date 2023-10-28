@@ -47,6 +47,10 @@ classdef EntitySchema < handle
             end
         end
 
+        function checkForUndefined(obj)
+            % TODO: Quickly access primitive types
+        end
+
         function [tf, ME] = checkSchemaIntegrity(obj, schemaType, entryName)
             if nargin > 1
                 schema = obj.getSchemaByType(schemaType);

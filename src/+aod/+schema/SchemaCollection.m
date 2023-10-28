@@ -9,6 +9,8 @@ classdef (Abstract) SchemaCollection < handle
 %
 % Constructor:
 %   obj = aod.schema.SchemaCollection(className)
+%
+% TODO: This could subclass IndexedCollection
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -20,7 +22,7 @@ classdef (Abstract) SchemaCollection < handle
     end
 
     properties (SetAccess = protected)
-        Parent
+        Parent              % aod.schema.EntitySchema
         className
         Records
     end
@@ -215,20 +217,6 @@ classdef (Abstract) SchemaCollection < handle
             % obj.listeners(idx) = []
         end
 
-        function names = list(obj)
-            % List all dataset names
-            %
-            % Syntax:
-            %   names = list(obj)
-            % -------------------------------------------------------------
-            if obj.Count == 0
-                names = [];
-                return
-            end
-
-            names = arrayfun(@(x) x.Name, obj.Records);
-        end
-
         function out = text(obj)
             % Convert contents to text for display
             %
@@ -249,7 +237,30 @@ classdef (Abstract) SchemaCollection < handle
 
     % Non-scalar property access
     methods
+        function names = list(obj)
+            % List all dataset names
+            %
+            % Syntax:
+            %   names = list(obj)
+            % -------------------------------------------------------------
+            if obj.Count == 0
+                names = [];
+                return
+            end
+
+            names = arrayfun(@(x) x.Name, obj.Records);
+        end
+
+        function primitiveTypes = getPrimitiveTypes(obj)
+            if obj.Count == 0
+                primitiveTypes = [];
+            else
+                primitiveTypes = arrayfun(@(x) x.primitiveType, obj.Records);
+            end
+        end
+
         function out = getClassName(obj)
+            % TODO: Needed?
             if ~isscalar(obj)
                 out = arrayfun(@(x) x.className, obj);
                 return
@@ -259,22 +270,23 @@ classdef (Abstract) SchemaCollection < handle
     end
 
     methods (Access = private)
-        function setParent(obj, entity)
-            if nargin < 2 || isempty(entity)
+        function setParent(obj, parent)
+            if nargin < 2 || isempty(parent)
                 obj.Parent = [];
                 return
             end
 
-            assert(isa(entity, 'aod.schema.Entity'),...
-                'Parent must be an AOData entity');
+            assert(isa(parent, 'aod.schema.EntitySchema'),...
+                'Parent must be an EntitySchema');
 
-            obj.Parent = entity;
+            obj.Parent = parent;
         end
     end
 
 
     % MATLAB builtin methods
     methods
+        % TODO: Keep isempty()?
         function tf = isempty(obj)
             tf = (obj.Count == 0);
         end

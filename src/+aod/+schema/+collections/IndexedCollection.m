@@ -16,6 +16,12 @@ classdef IndexedCollection < handle
 %   has(obj, ID)
 %   remove(obj, ID)
 %   set(obj, ID, varargin)
+%
+% Hierarchy:
+%   - Record
+%       - Container
+%           - IndexedCollection
+%               - Primitive(s)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -26,7 +32,7 @@ classdef IndexedCollection < handle
     end
 
     properties (Dependent)
-        Count
+        Count   (1,1)       {mustBeInteger}
     end
 
     methods
@@ -64,7 +70,7 @@ classdef IndexedCollection < handle
             end
 
             if ~obj.has(ID)
-                switch errorType 
+                switch errorType
                     case aod.infra.ErrorTypes.ERROR
                         error('get:PrimitiveNotFound',...
                             'Primitive matching input, %s, was not found',...
@@ -136,9 +142,21 @@ classdef IndexedCollection < handle
             end
         end
 
-        function [tf, ME, excObj] = checkIntegrity(obj)
-            
-            excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
+        function [tf, ME] = validateItem(obj, ID, input)
+            if istext(ID)
+                ID = obj.name2id(ID);
+            end
+
+            [tf, ME] = obj.Primitives(ID).validate(input);
+        end
+
+        function [tf, ME, excObj] = checkIntegrity(obj, ~)
+            if ~isempty(obj.Parent) && obj.Parent.isInitializing
+                return
+            end
+
+            % Supply Parent to exception (collection is transparent)
+            excObj = aod.schema.exceptions.SchemaIntegrityException(obj.Parent);
             for i = 1:obj.Count
                 [iTF, iME] = obj.Primitives(i).checkIntegrity(false);
                 if ~iTF
@@ -160,7 +178,7 @@ classdef IndexedCollection < handle
         function setParent(obj, parent)
             % SETPARENT  Validate input to Parent property before setting
             arguments
-                obj 
+                obj
                 parent          {mustBeSubclass(parent, 'aod.schema.primitives.Container')}
             end
 
@@ -173,7 +191,7 @@ classdef IndexedCollection < handle
                 obj
                 name        string
             end
-            
+
             if obj.Count == 0
                 ID = [];
             else

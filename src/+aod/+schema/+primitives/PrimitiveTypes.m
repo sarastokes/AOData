@@ -21,16 +21,17 @@ classdef PrimitiveTypes
         LINK
         NUMBER
         LIST
+        OBJECT
         TABLE
         TEXT
         UNKNOWN
     end
 
     methods
-        function tf = isTableAllowedParent(obj)
+        function tf = isContainerAllowable(obj)
             % TODO: choose between this and allowableChild property
             txt = string(obj);
-            if ismember(txt, ["BOOLEAN", "DATE", "DURATION", "NUMBER", "INTEGER", "TEXT"])
+            if ismember(txt, ["BOOLEAN", "CATEGORICAL", "DATE", "DURATION", "FILE", "NUMBER", "INTEGER", "TEXT"])
                 tf = true;
             else
                 tf = false;
@@ -87,6 +88,8 @@ classdef PrimitiveTypes
                 obj = PrimitiveTypes.LIST;
             elseif istable(data)
                 obj = PrimitiveTypes.TABLE;
+            elseif isstruct(data) || isa(data, 'containers.Map')
+                obj = PrimitiveTypes.OBJECT;
             elseif istext(data)
                 if isfile(data)
                     obj = PrimitiveTypes.FILE;

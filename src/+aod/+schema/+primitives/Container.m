@@ -25,6 +25,7 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             aod.schema.primitives.PrimitiveTypes.INTEGER,...
             aod.schema.primitives.PrimitiveTypes.DURATION,...
             aod.schema.primitives.PrimitiveTypes.DATE,...
+            aod.schema.primitives.PrimitiveTypes.FILE,...
             aod.schema.primitives.PrimitiveTypes.BOOLEAN];
     end
 
@@ -65,35 +66,26 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             else
                 if obj.isInitializing
                     p = obj.createPrimitive(varargin{:});
-                    obj.addItem(p);
+                    obj.doAddItem(p);
                 else
                     obj.editItem(varargin{:});
                 end
             end
         end
 
-        function editItem(obj, ID, varargin)
-            obj.Collections.set(ID, varargin{:});
+        function addItem(obj, varargin)
+            if iscell(varargin{1})
+                for i = 1:numel(varargin)
+                    obj.addItem(varargin{i}{:});
+                end
+            else % TODO: Error catching
+                p = obj.createPrimitive(varargin{:});
+                obj.doAddItem(p);
+            end
         end
 
-        function addItem(obj, newItem)
-            arguments
-                obj         (1,1)   aod.schema.primitives.Container
-                newItem             aod.schema.primitives.Primitive
-            end
-
-            if ~isscalar(newItem)
-                arrayfun(@(x) addItem(obj, x), newItem);
-                return;
-            end
-
-            if ~ismember(newItem.PRIMITIVE_TYPE, obj.ALLOWABLE_CHILD_TYPES)
-                error('addItem:InvalidPrimitive',...
-                    'Field %s cannot be added to %s because it has a primitive type (%s) that is not supported for containers',...
-                    newItem.Name, obj.Name, string(newItem.PRIMITIVE_TYPE));
-            end
-
-            obj.Collection.add(newItem);
+        function editItem(obj, ID, varargin)
+            obj.Collection.set(ID, varargin{:});
         end
 
         function removeItem(obj, ID)
@@ -109,10 +101,9 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             end
 
             if obj.isInitializing || isempty(obj.Collection)
-                tf = true; ME = [];
                 return
             end
-            
+
             [tf, ME, excObj] = obj.Collection.checkIntegrity();
 
             if ~tf && throwError
@@ -124,6 +115,52 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
     methods (Access = protected)
         function p = createPrimitive(obj, type, name, varargin)
             p = aod.schema.util.createPrimitive(type, name, obj, varargin{:});
+        end
+
+        function doAddItem(obj, newItem)
+            arguments
+                obj         (1,1)   aod.schema.primitives.Container
+                newItem             aod.schema.primitives.Primitive
+            end
+
+            if ~isscalar(newItem)
+                arrayfun(@(x) doAddItem(obj, x), newItem);
+                return;
+            end
+
+            if ~ismember(newItem.PRIMITIVE_TYPE, obj.ALLOWABLE_CHILD_TYPES)
+                error('addItem:InvalidPrimitive',...
+                    'Field %s cannot be added to %s because it has a primitive type (%s) that is not supported for containers',...
+                    newItem.Name, obj.Name, string(newItem.PRIMITIVE_TYPE));
+            end
+
+            obj.Collection.add(newItem);
+        end
+    end
+
+    methods (Static)
+        function inputItem = getItemFromInput(input, ID)
+
+            if iscell(input)
+                if isnumeric(ID)
+                    inputItem = input{ID};
+                else
+                    error('getItemFromInput:InvalidInput',...
+                        'Input must be a numeric index if input is a cell, not %s', class(ID));
+                end
+            elseif isstruct(input)
+                if istext(ID)
+                    inputItem = input.(ID);
+                else
+                    error('getItemFromInput:InvalidInput',...
+                        'If input is a struct, ID must be a string/char fieldname not %s', class(ID));
+                end
+            elseif istable(input)
+                inputItem = input{:, ID};
+            else
+                warning('getItemFromInput:InvalidInput',...
+                    'Validation could not extract items from inputs of type %s', class(input));
+            end
         end
     end
 end

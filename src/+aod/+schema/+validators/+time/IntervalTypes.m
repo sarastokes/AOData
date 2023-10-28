@@ -17,6 +17,29 @@ classdef IntervalTypes
         UNDEFINED
     end
 
+    methods 
+        function out = getFormat(obj)
+            import aod.schema.validators.time.IntervalTypes
+
+            switch obj
+                case IntervalTypes.SECONDS
+                    out = "s";
+                case IntervalTypes.MILLISECONDS
+                    out = "ms";
+                case IntervalTypes.MINUTES
+                    out = "m";
+                case IntervalTypes.HOURS
+                    out = "h";
+                case IntervalTypes.DAYS
+                    out = "d";
+                case IntervalTypes.YEARS
+                    out = "y";
+                case IntervalTypes.UNDEFINED
+                    out = [];
+            end
+        end
+    end
+
     methods (Static)
         function obj = get(input)
             import aod.schema.validators.time.IntervalTypes
@@ -40,23 +63,21 @@ classdef IntervalTypes
 
             switch lower(input)
                 case {'s', 'sec', 'second', 'seconds'}
-                    out = IntervalTypes.SECONDS;
+                    obj = IntervalTypes.SECONDS;
                 case {'m', 'min', 'minute', 'minutes'}
-                    out = IntervalTypes.MINUTES;
+                    obj = IntervalTypes.MINUTES;
                 case {'h', 'hr', 'hour', 'hours'}
-                    out = IntervalTypes.HOURS;
+                    obj = IntervalTypes.HOURS;
                 case {'d', 'day', 'days'}
-                    out = IntervalTypes.DAYS;
+                    obj = IntervalTypes.DAYS;
                 case {'y', 'yr', 'year', 'years'}
-                    out = IntervalTypes.YEARS;
+                    obj = IntervalTypes.YEARS;
                 case {'ms', 'msec', 'millisecond', 'milliseconds'}
-                    out = IntervalTypes.MILLISECONDS;
+                    obj = IntervalTypes.MILLISECONDS;
                 otherwise
                     error('get:InvalidIntervalType',...
                         'Invalid input "%s". Valid inputs are: seconds, minutes, hours, days, years or milliseconds', input);
             end
-
-
         end
 
         function out = getFormatFcn(input)

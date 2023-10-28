@@ -25,6 +25,7 @@ function out = fcn2regexp(fcn)
     fcn = string(func2str(fcn));
     fcn = erase(fcn, [" ", "'"]);
     fcn = erase(fcn, '"');
+    fcn = lower(fcn);
 
     withinParens = extractBetween(fcn, '(', ')');
     txtVariable = withinParens(1);
@@ -36,22 +37,25 @@ function out = fcn2regexp(fcn)
     end
     indivArgs(varPosition) = [];
 
+    % Determine the function
     if contains(fcn, 'contains')
         out = ".*" + indivArgs(1) + ".*";
-        if ismember(fcn, 'IgnoreCase,true')
-            out = out + "/i";
-        end
-    elseif contains(fcn, 'startsWith')
+    elseif contains(fcn, 'startswith')
         out = "^" + indivArgs(1);
-        if ismember(fcn, 'IgnoreCase,true')
-            out = out + "/i";
-        end
-    elseif contains(fcn, 'endsWith')
+    elseif contains(fcn, 'endswith')
         out = ".*" + indivArgs(1) + "$";
-        if ismember(fcn, 'IgnoreCase,true')
-            out = out + "/i";
-        end
     else
         error('fcn2regexp:NotSupported',...
             'The function %s is not supported', fcn);
     end 
+
+    % Decide whether to make it case-sensitive or not
+    idx = find(indivArgs == 'ignorecase');
+    if ~isempty(idx) && strcmpi(indivArgs(idx+1), 'true')
+        caseFlag = true;
+    else
+        caseFlag = false;
+    end
+    if caseFlag
+        out = out + "/i";
+    end

@@ -45,7 +45,18 @@ classdef SchemaTest < matlab.unittest.TestCase
                 @() obj.get("P1"), "get:PrimitiveNotFound");
             testCase.verifyWarning(...
                 @() obj.get("P1", "WARNING"));
+        end
+    end
 
+    methods (Test, TestTags="List")
+        function List(testCase)
+            obj = aod.schema.primitives.List("TestList", []);
+            testCase.verifyEqual(obj.numItems, 0);
+            obj.assign("Items", {{'Boolean', 'Size', '(1,1)'}, {'Number', 'Units', 'mV'}});
+            testCase.verifyEqual(obj.numItems, 2);
+
+            testCase.verifyTrue(obj.checkIntegrity())
+            testCase.verifyTrue(obj.validate({true, 2}));
         end
     end
 
@@ -110,7 +121,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Count, 0);
             testCase.verifyEqual(obj.className, "aod.core.Calibration");
 
-            obj.add('TestFile', 'Description', 'A test file', 'ExtensionType', '.txt');
+            obj.add('TestFile', 'Description', 'A test file', 'Extension', '.txt');
             testCase.verifyNotEmpty(obj);
             testCase.verifyEqual(obj.Count, 1);
             testCase.verifyEqual(obj.Records(1).Name, "TestFile");
