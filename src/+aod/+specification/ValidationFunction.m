@@ -150,7 +150,7 @@ classdef ValidationFunction < aod.schema.Validator
             tf = strcmp(text(obj), text(other));
         end
 
-        function out = jsonencode(obj)
+        function out = jsonencode(obj ,varargin)
             if isempty(obj)
                 out = jsonencode([]);
             else

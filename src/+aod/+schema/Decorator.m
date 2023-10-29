@@ -31,28 +31,20 @@ classdef (Abstract) Decorator < aod.schema.Specification
                 out = value2string(obj.Value);
             end
         end
+
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
+        end
     end
 
     % MATLAB built-in methods
     methods
-        function tf = isSpecified(obj)
-            tf = ~aod.util.isempty(obj.Value);
-        end
-
         function tf = isequal(obj, other)
             if ~isa(other, class(obj))
                 tf = false;
                 return
             end
             tf = isequal(obj.Value, other.Value);
-        end
-
-        function out = jsonencode(obj)
-            if aod.util.isempty(obj.Value)
-                out = jsonencode([]);
-            else
-                out = jsonencode(obj.Value);
-            end
         end
     end
 end

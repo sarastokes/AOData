@@ -56,8 +56,8 @@ classdef DefaultValue < aod.schema.Validator
             tf = aod.util.isempty(obj.Value);
         end
 
-        function out = jsonencode(obj)
-            if isempty(obj)
+        function out = jsonencode(obj, varargin)
+            if aod.util.isempty(obj)
                 out = jsonencode([]);
             else
                 out = jsonencode(obj.Value);

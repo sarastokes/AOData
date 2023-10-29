@@ -14,7 +14,7 @@ classdef Size < aod.schema.Validator
 %   tf = isequal(obj, other)
 %   tf = isscalar(obj)
 %   tf = isvector(obj)
-%   out = jsonencode(obj)
+%   out = jsonencode(obj, varargin)
 %   x = ndims(obj)
 %
 % TODO: custom display so human-readable size is shown in disp()
@@ -151,12 +151,6 @@ classdef Size < aod.schema.Validator
         end
     end
 
-    methods (Access = protected)
-        function out = toYAML(obj)
-            out = obj.text();
-        end
-    end
-
     methods (Access = private)
         function setSizeType(obj)
             % Set the SizeType
@@ -284,16 +278,16 @@ classdef Size < aod.schema.Validator
             tf = true;
         end
 
-        function out = jsonencode(obj)
+        function out = jsonencode(obj, varargin)
             % Convert to JSON-formatted text
             %
             % Syntax:
-            %   out = jsonencode(obj)
+            %   out = jsonencode(obj, varargin)
             % -------------------------------------------------------------
             if ~obj.isSpecified()
-                out = jsonencode([]);
+                out = jsonencode([], varargin{:});
             else
-                out = jsonencode(obj.text());
+                out = jsonencode(obj.text(), varargin{:});
             end
         end
 

@@ -129,13 +129,5 @@ classdef Class < aod.schema.Validator
             end
             tf = true;
         end
-
-        function out = jsonencode(obj)
-            if ~obj.isSpecified()
-                out = jsonencode([]);
-            else
-                out = jsonencode(obj.Value);
-            end
-        end
     end
 end

@@ -56,15 +56,4 @@ classdef Description < aod.schema.Decorator
             end
         end
     end
-
-    % MATLAB built-in methods
-    methods
-        function out = jsonencode(obj)
-            if ~obj.isSpecified()
-                out = jsonencode([]);
-            else
-                out = jsonencode(obj.Value);
-            end
-        end
-    end
 end

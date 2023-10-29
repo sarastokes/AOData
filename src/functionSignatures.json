@@ -1,57 +1,70 @@
 {
     "_schemaVersion": "1.0.0",
-    
-    "aod.specification.types.Number.assign": 
+
+    "aod.schema.SchemaCollection.set":
     {
         "inputs": [
             {"name": "obj",
-                "kind": "required", "type": "aod.specification.types.Number"},
+                "kind": "required", "type": "aod.schema.SchemaCollection"},
+            {"name": "name",
+                "kind": "required", "type": [["string"],["char"]]},
+            {"name": "primitiveType",
+                "kind": "required", "type": [["string"], ["char"], ["aod.schema.primitives.PrimitiveTypes"]]},
+            {"name": "Default", "purpose": "A default value"},
+            {"name": "Description", "purpose": "A description of the data/metadata"}
+        ]
+    },
+    "aod.schema.primitives.Number.assign":
+    {
+        "inputs": [
+            {"name": "obj",
+                "kind": "required", "type": "aod.schema.primitives.Number"},
             {"name": "Size",
-                "kind": "keyvalue", "type": [["double"], ["string"]]},
+                "kind": "namevalue", "type": [["double"], ["string"]]},
             {"name": "Minimum",
-                "kind": "keyvalue", "type": "double",
+                "kind": "namevalue", "type": "double",
                 "purpose": "The minimum allowable value of the number"},
             {"name": "Maximum",
-                "kind": "keyvalue", "type": "double",
+                "kind": "namevalue", "type": "double",
                 "purpose": "The maximum allowable value of the number"},
             {"name": "Default",
-                "kind": "keyvalue", "type": "double",
+                "kind": "namevalue", "type": "double",
                 "purpose": "A default value for the number"},
             {"name": "Description",
-                "kind": "keyvalue", "type": "string"},
+                "kind": "namevalue", "type": "string"},
             {"name": "Units",
-                "kind": "keyvalue", "type": "string"}
+                "kind": "namevalue", "type": "string"}
         ]
     },
     "aod.common.mixins.Entity.hasAttr":
     {
-        "inputs": 
+        "inputs":
         [
-            {"name": "obj", 
-                "kind": "required", 
+            {"name": "obj",
+                "kind": "required",
                 "type":[["aod.core.Entity"], ["aod.persistent.Entity"]]},
-            {"name": "attrName", 
-                "kind": "required", 
+            {"name": "attrName",
+                "kind": "required",
                 "type":[["string"], ["char"]],
                 "purpose": "The name of the attribute (case sensitive)"}
         ]
     },
     "aod.common.mixins.Entity.getAttr":{
         "inputs": [
-            {"name": "obj", 
-                "kind":"required", 
+            {"name": "obj",
+                "kind":"required",
                 "type":[["aod.core.Entity"], ["aod.persistent.Entity"]]},
-            {"name": "attrName", 
-                "kind": "required", 
-                "type": ["char"], 
+            {"name": "attrName",
+                "kind": "required",
+                "type": ["char"],
                 "purpose":"The name of the attribute (case sensitive)"},
-            {"name": "errorType", 
-                "kind": "ordered", 
+            {"name": "errorType",
+                "kind": "ordered",
                 "type": [["char", "choices={'none', 'missing', 'warning', 'error'}"], ["aod.infra.ErrorTypes"]],
                 "purpose": "How to handle missing values"}
         ]
     },
-    "aod.common.mixins.Entity.hasProp": 
+    "aod.common.mixins.Entity.hasProp":
     {
         "inputs": [
             {"name": "obj",
@@ -64,26 +77,26 @@
     "aod.core.Entity.Entity":
     {
         "inputs":[
-            {"name": "name", 
-                "kind": "positional", 
+            {"name": "name",
+                "kind": "positional",
                 "type": ["string", "char"]},
-            {"name": "parent", 
-                "kind": "namevalue", 
+            {"name": "parent",
+                "kind": "namevalue",
                 "type":[["aod.core.Entity"], ["aod.persistent.Entity"]]}
         ]
     },
     "aod.core.Epoch.Epoch":
     {
         "inputs":[
-            {"name": "ID", 
-                "kind": "required", 
+            {"name": "ID",
+                "kind": "required",
                 "type":["integer"]},
-            {"name": "Source", 
-                "kind": "namevalue", 
+            {"name": "Source",
+                "kind": "namevalue",
                 "type":["aod.core.Source", "aod.persistent.Source"]},
-            {"name": "System", 
-                "kind": "namevalue", 
-                "type":["aod.core.System", "aod.persistent.System"], 
+            {"name": "System",
+                "kind": "namevalue",
+                "type":["aod.core.System", "aod.persistent.System"],
                 "purpose": "The Source from which data was acquired during the Epoch"},
             {"name": "Parent",
                 "kind": "namevalue",
@@ -103,8 +116,8 @@
             {"mutuallyExclusiveGroup":
                 [
                     [
-                        {"name": "query", 
-                            "kind": "ordered", 
+                        {"name": "query",
+                            "kind": "ordered",
                             "type": "cell",
                             "repeating": true,
                             "purpose": "AOQuery cells"}
@@ -121,14 +134,14 @@
     },
     "aod.h5.writeExperimentToFile": {
         "inputs": [
-            {"name": "hdfName", 
-                "kind":"required", 
+            {"name": "hdfName",
+                "kind":"required",
                 "type":["char","string"]},
-            {"name": "obj", 
-                "kind": "required", 
+            {"name": "obj",
+                "kind": "required",
                 "type": ["aod.core.Experiment"]},
-            {"name": "overwriteFlag", 
-                "kind":"ordered", 
+            {"name": "overwriteFlag",
+                "kind":"ordered",
                 "type":["logical"]}
         ]
     }

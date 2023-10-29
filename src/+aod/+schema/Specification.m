@@ -60,12 +60,18 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Access = protected)
-        function out = toYAML(obj)
-            % Overwrite by subclasses, if needed
-            out = {obj.Value};
+    methods
+        function out = jsonencode(obj, varargin)
+            % Subclasses may modify if needed
+            if ~obj.isSpecified()
+                out = jsonencode([], varargin{:});
+            else
+                out = jsonencode(obj.Value, varargin{:});
+            end
         end
+    end
 
+    methods (Access = protected)
         function notifyListeners(obj, msg)
             evtData = aod.specification.events.ValidationEvent(...
                 class(obj), msg);
@@ -77,16 +83,6 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         function setParent(obj, primitive)
             % TODO: Validation
             obj.Parent = primitive;
-        end
-
-        function out = getValueForYAML(obj)
-            % Note that values need to be wrapped in a cell array to
-            % ensure proper conversion to YAML
-            if ~obj.isSpecified()
-                out = {yaml.Null};
-            else
-                out = {obj.toYAML()};
-            end
         end
     end
 end

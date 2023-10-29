@@ -43,7 +43,7 @@
 - [ ] Show schema for a specific data type in UI (as a tree? text?)
 
 
-### Schema JSON (or YAML)
+### Schema JSON
 Should entire package be in one file or separate files referenced by a "schema registry"? If the files are large, might want to serialize with msgpack.
 - Schema UUID
   - *Versions*

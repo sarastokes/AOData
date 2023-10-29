@@ -65,7 +65,7 @@ classdef EntityType < aod.schema.Validator
 
     % Matlab builtin methods
     methods
-        function out = jsonencode(obj)
+        function out = jsonencode(obj, varargin)
             if ~obj.isSpecified()
                 out = jsonencode([]);
             else

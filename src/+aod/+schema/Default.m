@@ -65,13 +65,5 @@ classdef Default < aod.schema.Specification
                 tf = isequal(obj.Value, other.Value);
             end
         end
-
-        function out = jsonencode(obj)
-            if ~obj.isSpecified()
-                out = jsonencode([]);
-            else
-                out = jsonencode(obj.Value);
-            end
-        end
     end
 end

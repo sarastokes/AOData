@@ -70,7 +70,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 record = [];
                 return
             end
-        
+
             parent = obj.Parent;
             while ~isa(parent, 'aod.schema.Record')
                 parent = parent.Parent;
@@ -83,7 +83,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 
         function parentObj = getParent(obj, parentType)
             arguments
-                obj 
+                obj
                 parentType      {mustBeMember(parentType, ["", "Record", "Collection", "Entity"])} = ""
             end
 
@@ -151,23 +151,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             changedProps = setdiff(ip.Parameters, ip.UsingDefaults);
             cellfun(@(x) obj.parse(x, ip.Results.(x)), changedProps);
             obj.checkIntegrity();
-        end
-
-        function S = toYAML(obj)
-            % Create a structure prepped for writing to a YAML file
-            %
-            % Syntax:
-            %   S = toYAML(obj)
-            % ----------------------------------------------------------
-            S.(obj.Name) = struct();
-
-            currentProps = string(properties(obj));
-            for i = 1:numel(currentProps)
-                iProp = currentProps(i);
-                if isSubclass(obj.(iProp), 'aod.schema.Specification')
-                    S.(obj.Name).(iProp) = obj.(iProp).getValueForYAML();
-                end
-            end
         end
     end
 
@@ -286,7 +269,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 value
                 errorType           = aod.infra.ErrorTypes.ERROR
             end
-            
+
             errorType = aod.infra.ErrorTypes.init(errorType);
 
             tf = true; MEs = [];
