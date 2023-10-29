@@ -63,7 +63,6 @@ classdef EntitySchema < handle
                     end
                 end
             end
-
         end
 
         function out = getSchemaByType(obj, schemaType)
@@ -80,6 +79,34 @@ classdef EntitySchema < handle
             end
         end
 
+        function out = code(obj)
+            if isempty(obj.Parent)
+                superName = "UNKNOWN";  % For testing 
+            else
+                superName = superclasses(obj.Parent);
+                superName = superName{1};
+            end
+
+            out = sprintf("\tmethods (Static)\n");
+            dsetCode = obj.Datasets.code();
+            out = out + sprintf("\t\tfunction value = specifyDatasets(value)\n");
+            out = out + sprintf("\t\t\tvalue = specifyDatasets@%s(value);\n", superName);
+            out = out + dsetCode + sprintf("\t\tend\n\n");
+
+            attrCode = obj.Attributes.code();
+            out = out + sprintf("\t\tfunction value = specifyAttributes()\n");
+            out = out + sprintf("\t\t\tvalue = specifyAttributes@%s();\n\n", superName);
+            out = out + attrCode + sprintf("\t\tend\n\n");
+
+            fileCode = obj.Files.code();
+            out = out + sprintf("\t\tfunction value = specifyFiles()\n");
+            out = out + sprintf("\t\t\tvalue = specifyFiles@%s();\n\n", superName);
+            out = out + fileCode + sprintf("\t\tend\n");
+            out = out + sprintf("\tend\n");
+        end
+    end
+
+    methods
         function checkForUndefined(obj)
             % TODO: Quickly access primitive types
         end

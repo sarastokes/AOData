@@ -35,7 +35,6 @@ classdef SpecsTest < matlab.unittest.TestCase
         end
 
         function CoreEntityType(testCase)
-
             obj = aod.schema.validators.EntityType([], 'Calibration');
 
             [tf, ME] = obj.validate(aod.core.Calibration('Test', getDateYMD()));
@@ -54,6 +53,8 @@ classdef SpecsTest < matlab.unittest.TestCase
         function Enum(testCase)
             obj = aod.schema.validators.Enum([], ["a", "b", "c"]);
             testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Enum([], ["a", "b", "c"]));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Enum([], ["a", "b", "d"]));
 
             [tf, ME] = obj.validate("a");
             testCase.confirmValid(tf, ME);
@@ -77,6 +78,8 @@ classdef SpecsTest < matlab.unittest.TestCase
         function Length(testCase)
             obj = aod.schema.validators.Length([], 3);
             testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Length([], 3));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Length([], 4));
             testCase.verifyEqual(obj.text(), "3");
 
             [tf, ME] = obj.validate("abc");
@@ -114,7 +117,9 @@ classdef SpecsTest < matlab.unittest.TestCase
     methods (Test, TestTags="Count")
         function Count(testCase)
             obj = aod.schema.validators.Count([], 3);
-            testCase.verifyFalse(isempty(obj));
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Count([], 3));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Count([], 4));
 
             [tf, ME] = obj.validate(["a", "b", "c"]);
             testCase.confirmValid(tf, ME);
@@ -150,6 +155,9 @@ classdef SpecsTest < matlab.unittest.TestCase
         function Units(testCase)
             obj = aod.schema.decorators.Units([], "mV");
             testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.decorators.Units([], "mV"));
+            testCase.verifyNotEqual(obj, aod.schema.decorators.Units([], "mm"));
+
 
             obj.setValue(["mV"; "sec"]);
             testCase.verifyEqual(obj.Value, ["mV", "sec"]);
@@ -176,6 +184,8 @@ classdef SpecsTest < matlab.unittest.TestCase
 
             obj = aod.schema.validators.Extension([], ".txt");
             testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Extension([], ".txt"));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Extension([], ".json"));
 
             [tf, ME] = obj.validate([]);
             testCase.confirmValid(tf, ME);

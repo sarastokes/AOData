@@ -85,4 +85,22 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
             obj.Parent = primitive;
         end
     end
+
+    % MATLAB builtin methods
+    methods
+        function tf = isequal(obj, other)
+            % If a subclass doesn't have Value, they should override this
+            if ~isa(other, class(obj))
+                tf = false;
+                return
+            end
+
+            if ~obj.isSpecified() && ~other.isSpecified()
+                tf = true;
+                return
+            end
+
+            tf = isequal(obj.Value, other.Value);
+        end
+    end
 end

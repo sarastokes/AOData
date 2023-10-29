@@ -39,19 +39,4 @@ classdef (Abstract) Validator < aod.schema.Specification
             tf = ~isempty(obj.Value);
         end
     end
-
-    % MATLAB builtin methods
-    methods
-        function tf = isequal(obj, other)
-            if ~isa(other, class(obj))
-                tf = false;
-                return
-            end
-
-            % If a subclass doesn't have Value, they should override this
-            if isprop(obj, 'Value') && isprop(other, 'Value')
-                tf = isequal(obj.Value, other.Value);
-            end
-        end
-    end
 end

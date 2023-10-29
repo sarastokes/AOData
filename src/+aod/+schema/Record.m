@@ -83,6 +83,35 @@ classdef Record < handle
                 primitiveType, obj.Name, obj);
             obj.Primitive = newPrimitive;
         end
+
+        function out = code(obj, collectionVarName)
+            % CODE  Returns the code for the primitive
+            %
+            % Syntax:
+            %   out = code(obj)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                collectionVarName  (1,1)     string = "value"
+            end
+            if ~isempty(obj.Parent) && obj.Parent.schemaType == "Dataset"
+                fcnName = 'set';
+            else
+                fcnName = 'add';
+            end
+            out = sprintf('\t\t\t%s.%s("%s", "%s"', ...
+                collectionVarName, fcnName, obj.Name, char(obj.primitiveType));
+            for i = 1:numel(obj.Primitive.OPTIONS)
+                if ~obj.Primitive.(obj.Primitive.OPTIONS(i)).isSpecified()
+                    continue
+                end
+                out = sprintf('%s,...\n\t\t\t\t"%s", %s', out,...
+                    obj.Primitive.OPTIONS(i), obj.Primitive.(obj.Primitive.OPTIONS(i)).jsonencode());
+            end
+            out = sprintf("%s);\n", out);
+            out = string(out);
+
+        end
     end
 
     % Methods that pass to primitive
@@ -97,7 +126,7 @@ classdef Record < handle
                 input
                 errorType           = aod.infra.ErrorTypes.ERROR
             end
-            
+
             errorType = aod.infra.ErrorTypes.init(errorType);
 
             [tf, ME] = obj.Primitive.validate(input, errorType);

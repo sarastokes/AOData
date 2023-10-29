@@ -53,7 +53,6 @@ classdef AttributeCollection < aod.schema.SchemaCollection
         end
 
         function ip = getParser(obj)
-            % Amazingly this works
             ip = aod.util.InputParser();
             for i = 1:obj.Count
                 addParameter(ip, obj.Records(i).Name,...

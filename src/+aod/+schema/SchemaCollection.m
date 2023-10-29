@@ -233,6 +233,22 @@ classdef (Abstract) SchemaCollection < handle
                 out = out + obj.Records(i).text();
             end
         end
+
+        function out = code(obj, collectionVarName)
+            arguments
+                obj
+                collectionVarName    (1,1)  string = "value"
+            end
+            if obj.Count == 0
+                out = "";
+                return
+            end
+
+            out = "";
+            for i = 1:obj.Count
+                out = out + obj.Records(i).code(collectionVarName);
+            end
+        end
     end
 
     % Non-scalar property access
@@ -285,11 +301,6 @@ classdef (Abstract) SchemaCollection < handle
 
     % MATLAB builtin methods
     methods
-        % TODO: Keep isempty()?
-        function tf = isempty(obj)
-            tf = (obj.Count == 0);
-        end
-
         function tf = isequal(obj, other)
             if ~isa(other, class(obj))
                 tf = false;
