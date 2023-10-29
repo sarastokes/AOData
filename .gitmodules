@@ -24,6 +24,3 @@
 [submodule "lib/jsonlab"]
 	path = lib/jsonlab
 	url = https://github.com/fangq/jsonlab.git
-[submodule "lib/yaml"]
-	path = lib/yaml
-	url = https://github.com/MartinKoch123/yaml.git
