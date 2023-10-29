@@ -6,12 +6,8 @@ classdef FileCollection < aod.schema.SchemaCollection
     end
 
     methods
-        function obj = FileCollection(className, parent)
-            arguments
-                className       string    = []
-                parent                    = []
-            end
-            obj = obj@aod.schema.SchemaCollection(className, parent);
+        function obj = FileCollection(parent)
+            obj = obj@aod.schema.SchemaCollection(parent);
         end
     end
 

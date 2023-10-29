@@ -16,13 +16,13 @@ classdef CustomSubclassController < aod.app.Controller
     properties (SetAccess = private)
         helpBox                 matlab.ui.control.TextArea
         titleBox                matlab.ui.control.Label
-        codeEditor              weblab.components.CodeEditor 
+        codeEditor              weblab.components.CodeEditor
     end
 
     properties (Hidden, Constant)
-        LAYOUT_PROPS = {"Padding", 5,... 
+        LAYOUT_PROPS = {"Padding", 5,...
             "RowSpacing", 5, "ColumnSpacing", 5};
-        ICON_DIR = fullfile(getpref('AOData', 'BasePackage'),... 
+        ICON_DIR = fullfile(getpref('AOData', 'BasePackage'),...
             'src', '+aod', '+app', '+icons');
     end
 
@@ -31,12 +31,12 @@ classdef CustomSubclassController < aod.app.Controller
             arguments
                 model   {mustBeA(model, "aod.app.creator.CustomSubclass")} = aod.app.creator.CustomSubclass();
             end
-            
+
             obj@aod.app.Controller(model);
         end
 
         function m = getModel(obj)
-            % For debugging but may be worth keeping around for times when 
+            % For debugging but may be worth keeping around for times when
             % Model isn't explicitly created before Controller
             m = obj.Model;
         end
@@ -91,9 +91,9 @@ classdef CustomSubclassController < aod.app.Controller
                 obj.onModelChangedAttributes();
             end
         end
-    end 
-    
-    methods 
+    end
+
+    methods
         function update(obj)
             if obj.Model.isViewable
                 set(findByTag(obj.figureHandle, "UpdateButton"),...
@@ -111,14 +111,14 @@ classdef CustomSubclassController < aod.app.Controller
     % Support methods
     methods
         function [success, ME] = trySetModel(obj, propName, propValue)
-            % Try to set Model property, collects errors if fails 
+            % Try to set Model property, collects errors if fails
             %
             % Description:
-            %   Tries to set Model property and collects any errors that 
-            %   are thrown by Model's set function parsing. The calling 
-            %   function then has the option of handling the error to 
+            %   Tries to set Model property and collects any errors that
+            %   are thrown by Model's set function parsing. The calling
+            %   function then has the option of handling the error to
             %   ensure it doesn't halt functionality of the UI for user.
-            %   Because the Model's set functions handle all argument 
+            %   Because the Model's set functions handle all argument
             %   validation, errors are expected to be relatively common
             %
             % Syntax:
@@ -129,7 +129,7 @@ classdef CustomSubclassController < aod.app.Controller
                 obj.Model.(propName) = propValue;
                 success = true;
                 ME = [];
-            catch ME 
+            catch ME
                 success = false;
             end
         end
@@ -203,7 +203,7 @@ classdef CustomSubclassController < aod.app.Controller
             if isempty(filePath)
                 filePath = [];
             end
-            
+
             [success, ME] = obj.trySetModel('FilePath', filePath);
             if success
                 obj.setFilePath(filePath);
@@ -254,7 +254,7 @@ classdef CustomSubclassController < aod.app.Controller
                 return
             end
             [success, ME] = obj.trySetModel('SuperClass', evt.Value);
-            if success 
+            if success
                 obj.didSetSuperClass(false);
             else
                 obj.showError(ME.message);
@@ -308,7 +308,7 @@ classdef CustomSubclassController < aod.app.Controller
         end
 
         function onPushAddDataset(obj, ~, ~)
-            out = inputdlg('What is the dataset name?',... 
+            out = inputdlg('What is the dataset name?',...
                 'New Dataset', [1 35], "DatasetName");
 
             if isempty(out)
@@ -323,7 +323,7 @@ classdef CustomSubclassController < aod.app.Controller
         function onPushRemoveDataset(obj, ~, ~)
             h = findByTag(obj.figureHandle, "DatasetListBox");
             if isempty(h.Items) || isempty(h.Value)
-                return 
+                return
             end
             out = h.Value;
             obj.Model.removeDataset(out);
@@ -336,7 +336,7 @@ classdef CustomSubclassController < aod.app.Controller
         end
 
         function onPushAddAttribute(obj, ~, ~)
-            out = inputdlg('What is the attribute name?',... 
+            out = inputdlg('What is the attribute name?',...
                 'New Attribute UI', [1 35], "MyParam");
 
             if isempty(out)
@@ -347,11 +347,11 @@ classdef CustomSubclassController < aod.app.Controller
             obj.Model.addAttribute(attr);
             inspect(obj.Model.Attributes(end));
         end
-        
+
         function onPushRemoveAttribute(obj, ~, ~)
             h = findByTag(obj.figureHandle, "AttributeListBox");
             if isempty(h.Items) || isempty(h.Value)
-                return 
+                return
             end
             out = h.Value;
             obj.Model.removeAttribute(out);
@@ -399,7 +399,7 @@ classdef CustomSubclassController < aod.app.Controller
         end
 
         function onGetHelp(obj, src, ~)
-            switch src.Tag 
+            switch src.Tag
                 case "CodePanel"
                     obj.helpBox.Value = "Once Class Name, File Path, Entity Type and Superclass are set " + ...
                         "click the Update button after making changes to see their impact on how the AOData " + ...
@@ -415,7 +415,7 @@ classdef CustomSubclassController < aod.app.Controller
                     obj.helpBox.Value = ...
                         "Which AOData entity type should the new class be?";
                 case "SuperclassPanel"
-                    obj.helpBox.Value = "Choose a superclass. " + ... 
+                    obj.helpBox.Value = "Choose a superclass. " + ...
                         "The entity will inherit properties and methods from this class";
                 case "GroupNamePanel"
                     obj.helpBox.Value = ...
@@ -442,7 +442,7 @@ classdef CustomSubclassController < aod.app.Controller
                 "RowHeight", {'fit', '2x', 'fit', '0.15x'},...
                 "ColumnWidth", {'1x', '1x'},...
                 "RowSpacing", 3);
-            
+
             % Title
             obj.titleBox = uilabel(mainLayout,...
                 "Text", "   ", "HorizontalAlignment", "center",...
@@ -468,7 +468,7 @@ classdef CustomSubclassController < aod.app.Controller
                 "Tag", "DetailPanel", "FontSize", 12);
             obj.setLayout(p, [1 3], 2);
             obj.makeDetailBox(p);
-            
+
             % SPECIFICATION --------------------------------------
             % What should the entity be named?
             % > uieditfield (#1)
@@ -476,7 +476,7 @@ classdef CustomSubclassController < aod.app.Controller
                 "FontSize", 12, "Tag", "ClassNamePanel",...
                 "ButtonDownFcn", @obj.onGetHelp);
             obj.setLayout(p, 1, [1 3]);
-            uieditfield(uigridlayout(p, [1 1], obj.LAYOUT_PROPS{:}),... 
+            uieditfield(uigridlayout(p, [1 1], obj.LAYOUT_PROPS{:}),...
                 "Value", "",...
                 "Tag", "ClassName",...
                 "ValueChangedFcn", @obj.onClassNameChanged);
@@ -497,8 +497,8 @@ classdef CustomSubclassController < aod.app.Controller
             obj.setLayout(p, 2, [1 3]);
             uidropdown(uigridlayout(p, [1 1], obj.LAYOUT_PROPS{:}),...
                 "ValueChangedFcn", @obj.onEntityTypeSelected,...
-                "Tag", "EntityTypeDropdown");           
-            
+                "Tag", "EntityTypeDropdown");
+
             % What is the superclass?
             % > uidropdown (#4) based on entityType, then show inherited
             p = uipanel(basicGrid, "Title", "Superclass",...
@@ -510,14 +510,14 @@ classdef CustomSubclassController < aod.app.Controller
                 "ValueChangedFcn", @obj.onSuperclassSelected);
 
             % What attributes are expected?
-            % - Required: Name 
+            % - Required: Name
             %   > uieditbox
             % - Optional: default, validation
             %   > uieditbox, uieditbox
             % - Optional: importance - required, optional or N/A
             %   > uidropdown (default N/A)
             p = uipanel(basicGrid, "Title", "Attributes",...
-                "FontSize", 12, "FontWeight", "bold",... 
+                "FontSize", 12, "FontWeight", "bold",...
                 "Tag", "AttributePanel",...
                 "ButtonDownFcn", @obj.onGetHelp);
             obj.setLayout(p, 4, [1 2]);
@@ -531,14 +531,14 @@ classdef CustomSubclassController < aod.app.Controller
             % - Optional: Property's importance - required, optional or N/A
             %   > uidropdown (default N/A)
             p = uipanel(basicGrid, "Title", "Datasets",...
-                "FontSize", 12, "FontWeight", "bold",... 
+                "FontSize", 12, "FontWeight", "bold",...
                 "Tag", "DatasetPanel",...
                 "ButtonDownFcn", @obj.onGetHelp);
             obj.setLayout(p, 4, [3 4]);
             obj.makeDatasetPanel(p);
 
             % What links should the entity have (properties)?
-            % - Required: Name 
+            % - Required: Name
             %   > uieditfield
             % - Optional: entityType(s)
             %   > uidropdown (excluding Experiment, Parent & EntityType)
@@ -551,7 +551,7 @@ classdef CustomSubclassController < aod.app.Controller
 
             % How should the entity's group name be determined?
             % - User-defined?
-            %   > uicheckbox (isRequired)
+            %   > uicheckbox (Required)
             % - Hard-coded default? Could still be changed with setName
             %   - What is the default?
             %   > uicheckbox, uieditfield if true
@@ -575,7 +575,7 @@ classdef CustomSubclassController < aod.app.Controller
         function makeDetailBox(obj, p)
             mainLayout = uigridlayout(p, [2 1],...
                 "RowHeight", {'1x', 'fit'}, obj.LAYOUT_PROPS{:});
-        
+
             obj.codeEditor = weblab.components.CodeEditor();
             f = weblab.internal.Frame("Parent", mainLayout);
             f.insert(obj.codeEditor);
@@ -603,7 +603,7 @@ classdef CustomSubclassController < aod.app.Controller
                 "Icon", obj.getIcon('filecabinet.png'),...
                 "Tag", "FileBrowserButton",...
                 "ButtonPushedFcn", @obj.onPushFileBrowser);
-            uitextarea(g, "Value", "",... 
+            uitextarea(g, "Value", "",...
                 "Tag", "FilePath", "Editable", "off");
         end
 
@@ -697,4 +697,4 @@ classdef CustomSubclassController < aod.app.Controller
             end
         end
     end
-end 
+end

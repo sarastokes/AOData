@@ -100,7 +100,7 @@ classdef Persistor < handle
 
             % Change the entity name
             h5tools.move(obj.hdfName, oldPath, newPath);
-            
+
             % Ensure the change is reflected in EntityFactory
             evtData = aod.persistent.events.HdfPathEvent(...
                 src, oldPath, newPath);
@@ -108,7 +108,7 @@ classdef Persistor < handle
         end
 
         function onLinkChanged(obj, src, evt)
-            % Callback for changes to a softlink 
+            % Callback for changes to a softlink
             %
             % Syntax:
             %   onLinkChanged(obj, src, evt)
@@ -118,15 +118,15 @@ classdef Persistor < handle
 
             if isempty(evt.Value)
                 % Link removed
-                h5tools.deleteObject(obj.hdfName, h5tools.util.buildPath(... 
+                h5tools.deleteObject(obj.hdfName, h5tools.util.buildPath(...
                     src.hdfPath, evt.Name));
             else
-                try 
+                try
                     %! Use exists instead of try/catch
                     h5tools.writelink(obj.hdfName,...
                         src.hdfPath, evt.Name, evt.Value.hdfPath);
                 catch
-                    % As far as` I can find, there's no way to change an 
+                    % As far as` I can find, there's no way to change an
                     % existing softlink so pull metadata, delete, recreate
                     h5tools.deleteObject(obj.hdfName, linkPath);
                     % Recreate the link and add original attributes
@@ -166,7 +166,7 @@ classdef Persistor < handle
             elseif strcmp(evt.Action, 'Replace');
                 newObj = evt.NewEntity;
                 oldObj = evt.Entity;
-                
+
                 % Update atttribute properties
                 if ~strcmp(newObj.label, oldObj.label)
                     h5writeatt(obj.hdfName, hdfPath, 'label', newObj.label);
@@ -180,17 +180,14 @@ classdef Persistor < handle
                 h5writeatt(obj.hdfName, hdfPath, 'dateCreated', newObj.dateCreated);
 
                 % Update specifications
-                if ~isequal(newObj.expectedDatasets, oldObj.expectedDatasets)
-                    aod.h5.writeSpecificationManager(obj.hdfName, hdfPath,... 
-                        'expectedDatasets', newObj.expectedDatasets);
-                end
-                if ~isequal(newObj.expectedAttributes, oldObj.expectedAttributes)
-                    aod.h5.writeSpecificationManager(obj.hdfName, hdfPath,...
-                        'expectedAttributes', newObj.expectedAttributes);
+                % TODO Update for new Schemas
+                if ~isequal(newObj.Schema, oldObj.Schema)
+                    aod.h5.writeEntitySchema(obj.hdfName, hdfPath,...
+                        'Schema', newObj.Schema);
                 end
 
                 % Final steps below aren't needed
-                return 
+                return
             end
 
             % Ensure the change is reflected in EntityFactory
@@ -218,10 +215,10 @@ classdef Persistor < handle
             if isempty(evt.NewValue)
                 % Dataset should be deleted
                 h5tools.deleteObject(obj.hdfName, fullPath, evt.Name);
-            elseif ~h5tools.exist(obj.hdfName, fullPath) 
+            elseif ~h5tools.exist(obj.hdfName, fullPath)
                 % Dataset does not yet exist
                 aod.h5.write(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
-            else  
+            else
                 % Dataset exists and should be overwritten
                 aod.h5.write(obj.hdfName, src.hdfPath, evt.Name, evt.NewValue);
             end

@@ -10,8 +10,8 @@ classdef SubclassWriter < handle
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-%#ok<*AGROW> 
-%#ok<*MANU> 
+%#ok<*AGROW>
+%#ok<*MANU>
 
     properties (SetAccess = private)
         Model
@@ -27,7 +27,7 @@ classdef SubclassWriter < handle
         function write(obj)
             if exist(obj.Model.classFileName, 'file')
                 delete(obj.Model.classFileName);
-            end 
+            end
             out = obj.getFull();
             out = strsplit(out, '\n');
             for i = 1:numel(out)
@@ -62,7 +62,7 @@ classdef SubclassWriter < handle
     end
 
     % Components of the class
-    methods 
+    methods
         function out = getHeader(obj)
             out = sprintf("classdef %s < %s", ...
                 obj.Model.ClassName, obj.Model.SuperClass);
@@ -152,7 +152,7 @@ classdef SubclassWriter < handle
                 out = out + obj.indent(4) + "name = " + string(sprintf('"%s";', obj.Model.defaultName)) + newline;
                 out = out + obj.indent(3) + "end" + newline;
                 out = out + obj.addLineBreak();
-            end 
+            end
             out = out + obj.indent(3) + obj.getSupercall() + newline;
 
             % Direct assignment for required properties
@@ -209,7 +209,7 @@ classdef SubclassWriter < handle
         end
         function out = getSetLabel(obj)
             out = "";
-            if obj.Model.groupNameMode == "DefinedInternally"                             
+            if obj.Model.groupNameMode == "DefinedInternally"
                 out = out + obj.indent(2) + "function value = specifyLabel(obj)" + newline;
                 out = out + obj.indent(3) + sprintf("value = specifyLabel@%s(obj);", obj.Model.SuperClass) + newline + newline;
                 out = out + obj.indent(3) + "% Modify value as needed to set label" + newline;
@@ -242,9 +242,9 @@ classdef SubclassWriter < handle
                 out = out + obj.indent(3) + "% Add new attributes" + newline;
                 for i = 1:numel(obj.Model.Attributes)
                     iAttr = obj.Model.Attributes(i);
-                    
+
                     if isempty(iAttr.Default) && isempty(iAttr.Validation) && isempty(iAttr.Description) && isempty(iAttr.Class)
-                        continue 
+                        continue
                     end
                     out = out + obj.indent(3)  + sprintf("value.add(""%s""", iAttr.Name);
                     if isempty(iAttr.Default)
@@ -264,7 +264,7 @@ classdef SubclassWriter < handle
                     if ~isempty(iAttr.Description)
                         out = out + ",..." + newline;
                         out = out + obj.indent(4) + "'" + iAttr.Description + "'";
-                    end 
+                    end
                     out = out + ");" + newline;
                 end
                 out = out + obj.indent(2) + "end" + newline +  " " + newline;
@@ -278,7 +278,7 @@ classdef SubclassWriter < handle
                 for i = 1:numel(obj.Model.Datasets)
                     iDataset = obj.Model.Datasets(i);
                     if isempty(iDataset.Default) && isempty(iDataset.Validation) && isempty(iDataset.Description) && isempty(iDataset.Class)
-                        continue 
+                        continue
                     end
                     out = out + obj.indent(3) + sprintf("value.set(""%s""", iDataset.Name);
                     if ~isempty(iDataset.Class)
@@ -314,8 +314,8 @@ classdef SubclassWriter < handle
             end
             % TODO: Inherited constructor
             for i = 1:numel(obj.Model.Properties)
-                if obj.Model.Properties(i).isRequired
-                    out = out + camelCase(obj.Model.Properties(i).Name) + ", "; 
+                if obj.Model.Properties(i).Required
+                    out = out + camelCase(obj.Model.Properties(i).Name) + ", ";
                 end
             end
             out = out + "varargin)";
@@ -344,19 +344,19 @@ classdef SubclassWriter < handle
             out = out + ");";
         end
 
-        
+
         function out = getPropAssignments(obj)
             % Direct property assignment in constructor
             out = string.empty();
             for i = 1:numel(obj.Model.Properties)
                 iProp = obj.Model.Properties(i);
-                if iProp.isRequired
+                if iProp.Required
                     if iProp.makeSetFcn
-                        setLine = sprintf("obj.set%s(%s);",... 
-                            capFirstChar(iProp.Name),... 
+                        setLine = sprintf("obj.set%s(%s);",...
+                            capFirstChar(iProp.Name),...
                             camelCase(iProp.Name));
                     else
-                        setLine = sprintf("obj.%s = %s;",... 
+                        setLine = sprintf("obj.%s = %s;",...
                             iProp.Name, camelCase(iProp.Name));
                     end
                     out = cat(1, out, setLine);
@@ -374,7 +374,7 @@ classdef SubclassWriter < handle
                     if isempty(obj.Model.Properties(i).Default)
                         setFcn = setFcn + "[]);";
                     else
-                        setFcn = setFcn + sprintf('%s);',... 
+                        setFcn = setFcn + sprintf('%s);',...
                             value2string(obj.Model.Properties(i).Default));
                     end
                     setters = setters + obj.indent(3) + setFcn + newline;
@@ -405,7 +405,7 @@ classdef SubclassWriter < handle
                 end
             end
         end
-        
+
         function out = getSetMethod(obj, prop)
             out = obj.indent(2) + "function ";
             out = out + sprintf("set%s(obj, value)", capFirstChar(prop.Name));
@@ -416,7 +416,7 @@ classdef SubclassWriter < handle
                 out = out + ".empty();" + newline;
                 out = out + obj.indent(3) + "end" + newline;
             end
-            
+
             out = out + obj.indent(3);
             if isa(prop, 'aod.util.templates.AttributeSpecification')
                 out = out + sprintf("obj.setAttr('%s', value);", prop.Name);
@@ -425,7 +425,7 @@ classdef SubclassWriter < handle
             end
             out = out + newline;
 
-            out = out + obj.indent(2) + "end" + newline; 
+            out = out + obj.indent(2) + "end" + newline;
         end
 
         function out = getValidation(~, fcn)
@@ -446,7 +446,7 @@ classdef SubclassWriter < handle
             out = out + "}";
         end
 
-        function val = getDefaultValue(obj, defaultValue) %#ok<INUSD> 
+        function val = getDefaultValue(obj, defaultValue) %#ok<INUSD>
             val = strtrim(formattedDisplayText(defaultValue));
             if ischar(defaultValue)
                 val = "'" + val + "'";

@@ -1,4 +1,4 @@
-classdef AONodeTypes 
+classdef AONodeTypes
 % Node types in AODataViewer display tree
 %
 % Description:
@@ -10,10 +10,10 @@ classdef AONodeTypes
 %
 % Static methods:
 %   obj = aod.app.util.AONodeTypes.get(data, datasetName)
-%       Matches AOData system names if dataset name is provided, then 
+%       Matches AOData system names if dataset name is provided, then
 %       passes the data to init()
 %   obj = aod.app.util.AONodeTypes.init(nodeName);
-%       Returns the node type given the text name which can often be 
+%       Returns the node type given the text name which can often be
 %       extracted from the data with class()
 %
 % Notes:
@@ -24,29 +24,30 @@ classdef AONodeTypes
 
     enumeration
         % Group types
-        ENTITY 
+        ENTITY
         CONTAINER
 
         % Dataset types
-        TEXT 
-        NUMERIC 
-        TABLE 
-        TIMETABLE 
+        TEXT
+        NUMERIC
+        TABLE
+        TIMETABLE
         TIMESERIES
-        DATETIME 
+        DATETIME
         STRUCTURE
-        MAP 
-        ENUM 
+        MAP
+        ENUM
         TRANSFORM
         LOGICAL
 
         % Specific AOData types
-        ATTRIBUTEMANAGER
+        ATTRIBUTEMANAGER  % TODO: Remove
         DATASETMANAGER
         HOMEDIRECTORY
         QUERYMANAGER
         FILEREADER
         DESCRIPTION
+        SCHEMA
         FILES
         NOTES
         NAME
@@ -63,8 +64,8 @@ classdef AONodeTypes
         ICON_DIR = [fileparts(fileparts(mfilename('fullpath'))), ...
                     filesep, '+icons', filesep];
     end
-    
-    methods 
+
+    methods
         function [displayType, data] = displayInfo(obj, data)
             displayType = obj.getDisplayType();
             data = obj.processDataForDisplay(data);
@@ -83,11 +84,13 @@ classdef AONodeTypes
 
             switch obj
                 case AONodeTypes.DATETIME
-                    out = datestr(data); %#ok<DATST> 
+                    out = datestr(data); %#ok<DATST>
                 case AONodeTypes.ENUM
                     out = char(data);
                 case AONodeTypes.TRANSFORM
                     out = data.T;
+                case AONodeTypes.SCHEMA
+                    out = data.text();
                 case {AONodeTypes.ATTRIBUTEMANAGER, AONodeTypes.DATASETMANAGER}
                     out = data.table();
                 case {AONodeTypes.NUMERIC, AONodeTypes.LOGICAL}
@@ -114,7 +117,8 @@ classdef AONodeTypes
                 AONodeTypes.NAME,...
                 AONodeTypes.DESCRIPTION,...
                 AONodeTypes.HOMEDIRECTORY,...
-                AONodeTypes.QUERYMANAGER];
+                AONodeTypes.QUERYMANAGER,...
+                AONodeTypes.SCHEMA];
 
             tf = ismember(obj, textNodes);
         end
@@ -134,7 +138,7 @@ classdef AONodeTypes
                 AONodeTypes.ATTRIBUTEMANAGER,...
                 AONodeTypes.DATASETMANAGER,...
                 AONodeTypes.CODE];
-            
+
             tf = ismember(obj, tableNodes);
         end
 
@@ -154,8 +158,8 @@ classdef AONodeTypes
         function out = getIconPath(obj)
             import aod.app.util.AONodeTypes;
 
-            switch obj 
-                case AONodeTypes.ENTITY 
+            switch obj
+                case AONodeTypes.ENTITY
                     out = 'folder.png';
                 case AONodeTypes.CONTAINER
                     out = 'new-product.png';
@@ -163,9 +167,9 @@ classdef AONodeTypes
                     out = 'grid.png';
                 case AONodeTypes.LINK
                     out = 'link.png';
-                case AONodeTypes.TEXT 
+                case AONodeTypes.TEXT
                     out = 'new-document.png';
-                case AONodeTypes.DATETIME 
+                case AONodeTypes.DATETIME
                     out = 'calendar.png';
                 case [AONodeTypes.TABLE, AONodeTypes.TIMETABLE]
                     out = 'data-sheet.png';
@@ -175,21 +179,23 @@ classdef AONodeTypes
                     out = 'list.png';
                 case AONodeTypes.LOGICAL
                     out = 'binary-file.png';
-                case AONodeTypes.FILES 
+                case AONodeTypes.FILES
                     out = 'filecabinet.png';
                 case AONodeTypes.NOTES
                     out = 'making-notes.png';
-                case AONodeTypes.NAME 
+                case AONodeTypes.NAME
                     out = 'contact-details.png';
                 case AONodeTypes.DESCRIPTION
                     out = 'info.png';
-                case AONodeTypes.CODE 
+                case AONodeTypes.SCHEMA
+                    out = 'test-passed.png';
+                case AONodeTypes.CODE
                     out = 'code.png';
-                case AONodeTypes.HOMEDIRECTORY 
+                case AONodeTypes.HOMEDIRECTORY
                     out = 'home-page.png';
                 case AONodeTypes.ATTRIBUTEMANAGER
                     out = 'settings.png';
-                case AONodeTypes.DATASETMANAGER 
+                case AONodeTypes.DATASETMANAGER
                     out = 'settings.png';
                 case AONodeTypes.QUERYMANAGER
                     out = 'search.png';
@@ -207,15 +213,15 @@ classdef AONodeTypes
             % Syntax:
             %   obj = aod.app.util.AONodeTypes.get(data, name)
             % -------------------------------------------------------------
-            
+
             import aod.app.util.AONodeTypes
 
             obj = [];
 
-            % First chec dataset name, if provided, to see if it is a 
+            % First chec dataset name, if provided, to see if it is a
             % special AOData dataset.
             if nargin > 1
-                switch lower(name) 
+                switch lower(name)
                     case 'name'
                         obj = AONodeTypes.NAME;
                     case 'files'
@@ -234,6 +240,8 @@ classdef AONodeTypes
                         obj = AONodeTypes.ATTRIBUTEMANAGER;
                     case 'expecteddatasets'
                         obj = AONodeTypes.DATASETMANAGER;
+                    case 'schema'
+                        obj = AONodeTypes.SCHEMA;
                 end
             end
 
@@ -261,7 +269,7 @@ classdef AONodeTypes
         function obj = init(nodeName)
             if isa(nodeName, 'aod.app.util.AONodeTypes')
                 obj = nodeName;
-                return 
+                return
             end
 
             import aod.app.util.AONodeTypes;
@@ -309,6 +317,8 @@ classdef AONodeTypes
                     obj = AONodeTypes.ATTRIBUTEMANAGER;
                 case {'datasetmanager', 'aod.specification.datasetmanager'}
                     obj = AONodeTypes.DATASETMANAGER;
+                case {'schema', 'aod.schema.entityschema'}
+                    obj = AONodeTypes.SCHEMA;
                 case {'querymanager', 'aod.api.querymanager'}
                     obj = AONodeTypes.QUERYMANAGER;
                 otherwise

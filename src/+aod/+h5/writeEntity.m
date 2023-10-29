@@ -156,8 +156,13 @@ function writeEntity(hdfName, obj)
         end
 
         % Write dataset description, if exists
-        % TODO: Switch in expectedDataset descriptors
-        dsetDescription = aod.specification.util.getClassPropDescription(mc, persistedProps(i));
+        % TODO: Switch in schema descriptors
+        record = obj.Schema.Datasets.get(persistedProps(i));
+        if record.Primitive.Description.isSpecified()
+            dsetDescription = record.Primitive.Description.Value;
+        else
+            dsetDescription = [];
+        end
         % Write dataset
         success = aod.h5.write(hdfName, hdfPath, persistedProps(i), prop, dsetDescription);
         if ~success

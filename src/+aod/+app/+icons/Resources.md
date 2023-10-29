@@ -68,6 +68,7 @@ Other icons:
 - <a href="https://icons8.com/icon/VKNnbtYRlG_o/search">Search</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21103/settings">Settings</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/32537/static-views">Static Views</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a target="_blank" href="https://icons8.com/icon/45991/test-passed">Test Passed</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21256/tree-structure">Tree Structure</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21430/unchecked-checkbox">Unchecked Checkbox</a> icon by <a href="https://icons8.com">Icons8</a>
 - File Cabinet Icon by <a href="https://freeicons.io/profile/101154">sripfoto</a> on <a href="https://freeicons.io">freeicons.io</a>

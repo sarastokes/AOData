@@ -22,7 +22,7 @@ classdef Record < handle
 
     properties (Dependent)
         % TODO: isNested
-        isRequired      (1,1)   logical
+        Required        (1,1)   logical
         className       (1,1)   string
         primitiveType   (1,1)   aod.schema.primitives.PrimitiveTypes
         ParentPath      (1,1)   string
@@ -43,8 +43,8 @@ classdef Record < handle
             end
         end
 
-        function value = get.isRequired(obj)
-            value = obj.Primitive.isRequired;
+        function value = get.Required(obj)
+            value = obj.Primitive.Required;
         end
 
         function value = get.primitiveType(obj)

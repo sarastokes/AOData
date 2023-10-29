@@ -30,7 +30,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 %   removeFile(obj, fileKey)
 %
 %   tf = isequal(obj, entity)
-%   
+%
 % Events:
 %   AttributeChanged
 %   DatasetChanged
@@ -55,20 +55,17 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 
     properties (SetAccess = private)
         Parent                  % aod.persistent.Entity
+        Schema                  % aod.persistent.Schema
         % A unique identifier for the entity
         UUID                    string
         % When the entity was first created
-        dateCreated             datetime 
+        dateCreated             datetime
         % When the entity's HDF5 group was last modified
         lastModified            datetime
-        % Specification of expected metadata 
-        expectedAttributes      = aod.specification.AttributeManager
-        % Specification of expected datasets
-        expectedDatasets        = aod.specification.DatasetManager
         % The underlying HDF5 file
-        hdfName                 string 
+        hdfName                 string
         % The core class name used to create the entity
-        coreClassName           char    
+        coreClassName           char
     end
 
     properties (Dependent)
@@ -84,14 +81,14 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
     properties (Hidden, SetAccess = private)
         % Entity properties
         Name                    string
-        label                   string 
+        label                   string
         entityType              % aod.common.EntityTypes
         % The entity's HDF5 path
         hdfPath                 char
         % Middle layer between HDF5 file and interface
         factory                 % aod.persistent.EntityFactory
     end
-    
+
     properties (Access = {?aod.persistent.Entity, ?aod.app.viewer.ExperimentPresenter})
         linkNames
         dsetNames
@@ -119,7 +116,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             obj.hdfPath = hdfPath;
             obj.factory = entityFactory;
 
-            % Initialize attributes 
+            % Initialize attributes
             obj.files = aod.common.KeyValueMap();
             obj.attributes = aod.common.KeyValueMap();
 
@@ -139,7 +136,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
     end
 
     % Modification methods
-    methods 
+    methods
         function setReadOnlyMode(obj, tf)
             % Toggle read-only mode on and off
             %
@@ -148,7 +145,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             %
             % Inputs:
             %   tf          logical (default = true)
-            %       Whether changes can be made to underlying HDF5 file 
+            %       Whether changes can be made to underlying HDF5 file
             % -------------------------------------------------------------
             arguments
                 obj
@@ -167,7 +164,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Syntax:
             %   out = getHomeDirectory(obj)
             % -------------------------------------------------------------
-        
+
             h = obj.getParent('Experiment');
             out = h.homeDirectory;
         end
@@ -209,7 +206,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             if ~strcmp(newEntity.groupName, obj.groupName)
                 obj.setGroupName(newEntity.groupName);
             end
-            
+
             % Send to Persistor to perform HDF5 actions outside interface
             % Includes updating specifications and entity's attr properties
             evtData = aod.persistent.events.GroupEvent(obj, 'Replace', newEntity);
@@ -241,8 +238,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Inputs:
             %   propName            char
             %       The property's name (HDF5 dataset name)
-            %   propValue           
-            %       The value of the property 
+            %   propValue
+            %       The value of the property
             % -------------------------------------------------------------
             arguments
                 obj
@@ -285,8 +282,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Inputs:
             %   propName            char
             %       The property's name (HDF5 dataset name)
-            %   propValue           
-            %       The value of the property 
+            %   propValue
+            %       The value of the property
             %
             % Optional inputs:
             %   ignoreValidation    logical
@@ -294,20 +291,21 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % -------------------------------------------------------------
             arguments
                 obj
-                propName            char 
+                propName            char
                 propValue                   = []
-                ignoreValidation    logical = false   
+                ignoreValidation    logical = false
             end
 
             obj.verifyReadOnlyMode();
- 
+
             % Check whether the value can be validated with specs
-            propSpec = obj.expectedDatasets.get(propName);
+            propSpec = obj.Schema.Datasets.get(propName);
             if ~isempty(propSpec)
                 isValid = propSpec.validate(propValue);
-                if ~isValid 
+                if ~isValid
+                    % TODO Update for new schema format
                     id = 'modifyDataset:InvalidValue';
-                    msg = "Value did not pass specs in expectedDatasets. " + ... 
+                    msg = "Value did not pass specs in Schema. " + ...
                            "Rerun with ignoreValidation=false to ignore.";
                     if ignoreValidation
                         warning(id, msg);
@@ -316,7 +314,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                     end
                 end
             end
-            
+
             % Make the change in the HDF5 file
             [isEntity, isPersisted] = aod.util.isEntity(propValue);
             if isEntity
@@ -338,7 +336,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             %   removeProp(obj, dsetName)
             %
             % Note:
-            %   The property will not be removed if in expectedDatasets
+            %   The property will not be removed if in dataset schemas
             % -------------------------------------------------------------
             obj.verifyReadOnlyMode();
 
@@ -365,11 +363,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                 obj.modifyLink(propName, []);
             end
 
-            % Delete if not in expectedDatasets
-            if ~obj.expectedDatasets.has(propName)
+            % Delete if not in schema
+            if ~obj.Schema.Datasets.has(propName)
                 delete(p);
             end
-        end  
+        end
     end
 
     % Special property methods
@@ -383,15 +381,15 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % See also:
             %   aod.persistent.Entity/setName
             % -------------------------------------------------------------
-        
-            arguments 
-                obj 
+
+            arguments
+                obj
                 name            string
             end
-            
+
             % Don't proceed if name does not need to change
             if strcmp(name, obj.groupName)
-                return 
+                return
             end
 
             obj.verifyReadOnlyMode();
@@ -447,7 +445,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                 obj
                 txt     char = char.empty()
             end
-            
+
             obj.verifyReadOnlyMode();
 
             % Make the change in the HDF5 file
@@ -464,7 +462,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             %   setNote(obj, newNote, ID)
             % -------------------------------------------------------------
             arguments
-                obj 
+                obj
                 newNote         string
                 ID              {mustBeInteger} = 0
             end
@@ -491,7 +489,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
         function removeNote(obj, noteID)
             arguments
                 obj
-                noteID      
+                noteID
             end
 
             obj.verifyReadOnlyMode();
@@ -513,7 +511,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 
             % Make the change in the HDF5 file
             obj.modifyDataset('notes', newValue);
-            
+
             % Make the change in the MATLAB object
             obj.notes = newValue;
         end
@@ -537,7 +535,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 
             obj.verifyReadOnlyMode();
             aod.util.mustNotBeSystemAttribute(attrName)
-            
+
             if ~isscalar(obj)
                 arrayfun(@(x) x.setAttr(attrName, attrValue), obj);
                 return
@@ -572,7 +570,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                     "Attribute %s not removed, member of system attributes", attrName);
                 return
             end
-            
+
             if ~obj.hasAttr(attrName)
                 warning("removeAttr:AttrNotFound",...
                     "Attribute %s not found in attributes property!", attrName);
@@ -602,7 +600,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % -------------------------------------------------------------
             arguments
                 obj
-                fileKey        char 
+                fileKey        char
                 errorType       = []
             end
 
@@ -621,7 +619,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             end
 
             if ~obj.hasFile(fileKey)
-                switch errorType 
+                switch errorType
                     case ErrorTypes.ERROR
                         error("getFile:FileNotFound",...
                             "File %s not present", fileKey);
@@ -660,7 +658,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             end
 
             out = obj.getFile(fileKey, errorType);
-            
+
             if ~isempty(out) || ~ismissing(out)
                 out = fullfile(obj.getHomeDirectory(), out);
             end
@@ -675,11 +673,11 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             arguments
                 obj
                 fileKey            char
-                fileValue 
+                fileValue
             end
 
             obj.verifyReadOnlyMode();
-            
+
             if ~isscalar(obj)
                 arrayfun(@(x) x.setFile(fileKey, fileValue), obj);
                 return
@@ -737,18 +735,17 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             %
             % Description:
             %   Load datasets and attributes from the HDF5 file, assigning
-            %   defined ones to the appropriate places. 
+            %   defined ones to the appropriate places.
             % -------------------------------------------------------------
             obj.loadInfo();
 
+
             % DATASETS -----------
+            obj.Schema = aod.persistent.Schema(obj);
             obj.description = obj.loadDataset('description');
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
             obj.files = obj.loadDataset('files', 'aod.common.KeyValueMap');
-
-            obj.assignProp('expectedAttributes');
-            obj.assignProp('expectedDatasets');
 
             % LINKS -----------
             obj.Parent = obj.loadLink('Parent');
@@ -791,7 +788,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             %   Call whenever a change to the underlying HDF5 file is made
             % -------------------------------------------------------------
             info = h5info(obj.hdfName, obj.hdfPath);
-            
+
             if ~isempty(info.Datasets)
                 obj.dsetNames = string({info.Datasets.Name});
             else
@@ -803,7 +800,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             else
                 obj.attNames = [];
             end
-            
+
             if ~isempty(info.Links)
                 obj.linkNames = string({info.Links.Name});
             else
@@ -946,7 +943,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                         obj.hdfName, obj.hdfPath, char(obj.dsetNames(i)));
                     obj.(obj.dsetNames(i)) = dsetValue;
                     % Check specifications
-                    propSpec = obj.expectedDatasets.get(obj.dsetNames(i));
+                    propSpec = obj.Schema.Datasets.get(obj.dsetNames(i));
                     if ~isempty(propSpec)
                         p.Description = propSpec.Description.Value;
                         % Final step, after setting the value
@@ -961,17 +958,17 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                 end
             end
 
-            if isempty(obj.expectedDatasets)
+            if obj.Schema.Datasets.Count == 0
                 return
             end
 
-            emptyDsets = setdiff(obj.expectedDatasets.list, obj.dsetNames);
+            emptyDsets = setdiff(obj.Schema.Datasets.list(), obj.dsetNames);
             for i = 1:numel(emptyDsets)
                 p = findprop(obj, emptyDsets(i));
                 if isempty(p)
                     p = obj.addprop(emptyDsets(i));
                     % Check specifications
-                    propSpec = obj.expectedDatasets.get(emptyDsets(i));
+                    propSpec = obj.Schema.Datasets.get(emptyDsets(i));
                     if ~isempty(propSpec)
                         p.Description = propSpec.Description.Value;
                         p.SetAccess = 'protected';
@@ -1022,7 +1019,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Syntax:
             %   verifyReadOnlyMode(obj)
             % -------------------------------------------------------------
-            if obj(1).readOnly 
+            if obj(1).readOnly
                 error("verifyReadOnlyMode:ReadOnlyModeEnabled",...
                     "Disable read only mode before making changes");
             end
@@ -1033,7 +1030,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             %
             % Syntax:
             %   updateModificationTimestamp(obj)
-            % ------------------------------------------------------------- 
+            % -------------------------------------------------------------
             newValue = datetime('now');
             obj.setAttribute('lastModified', newValue);
             obj.lastModified = newValue;
@@ -1077,7 +1074,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 
             arguments
                 obj
-                dsetName            char        
+                dsetName            char
                 dsetValue                       = []
             end
 
@@ -1109,7 +1106,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Modify an attribute of the entity's group
             %
             % Notes:
-            %   Attributes are used in several locations so updating of 
+            %   Attributes are used in several locations so updating of
             %   the MATLAB object needs to occur in the calling function
             % -------------------------------------------------------------
 
@@ -1122,7 +1119,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                 obj.updateModificationTimestamp();
             end
         end
-                
+
         function addEntity(obj, entity)
             % Add a new entity to the persistent hierarchy (back-end)
             %
@@ -1147,7 +1144,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 
     methods (Access = private)
         function validateGroupNames(obj, groupName) %#ok
-            
+
         end
     end
 
@@ -1158,7 +1155,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                 arrayfun(@(x) dissociateEntity(obj, x), x);
                 return
             end
-            
+
             evtData = aod.persistent.events.GroupEvent(obj, 'Remove');
             notify(obj, 'GroupChanged', evtData);
 
@@ -1184,7 +1181,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Description:
             %   Wrapper for MATLAB's ismember that returns false if the
             %   list to search is empty, instead of an error
-            % 
+            %
             % Syntax:
             %   tf = ismember(obj)
             % -------------------------------------------------------------
@@ -1204,10 +1201,10 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                 header = getHeader@matlab.mixin.CustomDisplay(obj);
             else
                 headerStr = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
-                header = sprintf('%s (%s, %s)\n',... 
+                header = sprintf('%s (%s, %s)\n',...
                     headerStr, obj.label, char(obj.coreClassName));
             end
-        end 
+        end
 
         function propgrp = getPropertyGroups(obj)
             % Defines custom property group for dislay
@@ -1220,8 +1217,8 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             if isempty(containerNames)
                 return
             end
-            
-            % Change container names to the access function names 
+
+            % Change container names to the access function names
             for i = 1:numel(containerNames)
                 iName = containerNames{i};
                 propgrp.PropertyList.(iName) = propgrp.PropertyList.([iName, 'Container']);
@@ -1229,4 +1226,4 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             end  % toc = 2.9 ms
         end
     end
-end 
+end

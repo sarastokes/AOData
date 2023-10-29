@@ -22,12 +22,11 @@ classdef AttributeCollection < aod.schema.SchemaCollection
     end
 
     methods
-        function obj = AttributeCollection(className, parent)
+        function obj = AttributeCollection(parent)
             arguments
-                className       string    = []
-                parent                    = []
+                parent 
             end
-            obj = obj@aod.schema.SchemaCollection(className, parent);
+            obj = obj@aod.schema.SchemaCollection(parent);
         end
     end
 

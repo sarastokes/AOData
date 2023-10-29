@@ -7,16 +7,16 @@ function out = read(hdfName, pathName, dsetName, className)
 % Syntax:
 %   out = aod.h5.read(hdfName, pathName, dsetName)
 %   out = aod.h5.read(hdfName, pathName, dsetName, className)
-% 
-% See Also: 
+%
+% See Also:
 %   h5tools.read
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
+
     % No need for argument checking that occurs in h5tools.read
     arguments
-        hdfName         
+        hdfName
         pathName
         dsetName
         className       string    = [];
@@ -38,7 +38,8 @@ function out = read(hdfName, pathName, dsetName, className)
         out = aod.h5.readFileReader(hdfName, pathName, dsetName);
         return
     end
-    
+
+    % TODO Add Schema or handle independently?
     if strcmp(dsetName, "expectedAttributes")
         out = aod.h5.readSpecificationManager(hdfName, pathName, dsetName);
         return
@@ -52,10 +53,10 @@ function out = read(hdfName, pathName, dsetName, className)
     % Generic HDF5 datasets
     out = h5tools.read(hdfName, pathName, dsetName);
 
-    
+
 
     % Deal with AOData-specific classes that weren't flagged by user
-    if isstring(out) && isscalar(out) 
+    if isstring(out) && isscalar(out)
         if isequal(out, "aod.common.KeyValueMap")
             out = h5tools.readatt(hdfName, fullPath, 'all');
         elseif isSubclass(out, "aod.common.FileReader")

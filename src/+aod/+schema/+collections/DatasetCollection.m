@@ -21,8 +21,8 @@ classdef DatasetCollection < aod.schema.SchemaCollection
     end
 
     methods
-        function obj = DatasetCollection(className)
-            obj = obj@aod.schema.SchemaCollection(className);
+        function obj = DatasetCollection(parent)
+            obj = obj@aod.schema.SchemaCollection(parent);
         end
     end
 

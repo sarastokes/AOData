@@ -1,5 +1,5 @@
 classdef Object < aod.schema.primitives.Container
-% TODO: Should Count be included?? Survey "isRequired" to determine?
+% TODO: Should Count be included?? Survey "Required" to determine?
 
     properties (SetAccess = private)
         Count               aod.schema.validators.Count
@@ -48,7 +48,7 @@ classdef Object < aod.schema.primitives.Container
             if obj.numItems == 0
                 obj.Count.setValue([]);
             else
-                % TODO: Determine which have "isRequired"
+                % TODO: Determine which have "Required"
             end
         end
     end

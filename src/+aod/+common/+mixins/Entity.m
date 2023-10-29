@@ -23,9 +23,9 @@ classdef Entity < handle
             % Get the entity's HDF5 group name
             %
             % Description:
-            %   Can be accessed through the groupName property; however, 
-            %   this function supports groupName access for multiple 
-            %   entities at once. 
+            %   Can be accessed through the groupName property; however,
+            %   this function supports groupName access for multiple
+            %   entities at once.
             %
             % Syntax:
             %   out = getGroupName(obj)
@@ -42,8 +42,8 @@ classdef Entity < handle
             % Get the parent of an entity or ancestor of a specific type
             %
             % Description:
-            %   Can be accessed through the Parent property, but this 
-            %   method will concatenate parents if more than one entity 
+            %   Can be accessed through the Parent property, but this
+            %   method will concatenate parents if more than one entity
             %   is provided
             %
             % Syntax:
@@ -76,10 +76,10 @@ classdef Entity < handle
                 parent = [];
                 return
             end
-            
+
             if isempty(entityType)
                 parent = entity.Parent; %#ok<MCNPN>
-                return 
+                return
             end
 
             out = entity;
@@ -112,20 +112,20 @@ classdef Entity < handle
             % See also:
             %   findprop, aod.common.mixins.Entity.getProp
             % -------------------------------------------------------------
-            arguments 
-                obj 
-                propName        char 
+            arguments
+                obj
+                propName        char
             end
 
             if ~isscalar(obj)
                 tf = aod.util.arrayfun(@(x) hasProp(x, propName), obj);
-                return 
+                return
             end
 
             p = findprop(obj, propName);
             tf = ~isempty(p);
         end
-        
+
         function propValue = getProp(obj, propName, errorType)
             % Return an entity property (works with arrays of entities)
             %
@@ -133,9 +133,9 @@ classdef Entity < handle
             %   propValue = getProp(obj, propName)
             %   propValue = getProp(obj, propName, errorType)
             % -----------------------------------------------------------
-            arguments 
-                obj     
-                propName        char 
+            arguments
+                obj
+                propName        char
                 errorType               = aod.infra.ErrorTypes.NONE
             end
 
@@ -154,21 +154,21 @@ classdef Entity < handle
                         end
                     end
                 end
-                
+
                 % Parse missing values
                 isMissing = getMissing(propValue);
                 if any(isMissing)
-                    if errorType == ErrorTypes.ERROR 
-                        error("getProp:PropertyNotFound",... 
-                            "%u of %u entities did not have property ""%s""",... 
+                    if errorType == ErrorTypes.ERROR
+                        error("getProp:PropertyNotFound",...
+                            "%u of %u entities did not have property ""%s""",...
                             nnz(isMissing), numel(obj), propName);
-                    elseif errorType == ErrorTypes.WARNING 
-                        warning("getProp:PropertyNotFound",... 
-                            "%u of %u entities did not have property ""%s""",... 
+                    elseif errorType == ErrorTypes.WARNING
+                        warning("getProp:PropertyNotFound",...
+                            "%u of %u entities did not have property ""%s""",...
                             nnz(isMissing), numel(obj), propName);
                     end
                 end
-                
+
                 % Attempt to return a matrix rather than a cell
                 if iscell(propValue) && any(isMissing)
                     propValue = extractCellData(propValue);
@@ -179,12 +179,12 @@ classdef Entity < handle
             if obj.hasProp(propName)
                 propValue = obj.(propName);
             else
-                switch errorType 
-                    case ErrorTypes.ERROR 
-                        error('getProp:PropertyNotFound',... 
+                switch errorType
+                    case ErrorTypes.ERROR
+                        error('getProp:PropertyNotFound',...
                             'Entity did not have property named "%s"', propName);
-                    case ErrorTypes.WARNING 
-                        warning('getProp:PropertyNotFound',... 
+                    case ErrorTypes.WARNING
+                        warning('getProp:PropertyNotFound',...
                             'Entity did not have property named "%s"', propName);
                         propValue = [];
                     case ErrorTypes.MISSING
@@ -222,7 +222,7 @@ classdef Entity < handle
                 tf = arrayfun(@(x) x.hasAttr(attrName), obj);
                 return
             end
-            
+
             tf = obj.attributes.isKey(attrName); %#ok<MCNPN>
         end
 
@@ -231,7 +231,7 @@ classdef Entity < handle
             % Get the value of a attribute
             %
             % Description:
-            %   Return the value of a specific attribute. 
+            %   Return the value of a specific attribute.
             %
             % Syntax:
             %   attrValue = getAttr(obj, attrName, errorType)
@@ -239,22 +239,22 @@ classdef Entity < handle
             % Inputs:
             %   attrName       char
             % Optional inputs:
-            %   errorType       aod.infra.ErrorTypes (default = NONE) 
+            %   errorType       aod.infra.ErrorTypes (default = NONE)
             %
             % Examples:
             %   % Get the value of 'MyAttr'
-            %   attrValue = obj.getAttr('MyAttr')           
+            %   attrValue = obj.getAttr('MyAttr')
             % -------------------------------------------------------------
 
             arguments
                 obj
-                attrName           char 
+                attrName           char
                 errorType           = aod.infra.ErrorTypes.NONE
             end
-            
+
             import aod.infra.ErrorTypes
             errorType = ErrorTypes.init(errorType);
-            
+
             if ~isscalar(obj)
                 attrValue = aod.util.arrayfun(...
                     @(x) x.getAttr(attrName, ErrorTypes.MISSING), obj);
@@ -263,7 +263,7 @@ classdef Entity < handle
                 isMissing = getMissing(attrValue);
                 if all(isMissing)
                     if errorType == ErrorTypes.ERROR
-                        error('getAttr:NotFound',... 
+                        error('getAttr:NotFound',...
                             'Did not find attribute %s', attrName);
                     elseif errorType == ErrorTypes.WARNING
                         warning('getAttr:NotFound',...
@@ -281,12 +281,12 @@ classdef Entity < handle
             if obj.hasAttr(attrName)
                 attrValue = obj.attributes(attrName); %#ok<MCNPN>
             else
-                switch errorType 
-                    case ErrorTypes.ERROR 
-                        error('getAttr:NotFound',... 
+                switch errorType
+                    case ErrorTypes.ERROR
+                        error('getAttr:NotFound',...
                             'Did not find %s in attributes', attrName);
-                    case ErrorTypes.WARNING 
-                        warning('getAttr:NotFound',... 
+                    case ErrorTypes.WARNING
+                        warning('getAttr:NotFound',...
                             'Did not find %s in attributes', attrName);
                         attrValue = [];
                     case ErrorTypes.MISSING
@@ -313,7 +313,7 @@ classdef Entity < handle
             %   tf = obj.hasFile('MyFile')
             % -------------------------------------------------------------
             arguments
-                obj 
+                obj
                 fileName                char
             end
 
@@ -332,8 +332,8 @@ classdef Entity < handle
 
     methods (Sealed, Access = protected)
         function parseAttributes(obj, varargin)
-            % Parses varargin input to constructor with expectedAttributes
-            % 
+            % Parses varargin input to through parser from attribute schema
+            %
             % Syntax:
             %   parseAttributes(obj, varargin)
             %
@@ -341,7 +341,7 @@ classdef Entity < handle
             %   aod.core.Entity.specifyAttributes,
             %   aod.specification.AttributeManager
             % -------------------------------------------------------------
-            
+
             ip = obj.Schema.Attributes.getParser(); %#ok<MCNPN>
             f = fieldnames(ip.Results);
             for i = 1:numel(f)
@@ -363,7 +363,7 @@ classdef Entity < handle
         end
 
         function tf = isequal(obj, other)
-            % Test whether two entities have the same UUID. If 2nd input 
+            % Test whether two entities have the same UUID. If 2nd input
             % is not an entity, returns false
             %
             % Syntax:

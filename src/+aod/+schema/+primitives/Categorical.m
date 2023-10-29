@@ -58,7 +58,7 @@ classdef Categorical < aod.schema.primitives.Primitive
         end
     end
 
-    methods (Access = protected)
+    methods 
         function [tf, ME] = checkIntegrity(obj, throwErrors)
             arguments
                 obj

@@ -1,5 +1,5 @@
 function success = write(hdfName, pathName, dsetName, data, description)
-% Writes MATLAB dataset to an HDF5 dataset 
+% Writes MATLAB dataset to an HDF5 dataset
 %
 % Syntax:
 %   success = write(hdfName, pathName, dsetName, data)
@@ -29,33 +29,27 @@ function success = write(hdfName, pathName, dsetName, data, description)
 %
 % See also:
 %   h5tools.write, aod.h5.read, h5write
+%
+% TODO: Include Schema here?
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
+
         % Detailed input checking for first 4 is performed by h5tools
         arguments
-            hdfName             char 
-            pathName            char 
-            dsetName            char 
+            hdfName             char
+            pathName            char
+            dsetName            char
             data
             description         string      = []
         end
-    
+
         fullPath = h5tools.util.buildPath(pathName, dsetName);
-    
+
         if isa(data, 'aod.common.KeyValueMap')
             h5tools.datasets.makeTextDataset(hdfName, pathName, dsetName, "aod.common.KeyValueMap");
             h5tools.writeatt(hdfName, fullPath, 'Class', 'aod.common.KeyValueMap');
             success = true;
-        elseif isa(data, 'aod.specification.AttributeManager')
-            success = aod.h5.writeSpecificationManager(hdfName, pathName, dsetName, data);
-            h5tools.writeatt(hdfName, fullPath, 'Description',...
-                "Specification of expected metadata for the entity")
-        elseif isa(data, 'aod.specification.DatasetManager')
-            success = aod.h5.writeSpecificationManager(hdfName, pathName, dsetName, data);
-            h5tools.writeatt(hdfName, fullPath, 'Description',...
-                "Specification of expected data for the entity");
         elseif isSubclass(data, 'aod.common.FileReader')
             success = aod.h5.writeFileReader(hdfName, pathName, dsetName, data);
         else
@@ -65,4 +59,3 @@ function success = write(hdfName, pathName, dsetName, data, description)
                 h5tools.writeatt(hdfName, fullPath, 'Description', description);
             end
         end
-        

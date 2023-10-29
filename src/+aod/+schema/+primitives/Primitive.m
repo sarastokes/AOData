@@ -13,7 +13,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
     properties (SetAccess = private)
         Parent                  % aod.schema.Record, aod.schema.primitives.Container
         Name        (1,1)       string
-        isRequired  (1,1)       logical = false
+        Required    (1,1)       logical = false
         Default     (1,1)       aod.schema.Default
         Class       (1,1)       aod.schema.validators.Class
         Description (1,1)       aod.schema.decorators.Description
@@ -161,7 +161,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 value   (1,1)    logical
             end
 
-            obj.isRequired = value;
+            obj.Required = value;
         end
     end
 
@@ -408,14 +408,15 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             S = struct();
             S.(obj.Name) = struct();
             S.(obj.Name).PrimitiveType = string(obj.PRIMITIVE_TYPE);
-            S.(obj.Name).isRequired = obj.isRequired;
-            
+            S.(obj.Name).Required = obj.Required;
+
             [validators, decorators] = aod.schema.util.getValidatorsAndDecorators(obj);
             for i = 1:numel(validators)
-                if validators(i) == "Size"  % TODO: Should be method
+                if validators(i) == "Size" && obj.Size.isSpecified()
+                    % TODO: Should be method
                     value = obj.(validators(i)).text();
                 else
-                    value = obj.(validators(i)).Value;
+                    value = [];
                 end
                 S.(obj.Name).(validators(i)) = value; %.jsonencode();
             end

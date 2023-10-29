@@ -23,8 +23,8 @@ classdef (Abstract) SchemaCollection < handle
 
     properties (SetAccess = protected)
         Parent              % aod.schema.EntitySchema
-        className
-        Records
+        className           string
+        Records             % aod.schema.Record
     end
 
     properties (Hidden, SetAccess = private)
@@ -37,12 +37,15 @@ classdef (Abstract) SchemaCollection < handle
     end
 
     methods
-        function obj = SchemaCollection(className, parent)
-            if nargin > 0 && ~aod.util.isempty(className)
+        function obj = SchemaCollection(parent)
+            if nargin > 0 && ~aod.util.isempty(parent)
+                if istext(parent)
+                    className = parent;
+                else
+                    obj.setParent(parent);
+                    className = class(parent);
+                end
                 obj.className = convertCharsToStrings(className);
-            end
-            if nargin > 1
-                obj.setParent(parent);
             end
             obj.lastModified = datetime('now');
         end
@@ -292,7 +295,7 @@ classdef (Abstract) SchemaCollection < handle
                 return
             end
 
-            mustBeSubclass(parent, "aod.common.mixins.Entity");
+            mustBeSubclass(parent, ["aod.core.Entity", "aod.persistent.Entity"]);
 
             obj.Parent = parent;
         end
