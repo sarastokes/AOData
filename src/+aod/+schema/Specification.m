@@ -71,14 +71,6 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Access = protected)
-        function notifyListeners(obj, msg)
-            evtData = aod.specification.events.ValidationEvent(...
-                class(obj), msg);
-            notify(obj, 'ValidationFailed', evtData);
-        end
-    end
-
     methods (Sealed, Access = {?aod.schema.primitives.Primitive})
         function setParent(obj, primitive)
             % TODO: Validation

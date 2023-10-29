@@ -7,18 +7,11 @@ classdef (Abstract) Validator < aod.schema.Specification
 % Constructor:
 %   obj = aod.schema.Validator(parent)
 %
-% Events:
-%   ValidationFailed
-%
 % Abstract methods:
 %   [tf, ME] = validate(obj, input)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-
-    events
-        ValidationFailed  %% TODO: Keep events?
-    end
 
     methods (Abstract)
         [tf, ME] = validate(obj, input)
@@ -36,6 +29,7 @@ classdef (Abstract) Validator < aod.schema.Specification
     % aod.schema.Specification methods
     methods
         function tf = isSpecified(obj)
+            % Subclasses without "Value" property should modify
             tf = ~isempty(obj.Value);
         end
     end

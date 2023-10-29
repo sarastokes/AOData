@@ -12,7 +12,7 @@ classdef EntitySchema < handle
         Files
         className
     end
-
+    
     properties (Hidden, Access = private)
         DatasetCollection
     end
@@ -26,7 +26,7 @@ classdef EntitySchema < handle
         
         function value = get.className(obj)
             if isempty(obj.Parent)
-                value = "";
+                value = "UNKNOWN";  % For testing only
             else
                 value = string(class(obj.Parent));
             end
@@ -151,8 +151,13 @@ classdef EntitySchema < handle
         end
 
         function [tf, ME] = validate(obj, schemaType, entryName)
-            
-
+            if ~aod.util.isempty(schemaType)
+                switch schemaType
+                    case "dataset"
+                        [tf, ME] = obj.validateDataset(entryName);
+                end
+            end
+            % TODO: Finish writing
         end
 
         function [tf, ME] = validateDataset(obj, dsetName)
@@ -177,6 +182,31 @@ classdef EntitySchema < handle
                 mustBeA(parent, 'aod.core.Entity');
             end
             obj.Parent = parent;
+        end
+    end
+
+    % MATLAB builtin methods
+    methods
+        function S = struct(obj)
+            entityName = strrep(obj.className, '.', '__'); % TODO
+            if ~isempty(obj.Parent)
+                entityType = string(obj.Parent.entityType);
+                entityClass = string(getClassWithoutPackages(obj.Parent));
+                packageName = erase(string(class(obj.Parent)), "." + entityClass);
+                superNames = string(superclasses(obj.Parent));
+                superNames = superNames(1:find(superNames == "aod.core.Entity"));
+            else
+                entityType = []; entityClass = []; 
+                packageName = []; superNames = [];
+            end
+            S = struct();
+            S.(entityName).ClassName = entityClass;
+            S.(entityName).PackageName = packageName;
+            S.(entityName).EntityType = entityType;
+            S.(entityName).Superclasses = superNames';
+            S.(entityName) = catstruct(S.(entityName), obj.Attributes.struct());
+            S.(entityName) = catstruct(S.(entityName), obj.Datasets.struct());
+            S.(entityName) = catstruct(S.(entityName), obj.Files.struct());
         end
     end
 end

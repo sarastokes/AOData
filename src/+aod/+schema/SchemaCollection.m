@@ -10,10 +10,10 @@ classdef (Abstract) SchemaCollection < handle
 % Constructor:
 %   obj = aod.schema.SchemaCollection(className)
 %
-% TODO: This could subclass IndexedCollection
+% TODO: This could subclass IndexedCollection (?)
 
 % By Sara Patterson, 2023 (AOData)
-% -------------------------------------------------------------------------
+% ----------------------------------------------------------------------
 
     properties (Abstract, Hidden, SetAccess = protected)
         % The specification type
@@ -93,7 +93,7 @@ classdef (Abstract) SchemaCollection < handle
 
         function set(obj, recordName, primitiveType, varargin)
             % SET Set the type and options of an record's primitive
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
 
 
             record = obj.get(recordName);
@@ -117,7 +117,7 @@ classdef (Abstract) SchemaCollection < handle
             %
             % Syntax:
             %   [tf, idx] = has(obj, recordName)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             arguments
                 obj
                 recordName        string
@@ -149,7 +149,7 @@ classdef (Abstract) SchemaCollection < handle
             %
             % Outputs:
             %   record               aod.specification.Entry
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             arguments
                 obj
                 recordName       char
@@ -190,7 +190,7 @@ classdef (Abstract) SchemaCollection < handle
             %
             % See also:
             %   aod.schema.Record
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             arguments
                 obj
                 record         aod.schema.Record
@@ -208,7 +208,7 @@ classdef (Abstract) SchemaCollection < handle
             %
             % Syntax:
             %   remove(obj, recordName)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             [tf, idx] = obj.has(recordName);
             if ~tf
                 return
@@ -222,7 +222,7 @@ classdef (Abstract) SchemaCollection < handle
             %
             % Syntax:
             %   out = text(obj)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             if isempty(obj)
                 out = sprintf("Empty %sCollection", obj.schemaType);
                 return
@@ -230,7 +230,7 @@ classdef (Abstract) SchemaCollection < handle
 
             out = "";
             for i = 1:obj.Count
-                out = out + obj.Records(i).text();
+                out = out + obj.Records(i).Primitive.text(); % TODO
             end
         end
 
@@ -258,7 +258,7 @@ classdef (Abstract) SchemaCollection < handle
             %
             % Syntax:
             %   names = list(obj)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
             if obj.Count == 0
                 names = [];
                 return
@@ -330,16 +330,16 @@ classdef (Abstract) SchemaCollection < handle
             %
             % Syntax:
             %   S = struct(obj)
-            % -------------------------------------------------------------
+            % ----------------------------------------------------------
+            groupName = obj.schemaType+"s";
             S = struct();
+            S.(obj.schemaType+"s") = struct();
             if isempty(obj)
                 return
             end
 
             for i = 1:obj.Count
-                iStruct = obj.Records(i).struct();
-                % Place into a struct named for the dataset
-                S.(obj.Records(i).Name) = iStruct;
+                S.(groupName) = catstruct(S.(groupName), obj.Records(i).struct());
             end
         end
     end

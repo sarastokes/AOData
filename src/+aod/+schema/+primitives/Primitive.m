@@ -262,7 +262,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             ME = excObj.getException();
         end
 
-
         function [tf, ME] = validate(obj, value, errorType)
             arguments
                 obj
@@ -326,6 +325,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             ip = obj.getParser();
             parse(ip, varargin{:});
 
+            % TODO: Add required
             for i = 1:numel(obj.OPTIONS)
                 fcn = str2func("@(obj, x) set" + obj.OPTIONS(i) + "(obj, x)");
                 fcn(obj, ip.Results.(obj.OPTIONS(i)));
@@ -404,6 +404,26 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
 
     % MATLAB builtin methods
     methods
+        function S = struct(obj)
+            S = struct();
+            S.(obj.Name) = struct();
+            S.(obj.Name).PrimitiveType = string(obj.PRIMITIVE_TYPE);
+            S.(obj.Name).isRequired = obj.isRequired;
+            
+            [validators, decorators] = aod.schema.util.getValidatorsAndDecorators(obj);
+            for i = 1:numel(validators)
+                if validators(i) == "Size"  % TODO: Should be method
+                    value = obj.(validators(i)).text();
+                else
+                    value = obj.(validators(i)).Value;
+                end
+                S.(obj.Name).(validators(i)) = value; %.jsonencode();
+            end
+            for i = 1:numel(decorators)
+                S.(obj.Name).(decorators(i)) = obj.(decorators(i)).Value; %.jsonencode();
+            end
+        end
+
         function tf = isequal(obj, other)
             % Determine if two primitives are equal
             %

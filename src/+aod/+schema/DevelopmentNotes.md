@@ -44,7 +44,7 @@
 
 
 ### Schema JSON
-Should entire package be in one file or separate files referenced by a "schema registry"? If the files are large, might want to serialize with msgpack.
+Should entire package be in one file or separate files referenced by a "schema registry"? If the files are large, might want to serialize with [msgpack](https://github.com/bastibe/matlab-msgpack).
 - Schema UUID
   - *Versions*
     - Class name
@@ -54,6 +54,15 @@ Should entire package be in one file or separate files referenced by a "schema r
     - *Datasets*
     - *Attributes*
     - DateCreated
+
+Files for schema storage
+- [ ] One per package
+- [ ] One per class
+- [ ] One per subpackage
+- [ ] All versions together (simplest but not easy to read)
+- [ ] Current then outdated versions in a separate file
+- [ ] Dedicated schema folder
+- [ ] Located within packages (might complicate package refactoring)
 
 ### Class Hierarchy
 The each parent-child relationship in the hierarchy is one-to-many. Parent classes have properties for containing the child classes. The child classes maintain a reference to the parent class with a property called `Parent`.
@@ -143,16 +152,20 @@ Basic types (**validator**, *decorator*):
 
 
 ### Writing an AOData HDF5 file
-1. `checkSchemaIntegrity` - are schemas viable
-2. `validate` - do provided values pass schema validation?
+1. `[tf, ME, excObj] = checkSchemaIntegrity(obj, throwError)`
+   - Are schemas viable?
+   - Where are the conflicts?
+2. `[tf, ME] = validate(obj, throwError)`
+   - Do provided values pass schema validation?
+   - If not, where did validation fail
 3. `checkRequirements` - are required values provided? AOData sticks to soft requirements and users can choose to leave a required value blank.
-4. `checkGitRepo` - are classes committed? Only prompt if schemas are viable
+4. `checkGitRepo` - are classes committed? Only prompt if schemas are viable, no reason to be committing schemas that will need to be updated soon
 5. `updateSchemas` - update schemas before writing
 
 ### Misc notes
 - Don't use numeric indexing for tables, use the column names so it's clear what data is used (and how to modify the code if the table changes in the future)
 - Values are only validated if not empty (or not "" in the case of `string`)
-- Avoid `char`, `struct` and `containers.Map`
+- Avoid `char` because it complicates equality and size which complicates schemas (for me, also user) and AOData file queries (for user)
 
 ### Validation error messages
 For a Record that is not nested:

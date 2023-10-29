@@ -195,5 +195,9 @@ classdef Record < handle
                 tf = isequal(obj.getPrimitive(), other.getPrimitive());
             end
         end
+
+        function S = struct(obj)
+            S = obj.Primitive.struct();
+        end
     end
 end

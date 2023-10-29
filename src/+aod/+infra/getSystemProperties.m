@@ -10,8 +10,7 @@ function props = getSystemProperties()
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
-    props = ["Parent", "notes", "Name", "files",...
-        "UUID", "description", "attributes", "Timing", "Code",...
-        "expectedDatasets", "expectedAttributes"];
+
+    props = ["Parent", "notes", "Name", "files", "Schema",...
+        "UUID", "description", "attributes", "Timing", "Code"];
     %props = [props, aod.common.EntityTypes.allContainerNames()];

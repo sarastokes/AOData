@@ -140,7 +140,6 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
 
     methods (Static)
         function inputItem = getItemFromInput(input, ID)
-
             if iscell(input)
                 if isnumeric(ID)
                     inputItem = input{ID};
@@ -160,6 +159,18 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             else
                 warning('getItemFromInput:InvalidInput',...
                     'Validation could not extract items from inputs of type %s', class(input));
+            end
+        end
+    end
+
+    % MATLAB builtin methods
+    methods
+        function S = struct(obj)
+            S = struct@aod.schema.primitives.Primitive(obj);
+            S.(obj.Name).Items = struct();
+            for i = 1:obj.numItems
+                S.(obj.Name).Items = catstruct(S.(obj.Name).Items, ...
+                    obj.Collection.Primitives(i).struct());
             end
         end
     end
