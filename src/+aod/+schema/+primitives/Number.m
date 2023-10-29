@@ -107,7 +107,7 @@ classdef Number < aod.schema.primitives.Primitive
 
             [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
             if obj.Minimum.isSpecified() && obj.Maximum.isSpecified()
-                if obj.Minimum > obj.Maximum
+                if obj.Minimum.Value > obj.Maximum.Value
                     excObj.addCause(MException('checkIntegrity:InvalidRange',...
                         'Minimum (%.2f) must be less than or equal to maximum (%.2f).',...
                         obj.Minimum.Value, obj.Maximum.Value));

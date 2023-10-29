@@ -2,7 +2,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 % An annotation of acquired data
 %
 % Description:
-%   Spatial regions within acquired data. Could be ROIs in a physiology 
+%   Spatial regions within acquired data. Could be ROIs in a physiology
 %   experiment, coordinates of structures of interest, etc.
 %
 % Parent:
@@ -18,7 +18,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 %   name            char or string
 %       Annotation name
 % Optional key/value inputs:
-%   Data            
+%   Data
 %       Data detailing the annotation locations
 %   Source          aod.core.Source/aod.persistent.Source
 %       The Source of the annotations
@@ -28,12 +28,12 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Properties:
-%   Data  
-%   Source    
+%   Data
+%   Source
 %
 % Attributes
 %   Administrator       string
-%       Who performed the Annotation              
+%       Who performed the Annotation
 %
 % Sealed protected methods:
 %   setData(obj, data)
@@ -44,9 +44,9 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
     properties (SetAccess = protected)
         annotationDate          datetime = datetime.empty();
         % The annotation data
-        Data   
+        Data
         % Source associated with the Annotation
-        Source     {mustBeScalarOrEmpty, aod.util.mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()       
+        Source     {mustBeScalarOrEmpty, aod.util.mustBeEntityType(Source, 'Source')} = aod.core.Source.empty()
     end
 
     methods
@@ -77,7 +77,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
                 arrayfun(@(x) x.setSource(source), obj);
                 return
             end
-            
+
             if isempty(source)
                 obj.Source = aod.core.Source.empty();
             else % Validate then add
@@ -90,7 +90,7 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
         end
 
         function setData(obj, data)
-            % Assign Annotation's data 
+            % Assign Annotation's data
             %
             % Description:
             %   Assigns Data property
@@ -124,27 +124,25 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
             obj.annotationDate = aod.util.validateDate(annotationDate);
         end
     end
-    
+
     methods (Static)
 
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
-        
-            value.set("annotationDate",...
-                "Class", "datetime", "Size", "(1,1)",...
+
+            value.set("annotationDate", "DATETIME",...
+                "Size", "(1,1)",...
                 "Description", "Date the annotation was performed");
         end
 
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
-            
-            value.add("Administrator",...
-                "Class", "string",...
-                "Size", "(1,1)",...
+
+            value.add("Administrator", "TEXT",...
+                "Size", "(1,:)",...
                 "Description", "The person(s) who performed the annotation");
-            value.add("Software",...
-                "Class", "string",...
-                "Size", "(1,1)",...
+            value.add("Software", "TEXT",...
+                "Size", "(1,:)",...
                 "Description", "Software used for the registration");
         end
     end

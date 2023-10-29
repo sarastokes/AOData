@@ -14,7 +14,7 @@ classdef EntityType < aod.schema.Validator
 % ---------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value           {mustBeScalarOrEmpty}
+        Value
     end
 
     methods
@@ -26,10 +26,11 @@ classdef EntityType < aod.schema.Validator
 
     methods
         function setValue(obj, input)
-            if obj.isInputEmpty(input)
+            if aod.schema.util.isInputEmpty(input)
                 obj.Value = [];
             else
-                obj.Value = aod.common.EntityTypes.get(input);
+                input = convertCharsToStrings(input);
+                obj.Value = arrayfun(@(x) aod.common.EntityTypes.get(x), input);
             end
         end
 

@@ -20,7 +20,7 @@ classdef Primate < aod.core.sources.Subject
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
+
     properties (Dependent)
         ID
     end
@@ -40,16 +40,16 @@ classdef Primate < aod.core.sources.Subject
             value = specifyAttributes@aod.core.sources.Subject();
 
             value.remove("Age");
-            value.add("DateOfBirth",...
-                "Class", "datetime", "Size", "(1,1)",... 
+            value.add("DateOfBirth", "DATETIME",... 
+                "Size", "(1,1)",...
                 "Description", "Date of birth of the subject");
         end
 
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.sources.Subject(value);
 
-            value.set("ID",...
-                "Class", "string", "Size", [1 1],...
+            value.set("ID", "TEXT",...
+                "Size", [1 1],...
                 "Description", "A comprehensive identifier with parent source(s) appended");
         end
     end

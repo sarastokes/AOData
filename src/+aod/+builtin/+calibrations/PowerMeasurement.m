@@ -17,14 +17,14 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
 %   loadTable(obj, measurementTable)
 %
 % Note:
-%   Subclasses should set light source specific attributes (wavelength, 
+%   Subclasses should set light source specific attributes (wavelength,
 %   settingUnit) in their constructors. If greater flexibility is needed,
 %   use the setValueUnit(), setSettingUnit() and setWavelength() functions
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    methods 
+    methods
         function obj = PowerMeasurement(name, calibrationDate, wavelength, colNames, units, varargin)
 
             if nargin < 4 || isempty(colNames)
@@ -36,7 +36,7 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
             end
             obj = obj@aod.builtin.calibrations.MeasurementTable(name, ...
                 calibrationDate, colNames, units, varargin{:});
-            
+
             % Required input parsing
             obj.setAttr('Wavelength', wavelength);
         end
@@ -56,15 +56,15 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
         function value = specifyAttributes()
             value = specifyAttributes@aod.builtin.calibrations.MeasurementTable();
 
-            value.add("Wavelength",...
-                "Class", "double", "Size", "(1,1)", "Units", "nm", ...
+            value.add("Wavelength", "NUMBER",...
+                "Size", [1 1], "Units", "nm", ...
                 "Description", "The wavelength of the light source being measured");
         end
 
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.builtin.calibrations.MeasurementTable(value);
 
-            value.set("Measurements", "Class", "table");
+            value.set("Measurements", "TABLE");
         end
     end
 end

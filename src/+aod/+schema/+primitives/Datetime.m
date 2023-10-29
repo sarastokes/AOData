@@ -1,25 +1,32 @@
 classdef Datetime < aod.schema.primitives.Primitive
-% Specifies a date (day, month, year)
+% Specifies a date and time (day, month, year)
 %
 % Constructor:
-%   obj = aod.schema.primitives.Date(name, parent, varargin)
+%   obj = aod.schema.primitives.Datetime(name, parent, varargin)
+%
+% TODO: Validation isn't rejecting - figure out a different approach
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    properties (SetAccess = private)
+        Format              aod.schema.validators.Format
+    end
+
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATE
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATETIME
         OPTIONS = ["Class", "Size", "Format", "Description"];
-        VALIDATORS = ["Class", "Size"];
+        VALIDATORS = ["Class", "Size", "Format"];
     end
 
     methods
         function obj = Datetime(name, parent, varargin)
             obj = obj@aod.schema.primitives.Primitive(name, parent);
 
+            obj.Format = aod.schema.validators.Format(obj, []);
             obj.setSize("(1,1)");
             obj.setFormat("yyyy-MM-dd HH:mm:ss");
-            obj.setClass("datetime");  %% TODO - yymmdd
+            obj.setClass("datetime");  %% TODO - string/datetime
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
@@ -33,7 +40,7 @@ classdef Datetime < aod.schema.primitives.Primitive
         function setFormat(obj, value)
             arguments
                 obj
-                value     (1,1)     string = ""
+                value          string
             end
 
             if aod.util.isempty(value)
@@ -54,12 +61,12 @@ classdef Datetime < aod.schema.primitives.Primitive
                 end
             end
 
-            obj.setValue(value);
+            obj.Format.setValue(value);
             obj.checkIntegrity(true);
         end
     end
 
-    methods (Access = protected)
+    methods
         function [tf, ME, excObj] = checkIntegrity(obj, throwErrors)
             arguments
                 obj

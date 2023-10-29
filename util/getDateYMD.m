@@ -1,15 +1,19 @@
-function out = getDateYMD(txt)
+function out = getDateYMD(txt, format)
 % GETDATEYMD
 %
 % Description:
-%   Convert text in yyyyMMdd format to datetime
+%   Convert text in to datetime in a specific format
 %
 % Syntax:
 %   out = getDateYMD()
 %   out = getDateYMD(txt)
+%   out = getDateYMD(txt, format)
 %
 % Input:
-%   txt             char or string, date in 'yyyyMMdd' format
+%   txt             char or string of date
+%       Date to convert, if empty then "now" will be used
+%   format          char or string
+%       Format for datetime (default is 'yyyy-MM-dd')
 %
 % Output:
 %   datetime
@@ -19,10 +23,15 @@ function out = getDateYMD(txt)
 %
 % History:
 %   21Oct2022 - SSP
+%   28Oct2023 - SSP - Added option to specify format, switched to ISO
 % -------------------------------------------------------------------------
 
-    if nargin < 1
-        out = datetime('now', 'Format', 'yyyyMMdd');
+    if nargin < 2
+        format = 'yyyy-MM-dd';
+    end
+
+    if nargin < 1 || isempty(txt)
+        out = datetime('now', 'Format', format);
         return
     end
 
@@ -36,11 +45,11 @@ function out = getDateYMD(txt)
     end
 
     try
-        out = datetime(txt, 'Format', 'yyyyMMdd');
+        out = datetime(txt, 'Format', format);
     catch ME
         if strcmp(ME.identifier, 'MATLAB:datestr:ConvertToDateNumber')
             error("getDateYMD:FailedDatetimeConversion", ...
-            "Failed to convert to datetime, use format yyyyMMdd");
+            "Failed to convert to datetime, use format %s", format);
         else
             rethrow(ME);
         end

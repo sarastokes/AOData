@@ -1,4 +1,4 @@
-classdef MeasurementTable < aod.core.Calibration 
+classdef MeasurementTable < aod.core.Calibration
 % Calibrations stored in a table, useful base for custom subclasses
 %
 % Superclasses:
@@ -23,15 +23,15 @@ classdef MeasurementTable < aod.core.Calibration
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
+    properties (SetObservable, SetAccess = {?aod.core.Entity})
         % A table containing calibration measurements
-        Measurements        table 
+        Measurements        table
     end
 
     methods
         function obj = MeasurementTable(name, calibrationDate, colNames, units, varargin)
             obj@aod.core.Calibration(name, calibrationDate, varargin{:});
-            
+
             obj.Measurements = table.empty(0, numel(colNames));
             obj.Measurements.Properties.VariableNames = colNames;
             if nargin > 3 && ~isempty(units)
@@ -40,9 +40,9 @@ classdef MeasurementTable < aod.core.Calibration
         end
     end
 
-    methods 
+    methods
         function editTable(obj)
-            T = obj.Measurements;
+            T = obj.Measurements; %#ok<NASGU>
             openvar('T');
             % TODO: Add a listener to update the table when it is changed
         end
@@ -65,7 +65,7 @@ classdef MeasurementTable < aod.core.Calibration
                     'Each row must be specified as a cell');
             end
             for i = 1:numel(varargin)
-                iRow = cellfun(@(x) convertCharsToStrings(x), varargin{i},... 
+                iRow = cellfun(@(x) convertCharsToStrings(x), varargin{i},...
                     'UniformOutput', false);
                 obj.Measurements = [obj.Measurements; iRow];
             end
@@ -83,29 +83,29 @@ classdef MeasurementTable < aod.core.Calibration
             % -------------------------------------------------------------
             obj.Measurements(idx, :) = [];
         end
-  
+
         function loadTable(obj, measurementTable)
-            % LOADTABLE 
+            % LOADTABLE
             %
             % Description:
             %   loadTable(obj, measurementTable)
             % -------------------------------------------------------------
-            
+
             if istext(measurementTable)
                 T = readmatrix(measurementTable);
                 obj.setFile('Calibration', measurementTable);
             elseif istable(measurementTable)
                 T = measurementTable;
             end
-            % TODO: Check column names
+            obj.setProp('Measurements', T);
         end
-    end 
+    end
 
     % MATLAB builtin methods
     methods
         function T = table(obj)
             % Return the measurement table
-            % 
+            %
             % Syntax:
             %   T = table(obj)
             % -------------------------------------------------------------
@@ -117,8 +117,8 @@ classdef MeasurementTable < aod.core.Calibration
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Calibration(value);
 
-            value.set("Measurements",...
+            value.set("Measurements", "TABLE",...
                 "Class", "table");
         end
     end
-end 
+end

@@ -2,7 +2,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
 % ANALYSIS
 %
 % Description:
-%   Any analysis performed on experimental data, with implementation 
+%   Any analysis performed on experimental data, with implementation
 %   defined by subclasses.
 %
 % Parent:
@@ -27,7 +27,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
     methods
         function obj = Analysis(name, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
-            
+
             ip = aod.util.InputParser();
             addParameter(ip, 'Date', getDateYMD());
             parse(ip, varargin{:});
@@ -52,7 +52,7 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
                 obj.analysisDate = datetime.empty();
                 return
             end
-            
+
             analysisDate = aod.util.validateDate(analysisDate);
             obj.analysisDate = analysisDate;
         end
@@ -62,11 +62,10 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
 
-            value.add("Administrator",...
-                "Class", "string", "Size", "(1,1)",...
+            value.add("Administrator", "TEXT",...
+                "Size", "(1,:)",...
                 "Description", "Person(s) who performed the analysis");
-            value.add("Software",...
-                "Class", "string", "Size", "(1,1)",...
+            value.add("Software", "TEXT", "Size", "(1,1)",...
                 "Default", "MATLAB",...
                 "Description", "Software used for the registration");
         end
@@ -74,9 +73,9 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
 
-            value.set("analysisDate",...
-                "Class", "datetime", "Size", "(1,1)",...
+            value.set("analysisDate", "DATETIME",...
+                "Size", "(1,1)",...
                 "Description", "The date the analysis was performed");
         end
     end
-end 
+end

@@ -21,10 +21,10 @@ classdef ImagingLight < aod.core.Stimulus
 % -------------------------------------------------------------------------
 
     properties (SetObservable, SetAccess = {?aod.core.Entity})
-        % Intensity of the imaging light 
+        % Intensity of the imaging light
         intensity               double
     end
-    
+
     methods
         function obj = ImagingLight(name, intensity, varargin)
             obj@aod.core.Stimulus(name, [], varargin{:});
@@ -47,8 +47,8 @@ classdef ImagingLight < aod.core.Stimulus
             value = specifyDatasets@aod.core.Stimulus(value);
 
             % Subclasses should change the units if needed
-            value.set("intensity",...
-                "Class", "double", "Size", "(1,1)", "Units", "Percent",...
+            value.set("intensity", "NUMBER",...
+                "Size", "(1,1)", "Units", "Percent",...
                 "Description", "Intensity of the imaging light");
         end
     end

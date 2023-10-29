@@ -22,13 +22,13 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
 %   Annotations                 Container for experiment's Annotations
 %   Calibrations                Container for experiment's Calibrations
 %   Systems                     Container for experiment's Systems
-%   homeDirectory               File path for experiment files 
+%   homeDirectory               File path for experiment files
 %   experimentDate              Date the experiment occurred
 %   epochIDs                    List of epoch IDs in experiment
 %
 % Dependent properties:
 %   numEpochs                   Number of epochs in experiment
-% 
+%
 % Public methods:
 %   setHomeDirectory(obj, filePath)
 %   id = id2epoch(obj, epochID)
@@ -44,7 +44,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
     properties (SetAccess = private)
         % The experiment's data folder path
         homeDirectory  (1,:)    char
-        % The date the experiment was performed 
+        % The date the experiment was performed
         experimentDate (1, 1)   datetime
         % A table containing all git repositories and their status
         Code                    table
@@ -52,19 +52,19 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
 
     properties (SetAccess = {?aod.common.mixins.Entity, ?aod.common.mixins.ParentEntity})
         % Container for Experiment's Analyses
-        Analyses                aod.core.Analysis  
-        % Container for Experiment's Annotations     
-        Annotations             aod.core.Annotation  
-        % Container for Experiment's Calibrations   
-        Calibrations            aod.core.Calibration  
+        Analyses                aod.core.Analysis
+        % Container for Experiment's Annotations
+        Annotations             aod.core.Annotation
+        % Container for Experiment's Calibrations
+        Calibrations            aod.core.Calibration
         % Container for Experiment's Epochs
-        Epochs                  aod.core.Epoch         
+        Epochs                  aod.core.Epoch
         % Container for Experiment's ExperimentDatasets
-        ExperimentDatasets      aod.core.ExperimentDataset  
+        ExperimentDatasets      aod.core.ExperimentDataset
         % Container for Experiment's Sources
-        Sources                 aod.core.Source      
-        % Container for Experiment's Systems 
-        Systems                 aod.core.System          
+        Sources                 aod.core.Source
+        % Container for Experiment's Systems
+        Systems                 aod.core.System
     end
 
     properties (Dependent)
@@ -73,8 +73,8 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
         % The total number of epochs in the experiment
         numEpochs (1,1)         double      {mustBeInteger}
     end
-    
-    methods 
+
+    methods
         function obj = Experiment(name, homeFolder, expDate, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
 
@@ -106,7 +106,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             % SETHOMEDIRECTORY
             %
             % Description:
-            %   Set a new base filepath. Useful if you are analyzing data 
+            %   Set a new base filepath. Useful if you are analyzing data
             %   on multiple computers
             %
             % Syntax:
@@ -118,7 +118,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             end
             obj.homeDirectory = filePath;
         end
-        
+
         function setDate(obj, expDate)
             % Change the experiment's date
             %
@@ -130,7 +130,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             % -------------------------------------------------------------
             obj.experimentDate = aod.util.validateDate(expDate);
         end
-        
+
         function epoch = id2epoch(obj, IDs)
             % Input epoch ID(s), get Epoch(s)
             %
@@ -157,11 +157,11 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
 
             idx = find(obj.epochIDs == IDs);
         end
-    end 
+    end
 
     methods
         function add(obj, entity)
-            % Add a new entity to the Experiment 
+            % Add a new entity to the Experiment
             %
             % Description:
             %   Add a new entity or entities to the experiment
@@ -175,7 +175,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             %
             % Notes: Only entities contained by  experiment can be added:
             %   Analysis, Epoch, Calibration, Annotation, Source, System
-            % ------------------------------------------------------------- 
+            % -------------------------------------------------------------
             arguments
                 obj
                 entity      {mustBeA(entity, 'aod.core.Entity')}
@@ -195,10 +195,10 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
                     "Entity must be Analysis, Calibration, Annotation, Epoch, ExperimentDataset, Source or System");
             end
 
-            switch entityType 
+            switch entityType
                 case EntityTypes.EPOCH
                     obj.addEpoch(entity)
-                case EntityTypes.SOURCE 
+                case EntityTypes.SOURCE
                     obj.addSource(entity);
                 otherwise
                     entity.setParent(obj);
@@ -208,7 +208,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
                     else
                         obj.(parentContainer) = cat(1, obj.(parentContainer), entity);
                     end
-                    
+
             end
         end
 
@@ -224,7 +224,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             %
             %   % Remove System most recently added (last in obj.Systems)
             %   remove(obj, 'System', 'last')
-            %   
+            %
             %
             %   % Remove all Epochs
             %   remove(obj, 'Epoch', 'all');
@@ -277,7 +277,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             import aod.common.EntityTypes
 
             entityType = EntityTypes.get(entityType);
-            if ismember(entityType, obj.entityType.validChildTypes)                
+            if ismember(entityType, obj.entityType.validChildTypes)
                 if entityType == EntityTypes.SOURCE
                     group = obj.getChildSources();
                 else
@@ -285,21 +285,21 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
                 end
             elseif ismember(entityType, EntityTypes.EPOCH.validChildTypes)
                 group = obj.getByEpoch('all', entityType);
-            else 
-                switch entityType 
-                    case EntityTypes.CHANNEL 
+            else
+                switch entityType
+                    case EntityTypes.CHANNEL
                         if isempty(obj.Systems)
                             group = aod.core.Channel.empty();
                         else
                             group = vertcat(obj.Systems.Channels);
                         end
-                    case EntityTypes.DEVICE          
+                    case EntityTypes.DEVICE
                         if isempty(obj.Systems)
                             group = aod.core.Device.empty();
                         else
                             group = vertcat(obj.Systems.getChannelDevices());
-                        end 
-                    case EntityTypes.EXPERIMENT 
+                        end
+                    case EntityTypes.EXPERIMENT
                         out = obj;  % There is only one experiment
                         return
                 end
@@ -325,7 +325,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             %   ID          integer or empty
             %       Epoch ID(s). For all epochs, set to 'all' or []
             %   entityType      aod.common.EntityTypes or char
-            %       Entity type to get (epoch dataset, registration,  
+            %       Entity type to get (epoch dataset, registration,
             %       stimulus or response)
             % Optional inputs:
             %   varargin    queries, IDs or 'all'
@@ -340,9 +340,9 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             %   % Get stimuli from epochs 1:3 matching a query
             %   out = obj.getByEpoch(1:3, 'Stimulus', {'Name', 'Mustang'})
             % -------------------------------------------------------------
-            
+
             import aod.common.EntityTypes
-            
+
             entityType = EntityTypes.get(entityType);
             if ~ismember(entityType, EntityTypes.EPOCH.validChildTypes())
                 error('getByEpoch:NonChildEntityType',...
@@ -363,7 +363,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
 
             idx = obj.id2index(ID);
             group = vertcat(obj.Epochs(idx).(entityType.parentContainer()));
-            
+
             if isempty(group)
                 out = group;
                 return
@@ -377,7 +377,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
                     if isnumeric(entityID)
                         mustBeInteger(entityID); mustBeInRange(entityID, 1, numel(group));
                         group = group(entityID);
-                    end 
+                    end
                     % Were queries provided as well
                     if nargin > 4
                         out = aod.common.EntitySearch.go(group, varargin{2:end});
@@ -465,7 +465,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             %   obj.addSource(source, overwrite)
             %
             % Note:
-            %   To add a new Source to an existing source, use the 
+            %   To add a new Source to an existing source, use the
             %   add function of the target parent aod.core.Source
             % -------------------------------------------------------------
             assert(isSubclass(source, 'aod.core.Source'),...
@@ -490,7 +490,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
             %
             % Description:
             %   Sorts epochIDs and epochs by increasing numerical order
-            % 
+            %
             % Syntax:
             %   obj.sortEpochs();
             % -------------------------------------------------------------
@@ -502,7 +502,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
         end
 
         function sources = getChildSources(obj)
-            % Returns all sources in an Experiment 
+            % Returns all sources in an Experiment
             %
             % Description:
             %   Returns all sources and nested sources in Experiment
@@ -515,7 +515,7 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
                 return
             end
             sources = obj.Sources.getChildSources();
-        end 
+        end
 
         function appendGitHashes(obj)
             % APPENDGITHASHES
@@ -536,11 +536,11 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
 
-            value.add("Administrator",...
-                "Class", "string", "Size", "(1,1)",...
+            value.add("Administrator", "TEXT",...
+                "Size", [1 1],...
                 "Description", "Person(s) who performed the experiment");
-            value.add("Laboratory",...
-                "Class", "string", "Size", "(1,1)",...
+            value.add("Laboratory", "TEXT",...
+                "Size", [1 1],...
                 "Description", "Lab where experiment was performed.");
         end
     end

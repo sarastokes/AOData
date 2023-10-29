@@ -35,11 +35,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
         % Epoch ID number in Experiment
         ID (1,1)            double          {mustBeInteger}
         % Time the Epoch (i.e. data acquisition) began
-        startTime           datetime        {mustBeScalarOrEmpty} = datetime.empty()   
+        startTime           datetime        {mustBeScalarOrEmpty} = datetime.empty()
     end
 
-    properties (GetAccess = public, SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})                       
-        % The timing of samples during Epoch                             
+    properties (GetAccess = public, SetAccess = {?aod.core.Epoch, ?aod.core.Experiment})
+        % The timing of samples during Epoch
         Timing (:,1)        duration = seconds([])
     end
 
@@ -51,24 +51,24 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
         % The System used for data acquisition during the Epoch
         System      {mustBeScalarOrEmpty, mustBeEntityType(System, 'System')} = aod.core.System.empty()
     end
-    
+
     % Containers for child entities
     properties (GetAccess = public, SetAccess = {?aod.common.mixins.ParentEntity, ?aod.core.Entity})
         % Container for Epoch's Registrations
         Registrations       aod.core.Registration
         % Container for Epoch's Responses
-        Responses           aod.core.Response 
+        Responses           aod.core.Response
         % Container for Epoch's Stimuli
         Stimuli             aod.core.Stimulus
         % Container for Epoch's Datasets
         EpochDatasets       aod.core.EpochDataset
     end
 
-    methods 
+    methods
         function obj = Epoch(ID, varargin)
             obj = obj@aod.core.Entity([], varargin{:});
             obj.ID = ID;
-            
+
             ip = aod.util.InputParser();
             addParameter(ip, 'Source', [], @(x) isSubclass(x, 'aod.core.Source'));
             addParameter(ip, 'System', [], @(x) isSubclass(x, 'aod.core.System'));
@@ -77,11 +77,11 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             obj.setSource(ip.Results.Source);
             obj.setSystem(ip.Results.System);
         end
-    end 
+    end
 
     methods (Sealed)
         function add(obj, entity)
-            % Add an entity to the Epoch 
+            % Add an entity to the Epoch
             %
             % Description:
             %   Add a new entity to the epoch
@@ -91,7 +91,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             %
             % Notes: Only entities contained by Epoch can be added:
             %   EpochDataset, Response, Registration, Stimulus
-            % ------------------------------------------------------------- 
+            % -------------------------------------------------------------
 
             if ~isscalar(entity)
                 arrayfun(@(x) add(obj, x), entity);
@@ -99,7 +99,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             end
 
             add@aod.common.mixins.ParentEntity(obj, entity);
-            
+
             % Register the parent
             entity.setParent(obj);
             % Add to the parent's hierarchy
@@ -119,13 +119,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             %
             % Notes: Only entities contained by Epoch can be added:
             %   Dataset, Response, Registration, Stimulus
-            % ------------------------------------------------------------- 
+            % -------------------------------------------------------------
 
             childType = obj.validateChildType(childType);
 
             if ~isscalar(obj)
                 arrayfun(@(x) remove(x, childType, varargin{:}), obj);
-                return 
+                return
             end
 
             remove@aod.common.mixins.ParentEntity(obj, childType, varargin{:});
@@ -133,7 +133,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
     end
 
     % Linked entity methods
-    methods (Sealed)  
+    methods (Sealed)
         function setSource(obj, source)
             % Set the Source for this epoch
             %
@@ -154,7 +154,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
                 error('setSource:InvalidEntityType',...
                     'Must be a core or persistent Source');
             end
-            
+
             obj.Source = source;
         end
 
@@ -190,7 +190,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             % SETSTARTTIME
             %
             % Description:
-            %   Set the time the epoch began. If input is empty, existing 
+            %   Set the time the epoch began. If input is empty, existing
             %   startTime will be erased
             %
             % Syntax:
@@ -229,14 +229,14 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
         end
 
         function setTiming(obj, timing)
-            % Set Epoch "Timing", the time each sample was acquired 
+            % Set Epoch "Timing", the time each sample was acquired
             %
             % Syntax:
             %   addTiming(obj, timing)
             %
             % Inputs:
             %   timing      vector, numeric or duration
-            %       The timing for each sample in Response. If empty, the 
+            %       The timing for each sample in Response. If empty, the
             %       contents of Timing will be cleared.
             %
             % Examples:
@@ -245,14 +245,14 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             %
             %   % Set duration timing
             %   obj.setTiming(seconds(1:4))
-            %   
+            %
             %   % Clear timing
             %   obj.setTiming([])
             % -------------------------------------------------------------
 
             if ~isscalar(obj)
                 arrayfun(@(x) setTiming(x, timing), obj);
-                return 
+                return
             end
 
             if ~isempty(timing)
@@ -267,7 +267,7 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
     end
 
     methods (Access = protected)
-        function value = specifyLabel(obj) 
+        function value = specifyLabel(obj)
             % Set the label to the epochID (with up to 3 leading zeros to
             % ensure alphabetical sorting doesn't get it out of order)
             value = int2fixedwidthstr(obj.ID, 4);
@@ -278,16 +278,12 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
 
-            %d.set('Timing',...
-            %    'Class', 'duration',...
-            %    'Description', 'The timing of samples acquired during th epoch');
-            value.set('ID',... 
-                'Size', '(1,1)',...
-                'Description', 'Epoch ID in the Experiment');
-            value.set('Source',...
-                'Size', '(1,1)',...
-                'Function', {@(x) aod.util.mustBeEntityType(x, 'Source')},...
-                'Description', 'The source of data acquired during the Epoch');
+            value.set('ID', "INTEGER",...
+                "Class", "double", "Size", [1 1],...
+                "Description", "Epoch ID in the Experiment");
+            value.set('Source', "LINK",...
+                "EntityType", "Source",...
+                "Description", "The source of data acquired during the Epoch");
         end
     end
-end 
+end

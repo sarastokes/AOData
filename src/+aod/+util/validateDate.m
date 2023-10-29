@@ -26,7 +26,7 @@ function out = validateDate(dateIn)
         out = dateIn;
     else
         try
-            out = datetime(dateIn, 'Format', 'yyyyMMdd');
+            out = datetime(dateIn, 'Format', 'yyyy-MM-dd');
         catch ME 
             if ismember(ME.identifier, ["MATLAB:datestr:ConvertToDateNumber", "MATLAB:datetime:ParseErr"])
                 error("validateDate:FailedDatetimeConversion",...

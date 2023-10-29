@@ -45,6 +45,10 @@ classdef Format < aod.schema.Validator
     methods
         function [tf, ME] = validate(obj, input)
             ME = [];
+            if ~obj.isSpecified()
+                tf = true;
+                return
+            end
             if isdatetime(input) || isduration(input)
                 tf = strcmp(input.Format, obj.Value);
                 if ~tf
@@ -63,6 +67,10 @@ classdef Format < aod.schema.Validator
         function out = text(obj)
             out = value2string(obj.Value);
             out = convertCharsToStrings(out);
+        end
+
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
         end
     end
 end

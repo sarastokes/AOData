@@ -78,7 +78,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         lastModified                datetime = datetime.empty()
     end
 
-    properties 
+    properties
         Schema
     end
 

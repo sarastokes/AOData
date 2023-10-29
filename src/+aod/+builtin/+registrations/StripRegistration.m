@@ -12,7 +12,7 @@ classdef StripRegistration < aod.core.Registration
 %
 % Attributes:
 %   RegistrationType        "frame" or "strip"
-%       Whether the frame or strip registration was ultimately used                    
+%       Whether the frame or strip registration was ultimately used
 %
 % Properties:
 %   usedFrame (logical; whether strip or frame reg was ultimately used)
@@ -23,9 +23,9 @@ classdef StripRegistration < aod.core.Registration
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        correlationCoefficient 
-        regFlag 
-        stripX 
+        correlationCoefficient
+        regFlag
+        stripX
         stripY
         frameXY
         regDescription
@@ -35,7 +35,7 @@ classdef StripRegistration < aod.core.Registration
     methods
         function obj = StripRegistration(name, registrationDate, varargin)
             if nargin < 1
-                % There is often only one strip registration per Epoch 
+                % There is often only one strip registration per Epoch
                 % so the class name (specifyLabel's default) may suffice
                 name = [];
             end
@@ -43,19 +43,19 @@ classdef StripRegistration < aod.core.Registration
                 registrationDate = [];
             end
             obj@aod.core.Registration(name, registrationDate, varargin{:});
-            
+
             % Hard-coded attributes
             obj.setAttr('Software', "ImageReg");
         end
 
         function apply(~)
-            warning("StripRegistration:AlreadyApplied",... 
+            warning("StripRegistration:AlreadyApplied",...
                 "Strip Registration is applied offline");
         end
 
         function loadData(obj, fPath, ID)
             % Load data from ImageReg strip registration
-            % 
+            %
             % Syntax:
             %   obj.loadData(fName)
             %   obj.loadData(fPath, ID)
@@ -84,7 +84,7 @@ classdef StripRegistration < aod.core.Registration
 
         function loadParameters(obj, fPath, ID)
             % Load parameters from ImageReg strip registration
-            % 
+            %
             % Syntax:
             %   obj.loadParameters(fName)
             %   obj.loadParameters(fPath, ID)
@@ -103,35 +103,36 @@ classdef StripRegistration < aod.core.Registration
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Registration();
 
-            value.add("RegistrationType",...
-                "Class", "string", "Size", "(1,1)",...
-                "Function", @(x) ismember(x, ["frame", "strip"]),...
+            value.add("RegistrationType", "TEXT",...
+                "Size", "(1,1)", "Enum", ["frame", "strip"],...
                 "Description", "Whether frame or strip registration was chosen for subsequent processing.");
         end
 
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Registration(value);
-            
-            value.set("correlationCoefficient",...
-                "Class", "double", "Size", "(:,1)",...
+
+            value.set("correlationCoefficient", "NUMBER",...
+                "Size", "(:,1)", "Minimum", 0, "Maximum", 1,...
                 "Description", "The correlation coefficient between each frame and the reference image");
-            value.set("rotationAngle",...
+            value.set("rotationAngle", "NUMBER",...
+                "Size", "(:,1)", "Minimum", 0, "Maximum", 360,...
+                "Units", "degrees",...
                 "Description", "The angle in degrees for torsion correction, per frame");
-            value.set("frameXY",...
-                "Class", "double", "Size", "(:,2)", "Units", "pixels",...
+            value.set("frameXY", "NUMBER",...
+                "Size", "(:,2)", "Units", "pixels",...
                 "Description", "The X and Y offset from frame registration, per frame");
-            value.set("stripX",...
-                "Class", "double", "Units", "pixels",...
+            value.set("stripX", "NUMBER",...
+                "Units", "pixels",...
                 "Description", "The X offsets for each registered strip, per frame");
-            value.set("stripY", ...
-                "Class", "double", "Units", "pixels", ...
+            value.set("stripY", "NUMBER",...
+                "Units", "pixels", ...
                 "Description", "The Y offsets for each registered strip, per frame");
-            value.set("regDescription",...
-                "Class", "string", "Size", "(:,1)",...
+            value.set("regDescription", "TEXT",...
+                "Size", "(:,1)",...
                 "Description", "Whether registration succeeded or failed, per frame");
-            value.set("regFlag",...
-                "Class", "logical", "Size", "(:,1)",...
+            value.set("regFlag", "BOOLEAN",...
+                "Size", "(:,1)",...
                 "Description", "Whether registration failed");
         end
     end
-end 
+end

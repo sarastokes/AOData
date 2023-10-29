@@ -43,14 +43,14 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     methods (Sealed)
         function setDate(obj, regDate)
             % Set the date where the registration was performed
-            % 
+            %
             % Syntax:
             %   obj.setDate(regDate)
             %
             % Inputs:
             %   regDate             datetime, or char: 'yyyyMMdd'
             % -------------------------------------------------------------
-            
+
             if ~isscalar(obj)
                 arrayfun(@(x) setDate(x, regDate), obj);
                 return
@@ -61,7 +61,6 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
                 return
             end
 
-            regDate = aod.util.validateDate(regDate);
             obj.setProp('registrationDate', regDate);
         end
     end
@@ -70,19 +69,19 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
 
-            value.set("registrationDate",...
-                "Class", "datetime", "Size", "(1,1)",...
+            value.set("registrationDate", "DATETIME",...
+                "Size", "(1,1)", "Format", "yyyy-MM-dd",...
                 "Description", "Date the registration was performed");
         end
 
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
 
-            value.add("Administrator",...
-                "Class", "string", "Size", "(1,1)",...
+            value.add("Administrator", "TEXT",...
+                "Size", "(1,1)",...
                 "Description", "Person(s) who performed the registration");
-            value.add("Software",...
-                "Class", "string", "Size", "(1,1)",...
+            value.add("Software", "TEXT",...
+                "Size", "(1,1)",...
                 "Description", "Software used for the registration");
         end
     end

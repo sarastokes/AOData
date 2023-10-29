@@ -142,8 +142,23 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
             % TODO: Implement wrapper class
             testCase.verifyError(...
-                @() obj.assign("Class", "double"),...
+                @() obj.assign("Class", "string"),...
                 "setClass:InvalidFormat");
+        end
+
+        function IntegerDouble(testCase)
+            obj = aod.schema.primitives.Integer("Test", [],...
+                "Class", "double");
+            testCase.verifyEqual(obj.Minimum, 0);
+            testCase.verifyEmpty(obj.Maximum);
+            testCase.verifyTrue(obj.validate(1));
+            testCase.verifyError(...
+                @() obj.validate(1.5), 'validate:Failed');
+
+            obj = aod.schema.primitives.Integer("Test", [],...
+                "Minimum", 2);
+            obj.assign("Class", "double");
+            testCase.verifyEqual(obj.Minimum, 2);
         end
 
         function IntegerErrors(testCase)

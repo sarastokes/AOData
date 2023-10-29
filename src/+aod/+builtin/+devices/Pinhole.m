@@ -27,11 +27,11 @@ classdef Pinhole < aod.core.Device
     methods
         function obj = Pinhole(diameter, varargin)
             obj = obj@aod.core.Device([], varargin{:});
-            
+
             obj.setDiameter(diameter);
         end
     end
-    
+
     methods
         function setDiameter(obj, diameter)
             % Set pinhole diameter in microns
@@ -56,8 +56,8 @@ classdef Pinhole < aod.core.Device
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
 
-            value.add("Diameter",...
-                "Class", "double", "Size", "(1,1)", "Units", "micron",...
+            value.add("Diameter", "NUMBER",...
+                "Size", "(1,1)", "Units", "micron",...
                 "Description", "Pinhole diameter");
         end
     end

@@ -276,6 +276,10 @@ classdef EntityTypes
             %   out = getCoreClassName(obj)
             % -------------------------------------------------------------
 
+            if ~isscalar(obj)
+                out = arrayfun(@(x) string(getCoreClassName(x)), obj);
+                return
+            end
             out = ['aod.core.', char(obj)];
         end
 
@@ -286,6 +290,10 @@ classdef EntityTypes
             %   out = getCoreClassName(obj)
             % -------------------------------------------------------------
 
+            if ~isscalar(obj)
+                out = arrayfun(@(x) string(getPersistentClassName(x)), obj);
+                return
+            end
             out = ['aod.persistent.', char(obj)];
         end
     end

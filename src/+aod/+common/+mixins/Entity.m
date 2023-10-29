@@ -342,7 +342,7 @@ classdef Entity < handle
             %   aod.specification.AttributeManager
             % -------------------------------------------------------------
             
-            ip = obj.Schema.Attributes.getParser();
+            ip = obj.Schema.Attributes.getParser(); %#ok<MCNPN>
             f = fieldnames(ip.Results);
             for i = 1:numel(f)
                 if ~isempty(ip.Results.(f{i}))

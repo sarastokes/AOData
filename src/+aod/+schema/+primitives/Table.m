@@ -27,6 +27,9 @@ classdef Table < aod.schema.primitives.Container
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
+            if ~obj.Class.isSpecified()
+                obj.setClass("table");
+            end
             obj.isInitializing = false;
             obj.checkIntegrity(true);
         end
@@ -36,10 +39,14 @@ classdef Table < aod.schema.primitives.Container
         function setClass(obj, value)
             arguments
                 obj
-                value       {mustBeMember(value, ["table", "timetable"])}
+                value       string
             end
 
-            obj.setClass(value);
+            if ~aod.util.isempty(value)
+                mustBeMember(value, ["table", "timetable"]);
+            end
+
+            setClass@aod.schema.primitives.Container(obj, value);
         end
     end
 
@@ -86,7 +93,7 @@ classdef Table < aod.schema.primitives.Container
                 return
             end
 
-            [tf, ME, excObj] = checkIntegrity@aod.schema.primitives.Container(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Container(obj);
             if obj.Class == "timetable" && obj.numItems > 0
                 if obj.Items(1).primitiveType ~= aod.schema.primitives.PrimitiveType.DURATION
                     excObj.addCause(MException("checkIntegrity:FirstItemMustBeDuration",...
@@ -95,7 +102,7 @@ classdef Table < aod.schema.primitives.Container
                 end
             end
 
-            tf = excObj.isValid;
+            tf = ~excObj.hasErrors;
             ME = excObj.getException();
             if ~tf && throwError
                 throw(ME);

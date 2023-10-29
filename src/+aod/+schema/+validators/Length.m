@@ -31,7 +31,7 @@ classdef Length < aod.schema.Validator
 
     methods
         function setValue(obj, value)
-            if obj.isInputEmpty(value)
+            if aod.schema.util.isInputEmpty(value)
                 obj.Value = [];
             else
                 obj.Value = value;

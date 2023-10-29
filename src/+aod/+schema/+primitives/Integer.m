@@ -25,7 +25,7 @@ classdef Integer < aod.schema.primitives.Primitive
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.INTEGER
-        OPTIONS = ["Class", "Size", "Minimum", "Maximum", "Default", "Units", "Description"]
+        OPTIONS = ["Size", "Minimum", "Maximum", "Class", "Default", "Units", "Description"]
         VALIDATORS = ["Class", "Size", "Minimum", "Maximum"];
     end
 
@@ -128,13 +128,20 @@ classdef Integer < aod.schema.primitives.Primitive
             end
 
             % Validate format
-            if strcmp(value, 'double') || ~contains(value, 'int')
+            if ~strcmp(value, 'double') && ~contains(value, 'int')
                 error('setClass:InvalidFormat',...
-                    'Format must be an integer type, not %s', value);
+                    'Format must be an integer type or double, not %s', value);
             end
             obj.Class.setValue(value);
 
-            if ~obj.Class.isSpecified()
+            if ~obj.Class.isSpecified() 
+                return
+            end
+
+            if strcmp(obj.Class.Value, 'double')
+                if ~obj.Minimum.isSpecified()
+                    obj.Minimum.setValue(0);
+                end
                 return
             end
 
@@ -195,7 +202,7 @@ classdef Integer < aod.schema.primitives.Primitive
 
             excObj = aod.schema.exceptions.SchemaIntegrityException(obj);
             % Refactor - this runs too often, but may be useful in one place
-            if obj.Class.isSpecified()
+            if obj.Class.isSpecified() && ~strcmp(obj.Class.Value, 'double')
                 % Minimum and maximum are set by the format if not already
                 % set by the user so isSpecified not required.
                 [minValue, maxValue] = obj.getIntegerRange(obj.Class);
@@ -235,6 +242,44 @@ classdef Integer < aod.schema.primitives.Primitive
             ME = excObj.getException();
             if excObj.hasErrors() && throwErrors
                 throw(ME);
+            end
+        end
+
+        function [tf, ME] = validate(obj, value, errorType)
+
+            arguments
+                obj
+                value
+                errorType           = aod.infra.ErrorTypes.ERROR
+            end
+            
+            errorType = aod.infra.ErrorTypes.init(errorType);
+
+            if ~isinteger(value)
+                itf = false;
+                % TODO: Better error passing
+                iME = MException('validate:Failed',...
+                    'Inputs to INTEGER must be a whole numbers');
+                if errorType == aod.infra.ErrorTypes.ERROR
+                    throw(iME);
+                end
+            else
+                iME = [];
+            end
+            [tf, ME] = validate@aod.schema.primitives.Primitive(obj,...
+                value, aod.infra.ErrorTypes.NONE);
+
+            if ~itf
+                tf = false;
+                ME = addCause(ME, iME);
+            end
+
+            % TODO Maybe a single function that gets called for this
+            switch errorType
+                case aod.infra.ErrorTypes.ERROR
+                    throw(ME);
+                case aod.infra.ErrorTypes.WARNING
+                    warning(ME.identifier, ME.message);
             end
         end
     end

@@ -18,7 +18,7 @@ classdef Link < aod.schema.primitives.Primitive
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.LINK
-        OPTIONS = ["EntityType", "Description"];
+        OPTIONS = ["EntityType", "Class", "Description"];
         VALIDATORS = ["Size", "EntityType"];
     end
 

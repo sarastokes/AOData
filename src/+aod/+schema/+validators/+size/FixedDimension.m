@@ -28,8 +28,8 @@ classdef FixedDimension < aod.schema.Validator
     methods
         function obj = FixedDimension(parent, value)
             obj = obj@aod.schema.Validator(parent);
-            
-            if nargin == 2 && ~obj.isInputEmpty(value)
+
+            if nargin == 2 && ~aod.schema.util.isInputEmpty(value)
                 obj.setValue(value);
             end
         end
@@ -38,7 +38,7 @@ classdef FixedDimension < aod.schema.Validator
 
     methods
         function setValue(obj, input)
-            if obj.isInputEmpty(input)
+            if aod.schema.util.isInputEmpty(input)
                 obj.Length = [];
                 return
             end
@@ -50,7 +50,7 @@ classdef FixedDimension < aod.schema.Validator
         end
 
         function tf = validate(obj, input)
-            if obj.isInputEmpty(input)
+            if aod.schema.util.isInputEmpty(input)
                 tf = true;
                 return
             end

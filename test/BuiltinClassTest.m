@@ -33,7 +33,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
     methods (Test, TestTags = {'Devices'})
         function Pinhole(testCase) 
             obj = aod.builtin.devices.Pinhole(25,... 
-                'Manufacturer', "ThorLabs", 'Model', "P20K"); 
+                "Manufacturer", "ThorLabs", "Model", "P20K"); 
             obj.setDiameter(20);
             paramValue = getAttr(obj, 'Diameter');
             testCase.verifyEqual(paramValue, 20);
@@ -41,12 +41,12 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
         function PMT(testCase) 
             obj = aod.builtin.devices.PMT('VisiblePMT',...
-                'Manufacturer', "Hamamatsu", 'Model', "H16722");
+                "Manufacturer", "Hamamatsu", "Model", "H16722");
         end
 
         function LightSource(testCase)
             obj = aod.builtin.devices.LightSource(488,...
-                'SerialNumber', "123A");
+                "SerialNumber", "123A");
             obj.setSpectra([1:10; 11:20]);
         end
 
@@ -61,7 +61,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
         function Pellicle(testCase)
             obj = aod.builtin.devices.Pellicle([30, 70]);
-            testCase.verifyEqual(obj.getAttr('SplittingRatio', [30 70]));
+            testCase.verifyEqual(obj.getAttr('SplittingRatio'), [30 70]);
             testCase.verifyEqual(obj.label, "30:70Pellicle");
 
             value = [300:700, randn(1, numel(300:700))]';
@@ -71,20 +71,20 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
         function DichroicFilter(testCase)
             obj = aod.builtin.devices.DichroicFilter(470, "high",...
-                'Manufacturer', "Semrock", 'Model', "FF470-Di01");
+                "Manufacturer", "Semrock", "Model", "FF470-Di01");
             obj.setTransmission(sara.resources.getResource('FF470_Di01.txt'));
         end
 
         function NDF(testCase)
             obj = aod.builtin.devices.NeutralDensityFilter(0.6,...
-                'Manufacturer', "ThorLabs", 'Model', "NE06A-A");
-            obj.setTransmission([400:700; zeros(size(400:700))]);
+                "Manufacturer", "ThorLabs", "Model", "NE06A-A");
+            obj.setTransmission([400:700; zeros(size(400:700))]');
             testCase.verifyTrue(strcmp(obj.label, '0.6NDF'));
         end
 
         function BandpassFilter(testCase)
             obj = aod.builtin.devices.BandpassFilter(590, 20,...
-                'Manufacturer', "Semrock", 'Model', "FF01-590/20");
+                "Manufacturer", "Semrock", "Model", "FF01-590/20");
             obj.setTransmission(sara.resources.getResource('FF01-590_20.txt'));
         end
     end
@@ -152,17 +152,17 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
                 'Mustang', getDateYMD());
             testCase.verifyError(...
                 @()obj.setAttr('Wavelength', 'badinput'),...
-                'MATLAB:InputParser:ArgumentFailedValidation');
+                'validate:Failed');
             testCase.verifyError(...
                 @()obj.setIterations("badInput"),...
-                "setProp:InvalidValue");
+                "validate:Failed");
         end
     end
 
     methods (Test, TestTags = {'Registrations'})
         function RigidRegistration(testCase)
             obj = aod.builtin.registrations.RigidRegistration(...
-                'SIFT', '20220822', eye(3));
+                'SIFT', "2022-08-22", eye(3));
             testCase.verifyClass(obj.affine2d_to_3d(eye(3)), 'affine3d');
             testCase.verifyClass(obj.affine2d_to_3d(affine2d(eye(3))), 'affine3d');
 
@@ -175,12 +175,10 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
                 @() aod.builtin.registrations.RigidRegistration('Reg', getDateYMD(), [2 2; 2 2]),...
                 "RigidRegistration:IncorrectSize");
 
-                
             obj = aod.builtin.registrations.RigidRegistration(...
-                'SIFT', '20220822', eye(3));
+                'SIFT', "2022-08-22", eye(3));
             testCase.verifyError(...
-                @()obj.apply(zeros(3,3,3)),...
-                "Apply:NotYetImplemented");
+                @()obj.apply(zeros(3,3,3)), "Apply:NotYetImplemented");
         end
 
         function RigidRegistrationApply(testCase)
@@ -285,7 +283,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["Readers"])
         function RegistrationParameterReader(testCase)
-            obj = aod.builtin.registrations.StripRegistration([], "20220314");
+            obj = aod.builtin.registrations.StripRegistration([], "2022-03-14");
 
             reader = aod.builtin.readers.RegistrationParameterReader(...
                 fullfile(test.util.getAODataTestFolder(), "test_data",... 

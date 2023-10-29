@@ -14,7 +14,7 @@ classdef PrimitiveTypes
     enumeration
         BOOLEAN
         CATEGORICAL
-        DATE
+        DATETIME
         DURATION
         FILE
         INTEGER
@@ -31,7 +31,7 @@ classdef PrimitiveTypes
         function tf = isContainerAllowable(obj)
             % TODO: choose between this and allowableChild property
             txt = string(obj);
-            if ismember(txt, ["BOOLEAN", "CATEGORICAL", "DATE", "DURATION", "FILE", "NUMBER", "INTEGER", "TEXT"])
+            if ismember(txt, ["BOOLEAN", "CATEGORICAL", "DATETIME", "DURATION", "FILE", "NUMBER", "INTEGER", "TEXT"])
                 tf = true;
             else
                 tf = false;
@@ -86,6 +86,10 @@ classdef PrimitiveTypes
                 obj = PrimitiveTypes.TEXT;
             elseif iscell(data)
                 obj = PrimitiveTypes.LIST;
+            elseif isdatetime(data)
+                obj = PrimitiveTypes.DATE;
+            elseif isduration(data)
+                obj = PrimitiveTypes.DURATION;
             elseif istable(data)
                 obj = PrimitiveTypes.TABLE;
             elseif isstruct(data) || isa(data, 'containers.Map')

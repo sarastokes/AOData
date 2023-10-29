@@ -33,7 +33,7 @@ classdef Maximum < aod.schema.Validator
 
     methods
         function setValue(obj, input)
-            if obj.isInputEmpty(input)
+            if aod.schema.util.isInputEmpty(input)
                 obj.Value = [];
             elseif ~isa(input, 'meta.property')
                 obj.Value = input;

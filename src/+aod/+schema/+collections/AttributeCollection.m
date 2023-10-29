@@ -16,7 +16,9 @@ classdef AttributeCollection < aod.schema.SchemaCollection
             aod.schema.primitives.PrimitiveTypes.TEXT,...
             aod.schema.primitives.PrimitiveTypes.BOOLEAN,...
             aod.schema.primitives.PrimitiveTypes.NUMBER,...
-            aod.schema.primitives.PrimitiveTypes.INTEGER];
+            aod.schema.primitives.PrimitiveTypes.INTEGER,...
+            aod.schema.primitives.PrimitiveTypes.DATETIME,...
+            aod.schema.primitives.PrimitiveTypes.LIST];
     end
 
     methods
@@ -78,7 +80,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
 
     methods (Static)
         function obj = populate(className)
-            % TODO: Modify entity framework
+            obj = aod.schema.util.getAttributeSchema(className);
         end
     end
 end

@@ -305,6 +305,8 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 return
             end
 
+            % TODO Put this in a function too sometimes primitive may
+            % need to handle this?
             if ~isempty(obj.Parent)
                 msg = sprintf('Failed validation for %s/%s in %s',...
                     obj.Parent.className, obj.Name, obj.Parent.ParentPath);
@@ -316,6 +318,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 ME = addCause(ME, MEs(i));
             end
 
+            % TODO Maybe a single function that gets called for this
             switch errorType
                 case aod.infra.ErrorTypes.ERROR
                     throw(ME);

@@ -21,20 +21,20 @@ classdef PMT < aod.core.Device
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    methods 
+    methods
         function obj = PMT(name, varargin)
             obj = obj@aod.core.Device(name, varargin{:});
         end
     end
 
-    
+
     methods (Static)
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
 
-            value.add("SerialNumber",...
-                "Class", "string", "Size", "(1,1)",...
+            value.add("SerialNumber", "TEXT",...
+                "Size", "(1,1)",...
                 "Description", "Serial number of the light source");
         end
     end
-end 
+end
