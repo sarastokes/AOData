@@ -48,7 +48,7 @@ function writeEntity(hdfName, obj)
         parentPath = '/';
         hdfPath = '/Experiment';
     end
-    % Unlike parentPath, basePath includes the container 
+    % Unlike parentPath, basePath includes the container
     [basePath, groupName] = h5tools.util.splitPath(hdfPath);
 
     fprintf('Writing %s\n', hdfPath);
@@ -62,14 +62,14 @@ function writeEntity(hdfName, obj)
     if ~isempty(containers)
         h5tools.createGroup(hdfName, hdfPath, containers{:});
         for i = 1:numel(containers)
-            h5tools.writeatt(hdfName, [hdfPath, '/', containers{i}],... 
+            h5tools.writeatt(hdfName, [hdfPath, '/', containers{i}],...
                 'Class', 'Container');
         end
     end
 
     % Write entity identifiers
     h5tools.writeatt(hdfName, hdfPath,...
-        'UUID', obj.UUID, 'Class', class(obj),... 
+        'UUID', obj.UUID, 'Class', class(obj),...
         'EntityType', char(entityType),...
         'lastModified', obj.lastModified,...
         'dateCreated', obj.dateCreated);
@@ -86,8 +86,11 @@ function writeEntity(hdfName, obj)
         end
     end
 
-    % Handle timing
-    if isprop(obj, 'Timing') 
+    % Write the schema
+    aod.h5.writeEntitySchema(hdfName, hdfPath, obj.Schema);
+
+    % TODO: Handle timing
+    if isprop(obj, 'Timing')
         if ~isempty(obj.Timing)
             aod.h5.write(hdfName, hdfPath, 'Timing', obj.Timing);
         else  % If Timing is empty, check for Parent timing to inherit
@@ -95,7 +98,7 @@ function writeEntity(hdfName, obj)
                 h5tools.writelink(hdfName, EM.uuid2path(obj.Timing.UUID), hdfPath, 'Timing');
             end
         end
-    end 
+    end
 
     % Write names, if exist
     h5tools.writeatt(hdfName, hdfPath, 'label', obj.label);
@@ -117,7 +120,7 @@ function writeEntity(hdfName, obj)
     if ~isempty(obj.attributes)
         h5tools.writeatt(hdfName, hdfPath, obj.attributes);
     end
-    
+
     % Write file paths, if necessary
     if ~isempty(obj.files)
         h5tools.datasets.makeStringDataset(hdfName, hdfPath, 'files', "aod.common.KeyValueMap");
@@ -129,16 +132,6 @@ function writeEntity(hdfName, obj)
         h5tools.write(hdfName, hdfPath, 'Code', obj.Code);
     end
 
-    % Write expected attributes and datasets
-    if ~isempty(obj.expectedAttributes)
-        aod.h5.write(hdfName, hdfPath,... 
-            'expectedAttributes', obj.expectedAttributes);
-    end
-    if ~isempty(obj.expectedDatasets)
-        aod.h5.write(hdfName, hdfPath,...
-            'expectedDatasets', obj.expectedDatasets);
-    end
-    
     % Write remaining properties as datasets
     for i = 1:numel(persistedProps)
         try
@@ -169,7 +162,7 @@ function writeEntity(hdfName, obj)
         success = aod.h5.write(hdfName, hdfPath, persistedProps(i), prop, dsetDescription);
         if ~success
             warning('writeEntity:UnknownDataType',...
-                'Failed to write property %s, did not recognize type %s',... 
+                'Failed to write property %s, did not recognize type %s',...
                 persistedProps(i), class(prop));
         end
 
@@ -182,7 +175,7 @@ function parentPath = getParentPath(EMT, parentUUID)
 end
 
 function tf = isEntityInFile(EMT, UUID)
-    if isempty(find(EMT.UUID == UUID)) %#ok<EFIND> 
+    if isempty(find(EMT.UUID == UUID)) %#ok<EFIND>
         if nargout == 0
             error('Entity does not exist in HDF5 file!');
         else

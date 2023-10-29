@@ -27,7 +27,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
         saveAsMat       logical = false
     end
 
-    experiment = aod.core.Experiment("Tester", cd, '20220823',...
+    experiment = aod.core.Experiment("Tester", cd, "2022-08-23",...
         'Administrator', "Sara Patterson",...
         'Laboratory', "Primate-1P");
 
@@ -104,7 +104,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 
     % Registrations
     reg = aod.builtin.registrations.RigidRegistration( ...
-        'SIFT', '20220823', eye(3));
+        'SIFT', "2022-08-23", eye(3));
     epoch.add(reg);
 
     % Responses
@@ -119,7 +119,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 
     % Stimuli
     stim = aod.builtin.stimuli.ImagingLight('Mustang', 22,...
-        'IntensityUnits', "Normalized");
+        'IntensityUnits', "Normalized");  % TODO Remove units as attr
     epoch.add(stim);
 
     % Datasets

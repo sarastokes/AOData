@@ -165,7 +165,7 @@ Basic types (**validator**, *decorator*):
 ### Misc notes
 - Don't use numeric indexing for tables, use the column names so it's clear what data is used (and how to modify the code if the table changes in the future)
 - Values are only validated if not empty (or not "" in the case of `string`)
-- Avoid `char` because it complicates equality and size which complicates schemas (for me, also user) and AOData file queries (for user)
+- Avoid `char` because it complicates equality and size which complicates the schema framework (for me, also user) and AOData file queries (for user). Plus `jsonencode` does not distinguish between string and char.
 
 ### Validation error messages
 For a Record that is not nested:
