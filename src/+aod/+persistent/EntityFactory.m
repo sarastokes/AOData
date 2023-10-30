@@ -1,8 +1,8 @@
-classdef EntityFactory < handle 
+classdef EntityFactory < handle
 % Middle layer between persistent interface and HDF5 file
 %
 % Description:
-%   A factory for creating entities from an HDF5 file and caching the 
+%   A factory for creating entities from an HDF5 file and caching the
 %   for faster interaction
 %
 % Constructor:
@@ -15,14 +15,14 @@ classdef EntityFactory < handle
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        hdfName                 string 
+        hdfName                 string
         % Handles changes made from persistent interface to HDF5 file
         persistor               aod.persistent.Persistor
         % Tracks all entities in the HDF5 file
-        entityManager           aod.h5.EntityManager 
+        entityManager           aod.h5.EntityManager
         classManager            aod.infra.ClassRepository
         listeners               event.listener
-        cache 
+        cache
     end
 
     methods
@@ -31,7 +31,7 @@ classdef EntityFactory < handle
             obj.entityManager = aod.h5.EntityManager(hdfName);
             obj.classManager = aod.infra.ClassRepository();
             obj.persistor = aod.persistent.Persistor(hdfName);
-            
+
             obj.listeners = [...
                 addlistener(obj.persistor, 'EntityChanged', @obj.onEntityChanged);...
                 addlistener(obj.persistor, 'HdfPathChanged', @obj.onEntityRenamed)];
@@ -83,13 +83,10 @@ classdef EntityFactory < handle
                 return
             end
 
-            className = T{T.Path == hdfPath, 'Class'};
+            % Find persistent class and instantiate
             entityType = aod.common.EntityTypes.get(obj.entityManager.entityMap(uuid));
-
-            %! Consider deprecating
-            mirrorFcn = str2func(aod.infra.findMirror(...
-                entityType, className, obj.classManager));
-            e = mirrorFcn(obj.hdfName, hdfPath, obj);
+            persistentClass = str2func(entityType.getPersistentClassName());
+            e = persistentClass(obj.hdfName, hdfPath, obj);
 
             obj.persistor.bind(e);
             obj.cache(uuid) = e;
@@ -129,13 +126,13 @@ classdef EntityFactory < handle
         end
 
         function onEntityReplaced(obj, ~, evt)
-            
+
         end
 
         function onEntityRenamed(obj, ~, evt)
             % Handles side-effects of a renamed group and the path change
             %
-            % HDF5 group renaming is a nightmare and here I've chosen to 
+            % HDF5 group renaming is a nightmare and here I've chosen to
             % minimize disruption to user over minimizing complexity
             % -------------------------------------------------------------
 
@@ -167,18 +164,18 @@ classdef EntityFactory < handle
             % Update entity's parent containers to reflect new HDF5 paths
             evt.Entity.Parent.reload();
 
-            % Collect all softlinks. Softlink sources are changed by 
+            % Collect all softlinks. Softlink sources are changed by
             % H5L.move, but softlink targets are not and must be edited
             links = aod.h5.collectExperimentLinks(obj.hdfName, true);
             for i = 1:numel(allPaths)
                 % Check if original HDF path is a softlink target
                 idx = find(links.Target == strrep(allPaths(i), evt.NewPath, evt.OldPath));
                 if isempty(idx)
-                    continue 
+                    continue
                 end
                 sourcePaths = links{idx, "Location"};
                 % Entities cannot be loaded until link is fixed so correct
-                % through h5tools rather than persistent interface 
+                % through h5tools rather than persistent interface
                 for j = 1:numel(sourcePaths)
                     h5tools.deleteObject(obj.hdfName, sourcePaths(j));
                     [sourcePath, sourceLink] = h5tools.util.splitPath(sourcePaths(j));
@@ -187,15 +184,15 @@ classdef EntityFactory < handle
                 end
             end
 
-            % Now we need to reload any cached entities with a changed 
-            % softlink - reload is preferable to deletion because user may 
+            % Now we need to reload any cached entities with a changed
+            % softlink - reload is preferable to deletion because user may
             % have existing handles to these entities
             updatedEntities = unique(updatedEntities);
             for i = 1:numel(updatedEntities)
                 uuid = obj.path2uuid(updatedEntities(i));
                 e = obj.isCached(uuid);
                 if isempty(e)
-                    continue 
+                    continue
                 end
                 e.reload();
             end
@@ -208,4 +205,4 @@ classdef EntityFactory < handle
             experiment = obj.getExperiment();
         end
     end
-end 
+end

@@ -301,7 +301,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             % Check whether the value can be validated with specs
             propSpec = obj.Schema.Datasets.get(propName);
             if ~isempty(propSpec)
-                isValid = propSpec.validate(propValue);
+                [isValid, ME] = propSpec.validate(propValue);
                 if ~isValid
                     % TODO Update for new schema format
                     id = 'modifyDataset:InvalidValue';
