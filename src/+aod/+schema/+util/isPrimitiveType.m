@@ -4,7 +4,7 @@ function tf = isPrimitiveType(obj, primitiveType)
 
     if isSubclass(obj, 'aod.schema.Record')
         tf = obj.primitiveType == primitiveType;
-    elseif isSubclass(obj, 'aod.schema.primitives.Primitive')
+    elseif isSubclass(obj, 'aod.schema.Primitive')
         tf = obj.PRIMITIVE_TYPE == primitiveType;
     else
         tf = false;

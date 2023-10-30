@@ -67,4 +67,16 @@ classdef Length < aod.schema.Validator
             end
         end
     end
+
+    % MATLAB builtin functions
+    methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.Length')
+                tf = false;
+                return
+            end
+
+            tf = isequal(obj.Value, other.Value);
+        end
+    end
 end

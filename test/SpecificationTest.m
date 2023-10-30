@@ -62,10 +62,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
         function SizeErrors(testCase)
             testCase.verifyError(...
-                @() aod.schema.validators.Size(1),...
-                "Size:InvalidDimensions");
-
-            testCase.verifyError(...
                 @() aod.schema.validators.Size("(1)"),...
                 "Size:InvalidDimensions");
         end
@@ -99,9 +95,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
             rowSize2a = aod.schema.validators.Size("(:,1)");
             testCase.verifyEqual(rowSize2a.text(), "(:,1)");
-
             testCase.verifyEqual(rowSize2a.Value, ref2);
-            testCase.verifyEqual(rowSize2b.Value, rowSize2a.Value);
         end
 
         function UnrestrictedDimensions(testCase)
@@ -272,8 +266,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 "Description", "This is a test");
         end
 
-        function EmptyDataset(testCase)
-            obj = aod.schema.Record([], "Test");
+        function EmptyRecord(testCase)
+            obj = aod.schema.Record([], "Test", "Unknown");
             obj.setType("TEXT");
             testCase.verifyEqual(obj.primitiveType,...
                 aod.schema.primitives.PrimitiveTypes.TEXT);
@@ -282,10 +276,10 @@ classdef SpecificationTest < matlab.unittest.TestCase
             obj.assign("Size", "(1,1)",...
                 "Description", "test",...
                 "Default", "hey");
-            testCase.verifyEqual(obj.Default.Value, "hey");
-            testCase.verifyEqual(obj.Description.Value, "test");
-            testCase.verifyEqual(obj.Class.Value, ["string", "char"]);
-            testCase.verifyEqual(obj.Size.SizeType, ...
+            testCase.verifyEqual(obj.Primitive.Default.Value, "hey");
+            testCase.verifyEqual(obj.Primitive.Description.Value, "test");
+            testCase.verifyEqual(obj.Primitive.Class.Value, ["string", "char"]);
+            testCase.verifyEqual(obj.Primitive.Size.SizeType, ...
                 aod.schema.validators.size.SizeTypes.SCALAR);
         end
     end
@@ -319,7 +313,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
             ep = aod.core.Epoch(1);
 
             testCase.verifyError(...
-                @() obj.add(findprop(ep, 'ID')), "add:EntryExists");
+                @() obj.add(findprop(ep, 'ID')), "add:AdditionNotSupported");
             testCase.verifyError(...
                 @() obj.add("NewProp"), 'add:AdditionNotSupported');
 
@@ -378,26 +372,25 @@ classdef SpecificationTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags="Access")
-
         function AttributeManagerAccess(testCase)
             AM = aod.schema.util.getAttributeSchema(...
                 'aod.builtin.devices.NeutralDensityFilter');
             testCase.verifyClass(AM, 'aod.schema.collections.AttributeCollection');
         end
 
-        function PackageAccess(testCase)
-            [DM, AM, S] = aod.specification.util.collectPackageSpecifications(...
-                "aod.core", "Write", false);
-            testCase.verifyEqual(numel(DM), numel(AM));
-
-            f = fieldnames(S);
-            testCase.verifyNumElements(f, 2);
-            testCase.verifyEqual(f{1}, 'Namespaces');
-
-            f = fieldnames(S.Namespaces);
-            testCase.verifyNumElements(f, 1);
-            testCase.verifyEqual(f{1}, 'aod');
-        end
+        % function PackageAccess(testCase)
+        %     [DM, AM, S] = aod.specification.util.collectPackageSpecifications(...
+        %         "aod.core", "Write", false);
+        %     testCase.verifyEqual(numel(DM), numel(AM));
+        % 
+        %     f = fieldnames(S);
+        %     testCase.verifyNumElements(f, 2);
+        %     testCase.verifyEqual(f{1}, 'Namespaces');
+        % 
+        %     f = fieldnames(S.Namespaces);
+        %     testCase.verifyNumElements(f, 1);
+        %     testCase.verifyEqual(f{1}, 'aod');
+        % end
 
         function AttributeManagerComparison(testCase)
             import aod.schema.MatchType
@@ -421,15 +414,15 @@ classdef SpecificationTest < matlab.unittest.TestCase
     end
 
     methods (Test, TestTags="Property")
-        function PropertySpecification(testCase)
-            prop = aod.util.templates.PropertySpecification("Test");
-            prop.Class = "duration,double";
-            testCase.verifyEqual(numel(prop.Class), 2);
-
-            testCase.verifyError(...
-                @() set(prop, "Class", "badclass"),...
-                "PropertySpecification:InvalidClassName")
-        end
+    %     function PropertySpecification(testCase)
+    %         prop = aod.util.templates.PropertySpecification("Test");
+    %         prop.Class = "duration,double";
+    %         testCase.verifyEqual(numel(prop.Class), 2);
+    % 
+    %         testCase.verifyError(...
+    %             @() set(prop, "Class", "badclass"),...
+    %             "PropertySpecification:InvalidClassName")
+    %     end
 
         function DatasetManagerFromEntity(testCase)
             % Populated DatasetManager

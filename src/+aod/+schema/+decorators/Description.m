@@ -8,7 +8,7 @@ classdef Description < aod.schema.Decorator
 %   aod.schema.Decorator
 %
 % Constructor:
-%   obj = aod.schema.Description(input)
+%   obj = aod.schema.decorators.Description(input)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -54,6 +54,18 @@ classdef Description < aod.schema.Decorator
             else
                 output = obj.Value;
             end
+        end
+    end
+
+    % MATLAB builtin functions
+    methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.Description')
+                tf = false;
+                return
+            end
+
+            tf = isequal(obj.Value, other.Value);
         end
     end
 end

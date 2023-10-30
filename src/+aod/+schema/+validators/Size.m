@@ -1,4 +1,4 @@
-classdef Size < aod.schema.Validator
+classdef Size < aod.schema.Validator & matlab.mixin.CustomDisplay
 % Container for the expected size of a dataset or attribute
 %
 % Superclasses:
@@ -250,6 +250,19 @@ classdef Size < aod.schema.Validator
         end
     end
 
+    % CustomDisplay methods
+    methods (Access = protected)
+        function header = getHeader(obj)
+            if ~isscalar(obj)
+                header = getHeader@matlab.mixin.CustomDisplay(obj);
+            else
+                className = matlab.mixin.CustomDisplay.getClassNameForHeader(obj);
+                newHeader = [className, obj.text(), ' with properties:'];
+                header = sprintf('%s\n',newHeader);
+            end
+        end
+    end
+
     % MATLAB built-in methods
     methods
         function tf = isequal(obj, other)
@@ -258,7 +271,7 @@ classdef Size < aod.schema.Validator
             % Syntax:
             %   tf = isequal(obj, other)
             % -------------------------------------------------------------
-            if ~isa(other, 'aod.schema.Size')
+            if ~isa(other, 'aod.schema.validators.Size')
                 tf = false;
                 return
             end
@@ -268,14 +281,7 @@ classdef Size < aod.schema.Validator
                 return
             end
 
-            for i = 1:numel(obj.Value)
-                if ~isequal(class(obj.Value(i)), class(other.Value(i))) || ...
-                        ~isequal(obj.Value(i), other.Value(i))
-                    tf = false;
-                    return
-                end
-            end
-            tf = true;
+            tf = strcmp(obj.text(), other.text());
         end
 
         function out = jsonencode(obj, varargin)

@@ -1,11 +1,11 @@
-classdef Boolean < aod.schema.primitives.Primitive
+classdef Boolean < aod.schema.Primitive
 % BOOLEAN - Specify a logical value (true/false or 0/1)
 %
 % Superclasses:
-%   aod.schema.primitives.Primitive
+%   aod.schema.Primitive
 %
 % Constructor:
-%   obj = aod.schema.primitives.Primitive(name, parent)
+%   obj = aod.schema.Boolean(name, parent, varargin)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -18,7 +18,7 @@ classdef Boolean < aod.schema.primitives.Primitive
 
     methods
         function obj = Boolean(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             % Set default values
             obj.setClass("logical");
@@ -60,7 +60,7 @@ classdef Boolean < aod.schema.primitives.Primitive
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwError)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwError)
             arguments
                 obj
                 throwError      (1,1)       logical = false
@@ -71,7 +71,7 @@ classdef Boolean < aod.schema.primitives.Primitive
                 return
             end
 
-            [tf, ME, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [tf, ME, excObj] = checkIntegrity@aod.schema.Primitive(obj);
             if ~tf && throwError
                 throw(ME);
             end

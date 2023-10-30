@@ -57,4 +57,21 @@ classdef Count < aod.schema.Validator
             end
         end
     end
+
+    % MATLAB builtin methods
+    methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.Count')
+                tf = false;
+                return
+            end
+
+            if ~isequal(obj.isSpecified, other.isSpecified)
+                tf = false;
+                return
+            end
+
+            tf = isequal(obj.Value, other.Value);
+        end
+    end
 end

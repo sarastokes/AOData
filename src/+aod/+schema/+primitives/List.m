@@ -80,19 +80,6 @@ classdef List < aod.schema.primitives.Container
                 throw(ME);
             end
         end
-
-        function [tf, ME] = validate(obj, input, errorType)
-            if nargin < 3 || isempty(errorType)
-                errorType = aod.infra.ErrorTypes.ERROR;
-            else
-                errorType = aod.infra.ErrorTypes.init(errorType);
-            end
-            [tf, ME] = validate@aod.schema.primitives.Container(obj, input, errorType);
-
-            for i = 1:obj.numItems
-                obj.Collection.validateItem(obj.getItemFromInput(input, i), errorType);
-            end
-        end
     end
 
     methods (Access = protected)

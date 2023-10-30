@@ -1,16 +1,13 @@
-classdef Text < aod.schema.primitives.Primitive
+classdef Text < aod.schema.Primitive
 % TEXT - Defines a string or string array input
 %
 % Superclasses:
-%   aod.schema.primitives.Primitive
+%   aod.schema.Primitive
 %
 % Constructor:
 %   obj = aod.schema.primitives.Text(name)
 %   obj = aod.schema.primitives.Text(name, 'Length', value,...
 %       'Length', value, 'Enum', value, 'Description', value)
-%
-% Allowed parents:
-%   aod.specification.Entry, aod.schema.primitives.Table
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -29,7 +26,7 @@ classdef Text < aod.schema.primitives.Primitive
 
     methods
         function obj = Text(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             % Initialization
             obj.Length = aod.schema.validators.Length(obj, []);
@@ -94,7 +91,7 @@ classdef Text < aod.schema.primitives.Primitive
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwErrors)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwErrors)
             if nargin < 2
                 throwErrors = false;
             end
@@ -102,7 +99,7 @@ classdef Text < aod.schema.primitives.Primitive
                 tf = true; ME = [];
                 return
             end
-            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.Primitive(obj);
 
             if obj.Default.isSpecified()
                 if obj.Length.isSpecified()
@@ -129,7 +126,7 @@ classdef Text < aod.schema.primitives.Primitive
             end
 
             if obj.Enum.isSpecified()
-                if obj.Length.isSpecified() 
+                if obj.Length.isSpecified()
                     if any(arrayfun(@(x) ~isequal(strlength(x), obj.Length.Value), obj.Enum.Value))
                         excObj.addCause(MException(...
                             'checkIntegrity:InvalidEnumLength',...

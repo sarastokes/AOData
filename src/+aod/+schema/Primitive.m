@@ -262,7 +262,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             ME = excObj.getException();
         end
 
-        function [tf, ME] = validate(obj, value, errorType)
+        function [tf, ME, excObj] = validate(obj, value, errorType)
             arguments
                 obj
                 value
@@ -270,34 +270,24 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             end
 
             errorType = aod.infra.ErrorTypes.init(errorType);
+            excObj = aod.schema.exceptions.SchemaValidationException();
 
-            tf = true; MEs = [];
+            tf = true;
             numFailures = 0;
             for i = 1:numel(obj.VALIDATORS)
                 [itf, iME] = obj.(obj.VALIDATORS(i)).validate(value);
                 if ~itf
                     tf = false;
                     numFailures = numFailures + 1;
-                    MEs = cat(1, MEs, iME);
+                    excObj = excObj.addCause(iME);
+                    %MEs = cat(1, MEs, iME);
                 end
             end
 
+            ME = excObj.getException();
             if numFailures == 0
                 ME = [];
                 return
-            end
-
-            % TODO Put this in a function too sometimes primitive may
-            % need to handle this?
-            if ~isempty(obj.Parent)
-                msg = sprintf('Failed validation for %s/%s in %s',...
-                    obj.Parent.className, obj.Name, obj.Parent.ParentPath);
-            else
-                msg = sprintf('Failed validation for %s', obj.Name);
-            end
-            ME = MException('validate:Failed', msg);
-            for i = 1:numel(MEs)
-                ME = addCause(ME, MEs(i));
             end
 
             % TODO Maybe a single function that gets called for this
@@ -305,7 +295,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 case aod.infra.ErrorTypes.ERROR
                     throw(ME);
                 case aod.infra.ErrorTypes.WARNING
-                    warning(ME.identifier, ME.message);
+                    throwWarning(ME);
             end
         end
     end
@@ -347,7 +337,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         end
     end
 
-    methods (Access = {?aod.specification.Entry, ?aod.schema.primitives.Primitive})
+    methods (Access = {?aod.schema.Primitive})
         function setParent(obj, parent)
             % Set the parent of the specification
             %
@@ -431,7 +421,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             % Syntax:
             %   tf = isequal(obj, other)
             % -------------------------------------------------------------
-            if ~isa(other, 'aod.schema.primitives.Primitive')
+            if ~isa(other, 'aod.schema.Primitive')
                 tf = false;
                 return
             end

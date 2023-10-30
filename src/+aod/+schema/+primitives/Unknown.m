@@ -1,4 +1,4 @@
-classdef Unknown < aod.schema.primitives.Primitive
+classdef Unknown < aod.schema.Primitive
 % A placeholder for unspecified datasets/attributes
 %
 % Superclasses:
@@ -20,7 +20,7 @@ classdef Unknown < aod.schema.primitives.Primitive
 
     methods
         function obj = Unknown(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             obj.parseInputs(varargin{:});
             obj.isInitializing = false;

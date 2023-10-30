@@ -14,7 +14,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 % --------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent                  % aod.schema.primitives.Primitive
+        Parent                  % aod.schema.Primitive
     end
 
     methods (Abstract)
@@ -71,28 +71,10 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         end
     end
 
-    methods (Sealed, Access = {?aod.schema.primitives.Primitive})
+    methods (Sealed, Access = {?aod.schema.Primitive})
         function setParent(obj, primitive)
             % TODO: Validation
             obj.Parent = primitive;
-        end
-    end
-
-    % MATLAB builtin methods
-    methods
-        function tf = isequal(obj, other)
-            % If a subclass doesn't have Value, they should override this
-            if ~isa(other, class(obj))
-                tf = false;
-                return
-            end
-
-            if ~obj.isSpecified() && ~other.isSpecified()
-                tf = true;
-                return
-            end
-
-            tf = isequal(obj.Value, other.Value);
         end
     end
 end

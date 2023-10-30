@@ -19,7 +19,7 @@ classdef SchemaIntegrityException < handle
     end
 
     properties (Dependent)
-        hasErrors
+        hasErrors       (1,1)       logical
     end
 
     methods
@@ -36,9 +36,17 @@ classdef SchemaIntegrityException < handle
                 'Schema conflicts detected for "%s"',...
                 string(record.Name));
         end
+    end
 
+    methods
         function value = get.hasErrors(obj)
             value = ~isempty(obj.Exception.cause);
+        end
+    end
+
+    methods
+        function tf = isValid(obj)
+            tf = isempty(obj.Exception.cause);
         end
 
         function addCause(obj, exception)

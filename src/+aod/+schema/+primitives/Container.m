@@ -1,8 +1,8 @@
-classdef (Abstract) Container < aod.schema.primitives.Primitive
+classdef (Abstract) Container < aod.schema.Primitive
 % CONTAINER (Abstract)
 %
 % Superclasses:
-%   aod.schema.primitives.Primitive
+%   aod.schema.Primitive
 %
 % Notes:
 %   - Subclasses need to decide whether to create a new field or assign to
@@ -38,7 +38,7 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
             if nargin < 3
                 parent = [];
             end
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
             obj.Collection = aod.schema.collections.IndexedCollection(obj);
         end
     end
@@ -79,7 +79,7 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
         end
 
         function addItem(obj, varargin)
-            if isa(varargin{1}, 'aod.schema.primitives.Primitive')
+            if isa(varargin{1}, 'aod.schema.Primitive')
                 obj.doAddItem(p);
             elseif iscell(varargin{1})
                 for i = 1:numel(varargin)
@@ -117,6 +117,23 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
                 throw(ME);
             end
         end
+
+        function [tf, ME, excObj] = validate(obj, input, errorType)
+            arguments
+                obj
+                input
+                errorType               = aod.infra.ErrorTypes.ERROR
+            end
+
+            errorType = aod.infra.ErrorTypes.init(errorType);
+
+            [tf, ME, excObj] = validate@aod.schema.primitives.Container(obj, input, errorType);
+
+            for i = 1:obj.numItems
+                [~, ~, iExc] = obj.Collection.validateItem(obj.getItemFromInput(input, i), errorType);
+                excObj.addCause(iExc);
+            end
+        end
     end
 
     methods (Access = protected)
@@ -127,7 +144,7 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
         function doAddItem(obj, newItem)
             arguments
                 obj         (1,1)   aod.schema.primitives.Container
-                newItem             aod.schema.primitives.Primitive
+                newItem             aod.schema.Primitive
             end
 
             if ~isscalar(newItem)
@@ -173,7 +190,7 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
     % MATLAB builtin methods
     methods
         function S = struct(obj)
-            S = struct@aod.schema.primitives.Primitive(obj);
+            S = struct@aod.schema.Primitive(obj);
             S.(obj.Name).Items = struct();
             for i = 1:obj.numItems
                 S.(obj.Name).Items = catstruct(S.(obj.Name).Items, ...

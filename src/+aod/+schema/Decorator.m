@@ -36,15 +36,4 @@ classdef (Abstract) Decorator < aod.schema.Specification
             tf = ~aod.util.isempty(obj.Value);
         end
     end
-
-    % MATLAB built-in methods
-    methods
-        function tf = isequal(obj, other)
-            if ~isa(other, class(obj))
-                tf = false;
-                return
-            end
-            tf = isequal(obj.Value, other.Value);
-        end
-    end
 end

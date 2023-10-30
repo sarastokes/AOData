@@ -83,7 +83,7 @@ classdef Table < aod.schema.primitives.Container
 
     % Primitive methods
     methods
-        function [tf, ME] = checkIntegrity(obj, throwError)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwError)
             arguments
                 obj
                 throwError          logical = false

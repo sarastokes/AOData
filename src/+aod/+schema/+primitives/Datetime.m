@@ -1,4 +1,4 @@
-classdef Datetime < aod.schema.primitives.Primitive
+classdef Datetime < aod.schema.Primitive
 % Specifies a date and time (day, month, year)
 %
 % Constructor:
@@ -14,14 +14,14 @@ classdef Datetime < aod.schema.primitives.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATETIME
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.DATETIME
         OPTIONS = ["Class", "Size", "Format", "Description"];
         VALIDATORS = ["Class", "Size", "Format"];
     end
 
     methods
         function obj = Datetime(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             obj.Format = aod.schema.validators.Format(obj, []);
             obj.setSize("(1,1)");
@@ -77,7 +77,7 @@ classdef Datetime < aod.schema.primitives.Primitive
                 return
             end
 
-            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.Primitive(obj);
 
             if obj.Default.isSpecified && obj.Format.isSpecified && isa(obj.Default.Value, ["datetime", "duration"])
                 if ~obj.Format.validate(obj.Default.Value);

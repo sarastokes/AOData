@@ -1,4 +1,4 @@
-classdef Link < aod.schema.primitives.Primitive
+classdef Link < aod.schema.Primitive
 % LINK
 %
 % Superclasses:
@@ -24,7 +24,7 @@ classdef Link < aod.schema.primitives.Primitive
 
     methods
         function obj = Link(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             obj.EntityType = aod.schema.validators.EntityType(obj, []);
 
@@ -66,7 +66,7 @@ classdef Link < aod.schema.primitives.Primitive
                 return
             end
 
-            [tf, ME, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [tf, ME, excObj] = checkIntegrity@aod.schema.Primitive(obj);
             if throwError && excObj.hasErrors()
                 throw(ME);
             end

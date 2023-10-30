@@ -57,4 +57,16 @@ classdef Minimum < aod.schema.Validator
             out = convertCharsToStrings(out);
         end
     end
+
+    % MATLAB builtin functions
+    methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.Minimum')
+                tf = false;
+                return
+            end
+
+            tf = isequal(obj.Value, other.Value);
+        end
+    end
 end

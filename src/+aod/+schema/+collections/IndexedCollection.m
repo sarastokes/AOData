@@ -94,7 +94,7 @@ classdef IndexedCollection < handle
             % -------------------------------------------------------------
             arguments
                 obj     (1,1)   aod.schema.collections.IndexedCollection
-                p               aod.schema.primitives.Primitive
+                p               aod.schema.Primitive
             end
 
             obj.Primitives = [obj.Primitives; p];

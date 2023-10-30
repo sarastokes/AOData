@@ -65,6 +65,20 @@ classdef EntityType < aod.schema.Validator
 
     % Matlab builtin methods
     methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.EntityType')
+                tf = false;
+                return
+            end
+
+            if numel(obj.Value) ~= numel(other.Value)
+                tf = false;
+                return
+            end
+
+            tf = isempty(setdiff(obj.Value, other.Value));
+        end
+
         function out = jsonencode(obj, varargin)
             if ~obj.isSpecified()
                 out = jsonencode([]);

@@ -1,4 +1,4 @@
-classdef SchemaValidationException < handle 
+classdef SchemaValidationException < handle
 %
 % Workflow:
 %   1. Collect exceptions in Causes
@@ -8,11 +8,11 @@ classdef SchemaValidationException < handle
     properties (SetAccess = private)
         Exception
         Causes
-        Triggers
+        Triggers                string
     end
 
     properties (Dependent)
-        numErrors
+        numErrors        (1,1)  logical
     end
 
     methods
@@ -29,16 +29,19 @@ classdef SchemaValidationException < handle
         end
 
         function addCause(obj, ME, schemaObj)
-            obj.Causes = [obj.Causes; ME];
+            if isa(ME, 'aod.schema.exceptions.SchemaValidationException')
+                obj.Causes = [obj.Causes; ME.Causes];
+            else
+                obj.Causes = [obj.Causes; ME];
+            end
             % TODO: Figure out how to log the object's path
             obj.Triggers = [obj.Triggers; schemaObj.Name];
         end
 
-        function addLevel(obj, schemaObj)
-            
-        end
-
         function ME = getException(obj, schemaObj)
+            if nargin < 2
+                schemaObj = [];
+            end
             if obj.isValid()
                 ME = [];
                 return
@@ -46,13 +49,21 @@ classdef SchemaValidationException < handle
 
             id = 'validate:SchemaViolationsDetected';
             msg = sprintf('%u schema violations', obj.numErrors);
-            if isSubclass(schemaObj, 'aod.schema.primitives.Container')
+            if isempty(schemaObj)
+                % Don't run the rest of the if statements
+            elseif isSubclass(schemaObj, 'aod.schema.primitives.Container')
 
-            elseif isSubclass(schemaObj, 'aod.schema.primitives.Primitive')
+            elseif isSubclass(schemaObj, 'aod.schema.Primitive')
+                if ~isempty(schemaObj.Parent)
+                    msg = sprintf('Failed validation for %s/%s in %s',...
+                        schemaObj.Parent.className, schemaObj.Name,...
+                        schemaObj.Parent.ParentPath);
+                else
+                    msg = sprintf('Failed validation for %s', schemaObj.Name);
+                end
+            % elseif isa(schemaObj, 'aod.schema.Record')
 
-            elseif isa(schemaObj, 'aod.schema.Record')
-
-            elseif isSubclass(schemaObj, 'aod.schema.SchemaCollection')
+            % elseif isSubclass(schemaObj, 'aod.schema.SchemaCollection')
 
             end
 

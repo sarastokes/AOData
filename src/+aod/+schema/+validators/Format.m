@@ -73,4 +73,21 @@ classdef Format < aod.schema.Validator
             tf = ~aod.util.isempty(obj.Value);
         end
     end
+
+    % MATLAB builtin functions
+    methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.Format')
+                tf = false;
+                return
+            end
+
+            if numel(obj.Value) ~= numel(other.Value)
+                tf = false;
+                return
+            end
+
+            tf = isempty(setdiff(obj.Value, other.Value));
+        end
+    end
 end

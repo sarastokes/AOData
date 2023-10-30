@@ -45,10 +45,7 @@ classdef Default < aod.schema.Specification
             out = value2string(obj.Value);
             out = convertCharsToStrings(out);
         end
-    end
 
-    % MATLAB built-in methods
-    methods
         function tf = isSpecified(obj)
             if isstring(obj.Value) && all(isequal(obj.Value, ""))
                 tf = false;
@@ -57,6 +54,10 @@ classdef Default < aod.schema.Specification
                 %tf = ~all(aod.util.isempty(obj.Value));
             end
         end
+    end
+
+    % MATLAB built-in methods
+    methods
 
         function tf = isequal(obj, other)
             if ~isa(other, 'aod.schema.Default')

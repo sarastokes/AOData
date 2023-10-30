@@ -96,12 +96,26 @@ classdef Extension < aod.schema.Validator
                 out = strjoin(obj.Value, ", ");
             end
         end
+
+        function tf = isSpecified(obj)
+            tf = ~aod.util.isempty(obj.Value);
+        end
     end
 
     % MATLAB builtin functions
     methods
-        function tf = isSpecified(obj)
-            tf = ~aod.util.isempty(obj.Value);
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.Extension')
+                tf = false;
+                return
+            end
+
+            if numel(obj.Value) ~= numel(other.Value)
+                tf = false;
+                return
+            end
+
+            tf = isempty(setdiff(obj.Value, other.Value));
         end
     end
 end

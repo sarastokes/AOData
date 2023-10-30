@@ -1,8 +1,8 @@
-classdef File < aod.schema.primitives.Primitive
+classdef File < aod.schema.Primitive
 % FILE
 %
 % Superclasses:
-%   aod.schema.primitives.Primitive
+%   aod.schema.Primitive
 %
 % TODO: IsRelative?
 
@@ -22,7 +22,7 @@ classdef File < aod.schema.primitives.Primitive
 
     methods
         function obj = File(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             % Initialize
             obj.Extension = aod.schema.validators.Extension(obj, []);
@@ -67,7 +67,7 @@ classdef File < aod.schema.primitives.Primitive
                 value       string = ""
             end
 
-            setDefault@aod.schema.primitives.Primitive(obj, value);
+            setDefault@aod.schema.Primitive(obj, value);
         end
     end
 
@@ -82,7 +82,7 @@ classdef File < aod.schema.primitives.Primitive
                 return
             end
 
-            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.Primitive(obj);
 
             if obj.Extension.isSpecified() && obj.Default.isSpecified()
                 if ~endsWith(obj.Default.Value, obj.Extension.Value)

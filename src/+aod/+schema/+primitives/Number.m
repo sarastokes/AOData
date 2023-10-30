@@ -1,8 +1,8 @@
-classdef Number < aod.schema.primitives.Primitive
+classdef Number < aod.schema.Primitive
 % NUMBER
 %
 % Superclasses:
-%   aod.schema.primitives.Primitive
+%   aod.schema.Primitive
 %
 % Description:
 %   A number is a scalar, vector or matrix of numeric values. The values
@@ -33,7 +33,7 @@ classdef Number < aod.schema.primitives.Primitive
 
     methods
         function obj = Number(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             % Initialize
             obj.Enum = aod.schema.validators.Enum(obj, []);
@@ -94,7 +94,7 @@ classdef Number < aod.schema.primitives.Primitive
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwErrors)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwErrors)
             arguments
                 obj
                 throwErrors    (1,1)     logical     = false
@@ -105,7 +105,7 @@ classdef Number < aod.schema.primitives.Primitive
                 return
             end
 
-            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.Primitive(obj);
             if obj.Minimum.isSpecified() && obj.Maximum.isSpecified()
                 if obj.Minimum.Value > obj.Maximum.Value
                     excObj.addCause(MException('checkIntegrity:InvalidRange',...

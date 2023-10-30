@@ -43,11 +43,21 @@ classdef Units < aod.schema.Decorator
                 out = value2string(obj.Value);
             end
         end
-    end
 
-    methods
         function tf = isSpecified(obj)
             tf = ~aod.util.isempty(obj.Value);
+        end
+    end
+
+    % MATLAB builtin functions
+    methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.validators.Description')
+                tf = false;
+                return
+            end
+
+            tf = isequal(obj.Value, other.Value);
         end
     end
 end

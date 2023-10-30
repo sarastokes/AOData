@@ -1,8 +1,8 @@
-classdef Integer < aod.schema.primitives.Primitive
+classdef Integer < aod.schema.Primitive
 % INTEGER
 %
 % Superclasses:
-%   aod.schema.primitives.Primitive
+%   aod.schema.Primitive
 %
 % Constructor:
 %   obj = aod.schema.primitives.Integer(name, varargin)
@@ -31,7 +31,7 @@ classdef Integer < aod.schema.primitives.Primitive
 
     methods
         function obj = Integer(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             % Initialization
             obj.Enum = aod.schema.validators.Enum(obj, []);
@@ -134,7 +134,7 @@ classdef Integer < aod.schema.primitives.Primitive
             end
             obj.Class.setValue(value);
 
-            if ~obj.Class.isSpecified() 
+            if ~obj.Class.isSpecified()
                 return
             end
 
@@ -189,7 +189,7 @@ classdef Integer < aod.schema.primitives.Primitive
     end
 
     methods
-        function [tf, ME] = checkIntegrity(obj, throwErrors)
+        function [tf, ME, excObj] = checkIntegrity(obj, throwErrors)
             arguments
                 obj
                 throwErrors         logical     = false
@@ -229,7 +229,7 @@ classdef Integer < aod.schema.primitives.Primitive
                 end
             end
 
-            [tf, ME, ~] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [tf, ME, ~] = checkIntegrity@aod.schema.Primitive(obj);
             if ~tf
                 cellfun(@(x) addCause(excObj, x), ME.cause);
             end
@@ -252,10 +252,10 @@ classdef Integer < aod.schema.primitives.Primitive
                 value
                 errorType           = aod.infra.ErrorTypes.ERROR
             end
-            
+
             errorType = aod.infra.ErrorTypes.init(errorType);
 
-            if ~isinteger(value)
+            if ~isinteger(value) && round(value) ~= value
                 itf = false;
                 % TODO: Better error passing
                 iME = MException('validate:Failed',...
@@ -264,9 +264,10 @@ classdef Integer < aod.schema.primitives.Primitive
                     throw(iME);
                 end
             else
+                itf = true;
                 iME = [];
             end
-            [tf, ME] = validate@aod.schema.primitives.Primitive(obj,...
+            [tf, ME] = validate@aod.schema.Primitive(obj,...
                 value, aod.infra.ErrorTypes.NONE);
 
             if ~itf

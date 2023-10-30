@@ -27,7 +27,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
     methods (Test, TestTags="Text")
         function Text(testCase)
             obj = aod.schema.primitives.Text("Test", []);
-            testCase.verifyFalse(obj.isRequired);
+            testCase.verifyFalse(obj.Required);
 
             testCase.verifyFalse(obj.Description.isSpecified());
             obj.assign('Description', 'This is my test description');
@@ -84,11 +84,11 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
             % Some tests for the "Required" option
             testCase.verifyTrue(ismember("Required", obj.getOptions));
-            testCase.verifyFalse(obj.isRequired);
+            testCase.verifyFalse(obj.Required);
             obj.setRequired(true);
-            testCase.verifyTrue(obj.isRequired);
+            testCase.verifyTrue(obj.Required);
             obj.assign('Required', false);
-            testCase.verifyFalse(obj.isRequired);
+            testCase.verifyFalse(obj.Required);
 
             % Back to testing the rest of the class
             obj.assign('Size', '(1,1)');
@@ -149,8 +149,8 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         function IntegerDouble(testCase)
             obj = aod.schema.primitives.Integer("Test", [],...
                 "Class", "double");
-            testCase.verifyEqual(obj.Minimum, 0);
-            testCase.verifyEmpty(obj.Maximum);
+            testCase.verifyEqual(obj.Minimum.Value, 0);
+            testCase.verifyFalse(obj.Maximum.isSpecified());
             testCase.verifyTrue(obj.validate(1));
             testCase.verifyError(...
                 @() obj.validate(1.5), 'validate:Failed');

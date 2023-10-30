@@ -17,7 +17,7 @@ classdef Record < handle
     properties (SetAccess = private)
         Name            (1,1)   string
         Parent                  % aod.schema.SchemaCollection
-        Primitive               % aod.schema.primitives.Primitive
+        Primitive               % aod.schema.Primitive
     end
 
     properties (Dependent)

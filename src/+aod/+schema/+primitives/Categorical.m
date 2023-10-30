@@ -1,11 +1,11 @@
-classdef Categorical < aod.schema.primitives.Primitive
+classdef Categorical < aod.schema.Primitive
 % CATEGORICAL
 %
 % Description:
 %   A variable with a limited set of values
 %
 % Superclasses:
-%   aod.schema.primitives.Primitive
+%   aod.schema.Primitive
 %
 % Notes:
 %   "Enum" determines the value of "Class"
@@ -25,7 +25,7 @@ classdef Categorical < aod.schema.primitives.Primitive
 
     methods
         function obj = Categorical(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(name, parent);
 
             % Initialize
             obj.Enum = aod.schema.validators.Enum(obj, []);
@@ -42,7 +42,7 @@ classdef Categorical < aod.schema.primitives.Primitive
 
         function tf = isValid(obj)
             % TODO: Not using this
-            tf = isValid@aod.schema.primitives.Categorical(obj);
+            tf = isValid@aod.schema.Primitive(obj);
             if ~tf
                 return
             end
@@ -58,7 +58,7 @@ classdef Categorical < aod.schema.primitives.Primitive
         end
     end
 
-    methods 
+    methods
         function [tf, ME] = checkIntegrity(obj, throwErrors)
             arguments
                 obj
@@ -70,7 +70,7 @@ classdef Categorical < aod.schema.primitives.Primitive
                 return
             end
 
-            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Primitive(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.Primitive(obj);
             if ~isempty(obj.Enum) && ~isempty(obj.Default)
                 if ~ismember(obj.Default, obj.Enum)
                     excObj.addCause(MException('checkIntegrity:InvalidItem',...

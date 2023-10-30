@@ -73,7 +73,7 @@ The each parent-child relationship in the hierarchy is one-to-many. Parent class
         - Multiple *`Specification`* (*`Validator`*, *`Decorator`* and `Default`) - the PrimitiveType determines specifications for a given Record
 
 ### Primitives
-Each primitive inherits from `aod.schema.primitives.Primitive` and include a specific set of validators (discussed below). Primitives in *italics* are Containers that hold other primitives (subclasses of `aod.schema.primitives.Container`). They map to H5T_COMPOUND so can only hold valid primitive types (boolean, date, duration, file, integer, number, text).
+Each primitive inherits from `aod.schema.Primitive` and include a specific set of validators (discussed below). Primitives in *italics* are Containers that hold other primitives (subclasses of `aod.schema.primitives.Container`). They map to H5T_COMPOUND so can only hold valid primitive types (boolean, date, duration, file, integer, number, text).
 
 |Name|Matlab|Python| Description|
 |----|------|--------|------------|

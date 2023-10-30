@@ -121,13 +121,7 @@ classdef Class < aod.schema.Validator
                 return
             end
 
-            for i = 1:numel(obj.Value)
-                if ~ismember(obj.Value(i), other.Value)
-                    tf = false;
-                    return
-                end
-            end
-            tf = true;
+            tf = isempty(setdiff(obj.Value, other.Value));
         end
     end
 end

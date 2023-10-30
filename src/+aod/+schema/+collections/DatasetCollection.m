@@ -28,11 +28,11 @@ classdef DatasetCollection < aod.schema.SchemaCollection
 
     methods
         function add(obj, varargin)
-            if istext(varargin{1})
+            if isa(varargin{1}, 'aod.schema.Record')  % Internal use only
+                add@aod.schema.SchemaCollection(obj, varargin{:});
+            else
                 error('add:AdditionNotSupported',...
                     'Ad-hoc property addition is not supported. Datasets must be defined in a property block. Use set() to modify an existing property defined or inherited by the class.');
-            elseif isa(varargin{1}, 'aod.schema.Record')  % Internal use only
-                add@aod.schema.SchemaCollection(obj, varargin{:});
             end
         end
 
