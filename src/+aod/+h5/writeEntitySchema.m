@@ -7,7 +7,7 @@ function writeEntitySchema(hdfName, hdfPath, schema)
 % Inputs:
 %   hdfName             HDF5 file name and path
 %   hdfPath             Path to group to write dataset containing schema
-%   schema              aod.schema.EntitySchema
+%   schema              aod.core.Schema
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -15,12 +15,12 @@ function writeEntitySchema(hdfName, hdfPath, schema)
     arguments
         hdfName             {mustBeHdfFile(hdfName)}
         hdfPath             char
-        schema              aod.schema.EntitySchema
+        schema              aod.core.Schema
     end
 
     % TODO: Read from persisted file or use jsonencode?
     % TODO: Shouldn't be recreating the struct each time a class is written
-    %       Instead explore caching the results of struct calls after 
+    %       Instead explore caching the results of struct calls after
     %       testing the time cost of recreating struct (seems fast)
     h5tools.write(hdfName, hdfPath, 'Schema', jsonencode(schema.struct()));
     h5tools.writeatt(hdfName, h5tools.util.buildPath(hdfPath, 'Schema'),...

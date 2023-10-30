@@ -945,7 +945,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                     % Check specifications
                     propSpec = obj.Schema.Datasets.get(obj.dsetNames(i));
                     if ~isempty(propSpec)
-                        p.Description = propSpec.Description.Value;
+                        p.Description = propSpec.Primitive.Description.Value;
                         % Final step, after setting the value
                         p.SetAccess = 'protected';
                     end
@@ -970,7 +970,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
                     % Check specifications
                     propSpec = obj.Schema.Datasets.get(emptyDsets(i));
                     if ~isempty(propSpec)
-                        p.Description = propSpec.Description.Value;
+                        % TODO p.Description = propSpec.Description.Value;
                         p.SetAccess = 'protected';
                     end
                 end

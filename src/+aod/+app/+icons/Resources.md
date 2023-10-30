@@ -21,6 +21,7 @@ Entity icons:
 Other icons:
 - <a href="https://icons8.com/icon/nkplpFWWQEKZ/add">Add</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31462/add-row">Add Row</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a target="_blank" href="https://icons8.com/icon/L8qbR3aPqSiX/backlog">Backlog</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38947/binary-file">Binary File</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21064/box">Box</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/23154/calculator">Calculator</a> icon by <a href="https://icons8.com">Icons8</a>
@@ -60,11 +61,13 @@ Other icons:
 - <a href="https://icons8.com/icon/38107/new-document">New Document</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/31150/new-product">New Product</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/38129/note">Note</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a target="_blank" href="https://icons8.com/icon/45990/pass-fail">Pass Fail</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21215/planner">Planner</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21098/puzzle">Puzzle</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21100/refresh">Refresh</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/22312/rename">Rename</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21394/save">Save</a> icon by <a href="https://icons8.com">Icons8</a>
+- <a target="_blank" href="https://icons8.com/icon/45989/scorecard">Scorecard</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/VKNnbtYRlG_o/search">Search</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/21103/settings">Settings</a> icon by <a href="https://icons8.com">Icons8</a>
 - <a href="https://icons8.com/icon/32537/static-views">Static Views</a> icon by <a href="https://icons8.com">Icons8</a>

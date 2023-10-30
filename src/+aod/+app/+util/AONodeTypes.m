@@ -317,7 +317,7 @@ classdef AONodeTypes
                     obj = AONodeTypes.ATTRIBUTEMANAGER;
                 case {'datasetmanager', 'aod.specification.datasetmanager'}
                     obj = AONodeTypes.DATASETMANAGER;
-                case {'schema', 'aod.schema.entityschema'}
+                case {'schema', 'aod.core.schema'}
                     obj = AONodeTypes.SCHEMA;
                 case {'querymanager', 'aod.api.querymanager'}
                     obj = AONodeTypes.QUERYMANAGER;

@@ -135,7 +135,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             end
 
             % Initialize containers
-            obj.Schema = aod.schema.EntitySchema(obj);
+            obj.Schema = aod.core.Schema(obj);
             obj.files = aod.common.KeyValueMap();
             obj.attributes = aod.common.KeyValueMap();
 
@@ -878,7 +878,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Syntax:
             %   value = specifyAttributes()
             % -------------------------------------------------------------
-            value = aod.schema.collections.AttributeCollection([], []);
+            value = aod.schema.collections.AttributeCollection([]);
         end
 
         function value = specifyDatasets(value)
@@ -901,7 +901,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Output:
             %   value       aod.schema.FileCollection
             % -------------------------------------------------------------
-            value = aod.schema.collections.FileCollection([], []);
+            value = aod.schema.collections.FileCollection([]);
         end
     end
 end

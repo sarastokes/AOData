@@ -63,6 +63,11 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
                 for i = 1:numel(varargin)
                     setItems(obj, varargin{i}{:});
                 end
+            elseif isstruct(varargin{1})
+                if obj.numItems ~= 0
+                    error("setItems:InvalidInput", "User-provided input must be cell");
+                end
+                obj.Collection = aod.h5.readSchemaCollection(varargin{1}, obj, true);
             else
                 if obj.isInitializing
                     p = obj.createPrimitive(varargin{:});
@@ -74,7 +79,9 @@ classdef (Abstract) Container < aod.schema.primitives.Primitive
         end
 
         function addItem(obj, varargin)
-            if iscell(varargin{1})
+            if isa(varargin{1}, 'aod.schema.primitives.Primitive')
+                obj.doAddItem(p);
+            elseif iscell(varargin{1})
                 for i = 1:numel(varargin)
                     obj.addItem(varargin{i}{:});
                 end

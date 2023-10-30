@@ -24,7 +24,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
     methods
         function obj = AttributeCollection(parent)
             arguments
-                parent 
+                parent
             end
             obj = obj@aod.schema.SchemaCollection(parent);
         end
@@ -61,7 +61,7 @@ classdef AttributeCollection < aod.schema.SchemaCollection
         end
     end
 
-    methods (Access = ?aod.schema.EntitySchema)
+    methods (Access = ?aod.schema.Schema)
         function setClassName(obj, className)
             % Set the class name
             %

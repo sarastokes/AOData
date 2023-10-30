@@ -145,9 +145,13 @@ classdef Record < handle
         function setParent(obj, parent)
             arguments
                 obj
-                parent      {mustBeSubclass(parent, 'aod.schema.SchemaCollection')}
+                parent      %{mustBeSubclass(parent, ["aod.schema.SchemaCollection, aod.schema.collections.IndexedCollection"])}
             end
 
+            % TODO: Think about Container primitive parentage
+            %if ~isSubclass(parent, ["aod.schema.SchemaCollection", "aod.schema.collections.IndexedCollection"])
+            %    error("setParent:InvalidInput", "Must be a collection subclass");
+            %end
             obj.Parent = parent;
         end
 

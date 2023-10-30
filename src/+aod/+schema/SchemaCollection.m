@@ -22,7 +22,7 @@ classdef (Abstract) SchemaCollection < handle
     end
 
     properties (SetAccess = protected)
-        Parent              % aod.schema.EntitySchema
+        Parent              % aod.schema.Schema
         className           string
         Records             % aod.schema.Record
     end
@@ -288,7 +288,7 @@ classdef (Abstract) SchemaCollection < handle
         end
     end
 
-    methods (Access = {?aod.schema.EntitySchema})
+    methods (Access = {?aod.schema.Schema})
         function setParent(obj, parent)
             if nargin < 2 || isempty(parent)
                 obj.Parent = [];

@@ -58,7 +58,7 @@ classdef FileCollection < aod.schema.SchemaCollection
     end
 
 
-    methods (Access = ?aod.schema.EntitySchema)
+    methods (Access = ?aod.schema.Schema)
         function setClassName(obj, className)
             % Set the class name
             %

@@ -67,7 +67,7 @@ Files for schema storage
 ### Class Hierarchy
 The each parent-child relationship in the hierarchy is one-to-many. Parent classes have properties for containing the child classes. The child classes maintain a reference to the parent class with a property called `Parent`.
 - **`aod.common.Entity`**
-  - `EntitySchema`
+  - _`aod.schema.Schema`_ (`aod.core.Schema`, `aod.persistent.Schema`)
     - *`SchemaCollection`*: three subclasses `AttributeCollection`, `FileCollection` and `DatasetCollection`
       - `Record`: a specific attribute or dataset defined by a *`Primitive`* which has a specific `PrimitiveType`. Some primitive types can contain other primitives (*`Container`*)
         - Multiple *`Specification`* (*`Validator`*, *`Decorator`* and `Default`) - the PrimitiveType determines specifications for a given Record

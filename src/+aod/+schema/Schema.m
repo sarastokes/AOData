@@ -1,55 +1,52 @@
-classdef EntitySchema < handle
-% TODO: distinct schema classes for core vs. persistent
-% TODO: requirements reporting
+classdef (Abstract) Schema < handle
 
     properties (SetAccess = private)
-        Parent      % aod.core.Entity
+        Parent
+        className       (1,1)       string
     end
 
+    properties (Hidden, Access = protected)
+        DatasetCollection
+        AttributeCollection
+        FileCollection
+    end
+
+    % Separating access and storage enables dynamic schema creation for
+    % the core interface and lazy loading for the persistent interface
     properties (Dependent)
         Datasets
         Attributes
         Files
-        className
     end
-    
-    properties (Hidden, Access = private)
-        DatasetCollection
+
+    methods (Abstract, Access = protected)
+        value = getDatasetCollection(obj);
+        value = getAttributeCollection(obj);
+        value = getFileCollection(obj);
     end
 
     methods
-        function obj = EntitySchema(parent)
+        function obj = Schema(parent)
             obj.setParent(parent);
-            obj.DatasetCollection = aod.schema.collections.DatasetCollection.populate(class(obj.Parent));
-            obj.DatasetCollection.setParent(obj.Parent);
         end
-        
-        function value = get.className(obj)
-            if isempty(obj.Parent)
-                value = "UNKNOWN";  % For testing only
-            else
-                value = string(class(obj.Parent));
-            end
-        end
+    end
 
+    methods
         function value = get.Datasets(obj)
-            value = obj.Parent.specifyDatasets(obj.DatasetCollection);
-        end
-
-        function value = get.Files(obj)
-            value = obj.Parent.specifyFiles();
-            value.setClassName(class(obj.Parent));
-            value.setParent(obj.Parent);
+            value = obj.getDatasetCollection();
         end
 
         function value = get.Attributes(obj)
-            value = obj.Parent.specifyAttributes();
-            value.setClassName(class(obj.Parent));
-            value.setParent(obj.Parent);
+            value = obj.getAttributeCollection();
+        end
+
+        function value = get.Files(obj)
+            value = obj.getFileCollection();
         end
     end
 
     methods
+
         function tf = has(obj, recordName, recordType)
             if nargin == 3
                 collection = obj.getSchemaByType(recordType);
@@ -78,31 +75,18 @@ classdef EntitySchema < handle
                         'Schema type %s was unrecognized; use datasets, attributes or files', schemaType);
             end
         end
+    end
 
-        function out = code(obj)
-            if isempty(obj.Parent)
-                superName = "UNKNOWN";  % For testing 
-            else
-                superName = superclasses(obj.Parent);
-                superName = superName{1};
+    methods (Access = protected)
+        function setParent(obj, parent)
+            if isempty(parent)
+                obj.className = "UNDEFINED";  % TODO For testing
+                return
             end
 
-            out = sprintf("\tmethods (Static)\n");
-            dsetCode = obj.Datasets.code();
-            out = out + sprintf("\t\tfunction value = specifyDatasets(value)\n");
-            out = out + sprintf("\t\t\tvalue = specifyDatasets@%s(value);\n", superName);
-            out = out + dsetCode + sprintf("\t\tend\n\n");
-
-            attrCode = obj.Attributes.code();
-            out = out + sprintf("\t\tfunction value = specifyAttributes()\n");
-            out = out + sprintf("\t\t\tvalue = specifyAttributes@%s();\n\n", superName);
-            out = out + attrCode + sprintf("\t\tend\n\n");
-
-            fileCode = obj.Files.code();
-            out = out + sprintf("\t\tfunction value = specifyFiles()\n");
-            out = out + sprintf("\t\t\tvalue = specifyFiles@%s();\n\n", superName);
-            out = out + fileCode + sprintf("\t\tend\n");
-            out = out + sprintf("\tend\n");
+            mustBeSubclass(parent, ["aod.core.Entity", "aod.persistent.Entity"]);
+            obj.Parent = parent;
+            obj.className = string(class(parent));
         end
     end
 
@@ -160,28 +144,36 @@ classdef EntitySchema < handle
             % TODO: Finish writing
         end
 
-        function [tf, ME] = validateDataset(obj, dsetName)
-            schema = obj.Datasets.get(dsetName);
-            [tf, ME] = schema.validate(obj.Parent.(dsetName));
+
+        function out = text(obj)
+            % TODO persistent schema text display
+            out = "Not yet implemented";
         end
 
-        function [tf, ME] = validateAttribute(obj, attrName)
-            schema = obj.Attributes.get(attrName);
-            [tf, ME] = schema.validate(obj.Parent.getAttr(attrName));
-        end
-
-        function [tf, ME] = validateFile(obj, fileName)
-            schema = obj.Files.get(fileName);
-            [tf, ME] = schema.validate(obj.Parent.getFile(fileName));
-        end
-    end
-
-    methods (Access = protected)
-        function setParent(obj, parent)
-            if ~isempty(parent)
-                mustBeA(parent, 'aod.core.Entity');
+        function out = code(obj)
+            if isempty(obj.Parent)
+                superName = "UNKNOWN";  % For testing
+            else
+                superName = superclasses(obj.Parent);
+                superName = superName{1};
             end
-            obj.Parent = parent;
+
+            out = sprintf("\tmethods (Static)\n");
+            dsetCode = obj.Datasets.code();
+            out = out + sprintf("\t\tfunction value = specifyDatasets(value)\n");
+            out = out + sprintf("\t\t\tvalue = specifyDatasets@%s(value);\n", superName);
+            out = out + dsetCode + sprintf("\t\tend\n\n");
+
+            attrCode = obj.Attributes.code();
+            out = out + sprintf("\t\tfunction value = specifyAttributes()\n");
+            out = out + sprintf("\t\t\tvalue = specifyAttributes@%s();\n\n", superName);
+            out = out + attrCode + sprintf("\t\tend\n\n");
+
+            fileCode = obj.Files.code();
+            out = out + sprintf("\t\tfunction value = specifyFiles()\n");
+            out = out + sprintf("\t\t\tvalue = specifyFiles@%s();\n\n", superName);
+            out = out + fileCode + sprintf("\t\tend\n");
+            out = out + sprintf("\tend\n");
         end
     end
 
@@ -196,7 +188,7 @@ classdef EntitySchema < handle
                 superNames = string(superclasses(obj.Parent));
                 superNames = superNames(1:find(superNames == "aod.core.Entity"));
             else
-                entityType = []; entityClass = []; 
+                entityType = []; entityClass = [];
                 packageName = []; superNames = [];
             end
             S = struct();

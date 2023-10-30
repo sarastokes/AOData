@@ -1,55 +1,73 @@
-classdef Schema < handle
+classdef Schema < aod.schema.Schema
+% SCHEMA
+%
+% Description:
+%   Represents the schema of a persisted Entity within an HDF5 file
+%
+% Superclasses:
+%   aod.schema.Schema
+%
+% Constructor:
+%   obj = aod.persistent.Schema(parent)
 
-    properties (SetAccess = private)
-        Parent          % aod.persistent.Entity
-    end
+% By Sara Patterson, 2023 (AOData)
+% --------------------------------------------------------------------------
 
-    properties
-        Datasets        aod.schema.collections.DatasetCollection
-        Attributes      aod.schema.collections.AttributeCollection
-        Files           aod.schema.collections.FileCollection
+    properties (Access = private)
+        isPopulated       (1,1)       logical
     end
 
     methods
         function obj = Schema(parent)
-            obj.setParent(parent);
+            if isempty(parent)
+               parent = [];
+            end
+            obj = obj@aod.schema.Schema(parent);
 
-            % Initialize
-            obj.Datasets = aod.schema.collections.DatasetCollection(obj.Parent);
-            obj.Attributes = aod.schema.collections.AttributeCollection(obj.Parent);
-            obj.Files = aod.schema.collections.FileCollection(obj.Parent);
-
-            % Populate the three schema collections
-            obj.collectSchemas()
+            obj.isPopulated = false;
+            
+            obj.DatasetCollection = aod.schema.collections.DatasetCollection(obj.Parent);
+            obj.AttributeCollection = aod.schema.collections.AttributeCollection(obj.Parent);
+            obj.FileCollection = aod.schema.collections.FileCollection(obj.Parent);
         end
     end
 
-    methods
-        function out = text(obj)
-            % TODO persistent schema text display
-            out = "Not yet implemented";
+    methods (Access = protected)
+        function value = getDatasetCollection(obj)
+            if ~obj.isPopulated
+                obj.collectSchemas();
+            end
+            value = obj.DatasetCollection;
+        end
+
+        function value = getAttributeCollection(obj)
+            if ~obj.isPopulated
+                obj.collectSchemas();
+            end
+            value = obj.AttributeCollection;
+        end
+
+        function value = getFileCollection(obj)
+            if ~obj.isPopulated
+                obj.collectSchemas();
+            end
+            value = obj.FileCollection;
         end
     end
 
     methods (Access = private)
-        function obj = collectSchemas(obj)
+        function collectSchemas(obj)
+            disp('Collecting schema...')
             out = h5read(obj.Parent.hdfName,...
                 h5tools.util.buildPath(obj.Parent.hdfPath, 'Schema'));
             S = jsondecode(out);
             fMain = string(fieldnames(S));
 
-            obj.Datasets = aod.h5.readSchemaCollection(S.(fMain).Datasets, obj.Datasets);
-            obj.Attributes = aod.h5.readSchemaCollection(S.(fMain).Attributes, obj.Attributes);
-            obj.Files = aod.h5.readSchemaCollection(S.(fMain).Files, obj.Files);
-        end
+            obj.DatasetCollection = aod.h5.readSchemaCollection(S.(fMain).Datasets, obj.DatasetCollection);
+            obj.AttributeCollection = aod.h5.readSchemaCollection(S.(fMain).Attributes, obj.AttributeCollection);
+            obj.FileCollection = aod.h5.readSchemaCollection(S.(fMain).Files, obj.FileCollection);
 
-        function setParent(obj, parent)
-            arguments
-                obj
-                parent          aod.persistent.Entity
-            end
-
-            obj.Parent = parent;
+            obj.isPopulated = true;
         end
     end
 end
