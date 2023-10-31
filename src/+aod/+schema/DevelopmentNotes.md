@@ -45,8 +45,42 @@ __User options__
 - [ ] Show schema for a specific data type in UI (as a tree? text?)
 
 
-### Schema JSON
-Should entire package be in one file or separate files referenced by a "schema registry"? If the files are large, might want to serialize with [msgpack](https://github.com/bastibe/matlab-msgpack).
+### Schema in JSON
+Need to figure out how to get a constant link between a class and a UID. Having the UID live in the classdef file itself would ensure the class could be moved or renamed without concern. But having users generate one and paste it into a UID property isn't fun.
+
+Files for schema storage. Some potential options:
+- [ ] One per package
+- [ ] ~~One per class~~ (too many files)
+- [ ] One per subpackage
+- [ ] ~~All versions together~~ (simplest but not easy to read)
+- [ ] Current then outdated versions in a separate file
+- [x] Dedicated schema folder
+- [ ] Located within packages (might complicate package refactoring)
+
+Option Two (30Oct2023):
+- `current.json`
+    - PackageUID (package identifier)
+    - PackageName (for readability)
+    - LastModified
+    - Aliases
+    - _Classes_
+        - __Class__ (Skip? Name? UID? Hyphens mess up `struct`)
+            - ClassUID
+            - ClassName (full w/ packages)
+            - Version #
+            - LastModified
+            - Aliases
+            - _Attributes_, _Datasets_, _Files_
+                - __Record__
+                    - Name
+                    - LastModified
+                    - Aliases
+                    - _Validators_, _Decorators_, _Default_
+
+
+- `registry.txt`: quick access to UIDs
+
+Option One:
 - Schema UUID
   - *Versions* (separate current from repository)
     - Class name
@@ -58,15 +92,6 @@ Should entire package be in one file or separate files referenced by a "schema r
     - *Attributes*
     - DateCreated
 
-Files for schema storage. Some potential options:
-- [ ] One per package
-- [ ] One per class
-- [ ] One per subpackage
-- [ ] All versions together (simplest but not easy to read)
-- [ ] Current then outdated versions in a separate file
-- [ ] Dedicated schema folder
-- [ ] Located within packages (might complicate package refactoring)
-
 ### Class Hierarchy
 The each parent-child relationship in the hierarchy is one-to-many. Parent classes have properties for containing the child classes. The child classes maintain a reference to the parent class with a property called `Parent`.
 - __`aod.common.Entity`__
@@ -74,6 +99,12 @@ The each parent-child relationship in the hierarchy is one-to-many. Parent class
     - *`SchemaCollection`*: three subclasses `AttributeCollection`, `FileCollection` and `DatasetCollection`
       - `Record`: a specific attribute or dataset defined by a *`Primitive`* which has a specific `PrimitiveType`. Some primitive types can contain other primitives (*`Container`*)
         - Multiple *`Specification`* (*`Validator`*, *`Decorator`* and `Default`) - the PrimitiveType determines specifications for a given Record
+
+##### Schema subclasses
+1. __`aod.core.Schema`__ - attached to core entity instance and dynamically generated from core class/subclass using `specifyDatasets`, `specifyFiles` and `specifyAttributes`
+2. __`aod.schema.util.StandaloneSchema`__ - same as above but created independent of a core class object instance
+3. __`aod.persistant.Schema`__ - reflects persisted schema attached to an entity in an HDF5 file
+4. __`aod.schema.io.Schema`__ - reflects a schema written to a JSON file.
 
 ### Primitives
 Each primitive inherits from `aod.schema.Primitive` and include a specific set of validators (discussed below). Primitives in *italics* are Containers that hold other primitives (subclasses of `aod.schema.primitives.Container`). They map to H5T_COMPOUND so can only hold valid primitive types (boolean, date, duration, file, integer, number, text).
@@ -89,9 +120,10 @@ Each primitive inherits from `aod.schema.Primitive` and include a specific set o
 |_`List`_|cell|list|Contains items of different types or with different specifications. Unlike Object, they are not distinguished by name but by index, like a numbered list|
 |`Number`|double|float|Standard MATLAB numbers|
 |_`Object`_|struct, handle|dict| Use this when the dataset contains multiple data types distinguished by name|
+|_`Table`_|table|||
 |`Text`|string| string||
 
-You can have a `double` that is specified as an __`Integer`__. Nevermind?? Just removed support for this on 25Oct2023. Should probably integrate `single` support into __`Number`__
+You can have a `double` that is specified as an __`Integer`__. TODO: integrate `single` support into __`Number`__.
 
 Currently not supporting `char` as it can cause issues with the queries (e.g., each character can be considered equal to a double).
 

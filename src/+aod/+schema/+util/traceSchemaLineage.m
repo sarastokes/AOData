@@ -1,4 +1,15 @@
 function fullName = traceSchemaLineage(schemaObj)
+% Trace the lineage of a primitive or specification object
+%
+% Syntax:
+%   obj = aod.schema.util.traceSchemaLineage(schemaObj)
+%
+% Inputs:
+%   schemaObj - aod.schema.Primitive or aod.schema.Specification object
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
+
 
     if isSubclass(schemaObj, "aod.schema.Specification")
         fullName = string(getClassWithoutPackages(schemaObj));
@@ -15,7 +26,8 @@ function fullName = traceSchemaLineage(schemaObj)
         primitive = schemaObj;
     else
         error("traceSchemaLineage:InvalidObjectType",...
-            "Input must be a primitive or specification object.");
+            "Input must be a primitive or specification object, not %s.",...
+            class(schemaObj));
     end
 
     schemaCollection = primitive.getParent('Collection');
@@ -28,7 +40,8 @@ function fullName = traceSchemaLineage(schemaObj)
     if isempty(entity)
         return
     end
-    fullName = sprintf("""%s"" (%s)", entity.groupName, string(entity.entityType)) + " \ " + fullName;
+    fullName = sprintf("""%s"" (%s)",...
+        entity.groupName, string(entity.entityType)) + " \ " + fullName;
 end
 
 function out = getPrimitiveName(p)

@@ -78,7 +78,9 @@ classdef AttributeCollection < aod.schema.SchemaCollection
 
     methods (Static)
         function obj = populate(className)
-            obj = aod.schema.util.getAttributeSchema(className);
+            % Create SchemaCollection independent of parent entity
+            obj = aod.schema.util.StandaloneSchema(className);
+            obj = obj.Attributes;
         end
     end
 end

@@ -50,7 +50,7 @@ classdef DatasetCollection < aod.schema.SchemaCollection
             %   obj = aod.schema.EntityDatasets.populate(className)
             %
             % Inputs:
-            %   className           string/char, meta.class, object
+            %   className           string/char, object
             %       Class (must be aod.core.Entity subclass)
             %
             % Examples:

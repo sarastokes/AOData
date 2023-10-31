@@ -1,19 +1,32 @@
-function classNames = getClassWithoutPackages(obj)
-    % GETCLASSWITHOUTPACKAGES
-    %
-    % Description:
-    %   Returns classname(s) without packages
-    %
-    % Syntax:
-    %   out = getClassWithoutPackages(obj)
-    %
-    % History:
-    %   03Aug2022 - SSP
-    % ---------------------------------------------------------------------
+function className = getClassWithoutPackages(obj)
+% GETCLASSWITHOUTPACKAGES
+%
+% Description:
+%   Returns classname(s) without packages
+%
+% Syntax:
+%   className = getClassWithoutPackages(obj)
+%
+% Inputs:
+%   obj             object or string
+%       Class name or instance of class
+%
+% History:
+%   03Aug2022 - SSP
+%   31Oct2023 - SSP - Better non-scalar support, class text input
+% --------------------------------------------------------------------------
 
-    classNames = string.empty();
-    for i = 1:numel(obj)
-        fullName = class(obj(i));
-        allNames = strsplit(fullName, '.');
-        classNames = cat(1, classNames, string(allNames{end}));
+    obj = convertCharsToStrings(obj);
+
+    if ~isscalar(obj)
+        className = arrayfun(@(x) getClassWithoutPackages(x), obj);
+        return
     end
+
+    if isstring(obj)
+        fullName = obj;
+    else
+        fullName = string(class(obj));
+    end
+    allNames = strsplit(fullName, '.');
+    className = allNames(end);

@@ -1,4 +1,15 @@
 classdef (Abstract) Schema < handle
+% SCHEMA (abstract)
+%
+% Description:
+%   Defines common interface for schema representation
+%
+% Notes:
+%   Separating access and storage of collections enables dynamic schema
+%   creation for core interface and lazy loading for persistent interface
+
+% By Sara Patterson, 2023 (AOData)
+% -------------------------------------------------------------------------
 
     properties (SetAccess = private)
         Parent
@@ -11,8 +22,6 @@ classdef (Abstract) Schema < handle
         FileCollection
     end
 
-    % Separating access and storage enables dynamic schema creation for
-    % the core interface and lazy loading for the persistent interface
     properties (Dependent)
         Datasets
         Attributes
@@ -31,6 +40,7 @@ classdef (Abstract) Schema < handle
         end
     end
 
+    % Dependent set/get methods
     methods
         function value = get.Datasets(obj)
             value = obj.getDatasetCollection();
@@ -146,8 +156,8 @@ classdef (Abstract) Schema < handle
 
 
         function out = text(obj)
-            % TODO persistent schema text display
-            out = "Not yet implemented";
+            % TODO spacing and indentation
+            out = jsonencode(obj.struct(), "PrettyPrint", true);
         end
 
         function out = code(obj)
@@ -177,15 +187,21 @@ classdef (Abstract) Schema < handle
         end
     end
 
+    methods (Access = protected)
+        function setClassName(obj, className)
+            obj.className = className;  % TODO: Validate
+        end
+    end
+
     % MATLAB builtin methods
     methods
         function S = struct(obj)
             entityName = strrep(obj.className, '.', '__'); % TODO
             if ~isempty(obj.Parent)
-                entityType = string(obj.Parent.entityType);
-                entityClass = string(getClassWithoutPackages(obj.Parent));
-                packageName = erase(string(class(obj.Parent)), "." + entityClass);
-                superNames = string(superclasses(obj.Parent));
+                entityType = aod.common.EntityTypes.getFromSuperclass(obj.className);
+                entityClass = getClassWithoutPackages(obj.className);
+                packageName = erase(obj.className, "." + entityClass);
+                superNames = string(superclasses(obj.className));
                 superNames = superNames(1:find(superNames == "aod.core.Entity"));
             else
                 entityType = []; entityClass = [];
@@ -196,6 +212,13 @@ classdef (Abstract) Schema < handle
             S.(entityName).PackageName = packageName;
             S.(entityName).EntityType = entityType;
             S.(entityName).Superclasses = superNames';
+            % TODO: Aliases, UUIDs and version number
+            S.(entityName).VersionNumber = [];
+            S.(entityName).Aliases = [];
+            S.(entityName).UUID = [];
+            % Leave blank until saved
+            S.(entityName).DateCreated = [];
+
             S.(entityName) = catstruct(S.(entityName), obj.Attributes.struct());
             S.(entityName) = catstruct(S.(entityName), obj.Datasets.struct());
             S.(entityName) = catstruct(S.(entityName), obj.Files.struct());

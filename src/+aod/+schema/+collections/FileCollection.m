@@ -72,4 +72,12 @@ classdef FileCollection < aod.schema.SchemaCollection
             obj.className = className;
         end
     end
+
+    methods (Static)
+        function obj = populate(className)
+            % Create SchemaCollection independent of parent entity
+            obj = aod.schema.util.StandaloneSchema(className);
+            obj = obj.Attributes;
+        end
+    end
 end

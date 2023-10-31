@@ -14,7 +14,7 @@ classdef EntityTypes
 %       Defines the back-end persistent container name
 %   out = childContainers(obj, fullVariableName)
 %       Defines the child containers within each entity type
-%   
+%
 %   out = collectAll(obj, experiment)
 %       Returns all members of an entity type within an experiment
 %   out = empty(obj)
@@ -24,7 +24,7 @@ classdef EntityTypes
 %       Returns the parent core class (e.g. aod.core.Epoch for EPOCH)
 %   out = getPersistentClassName(obj)
 %       Returns the parent persistent class (e.g. aod.persistent.Epoch)
-%   
+%
 %   obj = init(entityName)
 %       Returns the entity type given the entity name
 %   obj = get(entity)
@@ -36,19 +36,19 @@ classdef EntityTypes
     % Core entities in the order they are written to HDF5 files
     enumeration
         EXPERIMENT
-        SOURCE 
+        SOURCE
         CALIBRATION
         SYSTEM
-        CHANNEL 
-        DEVICE 
-        ANNOTATION 
+        CHANNEL
+        DEVICE
+        ANNOTATION
         EXPERIMENTDATASET
-        EPOCH 
+        EPOCH
         EPOCHDATASET
-        STIMULUS 
-        REGISTRATION 
+        STIMULUS
+        REGISTRATION
         RESPONSE
-        ANALYSIS 
+        ANALYSIS
     end
 
     methods
@@ -56,25 +56,25 @@ classdef EntityTypes
             % Return valid parent entity types
             %
             % Description:
-            %   Returns the entity types that can be set to "Parent". This 
+            %   Returns the entity types that can be set to "Parent". This
             %   enforces the AOData Object Model hierarchy
             %
             % Syntax:
             %   parentTypes = validParentTypes(obj)
             % -------------------------------------------------------------
-            
+
             import aod.common.EntityTypes
 
-            switch obj 
+            switch obj
                 case EntityTypes.EXPERIMENT
                     parentTypes = [];
                 case EntityTypes.SOURCE
                     parentTypes = [EntityTypes.EXPERIMENT, EntityTypes.SOURCE];
                 case {EntityTypes.EPOCH, EntityTypes.SYSTEM, EntityTypes.ANALYSIS,...
-                        EntityTypes.ANNOTATION, EntityTypes.CALIBRATION,... 
+                        EntityTypes.ANNOTATION, EntityTypes.CALIBRATION,...
                         EntityTypes.EXPERIMENTDATASET}
                     parentTypes = EntityTypes.EXPERIMENT;
-                case EntityTypes.CHANNEL 
+                case EntityTypes.CHANNEL
                     parentTypes = EntityTypes.SYSTEM;
                 case EntityTypes.DEVICE
                     parentTypes = EntityTypes.CHANNEL;
@@ -87,7 +87,7 @@ classdef EntityTypes
             % Return valid child entity types
             %
             % Description:
-            %   Implements AOData object model hierarchy with limitations 
+            %   Implements AOData object model hierarchy with limitations
             %   on which entities can be added to an entity
             %
             % Syntax:
@@ -96,13 +96,13 @@ classdef EntityTypes
 
             import aod.common.EntityTypes
 
-            switch obj 
-                case EntityTypes.EXPERIMENT 
-                    childTypes = [EntityTypes.ANALYSIS, EntityTypes.ANNOTATION,... 
+            switch obj
+                case EntityTypes.EXPERIMENT
+                    childTypes = [EntityTypes.ANALYSIS, EntityTypes.ANNOTATION,...
                         EntityTypes.CALIBRATION, EntityTypes.EPOCH, ...
                         EntityTypes.SOURCE, EntityTypes.SYSTEM,...
                         EntityTypes.EXPERIMENTDATASET];
-                case EntityTypes.EPOCH 
+                case EntityTypes.EPOCH
                     childTypes = [EntityTypes.EPOCHDATASET, EntityTypes.REGISTRATION,...
                         EntityTypes.RESPONSE, EntityTypes.STIMULUS];
                 case EntityTypes.SYSTEM
@@ -118,7 +118,7 @@ classdef EntityTypes
 
         function out = parentContainer(obj, entity)
             % Returns the container name for an entity type
-            % 
+            %
             % Syntax:
             %   out = parentContainer(obj)
             %
@@ -196,7 +196,7 @@ classdef EntityTypes
                 fullVariableName        logical = false
             end
 
-            out = arrayfun(@(x) x.parentContainer, obj.validChildTypes,... 
+            out = arrayfun(@(x) x.parentContainer, obj.validChildTypes,...
                 'UniformOutput', false);
             if ~isempty(out)
                 out = string(out);
@@ -224,7 +224,7 @@ classdef EntityTypes
                 'Must provide a subclass of aod.core.Experiment');
 
             out = expt.get(obj);
-        end 
+        end
 
         function out = empty(obj)
             % Returns an empty instance of the entity type
@@ -237,10 +237,10 @@ classdef EntityTypes
             % -------------------------------------------------------------
             import aod.common.EntityTypes
 
-            switch obj 
+            switch obj
                 case EntityTypes.EXPERIMENT
                     out = [];
-                case EntityTypes.SOURCE 
+                case EntityTypes.SOURCE
                     out = aod.core.Source.empty();
                 case EntityTypes.CALIBRATION
                     out = aod.core.Calibration.empty();
@@ -299,19 +299,19 @@ classdef EntityTypes
     end
 
     % HDF5 methods
-    methods 
+    methods
         function hdfPath = getPath(obj, entity, manager, parentPath)
             % Returns HDF5 path for core interface entity
             %
             % Syntax:
             %   hdfPath = getPath(obj, entity, manager, parentPath)
             % -------------------------------------------------------------
-            
+
             import aod.common.EntityTypes
 
             if obj == EntityTypes.EXPERIMENT
                 hdfPath = '/Experiment';
-                return 
+                return
             end
 
             if ~isSubclass(entity, 'aod.core.Entity')
@@ -347,14 +347,14 @@ classdef EntityTypes
 
             import aod.common.EntityTypes
 
-            switch obj 
-                case EntityTypes.EXPERIMENT 
+            switch obj
+                case EntityTypes.EXPERIMENT
                     hdfPath = [];
                 case {EntityTypes.SYSTEM, EntityTypes.EPOCH, EntityTypes.ANNOTATION,...
                         EntityTypes.ANALYSIS, EntityTypes.CALIBRATION,...
                         EntityTypes.EXPERIMENTDATASET}
                     hdfPath = '/Experiment';
-                case EntityTypes.SOURCE 
+                case EntityTypes.SOURCE
                     hdfPath = manager.uuid2path(entity.Parent.UUID);
                 otherwise
                     hdfPath = manager.uuid2path(entity.Parent.UUID);
@@ -363,15 +363,15 @@ classdef EntityTypes
     end
 
     methods (Static)
-        function out = allContainerNames(obj) %#ok<INUSD> 
+        function out = allContainerNames(obj) %#ok<INUSD>
             % Returns a list of all container names
             %
             % Syntax:
             %   out = getAllContainers(obj)
             % -------------------------------------------------------------
-            out = ["Sources", "Calibrations",  "ExperimentDatasets",... 
-                 "Epochs", "Registrations", "Stimuli", "EpochDatasets",... 
-                "Systems", "Channels", "Devices", "Responses",... 
+            out = ["Sources", "Calibrations",  "ExperimentDatasets",...
+                 "Epochs", "Registrations", "Stimuli", "EpochDatasets",...
+                "Systems", "Channels", "Devices", "Responses",...
                 "Annotations", "Analyses"];
         end
     end
@@ -382,7 +382,7 @@ classdef EntityTypes
         function out = char(obj)
             % Returns char of entity type with correct capitalization
             %
-            % Note: 
+            % Note:
             %   Necessary to avoid calling "string" bc infinite recursion
             % -------------------------------------------------------------
 
@@ -428,7 +428,7 @@ classdef EntityTypes
         function out = string(obj)
             % Returns string of entity type with correct capitalization
             %
-            % Note: 
+            % Note:
             %   Necessary to avoid calling "string" bc infinite recursion
             % -------------------------------------------------------------
 
@@ -436,7 +436,7 @@ classdef EntityTypes
                 out = aod.util.arrayfun(@(x) string(x), obj);
                 return
             end
-            
+
             out = sprintf("%s", char(obj));
         end
     end
@@ -449,11 +449,11 @@ classdef EntityTypes
             % Syntax:
             %   out = getByClass(obj)
             % -------------------------------------------------------------
-            arguments 
+            arguments
                 obj         {mustBeA(obj, ["aod.core.Entity","aod.persistent.Entity"])}
             end
 
-            import aod.common.EntityTypes 
+            import aod.common.EntityTypes
 
             if isSubclass(obj, {'aod.core.Experiment', 'aod.persistent.Experiment'})
                 out = EntityTypes.EXPERIMENT;
@@ -486,11 +486,26 @@ classdef EntityTypes
             end
         end
 
+        function obj = getFromSuperclass(className)
+            % Get entity type from core class name
+            %
+            % TODO: Some
+            superNames = string(superclasses(className));
+            if ismember(superNames, "aod.persistent.Entity")
+                error('getEntityTypeFromSuperclass:NotCoreEntity',...
+                    'The class %s is not a subclass of aod.core.Entity', className);
+            end
+
+            coreEntities = aod.common.EntityTypes.all();
+            coreClasses = getCoreClassName(coreEntities);
+            obj = coreEntities(ismember(coreClasses, superNames));
+        end
+
         function obj = get(entityName)
             % Initialize
             %
             % Description:
-            %   Initialize from entity name as text (string or char) or 
+            %   Initialize from entity name as text (string or char) or
             %   from an object in the core or persistent interface
             %
             % Syntax:
@@ -509,7 +524,7 @@ classdef EntityTypes
             %   input, it will be returned without error
             %   Several abbreviations are also defined, see code
             % -------------------------------------------------------------
-            
+
             import aod.common.EntityTypes;
 
             if isa(entityName, 'aod.common.EntityTypes')
@@ -519,7 +534,7 @@ classdef EntityTypes
                 obj = EntityTypes.getByClass(entityName);
                 return
             end
-  
+
             switch lower(entityName)
                 case {'experiment', 'exp'}
                     obj = EntityTypes.EXPERIMENT;
