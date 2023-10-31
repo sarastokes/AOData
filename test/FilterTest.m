@@ -16,9 +16,9 @@ classdef FilterTest < matlab.unittest.TestCase
 
     properties
         FILENAME
-        EXPT 
+        EXPT
         QM
-        
+
         SMALL_EXPT
         SMALL_QM
 
@@ -46,8 +46,8 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.EMPTY_QM = aod.api.QueryManager();
         end
     end
-    
-    methods 
+
+    methods
         function reset(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
@@ -115,7 +115,7 @@ classdef FilterTest < matlab.unittest.TestCase
         function FilterAddition(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
-            
+
             testCase.QM.addFilter({'Name', '0001'});
             testCase.verifyEqual(1, testCase.QM.numFilters);
             testCase.verifyEqual(height(testCase.QM.filter()), 1);
@@ -147,7 +147,7 @@ classdef FilterTest < matlab.unittest.TestCase
         function NameFilterErrors(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
-            
+
             testCase.verifyError(...
                 @() aod.api.NameFilter(testCase.QM, 123),...
                 "NameFilter:InvalidInput");
@@ -171,13 +171,13 @@ classdef FilterTest < matlab.unittest.TestCase
             PF1 = aod.api.PathFilter(testCase.QM, "/Experiment");
             idx = PF1.apply();
             testCase.verifyNumElements(find(idx), 1);
-            testCase.verifyEqual(PF1.describe(),... 
+            testCase.verifyEqual(PF1.describe(),...
                 string('PathFilter: Path="/Experiment"'));
             testCase.verifyEqual(PF1.code(), ...
                 string('aod.api.PathFilter(QM, "/Experiment")'));
             testCase.verifyEqual(PF1.code("QM", "F"),...
                 string('F = aod.api.PathFilter(QM, "/Experiment");'));
-            
+
             PF2 = aod.api.PathFilter(testCase.QM, @(x) endsWith(x, "Experiment"));
             idx = PF2.apply();
             testCase.verifyNumElements(find(idx), 1);
@@ -210,7 +210,7 @@ classdef FilterTest < matlab.unittest.TestCase
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
-            UF = aod.api.UuidFilter(testCase.QM, aod.util.generateUUID());
+            UF = aod.api.UuidFilter(testCase.QM, aod.infra.UUID.generate());
             testCase.verifyWarning(...
                 @()UF.apply(), "apply:NoMatches");
         end
@@ -266,8 +266,8 @@ classdef FilterTest < matlab.unittest.TestCase
             idx = DF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
             DF2.describe();
-            testCase.verifyEqual(DF2.code(),... 
-                string('aod.api.DatasetFilter(QM, "epochIDs", [1 2])')); 
+            testCase.verifyEqual(DF2.code(),...
+                string('aod.api.DatasetFilter(QM, "epochIDs", [1 2])'));
             testCase.verifyEqual(DF2.code("QM", "F"),...
                 string('F = aod.api.DatasetFilter(QM, "epochIDs", [1 2]);'));
 
@@ -291,7 +291,7 @@ classdef FilterTest < matlab.unittest.TestCase
         function DescriptionFilter(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
-            
+
             DF1 = aod.api.DescriptionFilter(testCase.QM,...
                 "This is a test experiment");
             testCase.verifyEqual(nnz(DF1.apply()), 1);
@@ -306,7 +306,7 @@ classdef FilterTest < matlab.unittest.TestCase
         end
 
         function DescriptionFilterErrors(testCase)
-            
+
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
 
@@ -361,8 +361,8 @@ classdef FilterTest < matlab.unittest.TestCase
         function ChildFilter(testCase)
             % Clear filters in case prior method errored
             testCase.QM.clearFilters();
-            
-            CF = aod.api.ChildFilter(testCase.QM, 'Response',... 
+
+            CF = aod.api.ChildFilter(testCase.QM, 'Response',...
                 {'Dataset', 'Data', [2 4 6 8]});
             idx = CF.apply();
             testCase.verifyEqual(nnz(idx), 1);
@@ -385,7 +385,7 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.verifyWarning(...
                 @() CF.apply, "apply:NoMatches");
         end
-        
+
         function ChildFilterErrors(testCase)
             CF = aod.api.ChildFilter(testCase.QM, 'Analysis', ...
                 {'Name', 'BadAnalysisName'});
@@ -433,7 +433,7 @@ classdef FilterTest < matlab.unittest.TestCase
                 'LinkFilter:ParentInvalid');
         end
     end
-    
+
     methods (Test, TestTags=["ParentFilter", "AOQuery"])
         function ParentFilter(testCase)
             % Clear filters in case prior method errored
@@ -483,12 +483,12 @@ classdef FilterTest < matlab.unittest.TestCase
                 string('F = aod.api.AttributeFilter(QM, "Laboratory");'));
 
             % Specific attribute value (match)
-            PF2 = aod.api.AttributeFilter(testCase.QM,... 
+            PF2 = aod.api.AttributeFilter(testCase.QM,...
                 'Laboratory', "Primate-1P");
             idx = PF2.apply();
             testCase.verifyEqual(nnz(idx), 1);
             PF2.describe();
-            
+
 
             % Alt initialization
             testCase.QM.addFilter({'Attribute', 'Laboratory', 'Primate-1P'});
@@ -503,7 +503,7 @@ classdef FilterTest < matlab.unittest.TestCase
             PF4 = aod.api.AttributeFilter(testCase.QM, 'BadParam');
             testCase.verifyWarning(...
                 @() PF4.apply(), "apply:NoMatches");
-            
+
             % Specific attribute value (no match)
             PF3 = aod.api.AttributeFilter(testCase.QM,...
                 'Laboratory', "none");

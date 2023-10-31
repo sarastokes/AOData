@@ -1,4 +1,4 @@
-classdef EntityManager < handle 
+classdef EntityManager < handle
 % ENTITYMANAGER
 %
 % Description:
@@ -10,10 +10,10 @@ classdef EntityManager < handle
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
-    
+
 
     properties
-        hdfName            
+        hdfName
         pathMap
         classMap
         entityMap
@@ -43,7 +43,7 @@ classdef EntityManager < handle
         end
 
         function T = table(obj)
-            T = table(string(obj.entityMap.keys'),... 
+            T = table(string(obj.entityMap.keys'),...
                 string(obj.entityMap.values'),...
                 string(obj.classMap.values'),...
                 string(obj.pathMap.values'),...
@@ -51,7 +51,7 @@ classdef EntityManager < handle
         end
 
         function hdfPath = uuid2path(obj, uuid)
-            uuid = aod.util.validateUUID(uuid);
+            uuid = aod.infra.UUID.validate(uuid);
             if ~obj.hasUUID(uuid)
                 error("EntityManager:UuidNotFound",...
                     "The UUID %s is not present", uuid);
@@ -64,7 +64,7 @@ classdef EntityManager < handle
         end
 
         function tf = hasUUID(obj, uuid)
-            uuid = aod.util.validateUUID(uuid);
+            uuid = aod.infra.UUID.validate(uuid);
             tf = ismember(uuid, obj.Table.UUID);
         end
 
@@ -76,7 +76,7 @@ classdef EntityManager < handle
             else
                 error('EntityManager:InvalidType',...
                     'Input must be persistent entity or HDF path');
-            end 
+            end
 
             paths = obj.Table.Path(...
                 startsWith(obj.Table.Path, hdfPath) & ...
@@ -117,8 +117,8 @@ classdef EntityManager < handle
             % TODO: Out of date - use faster h5tools-matlab functions
             % ---------------------------------------------------------------------
             arguments
-                info                struct 
-                attributeName       char 
+                info                struct
+                attributeName       char
             end
 
             if isempty(info.Attributes)

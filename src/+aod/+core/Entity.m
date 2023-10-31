@@ -124,7 +124,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             obj.entityType = aod.common.EntityTypes.get(obj);
 
             % Generate a random unique identifier to distinguish the class
-            obj.UUID = aod.util.generateUUID();
+            obj.UUID = aod.infra.UUID.generate();
             % Get current time for dateCreated and lastModified
             obj.dateCreated = datetime("now");
             obj.lastModified = obj.dateCreated;
@@ -748,9 +748,9 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %   Access restricted to factory subclasses to protect UUIDs
             %
             % See also:
-            %   aod.util.generateUUID
+            %   aod.infra.UUID.generate
             % -------------------------------------------------------------
-            uuid = aod.util.validateUUID(uuid);
+            uuid = aod.infra.UUID.validate(uuid);
             obj.UUID = uuid;
         end
     end

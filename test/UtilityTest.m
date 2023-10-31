@@ -1,5 +1,5 @@
 classdef UtilityTest < matlab.unittest.TestCase
-% Test miscellaneous utility functions 
+% Test miscellaneous utility functions
 %
 % Description:
 %   Tests AOData utility functions
@@ -19,14 +19,14 @@ classdef UtilityTest < matlab.unittest.TestCase
 %#ok<*MANU>
 
     properties
-        EXPT 
+        EXPT
     end
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            % Creates an experiment, writes to HDF5 and reads back in  
+            % Creates an experiment, writes to HDF5 and reads back in
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
-                'test', 'ToyExperiment.h5');            
+                'test', 'ToyExperiment.h5');
             if ~exist(fileName, 'file')
                 ToyExperiment(true, true);
             end
@@ -47,12 +47,12 @@ classdef UtilityTest < matlab.unittest.TestCase
             params('A') = 1;
             map = params.toMap();
             testCase.verifyClass(map, 'containers.Map');
-            
+
             S = params.toStruct();
             testCase.verifyClass(S, 'struct');
         end
 
-        function EmptyKeyValueMap(testCase) 
+        function EmptyKeyValueMap(testCase)
             obj = aod.common.KeyValueMap();
             toMap(obj)
         end
@@ -79,15 +79,15 @@ classdef UtilityTest < matlab.unittest.TestCase
     methods (Test, TestTags=["Validation", "Utility"])
         function ValidateUUID(testCase)
             testCase.verifyError(...
-                @() aod.util.validateUUID('baduuid'),...
-                "validateUUID:InvalidInput");
+                @() aod.infra.UUID.validate('baduuid'),...
+                "validate:InvalidUUID");
         end
 
         function ValidateDate(testCase)
             testCase.verifyEmpty(aod.util.validateDate([]));
 
             testCase.verifyError(...
-                @()aod.util.validateDate('BadDate'),... 
+                @()aod.util.validateDate('BadDate'),...
                 "validateDate:FailedDatetimeConversion");
         end
 
@@ -142,12 +142,12 @@ classdef UtilityTest < matlab.unittest.TestCase
                 'aod.util.readers.MatReader');
             testCase.verifyClass(aod.util.findFileReader('test.png'),...
                 'aod.util.readers.ImageReader');
-            
+
             testCase.verifyError(...
                 @() aod.util.findFileReader('RoiSet.zip'),...
                 "findFileReader:UnknownExtension");
         end
-    end 
+    end
 
     methods (Test, TestTags=["Metaclass", "Utility"])
         function PropDescription(testCase)
@@ -165,7 +165,7 @@ classdef UtilityTest < matlab.unittest.TestCase
         function FileManager(testCase)
             FM = test.TestFileManager(fullfile(...
                 test.util.getAODataTestFolder(), 'test_data'));
-            
+
             files = FM.getFilesFound();
             % ! This will change with # of test data files
             testCase.verifyNumElements(files, 12);
@@ -180,4 +180,4 @@ classdef UtilityTest < matlab.unittest.TestCase
                 FM.messageLevel, aod.infra.ErrorTypes.ERROR);
         end
     end
-end 
+end

@@ -1,4 +1,4 @@
-classdef UuidFilter < aod.api.FilterQuery 
+classdef UuidFilter < aod.api.FilterQuery
 % Filter entities based on UUID
 %
 % Description:
@@ -14,7 +14,7 @@ classdef UuidFilter < aod.api.FilterQuery
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        UUID        string 
+        UUID        string
     end
 
     properties (SetAccess = private)
@@ -25,20 +25,20 @@ classdef UuidFilter < aod.api.FilterQuery
         function obj = UuidFilter(parent, UUID)
             obj@aod.api.FilterQuery(parent);
 
-            obj.UUID = aod.util.validateUUID(UUID);
+            obj.UUID = aod.infra.UUID.validate(UUID);
 
             obj.collectAllUuids();
         end
     end
- 
+
     % Implementation of FilterQuery abstract methods
-    methods 
+    methods
         function tag = describe(obj)
             tag = sprintf("UuidFilter: UUID=%s", value2string(obj.UUID));
         end
 
         function out = apply(obj)
-            
+
             % Update local match indices to match those in Query Manager
             obj.localIdx = obj.getQueryIdx();
 
@@ -53,15 +53,15 @@ classdef UuidFilter < aod.api.FilterQuery
 
             out = obj.localIdx;
         end
-        
+
         function txt = code(obj, input, output)
-            arguments 
-                obj 
+            arguments
+                obj
                 input           string  = "QM"
                 output          string  = []
             end
 
-            txt = sprintf("aod.api.UuidFilter(%s, %s)",... 
+            txt = sprintf("aod.api.UuidFilter(%s, %s)",...
                 input, value2string(obj.UUID));
             if ~isempty(output)
                 txt = sprintf("%s = %s;", output, txt);
@@ -75,4 +75,4 @@ classdef UuidFilter < aod.api.FilterQuery
             obj.allUUIDs = entities.UUID;
         end
     end
-end 
+end

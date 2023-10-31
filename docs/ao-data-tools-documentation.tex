@@ -536,7 +536,7 @@ obj = aod.core.Entity(name)
 		\docheader{Private Properties:} These are handled behind the scenes and average users shouldn't need to worry about them
 		\begin{itemize}
 			\item \aodprop{Parent} optional, another entity that the current entity falls under in the  hierarchy (e.g. the Parent for an Epoch is the Experiment). This is set when you add the entity to another entity using \aodfcn{add()}.
-			\item \aodprop{UUID} - a randomly-generated unique identifier from \aodfcn{aod.util.generateUUID()}. Behind the scenes, these are used to search through entities and their HDF5 counterparts, providing a solution for indexing which is one of HDF5's larger shortcomings. See \myurl{\ref{subsubsection:EntityManager}} on \aodclass{aod.h5.EntityManager} for the solution.
+			\item \aodprop{UUID} - a randomly-generated unique identifier from \aodfcn{aod.infra.UUID.generate()}. Behind the scenes, these are used to search through entities and their HDF5 counterparts, providing a solution for indexing which is one of HDF5's larger shortcomings. See \myurl{\ref{subsubsection:EntityManager}} on \aodclass{aod.h5.EntityManager} for the solution.
 		\end{itemize}
 		\docheader{Dependent Properties:}
 		\begin{itemize}
