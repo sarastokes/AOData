@@ -142,12 +142,18 @@ classdef IndexedCollection < handle
             end
         end
 
-        function [tf, ME] = validateItem(obj, ID, input)
+        function [tf, ME, excObj] = validateItem(obj, ID, input, errorType)
+            if nargin < 3
+                errorType = aod.infra.ErrorTypes.NONE;
+            else
+                errorType = aod.infra.ErrorTypes.init(errorType);
+            end
+
             if istext(ID)
                 ID = obj.name2id(ID);
             end
 
-            [tf, ME] = obj.Primitives(ID).validate(input);
+            [tf, ME, excObj] = obj.Primitives(ID).validate(input, errorType);
         end
 
         function [tf, ME, excObj] = checkIntegrity(obj, ~)

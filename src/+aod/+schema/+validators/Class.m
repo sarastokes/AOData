@@ -45,13 +45,15 @@ classdef Class < aod.schema.Validator
                 tf = true; ME = [];
                 return
             end
-            tf = isSubclass(value, obj.Value);
-            if tf
-                ME = [];
-            else
+
+            if ~isSubclass(value, obj.Value)
+                tf = false;
                 ME = MException("Class:validate",...
                     "Expected class: %s. Actual class: %s",...
                     obj.text(), class(value));
+            else
+                tf = true;
+                ME = [];
             end
         end
 

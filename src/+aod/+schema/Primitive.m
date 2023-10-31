@@ -65,26 +65,10 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Description = aod.schema.decorators.Description([], obj);
         end
 
-        function record = getRecord(obj)
-            if isempty(obj.Parent)
-                record = [];
-                return
-            end
-
-            parent = obj.Parent;
-            while ~isa(parent, 'aod.schema.Record')
-                parent = parent.Parent;
-                if isempty(parent)
-                    break
-                end
-            end
-            record = parent;
-        end
-
         function parentObj = getParent(obj, parentType)
             arguments
                 obj
-                parentType      {mustBeMember(parentType, ["", "Record", "Collection", "Entity"])} = ""
+                parentType      (1,1)       string      = ""
             end
 
             parentObj = obj.Parent;
@@ -92,12 +76,14 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 return
             end
 
-            switch parentType
-                case "Record"
+            switch lower(parentType)
+                case "record"
                     parentClass = "aod.schema.Record";
-                case "Collection"
+                case "collection"
                     parentClass = "aod.schema.SchemaCollection";
-                case "Entity"
+                case "schema"
+                    parentClass = "aod.schema.Schema";
+                case "entity"
                     parentClass = "aod.common.Entity";
             end
 
@@ -279,13 +265,13 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 if ~itf
                     tf = false;
                     numFailures = numFailures + 1;
-                    excObj = excObj.addCause(iME);
+                    excObj.addCause(iME, obj); % TODO Modify for Container
                     %MEs = cat(1, MEs, iME);
                 end
             end
 
             ME = excObj.getException();
-            if numFailures == 0
+            if excObj.isValid()
                 ME = [];
                 return
             end

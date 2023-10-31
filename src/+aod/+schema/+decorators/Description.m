@@ -38,10 +38,6 @@ classdef Description < aod.schema.Decorator
                 return
             end
 
-            if isa(input, 'meta.property')
-                input = input.Description;
-            end
-
             input = convertCharsToStrings(input);
             mustBeTextScalar(input);
 
@@ -60,7 +56,7 @@ classdef Description < aod.schema.Decorator
     % MATLAB builtin functions
     methods
         function tf = isequal(obj, other)
-            if ~isa(other, 'aod.schema.validators.Description')
+            if ~isa(other, 'aod.schema.decorators.Description')
                 tf = false;
                 return
             end

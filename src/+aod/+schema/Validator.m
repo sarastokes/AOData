@@ -1,5 +1,5 @@
 classdef (Abstract) Validator < aod.schema.Specification
-% Validator (abstract)
+% VALIDATOR (abstract)
 %
 % Superclasses:
 %   aod.schema.Specification
@@ -9,6 +9,9 @@ classdef (Abstract) Validator < aod.schema.Specification
 %
 % Abstract methods:
 %   [tf, ME] = validate(obj, input)
+%
+% Public methods:
+%   tf = isSpecified(obj)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

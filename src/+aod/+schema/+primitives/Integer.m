@@ -245,7 +245,7 @@ classdef Integer < aod.schema.Primitive
             end
         end
 
-        function [tf, ME] = validate(obj, value, errorType)
+        function [tf, ME, excObj] = validate(obj, value, errorType)
 
             arguments
                 obj
@@ -255,24 +255,18 @@ classdef Integer < aod.schema.Primitive
 
             errorType = aod.infra.ErrorTypes.init(errorType);
 
-            if ~isinteger(value) && round(value) ~= value
-                itf = false;
-                % TODO: Better error passing
-                iME = MException('validate:Failed',...
-                    'Inputs to INTEGER must be a whole numbers');
-                if errorType == aod.infra.ErrorTypes.ERROR
-                    throw(iME);
-                end
-            else
-                itf = true;
-                iME = [];
-            end
-            [tf, ME] = validate@aod.schema.Primitive(obj,...
+            [tf, ~, excObj] = validate@aod.schema.Primitive(obj,...
                 value, aod.infra.ErrorTypes.NONE);
 
-            if ~itf
+            if ~isinteger(value) && round(value) ~= value
                 tf = false;
-                ME = addCause(ME, iME);
+                excObj.addCause(MException('validate:MustBeWholeNumber',...
+                    'Inputs to INTEGER must be a whole numbers'), obj);
+            end
+
+            ME = excObj.getException();
+            if excObj.isValid()
+                return;
             end
 
             % TODO Maybe a single function that gets called for this
@@ -280,7 +274,7 @@ classdef Integer < aod.schema.Primitive
                 case aod.infra.ErrorTypes.ERROR
                     throw(ME);
                 case aod.infra.ErrorTypes.WARNING
-                    warning(ME.identifier, ME.message);
+                    throwAsWarning(ME);
             end
         end
     end

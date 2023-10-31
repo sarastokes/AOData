@@ -14,7 +14,7 @@ classdef Datetime < aod.schema.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.DATETIME
+        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATETIME
         OPTIONS = ["Class", "Size", "Format", "Description"];
         VALIDATORS = ["Class", "Size", "Format"];
     end
@@ -80,7 +80,7 @@ classdef Datetime < aod.schema.Primitive
             [~, ~, excObj] = checkIntegrity@aod.schema.Primitive(obj);
 
             if obj.Default.isSpecified && obj.Format.isSpecified && isa(obj.Default.Value, ["datetime", "duration"])
-                if ~obj.Format.validate(obj.Default.Value);
+                if ~obj.Format.validate(obj.Default.Value)
                     excObj.addException(MException('checkIntegrity:InvalidDefaultFormat',...
                     'Default value format %s does not match specified Format %s', obj.Default.Format, obj.Format.Value));
                 end

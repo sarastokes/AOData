@@ -134,7 +134,7 @@ classdef (Abstract) Schema < handle
             end
         end
 
-        function [tf, ME] = validate(obj, schemaType, entryName)
+        function [tf, ME, excObj] = validate(obj, schemaType, entryName)
             if ~aod.util.isempty(schemaType)
                 switch schemaType
                     case "dataset"

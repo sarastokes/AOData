@@ -52,7 +52,7 @@ classdef Units < aod.schema.Decorator
     % MATLAB builtin functions
     methods
         function tf = isequal(obj, other)
-            if ~isa(other, 'aod.schema.validators.Description')
+            if ~isa(other, 'aod.schema.decorators.Units')
                 tf = false;
                 return
             end

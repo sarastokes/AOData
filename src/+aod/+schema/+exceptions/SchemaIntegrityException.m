@@ -24,7 +24,7 @@ classdef SchemaIntegrityException < handle
 
     methods
         function obj = SchemaIntegrityException(schemaObj)
-            record = schemaObj.getRecord();
+            record = schemaObj.getParent('record');
             if isempty(record)
                 % This is for testing, perhaps eliminate bc messy
                 obj.Exception = MException(...

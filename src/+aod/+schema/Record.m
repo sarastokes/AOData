@@ -120,7 +120,7 @@ classdef Record < handle
             obj.Primitive.assign(varargin{:});
         end
 
-        function [tf, ME] = validate(obj, input, errorType)
+        function [tf, ME, excObj] = validate(obj, input, errorType)
             arguments
                 obj
                 input
@@ -129,7 +129,7 @@ classdef Record < handle
 
             errorType = aod.infra.ErrorTypes.init(errorType);
 
-            [tf, ME] = obj.Primitive.validate(input, errorType);
+            [tf, ME, excObj] = obj.Primitive.validate(input, errorType);
         end
 
         function [tf, ME] = checkIntegrity(obj, throwError)

@@ -38,7 +38,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj = aod.schema.primitives.Text("Test", [],...
                 "Enum", ["a", "b", "c"], "Length", 1, "Default", "b");
             testCase.verifyError(...
-                @()obj.validate("d"), "validate:Failed");
+                @()obj.validate("d"), 'validate:SchemaViolationsDetected');
         end
     end
 
@@ -67,7 +67,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
             obj.assign("Format", "s");
             testCase.verifyError(...
-                @() obj.validate(minutes(1)), "validate:Failed");
+                @() obj.validate(minutes(1)), 'validate:SchemaViolationsDetected');
             testCase.verifyError( ...
                 @()obj.assign('Default', minutes(1)), ...
                 'checkIntegrity:SchemaConflictsDetected');
@@ -153,12 +153,12 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             testCase.verifyFalse(obj.Maximum.isSpecified());
             testCase.verifyTrue(obj.validate(1));
             testCase.verifyError(...
-                @() obj.validate(1.5), 'validate:Failed');
+                @() obj.validate(1.5), 'validate:SchemaViolationsDetected');
 
             obj = aod.schema.primitives.Integer("Test", [],...
                 "Minimum", 2);
             obj.assign("Class", "double");
-            testCase.verifyEqual(obj.Minimum, 2);
+            testCase.verifyEqual(obj.Minimum.Value, 2);
         end
 
         function IntegerErrors(testCase)
@@ -219,7 +219,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             testCase.verifyTrue(obj.validate("myfile.json"));
             testCase.verifyError(...
                 @() obj.validate("myfile.csv"),...
-                "validate:Failed");
+                'validate:SchemaViolationsDetected');
 
         end
 

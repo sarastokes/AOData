@@ -63,15 +63,16 @@ classdef (Abstract) SchemaCollection < handle
     end
 
     methods
-        function [tf, ME] = validate(obj, specName, value)
-            % Exception should contain:
-            %   - Class and record name
-            %   - Number of failures
-            %   - Names of failed validators
-            % The addCause function looks valuable in this regard
+        function [tf, ME, excObj] = validate(obj, specName, value, errorType)
+            arguments
+                obj
+                specName                    string
+                value
+                errorType                   = aod.infra.ErrorTypes.ERROR
+            end
 
             p = obj.get(specName, aod.infra.ErrorTypes.ERROR);
-            [tf, ME] = p.validate(value);
+            [tf, ME, excObj] = p.validate(value, errorType);
         end
 
         function [tf, ME, failedRecords] = checkIntegrity(obj, specName)
@@ -97,7 +98,6 @@ classdef (Abstract) SchemaCollection < handle
         function set(obj, recordName, primitiveType, varargin)
             % SET Set the type and options of an record's primitive
             % ----------------------------------------------------------
-
 
             record = obj.get(recordName);
             if isempty(record)

@@ -1,27 +1,29 @@
 # Specification
 
 ### Todo list
-**Requirements**
+__Requirements__
 - [ ] Validation performed in MATLAB while maintaining language independence
-- [ ] Schema documentation in a language-independent format (YAML > JSON)
+- [x] Schema documentation in a language-independent format (JSON)
+    - [ ] Clarify for users the limitations of JSON representation (currently working around most everything except for lack of support for anonymous functions in prior schema)
 - [ ] Decentralized but with support for standardization, along with navigation of schema evolution
 - [ ] User-friendly
 
-**Representation**
-- [ ] Combine `expectedAttributes` and `expectedDatasets` into a single property (`schema`?)
-- [ ] Add `expectedFiles` with descriptions or is that too excessive?
-- [ ] Units Decorator (implement siunitx)?
+__Representation__
+- [x] Combine `expectedAttributes` and `expectedDatasets` into a single property (`schema`?)
+- [x] Add `expectedFiles` with descriptions or is that too excessive?
+- [x] Units Decorator ~~(implement siunitx)?~~
 
-**Methods of schema validation**
+__Methods of schema validation__
 - [ ] Check an individual file before writing
 - [ ] Always with `setProp` from persistent interface. Option to use `setProp` from core interface
 - [ ] Always with `setAttr` from either interface
 
-**Schema persistence**
+__Schema persistence__
 - [ ] When to perform, how frequently?
     - Update *after* successful write to an HDF5 file
     - Update on user request
 - [ ] Schema folder in HDF5 file?
+    - [x] Schema stored as property and displayed in AODataViewer
 - [ ] Schema UUIDs assigned on first persistence
     - Independent of class name (renaming class maps to same UUID)
     - Add option to cleanup and remove extraneous classes from "current schema"
@@ -29,33 +31,34 @@
   - [ ] Cleanup old versions unused by existing files
   - [ ] Mark as deprecated
 
-**Schema evolution**
-- [ ] Quick update by class
+__Schema evolution__
+- [ ] Quick update by class upon writing modified entities
 - [ ] `setProp` with optional schema input, then convert
 
-**Alias management**
+__Alias management__
 - [ ] AliasManager class (look at MATLAB's existing alias support for design ideas)
   - [ ] Alias class containing old name and cutoff date
 - [ ] How to persist?
 - [ ] Change class names in file (but need to maintain reference to old class name too)
 
-**User options**
+__User options__
 - [ ] Show schema for a specific data type in UI (as a tree? text?)
 
 
 ### Schema JSON
 Should entire package be in one file or separate files referenced by a "schema registry"? If the files are large, might want to serialize with [msgpack](https://github.com/bastibe/matlab-msgpack).
 - Schema UUID
-  - *Versions*
+  - *Versions* (separate current from repository)
     - Class name
-    - *Aliases*
+    - *Aliases*: class name and cutoff date/version
       - Class name
       - Cutoff date
-    - *Datasets*
+    - *Datasets*/*Attributes*/*Files*
+        - *Aliases*: Record name and cutoff date/version
     - *Attributes*
     - DateCreated
 
-Files for schema storage
+Files for schema storage. Some potential options:
 - [ ] One per package
 - [ ] One per class
 - [ ] One per subpackage
@@ -66,7 +69,7 @@ Files for schema storage
 
 ### Class Hierarchy
 The each parent-child relationship in the hierarchy is one-to-many. Parent classes have properties for containing the child classes. The child classes maintain a reference to the parent class with a property called `Parent`.
-- **`aod.common.Entity`**
+- __`aod.common.Entity`__
   - _`aod.schema.Schema`_ (`aod.core.Schema`, `aod.persistent.Schema`)
     - *`SchemaCollection`*: three subclasses `AttributeCollection`, `FileCollection` and `DatasetCollection`
       - `Record`: a specific attribute or dataset defined by a *`Primitive`* which has a specific `PrimitiveType`. Some primitive types can contain other primitives (*`Container`*)
@@ -119,35 +122,35 @@ Decorators add metadata but do not perform any validation on user-provided value
 
 
 ### Components
-Basic types (**validator**, *decorator*):
+Basic types (__validator__, *decorator*):
 - Shared between all types
     - *Description* - information on the paramter
-    - **Format** - this is the underlying MATLAB class
-    - **Size**
+    - __Format__ - this is the underlying MATLAB class
+    - __Size__
 - Number: (double/float)
-    - **Minimum** - inclusive minimum
-    - **Maximum** - inclusive maximum
+    - __Minimum__ - inclusive minimum
+    - __Maximum__ - inclusive maximum
     - __Enum__
     - *Units*
 - Integer:
-    - **Minimum**
-    - **Maximum**
+    - __Minimum__
+    - __Maximum__
     - __Enum__
     - *Units*
 - String:
-    - **Enum**
-    - **Regexp** - standard regular expression string or can convert some MATLAB function handles
-    - **Length** - characters in the string
+    - __Enum__
+    - __Regexp__ - standard regular expression string or can convert some MATLAB function handles
+    - __Length__ - characters in the string
 - Datetime
-    - Format: 'yyyyMMdd HH:mm:ss'
-- Date (```yyyymmdd(datetime)```)
-    - Format: 'yyyyMMdd'
+    - Format: 'yyyy-MM-dd HH:mm:ss'
+- Date
+    - Format: 'yyyy-MM-dd'
 - Time
 - Duration
-    - **Units**
+    - __Units__
 - Table
-    - **NumFields**
-    - **Length**
+    - __NumFields__
+    - __Length__
     - _Fields_ (consists of other objects)
 
 
@@ -155,11 +158,11 @@ Basic types (**validator**, *decorator*):
 1. `[tf, ME, excObj] = checkSchemaIntegrity(obj, throwError)`
    - Are schemas viable?
    - Where are the conflicts?
-2. `[tf, ME] = validate(obj, throwError)`
+2. `[tf, ME, excObj] = validate(obj, throwError)`
    - Do provided values pass schema validation?
    - If not, where did validation fail
-3. `checkRequirements` - are required values provided? AOData sticks to soft requirements and users can choose to leave a required value blank.
-4. `checkGitRepo` - are classes committed? Only prompt if schemas are viable, no reason to be committing schemas that will need to be updated soon
+3. `[tf, objs] = checkRequirements` - are required values provided? AOData sticks to soft requirements and users can choose to leave a required value blank.
+4. `checkGitRepo()` - are classes committed? Only prompt if schemas are viable, no reason to be committing schemas that will need to be updated soon
 5. `updateSchemas` - update schemas before writing
 
 ### Misc notes
@@ -170,24 +173,17 @@ Basic types (**validator**, *decorator*):
 ### Validation error messages
 For a Record that is not nested:
 - BOOLEAN Size violation for Dataset "DsetName" in EPOCH "Epoch1" of "ExptName" (\Experiment\Epochs\Epoch1)
-- `PrimitiveType` `ValidatorType` violation for  `CollectionType` **RecordName** in `EntityType` **EntityName** of **ExperimentName** (*EntityPath*)
+- `PrimitiveType` `ValidatorType` violation for  `CollectionType` __RecordName__ in `EntityType` __EntityName__ of __ExperimentName__ (*EntityPath*)
 
 For a Primitive that is nested and named:
 - BOOLEAN Size violation for "ItemName" in TABLE Dataset "DsetName" in EPOCH "Epoch1" of "ExptName" (\Experiment\Epochs\Epoch1)
-- `PrimitiveType` `ValidatorType` violation for **ItemName** in `ContainerType` `CollectionType` **RecordName** in `EntityType` **EntityName** of **ExperimentName** (*EntityPath*)
+- `PrimitiveType` `ValidatorType` violation for __ItemName__ in `ContainerType` `CollectionType` __RecordName__ in `EntityType` __EntityName__ of __ExperimentName__ (*EntityPath*)
 
 Necessary access from Validator (provides `ValidatorType` and exception message):
-- getPrimitive - provides `PrimitiveType` (if nested, **ItemName** or **ItemID**)
-- getRecord - provides **RecordName** (if nested extract `ContainerType`)
+- getPrimitive - provides `PrimitiveType` (if nested, __ItemName__ or __ItemID__)
+- getRecord - provides __RecordName__ (if nested extract `ContainerType`)
 - getCollection - provides `CollectionType`
-- getEntity - provides `EntityType`, **EntityName**, **ExperimentName** and *EntityPath*
-
-### Interaction
-```matlab
-    function value = specifyAttributes(obj)
-        value.add("Name", "type", varargin{:});
-    end
-```
+- getEntity - provides `EntityType`, __EntityName__, __ExperimentName__ and *EntityPath*
 
 ### Syntax
 ##### Number

@@ -127,7 +127,7 @@ classdef (Abstract) Container < aod.schema.Primitive
 
             errorType = aod.infra.ErrorTypes.init(errorType);
 
-            [tf, ME, excObj] = validate@aod.schema.primitives.Container(obj, input, errorType);
+            [tf, ME, excObj] = validate@aod.schema.primitives.Primitive(obj, input, errorType);
 
             for i = 1:obj.numItems
                 [~, ~, iExc] = obj.Collection.validateItem(obj.getItemFromInput(input, i), errorType);
