@@ -36,11 +36,15 @@ classdef Primate < aod.core.sources.Subject
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "f51f688c-86b1-4503-a5db-5cda7139ffcc";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.sources.Subject();
 
             value.remove("Age");
-            value.add("DateOfBirth", "DATETIME",... 
+            value.add("DateOfBirth", "DATETIME",...
                 "Size", "(1,1)",...
                 "Description", "Date of birth of the subject");
         end

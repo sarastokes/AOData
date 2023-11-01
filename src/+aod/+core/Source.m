@@ -35,8 +35,8 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   add(obj, childSource)
             % -------------------------------------------------------------
-            arguments 
-                obj 
+            arguments
+                obj
                 childSource       {mustBeA(childSource, 'aod.core.Source')}
             end
 
@@ -78,9 +78,9 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % See Also:
             %   aod.common.EntitySearch
             % -------------------------------------------------------------
-            
+
             import aod.common.EntityTypes
-            
+
             if isempty(obj.Sources)
                 out = aod.core.Source.empty();
                 return
@@ -93,7 +93,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 entityType = EntityTypes.SOURCE;
                 startIdx = 1;
             end
-   
+
             if entityType ~= EntityTypes.SOURCE
                 error('get:InvalidEntityType',...
                     'Entity must be a Source');
@@ -115,9 +115,9 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % Remove child source(s) by ID, query or "all"
             %
             % Description:
-            %   Remove all child Sources, a specific Source or Sources 
-            %   that match a specific query. Entity type specification 
-            %   isn't necessary (but can be done) because 
+            %   Remove all child Sources, a specific Source or Sources
+            %   that match a specific query. Entity type specification
+            %   isn't necessary (but can be done) because
             %
             % Syntax:
             %   remove(obj, varargin)
@@ -126,7 +126,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   % Remove all child sources
             %   obj.remove('all')
             %
-            %   % Entity type input isn't needed as only Sources can be 
+            %   % Entity type input isn't needed as only Sources can be
             %   % child entities of a Source. It's allowed though
             %   obj.remove('Source', 'all')
             %
@@ -134,12 +134,12 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   obj.remove(2)
             %
             %   % Remove Sources by query (those named 'Right')
-            %   obj.remove({'Name', 'Right'}) 
+            %   obj.remove({'Name', 'Right'})
             % -------------------------------------------------------------
 
             import aod.common.EntityTypes
-            
-            try 
+
+            try
                 entityType = EntityTypes.get(varargin{1});
                 startIdx = 2;
             catch
@@ -213,7 +213,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             %   out = source.getChildSources();
             %   >> Returns OD and OS
             % -------------------------------------------------------------
-            
+
             if ~isscalar(obj)
                 out = uncell(aod.util.arrayfun(@(x) getChildSources(x), obj));
                 return
@@ -235,7 +235,7 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
             % Syntax:
             %   ID = obj.getParents();
             % -------------------------------------------------------------
-            
+
             sources = [];
             parent = obj.Parent;
             while ~isempty(parent) && isSubclass(parent, 'aod.core.Source')
@@ -250,8 +250,8 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     % Overloaded methods
-    methods (Access = protected)    
-        function value = specifyLabel(obj)  
+    methods (Access = protected)
+        function value = specifyLabel(obj)
             if ~isempty(obj.Parent) && isSubclass(obj.Parent, 'aod.core.Source')
                 value = obj.Parent.Name + "_" + obj.Name;
             else
@@ -271,5 +271,11 @@ classdef Source < aod.core.Entity & matlab.mixin.Heterogeneous
                 allSources = iterSource(obj, source.Sources(i), allSources);
             end
         end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "3d7c13e9-de74-44b6-9f0d-d47d8c47560f";
+		end
     end
 end

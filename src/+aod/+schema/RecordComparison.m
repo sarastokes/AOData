@@ -1,4 +1,5 @@
 classdef RecordComparison < handle
+% RECORDCOMPARISON
 
     properties (SetAccess = private)
         A

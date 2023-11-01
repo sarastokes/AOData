@@ -1,4 +1,4 @@
-classdef TestExperiment < aod.core.Experiment 
+classdef TestExperiment < aod.core.Experiment
 
     properties
         Date = getDateYMD();
@@ -16,10 +16,10 @@ classdef TestExperiment < aod.core.Experiment
         MapUnequal
     end
 
-    methods 
+    methods
         function obj = TestExperiment(varargin)
             obj@aod.core.Experiment(varargin{:});
-            
+
             obj.MapUnequal = containers.Map();
             obj.MapUnequal('A') = 123;
             obj.MapUnequal('B') = [123; 456];
@@ -31,4 +31,10 @@ classdef TestExperiment < aod.core.Experiment
                 'VariableNames', ["Numbers", "Letters"]);
         end
     end
-end 
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "151db93c-ffd3-47b9-9809-ffc12cc40e39";
+		end
+    end
+end

@@ -1,5 +1,5 @@
-classdef TestDevice < aod.core.Device 
-%#ok<*MANU,*NASGU,*ASGLU> 
+classdef TestDevice < aod.core.Device
+%#ok<*MANU,*NASGU,*ASGLU>
 
 % TODO: Constant properties
 
@@ -14,7 +14,7 @@ classdef TestDevice < aod.core.Device
     end
 
     properties (SetAccess = protected)
-        ProtectedSetProp        
+        ProtectedSetProp
     end
 
     properties (Access = private)
@@ -37,7 +37,7 @@ classdef TestDevice < aod.core.Device
         HiddenDependentProp
     end
 
-    methods 
+    methods
         function obj = TestDevice(varargin)
             obj@aod.core.Device("Test", varargin{:});
         end
@@ -52,6 +52,10 @@ classdef TestDevice < aod.core.Device
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "60cef672-0568-4e22-a5f6-736abc3ff3dd";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Device(value);
 
@@ -87,4 +91,4 @@ classdef TestDevice < aod.core.Device
                 "Description", "This is a .txt file");
         end
     end
-end  
+end

@@ -16,12 +16,11 @@ classdef Pellicle < aod.builtin.devices.Beamsplitter
 %   SplittingRatio
 %   Manufacturer
 %   Model
-%
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
-    methods 
+
+    methods
         function obj = Pellicle(splittingRatio, varargin)
             obj@aod.builtin.devices.Beamsplitter(splittingRatio, varargin{:});
         end
@@ -32,4 +31,10 @@ classdef Pellicle < aod.builtin.devices.Beamsplitter
             value = sprintf("%u:%uPellicle", obj.getAttr('SplittingRatio'));
         end
     end
-end 
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "e739df1f-62d5-46ab-aba7-d8c7bf173261";
+		end
+    end
+end

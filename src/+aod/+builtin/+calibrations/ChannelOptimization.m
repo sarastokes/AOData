@@ -102,6 +102,10 @@ classdef ChannelOptimization < aod.core.Calibration
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "a6466db8-dd30-404d-bd33-334696c80ed8";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Calibration();
 

@@ -53,6 +53,10 @@ classdef PowerMeasurement < aod.builtin.calibrations.MeasurementTable
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "29031b56-eb97-4101-9842-87825074b8d1";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.builtin.calibrations.MeasurementTable();
 

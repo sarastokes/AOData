@@ -11,14 +11,14 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
 %   obj = Device(varargin)
 %
 % Attributes:
-%   Model                            string   
+%   Model                            string
 %       Model of the device
-%   Manufacturer                     string  
+%   Manufacturer                     string
 %       Manufacturer of the device
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
-    
+
     methods
         function obj = Device(name, varargin)
             obj = obj@aod.core.Entity(name, varargin{:});
@@ -26,6 +26,10 @@ classdef Device < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "756660d3-f2a9-40b3-8ed6-b2f26d17c3e1";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
 

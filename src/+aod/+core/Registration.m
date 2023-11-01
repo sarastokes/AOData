@@ -66,6 +66,10 @@ classdef Registration < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "9521e4e4-fd34-47c2-a3c7-4e4c8434c9d1";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
 

@@ -126,6 +126,9 @@ classdef Annotation < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Static)
+		function UUID = specifyClassUUID()
+			 UUID = "7c60ed0a-04a4-41a9-bf72-a70df25420c2";
+		end
 
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);

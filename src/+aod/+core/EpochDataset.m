@@ -24,7 +24,7 @@ classdef EpochDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetObservable, SetAccess = {?aod.core.Entity})
-        Data 
+        Data
     end
 
     methods
@@ -44,5 +44,11 @@ classdef EpochDataset < aod.core.Entity & matlab.mixin.Heterogeneous
             % Validate with any specifications defined in subclasses
             obj.setProp('Data', data);
         end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "dab85248-adae-47d7-855e-2b4728a54428";
+		end
     end
 end

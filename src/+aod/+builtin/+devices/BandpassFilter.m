@@ -67,6 +67,10 @@ classdef BandpassFilter < aod.core.Device
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "cffcbec0-6dcd-4183-9434-d6d08ea99d3a";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Device(value);
 

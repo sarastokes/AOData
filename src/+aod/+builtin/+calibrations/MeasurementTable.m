@@ -114,6 +114,10 @@ classdef MeasurementTable < aod.core.Calibration
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "d76092ca-6823-4608-8d58-62b5d0706a24";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Calibration(value);
 

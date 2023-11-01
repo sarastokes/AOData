@@ -43,6 +43,10 @@ classdef ImagingLight < aod.core.Stimulus
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "8ebec018-c5b3-4255-8da7-987137c94628";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Stimulus(value);
 

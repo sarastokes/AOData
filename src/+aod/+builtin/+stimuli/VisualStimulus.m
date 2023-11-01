@@ -38,4 +38,10 @@ classdef VisualStimulus < aod.core.Stimulus
             end
         end
     end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "fdc3be20-719c-47a3-868b-97bf39b4d14f";
+		end
+    end
 end

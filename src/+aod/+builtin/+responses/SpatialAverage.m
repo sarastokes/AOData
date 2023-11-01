@@ -21,7 +21,7 @@ classdef SpatialAverage < aod.core.Response
             obj.extractResponse(varargin{:});
         end
 
-        function out = loadData(obj) %#ok<MANU,STOUT> 
+        function out = loadData(obj) %#ok<MANU,STOUT>
             error('loadData:NotYetImplemented',...
                 'Subclasses must define how data is loaded')
         end
@@ -30,5 +30,11 @@ classdef SpatialAverage < aod.core.Response
             imStack = obj.loadData(varargin{:});
             obj.setData(squeeze(mean(imStack, [1 2], 'omitnan')));
         end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "d24f6225-ede8-4c05-9ee7-c12694b31ad4";
+		end
     end
 end

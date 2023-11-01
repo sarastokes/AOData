@@ -80,6 +80,10 @@ classdef LightSource < aod.core.Device
     end
 
     methods (Static)
+		function UUID = specifyClassUUID()
+			 UUID = "6483bbe7-3633-4a30-bbc5-a8d06c87c9bb";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
 

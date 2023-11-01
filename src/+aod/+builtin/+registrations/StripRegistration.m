@@ -100,6 +100,10 @@ classdef StripRegistration < aod.core.Registration
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "403e175c-c531-4b6d-a784-50fdf1015b9b";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Registration();
 

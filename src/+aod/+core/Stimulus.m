@@ -125,6 +125,10 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "818ef4bb-6c77-4f71-b207-c83211fce177";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
 

@@ -1,4 +1,4 @@
-classdef TemporalAverage < aod.core.Response 
+classdef TemporalAverage < aod.core.Response
 % Spatial image averaged over time
 %
 % Description:
@@ -13,13 +13,13 @@ classdef TemporalAverage < aod.core.Response
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
 
-    methods 
+    methods
         function obj = TemporalAverage(name, parent, varargin)
             obj = obj@aod.core.Response(name, 'Parent', parent);
             obj.extractResponse(varargin{:});
         end
 
-        function out = loadData(obj) %#ok<MANU,STOUT> 
+        function out = loadData(obj) %#ok<MANU,STOUT>
             error('loadData:NotYetImplemented',...
                 'Subclasses must define how data is loaded')
         end
@@ -28,5 +28,11 @@ classdef TemporalAverage < aod.core.Response
             imStack = obj.loadData(varargin{:});
             obj.setData(squeeze(mean(imStack, 3, 'omitnan')));
         end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "1c65354f-979b-451d-9656-26fd85edbb5c";
+		end
     end
 end

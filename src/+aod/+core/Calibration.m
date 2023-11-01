@@ -118,6 +118,10 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
 
     % aod.core.Entity methods
     methods (Static)
+		function UUID = specifyClassUUID()
+			 UUID = "6033e1b4-fe51-497e-8c9d-f8618101f07e";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
 

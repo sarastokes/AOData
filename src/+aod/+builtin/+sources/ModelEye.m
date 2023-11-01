@@ -1,4 +1,4 @@
-classdef ModelEye < aod.core.Source 
+classdef ModelEye < aod.core.Source
 % A Model Eye
 %
 % Parent:
@@ -19,4 +19,10 @@ classdef ModelEye < aod.core.Source
             obj@aod.core.Source(name, varargin{:});
         end
     end
-end 
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "7e3fb909-6985-4d1f-b07f-a4a3eb792fef";
+		end
+    end
+end

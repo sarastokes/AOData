@@ -102,10 +102,7 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
     properties (Hidden, Dependent)
         % The name that will be used for the HDF5 group
         groupName                   char
-    end
-
-    properties (Hidden, Access = private)
-        DatasetManager
+        classUUID                   string
     end
 
     methods
@@ -123,8 +120,10 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             % Assign entity type
             obj.entityType = aod.common.EntityTypes.get(obj);
 
-            % Generate a random unique identifier to distinguish the class
+            % Generate a random unique identifier to distinguish the object
             obj.UUID = aod.infra.UUID.generate();
+            % Confirm the class UUID is unique
+            aod.infra.UUID.validateClass(obj);
             % Get current time for dateCreated and lastModified
             obj.dateCreated = datetime("now");
             obj.lastModified = obj.dateCreated;
@@ -155,6 +154,10 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
 
         function value = get.groupName(obj)
             value = obj.specifyGroupName();
+        end
+
+        function value = get.classUUID(obj)
+            value = obj.specifyClassUUID();
         end
     end
 
@@ -731,30 +734,6 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
         end
     end
 
-    methods (Access={?aod.util.Factory})
-        function assignUUID(obj, uuid)
-            % Assign a UUID to the entity
-            %
-            % Description:
-            %   The same system may be used over multiple experiments and
-            %   should share UUIDs. This function provides public access
-            %   to aod.core.Entity's setUUID function to facilitate hard-
-            %   coded UUIDs for common sources
-            %
-            % Syntax:
-            %   obj.assignUUID(UUID)
-            %
-            % Notes:
-            %   Access restricted to factory subclasses to protect UUIDs
-            %
-            % See also:
-            %   aod.infra.UUID.generate
-            % -------------------------------------------------------------
-            uuid = aod.infra.UUID.validate(uuid);
-            obj.UUID = uuid;
-        end
-    end
-
     methods (Sealed, Access = {?aod.core.Entity, ?aod.persistent.Entity, ?aod.common.mixins.ParentEntity})
         function dissociateEntity(obj)
             if ~isscalar(obj)
@@ -877,18 +856,24 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %
             % Syntax:
             %   value = specifyAttributes()
+            %
+            % Outputs:
+            %   value       aod.schema.collections.AttributeCollection
             % -------------------------------------------------------------
             value = aod.schema.collections.AttributeCollection([]);
         end
 
         function value = specifyDatasets(value)
-            % Subclasses can extend to modify DatasetManager
+            % Subclasses can extend to modify the DatasetCollection schemas
             %
             % Syntax:
-            %   mngr = specifyDatasets(mngr)
+            %   value = specifyDatasets(value)
             %
             % Inputs:
-            %   mngr        aod.specification.DatasetManager
+            %   value       aod.schema.collections.DatasetCollection
+            %
+            % Outputs:
+            %   value       aod.schema.collections.DatasetCollection
             % -------------------------------------------------------------
         end
 
@@ -899,9 +884,21 @@ classdef (Abstract) Entity < handle & aod.common.mixins.Entity
             %   value = specifyFiles()
             %
             % Output:
-            %   value       aod.schema.FileCollection
+            %   value       aod.schema.collections.FileCollection
             % -------------------------------------------------------------
             value = aod.schema.collections.FileCollection([]);
+        end
+
+        function value = specifyClassUUID()
+            % Subclasses can extend to assign a hard-coded UUID
+            %
+            % Syntax:
+            %   value = specifyClassUUID()
+            %
+            % Output:
+            %   value       string
+            % -------------------------------------------------------------
+            value = string.empty();
         end
     end
 end

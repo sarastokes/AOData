@@ -1,4 +1,4 @@
-classdef TestAnalysis < aod.core.Analysis 
+classdef TestAnalysis < aod.core.Analysis
 
     properties
         Source
@@ -19,5 +19,11 @@ classdef TestAnalysis < aod.core.Analysis
                 'Input must be a Source subclass');
             obj.Source = source;
         end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "c8079cbf-a71b-483b-b4ae-9edede056908";
+		end
     end
 end

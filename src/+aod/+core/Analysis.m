@@ -77,5 +77,9 @@ classdef Analysis < aod.core.Entity & matlab.mixin.Heterogeneous
                 "Size", "(1,1)",...
                 "Description", "The date the analysis was performed");
         end
-    end
+
+		function UUID = specifyClassUUID()
+			 UUID = "ef3ed1aa-6f3d-4141-90a3-9b92b7986624";
+		end
+	end
 end

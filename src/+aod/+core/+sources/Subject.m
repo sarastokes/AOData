@@ -33,6 +33,10 @@ classdef Subject < aod.core.Source
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "1aef2f9e-9fc1-4b06-a0b8-434576512cf7";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Entity();
 

@@ -150,6 +150,10 @@ classdef RegionResponse < aod.core.Response
 
     % aod.core.Entity static methods
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "8af7e89e-368c-4aef-b00d-2a991bca9e57";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Response(value);
 

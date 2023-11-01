@@ -1,12 +1,12 @@
-classdef RoomMeasurement < aod.builtin.calibrations.MeasurementTable 
+classdef RoomMeasurement < aod.builtin.calibrations.MeasurementTable
 % Measurements of temperature and humidity during experiment
 %
 % Description:
 %   Record of room measurements made during the experiment
 %
 % Superclasses:
-%   aod.builtin.calibrations.MeasurementTable 
-% 
+%   aod.builtin.calibrations.MeasurementTable
+%
 % Syntax:
 %   obj = aod.builtin.calibrations.RoomMeasurement(calibrationDate, varargin)
 %
@@ -43,4 +43,10 @@ classdef RoomMeasurement < aod.builtin.calibrations.MeasurementTable
             addMeasurements@aod.builtin.calibrations.MeasurementTable(obj, varargin{:});
         end
     end
-end 
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "dd14deff-879e-45d0-a324-cbae977fed8e";
+		end
+    end
+end

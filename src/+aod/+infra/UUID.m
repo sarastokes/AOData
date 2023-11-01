@@ -37,7 +37,7 @@ classdef UUID
             %
             % Syntax:
             %   uuid = aod.infra.UUID.validate(uuid)
-            % --------------------------------------------------------------
+            % -------------------------------------------------------------
             arguments
                 input        string
             end
@@ -83,11 +83,49 @@ classdef UUID
     end
 
     methods (Static)
-        function out = writeCodeBlock()
-            out = sprintf("\tmethods (Static)\n");
-            out = out + sprintf("\t\tfunction UUID = assignUUID()\n");
-            out = out + sprintf("\t\t\t UUID = ""%s"";\n;", aod.infra.UUID.generate());
-            out = out + sprintf("\t\tend\n\tend\n");
+        function UUID = getClassUUID(className) %#ok<STOUT>
+            % Get the UUID from a class by name
+            % -------------------------------------------------------------
+            arguments
+                className       string
+            end
+
+            if ~isSubclass(className)
+                error('getClassUUID:InvalidClass',...
+                    'Class %s is not a subclass of aod.core.Entity', className);
+            end
+            eval(sprintf("UUID = %s.specifyClassUUID();", className));
+        end
+
+        function validateClass(obj)
+            % Validate class UUID to ensure it's unique
+            % -------------------------------------------------------------
+            value = obj.classUUID;
+
+            superNames = string(superclasses(obj));
+            if value == eval(sprintf("%s.specifyClassUUID()", superNames(1)))
+                error('Entity:InvalidClassUUID',...
+                    [sprintf('Class %s''s classUUID matches superclass. ', class(obj)),...
+                    'Run aod.infra.UUID.generateCodeBlock(), then paste into class.']);
+            end
+        end
+
+        function out = writeCodeBlock(methodsFlag)
+            arguments
+                methodsFlag     (1,1)   logical = true
+            end
+
+            if methodsFlag
+                out = sprintf("\tmethods (Static)\n");
+            else
+                out = "";
+            end
+            out = out + sprintf("\t\tfunction UUID = specifyClassUUID()\n");
+            out = out + sprintf("\t\t\t UUID = ""%s"";\n", aod.infra.UUID.generate());
+            out = out + sprintf("\t\tend\n");
+            if methodsFlag
+                out = out + sprintf("\tend\n");
+            end
         end
     end
 end

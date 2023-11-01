@@ -65,6 +65,10 @@ classdef NeutralDensityFilter < aod.core.Device
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "23273323-ba40-40c0-bec6-eea76e502f9d";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Device(value);
 

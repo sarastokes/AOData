@@ -176,6 +176,10 @@ classdef Rois < aod.core.Annotation
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "82b71063-6475-4713-9797-c8de4b53a43c";
+		end
+
         function d = specifyDatasets(d)
             d = specifyDatasets@aod.core.Annotation(d);
 

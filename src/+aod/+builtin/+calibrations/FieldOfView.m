@@ -20,6 +20,10 @@ classdef FieldOfView < aod.builtin.calibrations.MeasurementTable
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "111ee880-fad4-4ae3-8b25-488900af104f";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.builtin.calibrations.MeasurementTable(value);
 

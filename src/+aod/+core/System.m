@@ -225,4 +225,10 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
             end
         end
     end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "4de28eec-513c-4e77-b699-85741dd01910";
+		end
+    end
 end

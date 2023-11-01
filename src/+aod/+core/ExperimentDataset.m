@@ -24,7 +24,7 @@ classdef ExperimentDataset < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetObservable, SetAccess = {?aod.core.Entity})
-        Data 
+        Data
     end
 
     methods
@@ -34,7 +34,7 @@ classdef ExperimentDataset < aod.core.Entity & matlab.mixin.Heterogeneous
             ip = aod.util.InputParser();
             addParameter(ip, 'Data', []);
             parse(ip, varargin{:});
-            
+
             if ~isempty(ip.Results.Data)
                 obj.setData(ip.Results.Data);
             end
@@ -46,5 +46,11 @@ classdef ExperimentDataset < aod.core.Entity & matlab.mixin.Heterogeneous
             % Set after validation with any specifications set by subclasses
             obj.setProp('Data', data);
         end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "ae1d8971-7098-4a30-803a-554a50aeeb7f";
+		end
     end
 end

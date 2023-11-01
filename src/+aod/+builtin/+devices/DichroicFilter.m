@@ -80,6 +80,10 @@ classdef DichroicFilter < aod.core.Device
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "57327a0d-36cf-4750-9fdd-895dd928fb59";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Device(value);
 

@@ -31,12 +31,12 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             % CHANNEL
             %
             % Description:
-            %   
+            %
             % -------------------------------------------------------------
             obj = obj@aod.core.Entity(name, varargin{:});
         end
     end
-    
+
     methods (Sealed)
         function tf = has(obj, varargin)
             % Search Channel's child entities and return if matches exist
@@ -67,7 +67,7 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             % Syntax:
             %   out = get(obj, entityType)
-            %   out = get(obj, queries)   
+            %   out = get(obj, queries)
             %
             % Inputs:
             %   entityType          char or aod.common.EntityTypes
@@ -85,26 +85,26 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             import aod.common.EntityTypes
 
             try
-                entityType = EntityTypes.get(varargin{1}); 
+                entityType = EntityTypes.get(varargin{1});
                 startIdx = 2;
-            catch 
+            catch
                 startIdx = 1;
             end
 
             % If entity type provided, make sure it's valid
-            if startIdx == 2 && entityType ~= EntityTypes.DEVICE 
+            if startIdx == 2 && entityType ~= EntityTypes.DEVICE
                 error('get:InvalidEntityType',...
                     'Only Devices can be searched from Channel');
             end
 
             if nargin > 2
-                out = aod.common.EntitySearch.go(obj.Devices,... 
+                out = aod.common.EntitySearch.go(obj.Devices,...
                     varargin{startIdx:end});
             else
                 out = obj.Devices;
             end
         end
-    
+
         function add(obj, device)
             % Add a Device to the Channel
             %
@@ -125,11 +125,11 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
                 arrayfun(@(x) add(obj, x), device);
                 return
             end
-            
+
             device.setParent(obj);
             obj.Devices = cat(1, obj.Devices, device);
         end
-        
+
         function remove(obj, varargin)
             % Remove a Device from the Channel
             %
@@ -138,10 +138,10 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
             %   remove(obj, entityType, varargin)
             %
             % Notes:
-            %   - entityType argument is optional as only Device can be  
-            %     removed from a Channel 
+            %   - entityType argument is optional as only Device can be
+            %     removed from a Channel
             % -------------------------------------------------------------
-            
+
             if nargin == 3
                 entityType = aod.common.EntityTypes.get(varargin{1});
                 if entityType ~= aod.common.EntityTypes.DEVICE
@@ -165,5 +165,11 @@ classdef Channel < aod.core.Entity & matlab.mixin.Heterogeneous
                     'ID must be integer indices or "all"');
             end
         end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "de412de0-8b63-4a8d-a14f-adcd37741f30";
+		end
     end
 end

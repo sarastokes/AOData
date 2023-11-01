@@ -84,6 +84,10 @@ classdef Eye < aod.core.sources.Eye
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "517e1c89-1bf2-402f-9de4-87bd9fbba7ff";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.sources.Eye();
 

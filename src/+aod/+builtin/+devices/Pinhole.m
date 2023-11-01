@@ -53,6 +53,10 @@ classdef Pinhole < aod.core.Device
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "f3ba26e8-1301-4e77-b998-96f32fba2208";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
 

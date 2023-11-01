@@ -65,4 +65,10 @@ classdef RigidRegistration < aod.builtin.registrations.GeometricTransformation
             end
         end
     end
-end 
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "974e51e2-b3b9-4993-9dd5-9db8c5a3ffb4";
+		end
+    end
+end

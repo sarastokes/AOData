@@ -29,6 +29,10 @@ classdef PMT < aod.core.Device
 
 
     methods (Static)
+		function UUID = specifyClassUUID()
+			 UUID = "d72c6121-0323-4020-90b1-4cdf48c0b937";
+		end
+
         function value = specifyAttributes()
             value = specifyAttributes@aod.core.Device();
 

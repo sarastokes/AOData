@@ -27,12 +27,12 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         ALLOWABLE_PARENT_TYPES = ["Dataset", "Attribute", "File"];
         % Holds integrity checks until object is constructed
         isInitializing  (1,1)   logical = true
+        isContainer     (1,1)   logical = false
     end
 
     properties (Hidden, SetAccess = private)
         % Whether primitive is part of a Container subclass
         isNested        (1,1)   logical = false
-        isContainer     (1,1)   logical = false
     end
 
     properties (Dependent)

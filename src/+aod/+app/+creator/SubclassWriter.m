@@ -55,7 +55,11 @@ classdef SubclassWriter < handle
             out = out + obj.getSetMethods();
             % Dependent property methods
             out = out + obj.getSetLabel();
+            % Static specifications
+            out = out + obj.indent(1) + "methods (Static)" + newline;
+            out = out + aod.infra.UUID.writeCodeBlock(false);
             out = out + obj.getDependentSetMethods();
+            out = out + obj.indent(1) + "end" + newline;
             % Close classdef
             out = out + "end" + newline;
         end
@@ -228,8 +232,6 @@ classdef SubclassWriter < handle
 
             if isempty(obj.Model.Attributes) && isempty(obj.Model.Datasets)
                 return
-            else
-                out = obj.indent(1) + "methods (Static)" + newline;
             end
 
             % ExpectedAttributes

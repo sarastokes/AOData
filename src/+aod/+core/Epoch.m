@@ -275,6 +275,10 @@ classdef Epoch < aod.core.Entity & aod.common.mixins.ParentEntity & matlab.mixin
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "78e6277b-3574-49c2-a9fe-ec38e6a91d70";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
 

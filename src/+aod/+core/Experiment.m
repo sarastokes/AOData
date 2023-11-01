@@ -533,6 +533,10 @@ classdef Experiment < aod.core.Entity & aod.common.mixins.ParentEntity
 
     % Overloaded methods
     methods (Static)
+		function UUID = specifyClassUUID()
+			 UUID = "2f8567dc-1bf1-4d42-9c90-8a7058e1dfbe";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Entity(value);
 

@@ -4,7 +4,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 % Description:
 %   A Response extracted from data acquired during an Epoch
 %
-% Parent: 
+% Parent:
 %   aod.core.Entity, matlab.mixin.Heterogeneous
 %
 % Constructor:
@@ -14,13 +14,13 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   name        string or char
 %       A name for the Response
 % Optional key/value inputs:
-%   Data        
+%   Data
 %       The data which is the response itself
 %   Timing      duration or numeric
 %       The timing for each response point
 %
 % Properties:
-%   Data 
+%   Data
 %   Timing
 %
 % Methods:
@@ -28,10 +28,10 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 %   addTiming(obj, timing)
 %   clearTiming(obj)
 %
-% The following methods operate directly on the Data property and will 
+% The following methods operate directly on the Data property and will
 % return a numeric output rather than a Response:
-%   plus (+), minus (-), not (~), ge (>), gt (>=), le (<), lt (<=), eq (=), 
-%   ne (~=), uminus, uplus, abs, mean, median, std, sum, cumsum, iqr, 
+%   plus (+), minus (-), not (~), ge (>), gt (>=), le (<), lt (<=), eq (=),
+%   ne (~=), uminus, uplus, abs, mean, median, std, sum, cumsum, iqr,
 %   prctile, quantile, sign
 
 %>@file aod.core.Response.m
@@ -41,13 +41,13 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        %> Response data (rows are samples) 
-        Data                          
-        %> Timing of each sample in the Response  (*duration*)    
+        %> Response data (rows are samples)
+        Data
+        %> Timing of each sample in the Response  (*duration*)
         Timing (:,1)         duration = seconds([])
     end
 
-    methods 
+    methods
         % -----------------------------------------------------------------
         %> @brief Class constructor
         %>
@@ -57,11 +57,11 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         %> @endcode
         %>
         %> @param name  @b string or @b char \n
-        %>      Response name 
+        %>      Response name
         %>
         %> @par Optional key/value inputs:
         %> - @c Data passed to @c setData()
-        %> - @c Timing \n 
+        %> - @c Timing \n
         %>      passed to @c setTiming()
         %> - @c Parent aod.core.Experiment or aod.persistent.Experiment \n
         %>      The Parent entity
@@ -122,8 +122,8 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         %> addTiming(obj, timing)
         %> @endcode
         %>
-        %> @param Timing @b double or @b duration \n 
-        %>      The time of each sample in the Response. If empty, the 
+        %> @param Timing @b double or @b duration \n
+        %>      The time of each sample in the Response. If empty, the
         %>      Timing property will be cleared.
         %>
         %> @par Examples
@@ -136,7 +136,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         %> obj.setTiming([])
         %> @endcode
         %>
-        %> @attention If Timing is unset, it will be inherited from 
+        %> @attention If Timing is unset, it will be inherited from
         %> the parent Epoch
         % -----------------------------------------------------------------
         function setTiming(obj, timing)
@@ -147,7 +147,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             % Inputs:
             %   timing      vector, numeric or duration
-            %       The timing for each sample in Response. If empty, the 
+            %       The timing for each sample in Response. If empty, the
             %       contents of Timing will be cleared.
             %
             % Examples:
@@ -156,20 +156,20 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             %
             %   % Set duration timing
             %   obj.setTiming(seconds(1:4))
-            %   
+            %
             %   % Clear timing
             %   obj.setTiming([])
             %
             % Notes:
-            %   If Timing is left empty, the Response will inherit the 
+            %   If Timing is left empty, the Response will inherit the
             %   Timing from its parent Epoch (if it exists)
             % -------------------------------------------------------------
-            arguments 
+            arguments
                 obj
-                timing         
+                timing
             end
 
-            if ~isempty(timing) 
+            if ~isempty(timing)
                 assert(isvector(timing), 'Timing must be a vector');
                 timing = timing(:);  % Columnate
             else
@@ -217,13 +217,13 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
         %     obj2 = aod.core.Response.extractData(obj2);
         %     out = obj1 == obj2;
         % end
-        % 
+        %
         % function out = ne(obj1, obj2)
         %     obj1 = aod.core.Response.extractData(obj1);
         %     obj2 = aod.core.Response.extractData(obj2);
         %     out = obj1 ~= obj2;
         % end
-        
+
         function out = ge(obj1, obj2)
             obj1 = aod.core.Response.extractData(obj1);
             obj2 = aod.core.Response.extractData(obj2);
@@ -247,7 +247,7 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
             obj2 = aod.core.Response.extractData(obj2);
             out = obj1 < obj2;
         end
-        
+
         function out = not(obj)
             out = ~not(obj.Data);
         end
@@ -298,11 +298,26 @@ classdef Response < aod.core.Entity & matlab.mixin.Heterogeneous
 
     methods (Static)
         function out = extractData(input)
+            % TODO: Why is this here???
             if aod.util.isEntitySubclass(input, 'Response')
                 out = input.Data;
             else
                 out = input;
             end
+        end
+    end
+
+    methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "8a42edb6-6077-4241-942c-25ce7877d1e2";
+		end
+
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Entity(value);
+
+            value.set("Timing", "DURATION",...
+                "Size", "(:, 1)",...
+                "Description", "The Timing of the Response's data");
         end
     end
 end

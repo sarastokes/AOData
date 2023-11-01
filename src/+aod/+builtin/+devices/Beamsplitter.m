@@ -93,6 +93,10 @@ classdef Beamsplitter < aod.core.Device
     end
 
     methods (Static)
+        function UUID = specifyClassUUID()
+			 UUID = "1c1730be-f134-41d8-8bbd-0a32b32e865d";
+		end
+
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Device(value);
 
