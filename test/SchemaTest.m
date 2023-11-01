@@ -20,9 +20,23 @@ classdef SchemaTest < matlab.unittest.TestCase
         function SchemaEquality(testCase)
             obj1 = aod.builtin.devices.Pinhole(20);
             obj2 = aod.builtin.devices.Pinhole(30);
-            
             testCase.verifyNotEqual(obj1, obj2);
             testCase.verifyEqual(obj1.Schema, obj2.Schema);
+
+            % Same schema, different schema subclass (no entity instance)
+            schema = aod.schema.util.StandaloneSchema('aod.builtin.devices.Pinhole');
+            testCase.verifyEqual(obj1.Schema, schema);
+        end
+
+        function SchemaUndefined(testCase)
+            obj = test.TestDevice("AttrOne", [2 2]);
+            [dsets, attrs, files, ME] = obj.Schema.getUndefined("None");
+            testCase.verifyNumElements(dsets, 2);
+            testCase.verifyNumELements(attrs, 1);
+            testCase.verifyEmpty(files);
+            testCase.verifyEqual(dsets, ["EmptyProp", "DependentProp"]);
+            testCase.verifyEqual(attrs, "AttrThree");
+            testCase.verifyTrue(contains(ME.message, "2 datasets, 1 attributes"));
         end
     end
 

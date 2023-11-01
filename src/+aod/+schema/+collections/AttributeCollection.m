@@ -18,7 +18,8 @@ classdef AttributeCollection < aod.schema.SchemaCollection
             aod.schema.primitives.PrimitiveTypes.NUMBER,...
             aod.schema.primitives.PrimitiveTypes.INTEGER,...
             aod.schema.primitives.PrimitiveTypes.DATETIME,...
-            aod.schema.primitives.PrimitiveTypes.LIST];
+            aod.schema.primitives.PrimitiveTypes.LIST,...
+            aod.schema.primitives.PrimitiveTypes.UNKNOWN];
     end
 
     methods
@@ -39,16 +40,21 @@ classdef AttributeCollection < aod.schema.SchemaCollection
             % --------------------------------------------------------------
 
             if isa(attrName, 'aod.schema.Record')
-                entry = attrName;
+                record = attrName;
             else
                 if nargin < 3
                     error('add:InsufficientInput',...
                         'Must at least specify attribute name and type');
                 end
-                entry = aod.schema.Record(obj, attrName, primitiveType, varargin{:});
+                record = aod.schema.Record(obj, attrName, primitiveType, varargin{:});
             end
 
-            add@aod.schema.SchemaCollection(obj, entry);
+            if ismember(record.Name, aod.infra.getSystemAttributes())
+                error('add:InvalidAttributeName',...
+                    'Attribute name %s is reserved by AOData. See aod.h5.getSystemAttributes', record.Name);
+            end
+
+            add@aod.schema.SchemaCollection(obj, record);
         end
 
         function ip = getParser(obj)

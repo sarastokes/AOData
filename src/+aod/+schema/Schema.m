@@ -14,6 +14,7 @@ classdef (Abstract) Schema < handle
     properties (SetAccess = private)
         Parent
         className       (1,1)       string
+        entityType                         
     end
 
     properties (Hidden, Access = protected)
@@ -170,25 +171,31 @@ classdef (Abstract) Schema < handle
                 sprintf("Undefined records exist in %u datasets, %u attributes and %u files",...
                     numel(datasets), numel(attributes), numel(files)));
             if numel(datasets) > 0
-                ME = addCause(ME, "Datasets: " + strjoin(datasets, ", "));
+                ME = addCause(ME, MException(...
+                    "getUndefined:UndefinedDatasetsExist",... 
+                    "Datasets: " + strjoin(datasets, ", ")));
             end
             if numel(attributes) > 0
-                ME = addCause(ME, "Attributes: " + strjoin(attributes, ", "));
+                ME = addCause(ME, MException(...
+                    "getUndefined:UndefinedAttributesExist",...
+                    "Attributes: " + strjoin(attributes, ", ")));
             end
+
             if numel(files) > 0
-                ME = addCause(ME, "Files: " + strjoin(files, ", "));
+                ME = addCause(ME, MException(...
+                    "getUndefined:UndefinedFilesExist",...
+                    "Files: " + strjoin(files, ", ")));
             end
 
             switch errorType
                 case aod.infra.ErrorTypes.WARNING
-                    throwAsWarning(ME);
+                    throwWarning(ME);
                 case aod.infra.ErrorTypes.ERROR
                     throw(ME);
             end
         end
 
         function out = text(obj)
-            % TODO spacing and indentation
             out = jsonencode(obj.struct(), "PrettyPrint", true);
         end
 
@@ -225,7 +232,9 @@ classdef (Abstract) Schema < handle
                 error('setClassName:InvalidClass',...
                     'Class %s is not a subclass of aod.core.Entity', className);
             end
-            obj.className = className;  % TODO: Validate
+
+            obj.className = className;
+            obj.entityType = aod.common.EntityTypes.getFromSuperclass(obj.className);
         end
     end
 
@@ -256,20 +265,21 @@ classdef (Abstract) Schema < handle
 
         function S = struct(obj)
             entityName = strrep(obj.className, '.', '__'); % TODO
-            if ~isempty(obj.Parent)
-                entityType = aod.common.EntityTypes.getFromSuperclass(obj.className);
+            if ~aod.util.isempty(obj.className)
+                %entityType = aod.common.EntityTypes.getFromSuperclass(obj.className);
                 entityClass = getClassWithoutPackages(obj.className);
                 packageName = erase(obj.className, "." + entityClass);
                 superNames = string(superclasses(obj.className));
                 superNames = superNames(1:find(superNames == "aod.core.Entity"));
             else
-                entityType = []; entityClass = [];
-                packageName = []; superNames = [];
+                packageName = []; superNames = []; entityClass = [];
             end
+
             S = struct();
+            S.(entityName).Name = entityName;
             S.(entityName).ClassName = entityClass;
             S.(entityName).PackageName = packageName;
-            S.(entityName).EntityType = entityType;
+            S.(entityName).EntityType = obj.entityType;
             S.(entityName).Superclasses = superNames';
             % TODO: Aliases, UUIDs and version number
             S.(entityName).VersionNumber = [];

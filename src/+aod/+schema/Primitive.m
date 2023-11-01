@@ -140,17 +140,6 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         end
     end
 
-    methods (Sealed)
-        function setRequired(obj, value)
-            arguments
-                obj
-                value   (1,1)    logical
-            end
-
-            obj.Required = value;
-        end
-    end
-
     methods
         function setDefault(obj, value)
             % Set the default value
@@ -205,6 +194,15 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                     'Property names must be valid MATLAB variables');
             end
             obj.Name = name;
+        end
+
+        function setRequired(obj, value)
+            arguments
+                obj
+                value   (1,1)    logical
+            end
+
+            obj.Required = value;
         end
 
         function setDescription(obj, description)
@@ -300,11 +298,12 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             % ----------------------------------------------------------
             ip = obj.getParser();
             parse(ip, varargin{:});
+            % TODO: MATLAB:InputParser:ParamMissingValue
 
-            % TODO: Add required
-            for i = 1:numel(obj.OPTIONS)
-                fcn = str2func("@(obj, x) set" + obj.OPTIONS(i) + "(obj, x)");
-                fcn(obj, ip.Results.(obj.OPTIONS(i)));
+            opts = obj.getOptions();
+            for i = 1:numel(opts)
+                fcn = str2func("@(obj, x) set" + opts(i) + "(obj, x)");
+                fcn(obj, ip.Results.(opts(i)));
             end
         end
 
@@ -313,9 +312,11 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             %
             % Notes:
             %   Parser isn't case-sensitive but partial-matching disabled
-            % ----------------------------------------------------------
+            % -------------------------------------------------------------
+
             ip = inputParser();
             ip.CaseSensitive = false;
+            ip.PartialMatching = false;
             for i = 1:numel(obj.OPTIONS)
                 ip.addParameter(obj.OPTIONS(i), []);
             end
