@@ -1,0 +1,39 @@
+{
+    "aod__builtin__devices__Pinhole": {
+        "Attributes": {
+            "Manufacturer": {
+                "PrimitiveType": "TEXT",
+                "isRequired": false,
+                "Length": [],
+                "Enum": [],
+                "Regexp": [],
+                "Class": "string",
+                "Size": "(1,1)",
+                "Description": "The company that made the device"
+            },
+            "Model": {
+                "PrimitiveType": "TEXT",
+                "isRequired": false,
+                "Length": [],
+                "Enum": [],
+                "Regexp": [],
+                "Class": "string",
+                "Size": "(1,1)",
+                "Description": "The model of the device"
+            },
+            "Diameter": {
+                "PrimitiveType": "NUMBER",
+                "isRequired": false,
+                "Enum": [],
+                "Minimum": [],
+                "Maximum": [],
+                "Class": "double",
+                "Size": "(1,1)",
+                "Units": "micron",
+                "Description": "Pinhole diameter"
+            }
+        },
+        "Datasets": {},
+        "Files": {}
+    }
+}

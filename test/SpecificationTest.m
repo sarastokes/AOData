@@ -50,9 +50,9 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 refObj1.compare(aod.schema.validators.Size("(1,:)")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(MatchType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.REMOVED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(MatchType.MISSING,...
+            testCase.verifyEqual(MatchType.ADDED,...
                 refObj2.compare(refObj1));
 
             testCase.verifyError(...
@@ -174,9 +174,9 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 refObj1.compare(aod.schema.validators.Class("double")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(MatchType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.REMOVED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(MatchType.MISSING,...
+            testCase.verifyEqual(MatchType.ADDED,...
                 refObj2.compare(refObj1));
         end
 
@@ -213,9 +213,9 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 refObj1.compare(aod.schema.Default([], "hey")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(MatchType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.REMOVED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(MatchType.MISSING,...
+            testCase.verifyEqual(MatchType.ADDED,...
                 refObj2.compare(refObj1));
         end
     end
@@ -227,13 +227,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
             obj.setValue("test");
             testCase.verifyEqual(obj.Value, "test");
             testCase.verifyEqual(obj.text(), "test");
-        end
-
-        function EntityDescription(testCase)
-            expt = aod.core.Experiment("test", cd, getDateYMD());
-            p = findprop(expt, "epochIDs");
-            obj2 = aod.schema.decorators.Description(p);
-            testCase.verifyEqual(obj2.Value, string(p.Description));
         end
 
         function EmptyDescription(testCase)
@@ -251,9 +244,9 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 refObj1.compare(aod.schema.decorators.Description("text")));
             testCase.verifyEqual(MatchType.SAME,...
                 refObj1.compare(refObj1));
-            testCase.verifyEqual(MatchType.UNEXPECTED,...
+            testCase.verifyEqual(MatchType.REMOVED,...
                 refObj1.compare(refObj2));
-            testCase.verifyEqual(MatchType.MISSING,...
+            testCase.verifyEqual(MatchType.ADDED,...
                 refObj2.compare(refObj1));
         end
     end
@@ -278,7 +271,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
                 "Default", "hey");
             testCase.verifyEqual(obj.Primitive.Default.Value, "hey");
             testCase.verifyEqual(obj.Primitive.Description.Value, "test");
-            testCase.verifyEqual(obj.Primitive.Class.Value, ["string", "char"]);
+            testCase.verifyEqual(obj.Primitive.Class.Value, "string");
             testCase.verifyEqual(obj.Primitive.Size.SizeType, ...
                 aod.schema.validators.size.SizeTypes.SCALAR);
         end
@@ -327,24 +320,24 @@ classdef SpecificationTest < matlab.unittest.TestCase
         function AttributeNameSearch(testCase)
             import aod.infra.ErrorTypes
 
-            AM = aod.schema.util.getAttributeSchema(...
+            schema = aod.schema.util.StandaloneSchema(...
                 "aod.builtin.devices.DichroicFilter");
-            testCase.verifyTrue(AM.has("Wavelength"));
+            testCase.verifyTrue(schema.Attributes.has("Wavelength"));
 
-            testCase.verifyFalse(AM.has("BadInput"));
+            testCase.verifyFalse(schema.Attributes.has("BadInput"));
             testCase.verifyWarning(...
-                @()AM.get("BadInput", ErrorTypes.WARNING),...
+                @()schema.Attributes.get("BadInput", ErrorTypes.WARNING),...
                 "get:EntryNotFound");
 
-            testCase.verifyNotEqual(AM.code(), "");
+            testCase.verifyNotEqual(schema.Attributes.code(), "");
         end
 
         function CoreEntityAttributes(testCase)
             obj = aod.builtin.devices.BandpassFilter(510, 20);
             p = obj.Schema.Attributes.get('Bandwidth');
             testCase.verifyEqual(p.Name, "Bandwidth");
-            expAtt = aod.schema.util.getAttributeSchema( ...
-                'aod.builtin.devices.BandpassFilter');
+            schema = aod.schema.util.StandaloneSchema('aod.builtin.devices.BandpassFilter');
+            expAtt = schema.Attributes;
             p2 = expAtt.get('Bandwidth');
             testCase.verifyEqual(p2.Name, "Bandwidth");
 
@@ -364,8 +357,8 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Parser")
         function Parser(testCase)
-            AM = aod.schema.util.getAttributeSchema("aod.core.Experiment");
-            ip = AM.parse("Administrator", "test1", "Laboratory", "test2");
+            schema = aod.schema.util.StandaloneSchema("aod.core.Experiment");
+            ip = schema.Attributes.parse("Administrator", "test1", "Laboratory", "test2");
             testCase.verifyEqual(ip.Results.Administrator, "test1");
             testCase.verifyEqual(ip.Results.Laboratory, "test2");
         end
@@ -373,20 +366,20 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Access")
         function AttributeManagerAccess(testCase)
-            AM = aod.schema.util.getAttributeSchema(...
+            schema = aod.schema.util.StandaloneSchema(...
                 'aod.builtin.devices.NeutralDensityFilter');
-            testCase.verifyClass(AM, 'aod.schema.collections.AttributeCollection');
+            testCase.verifyClass(schema.Attributes, 'aod.schema.collections.AttributeCollection');
         end
 
         % function PackageAccess(testCase)
         %     [DM, AM, S] = aod.specification.util.collectPackageSpecifications(...
         %         "aod.core", "Write", false);
         %     testCase.verifyEqual(numel(DM), numel(AM));
-        % 
+        %
         %     f = fieldnames(S);
         %     testCase.verifyNumElements(f, 2);
         %     testCase.verifyEqual(f{1}, 'Namespaces');
-        % 
+        %
         %     f = fieldnames(S.Namespaces);
         %     testCase.verifyNumElements(f, 1);
         %     testCase.verifyEqual(f{1}, 'aod');
@@ -418,7 +411,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
     %         prop = aod.util.templates.PropertySpecification("Test");
     %         prop.Class = "duration,double";
     %         testCase.verifyEqual(numel(prop.Class), 2);
-    % 
+    %
     %         testCase.verifyError(...
     %             @() set(prop, "Class", "badclass"),...
     %             "PropertySpecification:InvalidClassName")

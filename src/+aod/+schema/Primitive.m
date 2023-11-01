@@ -32,6 +32,11 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
     properties (Hidden, SetAccess = private)
         % Whether primitive is part of a Container subclass
         isNested        (1,1)   logical = false
+        isContainer     (1,1)   logical = false
+    end
+
+    properties (Dependent)
+        SCHEMA_TYPE
     end
 
     properties (Abstract, Hidden, SetAccess = protected)
@@ -65,6 +70,16 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             obj.Description = aod.schema.decorators.Description([], obj);
         end
 
+        function value = get.SCHEMA_TYPE(obj)
+            if obj.isNested
+                value = aod.schema.SchemaTypes.ITEM_PRIMITIVE;
+            else
+                value = aod.schema.SchemaTypes.PRIMITIVE;
+            end
+        end
+    end
+
+    methods
         function parentObj = getParent(obj, parentType)
             arguments
                 obj

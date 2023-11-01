@@ -27,8 +27,8 @@ classdef SpecificationComparison < handle
 
     properties (Hidden, Constant)
         CHANGED = uistyle('BackgroundColor', hex2rgb('ADD3FF'));
-        UNEXPECTED = uistyle('BackgroundColor', hex2rgb('A6F2C3'));
-        MISSING = uistyle('BackgroundColor', hex2rgb('FFD6DD'));
+        ADDED = uistyle('BackgroundColor', hex2rgb('A6F2C3'));
+        REMOVED = uistyle('BackgroundColor', hex2rgb('FFD6DD'));
     end
 
     methods
@@ -65,7 +65,7 @@ classdef SpecificationComparison < handle
                     set(obj.actionButton,...
                         "Text", "Set to Reference Value",...
                         "Visible", "on");
-                case aod.schema.MatchType.MISSING
+                case aod.schema.MatchType.REMOVED
                     set(obj.actionButton,...
                         "Text", "Set to Reference Value",...
                         "Visible", "on");
@@ -80,7 +80,7 @@ classdef SpecificationComparison < handle
             switch obj.currentComparison
                 case aod.schema.MatchType.SAME
                     return
-                case aod.schema.MatchType.MISSING
+                case aod.schema.MatchType.REMOVED
                 case aod.schema.MatchType.CHANGED
                     disp('hey')
             end
@@ -136,10 +136,10 @@ classdef SpecificationComparison < handle
                 "BackgroundColor", obj.CHANGED.BackgroundColor,...
                 "Text", "Changed", labelParams{:});
             obj.missingField = uilabel(reportLayout,...
-                "BackgroundColor", obj.MISSING.BackgroundColor,...
+                "BackgroundColor", obj.REMOVED.BackgroundColor,...
                 labelParams{:});
             obj.unexpectedField = uilabel(reportLayout,...
-                "BackgroundColor", obj.UNEXPECTED.BackgroundColor,...
+                "BackgroundColor", obj.ADDED.BackgroundColor,...
                 labelParams{:});
 
             idx = find(obj.values == MatchType.CHANGED);
@@ -149,17 +149,17 @@ classdef SpecificationComparison < handle
             end
             obj.changedField.Text = sprintf("%u Changed", numel(idx));
 
-            idx = find(obj.values == MatchType.MISSING);
+            idx = find(obj.values == MatchType.REMOVED);
             if ~isempty(idx)
-                addStyle(obj.testListbox, obj.MISSING, 'Item', idx);
-                addStyle(obj.refListbox, obj.MISSING, 'Item', idx);
+                addStyle(obj.testListbox, obj.REMOVED, 'Item', idx);
+                addStyle(obj.refListbox, obj.REMOVED, 'Item', idx);
             end
             obj.missingField.Text = sprintf("%u Missing", numel(idx));
 
-            idx = find(obj.values == MatchType.UNEXPECTED);
+            idx = find(obj.values == MatchType.ADDED);
             if ~isempty(idx)
-                addStyle(obj.testListbox, obj.UNEXPECTED, 'Item', idx);
-                addStyle(obj.refListbox, obj.UNEXPECTED, 'Item', idx);
+                addStyle(obj.testListbox, obj.ADDED, 'Item', idx);
+                addStyle(obj.refListbox, obj.ADDED, 'Item', idx);
             end
             obj.unexpectedField.Text = sprintf("%u Unexpected", numel(idx));
         end

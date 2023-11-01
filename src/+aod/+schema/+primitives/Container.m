@@ -38,8 +38,11 @@ classdef (Abstract) Container < aod.schema.Primitive
             if nargin < 3
                 parent = [];
             end
+
             obj = obj@aod.schema.Primitive(name, parent);
+
             obj.Collection = aod.schema.collections.IndexedCollection(obj);
+            obj.isContainer = true;
         end
     end
 

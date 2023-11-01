@@ -66,6 +66,20 @@ classdef Record < handle
         function p = getPrimitive(obj)
             p = obj.Primitive;
         end
+
+        function out = getSpec(obj, specName, itemName)
+            if nargin == 3
+                if isSubclass(obj.Primitive, "aod.schema.primitives.Container")
+                    item = obj.Primitive.getItem(itemName);
+                    out = item.(specName);
+                    return
+                else
+                    error('getSpec:ItemProvidedForNonContainer',...
+                        'Cannot specify an item name (%s) for a container', itemName);
+                end
+            end
+            out = obj.Primitive.(specName);
+        end
     end
 
     methods

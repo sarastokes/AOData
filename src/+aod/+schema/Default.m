@@ -56,6 +56,16 @@ classdef Default < aod.schema.Specification
         end
     end
 
+    methods (Access = protected)
+        function value = determineSchemaType(obj)
+            if ~isempty(obj.Parent) && obj.Parent.isNested
+                value = aod.schema.SchemaTypes.ITEM_DEFAULT;
+            else
+                value = aod.schema.SchemaTypes.DEFAULT;
+            end
+        end
+    end
+
     % MATLAB built-in methods
     methods
 

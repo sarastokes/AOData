@@ -17,10 +17,18 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
         Parent                  % aod.schema.Primitive
     end
 
+    properties (Dependent)
+        SCHEMA_TYPE             aod.schema.SchemaTypes
+    end
+
     methods (Abstract)
         out = text(obj)
         setValue(obj, input)
         tf = isSpecified(obj)
+    end
+
+    methods (Abstract, Access = protected)
+        value = determineSchemaType(obj)
     end
 
     methods
@@ -29,11 +37,15 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
                 obj.setParent(parent);
             end
         end
+
+        function value = get.SCHEMA_TYPE(obj)
+            value = obj.determineSchemaType();
+        end
     end
 
     methods
         function out = compare(obj, other)
-            % Compare two specifications
+            % Compare another specification (B) to this specification (A)
             %
             % Syntax:
             %   out = compare(obj, other)
@@ -50,9 +62,9 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
                 out = MatchType.SAME;
             else
                 if ~obj.isSpecified()
-                    out = MatchType.MISSING;
+                    out = MatchType.ADDED;
                 elseif ~other.isSpecified()
-                    out = MatchType.UNEXPECTED;
+                    out = MatchType.REMOVED;
                 else
                     out = MatchType.CHANGED;
                 end

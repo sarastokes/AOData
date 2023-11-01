@@ -36,4 +36,14 @@ classdef (Abstract) Decorator < aod.schema.Specification
             tf = ~aod.util.isempty(obj.Value);
         end
     end
+
+    methods (Access = protected)
+        function value = determineSchemaType(obj)
+            if ~isempty(obj.Parent) && obj.Parent.isNested
+                value = aod.schema.SchemaTypes.ITEM_DECORATOR;
+            else
+                value = aod.schema.SchemaTypes.DECORATOR;
+            end
+        end
+    end
 end

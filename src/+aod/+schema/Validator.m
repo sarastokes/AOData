@@ -36,4 +36,14 @@ classdef (Abstract) Validator < aod.schema.Specification
             tf = ~isempty(obj.Value);
         end
     end
+
+    methods (Access = protected)
+        function value = determineSchemaType(obj)
+            if ~isempty(obj.Parent) && obj.Parent.isNested
+                value = aod.schema.SchemaTypes.ITEM_VALIDATOR;
+            else
+                value = aod.schema.SchemaTypes.VALIDATOR;
+            end
+        end
+    end
 end
