@@ -412,7 +412,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 return
             end
 
-            if ~isequal(obj.primitiveType, other.primitiveType)
+            if ~isequal(obj.PRIMITIVE_TYPE, other.PRIMITIVE_TYPE)
                 tf = false;
                 return
             end

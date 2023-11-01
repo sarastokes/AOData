@@ -1,4 +1,4 @@
-classdef VisualStimulus < aod.core.Stimulus 
+classdef VisualStimulus < aod.core.Stimulus
 % A visual stimulus built from a Protocol
 %
 % Parent:
@@ -6,13 +6,15 @@ classdef VisualStimulus < aod.core.Stimulus
 %
 % Constructor:
 %   obj = aod.builtin.stimuli.VisualStimulus(protocol)
-%   obj = aod.builtin.stimuli.VisualStimulus 
+%   obj = aod.builtin.stimuli.VisualStimulus
 %
 % See also:
 %   aod.common.Protocol
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
+
+    % TODO: Put protocol information here, not in Stimulus
 
     methods
         function obj = VisualStimulus(protocol, varargin)
@@ -32,7 +34,7 @@ classdef VisualStimulus < aod.core.Stimulus
                 return
             end
             for i = 1:numel(txt)
-                value = [value, appbox.capitalize(txt{i})]; %#ok<AGROW> 
+                value = [value, appbox.capitalize(txt{i})]; %#ok<AGROW>
             end
         end
     end

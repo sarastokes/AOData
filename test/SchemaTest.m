@@ -16,6 +16,16 @@ classdef SchemaTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
 
+    methods (Test, TestTags="Schema")
+        function SchemaEquality(testCase)
+            obj1 = aod.builtin.devices.Pinhole(20);
+            obj2 = aod.builtin.devices.Pinhole(30);
+            
+            testCase.verifyNotEqual(obj1, obj2);
+            testCase.verifyEqual(obj1.Schema, obj2.Schema);
+        end
+    end
+
     methods (Test, TestTags="IndexedCollection")
         function IndexedCollection(testCase)
             obj = aod.schema.collections.IndexedCollection();
@@ -60,7 +70,7 @@ classdef SchemaTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="Entry")
+    methods (Test, TestTags="Record")
         function Entry(testCase)
             obj = aod.schema.Record([], 'Test', 'Number',...
                 'Maximum', 3, 'Size', '(1,1)');

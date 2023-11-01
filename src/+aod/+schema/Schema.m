@@ -154,6 +154,38 @@ classdef (Abstract) Schema < handle
             % TODO: Finish writing
         end
 
+        function [datasets, attributes, files, ME] = getUndefined(obj, errorType)
+            arguments
+                obj
+                errorType           = aod.infra.ErrorTypes.WARNING
+            end
+
+            errorType = aod.infra.ErrorTypes.init(errorType);
+
+            datasets = obj.Datasets.getUndefined();
+            attributes = obj.Attributes.getUndefined();
+            files = obj.Files.getUndefined();
+
+            ME = MException("getUndefined:UndefinedRecordsExist",...
+                sprintf("Undefined records exist in %u datasets, %u attributes and %u files",...
+                    numel(datasets), numel(attributes), numel(files)));
+            if numel(datasets) > 0
+                ME = addCause(ME, "Datasets: " + strjoin(datasets, ", "));
+            end
+            if numel(attributes) > 0
+                ME = addCause(ME, "Attributes: " + strjoin(attributes, ", "));
+            end
+            if numel(files) > 0
+                ME = addCause(ME, "Files: " + strjoin(files, ", "));
+            end
+
+            switch errorType
+                case aod.infra.ErrorTypes.WARNING
+                    throwAsWarning(ME);
+                case aod.infra.ErrorTypes.ERROR
+                    throw(ME);
+            end
+        end
 
         function out = text(obj)
             % TODO spacing and indentation
@@ -189,12 +221,39 @@ classdef (Abstract) Schema < handle
 
     methods (Access = protected)
         function setClassName(obj, className)
+            if ~isSubclass(className, "aod.core.Entity")
+                error('setClassName:InvalidClass',...
+                    'Class %s is not a subclass of aod.core.Entity', className);
+            end
             obj.className = className;  % TODO: Validate
         end
     end
 
     % MATLAB builtin methods
     methods
+        function tf = isequal(obj, other)
+            if ~isa(other, 'aod.schema.Schema')
+                tf = false;
+                return
+            end
+
+            % Are they schemas for the same class?
+            if ~isequal(obj.className, other.className)
+                tf = false;  % TODO aliases
+                return
+            end
+
+            % Defer to isequal defined by SchemaCollection
+            if ~isequal(obj.Datasets, other.Datasets) ...
+                    || ~isequal(obj.Attributes, other.Attributes) ... 
+                    || ~isequal(obj.Files, other.Files)
+                tf = false;
+                return
+            end
+
+            tf = true;
+        end
+
         function S = struct(obj)
             entityName = strrep(obj.className, '.', '__'); % TODO
             if ~isempty(obj.Parent)

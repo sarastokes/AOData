@@ -81,4 +81,13 @@ classdef UUID
             UUID = string(UUID);
         end
     end
+
+    methods (Static)
+        function out = writeCodeBlock()
+            out = sprintf("\tmethods (Static)\n");
+            out = out + sprintf("\t\tfunction UUID = assignUUID()\n");
+            out = out + sprintf("\t\t\t UUID = ""%s"";\n;", aod.infra.UUID.generate());
+            out = out + sprintf("\t\tend\n\tend\n");
+        end
+    end
 end

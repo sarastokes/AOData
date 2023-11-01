@@ -10,21 +10,21 @@ classdef (Abstract) GeometricTransformation < aod.core.Registration
 % Properties:
 %   transform
 %   reference
-% 
+%
 % Methods to be implemented by subclasses:
 %   dataOut = apply(obj, dataIn, varargin)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
         transform
-        reference       
+        reference       % TODO: remove?
     end
 
     methods
         function obj = GeometricTransformation(name, registrationDate, varargin)
             obj = obj@aod.core.Registration(name, registrationDate, varargin{:});
         end
-        
+
         function setTransform(obj, tform)
             obj.transform = tform;
         end
@@ -32,8 +32,8 @@ classdef (Abstract) GeometricTransformation < aod.core.Registration
         function setReference(obj, ref)
             obj.reference = ref;
         end
-        
-        function data = apply(obj, data, varargin) %#ok<INUSD> 
+
+        function data = apply(obj, data, varargin) %#ok<INUSD>
             error('Apply:NotYetImplemented',...
                 'GeometricTransformation/apply must be implemented by subclasses');
         end
@@ -70,6 +70,16 @@ classdef (Abstract) GeometricTransformation < aod.core.Registration
             T2(4, 2) = T(3, 2);
 
             tform = affine3d(T2);
+        end
+    end
+
+    methods (Static)
+        function value = specifyDatasets(value)
+            value = specifyDatasets@aod.core.Registration(value);
+
+            value.add("transform", "NUMBER",...
+                "Size", "(3,3)",...
+                "Description", "The transformation matrix");
         end
     end
 end

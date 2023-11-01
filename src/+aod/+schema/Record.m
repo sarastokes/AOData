@@ -139,6 +139,11 @@ classdef Record < handle
 
             [tf, ME] = obj.Primitive.checkIntegrity(throwError);
         end
+
+        function tf = isUndefined(obj)
+            % ISUNDEFINED  Returns true if the primitive is undefined
+            tf = obj.primitiveType == aod.schema.primitives.PrimitiveTypes.UNKNOWN;
+        end
     end
 
     methods (Access = private)

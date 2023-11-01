@@ -1,11 +1,11 @@
-classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixins.ParentEntity
+classdef Epoch < aod.core.Entity & aod.common.mixins.ParentEntity & matlab.mixin.Heterogeneous
 % A period of data acquision during an experiment
 %
 % Description:
 %   A continuous period of data acquisition within an experiment
 %
 % Parent:
-%   aod.core.Entity, matlab.mixin.Heterogeneous
+%   aod.core.Entity, aod.common.mixins.ParentEntity, matlab.mixin.Heterogeneous
 %
 % Constructor:
 %   obj = aod.core.Epoch(ID, varargin)
@@ -284,6 +284,13 @@ classdef Epoch < aod.core.Entity & matlab.mixin.Heterogeneous & aod.common.mixin
             value.set('Source', "LINK",...
                 "EntityType", "Source",...
                 "Description", "The source of data acquired during the Epoch");
+            value.set('System', "LINK",...
+                "EntityType", "System",...
+                "Description", "The system configuration used during the Epoch");
+            value.set("startTime", "DATETIME",...
+                "Class", "datetime", "Size", "(1,1)",...
+                "Format", "yyyy-MM-dd HH:mm:ss.SSS",...
+                "Description", "The time the Epoch began")
         end
     end
 end

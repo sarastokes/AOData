@@ -22,7 +22,7 @@ classdef System < aod.core.Entity & matlab.mixin.Heterogeneous
 % -------------------------------------------------------------------------
 
     properties (SetObservable, SetAccess = {?aod.common.Entity})
-        extends             = []
+        extends             = []  % TODO
     end
 
     properties (SetAccess = {?aod.common.mixins.Entity, ?aod.common.mixins.ParentEntity})

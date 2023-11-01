@@ -19,7 +19,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
 
         protocolClass               string = string.empty()
         protocolName                string = string.empty()
-        DateProtocolCreated         datetime = datetime.empty()
+        dateProtocolCreated         datetime = datetime.empty()
     end
 
     methods
@@ -67,7 +67,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             end
 
             obj.protocolClass = class(protocol);
-            obj.DateProtocolCreated = protocol.dateCreated;
+            obj.dateProtocolCreated = protocol.dateCreated;
             obj.setFile('Protocol', fileparts(protocol.getFileName()));
             [~, obj.protocolName, ~] = fileparts(protocol.getFileName());
             obj.getProtocolParameters(protocol);
@@ -115,7 +115,7 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
                     if strcmpi(propName, 'Calibration')
                         obj.setCalibration(protocol.(propName));
                     elseif strcmpi(propName, 'dateCreated')
-                        obj.DateProtocolCreated = protocol.(propName);
+                        obj.dateProtocolCreated = protocol.(propName);
                     else
                         obj.setAttr(propName, protocol.(propName));
                     end
@@ -134,6 +134,12 @@ classdef Stimulus < aod.core.Entity & matlab.mixin.Heterogeneous
             value.set("protocolName", "TEXT",...
                 "Size", "(1,1)",...
                 "Description", "The name of the protocol used.");
+            value.set("protocolClass", "TEXT",...
+                "Size", "(1,1)",...
+                "Description", "The name of the protocol.");
+            value.set("dateProtocolCreated", "DATETIME",...
+                "Class", "datetime", "Size", "(1,1)",...
+                "Description", "The date the protocol was created.")
         end
     end
 end

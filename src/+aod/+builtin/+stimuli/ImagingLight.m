@@ -33,7 +33,7 @@ classdef ImagingLight < aod.core.Stimulus
         end
 
         function setIntensity(obj, intensity)
-            % Set imaging light intensity and, optionally, units
+            % Set imaging light intensity
             %
             % Syntax:
             %   obj.setIntensity(intensity)

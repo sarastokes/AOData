@@ -44,7 +44,7 @@ classdef RegionResponse < aod.core.Response
             obj.Annotation = annotation;
         end
 
-        function signals = get(obj, IDs, timePoints) 
+        function signals = get(obj, IDs, timePoints)
             % Get a subregion of the data, specified by ID and/or time
             %
             % Description:
@@ -52,12 +52,12 @@ classdef RegionResponse < aod.core.Response
             %
             % Syntax:
             %   Returns just the signals in the timetable
-            % 
+            %
             % Optional input:
             %   IDs             integer(s)      (default = all)
             %       Specific rows (regions) to return
             %   timePoints      integer(s)      (default = all)
-            %       Specific time points or region of time to return 
+            %       Specific time points or region of time to return
             %
             % Output:
             %   signals     double [time x rois]
@@ -153,11 +153,10 @@ classdef RegionResponse < aod.core.Response
         function value = specifyDatasets(value)
             value = specifyDatasets@aod.core.Response(value);
 
-            value.set("Annotation",...
-                "Size", "(1,1)",...
-                "Function", @(x) aod.util.mustBeEntityType(x, "Annotation"),...
+            value.set("Annotation", "LINK",...
+                "EntityType", "Annotation",...
                 "Description", "The annotation used to extract responses");
-            value.set("Data",...
+            value.set("Data", "NUMBER",...
                 "Description", "Region responses (time x regions)");
         end
     end

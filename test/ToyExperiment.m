@@ -18,7 +18,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
 %
 % Notes:
 %   HDF file will write to current directory as 'ToyExperiment.h5'
-    
+
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
@@ -51,14 +51,14 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     channel1 = aod.core.Channel('WavefrontSensing');
     channel1.add(aod.builtin.devices.LightSource(847,...
         "Manufacturer", "QPhotonics"));
-    
+
     channel2 = aod.core.Channel("ReflectanceImaging");
     channel2.add(aod.builtin.devices.LightSource(796,...
         "Manufacturer", "SuperLum"));
     channel2.add(aod.builtin.devices.Pinhole(20,...
         "Manufacturer", "ThorLabs", "Model", "P20K"));
     channel2.add(aod.builtin.devices.PMT("ReflectancePMT"));
-    
+
     channel3 = aod.core.Channel("FluorescenceImaging");
     channel3.add(aod.builtin.devices.LightSource(561,...
         "Manufacturer", "Qioptiq"));
@@ -67,7 +67,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     channel3.add(aod.builtin.devices.PMT("VisiblePMT",...
         "Manufacturer", "Hamamatsu", "Model", "H16722"));
     dichroic = aod.builtin.devices.BandpassFilter(607, 70,...
-        "Manufacturer", "Semrock", "Model", "FF01-590/20"); 
+        "Manufacturer", "Semrock", "Model", "FF01-590/20");
     dichroic.setTransmission(fullfile(...
         test.util.getAODataTestFolder(), "test_data", "FF01-607_70.txt"));
     channel3.add(dichroic);
@@ -87,7 +87,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     experiment.add(calibration2);
 
     % Experiment Datasets
-    dset1 = aod.core.ExperimentDataset('ExpDataset1',... 
+    dset1 = aod.core.ExperimentDataset('ExpDataset1',...
         'Data', eye(3));
     experiment.add(dset1);
 
@@ -98,7 +98,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     experiment.add(epoch);
     epoch.setTiming(seconds(1:5));
     epoch.setFile('PostSyncFile', fullfile(cd, 'PostSyncFile.txt'));
-    
+
     experiment.add(aod.core.Epoch(2, 'Source', epoch.Source));
     setAttr(experiment.Epochs, 'RefPmtGain', 0.51);
 
@@ -118,8 +118,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     epoch.add(response2);
 
     % Stimuli
-    stim = aod.builtin.stimuli.ImagingLight('Mustang', 22,...
-        'IntensityUnits', "Normalized");  % TODO Remove units as attr
+    stim = aod.builtin.stimuli.ImagingLight('Mustang', 22);
     epoch.add(stim);
 
     % Datasets
@@ -145,7 +144,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     end
 
     coreExpt = experiment;
-    if nargout == 2 
+    if nargout == 2
         if writeToHDF
             persistentExpt = loadExperiment(fileName);
         else

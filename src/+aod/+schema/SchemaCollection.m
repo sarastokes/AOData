@@ -95,6 +95,19 @@ classdef (Abstract) SchemaCollection < handle
             end
         end
 
+        function recordNames = getUndefined(obj)
+            % GETUNDEFINED  Returns record names with UNKNOWN primitives
+            % ----------------------------------------------------------
+
+            if obj.Count == 0
+                recordNames = string.empty();
+                return
+            end
+
+            idx = arrayfun(@(x) x.isUndefined(), obj.Records);
+            recordNames = obj.Contents(idx);
+        end
+
         function set(obj, recordName, primitiveType, varargin)
             % SET Set the type and options of an record's primitive
             % ----------------------------------------------------------
