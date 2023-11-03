@@ -13,17 +13,14 @@ classdef Description < aod.schema.Decorator
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    % properties (SetAccess = private)
-    %     Value (1,1)         string      = ""
-    % end
-
     methods
-        function obj = Description(input, parent)
-            if nargin < 2
-                parent = [];
+        function obj = Description(parent, input)
+            arguments
+                parent          = []
+                input           = []
             end
             obj = obj@aod.schema.Decorator(parent);
-            if nargin < 1 || aod.util.isempty(input) || input == "[]"
+            if aod.util.isempty(input) || input == "[]"
                 input = "";
             end
             obj.setValue(input);

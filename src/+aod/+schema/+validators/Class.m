@@ -18,12 +18,12 @@ classdef Class < aod.schema.Validator
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Value   (1,:)       string = ""
+        Value             string = ""
     end
 
     methods
-        function obj = Class(classes, parent)
-            if nargin < 2
+        function obj = Class(parent, classes)
+            if nargin < 1
                 parent = [];
             end
             obj = obj@aod.schema.Validator(parent);

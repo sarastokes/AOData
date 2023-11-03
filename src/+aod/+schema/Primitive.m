@@ -64,10 +64,10 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             end
 
             % Initialize
-            obj.Size = aod.schema.validators.Size([], obj);
-            obj.Class = aod.schema.validators.Class([], obj);
+            obj.Size = aod.schema.validators.Size(obj, []);
+            obj.Class = aod.schema.validators.Class(obj, []);
             obj.Default = aod.schema.Default(obj, []);
-            obj.Description = aod.schema.decorators.Description([], obj);
+            obj.Description = aod.schema.decorators.Description(obj, []);
         end
 
         function value = get.SCHEMA_TYPE(obj)
@@ -179,7 +179,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             % See also:
             %   aod.schema.validators.Size
             % --------------------------------------------------------------
-            obj.Size = aod.schema.validators.Size(value);
+            obj.Size.setValue(value);
             obj.checkIntegrity(true);
         end
 
@@ -208,6 +208,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 error('setName:InvalidName',...
                     'Property names must be valid MATLAB variables');
             end
+
             obj.Name = name;
         end
 
@@ -229,7 +230,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             % Inputs:
             %   description     string (1,1)
             %       Description of the dataset/property.
-            % ----------------------------------------------------------
+            % --------------------------------------------------------------
             obj.Description.setValue(description);
         end
     end
@@ -408,7 +409,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                     % TODO: Should be method
                     value = obj.(validators(i)).text();
                 else
-                    value = [];
+                    value = obj.(validators(i)).Value;
                 end
                 S.(obj.Name).(validators(i)) = value; %.jsonencode();
             end

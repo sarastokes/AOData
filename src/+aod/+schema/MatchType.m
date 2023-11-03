@@ -18,19 +18,27 @@ classdef MatchType
     end
 
     methods
-        function rgb = getColor(obj)
+        function rgb = getColor(obj, textFlag)
+            arguments
+                obj
+                textFlag        logical = false
+            end
 
-            actionName = extractAfter(string(obj), "_");
+            import aod.schema.MatchType
 
-            switch actionName
-                case "CHANGED"
+            switch obj
+                case MatchType.CHANGED
                     rgb = hex2rgb('0077ff');
-                case "REMOVED"
+                case MatchType.REMOVED
                     rgb = hex2rgb('ff4040');
-                case "ADDED"
+                case MatchType.ADDED
                     rgb = hex2rgb('00bd9d');
                 otherwise
-                    rgb = [1 1 1];
+                    if textFlag
+                        rgb = [0 0 0];
+                    else
+                        rgb = [1 1 1];
+                    end
             end
         end
     end

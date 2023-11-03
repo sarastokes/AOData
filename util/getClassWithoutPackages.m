@@ -18,10 +18,10 @@ function className = getClassWithoutPackages(obj)
 
     obj = convertCharsToStrings(obj);
 
-    if ~isscalar(obj)
-        className = arrayfun(@(x) getClassWithoutPackages(x), obj);
-        return
-    end
+    % if ~isscalar(obj)
+    %     className = arrayfun(@(x) getClassWithoutPackages(x), obj);
+    %     return
+    % end
 
     if isstring(obj)
         fullName = obj;

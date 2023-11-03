@@ -85,7 +85,7 @@ classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
 
     methods (Sealed, Access = {?aod.schema.Primitive})
         function setParent(obj, primitive)
-            % TODO: Validation
+            mustBeSubclass(primitive, ["aod.schema.Primitive", "aod.schema.Validator"]);
             obj.Parent = primitive;
         end
     end

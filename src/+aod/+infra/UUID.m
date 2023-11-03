@@ -90,7 +90,7 @@ classdef UUID
                 className       string
             end
 
-            if ~isSubclass(className)
+            if ~isSubclass(className, "aod.core.Entity")
                 error('getClassUUID:InvalidClass',...
                     'Class %s is not a subclass of aod.core.Entity', className);
             end

@@ -30,13 +30,10 @@ classdef Size < aod.schema.Validator & matlab.mixin.CustomDisplay
     end
 
     methods
-        function obj = Size(input, parent)
-            if nargin < 2
-                parent = [];
-            end
+        function obj = Size(parent, input)
             obj = obj@aod.schema.Validator(parent);
 
-            if nargin > 0
+            if nargin > 1
                 obj.setValue(input);
             end
         end

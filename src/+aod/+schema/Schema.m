@@ -14,7 +14,8 @@ classdef (Abstract) Schema < handle
     properties (SetAccess = private)
         Parent
         className       (1,1)       string
-        entityType                         
+        classUUID       (1,1)       string
+        entityType
     end
 
     properties (Hidden, Access = protected)
@@ -97,7 +98,7 @@ classdef (Abstract) Schema < handle
 
             mustBeSubclass(parent, ["aod.core.Entity", "aod.persistent.Entity"]);
             obj.Parent = parent;
-            obj.className = string(class(parent));
+            obj.setClassName(class(parent));
         end
     end
 
@@ -172,7 +173,7 @@ classdef (Abstract) Schema < handle
                     numel(datasets), numel(attributes), numel(files)));
             if numel(datasets) > 0
                 ME = addCause(ME, MException(...
-                    "getUndefined:UndefinedDatasetsExist",... 
+                    "getUndefined:UndefinedDatasetsExist",...
                     "Datasets: " + strjoin(datasets, ", ")));
             end
             if numel(attributes) > 0
@@ -235,6 +236,7 @@ classdef (Abstract) Schema < handle
 
             obj.className = className;
             obj.entityType = aod.common.EntityTypes.getFromSuperclass(obj.className);
+            obj.classUUID = aod.infra.UUID.getClassUUID(obj.className);
         end
     end
 
@@ -254,7 +256,7 @@ classdef (Abstract) Schema < handle
 
             % Defer to isequal defined by SchemaCollection
             if ~isequal(obj.Datasets, other.Datasets) ...
-                    || ~isequal(obj.Attributes, other.Attributes) ... 
+                    || ~isequal(obj.Attributes, other.Attributes) ...
                     || ~isequal(obj.Files, other.Files)
                 tf = false;
                 return
@@ -266,7 +268,6 @@ classdef (Abstract) Schema < handle
         function S = struct(obj)
             entityName = strrep(obj.className, '.', '__'); % TODO
             if ~aod.util.isempty(obj.className)
-                %entityType = aod.common.EntityTypes.getFromSuperclass(obj.className);
                 entityClass = getClassWithoutPackages(obj.className);
                 packageName = erase(obj.className, "." + entityClass);
                 superNames = string(superclasses(obj.className));
@@ -276,15 +277,15 @@ classdef (Abstract) Schema < handle
             end
 
             S = struct();
-            S.(entityName).Name = entityName;
+            S.(entityName).Name = obj.className;
             S.(entityName).ClassName = entityClass;
             S.(entityName).PackageName = packageName;
-            S.(entityName).EntityType = obj.entityType;
+            S.(entityName).EntityType = char(obj.entityType);
             S.(entityName).Superclasses = superNames';
             % TODO: Aliases, UUIDs and version number
             S.(entityName).VersionNumber = [];
             S.(entityName).Aliases = [];
-            S.(entityName).UUID = [];
+            S.(entityName).UUID = obj.classUUID;
             % Leave blank until saved
             S.(entityName).DateCreated = [];
 

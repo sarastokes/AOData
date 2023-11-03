@@ -10,8 +10,14 @@ function fullName = traceSchemaLineage(schemaObj)
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    if isSubclass(schemaObj, "aod.schema.Record")
+        schemaObj = schemaObj.Primitive;
+    end
 
     if isSubclass(schemaObj, "aod.schema.Specification")
+        if isSubclass(schemaObj.Parent, "aod.schema.Specification")
+            schemaObj = schemaObj.Parent;
+        end
         fullName = string(getClassWithoutPackages(schemaObj));
         primitive = schemaObj.Parent;
         if isempty(primitive)
@@ -26,7 +32,7 @@ function fullName = traceSchemaLineage(schemaObj)
         primitive = schemaObj;
     else
         error("traceSchemaLineage:InvalidObjectType",...
-            "Input must be a primitive or specification object, not %s.",...
+            "Input must be a record primitive, or specification, not %s.",...
             class(schemaObj));
     end
 
