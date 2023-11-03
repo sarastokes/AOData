@@ -111,7 +111,7 @@ classdef Calibration < aod.core.Entity & matlab.mixin.Heterogeneous
                 obj.calibrationDate = datetime.empty();
                 return
             end
-            calDate = aod.util.validateDate(calDate);
+            %calDate = aod.util.validateDate(calDate);
             obj.setProp('calibrationDate', calDate);
         end
     end

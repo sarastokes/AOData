@@ -235,4 +235,17 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             obj.assign("Default", []);
         end
     end
+
+
+    methods (Test, TestTags="List")
+        function List(testCase)
+            obj = aod.schema.primitives.List("TestList", []);
+            testCase.verifyEqual(obj.numItems, 0);
+            obj.assign("Items", {{'Boolean', 'Size', '(1,1)'}, {'Number', 'Units', 'mV'}});
+            testCase.verifyEqual(obj.numItems, 2);
+
+            testCase.verifyTrue(obj.checkIntegrity())
+            testCase.verifyTrue(obj.validate({true, 2}));
+        end
+    end
 end

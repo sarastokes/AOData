@@ -2,7 +2,7 @@ classdef SpecificationTest < matlab.unittest.TestCase
 % Tests specification of AOData subclasses
 %
 % Description:
-%   Tests templates for specifying AOData subclasses
+%   Tests validator, descriptor and default specifications
 %
 % Superclass:
 %    matlab.unittest.TestCase
@@ -17,6 +17,13 @@ classdef SpecificationTest < matlab.unittest.TestCase
 % -------------------------------------------------------------------------
 
 %#ok<*MANU,*NASGU,*ASGLU>
+
+    methods
+        function confirmValid(testCase, tf, ME)
+            testCase.verifyTrue(tf);
+            testCase.verifyEmpty(ME);
+        end
+    end
 
     methods (Test, TestTags="Size")
         function EmptySize(testCase)
@@ -193,7 +200,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="DefaultValue")
         function Default(testCase)
-
             obj = aod.schema.Default([], 2);
             testCase.verifyEqual("2", obj.text());
             testCase.verifyFalse(isempty(obj));
@@ -251,32 +257,6 @@ classdef SpecificationTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="Dataset")
-        function DatasetFromInput(testCase)
-            obj = aod.schema.Record([], "test", "NUMBER",...
-                "Size", "(1,2)",...
-                "Default", [2 2],...
-                "Description", "This is a test");
-        end
-
-        function EmptyRecord(testCase)
-            obj = aod.schema.Record([], "Test", "Unknown");
-            obj.setType("TEXT");
-            testCase.verifyEqual(obj.primitiveType,...
-                aod.schema.primitives.PrimitiveTypes.TEXT);
-
-            % Test assignment
-            obj.assign("Size", "(1,1)",...
-                "Description", "test",...
-                "Default", "hey");
-            testCase.verifyEqual(obj.Primitive.Default.Value, "hey");
-            testCase.verifyEqual(obj.Primitive.Description.Value, "test");
-            testCase.verifyEqual(obj.Primitive.Class.Value, "string");
-            testCase.verifyEqual(obj.Primitive.Size.SizeType, ...
-                aod.schema.validators.size.SizeTypes.SCALAR);
-        end
-    end
-
     methods (Test, TestTags="Specification")
         function Specification(testCase)
             sizeSpec = aod.schema.validators.Size([], "(1,:)");
@@ -284,178 +264,330 @@ classdef SpecificationTest < matlab.unittest.TestCase
             descSpec = aod.schema.decorators.Description([], "This is a description");
             defaultSpec = aod.schema.Default(1);
         end
-
-        function DatasetManager(testCase)
-            obj = aod.schema.collections.DatasetCollection.populate('aod.core.Epoch');
-            testCase.verifyEqual(obj.Count, 4);
-            testCase.verifyNumElements(obj.Records, 4);
-            testCase.verifyEqual("aod.core.Epoch", obj.className);
-
-            testCase.verifyTrue(obj.has('ID'));
-            testCase.verifyEmpty(obj.get('Blah'));
-            testCase.verifyFalse(obj.has('Blah'));
-
-            out = obj.text();
-        end
-
-        function DatasetManagerAccess(testCase)
-        end
-
-        function DatasetManagerError(testCase)
-            obj = aod.schema.collections.DatasetCollection.populate('aod.core.Epoch');
-            ep = aod.core.Epoch(1);
-
-            testCase.verifyError(...
-                @() obj.add(findprop(ep, 'ID')), "add:AdditionNotSupported");
-            testCase.verifyError(...
-                @() obj.add("NewProp"), 'add:AdditionNotSupported');
-
-            testCase.verifyError(...
-                @() aod.schema.collections.DatasetCollection.populate("aod.common.FileReader"),...
-                "populate:InvalidInput");
-        end
     end
 
-    methods (Test, TestTags="Attribute")
-        function AttributeNameSearch(testCase)
-            import aod.infra.ErrorTypes
+    methods (Test, TestTags="EntityType")
+        function EntityType(testCase)
+            obj = aod.schema.validators.EntityType([], 'Calibration');
+            testCase.verifyTrue(obj.isSpecified());
 
-            schema = aod.schema.util.StandaloneSchema(...
-                "aod.builtin.devices.DichroicFilter");
-            testCase.verifyTrue(schema.Attributes.has("Wavelength"));
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
 
-            testCase.verifyFalse(schema.Attributes.has("BadInput"));
-            testCase.verifyWarning(...
-                @()schema.Attributes.get("BadInput", ErrorTypes.WARNING),...
-                "get:EntryNotFound");
-
-            testCase.verifyNotEqual(schema.Attributes.code(), "");
-        end
-
-        function CoreEntityAttributes(testCase)
-            obj = aod.builtin.devices.BandpassFilter(510, 20);
-            p = obj.Schema.Attributes.get('Bandwidth');
-            testCase.verifyEqual(p.Name, "Bandwidth");
-            schema = aod.schema.util.StandaloneSchema('aod.builtin.devices.BandpassFilter');
-            expAtt = schema.Attributes;
-            p2 = expAtt.get('Bandwidth');
-            testCase.verifyEqual(p2.Name, "Bandwidth");
-
-            % Set/remove expected attribute
-            obj.setAttr('Bandwidth', 30);
-            testCase.verifyEqual(obj.attributes('Bandwidth'), 30);
-            obj.removeAttr('Bandwidth');
-            testCase.verifyTrue(obj.attributes.isKey('Bandwidth'));
-            testCase.verifyEmpty(obj.attributes('Bandwidth'));
-
-            % Set/remove adhoc attribute
-            obj.setAttr('RandomParam', true);
-            obj.removeAttr('RandomParam');
-            testCase.verifyFalse(obj.attributes.isKey('RandomParam'));
-        end
-    end
-
-    methods (Test, TestTags="Parser")
-        function Parser(testCase)
-            schema = aod.schema.util.StandaloneSchema("aod.core.Experiment");
-            ip = schema.Attributes.parse("Administrator", "test1", "Laboratory", "test2");
-            testCase.verifyEqual(ip.Results.Administrator, "test1");
-            testCase.verifyEqual(ip.Results.Laboratory, "test2");
-        end
-    end
-
-    methods (Test, TestTags="Access")
-        function AttributeManagerAccess(testCase)
-            schema = aod.schema.util.StandaloneSchema(...
-                'aod.builtin.devices.NeutralDensityFilter');
-            testCase.verifyClass(schema.Attributes, 'aod.schema.collections.AttributeCollection');
-        end
-
-        % function PackageAccess(testCase)
-        %     [DM, AM, S] = aod.specification.util.collectPackageSpecifications(...
-        %         "aod.core", "Write", false);
-        %     testCase.verifyEqual(numel(DM), numel(AM));
-        %
-        %     f = fieldnames(S);
-        %     testCase.verifyNumElements(f, 2);
-        %     testCase.verifyEqual(f{1}, 'Namespaces');
-        %
-        %     f = fieldnames(S.Namespaces);
-        %     testCase.verifyNumElements(f, 1);
-        %     testCase.verifyEqual(f{1}, 'aod');
-        % end
-
-        function AttributeManagerComparison(testCase)
-            import aod.schema.MatchType
-
-            obj = aod.builtin.devices.Pellicle([30 70]);
-            model = obj.Schema.Attributes.get('Model');
-            manufacturer = obj.Schema.Attributes.get('Manufacturer');
-
-            fields = ["Description", "Class", "Size", "Default"];
-
-            % Equal in all but description
-            details = model.compare(manufacturer);
-            for i = 1:numel(fields)
-                if fields(i) == "Description"
-                    testCase.verifyEqual(details(fields(i)), MatchType.CHANGED);
-                else
-                    testCase.verifyEqual(details(fields(i)), MatchType.SAME);
-                end
-            end
-        end
-    end
-
-    methods (Test, TestTags="Property")
-    %     function PropertySpecification(testCase)
-    %         prop = aod.util.templates.PropertySpecification("Test");
-    %         prop.Class = "duration,double";
-    %         testCase.verifyEqual(numel(prop.Class), 2);
-    %
-    %         testCase.verifyError(...
-    %             @() set(prop, "Class", "badclass"),...
-    %             "PropertySpecification:InvalidClassName")
-    %     end
-
-        function DatasetManagerFromEntity(testCase)
-            % Populated DatasetManager
-            cEXPT = ToyExperiment(false);
-            DM = aod.schema.collections.DatasetCollection.populate(cEXPT);
-            testCase.verifyEqual(DM.Count, 4);
-            testCase.verifyNumElements(DM.list(), 4);
-
-            % Hard to test, but make sure it's error free
-            DM.text();
-            DM.struct();
-
-            % Get dataset by name
-            D = DM.get('experimentDate');
-            testCase.verifyEqual(D.Name, "experimentDate");
-
-            % Modify
-            DM.set('experimentDate',...
-                "Description", "test");
-            testCase.verifyEqual(D.Description.Value, "test");
-        end
-
-        function DatasetManagerAltPopulate(testCase)
-            DM1 = aod.schema.collections.DatasetCollection.populate( ...
-                'aod.core.Experiment');
-            DM2 = aod.schema.collections.DatasetCollection.populate( ...
-                meta.class.fromName('aod.core.Experiment'));
-
-            testCase.verifyEqual(DM1.Count, DM2.Count);
-        end
-
-        function EmptyDatasetManager(testCase)
-            obj = aod.schema.collections.DatasetCollection();
-            testCase.verifyEmpty(obj.list());
-            testCase.verifyEqual(obj.text(), "Empty DatasetManager");
-            testCase.verifyEmpty(fieldnames(obj.struct()));
-
-            [tf, idx] = obj.has('DsetName');
+            [tf, ME] = obj.validate(123);
             testCase.verifyFalse(tf);
-            testCase.verifyEmpty(idx);
+            testCase.verifyEqual(ME.identifier, 'AOData:EntityType:Invalid');
+        end
+
+        function EmptyEntityType(testCase)
+            obj = aod.schema.validators.EntityType([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+        end
+
+        function CoreEntityType(testCase)
+            obj = aod.schema.validators.EntityType([], 'Calibration');
+
+            [tf, ME] = obj.validate(aod.core.Calibration('Test', getDateYMD()));
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(aod.core.Calibration("Test", getDateYMD()));
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(aod.core.Epoch(1));
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'AOData:EntityType:Invalid');
+        end
+    end
+
+    methods (Test, TestTags="Enum")
+        function Enum(testCase)
+            obj = aod.schema.validators.Enum([], ["a", "b", "c"]);
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Enum([], ["a", "b", "c"]));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Enum([], ["a", "b", "d"]));
+
+            [tf, ME] = obj.validate("a");
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate("d");
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'Enum:validate:InvalidEnum');
+        end
+
+        function EmptyEnum(testCase)
+            obj = aod.schema.validators.Enum([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            testCase.verifyTrue(obj.validate("d"));
+        end
+    end
+
+    methods (Test, TestTags="Length")
+        function Length(testCase)
+            obj = aod.schema.validators.Length([], 3);
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Length([], 3));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Length([], 4));
+            testCase.verifyEqual(obj.text(), "3");
+
+            [tf, ME] = obj.validate("abc");
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate("a");
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier,...
+                'validate:InvalidLength');
+            [tf, ME] = obj.validate(123);
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier,...
+                'validate:InvalidClass');
+        end
+
+        function EmptyLength(testCase)
+            obj = aod.schema.validators.Length([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            [tf, ME] = obj.validate("d");
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(3);
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj.Value, 3);
+            testCase.verifyEqual(obj.text(), "3");
+
+            obj.setValue([]);
+            testCase.verifyFalse(obj.isSpecified());
+        end
+    end
+
+    methods (Test, TestTags="Count")
+        function Count(testCase)
+            obj = aod.schema.validators.Count([], 3);
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Count([], 3));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Count([], 4));
+
+            [tf, ME] = obj.validate(["a", "b", "c"]);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(["a", "b"]);
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier,...
+                'validate:InvalidCount');
+
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
+        end
+
+        function EmptyCount(testCase)
+            obj = aod.schema.validators.Count([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            [tf, ME] = obj.validate("d");
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(3);
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "3");
+
+            obj.setValue([]);
+            testCase.verifyFalse(obj.isSpecified());
+        end
+    end
+
+    methods (Test, TestTags="Units")
+        function Units(testCase)
+            obj = aod.schema.decorators.Units([], "mV");
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.decorators.Units([], "mV"));
+            testCase.verifyNotEqual(obj, aod.schema.decorators.Units([], "mm"));
+
+
+            obj.setValue(["mV"; "sec"]);
+            testCase.verifyEqual(obj.Value, ["mV", "sec"]);
+        end
+
+        function EmptyUnits(testCase)
+            obj = aod.schema.decorators.Units([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            obj.setValue("mV");
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj.Value, "mV");
+            testCase.verifyEqual(obj.text(), string('"mV"'));
+
+            obj.setValue([]);
+            testCase.verifyFalse(obj.isSpecified());
+        end
+    end
+
+    methods (Test, TestTags="Extension")
+        function Extension(testCase)
+
+            obj = aod.schema.validators.Extension([], ".txt");
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj, aod.schema.validators.Extension([], ".txt"));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Extension([], ".json"));
+
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate("test.txt");
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate("test.csv");
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:InvalidExtension');
+
+            [tf, ME] = obj.validate("test");
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:NoExtensionFound');
+        end
+
+        function ExtensionEmpty(testCase)
+            obj = aod.schema.validators.Extension([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            [tf, ME] = obj.validate("test.txt");
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(".txt");
+            testCase.verifyTrue(obj.isSpecified());
+
+            obj.setValue("");
+            testCase.verifyFalse(obj.isSpecified());
+
+        end
+
+        function ExtensionErrors(testCase)
+            testCase.verifyError(...
+                @() aod.schema.validators.Extension([], [".txt", "csv"]),...
+                "setExtension:InvalidExtensionFormat");
+
+            testCase.verifyError(...
+                @() aod.schema.validators.Extension([], [".txt", "csv"; ".dat", ".json"]),...
+                "setExtension:InvalidSize");
+
+            testCase.verifyError(...
+                @() aod.schema.validators.Extension([], ["", ".json"]),...
+                "setExtension:SomeValuesEmpty");
+        end
+    end
+
+    methods (Test, TestTags="Minimum")
+        function Minimum(testCase)
+            obj = aod.schema.validators.Minimum([], 0);
+            testCase.verifyTrue(obj.isSpecified());
+
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(-1);
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:MinimumExceeded');
+        end
+
+        function MinimumEquality(testCase)
+            obj = aod.schema.validators.Minimum([], 0);
+            testCase.verifyEqual(obj, aod.schema.validators.Minimum([], 0));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Minimum([], 1));
+        end
+
+        function MinimumEmpty(testCase)
+            obj = aod.schema.validators.Minimum([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(1);
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "1");
+
+            obj.setValue([]);
+            testCase.verifyFalse(obj.isSpecified());
+
+            obj.setValue("[]");
+            testCase.verifyFalse(obj.isSpecified());
+        end
+    end
+
+    methods (Test, TestTags="Maximum")
+        function Maximum(testCase)
+            obj = aod.schema.validators.Maximum([], 3);
+            testCase.verifyTrue(obj.isSpecified());
+
+            [tf, ME] = obj.validate([]);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            [tf, ME] = obj.validate(4);
+            testCase.verifyFalse(tf);
+            testCase.verifyEqual(ME.identifier, 'validate:MaximumExceeded');
+        end
+
+        function MaximumEquality(testCase)
+            obj = aod.schema.validators.Maximum([], 0);
+            testCase.verifyEqual(obj, aod.schema.validators.Maximum([], 0));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Maximum([], 1));
+            testCase.verifyNotEqual(obj, aod.schema.validators.Minimum([], 0));
+        end
+
+        function MaximumEmpty(testCase)
+            obj = aod.schema.validators.Maximum([], []);
+            testCase.verifyFalse(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "[]");
+            testCase.verifyEqual(obj.jsonencode(), '[]');
+
+            [tf, ME] = obj.validate(1);
+            testCase.confirmValid(tf, ME);
+
+            obj.setValue(1);
+            testCase.verifyTrue(obj.isSpecified());
+            testCase.verifyEqual(obj.text(), "1");
+
+            obj.setValue([]);
+            testCase.verifyFalse(obj.isSpecified());
+
+            obj.setValue("[]");
+            testCase.verifyFalse(obj.isSpecified());
+        end
+    end
+
+    methods (Test, TestTags="SpecUtil")
+        function IsInputEmpty(testCase)
+            obj = aod.schema.validators.size.FixedDimension([]);
+
+            obj.setValue([]);
+            testCase.verifyEmpty(obj.Length);
+            obj.setValue("[]");
+            testCase.verifyEmpty(obj.Length);
+            obj.setValue("");
+            testCase.verifyEmpty(obj.Length);
+
+            obj.setValue(1);
+            testCase.verifyEqual(obj.Length, 1);
+            obj.setValue("1");
+            testCase.verifyEqual(obj.Length, 1);
         end
     end
 

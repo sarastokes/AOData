@@ -1,4 +1,4 @@
-classdef AttributeCollection < aod.schema.SchemaColleRecordCollectionction
+classdef AttributeCollection < aod.schema.RecordCollection
 % ATTRIBUTECOLLECTION  A collection of attribute schemas
 %
 % Superclasses:

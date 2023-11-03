@@ -265,6 +265,19 @@ classdef (Abstract) Schema < handle
             tf = true;
         end
 
+        % function [tf, idx] = unique(obj)
+        %     tf = false(size(obj));
+        %     tf(1) = true;
+
+        %     idx = [];
+        %     for i = 2:numel(obj)
+        %         for j = 1:i
+        %             if isequal(obj(i), obj(j))
+        %             end
+        %         end
+        %     end
+        % end
+
         function S = struct(obj)
             entityName = strrep(obj.className, '.', '__'); % TODO
             if ~aod.util.isempty(obj.className)

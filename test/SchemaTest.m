@@ -16,6 +16,16 @@ classdef SchemaTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
 
+    properties
+        EXPT
+    end
+
+    methods (TestClassSetup)
+        function setupClass(testCase)
+            testCase.EXPT = ToyExperiment(false, false);
+        end
+    end
+
     methods (Test, TestTags="Schema")
         function SchemaEquality(testCase)
             obj1 = aod.builtin.devices.Pinhole(20);
@@ -37,6 +47,19 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyEqual(dsets, ["EmptyProp", "DependentProp"]);
             testCase.verifyEqual(attrs, "AttrThree");
             testCase.verifyTrue(contains(ME.message, "2 datasets, 1 attributes"));
+        end
+    end
+
+    methods (Test, TestTags="SchemaCollection")
+        function SchemaCollection(testCase)
+            import aod.common.EntityTypes
+
+            obj = aod.schema.SchemaCollection(testCase.EXPT);
+            testCase.verifyNumElements(obj.Schemas, 20);
+            testCase.verifyNumElements(find(obj.entityTypes == EntityTypes.Epoch), 1);
+
+            T = obj.table();
+            testCase.verifySize(T, [20 3]);
         end
     end
 
@@ -72,20 +95,81 @@ classdef SchemaTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="List")
-        function List(testCase)
-            obj = aod.schema.primitives.List("TestList", []);
-            testCase.verifyEqual(obj.numItems, 0);
-            obj.assign("Items", {{'Boolean', 'Size', '(1,1)'}, {'Number', 'Units', 'mV'}});
-            testCase.verifyEqual(obj.numItems, 2);
+    methods (Test, TestTags="AttributeCollection")
+        function AttributeCollectionAccess(testCase)
+            schema = aod.schema.util.StandaloneSchema(...
+                'aod.builtin.devices.NeutralDensityFilter');
+            testCase.verifyClass(schema.Attributes, 'aod.schema.collections.AttributeCollection');
+        end
 
-            testCase.verifyTrue(obj.checkIntegrity())
-            testCase.verifyTrue(obj.validate({true, 2}));
+        function Parser(testCase)
+            schema = aod.schema.util.StandaloneSchema("aod.core.Experiment");
+            ip = schema.Attributes.parse("Administrator", "test1", "Laboratory", "test2");
+            testCase.verifyEqual(ip.Results.Administrator, "test1");
+            testCase.verifyEqual(ip.Results.Laboratory, "test2");
+        end
+
+        function AttributeNameSearch(testCase)
+            import aod.infra.ErrorTypes
+
+            schema = aod.schema.util.StandaloneSchema(...
+                "aod.builtin.devices.DichroicFilter");
+            testCase.verifyTrue(schema.Attributes.has("Wavelength"));
+
+            testCase.verifyFalse(schema.Attributes.has("BadInput"));
+            testCase.verifyWarning(...
+                @()schema.Attributes.get("BadInput", ErrorTypes.WARNING),...
+                "get:EntryNotFound");
+
+            testCase.verifyNotEqual(schema.Attributes.code(), "");
+        end
+
+        function AttributeManagerComparison(testCase)
+            import aod.schema.MatchType
+
+            obj = aod.builtin.devices.Pellicle([30 70]);
+            model = obj.Schema.Attributes.get('Model');
+            manufacturer = obj.Schema.Attributes.get('Manufacturer');
+
+            fields = ["Description", "Class", "Size", "Default"];
+
+            % Equal in all but description
+            details = model.compare(manufacturer);
+            for i = 1:numel(fields)
+                if fields(i) == "Description"
+                    testCase.verifyEqual(details(fields(i)), MatchType.CHANGED);
+                else
+                    testCase.verifyEqual(details(fields(i)), MatchType.SAME);
+                end
+            end
+        end
+
+        function CoreEntityAttributes(testCase)
+            obj = aod.builtin.devices.BandpassFilter(510, 20);
+            p = obj.Schema.Attributes.get('Bandwidth');
+            testCase.verifyEqual(p.Name, "Bandwidth");
+            schema = aod.schema.util.StandaloneSchema('aod.builtin.devices.BandpassFilter');
+            expAtt = schema.Attributes;
+            p2 = expAtt.get('Bandwidth');
+            testCase.verifyEqual(p2.Name, "Bandwidth");
+
+            % Set/remove expected attribute
+            obj.setAttr('Bandwidth', 30);
+            testCase.verifyEqual(obj.attributes('Bandwidth'), 30);
+            obj.removeAttr('Bandwidth');
+            testCase.verifyTrue(obj.attributes.isKey('Bandwidth'));
+            testCase.verifyEmpty(obj.attributes('Bandwidth'));
+
+            % Set/remove adhoc attribute
+            obj.setAttr('RandomParam', true);
+            obj.removeAttr('RandomParam');
+            testCase.verifyFalse(obj.attributes.isKey('RandomParam'));
         end
     end
 
+
     methods (Test, TestTags="Record")
-        function Entry(testCase)
+        function Record(testCase)
             obj = aod.schema.Record([], 'Test', 'Number',...
                 'Maximum', 3, 'Size', '(1,1)');
             [tf, ME] = obj.validate(3);
@@ -110,6 +194,33 @@ classdef SchemaTest < matlab.unittest.TestCase
                 testCase.verifyNumElements(ME.cause, 2);
             end
         end
+        
+        function RecordFromInput(testCase)
+            obj = aod.schema.Record([], "test", "NUMBER",...
+                "Size", "(1,2)",...
+                "Default", [2 2],...
+                "Description", "This is a test");
+            testCase.verifyEqual(obj.primitiveType, ...
+                aod.schema.primitives.PrimitiveTypes.NUMBER);
+            testCase.verifyTrue(obj.Primitive.Size.isSpecified());
+        end
+
+        function EmptyRecord(testCase)
+            obj = aod.schema.Record([], "Test", "Unknown");
+            obj.setType("TEXT");
+            testCase.verifyEqual(obj.primitiveType,...
+                aod.schema.primitives.PrimitiveTypes.TEXT);
+
+            % Test assignment
+            obj.assign("Size", "(1,1)",...
+                "Description", "test",...
+                "Default", "hey");
+            testCase.verifyEqual(obj.Primitive.Default.Value, "hey");
+            testCase.verifyEqual(obj.Primitive.Description.Value, "test");
+            testCase.verifyEqual(obj.Primitive.Class.Value, "string");
+            testCase.verifyEqual(obj.Primitive.Size.SizeType, ...
+                aod.schema.validators.size.SizeTypes.SCALAR);
+        end
     end
 
     methods (Test, TestTags="DatasetCollection")
@@ -123,17 +234,73 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyClass(obj.Records(1).Parent, 'aod.schema.collections.DatasetCollection');
         end
 
+        function DatasetCollection2(testCase)
+            obj = aod.schema.collections.DatasetCollection.populate('aod.core.Epoch');
+            testCase.verifyEqual(obj.Count, 4);
+            testCase.verifyNumElements(obj.Records, 4);
+            testCase.verifyEqual("aod.core.Epoch", obj.className);
+
+            testCase.verifyTrue(obj.has('ID'));
+            testCase.verifyEmpty(obj.get('Blah'));
+            testCase.verifyFalse(obj.has('Blah'));
+
+            out = obj.text(); %#ok<NASGU>
+        end
+
+        function DatasetCollectionFromEntity(testCase)
+            cEXPT = ToyExperiment(false);
+            DM = aod.schema.collections.DatasetCollection.populate(cEXPT);
+            testCase.verifyEqual(DM.Count, 4);
+            testCase.verifyNumElements(DM.list(), 4);
+
+            % TODO: add tests, currently just ensures error free
+            DM.text();
+            DM.struct();
+
+            % Get dataset by name
+            D = DM.get('experimentDate');
+            testCase.verifyEqual(D.Name, "experimentDate");
+
+            % Modify
+            DM.set('experimentDate',...
+                "Description", "test");
+            testCase.verifyEqual(D.Description.Value, "test");
+        end
+
+        function DatasetManagerAltPopulate(testCase)
+            DM1 = aod.schema.collections.DatasetCollection.populate( ...
+                'aod.core.Experiment');
+            DM2 = aod.schema.collections.DatasetCollection.populate( ...
+                meta.class.fromName('aod.core.Experiment'));
+
+            testCase.verifyEqual(DM1.Count, DM2.Count);
+        end
+
+        function EmptyDatasetCollection(testCase)
+            obj = aod.schema.collections.DatasetCollection();
+            testCase.verifyEmpty(obj.list());
+            testCase.verifyEqual(obj.text(), "Empty DatasetManager");
+            testCase.verifyEmpty(fieldnames(obj.struct()));
+
+            [tf, idx] = obj.has('DsetName');
+            testCase.verifyFalse(tf);
+            testCase.verifyEmpty(idx);
+        end
+
         function DatasetCollectionErrors(testCase)
             obj = aod.schema.collections.DatasetCollection.populate('aod.core.Calibration');
             testCase.verifyError(...
                 @() obj.remove('Target'), "remove:DatasetRemovalNotSupported");
 
             testCase.verifyError(...
-                @() obj.add('NewProp', 'text', 'Description', 'this is a test'),...
+                @() obj.add('NewProp', 'TEXT', 'Description', 'this is a test'),...
                 "add:AdditionNotSupported");
 
             testCase.verifyError(...
                 @() aod.schema.collections.DatasetCollection.populate(123),...
+                "populate:InvalidInput");
+            testCase.verifyError(...
+                @() aod.schema.collections.DatasetCollection.populate("aod.common.FileReader"),...
                 "populate:InvalidInput");
         end
     end
