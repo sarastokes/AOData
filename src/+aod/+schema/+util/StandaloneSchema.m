@@ -22,7 +22,7 @@ classdef StandaloneSchema < aod.schema.Schema
         end
     end
 
-    % aod.schema.SchemaCollection methods
+    % aod.schema.RecordCollection methods
     methods (Access = protected)
         function value = getAttributeCollection(obj)
             if ~isempty(obj.AttributeCollection)

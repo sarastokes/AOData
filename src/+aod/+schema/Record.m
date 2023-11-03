@@ -16,7 +16,7 @@ classdef Record < handle
 
     properties (SetAccess = private)
         Name            (1,1)   string
-        Parent                  % aod.schema.SchemaCollection
+        Parent                  % aod.schema.RecordCollection
         Primitive               % aod.schema.Primitive
     end
 
@@ -164,11 +164,11 @@ classdef Record < handle
         function setParent(obj, parent)
             arguments
                 obj
-                parent      %{mustBeSubclass(parent, ["aod.schema.SchemaCollection, aod.schema.collections.IndexedCollection"])}
+                parent      %{mustBeSubclass(parent, ["aod.schema.RecordCollection, aod.schema.collections.IndexedCollection"])}
             end
 
             % TODO: Think about Container primitive parentage
-            %if ~isSubclass(parent, ["aod.schema.SchemaCollection", "aod.schema.collections.IndexedCollection"])
+            %if ~isSubclass(parent, ["aod.schema.RecordCollection", "aod.schema.collections.IndexedCollection"])
             %    error("setParent:InvalidInput", "Must be a collection subclass");
             %end
             obj.Parent = parent;

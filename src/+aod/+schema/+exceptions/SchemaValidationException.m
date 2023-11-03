@@ -58,7 +58,7 @@ classdef SchemaValidationException < handle
                 msg = [msg, ' in ', class(schemaObj)];
                 % Don't run the rest of the if statements
             % elseif isSubclass(schemaObj, 'aod.schema.primitives.Container')
-            % 
+            %
             % elseif isSubclass(schemaObj, 'aod.schema.Primitive')
             %     if ~isempty(schemaObj.Parent)
             %         msg = sprintf('Failed validation for %s/%s in %s',...
@@ -69,7 +69,7 @@ classdef SchemaValidationException < handle
             %     end
             % elseif isa(schemaObj, 'aod.schema.Record')
 
-            % elseif isSubclass(schemaObj, 'aod.schema.SchemaCollection')
+            % elseif isSubclass(schemaObj, 'aod.schema.RecordCollection')
             end
 
             ME = MException(id, msg);

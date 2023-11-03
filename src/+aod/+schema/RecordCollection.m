@@ -1,4 +1,4 @@
-classdef (Abstract) SchemaCollection < handle
+classdef (Abstract) RecordCollection < handle
 % SCHEMACOLLECTION (abstract)
 %
 % Description:
@@ -8,7 +8,7 @@ classdef (Abstract) SchemaCollection < handle
 %   handle
 %
 % Constructor:
-%   obj = aod.schema.SchemaCollection(className)
+%   obj = aod.schema.RecordCollection(className)
 %
 % TODO: This could subclass IndexedCollection (?)
 
@@ -37,7 +37,7 @@ classdef (Abstract) SchemaCollection < handle
     end
 
     methods
-        function obj = SchemaCollection(parent)
+        function obj = RecordCollection(parent)
             if nargin > 0 && ~aod.util.isempty(parent)
                 if istext(parent)
                     className = parent;

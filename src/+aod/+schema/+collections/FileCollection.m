@@ -1,4 +1,4 @@
-classdef FileCollection < aod.schema.SchemaCollection
+classdef FileCollection < aod.schema.RecordCollection
 
     properties (Hidden, SetAccess = protected)
         schemaType = "File";
@@ -7,7 +7,7 @@ classdef FileCollection < aod.schema.SchemaCollection
 
     methods
         function obj = FileCollection(parent)
-            obj = obj@aod.schema.SchemaCollection(parent);
+            obj = obj@aod.schema.RecordCollection(parent);
         end
     end
 
@@ -43,7 +43,7 @@ classdef FileCollection < aod.schema.SchemaCollection
                 entry = aod.schema.Record(obj, fileName, 'file', varargin{startIdx:end});
             end
 
-            add@aod.schema.SchemaCollection(obj, entry);
+            add@aod.schema.RecordCollection(obj, entry);
         end
 
         function ip = getParser(obj)

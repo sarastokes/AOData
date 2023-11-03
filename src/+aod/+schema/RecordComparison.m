@@ -1,6 +1,9 @@
 classdef RecordComparison < handle
 % RECORDCOMPARISON
 
+% By Sara Patterson, 2023 (AOData)
+% ------------------------------------------------------------------------
+
     properties (SetAccess = private)
         A
         B
@@ -45,7 +48,7 @@ classdef RecordComparison < handle
             logTable.MatchType = string(logTable.MatchType);
             tt = TextTable();
             tt.table_title = sprintf("Changes in %s", aod.schema.util.traceSchemaLineage(obj.A));
-            tt.addColumns({"SchemaType", "MatchType", "Lineage"},... 
+            tt.addColumns({"SchemaType", "MatchType", "Lineage"},...
                 [-1, -1, -1], [3 3 3]);
             for i = 1:height(logTable)
                 tt.addRows(table2cell(logTable(i,:)), obj.ChangeLog.MatchType(i).getColor(true));
@@ -72,7 +75,7 @@ classdef RecordComparison < handle
                 primitiveComp = MatchType.SAME;
             end
             obj.logComparison(A1.SCHEMA_TYPE, primitiveComp, aod.schema.util.traceSchemaLineage(A1));
-            
+
             % if A1.Name ~= B2.Name
             %     nameComp = MatchType.CHANGED;
             % else
