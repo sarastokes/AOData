@@ -45,6 +45,20 @@ __User options__
 - [ ] Show schema for a specific data type in UI (as a tree? text?)
 
 
+### Logging
+Two types of log events:
+1. Class-specific schema events
+    - Schema inconsistencies
+    - Undefined records
+2. Entity-specific schema events
+    - Validation failures
+
+|Class|RecordType|RecordName|EventName|Details|
+|-----|----------|----------|---------|-------|
+|aod.core.Demo|Dataset|Dset1|UndefinedPrimitive|Info|
+|aod.core.Demo|Attribute|MyAttr|ValidationFailed|Details from MException|
+
+
 ### Schema in JSON
 Need to figure out how to get a constant link between a class and a UID. Having the UID live in the classdef file itself would ensure the class could be moved or renamed without concern. But having users generate one and paste it into a UID property isn't fun.
 
@@ -64,7 +78,7 @@ Option Two (30Oct2023):
     - LastModified
     - Aliases
     - _Classes_
-        - __Class__ (Skip? Name? UID? Hyphens mess up `struct`)
+        - ~~__Class__ (Skip? Name? UID? Hyphens mess up `struct`)~~
             - ClassUID
             - ClassName (full w/ packages)
             - Version #
@@ -79,6 +93,9 @@ Option Two (30Oct2023):
 
 
 - `registry.txt`: quick access to UIDs
+    - Class UUID
+    - Class name (current)
+    - Has aliases?
 
 Option One:
 - Schema UUID
@@ -124,6 +141,8 @@ Each primitive inherits from `aod.schema.Primitive` and include a specific set o
 |`Text`|string| string||
 
 You can have a `double` that is specified as an __`Integer`__. TODO: integrate `single` support into __`Number`__.
+
+Specifying row and/or variable names for __`Table`__ through `RowNames` and `Items` will populate an empty default table with row and/or variable names specified.
 
 Currently not supporting `char` as it can cause issues with the queries (e.g., each character can be considered equal to a double).
 

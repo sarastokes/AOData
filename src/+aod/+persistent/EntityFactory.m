@@ -3,7 +3,14 @@ classdef EntityFactory < handle
 %
 % Description:
 %   A factory for creating entities from an HDF5 file and caching the
-%   for faster interaction
+%   for faster interaction. There is one EntityFactory per experiment. The
+%   EntityFactory is created, used to populate Experiment and attached as
+%   a property of Experiment. As Experiment is the root entity, all other
+%   entities can be passed the Experiment's EntityFactory either directly
+%   or through their parent in the object hierarchy. The EntityFactory is
+%   passed to the EntityContainer objects populated upon instantiation of
+%   an entity and there waits until a request is made for one of the
+%   contained objects, then is passed to the contained entity's constructor
 %
 % Constructor:
 %   obj = aod.persistent.EntityFactory(hdfName)
@@ -22,7 +29,7 @@ classdef EntityFactory < handle
         entityManager           aod.h5.EntityManager
         classManager            aod.infra.ClassRepository
         listeners               event.listener
-        cache
+        cache                   % containers.Map
     end
 
     methods

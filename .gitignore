@@ -5,7 +5,7 @@
 
 ## LaTeX
 *.aux
-*.fls 
+*.fls
 *.toc
 *.synctex.gz
 *.fdb_latexmk
@@ -46,6 +46,7 @@ test/SmallExperiment2.h5
 test/ShellExperiment.h5
 
 test/Test.json
+test/TestDevice.json
 
 test/ToyExperiment.mat
 

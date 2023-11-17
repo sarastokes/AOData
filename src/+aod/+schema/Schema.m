@@ -103,8 +103,31 @@ classdef (Abstract) Schema < handle
     end
 
     methods
-        function checkForUndefined(obj)
-            % TODO: Quickly access primitive types
+        function [idx, dsetNames, attrNames, fileNames] = checkForUndefined(obj, errorType)
+            arguments
+                obj
+                errorType       = aod.infra.ErrorTypes.WARNING
+            end
+
+            errorType = aod.infra.ErrorTypes.init(errorType);
+
+            dsetNames = obj.Datasets.checkForUndefined();
+            attrNames = obj.Attributes.checkForUndefined();
+            fileNames = obj.Files.checkForUndefined();
+
+            idx = [numel(dsetNames), numel(attrNames), numel(fileNames)];
+            if errorType == aod.infra.ErrorTypes.NONE
+                return
+            end
+
+            ME = MException('Schema:checkForUndefined:UndefinedRecordsExist',...
+                '%s - %u datasets, %u attributes, %u files',...
+                    obj.className, idx);
+            if errorType == aod.infra.ErrorTypes.WARNING
+                throwWarning(ME);
+            else
+                throw(ME);
+            end
         end
 
         function [tf, ME] = checkSchemaIntegrity(obj, schemaType, entryName)
@@ -130,7 +153,8 @@ classdef (Abstract) Schema < handle
 
             tf = all([tfFile, tfAttr, tfDset]);
             if ~tf
-                ME = MException("checkSchemaIntegrity:InconsistenciesFound",...
+                ME = MException(...
+                    "checkSchemaIntegrity:InconsistenciesFound",...
                     "Inconsistent schemas in %u datasets, %u attributes and %u files",...
                     numel(dsetME.cause), numel(attrME.cause), numel(fileME.cause));
 
@@ -279,7 +303,6 @@ classdef (Abstract) Schema < handle
         % end
 
         function S = struct(obj)
-            entityName = strrep(obj.className, '.', '__'); % TODO
             if ~aod.util.isempty(obj.className)
                 entityClass = getClassWithoutPackages(obj.className);
                 packageName = erase(obj.className, "." + entityClass);
@@ -290,21 +313,21 @@ classdef (Abstract) Schema < handle
             end
 
             S = struct();
-            S.(entityName).Name = obj.className;
-            S.(entityName).ClassName = entityClass;
-            S.(entityName).PackageName = packageName;
-            S.(entityName).EntityType = char(obj.entityType);
-            S.(entityName).Superclasses = superNames';
+            S.Name = obj.className;
+            S.ClassName = entityClass;
+            S.PackageName = packageName;
+            S.EntityType = char(obj.entityType);
+            S.Superclasses = superNames';
             % TODO: Aliases, UUIDs and version number
-            S.(entityName).VersionNumber = [];
-            S.(entityName).Aliases = [];
-            S.(entityName).UUID = obj.classUUID;
+            S.VersionNumber = [];
+            S.Aliases = [];
+            S.UUID = obj.classUUID;
             % Leave blank until saved
-            S.(entityName).DateCreated = [];
+            S.DateCreated = [];
 
-            S.(entityName) = catstruct(S.(entityName), obj.Attributes.struct());
-            S.(entityName) = catstruct(S.(entityName), obj.Datasets.struct());
-            S.(entityName) = catstruct(S.(entityName), obj.Files.struct());
+            S = catstruct(S, obj.Attributes.struct());
+            S = catstruct(S, obj.Datasets.struct());
+            S = catstruct(S, obj.Files.struct());
         end
     end
 end

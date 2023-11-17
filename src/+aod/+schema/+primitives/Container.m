@@ -140,7 +140,7 @@ classdef (Abstract) Container < aod.schema.Primitive
     end
 
     methods (Access = protected)
-        function p = createPrimitive(obj, type, name, varargin)
+        function p = createPrimitive(obj, name, type, varargin)
             p = aod.schema.util.createPrimitive(type, name, obj, varargin{:});
         end
 
@@ -179,7 +179,7 @@ classdef (Abstract) Container < aod.schema.Primitive
                     inputItem = input.(ID);
                 else
                     error('getItemFromInput:InvalidInput',...
-                        'If input is a struct, ID must be a string/char fieldname not %s', class(ID));
+                        'If input is a struct, ID must be a text fieldname not %s', class(ID));
                 end
             elseif istable(input)
                 inputItem = input{:, ID};

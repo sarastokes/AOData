@@ -95,8 +95,11 @@ classdef (Abstract) RecordCollection < handle
             end
         end
 
-        function recordNames = getUndefined(obj)
+        function [recordNames, idx] = getUndefined(obj)
             % GETUNDEFINED  Returns record names with UNKNOWN primitives
+            %
+            % Syntax:
+            %   [recordNames, idx] = getUndefined(obj)
             % ----------------------------------------------------------
 
             if obj.Count == 0

@@ -34,7 +34,7 @@ classdef Minimum < aod.schema.Validator
         function setValue(obj, input)
             if istext(input) && input == "[]"
                 obj.Value = [];
-            elseif ~isa(input, 'meta.property')
+            else
                 obj.Value = input;
             end
         end

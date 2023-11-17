@@ -75,11 +75,8 @@ classdef Enum < aod.schema.Validator
         end
 
         function out = text(obj)
-            if ~obj.isSpecified()
-                out = "[]";
-            else
-                out = obj.Value;
-            end
+            out = value2string(obj.Value);
+            out = convertCharsToStrings(out);
         end
 
         function tf = isSpecified(obj)

@@ -50,7 +50,6 @@ classdef IndexedCollection < handle
     end
 
     methods
-
         function tf = has(obj, ID)
             if istext(ID)
                 tf = ~isempty(obj.name2id(ID));
@@ -133,6 +132,14 @@ classdef IndexedCollection < handle
     end
 
     methods
+        function names = getNames(obj)
+            if obj.Count > 0
+                names = arrayfun(@(x) x.Name, obj.Primitives);
+            else
+                names = [];
+            end
+        end
+
         function record = getRecord(obj)
             % GETRECORD  Match primitive getRecord to keep chain intact
             if isempty(obj.Parent)

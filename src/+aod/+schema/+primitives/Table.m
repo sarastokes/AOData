@@ -15,15 +15,22 @@ classdef Table < aod.schema.primitives.Container
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    properties (SetAccess = private)
+        RowNames                aod.schema.validators.RowNames
+    end
+
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.TABLE
-        OPTIONS = ["Class", "Size", "Items", "Default", "Description"];
+        OPTIONS = ["Class", "Size", "Items", "Default", "Description"]
         VALIDATORS = ["Class", "Size"]
     end
 
     methods
         function obj = Table(name, parent, varargin)
             obj = obj@aod.schema.primitives.Container(name, parent);
+
+            % Initialization
+            obj.RowNames = aod.schema.validators.RowNames(obj, []);
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
@@ -32,6 +39,7 @@ classdef Table < aod.schema.primitives.Container
             end
             obj.isInitializing = false;
             obj.checkIntegrity(true);
+            obj.assignDefault();
         end
     end
 
@@ -47,6 +55,49 @@ classdef Table < aod.schema.primitives.Container
             end
 
             setClass@aod.schema.primitives.Container(obj, value);
+        end
+
+        function setDefault(obj, value)
+            if isempty(value)
+                if istable(value) && ~isempty(value.Properties.VariableNames)
+                    obj.Default.setValue(value);
+                else
+                    return
+                end
+            end
+
+            obj.validate(value, aod.infra.ErrorTypes.ERROR);
+            obj.Default.setValue(value);
+        end
+
+        function setRowNames(obj, value)
+            arguments
+                obj
+                value           string
+            end
+
+            if aod.util.isempty(value)
+                obj.RowNames.setValue([]);
+            end
+
+            obj.assignDefault();
+            obj.checkIntegrity(true);
+        end
+    end
+
+    methods (Access = private)
+        function assignDefault(obj)
+            if obj.Default.isSpecified() || obj.numItems == 0
+                return
+            end
+
+            % Create an empty table matching specs
+            T = array2table(zeros(0, obj.numItems),...
+                'VariableNames', cellstr(obj.Collection.getNames()));
+            if obj.RowNames.isSpecified()
+                T.RowNames = obj.rowNames.Value;
+            end
+            obj.Default.setValue(T);
         end
     end
 
@@ -65,6 +116,7 @@ classdef Table < aod.schema.primitives.Container
                 obj.setSize(sprintf("(%s,%u)", firstDim, obj.numItems))
                 obj.Size.Value(2).setValue(obj.numItems);
             end
+            obj.assignDefault();
         end
 
         function removeItem(obj, ID)
@@ -78,6 +130,7 @@ classdef Table < aod.schema.primitives.Container
             else
                 obj.setSize(sprintf("(%s, %u)", firstDim, obj.numItems))
             end
+            obj.assignDefault();
         end
     end
 
@@ -102,11 +155,28 @@ classdef Table < aod.schema.primitives.Container
                 end
             end
 
+            if obj.RowNames.isSpecified()
+                % TODO
+            end
+
             tf = ~excObj.hasErrors;
             ME = excObj.getException();
             if ~tf && throwError
                 throw(ME);
             end
+        end
+
+        function [tf, ME] = validate(obj, input, errorType)
+            [~, ~, excObj] = validate@aod.schema.primitives.Container(obj, input, errorType);
+            if obj.rowNames.isSpecified()
+                if height(input) ~= numel(obj.rowNames)
+                    excObj.addCause(MException("Table:validate:InvalidHeight"),...
+                        'The height (%u) does not match the number of rows (%u)',...
+                        height(input), numel(obj.rowNames.Value));
+                end
+            end
+            tf = ~excObj.hasErrors;
+            ME = excObj.getException();
         end
     end
 end

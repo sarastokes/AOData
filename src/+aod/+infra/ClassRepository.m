@@ -1,4 +1,4 @@
-classdef ClassRepository < handle 
+classdef ClassRepository < handle
 % Sorts classes by package
 %
 % Constructor:
@@ -9,37 +9,29 @@ classdef ClassRepository < handle
 %   path        Search path(s) split by ';'
 %       If empty, getpref('AOData', 'SearchPaths') will be used
 %
+% Methods:
+%   obj.setSearchPath(path)
+%
 % References:
 %   Adapted from ClassRespository in Symphony-DAS
+%
+% See also:
+%   AODataManagerApp
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        searchPath 
-        classMap 
+        searchPath          string
+        classMap            % containers.Map
     end
 
-    methods 
+    methods
         function obj = ClassRepository(path)
             if nargin < 1
                 path = obj.getPathPreferences();
             end
             obj.setSearchPath(path);
-        end
-
-        function setSearchPath(obj, path)
-            if ~isstring(path)
-                path = string(path);
-            end
-            for i = 1:numel(path)
-                if isfolder(path(i))
-                    [~, ~, p] = appbox.packageName(path(i));
-                    addpath(p);
-                end
-            end
-            obj.searchPath = path;
-            obj.loadAll();
         end
 
         function cn = get(obj, superclass)
@@ -54,9 +46,38 @@ classdef ClassRepository < handle
         function y = list(obj)
             y = string(obj.classMap.keys)';
         end
+
+        function pkgClasses = getClassesByPackage(obj, pkgName)
+            arguments
+                obj             aod.infra.ClassRepository
+                pkgName         string
+            end
+
+            allClasses = obj.list();
+            pkgClasses = allClasses(startsWith(allClasses, pkgName));
+        end
     end
 
     methods (Access = private)
+        function setSearchPath(obj, path)
+            arguments
+                obj         aod.infra.ClassRepository
+                path        string
+            end
+
+            for i = 1:numel(path)
+                if isfolder(path(i))
+                    [~, ~, p] = appbox.packageName(path(i));
+                    addpath(p);
+                else
+                    warning('setSearchPath:InvalidFolder',...
+                        'Folder %s not found on path', path(i));
+                end
+            end
+            obj.searchPath = path;
+            obj.loadAll();
+        end
+
         function loadAll(obj)
             obj.classMap = containers.Map();
 
@@ -79,7 +100,7 @@ classdef ClassRepository < handle
                 if strcmpi(ext, '.m') && exist([package name], 'class')
                     try
                         obj.loadClass([package name]);
-                    catch x 
+                    catch x
                         warning(x.message);
                     end
                 elseif ~isempty(name) && name(1) == '+'
@@ -114,4 +135,4 @@ classdef ClassRepository < handle
             searchPaths = string(strsplit(searchPaths, ';'))';
         end
     end
-end 
+end

@@ -5,8 +5,8 @@ classdef RecordComparison < handle
 % ------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        A
-        B
+        A                   % aod.schema.Record
+        B                   % aod.schema.Record
         ChangeLog           table
     end
 

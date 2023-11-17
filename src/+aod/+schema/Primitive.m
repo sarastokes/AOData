@@ -162,7 +162,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
             % Syntax:
             %   setDefault(obj, value)
             % ----------------------------------------------------------
-            if isempty(value)
+            if isempty(value) || (istable(value) && isempty(value.Properties.VariableNames))
                 obj.Default.setValue([]);
             end
 
