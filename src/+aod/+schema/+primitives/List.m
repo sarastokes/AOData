@@ -92,7 +92,7 @@ classdef List < aod.schema.primitives.Container
         function p = createPrimitive(obj, type, varargin)
             name = sprintf('%s_%u', obj.Name, obj.numItems+1);
             p = createPrimitive@aod.schema.primitives.Container(obj,...
-                type, name, varargin{:});
+                name, type, varargin{:});
         end
     end
 end

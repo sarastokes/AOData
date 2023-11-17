@@ -3,6 +3,9 @@ function fPath = getResourceDir(obj, makeIfAbsent)
 %
 % Syntax:
 %   fPath = aod.schema.util.getResourceDir(obj, makeIfAbsent)
+%
+% See also:
+%   packageFromFolder
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -19,6 +22,9 @@ function fPath = getResourceDir(obj, makeIfAbsent)
 
     if exist(obj, "class")
         fPath = fullfile(fileparts(which(obj)), "resources");
+    elseif isfolder(obj)
+        packageFromFolder(obj); % confirm package
+        fPath = fullfile(obj, "resources");
     else
         try
             mp = meta.package.fromName(obj);

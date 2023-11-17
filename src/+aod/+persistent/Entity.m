@@ -83,6 +83,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
         Name                    string
         label                   string
         entityType              % aod.common.EntityTypes
+        classUUID               string
         % The entity's HDF5 path
         hdfPath                 char
         % Middle layer between HDF5 file and interface
@@ -755,6 +756,7 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             specialAttributes = ["UUID", "Class", "EntityType", "lastModified", "dateCreated", "label"];
             obj.label = obj.loadAttribute('label');
             obj.UUID = obj.loadAttribute('UUID');
+            obj.classUUID = obj.loadAttribute('ClassUUID');
             obj.entityType = aod.common.EntityTypes.get(obj.loadAttribute('EntityType'));
             obj.coreClassName = obj.loadAttribute('Class');
             obj.assignAttributeToProp('dateCreated');

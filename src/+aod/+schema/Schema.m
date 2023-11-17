@@ -13,8 +13,11 @@ classdef (Abstract) Schema < handle
 
     properties (SetAccess = private)
         Parent
-        className       (1,1)       string
-        classUUID       (1,1)       string
+    end
+
+    properties (SetAccess = protected)
+        className               string
+        classUUID               string
         entityType
     end
 
@@ -58,7 +61,6 @@ classdef (Abstract) Schema < handle
     end
 
     methods
-
         function tf = has(obj, recordName, recordType)
             if nargin == 3
                 collection = obj.getSchemaByType(recordType);
@@ -253,7 +255,7 @@ classdef (Abstract) Schema < handle
 
     methods (Access = protected)
         function setClassName(obj, className)
-            if ~isSubclass(className, "aod.core.Entity")
+            if ~isSubclass(className, ["aod.core.Entity", "aod.persistent.Entity"])
                 error('setClassName:InvalidClass',...
                     'Class %s is not a subclass of aod.core.Entity', className);
             end
@@ -288,19 +290,6 @@ classdef (Abstract) Schema < handle
 
             tf = true;
         end
-
-        % function [tf, idx] = unique(obj)
-        %     tf = false(size(obj));
-        %     tf(1) = true;
-
-        %     idx = [];
-        %     for i = 2:numel(obj)
-        %         for j = 1:i
-        %             if isequal(obj(i), obj(j))
-        %             end
-        %         end
-        %     end
-        % end
 
         function S = struct(obj)
             if ~aod.util.isempty(obj.className)

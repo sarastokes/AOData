@@ -29,6 +29,10 @@ classdef Schema < aod.schema.Schema
             obj.DatasetCollection = aod.schema.collections.DatasetCollection(obj.Parent);
             obj.AttributeCollection = aod.schema.collections.AttributeCollection(obj.Parent);
             obj.FileCollection = aod.schema.collections.FileCollection(obj.Parent);
+
+
+            obj.entityType = parent.entityType;
+            obj.classUUID = parent.classUUID;
         end
     end
 
@@ -53,6 +57,15 @@ classdef Schema < aod.schema.Schema
             end
             value = obj.FileCollection;
         end
+
+        function setClassName(obj, className)
+            if ~isSubclass(className, ["aod.core.Entity", "aod.persistent.Entity"])
+                error('setClassName:InvalidClass',...
+                    'Class %s is not a subclass of aod.core.Entity', className);
+            end
+
+            obj.className = className;
+        end
     end
 
     methods (Access = private)
@@ -61,11 +74,10 @@ classdef Schema < aod.schema.Schema
             out = h5read(obj.Parent.hdfName,...
                 h5tools.util.buildPath(obj.Parent.hdfPath, 'Schema'));
             S = jsondecode(out);
-            fMain = string(fieldnames(S));
 
-            obj.DatasetCollection = aod.h5.readSchemaCollection(S.(fMain).Datasets, obj.DatasetCollection);
-            obj.AttributeCollection = aod.h5.readSchemaCollection(S.(fMain).Attributes, obj.AttributeCollection);
-            obj.FileCollection = aod.h5.readSchemaCollection(S.(fMain).Files, obj.FileCollection);
+            obj.DatasetCollection = aod.h5.readSchemaCollection(S.Datasets, obj.DatasetCollection);
+            obj.AttributeCollection = aod.h5.readSchemaCollection(S.Attributes, obj.AttributeCollection);
+            obj.FileCollection = aod.h5.readSchemaCollection(S.Files, obj.FileCollection);
 
             obj.isPopulated = true;
         end
