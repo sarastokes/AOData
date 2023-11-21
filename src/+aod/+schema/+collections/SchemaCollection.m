@@ -5,7 +5,7 @@ classdef SchemaCollection < handle
 %   Tracks the schemas associated with a given experiment
 %
 % Constructor:
-%   obj = aod.schema.SchemaCollection(experiment)
+%   obj = aod.schema.collections.SchemaCollection(experiment)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------

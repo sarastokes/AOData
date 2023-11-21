@@ -1,11 +1,11 @@
 {
     "_schemaVersion": "1.0.0",
 
-    "aod.schema.RecordCollection.set":
+    "aod.schema.collections.RecordCollection.set":
     {
         "inputs": [
             {"name": "obj",
-                "kind": "required", "type": "aod.schema.RecordCollection"},
+                "kind": "required", "type": "aod.schema.collections.RecordCollection"},
             {"name": "name",
                 "kind": "required", "type": [["string"],["char"]]},
             {"name": "primitiveType",

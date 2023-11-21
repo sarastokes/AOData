@@ -48,10 +48,11 @@ __User options__
 ### Logging
 Two types of log events:
 1. Class-specific schema events
-    - Schema inconsistencies
-    - Undefined records
+    - Schema inconsistencies (error)
+    - Undefined records (warning)
 2. Entity-specific schema events
-    - Validation failures
+    - Validation failures (error)
+    - Requirement absences (warning)
 
 |Class|RecordType|RecordName|EventName|Details|
 |-----|----------|----------|---------|-------|
@@ -60,7 +61,7 @@ Two types of log events:
 
 
 ### Schema in JSON
-Need to figure out how to get a constant link between a class and a UID. Having the UID live in the classdef file itself would ensure the class could be moved or renamed without concern. But having users generate one and paste it into a UID property isn't fun.
+Need to figure out how to get a constant link between a class and a UID. Having the UID live in the classdef file itself would ensure the class could be moved or renamed without concern. But having users generate one and paste it into a UID property isn't fun. _Nov2023: This is what ended up being done; benefits seem to outweigh the quick inconvenience_
 
 Files for schema storage. Some potential options:
 - [ ] One per package
@@ -83,13 +84,18 @@ Option Two (30Oct2023):
             - ClassName (full w/ packages)
             - Version #
             - LastModified
-            - Aliases
+            - Aliases (class name aliases)
             - _Attributes_, _Datasets_, _Files_
                 - __Record__
                     - Name
                     - LastModified
-                    - Aliases
-                    - _Validators_, _Decorators_, _Default_
+                    - Aliases (property/attribute/file name aliases)
+                    - __Primitive__
+                      - PrimitiveType
+                      - _Validators_, _Decorators_, _Default_
+                    - __Items__ (nested primitives), optional
+                      - PrimitiveType
+                        - _Validators_, _Decorators_, _Default_
 
 
 - `registry.txt`: quick access to UIDs
@@ -114,14 +120,25 @@ The each parent-child relationship in the hierarchy is one-to-many. Parent class
 - __`aod.common.Entity`__
   - _`aod.schema.Schema`_ (`aod.core.Schema`, `aod.persistent.Schema`)
     - *`SchemaCollection`*: three subclasses `AttributeCollection`, `FileCollection` and `DatasetCollection`
-      - `Record`: a specific attribute or dataset defined by a *`Primitive`* which has a specific `PrimitiveType`. Some primitive types can contain other primitives (*`Container`*)
-        - Multiple *`Specification`* (*`Validator`*, *`Decorator`* and `Default`) - the PrimitiveType determines specifications for a given Record
+      - `Record`: a specific attribute/dataset/file defined by a *`Primitive`* which has a specific `PrimitiveType`. Some primitive types (*`Container`* subclasses) can contain other primitives; these nested primitives are referred to as "items"
+        - Multiple *`Specification`*s (*`Validator`*, *`Decorator`* and one `Default`) - the PrimitiveType determines specifications for a given Record
 
 ##### Schema subclasses
 1. __`aod.core.Schema`__ - attached to core entity instance and dynamically generated from core class/subclass using `specifyDatasets`, `specifyFiles` and `specifyAttributes`
 2. __`aod.schema.util.StandaloneSchema`__ - same as above but created independent of a core class object instance
 3. __`aod.persistant.Schema`__ - reflects persisted schema attached to an entity in an HDF5 file
 4. __`aod.schema.io.Schema`__ - reflects a schema written to a JSON file.
+
+
+### Alias Management
+Needs to integrate with MATLAB's support for aliasing classes. Record names will be fully supported through AOData's access methods.
+
+General framework for handling Record aliases:
+1. User calls `getProp`, `getAttr` or `getFile`.
+2. If it doesn't exist, an alias table with RecordName and AliasName columns will be used for searching the requested name.
+3. If the requested name is present in AliasName, the corresponding RecordName will be used to return the dataset/file/attribute.
+4. A warning will be thrown when an alias is used so users know to modify their code for consistency.
+5. The warnings can be temporarily disabled or permanently disabled through a settings UI.
 
 ### Primitives
 Each primitive inherits from `aod.schema.Primitive` and include a specific set of validators (discussed below). Primitives in *italics* are Containers that hold other primitives (subclasses of `aod.schema.primitives.Container`). They map to H5T_COMPOUND so can only hold valid primitive types (boolean, date, duration, file, integer, number, text).
@@ -160,9 +177,8 @@ Currently not supporting `char` as it can cause issues with the queries (e.g., e
 |Regexp|Text, File| Uses regular expressions to validate text |
 |Size|all|The specific size or number of dimensions|
 
-Some primitives will set default values (unless user provides something more specific). This includes:
+Some primitives will set default values for some validators (unless user provides something more specific). This includes:
 - _Integer_: if the class is an integer class, the appropriate *Minimum* and *Maximum* values will be set (e.g., `uint8` sets the minimum to 0 and the maximum to 255).
-- _Categorical_ sets the *Enum* validator to the provided names.
 
 ### Decorators
 Decorators add metadata but do not perform any validation on user-provided values.
@@ -171,10 +187,14 @@ Decorators add metadata but do not perform any validation on user-provided value
 |Description| all | Text scalar describing the entry.|
 |Units|Number, Integer|Units for a number (preferrably SI)|
 
+### Default
+Each primitive can have a default value. This helps when a new record is added to a schema and entities written with prior schema need to update.
+
 
 ### Components
 Basic types (__validator__, *decorator*):
 - Shared between all types
+    - Default
     - *Description* - information on the paramter
     - __Format__ - this is the underlying MATLAB class
     - __Size__
@@ -202,19 +222,27 @@ Basic types (__validator__, *decorator*):
 - Table
     - __NumFields__
     - __Length__
-    - _Fields_ (consists of other objects)
+    - ItemCollection (contains other nested primitives)
 
 
 ### Writing an AOData HDF5 file
 1. `[tf, ME, excObj] = checkSchemaIntegrity(obj, throwError)`
    - Are schemas viable?
    - Where are the conflicts?
+   - __The entity should not be written if schemas are broken__
 2. `[tf, ME, excObj] = validate(obj, throwError)`
    - Do provided values pass schema validation?
-   - If not, where did validation fail
-3. `[tf, objs] = checkRequirements` - are required values provided? AOData sticks to soft requirements and users can choose to leave a required value blank.
-4. `checkGitRepo()` - are classes committed? Only prompt if schemas are viable, no reason to be committing schemas that will need to be updated soon
-5. `updateSchemas` - update schemas before writing
+   - If not, where did validation fail?
+   - __The entity *can* be written if user forces write, even if validation fails__. This will need to be recorded somehow
+3. `[tf, objs] = checkRequirements(obj)` -
+   - Are required values provided?
+   - AOData sticks to soft requirements and users can choose to leave a required value blank.
+4. `checkGitRepo()`
+   - Are any recent changes committed?
+   - Only prompt if schemas are viable, no reason to be committing schemas that will change soon
+5. `updateSchemas()` - update schemas before writing
+   - If a change is detected, update the schema and increment the "patch" count on the version number.
+   - Alert user of patch occurring.
 
 ### Misc notes
 - Don't use numeric indexing for tables, use the column names so it's clear what data is used (and how to modify the code if the table changes in the future)

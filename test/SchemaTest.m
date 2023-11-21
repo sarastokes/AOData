@@ -54,7 +54,7 @@ classdef SchemaTest < matlab.unittest.TestCase
         function SchemaCollection(testCase)
             import aod.common.EntityTypes
 
-            obj = aod.schema.SchemaCollection(testCase.EXPT);
+            obj = aod.schema.collections.SchemaCollection(testCase.EXPT);
             testCase.verifyNumElements(obj.Schemas, 20);
             testCase.verifyNumElements(find(obj.entityTypes == EntityTypes.Epoch), 1);
 

@@ -8,7 +8,7 @@ classdef (Abstract) RecordCollection < handle
 %   handle
 %
 % Constructor:
-%   obj = aod.schema.RecordCollection(className)
+%   obj = aod.schema.collections.RecordCollection(className)
 %
 % TODO: This could subclass IndexedCollection (?)
 

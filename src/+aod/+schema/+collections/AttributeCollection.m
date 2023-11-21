@@ -1,8 +1,8 @@
-classdef AttributeCollection < aod.schema.RecordCollection
+classdef AttributeCollection < aod.schema.collections.RecordCollection
 % ATTRIBUTECOLLECTION  A collection of attribute schemas
 %
 % Superclasses:
-%   aod.schema.RecordCollection
+%   aod.schema.collections.RecordCollection
 %
 % Constructor:
 %   obj = aod.schema.collections.AttributeCollection(className)
@@ -27,7 +27,7 @@ classdef AttributeCollection < aod.schema.RecordCollection
             arguments
                 parent
             end
-            obj = obj@aod.schema.RecordCollection(parent);
+            obj = obj@aod.schema.collections.RecordCollection(parent);
         end
     end
 
@@ -54,7 +54,7 @@ classdef AttributeCollection < aod.schema.RecordCollection
                     'Attribute name %s is reserved by AOData. See aod.h5.getSystemAttributes', record.Name);
             end
 
-            add@aod.schema.RecordCollection(obj, record);
+            add@aod.schema.collections.RecordCollection(obj, record);
         end
 
         function ip = getParser(obj)

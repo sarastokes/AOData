@@ -95,7 +95,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
                 case "record"
                     parentClass = "aod.schema.Record";
                 case "collection"
-                    parentClass = "aod.schema.RecordCollection";
+                    parentClass = "aod.schema.collections.RecordCollection";
                 case "schema"
                     parentClass = "aod.schema.Schema";
                 case "entity"

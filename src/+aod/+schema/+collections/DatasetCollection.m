@@ -1,8 +1,8 @@
-classdef DatasetCollection < aod.schema.RecordCollection
+classdef DatasetCollection < aod.schema.collections.RecordCollection
 % DATASETSCHEMA  A collection of attribute schemas
 %
 % Superclasses:
-%   aod.schema.RecordCollection
+%   aod.schema.collections.RecordCollection
 %
 % Constructor:
 %   obj = aod.schema.collections.DatasetCollections(className)
@@ -22,14 +22,14 @@ classdef DatasetCollection < aod.schema.RecordCollection
 
     methods
         function obj = DatasetCollection(parent)
-            obj = obj@aod.schema.RecordCollection(parent);
+            obj = obj@aod.schema.collections.RecordCollection(parent);
         end
     end
 
     methods
         function add(obj, varargin)
             if isa(varargin{1}, 'aod.schema.Record')  % Internal use only
-                add@aod.schema.RecordCollection(obj, varargin{:});
+                add@aod.schema.collections.RecordCollection(obj, varargin{:});
             else
                 error('add:AdditionNotSupported',...
                     'Ad-hoc property addition is not supported. Datasets must be defined in a property block. Use set() to modify an existing property defined or inherited by the class.');
