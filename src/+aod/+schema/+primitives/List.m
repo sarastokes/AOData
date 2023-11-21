@@ -18,7 +18,7 @@ classdef List < aod.schema.primitives.Container
     end
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.LIST
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.LIST
         OPTIONS = ["Class", "Items", "Default", "Description"];
         VALIDATORS = ["Class", "Count"] % SIZE
     end

@@ -9,7 +9,7 @@
             {"name": "name",
                 "kind": "required", "type": [["string"],["char"]]},
             {"name": "primitiveType",
-                "kind": "required", "type": [["string"], ["char"], ["aod.schema.primitives.PrimitiveTypes"]]},
+                "kind": "required", "type": [["string"], ["char"], ["aod.schema.PrimitiveTypes"]]},
             {"name": "Default", "purpose": "A default value"},
             {"name": "Description", "purpose": "A description of the data/metadata"}
         ]

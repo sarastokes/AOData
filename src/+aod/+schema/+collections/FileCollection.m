@@ -2,7 +2,7 @@ classdef FileCollection < aod.schema.RecordCollection
 
     properties (Hidden, SetAccess = protected)
         recordType = aod.schema.RecordTypes.FILE
-        ALLOWABLE_PRIMITIVE_TYPES = aod.schema.primitives.PrimitiveTypes.FILE
+        ALLOWABLE_PRIMITIVE_TYPES = aod.schema.PrimitiveTypes.FILE
     end
 
     methods
@@ -27,8 +27,8 @@ classdef FileCollection < aod.schema.RecordCollection
                     startIdx = 2;
                 else % Make sure a non-file primitive type wasn't specified
                     try
-                        primitiveType = aod.schema.primitives.PrimitiveTypes.get(varargin{1});
-                        if primitiveType ~= aod.schema.primitives.PrimitiveTypes.FILE
+                        primitiveType = aod.schema.PrimitiveTypes.get(varargin{1});
+                        if primitiveType ~= aod.schema.PrimitiveTypes.FILE
                             error('add:InvalidPrimitiveType',...
                                 'FileCollection only accepts File primitives, not %s', char(primitiveType));
                         end

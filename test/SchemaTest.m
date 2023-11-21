@@ -194,14 +194,14 @@ classdef SchemaTest < matlab.unittest.TestCase
                 testCase.verifyNumElements(ME.cause, 2);
             end
         end
-        
+
         function RecordFromInput(testCase)
             obj = aod.schema.Record([], "test", "NUMBER",...
                 "Size", "(1,2)",...
                 "Default", [2 2],...
                 "Description", "This is a test");
             testCase.verifyEqual(obj.primitiveType, ...
-                aod.schema.primitives.PrimitiveTypes.NUMBER);
+                aod.schema.PrimitiveTypes.NUMBER);
             testCase.verifyTrue(obj.Primitive.Size.isSpecified());
         end
 
@@ -209,7 +209,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             obj = aod.schema.Record([], "Test", "Unknown");
             obj.setType("TEXT");
             testCase.verifyEqual(obj.primitiveType,...
-                aod.schema.primitives.PrimitiveTypes.TEXT);
+                aod.schema.PrimitiveTypes.TEXT);
 
             % Test assignment
             obj.assign("Size", "(1,1)",...

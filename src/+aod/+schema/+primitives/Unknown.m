@@ -13,7 +13,7 @@ classdef Unknown < aod.schema.Primitive
 % -------------------------------------------------------------------------
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.UNKNOWN
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.UNKNOWN
         OPTIONS = ["Size", "Default", "Description"];
         VALIDATORS = "Size";
     end

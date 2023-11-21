@@ -33,7 +33,7 @@ classdef PrimitiveTypes
 
     methods
         function tf = isContainer(obj)
-            import aod.schema.primitives.PrimitiveTypes
+            import aod.schema.PrimitiveTypes
 
             tf = ismember(obj, [PrimitiveTypes.OBJECT, PrimitiveTypes.LIST, PrimitiveTypes.TABLE]);
         end
@@ -53,14 +53,14 @@ classdef PrimitiveTypes
 
     methods (Static)
         function obj = get(input)
-            import aod.schema.primitives.PrimitiveTypes
+            import aod.schema.PrimitiveTypes
 
-            if isa(input, 'aod.schema.primitives.PrimitiveTypes')
+            if isa(input, 'aod.schema.PrimitiveTypes')
                 obj = input;
                 return
             end
             try
-                obj = aod.schema.primitives.PrimitiveTypes.(upper(input));
+                obj = aod.schema.PrimitiveTypes.(upper(input));
             catch
                 error('get:UnrecognizedPrimitiveType',...
                     'Unrecognized input %s', input);
@@ -68,18 +68,18 @@ classdef PrimitiveTypes
         end
 
         function out = list()
-            mc = meta.class.fromName('aod.schema.primitives.PrimitiveTypes');
+            mc = meta.class.fromName('aod.schema.PrimitiveTypes');
             names = arrayfun(@(x) string(x.Name), mc.EnumerationMemberList);
-            out = arrayfun(@(x) aod.schema.primitives.PrimitiveTypes.get(x), names);
+            out = arrayfun(@(x) aod.schema.PrimitiveTypes.get(x), names);
         end
 
         function fcn = getFcnHandle(input)
-            obj = aod.schema.primitives.PrimitiveTypes.get(input);
+            obj = aod.schema.PrimitiveTypes.get(input);
             fcn = obj.fcnHandle();
         end
 
         function obj = find(data)
-            import aod.schema.primitives.PrimitiveTypes
+            import aod.schema.PrimitiveTypes
 
             if isSubclass(data, 'aod.common.Entity')
                 obj = PrimitiveTypes.LINK;

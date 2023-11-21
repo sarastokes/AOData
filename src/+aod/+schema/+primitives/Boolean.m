@@ -11,7 +11,7 @@ classdef Boolean < aod.schema.Primitive
 % -------------------------------------------------------------------------
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.BOOLEAN
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.BOOLEAN
         OPTIONS = ["Size", "Default", "Description"]
         VALIDATORS = ["Class", "Size"];
     end

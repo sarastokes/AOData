@@ -20,7 +20,7 @@ classdef Table < aod.schema.primitives.Container
     end
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.TABLE
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.TABLE
         OPTIONS = ["Class", "Size", "Items", "Default", "Description"]
         VALIDATORS = ["Class", "Size"]
     end

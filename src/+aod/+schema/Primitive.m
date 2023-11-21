@@ -49,7 +49,7 @@ classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mix
         % that are set automatically and thus absent fromm OPTIONS.
         VALIDATORS  (1,:)       string
         % The primitive type
-        PRIMITIVE_TYPE          aod.schema.primitives.PrimitiveTypes
+        PRIMITIVE_TYPE          aod.schema.PrimitiveTypes
     end
 
     methods

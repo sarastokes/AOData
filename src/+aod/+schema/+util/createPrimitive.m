@@ -28,5 +28,5 @@ function primitive = createPrimitive(primitiveType, name, parent, varargin)
         varargin
     end
 
-    createFcn = aod.schema.primitives.PrimitiveTypes.getFcnHandle(primitiveType);
+    createFcn = aod.schema.PrimitiveTypes.getFcnHandle(primitiveType);
     primitive = createFcn(name, parent, varargin{:});

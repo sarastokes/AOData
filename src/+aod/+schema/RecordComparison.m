@@ -67,9 +67,9 @@ classdef RecordComparison < handle
 
             if A1.PRIMITIVE_TYPE ~= B2.PRIMITIVE_TYPE
                 primitiveComp = MatchType.CHANGED;
-            elseif A1.PRIMITIVE_TYPE == aod.schema.primitives.PrimitiveTypes.UNKNOWN
+            elseif A1.PRIMITIVE_TYPE == aod.schema.PrimitiveTypes.UNKNOWN
                 primitiveComp = MatchType.ADDED;
-            elseif B2.PRIMITIVE_TYPE == aod.schema.primitives.PrimitiveTypes.UNKNOWN
+            elseif B2.PRIMITIVE_TYPE == aod.schema.PrimitiveTypes.UNKNOWN
                 primitiveComp = MatchType.REMOVED;
             else
                 primitiveComp = MatchType.SAME;

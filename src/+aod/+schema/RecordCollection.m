@@ -18,7 +18,7 @@ classdef (Abstract) RecordCollection < handle
     properties (Abstract, Hidden, SetAccess = protected)
         % The specification type
         recordType                      aod.schema.RecordTypes
-        ALLOWABLE_PRIMITIVE_TYPES       aod.schema.primitives.PrimitiveTypes
+        ALLOWABLE_PRIMITIVE_TYPES       aod.schema.PrimitiveTypes
     end
 
     properties (SetAccess = protected)
@@ -122,7 +122,7 @@ classdef (Abstract) RecordCollection < handle
                     obj.className, string(obj.recordType), recordName);
             end
 
-            primitiveType = aod.schema.primitives.PrimitiveTypes.get(primitiveType);
+            primitiveType = aod.schema.PrimitiveTypes.get(primitiveType);
             % TODO: Ensure type is valid for collection
             if primitiveType ~= record.primitiveType
                 record.setType(primitiveType);

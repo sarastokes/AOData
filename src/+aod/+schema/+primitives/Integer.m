@@ -24,7 +24,7 @@ classdef Integer < aod.schema.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.INTEGER
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.INTEGER
         OPTIONS = ["Size", "Minimum", "Maximum", "Class", "Default", "Units", "Description"]
         VALIDATORS = ["Class", "Size", "Minimum", "Maximum"];
     end

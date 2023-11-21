@@ -24,7 +24,7 @@ classdef Record < handle
         % TODO: isNested
         Required        (1,1)   logical
         className       (1,1)   string
-        primitiveType   (1,1)   aod.schema.primitives.PrimitiveTypes
+        primitiveType   (1,1)   aod.schema.PrimitiveTypes
         ParentPath      (1,1)   string
     end
 
@@ -89,7 +89,7 @@ classdef Record < handle
             % Notes:
             %   Anything specified by the existing primitive is lost
             % -------------------------------------------------------------
-            primitiveType = aod.schema.primitives.PrimitiveTypes.get(primitiveType);
+            primitiveType = aod.schema.PrimitiveTypes.get(primitiveType);
             if isequal(obj.primitiveType, primitiveType)
                 return
             end
@@ -156,7 +156,7 @@ classdef Record < handle
 
         function tf = isUndefined(obj)
             % ISUNDEFINED  Returns true if the primitive is undefined
-            tf = obj.primitiveType == aod.schema.primitives.PrimitiveTypes.UNKNOWN;
+            tf = obj.primitiveType == aod.schema.PrimitiveTypes.UNKNOWN;
         end
     end
 

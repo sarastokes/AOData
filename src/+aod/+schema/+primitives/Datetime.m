@@ -14,7 +14,7 @@ classdef Datetime < aod.schema.Primitive
     end
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.DATETIME
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.DATETIME
         OPTIONS = ["Class", "Size", "Format", "Description"];
         VALIDATORS = ["Class", "Size", "Format"];
     end

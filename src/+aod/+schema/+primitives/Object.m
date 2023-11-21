@@ -6,7 +6,7 @@ classdef Object < aod.schema.primitives.Container
     end
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.primitives.PrimitiveTypes.OBJECT
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.OBJECT
         OPTIONS = ["Class", "Items", "Count", "Default", "Description"];
         VALIDATORS = ["Class", "Count"];
     end
