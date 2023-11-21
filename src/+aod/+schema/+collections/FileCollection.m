@@ -1,7 +1,7 @@
 classdef FileCollection < aod.schema.RecordCollection
 
     properties (Hidden, SetAccess = protected)
-        schemaType = "File";
+        recordType = aod.schema.RecordTypes.FILE
         ALLOWABLE_PRIMITIVE_TYPES = aod.schema.primitives.PrimitiveTypes.FILE
     end
 

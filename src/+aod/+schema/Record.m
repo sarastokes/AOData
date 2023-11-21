@@ -108,7 +108,7 @@ classdef Record < handle
                 obj
                 collectionVarName  (1,1)     string = "value"
             end
-            if ~isempty(obj.Parent) && obj.Parent.schemaType == "Dataset"
+            if ~isempty(obj.Parent) && obj.Parent.recordType == "Dataset"
                 fcnName = 'set';
             else
                 fcnName = 'add';

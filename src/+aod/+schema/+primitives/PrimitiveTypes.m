@@ -4,6 +4,10 @@ classdef PrimitiveTypes
 % Description:
 %   Enumeration for typing primitives
 %
+% Methods:
+%   tf = isContainer(obj)
+%   tf = isNestable(obj)
+%
 % Static methods:
 %   obj = get(input)
 %   obj = find(data)
@@ -28,14 +32,17 @@ classdef PrimitiveTypes
     end
 
     methods
-        function tf = isContainerAllowable(obj)
+        function tf = isContainer(obj)
+            import aod.schema.primitives.PrimitiveTypes
+
+            tf = ismember(obj, [PrimitiveTypes.OBJECT, PrimitiveTypes.LIST, PrimitiveTypes.TABLE]);
+        end
+
+        function tf = isNestable(obj)
             % TODO: choose between this and allowableChild property
             txt = string(obj);
-            if ismember(txt, ["BOOLEAN", "CATEGORICAL", "DATETIME", "DURATION", "FILE", "NUMBER", "INTEGER", "TEXT"])
-                tf = true;
-            else
-                tf = false;
-            end
+            tf = ismember(txt, ["TEXT", "BOOLEAN", "CATEGORICAL", "FILE",...
+                                "DURATION", "DATETIME", "NUMBER", "INTEGER"]);
         end
 
         function fcn = fcnHandle(obj)

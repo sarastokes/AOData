@@ -40,7 +40,7 @@ function fullName = traceSchemaLineage(schemaObj)
     if isempty(schemaCollection)
         return
     end
-    fullName = schemaCollection.schemaType + " = " + fullName;
+    fullName = string(schemaCollection.recordType) + " = " + fullName;
 
     entity = schemaCollection.Parent;
     if isempty(entity)

@@ -12,6 +12,7 @@ classdef RecordTypes
         ATTRIBUTE
         DATASET
         FILE
+        UNDEFINED
     end
 
     methods
@@ -46,6 +47,49 @@ classdef RecordTypes
                     error('get:UnknownRecordType',...
                         'Record type %s not recognized', input);
             end
+        end
+    end
+
+    % Builtin MATLAB methods
+    methods
+        function out = char(obj)
+            % Returns char of entity type with correct capitalization
+            %
+            % Note:
+            %   Necessary to avoid calling "string" bc infinite recursion
+            % -------------------------------------------------------------
+            import aod.schema.RecordTypes
+
+            if ~isscalar(obj)
+                out = aod.util.arrayfun(@(x) char(x), obj);
+                return
+            end
+
+            switch obj
+                case RecordTypes.ATTRIBUTE
+                    out = 'Attribute';
+                case RecordTypes.DATASET
+                    out = 'Dataset';
+                case RecordTypes.FILE
+                    out = 'File';
+                case RecordTypes.UNDEFINED
+                    out = 'Undefined';
+            end
+        end
+
+        function out = string(obj)
+            % Returns string of entity type with correct capitalization
+            %
+            % Note:
+            %   Necessary to avoid calling "string" bc infinite recursion
+            % -------------------------------------------------------------
+
+            if ~isscalar(obj)
+                out = aod.util.arrayfun(@(x) string(x), obj);
+                return
+            end
+
+            out = sprintf("%s", char(obj));
         end
     end
 end

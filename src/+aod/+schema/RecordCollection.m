@@ -17,8 +17,8 @@ classdef (Abstract) RecordCollection < handle
 
     properties (Abstract, Hidden, SetAccess = protected)
         % The specification type
-        schemaType          string
-        ALLOWABLE_PRIMITIVE_TYPES
+        recordType                      aod.schema.RecordTypes
+        ALLOWABLE_PRIMITIVE_TYPES       aod.schema.primitives.PrimitiveTypes
     end
 
     properties (SetAccess = protected)
@@ -32,7 +32,7 @@ classdef (Abstract) RecordCollection < handle
     end
 
     properties (Dependent)
-        Count       (1,1)   double      {mustBeInteger}
+        Count       (1,1)   double      {mustBeInteger, mustBeNonnegative}
         Contents            string
     end
 
@@ -119,7 +119,7 @@ classdef (Abstract) RecordCollection < handle
             if isempty(record)
                 error('set:EntryNotFound',...
                     '%s does not have the %s "%s"', ...
-                    obj.className, obj.schemaType, recordName);
+                    obj.className, string(obj.recordType), recordName);
             end
 
             primitiveType = aod.schema.primitives.PrimitiveTypes.get(primitiveType);
@@ -186,11 +186,11 @@ classdef (Abstract) RecordCollection < handle
                     case aod.infra.ErrorTypes.ERROR
                         error('get:EntryNotFound',...
                             'Entry %s not found in %sCollection',...
-                            recordName, obj.schemaType);
+                            recordName, string(obj.recordType));
                     case aod.infra.ErrorTypes.WARNING
                         warning('get:EntryNotFound',...
                             'Entry %s not found in %sCollection',...
-                            recordName, obj.schemaType);
+                            recordName, string(obj.recordType));
                     case aod.infra.ErrorTypes.MISSING
                         error("get:InvalidInput",...
                             "Missing error type is not supported");
@@ -217,7 +217,8 @@ classdef (Abstract) RecordCollection < handle
 
             if obj.Count > 0 && ismember(lower(record.Name), lower(obj.list()))
                 error('add:RecordExists',...
-                    'A %s named %s is already present', record.schemaType, record.Name);
+                    'A %s named %s is already present',...
+                        string(obj.recordType), record.Name);
             end
             obj.Records = [obj.Records; record];
         end
@@ -228,12 +229,13 @@ classdef (Abstract) RecordCollection < handle
             % Syntax:
             %   remove(obj, recordName)
             % ----------------------------------------------------------
+
             [tf, idx] = obj.has(recordName);
             if ~tf
                 return
             end
+
             obj.Records(idx) = [];
-            % obj.listeners(idx) = []
         end
 
         function out = text(obj)
@@ -243,7 +245,7 @@ classdef (Abstract) RecordCollection < handle
             %   out = text(obj)
             % ----------------------------------------------------------
             if isempty(obj)
-                out = sprintf("Empty %sCollection", obj.schemaType);
+                out = sprintf("Empty %sCollection", string(obj.recordType));
                 return
             end
 
@@ -258,6 +260,7 @@ classdef (Abstract) RecordCollection < handle
                 obj
                 collectionVarName    (1,1)  string = "value"
             end
+
             if obj.Count == 0
                 out = "";
                 return
@@ -350,9 +353,9 @@ classdef (Abstract) RecordCollection < handle
             % Syntax:
             %   S = struct(obj)
             % ----------------------------------------------------------
-            groupName = obj.schemaType+"s";
+            groupName = string(obj.recordType)+"s";
             S = struct();
-            S.(obj.schemaType+"s") = struct();
+            S.(string(obj.recordType)+"s") = struct();
             if isempty(obj)
                 return
             end

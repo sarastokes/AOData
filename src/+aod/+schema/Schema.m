@@ -66,9 +66,9 @@ classdef (Abstract) Schema < handle
                 collection = obj.getSchemaByType(recordType);
                 tf = collection.has(recordName);
             else
-                schemaTypes = ["attribute", "dataset", "file"];
+                recordTypes = ["attribute", "dataset", "file"];
                 for i = 1:3
-                    tf = obj.has(recordName, schemaTypes(i));
+                    tf = obj.has(recordName, recordTypes(i));
                     if tf
                         return
                     end
@@ -76,8 +76,8 @@ classdef (Abstract) Schema < handle
             end
         end
 
-        function out = getSchemaByType(obj, schemaType)
-            switch lower(schemaType)
+        function out = getSchemaByType(obj, recordType)
+            switch lower(recordType)
                 case {'attribute', 'attributes', 'attr', 'attrs'}
                     out = obj.Attributes;
                 case {'dataset', 'datasets', 'dset', 'dsets'}
@@ -85,8 +85,8 @@ classdef (Abstract) Schema < handle
                 case {'file', 'files'}
                     out = obj.Files;
                 otherwise
-                    error('getSchemaType:UnknownSchemaType',...
-                        'Schema type %s was unrecognized; use datasets, attributes or files', schemaType);
+                    error('getRecordType:UnknownRecordType',...
+                        'Schema type %s was unrecognized; use datasets, attributes or files', recordType);
             end
         end
     end
@@ -132,9 +132,9 @@ classdef (Abstract) Schema < handle
             end
         end
 
-        function [tf, ME] = checkSchemaIntegrity(obj, schemaType, entryName)
+        function [tf, ME] = checkSchemaIntegrity(obj, recordType, entryName)
             if nargin > 1
-                schema = obj.getSchemaByType(schemaType);
+                schema = obj.getSchemaByType(recordType);
                 p = schema.get(entryName, aod.infra.ErrorTypes.ERROR);
                 [tf, ME] = p.checkSchemaIntegrity();
                 return
@@ -172,9 +172,9 @@ classdef (Abstract) Schema < handle
             end
         end
 
-        function [tf, ME, excObj] = validate(obj, schemaType, entryName)
-            if ~aod.util.isempty(schemaType)
-                switch schemaType
+        function [tf, ME, excObj] = validate(obj, recordType, entryName)
+            if ~aod.util.isempty(recordType)
+                switch recordType
                     case "dataset"
                         [tf, ME] = obj.validateDataset(entryName);
                 end

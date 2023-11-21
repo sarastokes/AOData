@@ -1,5 +1,5 @@
 classdef SchemaCollection < handle
-% SCHEMACOLLECTION 
+% SCHEMACOLLECTION
 %
 % Description:
 %   Tracks the schemas associated with a given experiment
@@ -10,20 +10,17 @@ classdef SchemaCollection < handle
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     properties
-        Experiment          % aod.core.Experiment
+        Experiment          {aod.util.mustBeEntityType(Experiment, "EXPERIMENT")}
         Schemas             % aod.core.Schema
-        entityTypes         % aod.common.EntityTypes
+        entityTypes         % aod.common.EntityTypes % TODO: Needed?
         classUUIDs          string
         classNames          string
     end
 
     methods
         function obj = SchemaCollection(expt)
-            arguments
-                expt        aod.core.Experiment
-            end
-
             obj.Experiment = expt;
+
             obj.populate();
         end
     end

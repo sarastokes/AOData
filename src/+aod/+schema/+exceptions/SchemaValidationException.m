@@ -5,6 +5,7 @@ classdef SchemaValidationException < handle
 %   2. Pass object up the schema hierarchy
 %   3. To compile and throw, pass caller to use in message
 % -------------------------------------------------------------------------
+
     properties (SetAccess = private)
         Causes                      % MException
         Triggers                    string

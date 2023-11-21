@@ -16,7 +16,7 @@ classdef DatasetCollection < aod.schema.RecordCollection
 % -------------------------------------------------------------------------
 
     properties (Hidden, SetAccess = protected)
-        schemaType        = "Dataset"
+        recordType        = aod.schema.RecordTypes.DATASET
         ALLOWABLE_PRIMITIVE_TYPES = aod.schema.primitives.PrimitiveTypes.list()
     end
 
