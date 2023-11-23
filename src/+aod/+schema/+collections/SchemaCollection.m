@@ -1,4 +1,4 @@
-classdef SchemaCollection < handle
+classdef SchemaCollection < aod.schema.AODataSchemaObject
 % SCHEMACOLLECTION
 %
 % Description:

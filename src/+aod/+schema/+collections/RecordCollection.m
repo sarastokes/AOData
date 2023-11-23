@@ -1,4 +1,4 @@
-classdef (Abstract) RecordCollection < handle
+classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
 % SCHEMACOLLECTION (abstract)
 %
 % Description:
@@ -77,9 +77,10 @@ classdef (Abstract) RecordCollection < handle
 
         function [tf, ME, failedRecords] = checkIntegrity(obj, specName)
             failedRecords = [];
-            if nargin < 1 || isempty(specName)
+            if nargin < 2 || isempty(specName)
+                ME = [];
                 if obj.Count == 0
-                    tf = true; ME = [];
+                    tf = true;
                     return
                 end
                 didPass = true(obj.Count, 1);
@@ -88,7 +89,8 @@ classdef (Abstract) RecordCollection < handle
                     didPass(i) = iPassed;
                     ME = cat(1, ME, iME);
                 end
-                failedRecords = obj.Contents(didPass);
+                failedRecords = obj.Contents(~didPass);
+                tf = all(didPass);
             else
                 p = obj.get(specName, aod.infra.ErrorTypes.ERROR);
                 [tf, ME] = p.checkIntegrity();

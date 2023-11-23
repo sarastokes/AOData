@@ -25,14 +25,13 @@ classdef Schema < aod.schema.Schema
             obj = obj@aod.schema.Schema(parent);
 
             obj.isPopulated = false;
-            
+
             obj.DatasetCollection = aod.schema.collections.DatasetCollection(obj.Parent);
             obj.AttributeCollection = aod.schema.collections.AttributeCollection(obj.Parent);
             obj.FileCollection = aod.schema.collections.FileCollection(obj.Parent);
 
-
-            obj.entityType = parent.entityType;
-            obj.classUUID = parent.classUUID;
+            obj.entityType = obj.Parent.entityType;
+            obj.classUUID = obj.Parent.classUUID;
         end
     end
 
@@ -70,7 +69,6 @@ classdef Schema < aod.schema.Schema
 
     methods (Access = private)
         function collectSchemas(obj)
-            disp('Collecting schema...')
             out = h5read(obj.Parent.hdfName,...
                 h5tools.util.buildPath(obj.Parent.hdfPath, 'Schema'));
             S = jsondecode(out);

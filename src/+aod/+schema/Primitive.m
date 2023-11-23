@@ -1,4 +1,4 @@
-classdef (Abstract) Primitive < handle & matlab.mixin.Heterogeneous & matlab.mixin.CustomDisplay
+classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Heterogeneous & matlab.mixin.CustomDisplay
 % PRIMITIVE (abstract)
 %
 % Superclasses:

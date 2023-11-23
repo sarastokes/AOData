@@ -1,4 +1,4 @@
-classdef Record < handle
+classdef Record < aod.schema.AODataSchemaObject
 % RECORD
 %
 % Description:
@@ -9,7 +9,12 @@ classdef Record < handle
 % Constructor:
 %   obj = aod.schema.Record(parent, name, primitiveType, varargin)
 %
-% TODO: Name property is currently duplicated in Entry and child Primitive
+% TODO: Name property is currently duplicated in Record and child Primitive
+%
+% Methods:
+%   assign(obj, varargin)
+%   specification = getSpec(obj, specName)
+%   setType(obj, primitiveType)
 
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
@@ -21,7 +26,7 @@ classdef Record < handle
     end
 
     properties (Dependent)
-        % TODO: isNested
+        isNested        (1,1)   logical
         Required        (1,1)   logical
         className       (1,1)   string
         primitiveType   (1,1)   aod.schema.PrimitiveTypes
@@ -41,6 +46,13 @@ classdef Record < handle
             if isobject(parent)
                 obj.checkPrimitiveType();
             end
+        end
+    end
+
+    % Dependent set/get methods
+    methods
+        function value = get.isNested(obj)
+            value = obj.Primitive.isNested;
         end
 
         function value = get.Required(obj)
@@ -62,12 +74,11 @@ classdef Record < handle
                 value = "";
             end
         end
+    end
 
-        function p = getPrimitive(obj)
-            p = obj.Primitive;
-        end
-
+    methods
         function out = getSpec(obj, specName, itemName)
+            % GETSPEC  Returns a specification by name
             if nargin == 3
                 if isSubclass(obj.Primitive, "aod.schema.primitives.Container")
                     item = obj.Primitive.getItem(itemName);
@@ -97,44 +108,26 @@ classdef Record < handle
                 primitiveType, obj.Name, obj);
             obj.Primitive = newPrimitive;
         end
-
-        function out = code(obj, collectionVarName)
-            % CODE  Returns the code for the primitive
-            %
-            % Syntax:
-            %   out = code(obj)
-            % -------------------------------------------------------------
-            arguments
-                obj
-                collectionVarName  (1,1)     string = "value"
-            end
-            if ~isempty(obj.Parent) && obj.Parent.recordType == "Dataset"
-                fcnName = 'set';
-            else
-                fcnName = 'add';
-            end
-            out = sprintf('\t\t\t%s.%s("%s", "%s"', ...
-                collectionVarName, fcnName, obj.Name, char(obj.primitiveType));
-            for i = 1:numel(obj.Primitive.OPTIONS)
-                if ~obj.Primitive.(obj.Primitive.OPTIONS(i)).isSpecified()
-                    continue
-                end
-                out = sprintf('%s,...\n\t\t\t\t"%s", %s', out,...
-                    obj.Primitive.OPTIONS(i), obj.Primitive.(obj.Primitive.OPTIONS(i)).jsonencode());
-            end
-            out = sprintf("%s);\n", out);
-            out = string(out);
-
-        end
     end
 
     % Methods that pass to primitive
     methods
         function assign(obj, varargin)
+            % ASSIGN  Assign values to specifications by name
+            %
+            % Syntax:
+            %   assign(obj, varargin)
+            % ----------------------------------------------------------
             obj.Primitive.assign(varargin{:});
         end
 
         function [tf, ME, excObj] = validate(obj, input, errorType)
+            % VALIDATE
+            %
+            % Syntax:
+            %   [tf, ME, excObj] = validate(obj, input)
+            %   [tf, ME, excObj] = validate(obj, input, errorType)
+            % ----------------------------------------------------------
             arguments
                 obj
                 input
@@ -147,6 +140,11 @@ classdef Record < handle
         end
 
         function [tf, ME] = checkIntegrity(obj, throwError)
+            % CHECKINTEGRITY
+            %
+            % Syntax:
+            %   [tf, ME] = checkIntegrity(obj, throwError)
+            % ----------------------------------------------------------
             if nargin < 2
                 throwError = false;
             end
@@ -156,24 +154,27 @@ classdef Record < handle
 
         function tf = isUndefined(obj)
             % ISUNDEFINED  Returns true if the primitive is undefined
+            %
+            % TODO: What about Item primitives?
+            % -------------------------------------------------------------
             tf = obj.primitiveType == aod.schema.PrimitiveTypes.UNKNOWN;
         end
     end
 
-    methods (Access = private)
+    methods (Access = protected)
         function setParent(obj, parent)
             arguments
                 obj
-                parent      %{mustBeSubclass(parent, ["aod.schema.collections.RecordCollection, aod.schema.collections.IndexedCollection"])}
+                parent
             end
 
-            % TODO: Think about Container primitive parentage
-            %if ~isSubclass(parent, ["aod.schema.collections.RecordCollection", "aod.schema.collections.IndexedCollection"])
-            %    error("setParent:InvalidInput", "Must be a collection subclass");
-            %end
+            % TODO: Think about Container primitive parents then add
+            % type-checking for Parent property.
             obj.Parent = parent;
         end
+    end
 
+    methods (Access = private)
         function checkPrimitiveType(obj)
             % Confirm parent collection supports requested primitive type
             %
@@ -209,13 +210,44 @@ classdef Record < handle
         end
     end
 
+    methods (Hidden)
+        function out = code(obj, collectionVarName)
+            % CODE  Returns the code for the primitive
+            %
+            % Syntax:
+            %   out = code(obj)
+            % -------------------------------------------------------------
+            arguments
+                obj
+                collectionVarName  (1,1)     string = "value"
+            end
+            if ~isempty(obj.Parent) && obj.Parent.recordType == "Dataset"
+                fcnName = 'set';
+            else
+                fcnName = 'add';
+            end
+            out = sprintf('\t\t\t%s.%s("%s", "%s"', ...
+                collectionVarName, fcnName, obj.Name, char(obj.primitiveType));
+            for i = 1:numel(obj.Primitive.OPTIONS)
+                if ~obj.Primitive.(obj.Primitive.OPTIONS(i)).isSpecified()
+                    continue
+                end
+                out = sprintf('%s,...\n\t\t\t\t"%s", %s', out,...
+                    obj.Primitive.OPTIONS(i), obj.Primitive.(obj.Primitive.OPTIONS(i)).jsonencode());
+            end
+            out = sprintf("%s);\n", out);
+            out = string(out);
+
+        end
+    end
+
     % MATLAB builtin functions
     methods
         function tf = isequal(obj, other)
             if ~isa(other, class(obj))
                 tf = false;
             else
-                tf = isequal(obj.getPrimitive(), other.getPrimitive());
+                tf = isequal(obj.Primitive, other.getPrimitive());
             end
         end
 

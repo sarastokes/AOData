@@ -1,4 +1,4 @@
-classdef (Abstract) Schema < handle
+classdef (Abstract) Schema < aod.schema.AODataSchemaObject
 % SCHEMA (abstract)
 %
 % Description:
@@ -105,7 +105,7 @@ classdef (Abstract) Schema < handle
     end
 
     methods
-        function [idx, dsetNames, attrNames, fileNames] = checkForUndefined(obj, errorType)
+        function [counts, dsetNames, attrNames, fileNames] = checkForUndefined(obj, errorType)
             arguments
                 obj
                 errorType       = aod.infra.ErrorTypes.WARNING
@@ -117,14 +117,14 @@ classdef (Abstract) Schema < handle
             attrNames = obj.Attributes.checkForUndefined();
             fileNames = obj.Files.checkForUndefined();
 
-            idx = [numel(dsetNames), numel(attrNames), numel(fileNames)];
+            counts = [numel(dsetNames), numel(attrNames), numel(fileNames)];
             if errorType == aod.infra.ErrorTypes.NONE
                 return
             end
 
             ME = MException('Schema:checkForUndefined:UndefinedRecordsExist',...
                 '%s - %u datasets, %u attributes, %u files',...
-                    obj.className, idx);
+                    obj.className, counts);
             if errorType == aod.infra.ErrorTypes.WARNING
                 throwWarning(ME);
             else
@@ -149,7 +149,7 @@ classdef (Abstract) Schema < handle
                 [tfAttr, attrME] = attrSchema.checkIntegrity();
             end
             dsetSchema = obj.Datasets;
-            if ~isempty(datasetSchema)
+            if ~isempty(dsetSchema)
                 [tfDset, dsetME] = dsetSchema.checkIntegrity();
             end
 

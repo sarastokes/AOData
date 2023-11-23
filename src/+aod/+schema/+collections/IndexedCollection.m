@@ -1,4 +1,4 @@
-classdef IndexedCollection < handle
+classdef IndexedCollection < aod.schema.AODataSchemaObject
 % INDEXEDCOLLECTION
 %
 % Description:

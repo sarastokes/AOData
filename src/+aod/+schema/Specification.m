@@ -1,4 +1,4 @@
-classdef (Abstract) Specification < handle & matlab.mixin.Heterogeneous
+classdef (Abstract) Specification < aod.schema.AODataSchemaObject & matlab.mixin.Heterogeneous
 % An abstract class for all specification fields
 %
 % Superclasses:

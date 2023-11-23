@@ -742,7 +742,6 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
 
 
             % DATASETS -----------
-            obj.Schema = aod.persistent.Schema(obj);
             obj.description = obj.loadDataset('description');
             obj.notes = obj.loadDataset('notes');
             obj.Name = obj.loadDataset('Name');
@@ -761,6 +760,9 @@ classdef (Abstract) Entity < handle & matlab.mixin.CustomDisplay & aod.common.mi
             obj.coreClassName = obj.loadAttribute('Class');
             obj.assignAttributeToProp('dateCreated');
             obj.assignAttributeToProp('lastModified');
+
+            % SCHEMA (must be loaded after entity info populated)
+            obj.Schema = aod.persistent.Schema(obj);
 
             % Parse the remaining attributes
             for i = 1:numel(obj.attNames)
