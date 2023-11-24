@@ -1,4 +1,4 @@
-classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
+classdef (Abstract) RecordCollection < aod.schema.Collection
 % SCHEMACOLLECTION (abstract)
 %
 % Description:
@@ -25,6 +25,10 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
         Parent              % aod.schema.Schema
         className           string
         Records             % aod.schema.Record
+    end
+
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE              = aod.schema.SchemaObjectTypes.RECORD_COLLECTION
     end
 
     properties (Hidden, SetAccess = private)

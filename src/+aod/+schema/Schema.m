@@ -33,6 +33,10 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
         Files
     end
 
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE         = aod.schema.SchemaObjectTypes.SCHEMA
+    end
+
     methods (Abstract, Access = protected)
         value = getDatasetCollection(obj);
         value = getAttributeCollection(obj);

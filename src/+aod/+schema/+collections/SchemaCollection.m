@@ -1,4 +1,4 @@
-classdef SchemaCollection < aod.schema.AODataSchemaObject
+classdef SchemaCollection < aod.schema.Collection
 % SCHEMACOLLECTION
 %
 % Description:
@@ -15,6 +15,10 @@ classdef SchemaCollection < aod.schema.AODataSchemaObject
         entityTypes         % aod.common.EntityTypes % TODO: Needed?
         classUUIDs          string
         classNames          string
+    end
+
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE          = aod.schema.SchemaObjectTypes.SCHEMA_COLLECTION
     end
 
     methods

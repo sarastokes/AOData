@@ -8,13 +8,17 @@ classdef SchemaTypes
 % -------------------------------------------------------------------------
 
     enumeration
+        SCHEMA
+        ENTITY
+        COLLECTION
+        RECORD
+        ITEM
         % Schema types for a Record's Primitive
         PRIMITIVE
         VALIDATOR
         DECORATOR
         DEFAULT
         % Schema types for a Container's Primitives
-        ITEM
         ITEM_PRIMITIVE
         ITEM_VALIDATOR
         ITEM_DECORATOR

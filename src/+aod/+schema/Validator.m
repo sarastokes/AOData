@@ -16,6 +16,10 @@ classdef (Abstract) Validator < aod.schema.Specification
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE             = aod.schema.SchemaObjectTypes.VALIDATOR
+    end
+
     methods (Abstract)
         [tf, ME] = validate(obj, input)
     end

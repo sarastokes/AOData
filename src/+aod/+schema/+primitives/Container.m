@@ -161,6 +161,8 @@ classdef (Abstract) Container < aod.schema.Primitive
                     newItem.Name, obj.Name, string(newItem.PRIMITIVE_TYPE));
             end
 
+            %itemObj = aod.schema.Item(newItem);
+
             obj.Collection.add(newItem);
         end
     end

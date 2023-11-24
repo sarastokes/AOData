@@ -14,6 +14,10 @@ classdef Default < aod.schema.Specification
         Value           = []
     end
 
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE          = aod.schema.SchemaObjectTypes.DEFAULT
+    end
+
     methods
         function obj = Default(parent, input)
             arguments

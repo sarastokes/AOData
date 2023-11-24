@@ -10,8 +10,12 @@ classdef (Abstract) Decorator < aod.schema.Specification
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties
+    properties (SetAccess = protected)
         Value              string = string.empty()
+    end
+
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE          = aod.schema.SchemaObjectTypes.DECORATOR
     end
 
     methods

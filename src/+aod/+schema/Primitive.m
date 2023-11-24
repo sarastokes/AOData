@@ -21,6 +21,7 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
     end
 
     properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE             = aod.schema.SchemaObjectTypes.PRIMITIVE
         % Determines which aspects of an AOData entity the primitive can
         % be used to describe. Some may not be valid for attributes and
         % almost all are not valid for files.

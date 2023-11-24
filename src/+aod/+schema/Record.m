@@ -22,15 +22,22 @@ classdef Record < aod.schema.AODataSchemaObject
     properties (SetAccess = private)
         Name            (1,1)   string
         Parent                  % aod.schema.collections.RecordCollection
+    end
+
+    properties (Hidden, SetAccess = private)
         Primitive               % aod.schema.Primitive
     end
 
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE             = aod.schema.SchemaObjectTypes.RECORD
+    end
+
     properties (Dependent)
+        Items
         isNested        (1,1)   logical
         Required        (1,1)   logical
         className       (1,1)   string
         primitiveType   (1,1)   aod.schema.PrimitiveTypes
-        ParentPath      (1,1)   string
     end
 
     methods
@@ -55,16 +62,20 @@ classdef Record < aod.schema.AODataSchemaObject
             value = obj.Primitive.isNested;
         end
 
+        function value = get.Items(obj)
+            if obj.isNested
+                value = obj.Primitive.Collection;
+            else
+                value = [];
+            end
+        end
+
         function value = get.Required(obj)
             value = obj.Primitive.Required;
         end
 
         function value = get.primitiveType(obj)
             value = obj.Primitive.PRIMITIVE_TYPE;
-        end
-
-        function value = get.ParentPath(obj) %#ok<MANU>
-            value = ""; % TODO: implement parent identifier
         end
 
         function value = get.className(obj)

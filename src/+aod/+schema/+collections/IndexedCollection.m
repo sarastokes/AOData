@@ -1,4 +1,4 @@
-classdef IndexedCollection < aod.schema.AODataSchemaObject
+classdef IndexedCollection < aod.schema.Collection
 % INDEXEDCOLLECTION
 %
 % Description:
@@ -29,6 +29,10 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
     properties (SetAccess = protected)
         Parent
         Primitives
+    end
+
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE          = aod.schema.SchemaObjectTypes.ITEM_COLLECTION
     end
 
     properties (Dependent)
