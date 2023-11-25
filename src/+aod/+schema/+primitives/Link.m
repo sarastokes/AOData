@@ -5,8 +5,8 @@ classdef Link < aod.schema.Primitive
 %   aod.specification.types.Primitive
 %
 % Constructor:
-%   obj = aod.specification.types.Link(name, varargin)
-%   obj = aod.specification.types.Link(name,...
+%   obj = aod.specification.types.Link(varargin)
+%   obj = aod.specification.types.Link(...
 %       'EntityType', entityType)
 
 % By Sara Patterson, 2023 (AOData)
@@ -23,8 +23,8 @@ classdef Link < aod.schema.Primitive
     end
 
     methods
-        function obj = Link(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Link(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             obj.EntityType = aod.schema.validators.EntityType(obj, []);
 

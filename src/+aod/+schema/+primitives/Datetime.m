@@ -2,7 +2,7 @@ classdef Datetime < aod.schema.Primitive
 % Specifies a date and time (day, month, year)
 %
 % Constructor:
-%   obj = aod.schema.primitives.Datetime(name, parent, varargin)
+%   obj = aod.schema.primitives.Datetime(parent, varargin)
 %
 % TODO: Validation isn't rejecting - figure out a different approach
 
@@ -20,8 +20,8 @@ classdef Datetime < aod.schema.Primitive
     end
 
     methods
-        function obj = Datetime(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Datetime(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             obj.Format = aod.schema.validators.Format(obj, []);
             obj.setSize("(1,1)");

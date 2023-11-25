@@ -14,12 +14,12 @@ classdef Record < aod.schema.AODataSchemaObject
 % Methods:
 %   assign(obj, varargin)
 %   specification = getSpec(obj, specName)
-%   setType(obj, primitiveType)
+%   setPrimitive(obj, primitiveType)
 
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
 
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         Name            (1,1)   string
         Parent                  % aod.schema.collections.RecordCollection
     end
@@ -49,7 +49,7 @@ classdef Record < aod.schema.AODataSchemaObject
 
             % Create the primitive and confirm that it is valid
             obj.Primitive = aod.schema.util.createPrimitive(...
-                type, obj.Name, obj, varargin{:});
+                obj, type, varargin{:});
             if isobject(parent)
                 obj.checkPrimitiveType();
             end
@@ -105,8 +105,8 @@ classdef Record < aod.schema.AODataSchemaObject
     end
 
     methods
-        function setType(obj, primitiveType)
-            % SETTYPE  Assigns a primitive type to an entry
+        function setPrimitive(obj, primitiveType)
+            % SETPRIMITIVE  Assigns a primitive type to an entry
             %
             % Notes:
             %   Anything specified by the existing primitive is lost
@@ -115,8 +115,7 @@ classdef Record < aod.schema.AODataSchemaObject
             if isequal(obj.primitiveType, primitiveType)
                 return
             end
-            newPrimitive = aod.schema.util.createPrimitive(...
-                primitiveType, obj.Name, obj);
+            newPrimitive = aod.schema.util.createPrimitive(obj, primitiveType);
             obj.Primitive = newPrimitive;
         end
     end
@@ -183,6 +182,15 @@ classdef Record < aod.schema.AODataSchemaObject
             % type-checking for Parent property.
             obj.Parent = parent;
         end
+
+        function primitiveTypes = getAllowablePrimitiveTypes(obj)
+            if isempty(obj.Parent)
+                primitiveTypes = [];
+                return
+            end
+
+            primitiveTypes = obj.Parent.ALLOWABLE_PRIMITIVE_TYPES;
+        end
     end
 
     methods (Access = private)
@@ -192,7 +200,12 @@ classdef Record < aod.schema.AODataSchemaObject
             % Syntax:
             %   checkPrimitiveType(obj)
             % -------------------------------------------------------------
-            if ~ismember(obj.primitiveType, obj.Parent.ALLOWABLE_PRIMITIVE_TYPES)
+            allowablePrimitiveTypes = obj.getAllowablePrimitiveTypes();
+            if isempty(allowablePrimitiveTypes)
+                return  % Should only occur in testing
+            end
+            
+            if ~ismember(obj.primitiveType, allowablePrimitiveTypes)
                 error('checkPrimitiveType:InvalidTypeForCollection',...
                     '%s does not support primitives of type %s',...
                     getClassWithoutPackages(obj.Parent), char(obj.primitiveType));
@@ -258,12 +271,14 @@ classdef Record < aod.schema.AODataSchemaObject
             if ~isa(other, class(obj))
                 tf = false;
             else
-                tf = isequal(obj.Primitive, other.getPrimitive());
+                tf = isequal(obj.Primitive, other.Primitive);
             end
         end
 
         function S = struct(obj)
-            S = obj.Primitive.struct();
+            pS = obj.Primitive.struct();
+            S = struct();
+            S.(obj.Name) = pS;
         end
     end
 end

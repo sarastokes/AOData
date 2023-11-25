@@ -5,8 +5,8 @@ classdef Text < aod.schema.Primitive
 %   aod.schema.Primitive
 %
 % Constructor:
-%   obj = aod.schema.primitives.Text(name)
-%   obj = aod.schema.primitives.Text(name, 'Length', value,...
+%   obj = aod.schema.primitives.Text(parent)
+%   obj = aod.schema.primitives.Text(parent, 'Length', value,...
 %       'Length', value, 'Enum', value, 'Description', value)
 
 % By Sara Patterson, 2023 (AOData)
@@ -25,8 +25,8 @@ classdef Text < aod.schema.Primitive
     end
 
     methods
-        function obj = Text(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Text(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             % Initialization
             obj.Length = aod.schema.validators.Length(obj, []);

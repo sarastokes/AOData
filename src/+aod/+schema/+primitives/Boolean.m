@@ -5,7 +5,7 @@ classdef Boolean < aod.schema.Primitive
 %   aod.schema.Primitive
 %
 % Constructor:
-%   obj = aod.schema.Boolean(name, parent, varargin)
+%   obj = aod.schema.Boolean(parent, varargin)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -17,8 +17,8 @@ classdef Boolean < aod.schema.Primitive
     end
 
     methods
-        function obj = Boolean(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Boolean(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             % Set default values
             obj.setClass("logical");

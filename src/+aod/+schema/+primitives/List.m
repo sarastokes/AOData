@@ -5,7 +5,7 @@ classdef List < aod.schema.primitives.Container
 %   aod.schema.primitives.Container
 %
 % Constructor:
-%   obj = aod.schema.primitives.List(name, parent, varargin)
+%   obj = aod.schema.primitives.List(parent, varargin)
 %
 % Options:
 %   Class, Items, Default, Description
@@ -24,8 +24,8 @@ classdef List < aod.schema.primitives.Container
     end
 
     methods
-        function obj = List(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Container(name, parent);
+        function obj = List(parent, varargin)
+            obj = obj@aod.schema.primitives.Container(parent);
 
             % Initialize
             obj.Count = aod.schema.validators.Count(obj, []);
@@ -89,10 +89,21 @@ classdef List < aod.schema.primitives.Container
             obj.setCount(obj.numItems);
         end
 
-        function p = createPrimitive(obj, type, varargin)
-            name = sprintf('%s_%u', obj.Name, obj.numItems+1);
-            p = createPrimitive@aod.schema.primitives.Container(obj,...
-                name, type, varargin{:});
+        function newItem = createItem(obj, type, varargin)
+            if isempty(obj.Parent)
+                parentName = "Unknown";
+            else
+                parentName = obj.Parent.Name;
+            end
+            name = sprintf("%s_%u", parentName, obj.numItems+1);
+            newItem = createItem@aod.schema.primitives.Container(obj, name, type, varargin{:});
         end
+        
+        % function p = createPrimitive(obj, type, varargin)
+        %     name = sprintf('%s_%u', obj.obj.numItems+1);
+        %     newItem = Item()
+        %     p = createPrimitive@aod.schema.primitives.Container(obj,...
+        %         type, varargin{:});
+        % end
     end
 end

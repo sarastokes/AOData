@@ -12,7 +12,6 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
 
     properties (SetAccess = private)
         Parent                  % aod.schema.Record, aod.schema.primitives.Container
-        Name        (1,1)       string
         Required    (1,1)       logical = false
         Default     (1,1)       aod.schema.Default
         Class       (1,1)       aod.schema.validators.Class
@@ -54,12 +53,7 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
     end
 
     methods
-        function obj = Primitive(name, parent)
-            if nargin < 1
-                name = "UNDEFINED";
-            end
-            obj.setName(name);
-
+        function obj = Primitive(parent)
             if nargin > 1
                 obj.setParent(parent);
             end
@@ -191,28 +185,6 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
     end
 
     methods (Sealed)
-        function setName(obj, name)
-            % Set the primitive's name, ensuring valid variable name
-            %
-            % Syntax:
-            %   setName(obj, name)
-            %
-            % See also:
-            %   isvarname
-            % -------------------------------------------------------------
-            arguments
-                obj
-                name    (1,1)       string
-            end
-
-            if ~isvarname(name)
-                error('setName:InvalidName',...
-                    'Property names must be valid MATLAB variables');
-            end
-
-            obj.Name = name;
-        end
-
         function setRequired(obj, value)
             arguments
                 obj
@@ -378,7 +350,6 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
                 return
             end
 
-
             f = fieldnames(propgrp.PropertyList);
             for i = 1:numel(f)
                 propgrp.PropertyList.(f{i}) = convertProp(obj.(f{i}));
@@ -400,9 +371,8 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
     methods
         function S = struct(obj)
             S = struct();
-            S.(obj.Name) = struct();
-            S.(obj.Name).PrimitiveType = string(obj.PRIMITIVE_TYPE);
-            S.(obj.Name).Required = obj.Required;
+            S.PrimitiveType = string(obj.PRIMITIVE_TYPE);
+            S.Required = obj.Required;
 
             [validators, decorators] = aod.schema.util.getValidatorsAndDecorators(obj);
             for i = 1:numel(validators)
@@ -412,10 +382,10 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
                 else
                     value = obj.(validators(i)).Value;
                 end
-                S.(obj.Name).(validators(i)) = value; %.jsonencode();
+                S.(validators(i)) = value;
             end
             for i = 1:numel(decorators)
-                S.(obj.Name).(decorators(i)) = obj.(decorators(i)).Value; %.jsonencode();
+                S.(decorators(i)) = obj.(decorators(i)).Value;
             end
         end
 

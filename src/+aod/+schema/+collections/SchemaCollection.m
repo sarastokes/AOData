@@ -10,7 +10,7 @@ classdef SchemaCollection < aod.schema.Collection
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
     properties
-        Experiment          {aod.util.mustBeEntityType(Experiment, "EXPERIMENT")}
+        Experiment          % aod.core.Experiment, aod.persistent.Experiment
         Schemas             % aod.core.Schema
         entityTypes         % aod.common.EntityTypes % TODO: Needed?
         classUUIDs          string
@@ -23,7 +23,9 @@ classdef SchemaCollection < aod.schema.Collection
 
     methods
         function obj = SchemaCollection(expt)
-            obj.Experiment = expt;
+            if nargin > 1 && ~isempty(expt)
+                obj.setExperiment(expt);
+            end
 
             obj.populate();
         end
@@ -56,6 +58,16 @@ classdef SchemaCollection < aod.schema.Collection
                 obj.entityTypes = cat(1, obj.entityTypes,...
                     repmat(eTypes(i), [numel(idx), 1]));
             end
+        end
+    end
+
+    methods (Access = private)
+        function setExperiment(obj, expt)
+            arguments
+                obj
+                expt        {aod.util.mustBeEntityType(expt, "EXPERIMENT")}
+            end
+            obj.Experiment = expt;
         end
     end
 

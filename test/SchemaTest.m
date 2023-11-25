@@ -42,7 +42,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             obj = test.TestDevice("AttrOne", [2 2]);
             [dsets, attrs, files, ME] = obj.Schema.getUndefined("None");
             testCase.verifyNumElements(dsets, 2);
-            testCase.verifyNumELements(attrs, 1);
+            testCase.verifyNumElements(attrs, 1);
             testCase.verifyEmpty(files);
             testCase.verifyEqual(dsets, ["EmptyProp", "DependentProp"]);
             testCase.verifyEqual(attrs, "AttrThree");
@@ -69,7 +69,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Count, 0);
 
             % Add a primitive
-            obj.add(aod.schema.primitives.Boolean("Test", obj, "Size", "(1,1)"));
+            obj.add(aod.schema.Item(obj, "Test", "BOOLEAN", "Size", "(1,1)"));
             testCase.verifyEqual(obj.Count, 1);
 
             % Remove a primitive
@@ -77,21 +77,21 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.Count, 0);
 
             % Re-add a primitive, then another
-            obj.add(aod.schema.primitives.Boolean("P1", obj, "Default", false));
-            obj.add(aod.schema.primitives.Number("P2", obj, "Size", "(1,1)", "Units", "mV"));
+            obj.add(aod.schema.Item(obj, "P1", "BOOLEAN", "Default", false));
+            obj.add(aod.schema.Item(obj, "P2", "NUMBER", "Size", "(1,1)", "Units", "mV"));
             testCase.verifyEqual(obj.Count, 2);
 
             testCase.verifyEqual(obj.has("P1"));
-            testCase.verifyClass(obj.get("P1"), "aod.schema.primitives.Boolean");
-            testCase.verifyClass(obj.get("P2"), "aod.schema.primitives.Number");
+            testCase.verifyClass(obj.get("P1").primitiveType, PrimitiveTypes.BOOLEAN);
+            testCase.verifyClass(obj.get("P2").primitiveType, PrimitiveTypes.NUMBER);
         end
 
         function IndexedCollectionErrors(testCase)
             obj = aod.schema.collections.IndexedCollection([]);
             testCase.verifyError(...
-                @() obj.get("P1"), "get:PrimitiveNotFound");
+                @() obj.get("P1"), "get:ItemNotFound");
             testCase.verifyWarning(...
-                @() obj.get("P1", "WARNING"));
+                @() obj.get("P1", "WARNING"), "get:ItemNotFound");
         end
     end
 
@@ -186,7 +186,7 @@ classdef SchemaTest < matlab.unittest.TestCase
             end
 
             testCase.verifyError(...
-                @() obj.validate([4 4]), 'validate:Failed');
+                @() obj.validate([4 4]), 'validate:SchemaViolationsDetected');
             [tf, ME] = obj.validate([4 4], aod.infra.ErrorTypes.NONE);
             testCase.verifyFalse(tf);
             testCase.verifyNotEmpty(ME);
@@ -207,7 +207,7 @@ classdef SchemaTest < matlab.unittest.TestCase
 
         function EmptyRecord(testCase)
             obj = aod.schema.Record([], "Test", "Unknown");
-            obj.setType("TEXT");
+            obj.setPrimitive("TEXT");
             testCase.verifyEqual(obj.primitiveType,...
                 aod.schema.PrimitiveTypes.TEXT);
 
@@ -277,10 +277,11 @@ classdef SchemaTest < matlab.unittest.TestCase
         end
 
         function EmptyDatasetCollection(testCase)
-            obj = aod.schema.collections.DatasetCollection();
+            obj = aod.schema.collections.DatasetCollection([]);
             testCase.verifyEmpty(obj.list());
             testCase.verifyEqual(obj.text(), "Empty DatasetManager");
-            testCase.verifyEmpty(fieldnames(obj.struct()));
+            S = obj.struct();
+            testCase.verifyEmpty(fieldnames(S.Datasets));
 
             [tf, idx] = obj.has('DsetName');
             testCase.verifyFalse(tf);
@@ -307,7 +308,7 @@ classdef SchemaTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="FileCollection")
         function FileCollection(testCase)
-            obj = aod.schema.FileCollection('aod.core.Calibration', []);
+            obj = aod.schema.collections.FileCollection.populate('aod.core.Calibration');
             testCase.verifyEmpty(obj);
             testCase.verifyEqual(obj.Count, 0);
             testCase.verifyEqual(obj.className, "aod.core.Calibration");
@@ -332,7 +333,7 @@ classdef SchemaTest < matlab.unittest.TestCase
         end
 
         function FileCollectionErrors(testCase)
-            obj = aod.schema.FileCollection('aod.core.Calibration', []);
+            obj = aod.schema.collections.FileCollection.populate('aod.core.Calibration');
             testCase.verifyError(...
                 @() obj.add('Test', 'number', 'Description', 'Bad spec'),...
                 "add:InvalidPrimitiveType");

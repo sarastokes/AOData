@@ -12,7 +12,7 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent
+        Parent                         % aod.core.Entity, aod.persistent.Entity
     end
 
     properties (SetAccess = protected)
@@ -66,7 +66,13 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
 
     methods
         function tf = has(obj, recordName, recordType)
-            if nargin == 3
+            arguments
+                obj
+                recordName          string
+                recordType                      = []
+            end
+
+            if isempty(recordType)
                 collection = obj.getSchemaByType(recordType);
                 tf = collection.has(recordName);
             else
@@ -81,6 +87,11 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
         end
 
         function out = getSchemaByType(obj, recordType)
+
+            if isa(recordType, 'aod.schema.RecordTypes')
+                recordType = char(recordType);
+            end
+
             switch lower(recordType)
                 case {'attribute', 'attributes', 'attr', 'attrs'}
                     out = obj.Attributes;

@@ -5,9 +5,7 @@ classdef Unknown < aod.schema.Primitive
 %   aod.schema.validators.Primitive
 %
 % Constructor:
-%   obj = aod.schema.primitives.Unknown(name, parent, varargin)
-%
-% TODO: Should UKNOWN be allowed to set any parameters
+%   obj = aod.schema.primitives.Unknown(parent, varargin)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -19,8 +17,8 @@ classdef Unknown < aod.schema.Primitive
     end
 
     methods
-        function obj = Unknown(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Unknown(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             obj.parseInputs(varargin{:});
             obj.isInitializing = false;

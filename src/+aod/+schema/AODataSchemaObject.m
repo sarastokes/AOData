@@ -12,7 +12,8 @@ classdef (Abstract) AODataSchemaObject < handle
 
     methods
         function getParent(obj, parentType)
-            parentType = "aod.schema." + parentType;
+            parentType = aod.schema.SchemaObjectTypes.get(parentType);
+
             parent = obj.Parent;
             while ~isSubclass(parent, parentType)
                 parent = parent.Parent;

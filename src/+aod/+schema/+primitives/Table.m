@@ -26,8 +26,8 @@ classdef Table < aod.schema.primitives.Container
     end
 
     methods
-        function obj = Table(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Container(name, parent);
+        function obj = Table(parent, varargin)
+            obj = obj@aod.schema.primitives.Container(parent);
 
             % Initialization
             obj.RowNames = aod.schema.validators.RowNames(obj, []);

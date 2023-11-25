@@ -12,8 +12,8 @@ classdef Object < aod.schema.primitives.Container
     end
 
     methods
-        function obj = Object(name, parent, varargin)
-            obj = obj@aod.schema.primitives.Container(name, parent);
+        function obj = Object(parent, varargin)
+            obj = obj@aod.schema.primitives.Container(parent);
 
             % Initialize
             obj.Count = aod.schema.validators.Count(obj, []);
