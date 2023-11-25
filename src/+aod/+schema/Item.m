@@ -22,7 +22,7 @@ classdef Item < aod.schema.Record
         function setParent(obj, parent)
             arguments
                 obj
-                parent          aod.schema.collections.IndexedCollection
+                parent          aod.schema.collections.ItemCollection
             end
 
             obj.Parent = parent;

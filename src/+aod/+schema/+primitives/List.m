@@ -1,8 +1,8 @@
-classdef List < aod.schema.primitives.Container
+classdef List < aod.schema.Container
 % LIST
 %
 % Superclasses:
-%   aod.schema.primitives.Container
+%   aod.schema.Container
 %
 % Constructor:
 %   obj = aod.schema.primitives.List(parent, varargin)
@@ -25,7 +25,7 @@ classdef List < aod.schema.primitives.Container
 
     methods
         function obj = List(parent, varargin)
-            obj = obj@aod.schema.primitives.Container(parent);
+            obj = obj@aod.schema.Container(parent);
 
             % Initialize
             obj.Count = aod.schema.validators.Count(obj, []);
@@ -50,7 +50,7 @@ classdef List < aod.schema.primitives.Container
 
     methods
         function removeItem(obj, ID)
-            removeItem@aod.schema.primitives.Container(obj, ID);
+            removeItem@aod.schema.Container(obj, ID);
 
             obj.setCount(obj.numItems);
         end
@@ -67,7 +67,7 @@ classdef List < aod.schema.primitives.Container
                 return
             end
 
-            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Container(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.Container(obj);
             if obj.Count.isSpecified && obj.Count.Value ~= obj.numItems
                 excObj.addCause(MException('checkIntegrity:ItemsDoNotMatchCount',...
                     'The number of specified items (%u) does not match Count (%u)',...
@@ -84,7 +84,7 @@ classdef List < aod.schema.primitives.Container
 
     methods (Access = protected)
         function doAddItem(obj, newItem)
-            doAddItem@aod.schema.primitives.Container(obj, newItem);
+            doAddItem@aod.schema.Container(obj, newItem);
 
             obj.setCount(obj.numItems);
         end
@@ -96,13 +96,13 @@ classdef List < aod.schema.primitives.Container
                 parentName = obj.Parent.Name;
             end
             name = sprintf("%s_%u", parentName, obj.numItems+1);
-            newItem = createItem@aod.schema.primitives.Container(obj, name, type, varargin{:});
+            newItem = createItem@aod.schema.Container(obj, name, type, varargin{:});
         end
-        
+
         % function p = createPrimitive(obj, type, varargin)
         %     name = sprintf('%s_%u', obj.obj.numItems+1);
         %     newItem = Item()
-        %     p = createPrimitive@aod.schema.primitives.Container(obj,...
+        %     p = createPrimitive@aod.schema.Container(obj,...
         %         type, varargin{:});
         % end
     end

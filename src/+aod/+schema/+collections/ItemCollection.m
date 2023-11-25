@@ -1,5 +1,5 @@
-classdef IndexedCollection < aod.schema.Collection
-% INDEXEDCOLLECTION
+classdef ItemCollection < aod.schema.Collection
+% ITEMCOLLECTION
 %
 % Description:
 %   A collection of nested items accessible by name or index, depending
@@ -9,7 +9,7 @@ classdef IndexedCollection < aod.schema.Collection
 %   aod.schema.Collection
 %
 % Constructor:
-%   obj = aod.schema.collections.IndexedCollection(parent)
+%   obj = aod.schema.collections.ItemCollection(parent)
 %
 % Methods:
 %   add(obj, primitive)
@@ -21,14 +21,14 @@ classdef IndexedCollection < aod.schema.Collection
 % Hierarchy:
 %   - Record
 %       - Container
-%           - IndexedCollection
+%           - ItemCollection
 %               - Primitive(s)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent                      % aod.schema.primitives.Container
+        Parent                      % aod.schema.Container
         Items                       % aod.schema.Item
     end
 
@@ -41,7 +41,7 @@ classdef IndexedCollection < aod.schema.Collection
     end
 
     methods
-        function obj = IndexedCollection(parent)
+        function obj = ItemCollection(parent)
             if nargin > 0 && ~isempty(parent)
                 obj.setParent(parent);
             end
@@ -99,7 +99,7 @@ classdef IndexedCollection < aod.schema.Collection
             % ADD  Adds a new primitive to the collection
             % -------------------------------------------------------------
             arguments
-                obj     (1,1)   aod.schema.collections.IndexedCollection
+                obj     (1,1)   aod.schema.collections.ItemCollection
                 p               aod.schema.Item
             end
 
@@ -201,7 +201,7 @@ classdef IndexedCollection < aod.schema.Collection
             % SETPARENT  Validate input to Parent property before setting
             arguments
                 obj
-                parent          {mustBeSubclass(parent, 'aod.schema.primitives.Container')}
+                parent          {mustBeSubclass(parent, 'aod.schema.Container')}
             end
 
             obj.Parent = parent;

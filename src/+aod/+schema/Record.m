@@ -91,7 +91,7 @@ classdef Record < aod.schema.AODataSchemaObject
         function out = getSpec(obj, specName, itemName)
             % GETSPEC  Returns a specification by name
             if nargin == 3
-                if isSubclass(obj.Primitive, "aod.schema.primitives.Container")
+                if isSubclass(obj.Primitive, "aod.schema.Container")
                     item = obj.Primitive.getItem(itemName);
                     out = item.(specName);
                     return
@@ -204,7 +204,7 @@ classdef Record < aod.schema.AODataSchemaObject
             if isempty(allowablePrimitiveTypes)
                 return  % Should only occur in testing
             end
-            
+
             if ~ismember(obj.primitiveType, allowablePrimitiveTypes)
                 error('checkPrimitiveType:InvalidTypeForCollection',...
                     '%s does not support primitives of type %s',...

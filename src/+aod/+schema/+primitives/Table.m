@@ -1,4 +1,4 @@
-classdef Table < aod.schema.primitives.Container
+classdef Table < aod.schema.Container
 % TABLE
 %
 % Description:
@@ -27,7 +27,7 @@ classdef Table < aod.schema.primitives.Container
 
     methods
         function obj = Table(parent, varargin)
-            obj = obj@aod.schema.primitives.Container(parent);
+            obj = obj@aod.schema.Container(parent);
 
             % Initialization
             obj.RowNames = aod.schema.validators.RowNames(obj, []);
@@ -54,7 +54,7 @@ classdef Table < aod.schema.primitives.Container
                 mustBeMember(value, ["table", "timetable"]);
             end
 
-            setClass@aod.schema.primitives.Container(obj, value);
+            setClass@aod.schema.Container(obj, value);
         end
 
         function setDefault(obj, value)
@@ -104,7 +104,7 @@ classdef Table < aod.schema.primitives.Container
     % Container methods
     methods
         function addItem(obj, newItem)
-            addItem@aod.schema.primitives.Container(obj, newItem);
+            addItem@aod.schema.Container(obj, newItem);
 
             % Ensure size reflects current number of items and preserve
             % the number of rows if it was specified.
@@ -120,7 +120,7 @@ classdef Table < aod.schema.primitives.Container
         end
 
         function removeItem(obj, ID)
-            removeItem@aod.schema.primitives.Container(obj, ID);
+            removeItem@aod.schema.Container(obj, ID);
 
             % Ensure size reflects current number of items and preserve
             % the number of rows if it was specified.
@@ -146,7 +146,7 @@ classdef Table < aod.schema.primitives.Container
                 return
             end
 
-            [~, ~, excObj] = checkIntegrity@aod.schema.primitives.Container(obj);
+            [~, ~, excObj] = checkIntegrity@aod.schema.Container(obj);
             if obj.Class == "timetable" && obj.numItems > 0
                 if obj.Items(1).primitiveType ~= aod.schema.primitives.PrimitiveType.DURATION
                     excObj.addCause(MException("checkIntegrity:FirstItemMustBeDuration",...
@@ -167,7 +167,7 @@ classdef Table < aod.schema.primitives.Container
         end
 
         function [tf, ME] = validate(obj, input, errorType)
-            [~, ~, excObj] = validate@aod.schema.primitives.Container(obj, input, errorType);
+            [~, ~, excObj] = validate@aod.schema.Container(obj, input, errorType);
             if obj.rowNames.isSpecified()
                 if height(input) ~= numel(obj.rowNames)
                     excObj.addCause(MException("Table:validate:InvalidHeight"),...

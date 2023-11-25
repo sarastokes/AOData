@@ -24,9 +24,7 @@ classdef SchemaObjectTypes
                 case SchemaObjectTypes.RECORD_COLLECTION
                     className = "aod.schema.collections.RecordCollection";
                 case SchemaObjectTypes.ITEM_COLLECTION
-                    className = "aod.schema.collections.IndexedCollection";
-                case SchemaObjectTypes.CONTAINER
-                    className = "aod.schema.primitives.Container";
+                    className = "aod.schema.collections.ItemCollection";
                 case SchemaObjectTypes.ENTITY
                     className = "aod.common.mixins.Entity";
                 otherwise
@@ -61,7 +59,7 @@ classdef SchemaObjectTypes
                 case SchemaObjectTypes.RECORD_COLLECTION
                     out = 'RecordCollection';
                 case SchemaObjectTypes.ITEM_COLLECTION
-                    out = 'IndexedCollection';
+                    out = 'ItemCollection';
                 case SchemaObjectTypes.RECORD
                     out = 'Record';
                 case SchemaObjectTypes.ITEM

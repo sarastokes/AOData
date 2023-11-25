@@ -1,4 +1,4 @@
-classdef Object < aod.schema.primitives.Container
+classdef Object < aod.schema.Container
 % TODO: Should Count be included?? Survey "Required" to determine?
 
     properties (SetAccess = private)
@@ -13,7 +13,7 @@ classdef Object < aod.schema.primitives.Container
 
     methods
         function obj = Object(parent, varargin)
-            obj = obj@aod.schema.primitives.Container(parent);
+            obj = obj@aod.schema.Container(parent);
 
             % Initialize
             obj.Count = aod.schema.validators.Count(obj, []);

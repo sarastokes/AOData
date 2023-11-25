@@ -63,9 +63,9 @@ classdef SchemaTest < matlab.unittest.TestCase
         end
     end
 
-    methods (Test, TestTags="IndexedCollection")
-        function IndexedCollection(testCase)
-            obj = aod.schema.collections.IndexedCollection();
+    methods (Test, TestTags="ItemCollection")
+        function ItemCollection(testCase)
+            obj = aod.schema.collections.ItemCollection();
             testCase.verifyEqual(obj.Count, 0);
 
             % Add a primitive
@@ -86,8 +86,8 @@ classdef SchemaTest < matlab.unittest.TestCase
             testCase.verifyClass(obj.get("P2").primitiveType, PrimitiveTypes.NUMBER);
         end
 
-        function IndexedCollectionErrors(testCase)
-            obj = aod.schema.collections.IndexedCollection([]);
+        function ItemCollectionErrors(testCase)
+            obj = aod.schema.collections.ItemCollection([]);
             testCase.verifyError(...
                 @() obj.get("P1"), "get:ItemNotFound");
             testCase.verifyWarning(...

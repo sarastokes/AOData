@@ -11,7 +11,7 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
 % --------------------------------------------------------------------------
 
     properties (SetAccess = private)
-        Parent                  % aod.schema.Record, aod.schema.primitives.Container
+        Parent                  % aod.schema.Record, aod.schema.Container
         Required    (1,1)       logical = false
         Default     (1,1)       aod.schema.Default
         Class       (1,1)       aod.schema.validators.Class
@@ -330,8 +330,8 @@ classdef (Abstract) Primitive < aod.schema.AODataSchemaObject & matlab.mixin.Het
                 return
             end
 
-            mustBeSubclass(parent, ["aod.schema.Record", "aod.schema.primitives.Container"]);
-            if isa(parent, 'aod.schema.primitives.Container')
+            mustBeSubclass(parent, ["aod.schema.Record", "aod.schema.Container"]);
+            if isa(parent, 'aod.schema.Container')
                 % Check if table is allowed, throw error if not
                 obj.isNested = true;
             else

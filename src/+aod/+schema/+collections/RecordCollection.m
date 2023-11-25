@@ -10,7 +10,7 @@ classdef (Abstract) RecordCollection < aod.schema.Collection
 % Constructor:
 %   obj = aod.schema.collections.RecordCollection(className)
 %
-% TODO: This could subclass IndexedCollection (?)
+% TODO: This could subclass ItemCollection (?)
 
 % By Sara Patterson, 2023 (AOData)
 % ----------------------------------------------------------------------

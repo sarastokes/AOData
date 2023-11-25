@@ -14,7 +14,7 @@ classdef (Abstract) Container < aod.schema.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Collection          aod.schema.collections.IndexedCollection
+        Collection          aod.schema.collections.ItemCollection
     end
 
     properties (Hidden, SetAccess = protected)
@@ -41,7 +41,7 @@ classdef (Abstract) Container < aod.schema.Primitive
 
             obj = obj@aod.schema.Primitive(parent);
 
-            obj.Collection = aod.schema.collections.IndexedCollection(obj);
+            obj.Collection = aod.schema.collections.ItemCollection(obj);
             obj.isContainer = true;
         end
     end
@@ -160,7 +160,7 @@ classdef (Abstract) Container < aod.schema.Primitive
 
         function doAddItem(obj, newItem)
             arguments
-                obj         (1,1)   aod.schema.primitives.Container
+                obj         (1,1)   aod.schema.Container
                 newItem             aod.schema.Item
             end
 
