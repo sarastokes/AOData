@@ -39,7 +39,7 @@ classdef SchemaTest < matlab.unittest.TestCase
         end
 
         function SchemaUndefined(testCase)
-            obj = test.TestDevice("AttrOne", [2 2]);
+            obj = aotest.TestDevice("AttrOne", [2 2]);
             [dsets, attrs, files, ME] = obj.Schema.getUndefined("None");
             testCase.verifyNumElements(dsets, 2);
             testCase.verifyNumElements(attrs, 1);

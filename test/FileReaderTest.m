@@ -27,7 +27,7 @@ classdef FileReaderTest < matlab.unittest.TestCase
             writematrix([8, 8.5, 7; 0 2.1 -1], ...
                 fullfile(testCase.FOLDER, 'test.csv'));
 
-            testCase.FILE = fullfile(test.util.getAODataTestFolder(), 'FileReaderTest.h5');
+            testCase.FILE = fullfile(aotest.util.getAODataTestFolder(), 'FileReaderTest.h5');
             h5tools.createFile(testCase.FILE, true);
 
         end
@@ -66,7 +66,7 @@ classdef FileReaderTest < matlab.unittest.TestCase
         end
 
         function TXT(testCase)
-            reader = test.TestTxtReader(...
+            reader = aotest.TestTxtReader(...
                 fullfile(testCase.FOLDER, 'test.txt'));
             testCase.verifyEqual(reader.Data.PMTGain, 0.541);
             testCase.verifyEqual(reader.Data.FieldOfView, [3.69 2.70]);
@@ -74,7 +74,7 @@ classdef FileReaderTest < matlab.unittest.TestCase
                 'AOData\test\test_data\test.avi'));
             testCase.verifyTrue(reader.Data.Stabilization);
             testCase.verifyTrue(reader.Data.ClosedLoop);
-            
+
             reader.changeFile(fullfile(testCase.FOLDER, 'test.txt'));
         end
 

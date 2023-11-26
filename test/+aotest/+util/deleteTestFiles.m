@@ -8,7 +8,7 @@ function deleteTestFiles()
 % -------------------------------------------------------------------------
     currentPWD = pwd;
 
-    cd(test.util.getAODataTestFolder());
+    cd(aotest.util.getAODataTestFolder());
 
     warning('off', 'MATLAB:DELETE:FileNotFound');
 
@@ -47,7 +47,7 @@ function deleteTestFiles()
     if exist('PersistentInterface.h5', 'file')
         delete('PersistentInterface.h5');
     end
-    
+
     if exist('HdfTest.h5', 'file')
         delete('HdfTest.h5');
     end
@@ -61,5 +61,5 @@ function deleteTestFiles()
     end
 
     warning('on', 'MATLAB:DELETE:FileNotFound');
-    
+
     cd(currentPWD);

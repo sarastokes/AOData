@@ -9,7 +9,7 @@ classdef TestStimProtocol < aod.builtin.protocols.StimulusProtocol
 %   aod.builtin.protocols.StimulusProtocol
 %
 % Constructor:
-%   obj = test.TestStimProtocol(calibration, varargin)
+%   obj = aotest.TestStimProtocol(calibration, varargin)
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
@@ -31,12 +31,12 @@ classdef TestStimProtocol < aod.builtin.protocols.StimulusProtocol
             stim = obj.appendTailTime(stim);
         end
 
-        function writeStim(obj, fName) 
+        function writeStim(obj, fName)
             % Do nothing
         end
 
-        function fName = getFileName(obj) 
+        function fName = getFileName(obj)
             fName = 'TestStimProtocol';
         end
     end
-end 
+end

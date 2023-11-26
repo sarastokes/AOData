@@ -1,6 +1,6 @@
 classdef TestEnumType
 
-    enumeration 
+    enumeration
         TYPEONE
         TYPETWO
         TYPETHREE
@@ -9,11 +9,11 @@ classdef TestEnumType
     methods (Static)
         function obj = init(txt)
             try
-                obj = test.TestEnumType.(upper(txt));
-            catch 
+                obj = aotest.TestEnumType.(upper(txt));
+            catch
                 error('init:UnrecognizedType',...
                     'Unrecognized type %s', txt);
             end
         end
     end
-end 
+end

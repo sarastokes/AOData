@@ -1,4 +1,4 @@
-classdef PersistorTest < matlab.unittest.TestCase 
+classdef PersistorTest < matlab.unittest.TestCase
 % Test interactions between persistent interface and HDF5 files
 %
 % Description:
@@ -19,13 +19,13 @@ classdef PersistorTest < matlab.unittest.TestCase
 %#ok<*NASGU,*MANU>
 
     properties
-        EXPT 
+        EXPT
         SMALL_EXPT
     end
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            % Creates an experiment, writes to HDF5 and reads back in  
+            % Creates an experiment, writes to HDF5 and reads back in
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
                 'test', 'ToyExperiment.h5');
             [~, testCase.EXPT] = ToyExperiment(true, true);
@@ -36,7 +36,7 @@ classdef PersistorTest < matlab.unittest.TestCase
             h5tools.files.copyFile(fileName, "EntityDeletionTest.h5");
 
             % Make a smaller experiment for testing empty entities
-            testCase.SMALL_EXPT = test.util.makeSmallExperiment(...
+            testCase.SMALL_EXPT = aotest.util.makeSmallExperiment(...
                 true, 'ShellExperiment.h5');
         end
     end
@@ -89,7 +89,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
     end
 
-    
+
     methods (Test, TestTags=["Experiment"])
         function HomeDirectoryChanges(testCase)
             testCase.EXPT.setReadOnlyMode(false);
@@ -110,7 +110,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         function EntityRename(testCase)
             pEXPT = loadExperiment("EntityRenameTest.h5");
             pEXPT.setReadOnlyMode(false);
-            
+
             % Change the group name of a source
             pEXPT.Sources(1).Sources(1).setGroupName("OD")
             links = aod.h5.collectExperimentLinks(pEXPT.hdfName);
@@ -138,12 +138,12 @@ classdef PersistorTest < matlab.unittest.TestCase
             pEXPT.Analyses(1).deleteEntity();
             testCase.verifyNumElements(pEXPT.Analyses, numAnalyses - 1);
             testCase.verifyEmpty(pEXPT.factory.isCached(analysisUUID));
-            
+
             % Delete a source with children that are linked
             pEXPT.Sources(1).deleteEntity();
             epoch = pEXPT.Epochs(1);
             testCase.verifyClass(epoch.Source, 'aod.h5.BrokenSoftlink');
-            
+
             % Add a new source and replace softlink
             newSource = aod.core.Source("ExtraSource");
             pEXPT.add(newSource);
@@ -155,14 +155,14 @@ classdef PersistorTest < matlab.unittest.TestCase
     methods (Test, TestTags = "Modification")
         function AttrIO(testCase)
             import matlab.unittest.constraints.Throws
-            
+
             testCase.EXPT.setReadOnlyMode(false);
-            
+
             % Ensure system attributes aren't editable
             testCase.verifyThat( ...
                 @() testCase.EXPT.setAttr('Class', 'TestValue'),...
                 Throws("mustNotBeSystemAttribute:InvalidInput"));
-            
+
             % Add a new attribute, ensure other attributes are editable
             testCase.EXPT.setAttr('TestAttr', 0);
             info = h5info('ToyExperiment.h5', '/Experiment');
@@ -208,7 +208,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
 
         function DatasetAddition(testCase)
-            
+
             testCase.EXPT.setReadOnlyMode(false);
 
             % Add a property
@@ -221,7 +221,7 @@ classdef PersistorTest < matlab.unittest.TestCase
         end
 
         function RemovePropWarnings(testCase)
-            
+
             testCase.EXPT.setReadOnlyMode(false);
 
             testCase.verifyError(...
@@ -241,13 +241,13 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.EXPT.Epochs(1).setProp('Source', testCase.EXPT.Sources(1));
             links = aod.h5.collectExperimentLinks(testCase.EXPT);
             testCase.verifyTrue(ismember(newTargetPath, links.Target));
-            
+
             % Restore the original link
             oldTarget = testCase.EXPT.Sources(1).Sources(1).Sources(1);
             testCase.EXPT.Epochs(1).setProp('Source', oldTarget);
             links = aod.h5.collectExperimentLinks(testCase.EXPT);
             testCase.verifyTrue(strcmp(oldTarget.hdfPath, links.Target(1)));
-     
+
             % Test for errors with unwritten links
             testCase.verifyError(...
                 @() testCase.EXPT.setProp('BadLink', aod.core.Analysis('Test')),...
@@ -256,7 +256,7 @@ classdef PersistorTest < matlab.unittest.TestCase
 
         function addEntity(testCase)
             testCase.SMALL_EXPT.setReadOnlyMode(false);
-            
+
             % Analysis
             analysis = aod.core.Analysis("TestAnalysis");
             testCase.SMALL_EXPT.add(analysis);
@@ -277,10 +277,10 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.SMALL_EXPT.add(system);
             testCase.verifyNumElements(testCase.SMALL_EXPT.Systems, 1);
 
-            channel = aod.core.Channel("TestChannel",... 
+            channel = aod.core.Channel("TestChannel",...
                 "Parent", testCase.SMALL_EXPT.Systems(1));
             % Confirm interoperability of core/persistent
-            testCase.verifyClass(channel.getParent('experiment'),... 
+            testCase.verifyClass(channel.getParent('experiment'),...
                 "aod.persistent.Experiment");
             testCase.verifyClass(channel.getParent('channel'),...
                 "aod.core.Channel");
@@ -290,13 +290,13 @@ classdef PersistorTest < matlab.unittest.TestCase
             testCase.SMALL_EXPT.Systems(1).add(channel);
             testCase.verifyNumElements(testCase.SMALL_EXPT.Systems(1).Channels, 1);
             % Swap interfaces
-            channel0 = aod.util.swapInterfaces(channel); 
+            channel0 = aod.util.swapInterfaces(channel);
             testCase.verifyEqual(channel0.UUID, channel.UUID);
 
             % Add a device
-            device = aod.core.Device("TestDevice", "Parent", channel);     
+            device = aod.core.Device("TestDevice", "Parent", channel);
             channel0.add(device);
-            testCase.verifyNumElements(channel0.Devices, 1);      
+            testCase.verifyNumElements(channel0.Devices, 1);
         end
 
         function AddEpoch(testCase)

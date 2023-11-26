@@ -58,7 +58,7 @@ classdef UtilityTest < matlab.unittest.TestCase
         end
 
         function Factory(testCase)
-            obj = test.TestFactory();
+            obj = aotest.TestFactory();
             testCase.verifyError(@() obj.create(), "create:NotImplemented");
         end
 
@@ -163,8 +163,8 @@ classdef UtilityTest < matlab.unittest.TestCase
 
     methods (Test, TestTags=["FileManager", "Utility"])
         function FileManager(testCase)
-            FM = test.TestFileManager(fullfile(...
-                test.util.getAODataTestFolder(), 'test_data'));
+            FM = aotest.TestFileManager(fullfile(...
+                aotest.util.getAODataTestFolder(), 'test_data'));
 
             files = FM.getFilesFound();
             % ! This will change with # of test data files

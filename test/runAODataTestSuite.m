@@ -57,12 +57,12 @@ function [results, packageTable] = runAODataTestSuite(varargin)
     cd(fileparts(mfilename('fullpath')));
 
     % Delete pre-existing test HDF5 files, if necessary
-    test.util.deleteTestFiles();
+    aotest.util.deleteTestFiles();
 
     % Run the test suite
     if coverageFlag
         results = testWithCoverageReport(debugFlag, reportFlag);
-        [coverageTable, detailTable] = test.util.readCoverageReport(fullfile(pwd, 'coverage_report'));
+        [coverageTable, detailTable] = aotest.util.readCoverageReport(fullfile(pwd, 'coverage_report'));
         % Summarize the results by package
         packageNames = ["+api", "+app", "+builtin", "+core", "+infra", ...
             "+h5", "+persistent", "+schema", "+specification", "+util"];
@@ -92,7 +92,7 @@ function [results, packageTable] = runAODataTestSuite(varargin)
 
     % Clean up files produced by tests, if necessary
     if ~fileFlag
-        test.util.deleteTestFiles();
+        aotest.util.deleteTestFiles();
     end
 
     % Return to user's previous working directory

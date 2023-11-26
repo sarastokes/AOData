@@ -2,14 +2,14 @@ function verifyDatetimesEqual(testCase, actual, expected)
 % Check whether each component of datetime is equal
 %
 % Syntax:
-%   test.util.verifyDatetimesEqual(testCase, actual, expected)
+%   aotest.util.verifyDatetimesEqual(testCase, actual, expected)
 %
 % See also:
-%   test.util.verifyDatesEqual
+%   aotest.util.verifyDatesEqual
 
 % By Sara Patterson, 2022 (AOData)
 % -------------------------------------------------------------------------
-    
+
     testCase.verifyEqual(actual.Year, expected.Year);
     testCase.verifyEqual(actual.Month, expected.Month);
     testCase.verifyEqual(actual.Day, expected.Day);

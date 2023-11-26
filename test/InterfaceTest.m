@@ -1,4 +1,4 @@
-classdef InterfaceTest < matlab.unittest.TestCase 
+classdef InterfaceTest < matlab.unittest.TestCase
 % INTERFACETEST
 %
 % Description:
@@ -19,14 +19,14 @@ classdef InterfaceTest < matlab.unittest.TestCase
 
     properties
         pEXPT
-        cEXPT 
+        cEXPT
     end
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            % Creates an experiment, writes to HDF5 and reads back in  
+            % Creates an experiment, writes to HDF5 and reads back in
             fileName = fullfile(getpref('AOData', 'BasePackage'), ...
-                'test', 'ToyExperiment.h5');            
+                'test', 'ToyExperiment.h5');
             if ~exist(fileName, 'file')
                 ToyExperiment(true, true);
             end
@@ -92,12 +92,12 @@ classdef InterfaceTest < matlab.unittest.TestCase
             testCase.verifyEqual(...
                 testCase.cEXPT.expectedAttributes,...
                 testCase.pEXPT.expectedAttributes);
-            
-            test.util.verifyDatesEqual(testCase,... 
+
+            aotest.util.verifyDatesEqual(testCase,...
                 testCase.cEXPT.experimentDate,...
                 testCase.pEXPT.experimentDate);
-            
-            testCase.verifyEqual(... 
+
+            testCase.verifyEqual(...
                 testCase.cEXPT.homeDirectory,...
                 testCase.pEXPT.homeDirectory);
 
@@ -107,7 +107,7 @@ classdef InterfaceTest < matlab.unittest.TestCase
 
             testCase.verifyEqual(...
                 testCase.cEXPT.UUID,...
-                testCase.pEXPT.UUID);               
+                testCase.pEXPT.UUID);
 
             testCase.verifyEqual(...
                 testCase.cEXPT.description,...
@@ -117,7 +117,7 @@ classdef InterfaceTest < matlab.unittest.TestCase
                 testCase.cEXPT.Code, ...
                 testCase.pEXPT.Code);
         end
-        
+
         function DeviceProperties(testCase)
             cDevice = testCase.cEXPT.Systems(1).Channels(1).Devices(1);
             pDevice = testCase.pEXPT.query({'UUID', cDevice.UUID});
@@ -134,16 +134,16 @@ classdef InterfaceTest < matlab.unittest.TestCase
 
             testCase.verifyEqual(pSource.Name, cSource.Name);
             testCase.verifyEqual(pSource.micronsPerDegree, cSource.micronsPerDegree);
-            test.util.verifyAttributesEqual(testCase,...
+            aotest.util.verifyAttributesEqual(testCase,...
                 pSource.attributes, cSource.attributes)
         end
 
         function RegistrationProperties(testCase)
-            test.util.verifyDatesEqual(testCase,...
+            aotest.util.verifyDatesEqual(testCase,...
                 testCase.cEXPT.Epochs(1).Registrations(1).registrationDate,...
                 testCase.pEXPT.Epochs(1).Registrations(1).registrationDate);
             testCase.verifyEqual(...
-                testCase.cEXPT.Epochs(1).Registrations.transform,... 
+                testCase.cEXPT.Epochs(1).Registrations.transform,...
                 testCase.pEXPT.Epochs(1).Registrations.transform);
         end
     end
