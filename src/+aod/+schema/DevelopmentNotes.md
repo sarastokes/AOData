@@ -146,6 +146,7 @@ Each primitive inherits from `aod.schema.Primitive` and include a specific set o
 |Name|Matlab|Python| Description|
 |----|------|--------|------------|
 |`Boolean`|logical|bool|True or false|
+|`Complex`|double||A complex number|
 |`Date`|datetime|datetime||
 |`Duration`|duration|timedelta||
 |`File`|string|string|An absolute or relative file path|
