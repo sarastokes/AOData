@@ -1,7 +1,7 @@
 classdef ExceptionTree < handle
 
     properties (SetAccess = private)
-        exceptionType
+        exceptionType   aod.schema.exceptions.ExceptionTypes
         Children        aod.schema.exceptions.tree.ExceptionNode = aod.schema.exceptions.tree.ExceptionNode.empty()
     end
 
@@ -12,7 +12,7 @@ classdef ExceptionTree < handle
 
     methods
         function obj = ExceptionTree(exceptionType)
-            obj.exceptionType = exceptionType;
+            obj.exceptionType = aod.schema.exceptions.ExceptionTypes.get(exceptionType);
         end
     end
 
