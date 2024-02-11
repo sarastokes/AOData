@@ -1,14 +1,15 @@
-classdef IndexedCollection < aod.schema.AODataSchemaObject
-% INDEXEDCOLLECTION
+classdef ItemCollection < aod.schema.Collection
+% ITEMCOLLECTION
 %
 % Description:
-%   A collection of primitives accessible by their name or index.
+%   A collection of nested items accessible by name or index, depending
+%   on the parent Container's primitive type.
 %
 % Superclasses:
-%   handle
+%   aod.schema.Collection
 %
 % Constructor:
-%   obj = aod.schema.collections.IndexedCollection(parent)
+%   obj = aod.schema.collections.ItemCollection(parent)
 %
 % Methods:
 %   add(obj, primitive)
@@ -20,37 +21,43 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
 % Hierarchy:
 %   - Record
 %       - Container
-%           - IndexedCollection
+%           - ItemCollection
 %               - Primitive(s)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-    properties (SetAccess = protected)
-        Parent
-        Primitives
+    properties (SetAccess = private)
+        Parent                      % aod.schema.Container
+        Items                       % aod.schema.Item
+    end
+
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE  = aod.schema.SchemaObjectTypes.ITEM_COLLECTION
     end
 
     properties (Dependent)
-        Count   (1,1)       {mustBeInteger}
+        Count   (1,1)       double          {mustBeInteger}
     end
 
     methods
-        function obj = IndexedCollection(parent)
-            if nargin > 0
+        function obj = ItemCollection(parent)
+            if nargin > 0 && ~isempty(parent)
                 obj.setParent(parent);
             end
         end
     end
 
+    % Dependent set/get methods
     methods
         function value = get.Count(obj)
-            value = numel(obj.Primitives);
+            value = numel(obj.Items);
         end
     end
 
     methods
         function tf = has(obj, ID)
+            % HAS  Returns whether an item matching index/name is present
             if istext(ID)
                 tf = ~isempty(obj.name2id(ID));
             elseif isnumeric(ID)
@@ -85,18 +92,18 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
                 ID = obj.name2id(ID);
             end
 
-            p = obj.Primitives(ID);
+            p = obj.Items(ID);
         end
 
         function add(obj, p)
             % ADD  Adds a new primitive to the collection
             % -------------------------------------------------------------
             arguments
-                obj     (1,1)   aod.schema.collections.IndexedCollection
-                p               aod.schema.Primitive
+                obj     (1,1)   aod.schema.collections.ItemCollection
+                p               aod.schema.Item
             end
 
-            obj.Primitives = [obj.Primitives; p];
+            obj.Items = [obj.Items; p];
         end
 
         function remove(obj, ID)
@@ -104,14 +111,14 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
             % -------------------------------------------------------------
 
             if ~obj.has(ID)
-                error('remove:PrimitiveNotFound',...
-                    'No primitive found for input %s', value2string(ID));
+                error('remove:ItemNotFound',...
+                    'No item found for input %s', value2string(ID));
             end
             if istext(ID)
                 ID = obj.name2id(ID);
             end
 
-            obj.Primitives(ID) = [];
+            obj.Items(ID) = [];
             if obj.Count == 0
                 obj.clear();
             end
@@ -127,14 +134,14 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
                 mustBeInRange(ID, 1, obj.Count);
             end
 
-            obj.Primitives(ID).assign(varargin{:});
+            obj.Items(ID).assign(varargin{:});
         end
     end
 
     methods
         function names = getNames(obj)
             if obj.Count > 0
-                names = arrayfun(@(x) x.Name, obj.Primitives);
+                names = arrayfun(@(x) x.Name, obj.Items);
             else
                 names = [];
             end
@@ -148,9 +155,11 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
                 record = obj.Parent.getRecord();
             end
         end
+    end
 
+    methods
         function [tf, ME, excObj] = validateItem(obj, ID, input, errorType)
-            if nargin < 3
+            if nargin < 4
                 errorType = aod.infra.ErrorTypes.NONE;
             else
                 errorType = aod.infra.ErrorTypes.init(errorType);
@@ -160,7 +169,7 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
                 ID = obj.name2id(ID);
             end
 
-            [tf, ME, excObj] = obj.Primitives(ID).validate(input, errorType);
+            [tf, ME, excObj] = obj.Items(ID).validate(input, errorType);
         end
 
         function [tf, ME, excObj] = checkIntegrity(obj, ~)
@@ -171,7 +180,7 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
             % Supply Parent to exception (collection is transparent)
             excObj = aod.schema.exceptions.SchemaIntegrityException(obj.Parent);
             for i = 1:obj.Count
-                [iTF, iME] = obj.Primitives(i).checkIntegrity(false);
+                [iTF, iME] = obj.Items(i).checkIntegrity(false);
                 if ~iTF
                     excObj.addCause(iME);
                 end
@@ -184,15 +193,15 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
 
     methods (Access = private)
         function clear(obj)
-            % CLEAR  Ensure Primitives is fully empty
-            obj.Primitives = [];
+            % CLEAR  Ensure Items is fully empty
+            obj.Items = [];
         end
 
         function setParent(obj, parent)
             % SETPARENT  Validate input to Parent property before setting
             arguments
                 obj
-                parent          {mustBeSubclass(parent, 'aod.schema.primitives.Container')}
+                parent          {mustBeSubclass(parent, 'aod.schema.Container')}
             end
 
             obj.Parent = parent;
@@ -208,7 +217,7 @@ classdef IndexedCollection < aod.schema.AODataSchemaObject
             if obj.Count == 0
                 ID = [];
             else
-                ID = find(arrayfun(@(x) strcmpi(x.Name, name), obj.Primitives));
+                ID = find(arrayfun(@(x) strcmpi(x.Name, name), obj.Items));
             end
         end
     end

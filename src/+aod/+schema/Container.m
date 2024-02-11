@@ -14,7 +14,7 @@ classdef (Abstract) Container < aod.schema.Primitive
 % -------------------------------------------------------------------------
 
     properties (SetAccess = protected)
-        Collection          aod.schema.collections.IndexedCollection
+        Collection          aod.schema.collections.ItemCollection
     end
 
     properties (Hidden, SetAccess = protected)
@@ -34,14 +34,14 @@ classdef (Abstract) Container < aod.schema.Primitive
     end
 
     methods
-        function obj = Container(name, parent, varargin)
+        function obj = Container(parent, varargin)
             if nargin < 3
                 parent = [];
             end
 
-            obj = obj@aod.schema.Primitive(name, parent);
+            obj = obj@aod.schema.Primitive(parent);
 
-            obj.Collection = aod.schema.collections.IndexedCollection(obj);
+            obj.Collection = aod.schema.collections.ItemCollection(obj);
             obj.isContainer = true;
         end
     end
@@ -67,14 +67,17 @@ classdef (Abstract) Container < aod.schema.Primitive
                     setItems(obj, varargin{i}{:});
                 end
             elseif isstruct(varargin{1})
+                % This is how persisted schema are repopulated:
                 if obj.numItems ~= 0
                     error("setItems:InvalidInput", "User-provided input must be cell");
                 end
                 obj.Collection = aod.h5.readSchemaCollection(varargin{1}, obj, true);
             else
-                if obj.isInitializing
-                    p = obj.createPrimitive(varargin{:});
-                    obj.doAddItem(p);
+                newItem = obj.createItem(varargin{:});
+                if obj.isInitializing || obj.numItems == 0 || ~obj.Collection.has(newItem.Name)
+                    obj.doAddItem(newItem);
+                    %p = obj.createPrimitive(varargin{:});
+                    %obj.doAddItem(p);
                 else
                     obj.editItem(varargin{:});
                 end
@@ -83,22 +86,29 @@ classdef (Abstract) Container < aod.schema.Primitive
 
         function addItem(obj, varargin)
             if isa(varargin{1}, 'aod.schema.Primitive')
-                obj.doAddItem(p);
+                obj.doAddItem(varargin{1});
+                if nargin > 2
+                    obj.addItem(varargin{2:end}{:});
+                end
             elseif iscell(varargin{1})
                 for i = 1:numel(varargin)
                     obj.addItem(varargin{i}{:});
                 end
             else % TODO: Error catching
-                p = obj.createPrimitive(varargin{:});
-                obj.doAddItem(p);
+                %p = obj.createPrimitive(varargin{:});
+                %obj.doAddItem(p);
+                newItem = aod.schema.Item(obj, varargin{:});
+                obj.doAddItem(newItem);
             end
         end
 
         function editItem(obj, ID, varargin)
+            % EDITITEM  Edit an item by name or index
             obj.Collection.set(ID, varargin{:});
         end
 
         function removeItem(obj, ID)
+            % REMOVE  Remove an item by name or index
             obj.Collection.remove(ID);
         end
     end
@@ -130,7 +140,7 @@ classdef (Abstract) Container < aod.schema.Primitive
 
             errorType = aod.infra.ErrorTypes.init(errorType);
 
-            [tf, ME, excObj] = validate@aod.schema.primitives.Primitive(obj, input, errorType);
+            [tf, ME, excObj] = validate@aod.schema.Primitive(obj, input, errorType);
 
             for i = 1:obj.numItems
                 [~, ~, iExc] = obj.Collection.validateItem(obj.getItemFromInput(input, i), errorType);
@@ -140,14 +150,18 @@ classdef (Abstract) Container < aod.schema.Primitive
     end
 
     methods (Access = protected)
-        function p = createPrimitive(obj, name, type, varargin)
-            p = aod.schema.util.createPrimitive(type, name, obj, varargin{:});
+        function newItem = createItem(obj, name, type, varargin)
+            newItem = aod.schema.Item(obj, name, type, varargin{:});
+        end
+
+        function p = createPrimitive(obj, type, varargin)
+            p = aod.schema.util.createPrimitive(obj, type, varargin{:});
         end
 
         function doAddItem(obj, newItem)
             arguments
-                obj         (1,1)   aod.schema.primitives.Container
-                newItem             aod.schema.Primitive
+                obj         (1,1)   aod.schema.Container
+                newItem             aod.schema.Item
             end
 
             if ~isscalar(newItem)
@@ -155,11 +169,11 @@ classdef (Abstract) Container < aod.schema.Primitive
                 return;
             end
 
-            if ~ismember(newItem.PRIMITIVE_TYPE, obj.ALLOWABLE_CHILD_TYPES)
-                error('addItem:InvalidPrimitive',...
-                    'Field %s cannot be added to %s because it has a primitive type (%s) that is not supported for containers',...
-                    newItem.Name, obj.Name, string(newItem.PRIMITIVE_TYPE));
-            end
+            %if ~ismember(newItem.PRIMITIVE_TYPE, obj.ALLOWABLE_CHILD_TYPES)
+            %    error('addItem:InvalidPrimitive',...
+            %        'Field %s cannot be added to %s because it has a primitive type (%s) that is not supported for containers',...
+            %        newItem.Name, string(obj.PRIMITIVE_TYPE), string(newItem.PRIMITIVE_TYPE));
+            %end
 
             obj.Collection.add(newItem);
         end
@@ -194,9 +208,9 @@ classdef (Abstract) Container < aod.schema.Primitive
     methods
         function S = struct(obj)
             S = struct@aod.schema.Primitive(obj);
-            S.(obj.Name).Items = struct();
+            S.Items = struct();
             for i = 1:obj.numItems
-                S.(obj.Name).Items = catstruct(S.(obj.Name).Items, ...
+                S.Items = catstruct(S.Items, ...
                     obj.Collection.Primitives(i).struct());
             end
         end

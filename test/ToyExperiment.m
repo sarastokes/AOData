@@ -69,7 +69,7 @@ function [coreExpt, persistentExpt] = ToyExperiment(writeToHDF, saveAsMat)
     dichroic = aod.builtin.devices.BandpassFilter(607, 70,...
         "Manufacturer", "Semrock", "Model", "FF01-590/20");
     dichroic.setTransmission(fullfile(...
-        test.util.getAODataTestFolder(), "test_data", "FF01-607_70.txt"));
+        aotest.util.getAODataTestFolder(), "test_data", "FF01-607_70.txt"));
     channel3.add(dichroic);
 
     system.add([channel1, channel2, channel3]);

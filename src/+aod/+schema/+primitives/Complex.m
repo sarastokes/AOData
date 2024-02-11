@@ -1,27 +1,27 @@
-classdef Boolean < aod.schema.Primitive
-% BOOLEAN - Specify a logical value (true/false or 0/1)
+classdef Complex < aod.schema.Primitive
+% BOOLEAN - Specify a complex number
 %
 % Superclasses:
 %   aod.schema.Primitive
 %
 % Constructor:
-%   obj = aod.schema.Boolean(parent, varargin)
+%   obj = aod.schema.Complex(parent, varargin)
 
-% By Sara Patterson, 2023 (AOData)
+% By Sara Patterson, 2024 (AOData)
 % -------------------------------------------------------------------------
 
     properties (Hidden, SetAccess = protected)
-        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.BOOLEAN
+        PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.COMPLEX
         OPTIONS = ["Size", "Default", "Description"]
-        VALIDATORS = ["Class", "Size"];
+        VALIDATORS = ["Class", "Size"]
     end
 
     methods
-        function obj = Boolean(parent, varargin)
+        function obj = Complex(parent, varargin)
             obj = obj@aod.schema.Primitive(parent);
 
             % Set default values
-            obj.setClass("logical");
+            obj.setClass("double");
 
             % Complete setup and ensure schema consistency
             obj.parseInputs(varargin{:});
@@ -34,7 +34,7 @@ classdef Boolean < aod.schema.Primitive
         function setDefault(obj, value)
             arguments
                 obj
-                value       {mustBeNumericOrLogical}
+                value           double
             end
 
             if isempty(value)
@@ -42,19 +42,12 @@ classdef Boolean < aod.schema.Primitive
                 return
             end
 
-            if islogical(value)
-                obj.Default.setValue(value);
-                return
+            if isnumeric(value) && isreal(value)
+                error('setDefault:InvalidInput',...
+                    'Complex defaults cannot be real numbers.');
             end
+            obj.Default.setValue(value);
 
-            if isa(value, 'double')
-                if any(~ismember(value, [0 1]))
-                    error('setDefault:InvalidInput',...
-                        'Boolean defaults must be either 0 or 1.');
-                else
-                    obj.Default.setValue(logical(value));
-                end
-            end
             obj.checkIntegrity(true);
         end
     end

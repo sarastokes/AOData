@@ -14,7 +14,7 @@ function results = runAODataTest(testName, varargin)
 
     import matlab.unittest.plugins.StopOnFailuresPlugin
     import matlab.unittest.plugins.CodeCoveragePlugin
-    import matlab.unittest.plugins.codecoverage.CoverageReport    
+    import matlab.unittest.plugins.codecoverage.CoverageReport
 
     ip = inputParser();
     ip.CaseSensitive = false;
@@ -28,10 +28,10 @@ function results = runAODataTest(testName, varargin)
     debugFlag = ip.Results.Debug;
     resetFiles = ip.Results.ResetFiles;
     keepFiles = ip.Results.KeepFiles;
-    
+
     % Delete pre-existing test HDF5 files, if necessary
     if resetFiles
-        test.util.deleteTestFiles();
+        aotest.util.deleteTestFiles();
     end
 
     % Run the suite in this function's directory ('test')
@@ -68,12 +68,12 @@ function results = runAODataTest(testName, varargin)
 
     % Clean up files produced by tests, if necessary
     if ~keepFiles
-        test.util.deleteTestFiles();
+        aotest.util.deleteTestFiles();
     end
 
     if nargin > 1 && ~isempty(coveragePackage)
         open(fullfile('single_report', 'index.html'));
-    end 
+    end
 
     % Return to user's previous working directory
     cd(currentCD);

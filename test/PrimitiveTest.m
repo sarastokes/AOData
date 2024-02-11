@@ -19,14 +19,14 @@ classdef PrimitiveTest < matlab.unittest.TestCase
     methods (Test, TestTags="Primitive")
         function PrimitiveErrors(testCase)
             testCase.verifyError(...
-                @() aod.schema.primitives.Boolean("123", []),...
+                @() aod.schema.Record([], "123", "BOOLEAN"),...
                 "setName:InvalidName");
         end
     end
 
     methods (Test, TestTags="Text")
         function Text(testCase)
-            obj = aod.schema.primitives.Text("Test", []);
+            obj = aod.schema.primitives.Text([]);
             testCase.verifyFalse(obj.Required);
 
             testCase.verifyFalse(obj.Description.isSpecified());
@@ -35,7 +35,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         end
 
         function TextWithOptions(testCase)
-            obj = aod.schema.primitives.Text("Test", [],...
+            obj = aod.schema.primitives.Text([],...
                 "Enum", ["a", "b", "c"], "Length", 1, "Default", "b");
             testCase.verifyError(...
                 @()obj.validate("d"), 'validate:SchemaViolationsDetected');
@@ -44,7 +44,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Duration")
         function Duration(testCase)
-            obj = aod.schema.primitives.Duration("Test", []);
+            obj = aod.schema.primitives.Duration([]);
 
             obj.assign("Format", "s");
             testCase.verifyEqual(obj.Format.Value, "s");
@@ -53,14 +53,14 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         end
 
         function DurationWithOptions(testCase)
-            obj = aod.schema.primitives.Duration("Test", [],...
+            obj = aod.schema.primitives.Duration([],...
                 "Size", "(1,1)", "Format", "s", "Default", seconds(1));
             testCase.verifyTrue(obj.validate(seconds(2)));
             testCase.verifyFalse(obj.validate(seconds(1:3), aod.infra.ErrorTypes.NONE));
         end
 
         function DurationErrors(testCase)
-            obj = aod.schema.primitives.Duration("Test", []);
+            obj = aod.schema.primitives.Duration([]);
             testCase.verifyError(...
                 @() obj.assign('Format', 'badinput'),...
                 'setFormat:InvalidFormatForDuration');
@@ -80,7 +80,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Boolean")
         function Boolean(testCase)
-            obj = aod.schema.primitives.Boolean("Test", []);
+            obj = aod.schema.primitives.Boolean([]);
 
             % Some tests for the "Required" option
             testCase.verifyTrue(ismember("Required", obj.getOptions));
@@ -97,7 +97,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         end
 
         function BooleanWithOptions(testCase)
-            obj = aod.schema.primitives.Boolean("Test", [],...
+            obj = aod.schema.primitives.Boolean([],...
                 "Default", false, "Required", true);
             testCase.verifyError(...
                 @() obj.setSize("(1,2)"),...
@@ -107,8 +107,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Integer")
         function Integer(testCase)
-            obj = aod.schema.primitives.Integer("Test", []);
-            testCase.verifyEqual(obj.Name, "Test");
+            obj = aod.schema.primitives.Integer([]);
 
             testCase.verifyFalse(obj.Units.isSpecified());
             obj.assign("Units", "mV");
@@ -147,7 +146,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         end
 
         function IntegerDouble(testCase)
-            obj = aod.schema.primitives.Integer("Test", [],...
+            obj = aod.schema.primitives.Integer([],...
                 "Class", "double");
             testCase.verifyEqual(obj.Minimum.Value, 0);
             testCase.verifyFalse(obj.Maximum.isSpecified());
@@ -155,14 +154,14 @@ classdef PrimitiveTest < matlab.unittest.TestCase
             testCase.verifyError(...
                 @() obj.validate(1.5), 'validate:SchemaViolationsDetected');
 
-            obj = aod.schema.primitives.Integer("Test", [],...
+            obj = aod.schema.primitives.Integer([],...
                 "Minimum", 2);
             obj.assign("Class", "double");
             testCase.verifyEqual(obj.Minimum.Value, 2);
         end
 
         function IntegerErrors(testCase)
-            obj = aod.schema.primitives.Integer("Test", []);
+            obj = aod.schema.primitives.Integer([]);
             testCase.verifyError(...
                 @() obj.assign('Size', "(1,2)", 'Default', 2),...
                 'checkIntegrity:SchemaConflictsDetected');
@@ -171,20 +170,40 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="Number")
         function Number(testCase)
-            obj = aod.schema.primitives.Number("Test", []);
+            obj = aod.schema.primitives.Number([]);
             testCase.verifyEqual(obj.Class.Value, "double");
 
             obj.assign('Minimum', 1, 'Maximum', 3);
             testCase.verifyEqual(obj.Minimum.Value, 1);
             testCase.verifyEqual(obj.Maximum.Value, 3);
 
+            obj.assign('Enum', [1 2 3]);
+            testCase.verifyEqual(obj.Enum.Value, [1 2 3]);
+
             testCase.verifyTrue(obj.validate(2));
+        end
+
+        function NumberErrors(testCase)
+            obj = aod.schema.primitives.Number([]);
+
+            obj.assign('Maximum', 3);
+            testCase.verifyError(...
+                @() obj.assign('Minimum', 4), ...
+                'checkIntegrity:SchemaConflictsDetected');
+            testCase.verifyError(...
+                @() obj.assign('Enum', [3 4 5]),...
+                'checkIntegrity:SchemaConflictsDetected');
+
+            obj.assign('Minimum', 2);
+            testCase.verifyError(...
+                @() obj.assign('Enum', [1 2 3]),...
+                'checkIntegrity:SchemaConflictsDetected');
         end
     end
 
     methods (Test, TestTags="Link")
         function Link(testCase)
-            obj = aod.schema.primitives.Link("Test", []);
+            obj = aod.schema.primitives.Link([]);
 
             testCase.verifyFalse(obj.EntityType.isSpecified());
             testCase.verifyFalse(obj.Class.isSpecified());
@@ -201,10 +220,10 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="File")
         function File(testCase)
-            obj = aod.schema.primitives.File("Test", []);
+            obj = aod.schema.primitives.File([]);
             testCase.verifyFalse(obj.Extension.isSpecified());
 
-            obj = aod.schema.primitives.File("Test", [], "Extension", ".csv");
+            obj = aod.schema.primitives.File([], "Extension", ".csv");
             testCase.verifyEqual(obj.Extension.Value, ".csv");
 
             testCase.verifyError(@() obj.assign('Default', 1), 'checkIntegrity:SchemaConflictsDetected');
@@ -212,7 +231,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         end
 
         function File2(testCase)
-            obj = aod.schema.primitives.File("Test", []);
+            obj = aod.schema.primitives.File([]);
 
             testCase.verifyTrue(obj.validate("myfile.csv"));
             obj.assign('Extension', [".json", ".txt"]);
@@ -224,7 +243,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
         end
 
         function FileWithOptions(testCase)
-            obj = aod.schema.primitives.File("Test", [],...
+            obj = aod.schema.primitives.File([],...
                 "Default", "myfile.json", "Required", true,...
                 "Description", "this is a test");
 
@@ -239,7 +258,7 @@ classdef PrimitiveTest < matlab.unittest.TestCase
 
     methods (Test, TestTags="List")
         function List(testCase)
-            obj = aod.schema.primitives.List("TestList", []);
+            obj = aod.schema.primitives.List([]);
             testCase.verifyEqual(obj.numItems, 0);
             obj.assign("Items", {{'Boolean', 'Size', '(1,1)'}, {'Number', 'Units', 'mV'}});
             testCase.verifyEqual(obj.numItems, 2);

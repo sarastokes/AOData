@@ -65,3 +65,5 @@ tutorials/AODataWalkthrough.docx
 tutorials/Development.mlx
 docs/BestPractices.md
 docs/CoreClassDiagram.pdf
+src/+aod/+core/DevelopmentNotes.md
+docs/EntityTypes.json

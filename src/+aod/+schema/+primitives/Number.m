@@ -10,8 +10,8 @@ classdef Number < aod.schema.Primitive
 %   fixed as "double".
 %
 % Constructor:
-%   obj = aod.specification.Number(name, varargin)
-%   obj = aod.specification.Number(name,...
+%   obj = aod.specification.Number(varargin)
+%   obj = aod.specification.Number(...
 %       'Size', size, 'Description', description, 'Units', units,
 %       'Minimum', minimum, 'Maximum', maximum, 'Default', default)
 
@@ -27,13 +27,13 @@ classdef Number < aod.schema.Primitive
 
     properties (Hidden, SetAccess = protected)
         PRIMITIVE_TYPE = aod.schema.PrimitiveTypes.NUMBER
-        OPTIONS =  ["Default", "Size", "Minimum", "Maximum", "Units", "Description"];
-        VALIDATORS = ["Class", "Size", "Minimum", "Maximum"];
+        OPTIONS =  ["Default", "Size", "Minimum", "Maximum", "Enum", "Units", "Description"];
+        VALIDATORS = ["Class", "Size", "Minimum", "Maximum", "Enum"];
     end
 
     methods
-        function obj = Number(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Number(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             % Initialize
             obj.Enum = aod.schema.validators.Enum(obj, []);
@@ -65,10 +65,15 @@ classdef Number < aod.schema.Primitive
         function setEnum(obj, value)
             arguments
                 obj
-                value       {mustBeNumeric, mustBeVector} = []
+                value        = []
+            end
+            if ~isempty(value)
+                mustBeNumeric(value);
+                mustBeVector(value);
             end
 
             obj.Enum.setValue(value);
+            obj.checkIntegrity(true);
         end
 
         function setMinimum(obj, value)
@@ -80,6 +85,7 @@ classdef Number < aod.schema.Primitive
             end
 
             obj.Minimum.setValue(value);
+            obj.checkIntegrity(true);
         end
 
         function setMaximum(obj, value)
@@ -90,6 +96,7 @@ classdef Number < aod.schema.Primitive
             end
 
             obj.Maximum.setValue(value);
+            obj.checkIntegrity(true);
         end
     end
 
@@ -109,8 +116,25 @@ classdef Number < aod.schema.Primitive
             if obj.Minimum.isSpecified() && obj.Maximum.isSpecified()
                 if obj.Minimum.Value > obj.Maximum.Value
                     excObj.addCause(MException('checkIntegrity:InvalidRange',...
-                        'Minimum (%.2f) must be less than or equal to maximum (%.2f).',...
-                        obj.Minimum.Value, obj.Maximum.Value));
+                        'Minimum (%s) must be less than or equal to maximum (%s).',...
+                        num2str(obj.Minimum.Value), num2str(obj.Maximum.Value)));
+                end
+            end
+
+            if obj.Enum.isSpecified()
+                if obj.Minimum.isSpecified()
+                    if any(obj.Enum.Value < obj.Minimum.Value)
+                        excObj.addCause(MException('checkIntegrity:InvalidEnum',...
+                            'Enum contained values less than Minimum (%s).',...
+                            num2str(obj.Minimum.Value)));
+                    end
+                end
+                if obj.Maximum.isSpecified()
+                    if any(obj.Enum.Value > obj.Maximum.Value)
+                        excObj.addCause(MException('checkIntegrity:InvalidEnum',...
+                            'Enum contained values less than Maximum (%s)',... 
+                            num2str(obj.Maximum.Value)));
+                    end
                 end
             end
 

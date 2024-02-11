@@ -15,19 +15,19 @@ classdef HdfTest < matlab.unittest.TestCase
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
-    
+
 %#ok<*MANU>
 %#ok<*NASGU>
 
     properties
         dataFolder
-        FILE 
+        FILE
     end
 
     methods (TestClassSetup)
         function methodSetup(testCase)
             testCase.dataFolder = fullfile(fileparts(mfilename('fullpath')), 'test_data');
-            testCase.FILE = fullfile(test.util.getAODataTestFolder(), 'HDFTest.h5');
+            testCase.FILE = fullfile(aotest.util.getAODataTestFolder(), 'HDFTest.h5');
             % Create a test file, overwrite if exists
             h5tools.createFile(testCase.FILE, true);
         end
@@ -35,7 +35,7 @@ classdef HdfTest < matlab.unittest.TestCase
 
     methods (Test)
         function PropertyHandling(testCase)
-            obj = test.TestDevice();
+            obj = aotest.TestDevice();
 
             [dsetProps, ~, abandonedProps] = aod.h5.getPersistedProperties(obj);
 
@@ -56,11 +56,11 @@ classdef HdfTest < matlab.unittest.TestCase
             % Read the dataset
             reader0 = aod.h5.read(testCase.FILE, '/', 'FileReader');
             testCase.verifyEqual(reader, reader0);
-        end 
+        end
 
         function FileReaderWithData(testCase)
             reader = aod.builtin.readers.ImageJRoiReader(...
-                fullfile(test.util.getAODataTestFolder(), 'test_data', 'RoiSet.zip'), [242, 360]);
+                fullfile(aotest.util.getAODataTestFolder(), 'test_data', 'RoiSet.zip'), [242, 360]);
             % Write the dataset
             aod.h5.write(testCase.FILE, '/', 'RoiReader', reader);
             % Read the dataset

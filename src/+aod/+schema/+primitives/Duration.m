@@ -2,7 +2,7 @@ classdef Duration < aod.schema.Primitive
 % Specifies a duration value in seconds, minutes, hours, days, or years.
 %
 % Constructor:
-%   obj = aod.schema.primitives.Duration(name, parent, varargin)
+%   obj = aod.schema.primitives.Duration(parent, varargin)
 
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
@@ -18,8 +18,8 @@ classdef Duration < aod.schema.Primitive
     end
 
     methods
-        function obj = Duration(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Duration(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             obj.Format = aod.schema.validators.Format(obj, []);
 

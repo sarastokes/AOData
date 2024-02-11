@@ -13,8 +13,7 @@ function collection = readSchemaCollection(S, collection, isNested)
         primitive = S.(recordNames(i));
         specs = string(fieldnames(primitive));
         if isNested
-            record = aod.schema.util.createPrimitive(primitive.PrimitiveType,...
-                recordNames(i), collection);
+            record = aod.schema.util.createPrimitive(collection, primitive.PrimitiveType);
             userOpts = record.OPTIONS;
         else
             record = aod.schema.Record(collection, recordNames(i), primitive.PrimitiveType);

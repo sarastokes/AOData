@@ -5,7 +5,7 @@ classdef Integer < aod.schema.Primitive
 %   aod.schema.Primitive
 %
 % Constructor:
-%   obj = aod.schema.primitives.Integer(name, varargin)
+%   obj = aod.schema.primitives.Integer(varargin)
 %   obj = aod.schema.primitives.Integer(name,...
 %       "Format", format, "Size", size, "Minimum", minimum,...
 %       "Maximum", maximum, "Default", default, "Units", units,...
@@ -30,8 +30,8 @@ classdef Integer < aod.schema.Primitive
     end
 
     methods
-        function obj = Integer(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = Integer(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             % Initialization
             obj.Enum = aod.schema.validators.Enum(obj, []);

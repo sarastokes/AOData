@@ -13,7 +13,7 @@ function pEXPT = makeSmallExperiment(writeToHdf, fileName)
     end
 
     % Make a small experiment with missing entity types
-    testDir = test.util.getAODataTestFolder();
+    testDir = aotest.util.getAODataTestFolder();
 
     expt = aod.core.Experiment('SmallExperiment', testDir, getDateYMD());
     if writeToHdf

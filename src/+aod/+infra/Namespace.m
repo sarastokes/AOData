@@ -23,25 +23,38 @@ classdef Namespace < handle
     end
 
     methods
-        function obj = Namespace(filePath)
+        function obj = Namespace(spaceName)
             arguments
-                filePath    (1,1)   string      {mustBeFolder}
+                spaceName    (1,1)   string
             end
+
+            if isfolder(spaceName)
+                obj.filePath = spaceName;
+                txt = string(strsplit(filePath, filesep));
+                txt = txt(arrayfun(@(x) startsWith(x, '+'), txt));
+                if isempty(txt)
+                    error('Namespace:InvalidPackage',...
+                        'No package folders beginning with + were identified');
+                end
+                obj.pkgName = erase(strjoin(txt, "."), "+");
+
+                try
+                    obj.metaPackage = meta.package.fromName(obj.pkgName);
+                catch
+                    error('Namespace:InvalidPackage', 'Invalid package name %s', obj.pkgName);
+                end
+            else
+                obj.pkgName = spaceName;
+                try
+                    obj.metaPackage = meta.package.fromName(spaceName);
+                catch
+                    error('Namespace:InvalidPackage', 'Invalid package name %s', obj.pkgName);
+                end
+            end
+
 
             obj.filePath = filePath;
 
-            txt = string(strsplit(filePath, filesep));
-            txt = txt(arrayfun(@(x) startsWith(x, '+'), txt));
-            if isempty(txt)
-                error('Namespace:InvalidPackage',...
-                    'No package folders beginning with + were identified');
-            end
-            obj.pkgName = erase(strjoin(txt, "."), "+");
-            try
-                obj.metaPackage = meta.package.fromName(obj.pkgName);
-            catch
-                error('Namespace:InvalidPackage', 'Invalid package name %s', obj.pkgName);
-            end
 
             obj.Table = obj.assembleNamespaceTable();
             obj.isPersisted = false;

@@ -21,8 +21,8 @@ classdef File < aod.schema.Primitive
     end
 
     methods
-        function obj = File(name, parent, varargin)
-            obj = obj@aod.schema.Primitive(name, parent);
+        function obj = File(parent, varargin)
+            obj = obj@aod.schema.Primitive(parent);
 
             % Initialize
             obj.Extension = aod.schema.validators.Extension(obj, []);

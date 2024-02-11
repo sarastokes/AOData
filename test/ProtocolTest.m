@@ -1,4 +1,4 @@
-classdef ProtocolTest < matlab.unittest.TestCase 
+classdef ProtocolTest < matlab.unittest.TestCase
 % Tests the Protocol utility and interaction with the experiment heirarchy
 %
 % Parent:
@@ -15,21 +15,21 @@ classdef ProtocolTest < matlab.unittest.TestCase
 
     methods (Test, TestTags = ["Protocol"])
         function DateCreated(testCase)
-            protocol1 = test.TestStimProtocol([],...
+            protocol1 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0, 'Contrast', 1);
-            test.util.verifyDatesEqual(testCase, protocol1.dateCreated, getDateYMD());
+            aotest.util.verifyDatesEqual(testCase, protocol1.dateCreated, getDateYMD());
         end
 
         function BaseMethods(testCase)
             % Make a protocol
-            protocol1 = test.TestStimProtocol([],...
+            protocol1 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
 
             % The stimRate was twice the sampleRate
             testCase.verifyEqual(protocol1.totalPoints, 2*protocol1.totalSamples);
-            
+
             % The stimulus should match stimRate, not sampleRate
             stim = protocol1.generate();
             testCase.verifyEqual(numel(stim), protocol1.totalPoints);
@@ -41,11 +41,11 @@ classdef ProtocolTest < matlab.unittest.TestCase
 
         function Equality(testCase)
             % Two identical protocols with no calibrations
-            protocol1 = test.TestStimProtocol([],...
+            protocol1 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
-            
-            protocol2 = test.TestStimProtocol([],...
+
+            protocol2 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
 
@@ -53,7 +53,7 @@ classdef ProtocolTest < matlab.unittest.TestCase
             testCase.verifyEqual(protocol1, protocol2);
             % Compare protocol with another class
             testCase.verifyNotEqual(protocol1, 123);
-            
+
             % Change the date
             protocol2.dateCreated = getDateYMD('20221122');
             testCase.verifyNotEqual(protocol1, protocol2);
@@ -64,14 +64,14 @@ classdef ProtocolTest < matlab.unittest.TestCase
             testCase.verifyNotEqual(protocol1, protocol2);
 
             % Compare protocols with different attributes
-            protocol3 = test.TestStimProtocol([],...
+            protocol3 = aotest.TestStimProtocol([],...
                 'PreTime', 6, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
             testCase.verifyNotEqual(protocol1, protocol3);
         end
 
         function Errors(testCase)
-            protocol1 = test.TestStimProtocol([],...
+            protocol1 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
             testCase.verifyError(@()protocol1.setCalibration(123),...
@@ -80,7 +80,7 @@ classdef ProtocolTest < matlab.unittest.TestCase
 
         function StimVsFrameRates(testCase)
             % Sample rate = 25, stimRate = 50
-            protocol1 = test.TestStimProtocol([],...
+            protocol1 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
             testCase.verifyEqual(protocol1.pts2sec(50), 1);
@@ -89,10 +89,10 @@ classdef ProtocolTest < matlab.unittest.TestCase
 
         function ContrastVsIntensity(testCase)
             % Make two protocols
-            protocol1 = test.TestStimProtocol([],...
+            protocol1 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
-            protocol2 = test.TestStimProtocol([],...
+            protocol2 = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0, 'Intensity', 0.75);
 
@@ -101,4 +101,4 @@ classdef ProtocolTest < matlab.unittest.TestCase
             testCase.verifyEqual(protocol2.amplitude, 0.75);
         end
     end
-end 
+end

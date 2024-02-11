@@ -59,10 +59,20 @@ function out = getPrimitiveName(p)
         return
     end
 
-    if p.isNested
-        out = sprintf("""%s in %s"" (%s/%s)", p.Name, p.Parent.Name, ...
-            string(p.PRIMITIVE_TYPE), string(p.Parent.PRIMITIVE_TYPE));
+    record = p.getParent("Record");
+    if isempty(record)
+        recordName = "Unknown";
+        recordPrimitiveType = "UNDEFINED";
     else
-        out = sprintf("""%s"" (%s)", p.Name, string(p.PRIMITIVE_TYPE));
+        recordName = record.Name;
+        recordPrimitiveType = string(record.primitiveType);
+    end
+
+    if p.isNested
+        item = p.getParent("Item");
+        out = sprintf("""%s in %s"" (%s/%s)", item.Name, recordName, ...
+            string(item.primitiveType), recordPrimitiveType);
+    else
+        out = sprintf("""%s"" (%s)", recordName, recordPrimitiveType);
     end
 end

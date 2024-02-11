@@ -58,17 +58,17 @@ classdef Enum < aod.schema.Validator
                 return
             end
 
-            if ~istext(input)
-                tf = false;
-                ME = MException('Enum:validate:InvalidClass',...
-                    'Input must be string or char, not %s', class(input));
-                return
-            end
+            %if ~istext(input)
+            %    tf = false;
+            %    ME = MException('Enum:validate:InvalidClass',...
+            %        'Input must be string or char, not %s', class(input));
+            %    return
+            %end
 
             tf = ismember(input, obj.Value);
             if ~tf
                 ME = MException('Enum:validate:InvalidEnum',...
-                    'Input must be one of %s', strjoin(obj.Value, ', '));
+                    'Input must be one of %s', value2string(obj.Value));
             else
                 ME = [];
             end

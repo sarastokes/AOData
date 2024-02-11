@@ -1,4 +1,4 @@
-classdef PersistentInterfaceTest < matlab.unittest.TestCase 
+classdef PersistentInterfaceTest < matlab.unittest.TestCase
 % Test access through the persistent interface
 %
 % Parent:
@@ -17,18 +17,18 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
         FILE
         SMALL_FILE
         EXPT
-        SMALL_EXPT 
+        SMALL_EXPT
     end
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            % Create and write a full experiment (prior versions may have 
+            % Create and write a full experiment (prior versions may have
             % unexpected changes from prior tests)
             testCase.FILE = 'ToyExperiment.h5';
             [~, testCase.EXPT] = ToyExperiment(true);
 
             testCase.SMALL_FILE = 'PersistentInterface.h5';
-            testCase.SMALL_EXPT = test.util.makeSmallExperiment(...
+            testCase.SMALL_EXPT = aotest.util.makeSmallExperiment(...
                 true, testCase.SMALL_FILE);
         end
     end
@@ -83,7 +83,7 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
         end
     end
 
-    
+
     methods (Test, TestTags="Containers")
         function EntityContainerContents(testCase)
             EC1 = testCase.EXPT.EpochsContainer;
@@ -114,15 +114,15 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
         function EntityContainerErrors(testCase)
             try
                 testCase.EXPT.EpochsContainer(1) = [];
-            catch ME 
+            catch ME
                 disp(ME.identifier)
                 testCase.verifyTrue(strcmp(ME.identifier,...
                     "EntityContainer:DeleteNotSupported"));
             end
 
-            try 
+            try
                 testCase.EXPT.EpochsContainer(1) = 1;
-            catch ME 
+            catch ME
                 testCase.verifyTrue(strcmp(ME.identifier,...
                     "EntityContainer:AssignNotSupported"));
             end
@@ -131,5 +131,5 @@ classdef PersistentInterfaceTest < matlab.unittest.TestCase
             testCase.verifyError( ...
                 @() [EC1, EC1], "EntityContainer:ConcatenationNotSupported");
         end
-    end 
-end 
+    end
+end

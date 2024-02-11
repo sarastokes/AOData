@@ -1,11 +1,11 @@
-function primitive = createPrimitive(primitiveType, name, parent, varargin)
+function primitive = createPrimitive(parent, primitiveType, varargin)
 % CREATEPRIMITIVE
 %
 % Description:
 %   Create and populate a Primitive
 %
 % Syntax:
-%   primitive = aod.schema.util.createPrimitive(primitiveType, name, varargin)
+%   primitive = aod.schema.util.createPrimitive(parent, primitiveType, varargin)
 %
 % Inputs:
 %   primitiveType       string/char or aod.schema.primitives.PrimitiveType
@@ -19,9 +19,8 @@ function primitive = createPrimitive(primitiveType, name, parent, varargin)
 % -------------------------------------------------------------------------
 
     arguments
+        parent
         primitiveType
-        name                (1,1)   string
-        parent                              = []
     end
 
     arguments (Repeating)
@@ -29,4 +28,4 @@ function primitive = createPrimitive(primitiveType, name, parent, varargin)
     end
 
     createFcn = aod.schema.PrimitiveTypes.getFcnHandle(primitiveType);
-    primitive = createFcn(name, parent, varargin{:});
+    primitive = createFcn(parent, varargin{:});

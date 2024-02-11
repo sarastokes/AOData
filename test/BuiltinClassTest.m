@@ -16,7 +16,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
 % By Sara Patterson, 2023 (AOData)
 % -------------------------------------------------------------------------
 
-%#ok<*MANU>  
+%#ok<*MANU>
 %#ok<*NASGU>
 
     properties
@@ -26,20 +26,20 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
     methods (TestClassSetup)
         function setup(testCase)
             testCase.dataFolder = fullfile(...
-                test.util.getAODataTestFolder(), 'test_data');
+                aotest.util.getAODataTestFolder(), 'test_data');
         end
     end
 
     methods (Test, TestTags = {'Devices'})
-        function Pinhole(testCase) 
-            obj = aod.builtin.devices.Pinhole(25,... 
-                "Manufacturer", "ThorLabs", "Model", "P20K"); 
+        function Pinhole(testCase)
+            obj = aod.builtin.devices.Pinhole(25,...
+                "Manufacturer", "ThorLabs", "Model", "P20K");
             obj.setDiameter(20);
             paramValue = getAttr(obj, 'Diameter');
             testCase.verifyEqual(paramValue, 20);
         end
 
-        function PMT(testCase) 
+        function PMT(testCase)
             obj = aod.builtin.devices.PMT('VisiblePMT',...
                 "Manufacturer", "Hamamatsu", "Model", "H16722");
         end
@@ -134,7 +134,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj.setPositions(true, 'X', 1, 'Y', 2, 'Z', 3, 'Source', 4);
             testCase.verifyEqual(obj.getAttr('Wavelength'), 488);
             testCase.verifyEqual(obj.positions{1,1}, 1);
-            
+
             obj.setPositions(false, 'X', 2, 'Y', 2);
             testCase.verifyEqual(obj.positions{2,2}, 2);
 
@@ -147,7 +147,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
         end
 
         function ChannelOptimizationErrors(testCase)
-        
+
             obj = aod.builtin.calibrations.ChannelOptimization(...
                 'Mustang', getDateYMD());
             testCase.verifyError(...
@@ -201,7 +201,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
         function StripRegistration(testCase)
             obj = aod.builtin.registrations.StripRegistration([]);
 
-            fPath = fullfile(test.util.getAODataTestFolder(), 'test_data');
+            fPath = fullfile(aotest.util.getAODataTestFolder(), 'test_data');
             obj.loadData(fPath, 3);
             testCase.verifyTrue(obj.hasFile('RegistrationOutput'));
 
@@ -222,7 +222,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
         end
 
         function VisualStimulus(testCase)
-            protocol = test.TestStimProtocol([],...
+            protocol = aotest.TestStimProtocol([],...
                 'PreTime', 5, 'StimTime', 5, 'TailTime', 5,...
                 'BaseIntensity', 0.5, 'Contrast', 1);
             obj = aod.builtin.stimuli.VisualStimulus(protocol);
@@ -242,12 +242,12 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             testCase.verifyEqual(obj.ID, 851);
 
             obj2 = aod.builtin.sources.primate.Eye('OS',...
-                'AxialLength', 16.56,... 
+                'AxialLength', 16.56,...
                 'ContactLens', [12.2, 5.8, 0],...
                 'PupilSize', 6.7);
             obj.add(obj2);
         end
-    end 
+    end
 
     methods (Test, TestTags={'Annotations'})
         function Rois(testCase)
@@ -286,7 +286,7 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             obj = aod.builtin.registrations.StripRegistration([], "2022-03-14");
 
             reader = aod.builtin.readers.RegistrationParameterReader(...
-                fullfile(test.util.getAODataTestFolder(), "test_data",... 
+                fullfile(aotest.util.getAODataTestFolder(), "test_data",...
                     "851_20230314_ref_0003_20230314_params_ref000_001.txt"));
             out = reader.readFile();
             testCase.verifyTrue(strcmp(out.System,...
@@ -295,4 +295,4 @@ classdef BuiltinClassTest < matlab.unittest.TestCase
             testCase.verifyEqual(out.NccLinesToIgnore, 50);
         end
     end
-end 
+end

@@ -18,6 +18,7 @@ classdef PrimitiveTypes
     enumeration
         BOOLEAN
         CATEGORICAL
+        COMPLEX
         DATETIME
         DURATION
         FILE
@@ -41,7 +42,7 @@ classdef PrimitiveTypes
         function tf = isNestable(obj)
             % TODO: choose between this and allowableChild property
             txt = string(obj);
-            tf = ismember(txt, ["TEXT", "BOOLEAN", "CATEGORICAL", "FILE",...
+            tf = ismember(txt, ["TEXT", "BOOLEAN", "CATEGORICAL", "COMPLEX", "FILE",...
                                 "DURATION", "DATETIME", "NUMBER", "INTEGER"]);
         end
 
@@ -86,7 +87,11 @@ classdef PrimitiveTypes
             elseif isinteger(data)
                 obj = PrimitiveTypes.INTEGER;
             elseif isa(data, 'double')
-                obj = PrimitiveTypes.NUMBER;
+                if isreal(data)
+                    obj = PrimitiveTypes.NUMBER;
+                else
+                    obj = PrimitiveTypes.COMPLEX;
+                end
             elseif iscategorical(data)
                 obj = PrimitiveTypes.CATEGORICAL;
             elseif isstring(data)

@@ -1,4 +1,4 @@
-classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
+classdef (Abstract) RecordCollection < aod.schema.Collection
 % SCHEMACOLLECTION (abstract)
 %
 % Description:
@@ -10,7 +10,7 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
 % Constructor:
 %   obj = aod.schema.collections.RecordCollection(className)
 %
-% TODO: This could subclass IndexedCollection (?)
+% TODO: This could subclass ItemCollection (?)
 
 % By Sara Patterson, 2023 (AOData)
 % ----------------------------------------------------------------------
@@ -25,6 +25,10 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
         Parent              % aod.schema.Schema
         className           string
         Records             % aod.schema.Record
+    end
+
+    properties (Hidden, SetAccess = protected)
+        SCHEMA_OBJECT_TYPE              = aod.schema.SchemaObjectTypes.RECORD_COLLECTION
     end
 
     properties (Hidden, SetAccess = private)
@@ -63,21 +67,21 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
     end
 
     methods
-        function [tf, ME, excObj] = validate(obj, specName, value, errorType)
+        function [tf, ME, excObj] = validate(obj, recordName, value, errorType)
             arguments
                 obj
-                specName                    string
+                recordName                  string
                 value
                 errorType                   = aod.infra.ErrorTypes.ERROR
             end
 
-            p = obj.get(specName, aod.infra.ErrorTypes.ERROR);
+            p = obj.get(recordName, aod.infra.ErrorTypes.ERROR);
             [tf, ME, excObj] = p.validate(value, errorType);
         end
 
-        function [tf, ME, failedRecords] = checkIntegrity(obj, specName)
+        function [tf, ME, failedRecords] = checkIntegrity(obj, recordName)
             failedRecords = [];
-            if nargin < 2 || isempty(specName)
+            if nargin < 2 || isempty(recordName)
                 ME = [];
                 if obj.Count == 0
                     tf = true;
@@ -92,8 +96,11 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
                 failedRecords = obj.Contents(~didPass);
                 tf = all(didPass);
             else
-                p = obj.get(specName, aod.infra.ErrorTypes.ERROR);
+                p = obj.get(recordName, aod.infra.ErrorTypes.ERROR);
                 [tf, ME] = p.checkIntegrity();
+                if ~tf
+                    failedRecords = recordName;
+                end
             end
         end
 
@@ -125,9 +132,15 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
             end
 
             primitiveType = aod.schema.PrimitiveTypes.get(primitiveType);
-            % TODO: Ensure type is valid for collection
+            % Reset primitive if type has changed
             if primitiveType ~= record.primitiveType
-                record.setType(primitiveType);
+                if ~ismember(primitiveType, obj.ALLOWABLE_PRIMITIVE_TYPES)
+                    error('set:InvalidPrimitiveType',...
+                        'PrimitiveType %s is not allowed for %s collections',...
+                            string(primitiveType), string(obj.recordType));
+                end
+                %! The existing specifications will be overwritten
+                record.setPrimitive(primitiveType);
             end
 
             record.assign(varargin{:});
@@ -140,8 +153,8 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
             %   [tf, idx] = has(obj, recordName)
             % ----------------------------------------------------------
             arguments
-                obj
-                recordName        string
+                obj                 aod.schema.collections.RecordCollection
+                recordName          string
             end
 
             if obj.Count == 0
@@ -173,7 +186,7 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
             % ----------------------------------------------------------
             arguments
                 obj
-                recordName       char
+                recordName       string
                 errorType       = aod.infra.ErrorTypes.NONE
             end
 
@@ -213,8 +226,8 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
             %   aod.schema.Record
             % ----------------------------------------------------------
             arguments
-                obj
-                record         aod.schema.Record
+                obj             aod.schema.collections.RecordCollection
+                record          aod.schema.Record
             end
 
             if obj.Count > 0 && ismember(lower(record.Name), lower(obj.list()))
@@ -231,6 +244,10 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
             % Syntax:
             %   remove(obj, recordName)
             % ----------------------------------------------------------
+            arguments
+                obj             aod.schema.collections.RecordCollection
+                recordName      string
+            end
 
             [tf, idx] = obj.has(recordName);
             if ~tf
@@ -356,8 +373,10 @@ classdef (Abstract) RecordCollection < aod.schema.AODataSchemaObject
             %   S = struct(obj)
             % ----------------------------------------------------------
             groupName = string(obj.recordType)+"s";
+
             S = struct();
-            S.(string(obj.recordType)+"s") = struct();
+            S.(groupName) = struct();
+
             if isempty(obj)
                 return
             end

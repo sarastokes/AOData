@@ -27,7 +27,7 @@ classdef FilterTest < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function methodSetup(testCase)
-            testDir = test.util.getAODataTestFolder();
+            testDir = aotest.util.getAODataTestFolder();
 
             % Creates an experiment, writes to HDF5 and reads back in
             testCase.FILENAME = fullfile(testDir, 'ToyExperiment.h5');
@@ -39,7 +39,7 @@ classdef FilterTest < matlab.unittest.TestCase
             testCase.QM = aod.api.QueryManager(testCase.FILENAME);
 
             % Make a smaller experiment to test for empty entities
-            testCase.SMALL_EXPT = test.util.makeSmallExperiment(true);
+            testCase.SMALL_EXPT = aotest.util.makeSmallExperiment(true);
             testCase.SMALL_QM = aod.api.QueryManager(testCase.SMALL_EXPT);
 
             % Make an empty QueryManager

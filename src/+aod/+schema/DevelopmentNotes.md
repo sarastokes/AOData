@@ -141,11 +141,12 @@ General framework for handling Record aliases:
 5. The warnings can be temporarily disabled or permanently disabled through a settings UI.
 
 ### Primitives
-Each primitive inherits from `aod.schema.Primitive` and include a specific set of validators (discussed below). Primitives in *italics* are Containers that hold other primitives (subclasses of `aod.schema.primitives.Container`). They map to H5T_COMPOUND so can only hold valid primitive types (boolean, date, duration, file, integer, number, text).
+Each primitive inherits from `aod.schema.Primitive` and include a specific set of validators (discussed below). Primitives in *italics* are Containers that hold other primitives (subclasses of `aod.schema.Container`). They map to H5T_COMPOUND so can only hold valid primitive types (boolean, date, duration, file, integer, number, text).
 
 |Name|Matlab|Python| Description|
 |----|------|--------|------------|
 |`Boolean`|logical|bool|True or false|
+|`Complex`|double||A complex number|
 |`Date`|datetime|datetime||
 |`Duration`|duration|timedelta||
 |`File`|string|string|An absolute or relative file path|
