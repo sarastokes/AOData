@@ -6,14 +6,14 @@ function schema = getRegisteredSchema(className)
 % --------------------------------------------------------------------------
 
     fPath = aod.schema.util.navToRoot(className);
-    schemaPath = fullfile(fPath, 'schema');
+    schemaPath = fullfile(fPath, 'schemas');
 
     if ~exist(schemaPath, 'dir')
         error('No schema directory found for class %s', className);
     end
 
     try
-        registry = loadjson(fullfile(schemaPath, 'registry.json'));
+        registry = aod.schema.util.loadSchemaRegistry(fullfile(schemaPath, 'registry.txt'));
         % TODO: Find version number
     catch
         warning('No registry found for package containing %s', className);

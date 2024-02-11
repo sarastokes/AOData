@@ -8,8 +8,8 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
 %   Separating access and storage of collections enables dynamic schema
 %   creation for core interface and lazy loading for persistent interface
 
-% By Sara Patterson, 2023 (AOData)
-% -------------------------------------------------------------------------
+% By Sara Patterson, 2024 (AOData)
+% -----------------------------------------------------------------------
 
     properties (SetAccess = private)
         Parent                         % aod.core.Entity, aod.persistent.Entity
@@ -323,7 +323,8 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
             S.EntityType = char(obj.entityType);
             S.Superclasses = superNames';
             % TODO: Aliases, UUIDs and version number
-            S.VersionNumber = [];
+            S.ClassVersion = [];
+            S.SchemaVersion = [];
             S.Aliases = [];
             S.UUID = obj.classUUID;
             % Leave blank until saved
