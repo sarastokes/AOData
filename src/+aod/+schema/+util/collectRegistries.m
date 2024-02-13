@@ -1,15 +1,17 @@
-function registries = collectRegistries()
+function [registries, registryFiles] = collectRegistries()
 % COLLECTREGISTRIES
 %
 % Description:
 %   Collect all schema registries in packages on AOData's search path
 %
 % Syntax:
-%   registries = aod.schema.util.collectRegistries()
+%   [registries, registryFiles] = aod.schema.util.collectRegistries()
 %
 % Output:
 %   registries          table
 %       Table of all schemas found on path (concatenated registries)
+%   registryFiles       string
+%       List of the full file path of all registry files identified
 %
 % Notes:
 %   Only packages added to AOData's search path are considered. To see which

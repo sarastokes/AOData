@@ -1,4 +1,4 @@
-function T = initializePackageSchemas(pkgFolder)
+function [T, errMap] = initializePackageSchemas(pkgFolder)
 % INITIALIZEPACKAGESCHEMAS
 %
 % Description:
@@ -14,8 +14,10 @@ function T = initializePackageSchemas(pkgFolder)
 % Outputs:
 %   T               table
 %       Schema registry table (also written to registry.txt)
+%   errMap          containers.Map
+%       Keys are class names with bad schemas and values are error messages
 %
-% TODO: Hard reset option??
+% TODO: Hard reset option?? Add DateCreated and DateUpdated
 
 % By Sara Patterson, 2024 (AOData)
 % -------------------------------------------------------------------------
@@ -41,17 +43,19 @@ function T = initializePackageSchemas(pkgFolder)
     if ~exist(schemaFolder, 'dir')
         mkdir(schemaFolder);
     end
+    
     packageFolder = fullfile(schemaFolder, mp.Name);
     if ~exist(packageFolder, "dir")
         mkdir(packageFolder);
     end
 
     S = [];
+    errMap = aod.common.KeyValueMap();
     if ~isempty(mp.ClassList)
-        S = addClasses(packageFolder, mp, S);
+        [S, errMap] = addClasses(packageFolder, mp, S, errMap);
     end
     for i = 1:numel(mp.PackageList)
-        addSubpackage(packageFolder, mp.PackageList(i), S);
+        [S, errMap] = addSubpackage(packageFolder, mp.PackageList(i), S, errMap);
     end
 
     % Write the schema registry file
@@ -62,11 +66,19 @@ function T = initializePackageSchemas(pkgFolder)
     end
     writetable(T, fullfile(schemaFolder, "registry.txt"));
 
+    % Warn user to check on errored schemas
+    if errMap.Count > 0
+        warning('%u classes had errors and could not be added', errMap.Count);
+    end
 end
 
-function S = addClasses(packageFolder, mp, S)
+function [S, errMap] = addClasses(packageFolder, mp, S, errMap)
     % ADDCLASSES  Write class json and add to registry
+    % ---------------------------------------------------------------------
     for i = 1:numel(mp.ClassList)
+        if mp.ClassList(i).Abstract
+            continue
+        end
         className = extractAfter(mp.ClassList(i).Name, [mp.Name, '.']);
         jsonFile = fullfile(packageFolder, [className, '.json']);
         try
@@ -80,34 +92,44 @@ function S = addClasses(packageFolder, mp, S)
             S = [S, createClassStruct(mp.ClassList(i), packageFolder)];  %#ok<AGROW>
         catch ME
             if ~strcmp(ME.identifier, 'StandaloneSchema:InvalidClass')
-                rethrow(ME);
+                message = [mp.ClassList(i).Name, ' - ', ME.message];
+                errMap(strrep(mp.ClassList(i).Name, '.', '_')) = [ME.identifier, '--> ', message];
+                throwWarning(ME);
             end
         end
     end
 end
 
-function S = addSubpackage(parentFolder, mp, S)
+function [S, errMap] = addSubpackage(parentFolder, mp, S, errMap)
     % ADDSUBPACKAGE  Write classes and recurse for more subpackages
+    % ---------------------------------------------------------------------
     if isempty(mp.ClassList) && isempty(mp.PackageList)
         return
     end
 
-    packageFolder = fullfile(parentFolder, mp.Name);
+    allPackageNames = strsplit(mp.Name, '.');
+    packageFolder = fullfile(parentFolder, allPackageNames{end});
     if ~exist(packageFolder, "dir")
         mkdir(packageFolder);
     end
 
     if ~isempty(mp.ClassList)
-        S = addClasses(packageFolder, mp, S);
+        [S, errMap] = addClasses(packageFolder, mp, S, errMap);
     end
 
     for i = 1:numel(mp.PackageList)
-        S = addSubpackage(packageFolder, mp.PackageList(i), S);
+        [S, errMap] = addSubpackage(packageFolder, mp.PackageList(i), S, errMap);
+    end
+
+    % Remove if folder and its subfolders do not contain AOData objects
+    if numel(string(ls(packageFolder))) == 2
+        rmdir(packageFolder);
     end
 end
 
 function S = createClassStruct(mc, packageFolder)
     % CREATECLASSSTRUCT  Create a structure containing class info
+    % ---------------------------------------------------------------------
     S = struct('Name', string(mc.Name),...
         'Package', string(mc.ContainingPackage.Name),...
         'ClassVersion', 1,...

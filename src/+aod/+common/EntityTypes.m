@@ -489,7 +489,13 @@ classdef EntityTypes
         function obj = getFromSuperclass(className)
             % Get entity type from core class name
             %
-            % TODO: Some
+            % Syntax:
+            %   obj = aod.common.EntityTypes.getFromSuperclass(className)
+            % -----------------------------------------------------------
+            arguments
+                className       string
+            end
+
             superNames = string(superclasses(className));
             if ismember(superNames, "aod.persistent.Entity")
                 error('getEntityTypeFromSuperclass:NotCoreEntity',...
@@ -498,7 +504,10 @@ classdef EntityTypes
 
             coreEntities = aod.common.EntityTypes.all();
             coreClasses = getCoreClassName(coreEntities);
-            obj = coreEntities(ismember(coreClasses, superNames));
+            obj = coreEntities(ismember(coreClasses, className));
+            if isempty(obj)
+                obj = coreEntities(ismember(coreClasses, superNames));
+            end
         end
 
         function obj = get(entityName)

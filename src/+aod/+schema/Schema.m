@@ -312,8 +312,19 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
                 packageName = erase(obj.className, "." + entityClass);
                 superNames = string(superclasses(obj.className));
                 superNames = superNames(1:find(superNames == "aod.core.Entity"));
+
+                registryPath = aod.schema.util.navToRoot(obj.className);
+                registry = aod.schema.util.loadSchemaRegistry(registryPath);
+                row = registry.Name == obj.className;
+                if ~isempty(row)
+                    schemaVersion = registry{row, 'SchemaVersion'};
+                    classVersion = registry{row, 'ClassVersion'};
+                else
+                    schemaVersion = []; classVersion = [];
+                end
             else
                 packageName = []; superNames = []; entityClass = [];
+                schemaVersion = []; classVersion = [];
             end
 
             S = struct();
@@ -323,8 +334,8 @@ classdef (Abstract) Schema < aod.schema.AODataSchemaObject
             S.EntityType = char(obj.entityType);
             S.Superclasses = superNames';
             % TODO: Aliases, UUIDs and version number
-            S.ClassVersion = [];
-            S.SchemaVersion = [];
+            S.ClassVersion = schemaVersion;
+            S.SchemaVersion = classVersion;
             S.Aliases = [];
             S.UUID = obj.classUUID;
             % Leave blank until saved
