@@ -32,6 +32,7 @@ Doxyfile.txt
 ## Testing folders and files
 test/coverage_report/
 test/single_report/
+test/schemas/
 
 test/test.h5
 test/CommonApiTest.h5

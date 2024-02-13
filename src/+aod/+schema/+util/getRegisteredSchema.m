@@ -3,7 +3,9 @@ function schema = getRegisteredSchema(className)
 %
 % Syntax:
 %   schema = aod.schema.util.getRegisteredSchema(className)
-% --------------------------------------------------------------------------
+
+% By Sara Patterson, 2024 (AOData)
+% -------------------------------------------------------------------------
 
     fPath = aod.schema.util.navToRoot(className);
     schemaPath = fullfile(fPath, 'schemas');
