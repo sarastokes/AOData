@@ -1,0 +1,68 @@
+{
+    "Name": "aod.builtin.devices.LightSource",
+    "ClassName": "LightSource",
+    "PackageName": "aod.builtin.devices",
+    "EntityType": "Device",
+    "Superclasses": [
+        "aod.core.Device",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "6483bbe7-3633-4a30-bbc5-a8d06c87c9bb",
+    "DateCreated": [],
+    "Attributes": {
+        "Manufacturer": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The company that made the device"
+        },
+        "Model": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The model of the device"
+        },
+        "Wavelength": {
+            "PrimitiveType": "NUMBER",
+            "Required": false,
+            "Enum": [],
+            "Minimum": [],
+            "Maximum": [],
+            "Class": "double",
+            "Size": "(1,1)",
+            "Units": "nm",
+            "Description": "The peak wavelength of the light source"
+        },
+        "SerialNumber": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The light source's serial number"
+        }
+    },
+    "Datasets": {
+        "spectra": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

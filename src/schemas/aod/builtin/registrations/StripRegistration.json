@@ -1,0 +1,109 @@
+{
+    "Name": "aod.builtin.registrations.StripRegistration",
+    "ClassName": "StripRegistration",
+    "PackageName": "aod.builtin.registrations",
+    "EntityType": "Registration",
+    "Superclasses": [
+        "aod.core.Registration",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "403e175c-c531-4b6d-a784-50fdf1015b9b",
+    "DateCreated": [],
+    "Attributes": {
+        "Administrator": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Person(s) who performed the registration"
+        },
+        "Software": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Software used for the registration"
+        },
+        "RegistrationType": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [
+                "frame",
+                "strip"
+            ],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Whether frame or strip registration was chosen for subsequent processing."
+        }
+    },
+    "Datasets": {
+        "correlationCoefficient": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "regFlag": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "stripX": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "stripY": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "frameXY": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "regDescription": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "rotationAngle": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "registrationDate": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

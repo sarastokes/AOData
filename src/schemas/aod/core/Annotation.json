@@ -1,0 +1,58 @@
+{
+    "Name": "aod.core.Annotation",
+    "ClassName": "Annotation",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "7c60ed0a-04a4-41a9-bf72-a70df25420c2",
+    "DateCreated": [],
+    "Attributes": {
+        "Administrator": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,:)",
+            "Description": "The person(s) who performed the annotation"
+        },
+        "Software": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,:)",
+            "Description": "Software used for the registration"
+        }
+    },
+    "Datasets": {
+        "annotationDate": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "Data": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "Source": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

@@ -1,0 +1,23 @@
+{
+    "Name": "aod.core.Response",
+    "ClassName": "Response",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "8a42edb6-6077-4241-942c-25ce7877d1e2",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Data": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

@@ -1,0 +1,15 @@
+{
+    "Name": "aod.core.Channel",
+    "ClassName": "Channel",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "de412de0-8b63-4a8d-a14f-adcd37741f30",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {},
+    "Files": {}
+}

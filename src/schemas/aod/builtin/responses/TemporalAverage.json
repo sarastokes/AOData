@@ -1,0 +1,26 @@
+{
+    "Name": "aod.builtin.responses.TemporalAverage",
+    "ClassName": "TemporalAverage",
+    "PackageName": "aod.builtin.responses",
+    "EntityType": "Response",
+    "Superclasses": [
+        "aod.core.Response",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "1c65354f-979b-451d-9656-26fd85edbb5c",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Data": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

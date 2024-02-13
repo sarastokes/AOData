@@ -1,0 +1,50 @@
+{
+    "Name": "aod.builtin.devices.Pinhole",
+    "ClassName": "Pinhole",
+    "PackageName": "aod.builtin.devices",
+    "EntityType": "Device",
+    "Superclasses": [
+        "aod.core.Device",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "f3ba26e8-1301-4e77-b998-96f32fba2208",
+    "DateCreated": [],
+    "Attributes": {
+        "Manufacturer": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The company that made the device"
+        },
+        "Model": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The model of the device"
+        },
+        "Diameter": {
+            "PrimitiveType": "NUMBER",
+            "Required": false,
+            "Enum": [],
+            "Minimum": [],
+            "Maximum": [],
+            "Class": "double",
+            "Size": "(1,1)",
+            "Units": "micron",
+            "Description": "Pinhole diameter"
+        }
+    },
+    "Datasets": {},
+    "Files": {}
+}

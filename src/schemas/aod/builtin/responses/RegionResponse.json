@@ -1,0 +1,33 @@
+{
+    "Name": "aod.builtin.responses.RegionResponse",
+    "ClassName": "RegionResponse",
+    "PackageName": "aod.builtin.responses",
+    "EntityType": "Response",
+    "Superclasses": [
+        "aod.core.Response",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "8af7e89e-368c-4aef-b00d-2a991bca9e57",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Annotation": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "Data": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

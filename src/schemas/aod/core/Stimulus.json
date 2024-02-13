@@ -1,0 +1,44 @@
+{
+    "Name": "aod.core.Stimulus",
+    "ClassName": "Stimulus",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "818ef4bb-6c77-4f71-b207-c83211fce177",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Calibration": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "protocolClass": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "protocolName": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "dateProtocolCreated": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

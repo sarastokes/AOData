@@ -1,0 +1,23 @@
+{
+    "Name": "aod.core.System",
+    "ClassName": "System",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "4de28eec-513c-4e77-b699-85741dd01910",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "extends": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

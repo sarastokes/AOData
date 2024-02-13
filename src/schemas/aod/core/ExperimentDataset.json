@@ -1,0 +1,23 @@
+{
+    "Name": "aod.core.ExperimentDataset",
+    "ClassName": "ExperimentDataset",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "ae1d8971-7098-4a30-803a-554a50aeeb7f",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Data": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

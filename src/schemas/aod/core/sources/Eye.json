@@ -1,0 +1,18 @@
+{
+    "Name": "aod.core.sources.Eye",
+    "ClassName": "Eye",
+    "PackageName": "aod.core.sources",
+    "EntityType": "Source",
+    "Superclasses": [
+        "aod.core.Source",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "bb3e0aa1-78ba-4b3c-a98f-24da159ec02b",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {},
+    "Files": {}
+}

@@ -1,0 +1,18 @@
+{
+    "Name": "aod.builtin.sources.ModelEye",
+    "ClassName": "ModelEye",
+    "PackageName": "aod.builtin.sources",
+    "EntityType": "Source",
+    "Superclasses": [
+        "aod.core.Source",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "7e3fb909-6985-4d1f-b07f-a4a3eb792fef",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {},
+    "Files": {}
+}

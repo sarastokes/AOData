@@ -1,0 +1,51 @@
+{
+    "Name": "aod.builtin.calibrations.MeasurementTable",
+    "ClassName": "MeasurementTable",
+    "PackageName": "aod.builtin.calibrations",
+    "EntityType": "Calibration",
+    "Superclasses": [
+        "aod.core.Calibration",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "d76092ca-6823-4608-8d58-62b5d0706a24",
+    "DateCreated": [],
+    "Attributes": {
+        "Administrator": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,:)",
+            "Description": "Person(s) who performed the calibration"
+        }
+    },
+    "Datasets": {
+        "Measurements": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "calibrationDate": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "Target": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

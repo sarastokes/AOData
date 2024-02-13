@@ -1,0 +1,70 @@
+{
+    "Name": "aod.builtin.sources.primate.Primate",
+    "ClassName": "Primate",
+    "PackageName": "aod.builtin.sources.primate",
+    "EntityType": "Source",
+    "Superclasses": [
+        "aod.core.sources.Subject",
+        "aod.core.Source",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "f51f688c-86b1-4503-a5db-5cda7139ffcc",
+    "DateCreated": [],
+    "Attributes": {
+        "Species": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Species of the subject"
+        },
+        "Sex": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [
+                "male",
+                "female",
+                "unknown"
+            ],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Sex of the subject"
+        },
+        "Demographics": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,:)",
+            "Description": "Additional demographic information about the subject"
+        },
+        "DateOfBirth": {
+            "PrimitiveType": "DATETIME",
+            "Required": false,
+            "Format": [],
+            "Class": "",
+            "Size": "(1,1)",
+            "Description": "Date of birth of the subject"
+        }
+    },
+    "Datasets": {
+        "ID": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

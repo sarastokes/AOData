@@ -1,0 +1,15 @@
+{
+    "Name": "aod.core.Source",
+    "ClassName": "Source",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "3d7c13e9-de74-44b6-9f0d-d47d8c47560f",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {},
+    "Files": {}
+}

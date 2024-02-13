@@ -1,0 +1,52 @@
+{
+    "Name": "aod.builtin.calibrations.RoomMeasurement",
+    "ClassName": "RoomMeasurement",
+    "PackageName": "aod.builtin.calibrations",
+    "EntityType": "Calibration",
+    "Superclasses": [
+        "aod.builtin.calibrations.MeasurementTable",
+        "aod.core.Calibration",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "dd14deff-879e-45d0-a324-cbae977fed8e",
+    "DateCreated": [],
+    "Attributes": {
+        "Administrator": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,:)",
+            "Description": "Person(s) who performed the calibration"
+        }
+    },
+    "Datasets": {
+        "Measurements": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "calibrationDate": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "Target": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

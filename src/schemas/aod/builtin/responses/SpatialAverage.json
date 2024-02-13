@@ -1,0 +1,26 @@
+{
+    "Name": "aod.builtin.responses.SpatialAverage",
+    "ClassName": "SpatialAverage",
+    "PackageName": "aod.builtin.responses",
+    "EntityType": "Response",
+    "Superclasses": [
+        "aod.core.Response",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "d24f6225-ede8-4c05-9ee7-c12694b31ad4",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Data": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

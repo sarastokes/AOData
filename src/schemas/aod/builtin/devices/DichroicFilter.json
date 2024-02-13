@@ -1,0 +1,71 @@
+{
+    "Name": "aod.builtin.devices.DichroicFilter",
+    "ClassName": "DichroicFilter",
+    "PackageName": "aod.builtin.devices",
+    "EntityType": "Device",
+    "Superclasses": [
+        "aod.core.Device",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "57327a0d-36cf-4750-9fdd-895dd928fb59",
+    "DateCreated": [],
+    "Attributes": {
+        "Manufacturer": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The company that made the device"
+        },
+        "Model": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The model of the device"
+        },
+        "Wavelength": {
+            "PrimitiveType": "NUMBER",
+            "Required": false,
+            "Enum": [],
+            "Minimum": [],
+            "Maximum": [],
+            "Class": "double",
+            "Size": "(1,1)",
+            "Units": "nm",
+            "Description": "The cutoff wavelength of the filter"
+        },
+        "Pass": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [
+                "low",
+                "high"
+            ],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Whether the dichroic is low or high pass"
+        }
+    },
+    "Datasets": {
+        "transmission": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

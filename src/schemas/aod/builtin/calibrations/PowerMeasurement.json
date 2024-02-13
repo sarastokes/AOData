@@ -1,0 +1,63 @@
+{
+    "Name": "aod.builtin.calibrations.PowerMeasurement",
+    "ClassName": "PowerMeasurement",
+    "PackageName": "aod.builtin.calibrations",
+    "EntityType": "Calibration",
+    "Superclasses": [
+        "aod.builtin.calibrations.MeasurementTable",
+        "aod.core.Calibration",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "29031b56-eb97-4101-9842-87825074b8d1",
+    "DateCreated": [],
+    "Attributes": {
+        "Administrator": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,:)",
+            "Description": "Person(s) who performed the calibration"
+        },
+        "Wavelength": {
+            "PrimitiveType": "NUMBER",
+            "Required": false,
+            "Enum": [],
+            "Minimum": [],
+            "Maximum": [],
+            "Class": "double",
+            "Size": "(1,1)",
+            "Units": "nm",
+            "Description": "The wavelength of the light source being measured"
+        }
+    },
+    "Datasets": {
+        "Measurements": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "calibrationDate": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "Target": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

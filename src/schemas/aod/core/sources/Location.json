@@ -1,0 +1,18 @@
+{
+    "Name": "aod.core.sources.Location",
+    "ClassName": "Location",
+    "PackageName": "aod.core.sources",
+    "EntityType": "Source",
+    "Superclasses": [
+        "aod.core.Source",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "25d825e0-46ce-4e14-a6a8-b9e70770909c",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {},
+    "Files": {}
+}

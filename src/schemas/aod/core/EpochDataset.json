@@ -1,0 +1,23 @@
+{
+    "Name": "aod.core.EpochDataset",
+    "ClassName": "EpochDataset",
+    "PackageName": "aod.core",
+    "EntityType": [],
+    "Superclasses": "aod.core.Entity",
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "dab85248-adae-47d7-855e-2b4728a54428",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Data": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

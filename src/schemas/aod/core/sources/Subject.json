@@ -1,0 +1,64 @@
+{
+    "Name": "aod.core.sources.Subject",
+    "ClassName": "Subject",
+    "PackageName": "aod.core.sources",
+    "EntityType": "Source",
+    "Superclasses": [
+        "aod.core.Source",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "1aef2f9e-9fc1-4b06-a0b8-434576512cf7",
+    "DateCreated": [],
+    "Attributes": {
+        "Species": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Species of the subject"
+        },
+        "Sex": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [
+                "male",
+                "female",
+                "unknown"
+            ],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Sex of the subject"
+        },
+        "Age": {
+            "PrimitiveType": "NUMBER",
+            "Required": false,
+            "Enum": [],
+            "Minimum": 0.0,
+            "Maximum": [],
+            "Class": "double",
+            "Size": "(1,1)",
+            "Units": "years",
+            "Description": "Age of the subject in years"
+        },
+        "Demographics": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,:)",
+            "Description": "Additional demographic information about the subject"
+        }
+    },
+    "Datasets": {},
+    "Files": {}
+}

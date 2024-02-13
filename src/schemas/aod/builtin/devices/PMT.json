@@ -1,0 +1,49 @@
+{
+    "Name": "aod.builtin.devices.PMT",
+    "ClassName": "PMT",
+    "PackageName": "aod.builtin.devices",
+    "EntityType": "Device",
+    "Superclasses": [
+        "aod.core.Device",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "d72c6121-0323-4020-90b1-4cdf48c0b937",
+    "DateCreated": [],
+    "Attributes": {
+        "Manufacturer": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The company that made the device"
+        },
+        "Model": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The model of the device"
+        },
+        "SerialNumber": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Serial number of the light source"
+        }
+    },
+    "Datasets": {},
+    "Files": {}
+}

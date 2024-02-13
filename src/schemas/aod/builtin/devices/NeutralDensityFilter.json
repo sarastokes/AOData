@@ -1,0 +1,58 @@
+{
+    "Name": "aod.builtin.devices.NeutralDensityFilter",
+    "ClassName": "NeutralDensityFilter",
+    "PackageName": "aod.builtin.devices",
+    "EntityType": "Device",
+    "Superclasses": [
+        "aod.core.Device",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "23273323-ba40-40c0-bec6-eea76e502f9d",
+    "DateCreated": [],
+    "Attributes": {
+        "Manufacturer": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The company that made the device"
+        },
+        "Model": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "The model of the device"
+        },
+        "Attenuation": {
+            "PrimitiveType": "NUMBER",
+            "Required": false,
+            "Enum": [],
+            "Minimum": [],
+            "Maximum": [],
+            "Class": "double",
+            "Size": "(1,1)",
+            "Units": [],
+            "Description": "Attenuation of the NDF."
+        }
+    },
+    "Datasets": {
+        "transmission": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

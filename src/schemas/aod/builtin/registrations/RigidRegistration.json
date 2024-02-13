@@ -1,0 +1,62 @@
+{
+    "Name": "aod.builtin.registrations.RigidRegistration",
+    "ClassName": "RigidRegistration",
+    "PackageName": "aod.builtin.registrations",
+    "EntityType": "Registration",
+    "Superclasses": [
+        "aod.builtin.registrations.GeometricTransformation",
+        "aod.core.Registration",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "974e51e2-b3b9-4993-9dd5-9db8c5a3ffb4",
+    "DateCreated": [],
+    "Attributes": {
+        "Administrator": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Person(s) who performed the registration"
+        },
+        "Software": {
+            "PrimitiveType": "TEXT",
+            "Required": false,
+            "Length": [],
+            "Enum": [],
+            "Regexp": [],
+            "Class": "string",
+            "Size": "(1,1)",
+            "Description": "Software used for the registration"
+        }
+    },
+    "Datasets": {
+        "transform": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "reference": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "registrationDate": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

@@ -1,0 +1,54 @@
+{
+    "Name": "aod.builtin.stimuli.ImagingLight",
+    "ClassName": "ImagingLight",
+    "PackageName": "aod.builtin.stimuli",
+    "EntityType": "Stimulus",
+    "Superclasses": [
+        "aod.core.Stimulus",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "8ebec018-c5b3-4255-8da7-987137c94628",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "intensity": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "Calibration": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "protocolClass": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "protocolName": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "dateProtocolCreated": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}

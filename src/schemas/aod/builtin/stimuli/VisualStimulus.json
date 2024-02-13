@@ -1,0 +1,47 @@
+{
+    "Name": "aod.builtin.stimuli.VisualStimulus",
+    "ClassName": "VisualStimulus",
+    "PackageName": "aod.builtin.stimuli",
+    "EntityType": "Stimulus",
+    "Superclasses": [
+        "aod.core.Stimulus",
+        "aod.core.Entity"
+    ],
+    "ClassVersion": 1.0,
+    "SchemaVersion": ">0.1.0",
+    "Aliases": [],
+    "UUID": "fdc3be20-719c-47a3-868b-97bf39b4d14f",
+    "DateCreated": [],
+    "Attributes": {},
+    "Datasets": {
+        "Calibration": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "protocolClass": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "protocolName": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        },
+        "dateProtocolCreated": {
+            "PrimitiveType": "UNKNOWN",
+            "Required": false,
+            "Class": "",
+            "Size": [],
+            "Description": ""
+        }
+    },
+    "Files": {}
+}
