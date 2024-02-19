@@ -41,12 +41,11 @@ function S3 = mergeNestedStructs(S1, S2)
 
     % If no nested fields match, merge at top level
     if isempty(idx)
-        S3.(f2a(1)) = S2;
+        S3.(f2a(1)) = S2.(f2a(1));
         return
     end
 
     diffNames = f2(find(~matchedFields) + 1);
-    diffStructs = [];
     for i = 1:numel(diffNames)
         [parent, field] = splitPath(diffNames(i));
         eval(sprintf('tf=isfield(%s, "%s");',...
