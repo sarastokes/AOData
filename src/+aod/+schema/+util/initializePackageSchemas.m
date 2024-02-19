@@ -43,7 +43,7 @@ function [T, errMap] = initializePackageSchemas(pkgFolder)
     if ~exist(schemaFolder, 'dir')
         mkdir(schemaFolder);
     end
-    
+
     packageFolder = fullfile(schemaFolder, mp.Name);
     if ~exist(packageFolder, "dir")
         mkdir(packageFolder);
@@ -64,6 +64,11 @@ function [T, errMap] = initializePackageSchemas(pkgFolder)
     for i = 2:numel(f)
         T.(f(i)) = arrayfun(@(x) x.(f(i)), S)';
     end
+
+    % Erase user-specific file path (result of navToRoot)
+    T.SchemaPath = erase(T.SchemaPath,...
+        extractBefore(T.SchemaPath, filesep + "schemas" + filesep));
+    % Write the registry
     writetable(T, fullfile(schemaFolder, "registry.txt"));
 
     % Warn user to check on errored schemas
@@ -93,7 +98,8 @@ function [S, errMap] = addClasses(packageFolder, mp, S, errMap)
         catch ME
             if ~strcmp(ME.identifier, 'StandaloneSchema:InvalidClass')
                 message = [mp.ClassList(i).Name, ' - ', ME.message];
-                errMap(strrep(mp.ClassList(i).Name, '.', '_')) = [ME.identifier, '--> ', message];
+                errMap(strrep(mp.ClassList(i).Name, '.', '_')) = [ME.identifier, '>> ', message];
+                %rethrow(ME)
                 throwWarning(ME);
             end
         end

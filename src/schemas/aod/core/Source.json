@@ -2,7 +2,7 @@
     "Name": "aod.core.Source",
     "ClassName": "Source",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Source",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

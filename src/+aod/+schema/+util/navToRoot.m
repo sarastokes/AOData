@@ -11,7 +11,7 @@ function fPath = navToRoot(className, target)
 %   className           string
 %       The name of the AOData class
 %   targetFolder        string
-%       Specify whether to root (default), "registry" or "json"
+%       Specify whether to root (default), "registry" or "schema"
 %
 % Outputs:
 %   fPath               string/char
@@ -26,14 +26,17 @@ function fPath = navToRoot(className, target)
 
     arguments
         className   (1,1)   string
-        target      (1,1)   string {mustBeMember(target, ["json", "registry", ""])} = ""
+        target      (1,1)   string {mustBeMember(target, ["schema", "registry", ""])} = ""
     end
 
     if ~exist(className, "class")
         error("navToRoot:InvalidInput", ...
             "Class %s not found on MATLAB path", className);
     end
-    % TODO: Check for AOData subclass?
+    if ~isSubclass(className, "aod.core.Entity")
+        error("navToRoot:InvalidClass",...
+            "Class %s is not a subclass of aod.core.Entity", className);
+    end
 
     fPath = which(className);
 
@@ -52,8 +55,11 @@ function fPath = navToRoot(className, target)
     switch target
         case "registry"
             fPath = fullfile(fPath, "schemas", "registry.txt");
-        case "json"
+        case "schema"
             txt = strsplit(className, ".");
-            fPath = fullfile(fPath, "schemas", txt(1:end-1));
+            fPath = fullfile(fPath, "schemas");
+            for i = 1:(numel(txt)-1)
+                fPath = fullfile(fPath, txt(i));
+            end
             fPath = fullfile(fPath, txt(end)+".json");
     end

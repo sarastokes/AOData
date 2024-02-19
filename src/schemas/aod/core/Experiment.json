@@ -2,7 +2,7 @@
     "Name": "aod.core.Experiment",
     "ClassName": "Experiment",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Experiment",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

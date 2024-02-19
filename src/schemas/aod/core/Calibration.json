@@ -2,7 +2,7 @@
     "Name": "aod.core.Calibration",
     "ClassName": "Calibration",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Calibration",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

@@ -2,7 +2,7 @@
     "Name": "aod.core.ExperimentDataset",
     "ClassName": "ExperimentDataset",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "ExperimentDataset",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

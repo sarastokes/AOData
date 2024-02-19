@@ -2,7 +2,7 @@
     "Name": "aod.core.Registration",
     "ClassName": "Registration",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Registration",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

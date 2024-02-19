@@ -2,7 +2,7 @@
     "Name": "aod.core.Epoch",
     "ClassName": "Epoch",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Epoch",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

@@ -2,7 +2,7 @@
     "Name": "aod.core.Device",
     "ClassName": "Device",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Device",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

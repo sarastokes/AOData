@@ -2,7 +2,7 @@
     "Name": "aod.core.Channel",
     "ClassName": "Channel",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Channel",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

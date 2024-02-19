@@ -2,7 +2,7 @@
     "Name": "aod.core.Analysis",
     "ClassName": "Analysis",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Analysis",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",

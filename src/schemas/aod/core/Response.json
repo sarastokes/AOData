@@ -2,7 +2,7 @@
     "Name": "aod.core.Response",
     "ClassName": "Response",
     "PackageName": "aod.core",
-    "EntityType": [],
+    "EntityType": "Response",
     "Superclasses": "aod.core.Entity",
     "ClassVersion": 1.0,
     "SchemaVersion": ">0.1.0",
