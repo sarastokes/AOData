@@ -1,5 +1,8 @@
 classdef ClassRepository < handle
-% Sorts classes by package
+% CLASSREPOSITORY
+%
+% Description:
+%   Sorts classes on AOData's search path by package
 %
 % Constructor:
 %   obj = aod.infra.ClassRepository()
@@ -10,7 +13,10 @@ classdef ClassRepository < handle
 %       If empty, getpref('AOData', 'SearchPaths') will be used
 %
 % Methods:
-%   obj.setSearchPath(path)
+%   setSearchPath(obj, path)
+%   superClasses = list(obj, [entityFlag])
+%   subClasses = get(obj, superClass, [entityFlag])
+%   allClasses = getAllClasses([entityFlag])
 %
 % References:
 %   Adapted from ClassRespository in Symphony-DAS
@@ -18,7 +24,7 @@ classdef ClassRepository < handle
 % See also:
 %   AODataManagerApp
 
-% By Sara Patterson, 2023 (AOData)
+% By Sara Patterson, 2024 (AOData)
 % -------------------------------------------------------------------------
 
     properties (SetAccess = private)
@@ -35,6 +41,7 @@ classdef ClassRepository < handle
         end
 
         function cn = get(obj, superclass)
+
             if obj.classMap.isKey(superclass)
                 cn = obj.classMap(superclass);
                 cn = string(cn');
@@ -43,17 +50,43 @@ classdef ClassRepository < handle
             end
         end
 
-        function y = list(obj)
-            y = string(obj.classMap.keys)';
+        function superClasses = list(obj, entityFlag)
+            arguments
+                obj         (1,1)       aod.infra.ClassRepository
+                entityFlag  (1,1)       logical = true;
+            end
+
+            superClasses = string(obj.classMap.keys)';
+            if entityFlag
+                tf = arrayfun(@(x) isSubclass(x, "aod.core.Entity"), superClasses);
+                superClasses = superClasses(tf);
+            end
         end
 
-        function pkgClasses = getClassesByPackage(obj, pkgName)
+        function classNames = getAllClasses(obj, entityFlag)
+            arguments
+                obj         (1,1)       aod.infra.ClassRepository
+                entityFlag  (1,1)       logical = true;
+            end
+
+            keyNames = obj.list(entityFlag);
+            classNames = arrayfun(@(x) obj.get(x), keyNames, ...
+                "UniformOutput", false);
+            classNames = uncell(classNames);
+        end
+
+        function pkgClasses = getClassesByPackage(obj, pkgName, entityFlag)
+            
             arguments
                 obj             aod.infra.ClassRepository
                 pkgName         string
+                entityFlag      logical = true
             end
 
-            allClasses = obj.list();
+            warning('getClassesByPackage:OnlySuperClasses',...
+                'This only contains superclasses, not all subclasses');
+
+            allClasses = obj.list(entityFlag);
             pkgClasses = allClasses(startsWith(allClasses, pkgName));
         end
     end
