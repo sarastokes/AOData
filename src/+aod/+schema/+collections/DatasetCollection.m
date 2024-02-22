@@ -43,6 +43,23 @@ classdef DatasetCollection < aod.schema.collections.RecordCollection
         end
     end
 
+    methods (Access = {?aod.schema.Schema})
+        function setClassName(obj, className)
+            arguments
+                obj
+                className       string = ""
+            end
+
+            if className == ""
+                obj.className = [];
+                return
+            end
+
+            mustBeSubclass(className, "aod.core.Entity");
+            obj.className = className;
+        end
+    end
+
     methods (Static)
         function obj = populate(className)
             % Populate and create a DatasetManager from a class name

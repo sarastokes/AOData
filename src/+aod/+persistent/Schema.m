@@ -13,12 +13,14 @@ classdef Schema < aod.schema.Schema
 % By Sara Patterson, 2023 (AOData)
 % --------------------------------------------------------------------------
 
-    properties (Access = private)
+    properties (Access = protected)
         isPopulated       (1,1)       logical
     end
 
     methods
         function obj = Schema(parent)
+            import aod.schema.collections.*
+
             if isempty(parent)
                parent = [];
             end
@@ -26,12 +28,14 @@ classdef Schema < aod.schema.Schema
 
             obj.isPopulated = false;
 
-            obj.DatasetCollection = aod.schema.collections.DatasetCollection(obj.Parent);
-            obj.AttributeCollection = aod.schema.collections.AttributeCollection(obj.Parent);
-            obj.FileCollection = aod.schema.collections.FileCollection(obj.Parent);
+            obj.DatasetCollection = DatasetCollection(obj.Parent);
+            obj.AttributeCollection = AttributeCollection(obj.Parent);
+            obj.FileCollection = FileCollection(obj.Parent);
 
-            obj.entityType = obj.Parent.entityType;
-            obj.classUUID = obj.Parent.classUUID;
+            if ~isempty(obj.Parent)
+                obj.entityType = obj.Parent.entityType;
+                obj.classUUID = obj.Parent.classUUID;
+            end
         end
     end
 
@@ -73,9 +77,12 @@ classdef Schema < aod.schema.Schema
                 h5tools.util.buildPath(obj.Parent.hdfPath, 'Schema'));
             S = jsondecode(out);
 
-            obj.DatasetCollection = aod.h5.readSchemaCollection(S.Datasets, obj.DatasetCollection);
-            obj.AttributeCollection = aod.h5.readSchemaCollection(S.Attributes, obj.AttributeCollection);
-            obj.FileCollection = aod.h5.readSchemaCollection(S.Files, obj.FileCollection);
+            obj.DatasetCollection = aod.h5.readSchemaCollection(...
+                S.Datasets, obj.DatasetCollection);
+            obj.AttributeCollection = aod.h5.readSchemaCollection(...
+                S.Attributes, obj.AttributeCollection);
+            obj.FileCollection = aod.h5.readSchemaCollection(...
+                S.Files, obj.FileCollection);
 
             obj.isPopulated = true;
         end
